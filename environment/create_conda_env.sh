@@ -95,6 +95,7 @@ source activate $PYTHON_ENV_DIR
 pip install $MATPLOTLIB_BASEMAP_PKG
 pip install pynetcf
 pip install ascat
+pip install ismn
 pip install pybufr-ecmwf
 pip install c3s_sm
 pip install coverage
@@ -114,15 +115,6 @@ pip install --upgrade --force-reinstall netcdf4
 
 cd $TEMP_DIR
 
-
-sh -c "GIT_SSH_COMMAND='ssh -F $SSH_CONFIG' git clone -b master --single-branch git@git.eodc.eu:pbuttinger/ismn.git"
-cd ismn
-git checkout 40ee729f29cfd7e6a909d7ae9262f2ea1a410715
-rm requirements.txt
-touch requirements.txt
-python setup.py install
-cd $TEMP_DIR
-rm -rf ismn
 
 git clone -b master --single-branch https://github.com/TUW-GEO/pytesmo.git
 cd pytesmo
