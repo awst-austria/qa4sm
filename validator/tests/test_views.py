@@ -79,7 +79,7 @@ class TestViews(TransactionTestCase):
         self.testrun.output_file.name = str(self.testrun.id) + '/foobar.nc'
         self.testrun.save()
 
-        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help']
+        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about']
         self.parameter_views = ['result', 'ajax_get_dataset_options', 'ajax_delete_result']
         self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
