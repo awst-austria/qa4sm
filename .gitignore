@@ -1,0 +1,15 @@
+.project
+.pydevproject
+.settings/
+.idea
+Thumbs.db
+__pycache__
+.pytest_cache/
+.coverage
+coverage.xml
+db.sqlite3
+*.log
+valentina/settings_conf.py
+output
+junit.xml
+emails

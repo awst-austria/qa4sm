@@ -1,0 +1,5 @@
+<div class="custom-control custom-checkbox">
+    <input class="custom-control-input" id="{{ widget.attrs.id }}" value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}" type="checkbox" {% include "django/forms/widgets/attrs.html" %}>
+    <label class="custom-control-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
+    <span class="input-group-text fas fa-question-circle help-icon" title="{{ widget.help_text }}"></span>
+</div>

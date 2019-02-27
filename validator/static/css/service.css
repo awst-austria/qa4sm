@@ -1,0 +1,77 @@
+html {
+    font-size: 14px;
+}
+
+@media(min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.navbar {
+    background-color: #00AAE3;
+    color: #ffffff;
+}
+
+.nav-link {
+    color: #FFDB5C;
+}
+
+.nav-link:focus, .nav-link:hover {
+    color: #F8C100;
+}
+
+.navbar-btn {
+    color: #FFDB5C;
+    border-color: #FFDB5C;
+}
+
+.navbar-btn:hover, .navbar-btn:not(:disabled):not(.disabled):active {
+    color: #fff;
+    background-color: #F8C100;
+    border-color: #FFDB5C;
+}
+
+.navbar-btn-active {
+    color: #fff;
+    background-color: #F8C100;
+}
+
+.navbar-btn:focus, .navbar-btn:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 .2rem rgba(248, 193, 0, .5);
+}
+
+.nav-item:not(:last-child) {
+    margin-right: 1em;
+}
+
+.container {
+    max-width: 960px;
+}
+
+.card-body {
+    text-align: left;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.addon-w {
+    min-width: 5.5rem;
+}
+
+.figure-thumb {
+    max-width: 95%;
+    height: auto;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.indented {
+    margin-left: 1rem;
+}

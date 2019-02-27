@@ -1,0 +1,66 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block content %}
+
+<h1>System settings and status</h1>
+
+    <div>
+        <h2>Celery workers</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" style="white-space: nowrap; width: 1%;">Workers</th>
+                    <th scope="col" style="white-space: nowrap; width: 1%;">Active tasks</th>
+                    <th scope="col" style="white-space: nowrap; width: 1%;">Scheduled tasks</th>
+                    <th scope="col">Queues</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% for w in workers %}
+                <tr>
+                    <td>{{w.name}}</td>
+                    <td>{{w.active_tasks}}</td>
+                    <td>{{w.scheduled_tasks}}</td>
+                    <td>
+                        <ul>
+                        {% for queue in w.queues %}
+                            <li >{{queue}}</li>
+                        {% endfor %}
+                        </ul>
+                    </td>
+                    <td>-</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h2>Settings</h2>
+
+        <div class="container">
+            Maintenance mode:
+            <label class="radio-inline"><input type="radio" name="optradio" onclick="ajax_set_maintenance_mode('True')" {% if maintenance_mode is True %} checked {% endif %} >Enabled</label>
+            <label class="radio-inline"><input type="radio" name="optradio" onclick="ajax_set_maintenance_mode('False')" {% if maintenance_mode is False%} checked {% endif %}>Disabled</label>
+        </div>
+    </div>
+
+<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+
+<script>
+    function ajax_set_maintenance_mode(mode) {
+        var url = "{% url 'admin:system-settings' %}"
+
+        $.ajaxSetup({ headers : { "X-CSRFToken" : '{{csrf_token}}' } });
+
+        $.ajax({
+            url : url,
+            type : 'POST',
+            data : { "maintenance_mode" : mode }
+        });
+    }
+</script>
+{% endblock %}

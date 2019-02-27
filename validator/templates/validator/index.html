@@ -1,0 +1,167 @@
+{% extends 'validator/base.html' %}
+
+{% load static %}
+
+{% block additional_styles %}
+    <link href="{% static 'css/landing.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <main role="main">
+        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+                <li data-target="#myCarousel" data-slide-to="0" class=""></li>
+                <li data-target="#myCarousel" data-slide-to="1" class="active"></li>
+                <li data-target="#myCarousel" data-slide-to="2" class=""></li>
+            </ol>
+
+            <div class="carousel-inner">
+                <div class="carousel-caption">
+                    <div class="text mb-3">
+                        <h1>Quality Assurance for Soil Moisture</h1>
+                        <h3 class="carousel-desc">
+                            Validation of satellite soil moisture products
+                            <br />
+                            against in-situ and model reference data
+                        </h3>
+                    </div>
+
+                    {% if user.is_authenticated %}
+                        <p>
+                            <a style="width: 5em;" class="btn btn-lg btn-primary" href="{% url 'validation' %}" role="button">Try it</a>
+                        </p>
+                    {% else %}
+                        <p>
+                            <a style="width: 5em; margin-right: 1em" class="btn btn-lg btn-primary" href="{% url 'signup' %}" role="button">Sign up</a>
+                            <span class="carousel-desc">or</span>
+                            <a style="width: 5em; margin-left: 1em" class="btn btn-lg btn-primary" href="{% url 'login' %}" role="button">Log in</a>
+                        </p>
+                    {% endif %}
+
+                </div>
+                <div class="carousel-item">
+                    <img class="first-slide" src="{% static 'images/root-zone_soil_moisture_may_2016.jpg' %}">
+                    <div class="image-attribution">
+                        <a href="https://www.esa.int/spaceinimages/Images/2016/05/Root-zone_soil_moisture_May_2016">Image: ESA</a>
+                    </div>
+                </div>
+                <div class="carousel-item active">
+                    <img class="second-slide" src="{% static 'images/smos.jpg' %}">
+                    <div class="image-attribution">
+                        <a href="https://www.esa.int/spaceinimages/Images/2009/09/SMOS">Image: ESA</a>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img class="third-slide" src="{% static 'images/map_us_spearman.png' %}">
+                    <div class="image-attribution">
+                        <a href="https://qa4sm.eodc.eu/">Image: QA4SM</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-marketing">
+
+            <div class="overflow">
+                <a href="https://www.eodc.eu/"><img src="{% static 'images/logo_eodc.png' %}"></a>
+                <a href="https://www.awst.at/"><img src="{% static 'images/logo_awst.png' %}"></a>
+                <a href="https://www.geo.tuwien.ac.at/"><img src="{% static 'images/logo_tuwien_geo.png' %}"></a>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <div class="row featurette">
+                <div class="col-md-7">
+                    <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
+                    <p class="lead">
+                        The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
+                        <ul>
+                            <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the <a href="https://ismn.geo.tuwien.ac.at/">international soil moisture network</a></li>
+                            <li>A traceble and consistent methodology for all comparisons</li>
+                            <li>Various filtering and scaling options to assess the impact of these on the validation results</li>
+                            <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>
+                        </ul>
+                        The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality control of soil moisture data products and provider users with <b>traceable validation results</b>.
+                    </p>
+                    <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
+                </div>
+                <div class="col-md-5">
+                    <img class="scaled_image" id="workflow" src="{% static 'images/qa4am_overview_diagram.png' %}" alt="QA4SM Workflow">
+                </div>
+            </div>
+
+            <hr class="featurette-divider">
+
+            <div class="row" style="text-align: center;">
+                <div class="col-md-4">
+                    <h3 class="text-muted">Datasets and Settings</h3>
+                    <p>Allows specification of input datasets and settings for your validation</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="text-muted">Results</h3>
+                    <p>Provides a list of all validation results</p>
+                </div>
+                <div class="col-md-4">
+                    <h3 class="text-muted">Download and Visualize</h3>
+                    <p>Allows download of validation results in netCDF format and as graphics</p>
+                </div>
+            </div>
+            <div class="row" style="text-align: center;">
+                <div class="col-md-4">
+                    <img class="scaled_image img-screen" id="serviceScreenshot1" alt="Validate" src="{% static 'images/validate.png' %}">
+                </div>
+                <div class="col-md-4">
+                    <img class="scaled_image img-screen" id="serviceScreenshot2" alt="Results" src="{% static 'images/list.png' %}">
+                </div>
+                <div class="col-md-4">
+                    <img class="scaled_image img-screen" id="serviceScreenshot3" alt="Download and Visualize" src="{% static 'images/download.png' %}">
+                </div>
+            </div>
+
+            <div id="modalOverlay" class="modal">
+                <!-- The Close Button -->
+                <span class="modalClose">&times;</span>
+                <!-- Modal Content (The Image) -->
+                <img class="modal-content" id="modalImg">
+                <!-- Modal Caption (Image Text) -->
+                <div id="caption"></div>
+            </div>
+
+            <hr class="featurette-divider">
+        </div>
+    </main>
+
+    <footer class="container">
+        <p class="float-right"><a href="#">Back to top</a></p>
+        <p>
+            Created by <a href="https://www.geo.tuwien.ac.at/">TU Wien GEO</a> and <a href="https://www.awst.at/">AWST</a>.
+            Hosted on <a href="https://www.eodc.eu/">EODC</a>.
+        </p>
+    </footer>
+
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <script type="text/javascript">
+        var modalImg = $("#modalImg")[0]
+        var captionText = $("#caption")[0]
+        var modal = $("#modalOverlay")[0]
+
+        function fillModal(){
+            modal.style.display = "block";
+            modalImg.src = this.src;
+            captionText.innerHTML = this.alt;
+        }
+
+        $("#serviceScreenshot1").click(fillModal)
+        $("#serviceScreenshot2").click(fillModal)
+        $("#serviceScreenshot3").click(fillModal)
+        $("#workflow").click(fillModal)
+
+        $(".modalClose").click(function() {
+            modal.style.display = "none";
+        })
+    </script>
+
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends 'validator/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}">
+        {% csrf_token %}
+
+        {% with WIDGET_ERROR_CLASS='is-invalid' %}
+
+            {% if maintenance_mode is True  %}
+                <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+                    <h1 class="jumbotron-heading">Maintenance...</h1>
+                    <p class="lead text-muted">Sorry! Currently, you can't start new validations because we're doing maintenance on the service. Please come back later.</p>
+                </div>
+
+            {% else %}
+                <div class="container center-text">
+
+                    <div class="card-deck">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Data</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
+                                        </div>
+                                        {% render_field form.data_dataset class="custom-select d-block" %}
+                                    </div>
+                                    {% for error in form.data_dataset.errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text addon-w" id="data-addon2">Version</span>
+                                        </div>
+                                        {% render_field form.data_version class="custom-select d-block" %}
+                                    </div>
+                                    {% for error in form.data_version.errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text addon-w" id="data-addon3">Variable</span>
+                                        </div>
+                                        {% render_field form.data_variable class="custom-select d-block" %}
+                                    </div>
+                                    {% for error in form.data_variable.errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Reference</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text addon-w" id="ref-addon1">Dataset</span>
+                                        </div>
+                                        {% render_field form.ref_dataset class="custom-select d-block" %}
+                                    </div>
+                                    {% for error in form.ref_dataset.errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text addon-w" id="ref-addon2">Version</span>
+                                        </div>
+                                        {% render_field form.ref_version class="custom-select d-block" %}
+                                    </div>
+                                    {% for error in form.ref_version.errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text addon-w" id="ref-addon3">Variable</span>
+                                        </div>
+                                        {% render_field form.ref_variable class="custom-select d-block" %}
+                                    </div>
+                                    {% for error in form.ref_variable.errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-deck">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Validation Period</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="container">
+                                    <div class="row">
+
+                                        <div class="col-sm pl-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">From</span>
+                                                </div>
+                                                {% render_field form.interval_from class="custom-select d-block" %}
+                                            </div>
+                                            {% for error in form.interval_from.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="col-sm pr-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="scaling_addon2">To</span>
+                                                </div>
+                                                {% render_field form.interval_to class="custom-select d-block" %}
+                                            </div>
+                                            {% for error in form.interval_to.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-deck">
+
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Data Filtering</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="Only data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" id="{{form.filter_data.auto_id}}" name="{{form.filter_data.name}}"
+                                        {{ form.filter_data.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'data-filters')">
+                                    <label class="custom-control-label" for="{{form.filter_data.auto_id}}">{{form.filter_data.label}}</label>
+                                </div>
+
+                                <div id="data-filters" class="indented">
+                                    {{ form.data_filters }}
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Reference Filtering</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="Only reference data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" id="{{form.filter_ref.auto_id}}" name="{{form.filter_ref.name}}"
+                                        {{ form.filter_ref.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
+                                    <label class="custom-control-label" for="{{form.filter_ref.auto_id}}">{{form.filter_ref.label}}</label>
+                                </div>
+
+                                <div id="ref-filters" class="indented">
+                                    {{ form.ref_filters }}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-deck">
+
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Scaling</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="The data values will be scaled to the reference value range (or vice versa) using the selected method."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="container">
+                                    <div class="row">
+
+                                        <div class="col-sm pl-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">Scale</span>
+                                                </div>
+                                                {% render_field form.scaling_ref class="custom-select d-block" %}
+                                            </div>
+                                            {% for error in form.scaling_ref.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="col-sm pr-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
+                                                </div>
+                                                {% render_field form.scaling_method class="custom-select d-block" %}
+                                            </div>
+                                            {% for error in form.scaling_method.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text addon-w" id="tag-addon1">Name your validation</span>
+                        </div>
+                        {% render_field form.name_tag class="d-block form-control" %}
+                        <div class="input-group-append">
+                            <span class="input-group-text fas fa-question-circle" id="tag-addon2" title="You can optionally name the validation to make it easier to identify in your list of validations."></span>
+                        </div>
+                    </div>
+                    {% for error in form.name_tag.errors %}
+                        <div class="custom-invalid-feedback">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+
+
+                    <input class="btn btn-lg btn-primary mb-3" type="submit" value="&#9658; Validate">
+                </div>
+            {% endif %}
+        {% endwith %}
+    </form>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        function toggleFiltering(checkbox, groupid) {
+            filterboxes = $( '#' + groupid ).find('input:checkbox')
+            newDisabledValue = !checkbox.checked
+            for (f of filterboxes) {
+                f.disabled=newDisabledValue
+            }
+        }
+        // on page load, call once:
+        toggleFiltering($('#{{form.filter_data.auto_id}}')[0], 'data-filters')
+        toggleFiltering($('#{{form.filter_ref.auto_id}}')[0], 'ref-filters')
+    </script>
+
+    <script type="text/javascript">
+        function ajax_change_dataset() {
+            var url = $("#validation_form").attr("data-options-url");
+            var datasetId = $(this).val();
+            var widgetId = $(this).attr('id');
+            var datasetType = (widgetId == '{{ form.ref_dataset.auto_id }}') ? 'ref' : 'data';
+            $.ajax({
+                url: url,
+                data: { 'dataset_id': datasetId, 'dataset_type': datasetType },
+                success: function (return_data) {
+                    var version_widget = "#{{ form.data_version.auto_id }}";
+                    var variable_widget = "#{{ form.data_variable.auto_id }}";
+                    var filter_widget = "#data-filters";
+                    if (datasetType == 'ref') {
+                        version_widget = "#{{ form.ref_version.auto_id }}";
+                        variable_widget = "#{{ form.ref_variable.auto_id }}";
+                        var filter_widget = "#ref-filters";
+                    }
+                    $(version_widget).html(return_data['versions']);
+                    $(variable_widget).html(return_data['variables']);
+                    $(filter_widget).html(return_data['filters']);
+                }
+            });
+        }
+
+        $("#{{ form.data_dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload
+        $("#{{ form.ref_dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload
+    </script>
+{% endblock %}
+

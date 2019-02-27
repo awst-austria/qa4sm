@@ -1,0 +1,135 @@
+{% extends 'validator/base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% if val.end_time == None %}
+
+    <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+        <h1 class="jumbotron-heading">Validation Running...</h1>
+        <p class="lead text-muted">Your validation of {{ val.data_dataset }} data against {{ val.ref_dataset }} reference data is still running. You'll be notified via e-mail once it's finished.</p>
+        <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
+    </div>
+
+{% else %}
+
+    <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+        <h1 class="jumbotron-heading">Validation Results</h1>
+        <p class="lead text-muted">Your validation of {{ val.data_dataset }} data against {{ val.ref_dataset }} reference data has finished. You can see the results below.</p>
+    </div>
+
+
+    <div class="container center-text">
+        <div class="card-deck">
+            <div id="result_summary" class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Summary</h4>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        {% if val.name_tag %}
+                            <li>Validation name: {{ val.name_tag }}</li>
+                        {% endif %}
+                        <li>Compared '{{ val.data_variable.pretty_name }}' variable from {{ val.data_dataset }} dataset (version {{ val.data_version }}) to '{{ val.ref_variable.pretty_name }}' variable from {{ val.ref_dataset }} reference (version {{ val.ref_version }}).</li>
+                        <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
+                        <li>Processing took {{ run_time }} minutes (wall time).</li>
+                        {% if val.interval_from and val.interval_to %}
+                            <li>Validation period: {{ val.interval_from }} to {{ val.interval_to }}.</li>
+                        {% else %}
+                            <li>Validated over entire available timespan.</li>
+                        {% endif %}
+
+                        <li>Data filters:
+                            {% if not val.data_filters.all %}
+                                none
+                            {% else %}
+                                {% for filter in val.data_filters.all %} {{ filter.description }}; {% endfor %}
+                            {% endif %}
+                        </li>
+
+                        <li>Reference filters:
+                            {% if not val.ref_filters.all %}
+                                none
+                            {% else %}
+                                {% for filter in val.ref_filters.all %} {{ filter.description }}; {% endfor %}
+                            {% endif %}
+                        </li>
+
+                        <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>
+                            {% widthratio error_rate 1 100 %}% ({{ val.error_points }} of {{ val.total_points }}) of the processed locations (grid points) produced errors during calculation.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if val.output_file %}
+        <div class="container">
+            <div class="row">
+
+                <div class="col-md-6" id="id_graph_box">
+                    <div class="card mb-4 box-shadow">
+                        <a id="id_boxplot_link" href="#" class="center-text mt-3">
+                            <img id="id_boxplot" class="card-img-top figure-thumb" alt="#" title="#" src="#">
+                        </a>
+                        <div class="card-body">
+                            <p id="id_graph_legend" class="card-text">Description goes here</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="btn-group">
+                                    <select id="id_graph_variable" name="graph_variable" class="btn custom-select custom-select-sm d-block btn-select col-sm-5">
+                                        {% for key, label in metrics.items %}
+                                            <option value="{{ key }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';">Download all graphs</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6" id="netcdf_box">
+                    <div class="card mb-4 box-shadow">
+                        <a id="id_overview_link" href="/media/{{val.id}}/overview.png" class="center-text mt-3">
+                            <img id="id_overview" class="card-img-top figure-thumb" alt="NetCDF visualisation" src="/media/{{val.id}}/overview.png">
+                        </a>
+                        <div class="card-body">
+                            <p class="card-text">NetCDF file containing all calculated metrics.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_file.url }}';">Download results in NetCDF</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    function changePlot(metric) {
+        var labels = {{json_metrics|safe}}
+        var graph_url = '{{ val.output_dir_url }}' + 'boxplot_' + metric + '.png';
+        var graph_legend = 'Boxplot of the distribution of ' + labels[metric] + ' for all evaluated locations.'
+        $("#id_boxplot").attr("src", graph_url);
+        $("#id_boxplot").attr("alt", graph_legend);
+        $("#id_boxplot").attr("title", graph_legend);
+        $("#id_boxplot_link").attr("href", graph_url);
+        $("#id_graph_legend").html(graph_legend);
+    }
+
+    // change the plot when the selection is changed
+    $("#id_graph_variable").change(function () {
+        changePlot($(this).val())
+    });
+
+    // change the plot once the page loads
+    changePlot($("#id_graph_variable").val())
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+CREATE DATABASE valentina;
+CREATE USER django WITH PASSWORD 's3cr3t';
+ALTER ROLE django SET client_encoding TO 'utf8';
+ALTER ROLE django SET default_transaction_isolation TO 'read committed';
+ALTER ROLE django SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE valentina TO django;

@@ -1,0 +1,21 @@
+- Install postgres server and client.
+
+- Set password for postgres database user:
+$ su - postgres 
+psql
+\password
+Enter password: ...
+
+- Create new django user and database according to script.
+
+- If necessary, edit postgresql.conf and pg_hba.conf, e.g. in /var/lib/pgsql/data:
+  - For postgresql.conf:
+    comment in listen_addresses, port, set log_directory to /var/log/postgresql/ (create and give to postgres user), comment in log_filename, log_rotation_size and log_file_mode
+
+  - For pg_hba.conf:
+    Set method to "trust" for 127.0.0.1/32, ::1/128, and local
+
+- Afterwards, restart with: rcpostgresql restart
+
+- Install psycopg2 into python env with
+  pip install psycopg2

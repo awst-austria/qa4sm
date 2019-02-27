@@ -1,0 +1,78 @@
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.navbar {
+	background-color: #f6ffd4;
+}
+
+.container {
+  max-width: 960px;
+}
+
+.card-header {
+    padding: .5rem 1.25rem;
+    background-color: #f6ffd4;
+}
+
+.input-group-text {
+    background-color: #f6ffd4;
+}
+
+.card-body {
+	text-align: left;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.input-group > .custom-select:not(:last-child), .input-group > .form-control:not(:last-child) {
+    border-top-right-radius: .25rem;
+    border-bottom-right-radius: .25rem;
+}
+
+.addon-w {
+	min-width: 5.5rem;
+}
+
+.figure-thumb {
+	max-width: 15rem;
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.carousel {
+    margin-bottom: 4rem;
+}
+
+.carousel-item > img {
+  min-width: 100%;
+}
+
+.carousel-caption > h1 {
+	text-shadow: .15rem .15rem .15rem rgba(0, 0, 0, .5);
+}
+
+.carousel-desc {
+	text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, .5);
+}
+
+.image-attribution {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+}
+
+.image-attribution > a {
+    color: #ffffff;
+}

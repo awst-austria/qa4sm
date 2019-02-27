@@ -1,0 +1,8 @@
+[run]
+omit = 
+    settings_example_conf.py
+    */tests/*
+    */__init__.py
+    */migrations/*
+    */wsgi.py
+    manage.py

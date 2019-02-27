@@ -1,0 +1,58 @@
+{% extends 'validator/login_base.html' %}
+
+{% load static %}
+{% load widget_tweaks %}
+
+{% block additional_styles %}
+    <link href="{% static 'css/solid.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/fontawesome.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <form class="form-signin" method="post">
+        {% csrf_token %}
+
+        <h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
+
+        {% with WIDGET_ERROR_CLASS='is-invalid' %}
+            {% for field in form %}
+                {% if field != form.terms_consent %}
+                    <label for="{{ field.auto_id }}" class="sr-only">{{ field.label }}</label>
+                    <div class="input-group mb-3">
+                        {% if field|widget_type == 'lazyselect' %}
+                            {% render_field field class="form-control custom-select" title=field.help_text placeholder=field.label %}
+                        {% else %}
+                            {% render_field field class="form-control" title=field.help_text placeholder=field.label %}
+                        {% endif %}
+                        {% if field.help_text %}
+                            <div class="input-group-append">
+                                <span class="input-group-text fas fa-question-circle" id="basic-addon2" title="{{ field.help_text }}"></span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% if field.errors %}
+                        <p class="alert alert-danger small-padding">
+                        {% for error in field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                        </p>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            
+            <div class="mb-3">
+                <label for="{{ form.terms_consent.auto_id }}" class="sr-only">{{ form.terms_consent.label }}</label>
+                {% render_field form.terms_consent class="form-control" title=form.terms_consent.help_text style="width: initial; display: initial;" %}
+                I accept the <a href="{% url 'terms' %}">terms, conditions, and privacy policy</a>.
+                {% if field.errors %}
+                    <p class="alert alert-danger small-padding">
+                    {% for error in form.terms_consent.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
+        {% endwith %}
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+    </form>
+{% endblock %}

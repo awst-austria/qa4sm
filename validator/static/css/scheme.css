@@ -1,0 +1,111 @@
+.custom-invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+    color: rgb(255, 108, 92);
+    display: block;
+}
+
+.custom-select.is-invalid, .form-control.is-invalid {
+    border-color: rgb(255, 108, 92);
+}
+
+.custom-select.is-invalid:focus, .form-control.is-invalid:focus {
+    border-color: rgb(255, 108, 92);
+    box-shadow: 0 0 0 .2rem rgba(255, 108, 92, .25);
+}
+
+.custom-control-input.is-invalid ~ .custom-control-label {
+    color: rgb(255, 108, 92);
+}
+
+.alert-danger {
+    color: rgb(255, 108, 92);
+    background-color: rgba(255, 108, 92, .15);
+}
+
+a {
+    color: #4760E5;
+}
+
+a:hover {
+    color: #213FE0;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #4760E5;
+    border-color: #4760E5;
+}
+
+.btn-primary:hover, .btn-primary:not(:disabled):not(.disabled):active {
+    color: #fff;
+    background-color: #213FE0;
+    border-color: #213FE0;
+}
+
+.btn-primary.focus, .btn-primary:focus, .btn-primary:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .5);
+}
+
+.custom-checkbox .custom-control-input:checked~.custom-control-label::before {
+    background-color: rgb(71, 96, 229);
+}
+
+.custom-checkbox .custom-control-input:disabled:checked~.custom-control-label::before {
+    background-color: rgba(71, 96, 229,.5);
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow: 0 0 0 1px #fff, 0 0 0 .2rem rgba(71, 96, 229,.25);
+}
+
+.card-header {
+    padding: .5rem 1.25rem;
+    background-color: #00AAE3;
+    color: #ffffff;
+}
+
+.input-group-text {
+    background-color: #00AAE3;
+    color: #ffffff;
+}
+
+.btn-select {
+    color: #4760E5;
+    background-color: transparent;
+    border-color: #6c757d;
+    font-size: .875rem;
+    padding-top: .25rem;
+}
+
+.help-icon {
+    border: initial;
+    padding: initial;
+    display: inline-block;
+    float: right;
+    background-color: inherit;
+    color: inherit;
+}
+
+.card-header h4 {
+    display: inline-block;
+}
+
+.table .thead-dark th{
+    color:white;
+    background-color:#00AAE3;
+    border-color:white
+}
+
+.btn-action {
+    width: 2.4em;
+    margin-top: 0.05em;
+    margin-bottom: 0.05em;
+}
+
+.scaled_image {
+    display: inline-block;
+    max-width:100%;
+}

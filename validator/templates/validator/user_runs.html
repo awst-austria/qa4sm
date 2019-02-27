@@ -1,0 +1,98 @@
+{% extends 'validator/base.html' %}
+
+{% block content %}
+
+    <div class="container center-text">
+        <div class="card-deck">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">My Validations</h4>
+                </div>
+                <div class="card-body">
+
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Started</th>
+                            <th>Name</th>
+                            <th>Dataset</th>
+                            <th>Reference</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for valrun in myruns %}
+                        <tr id="result_row_{{ valrun.id }}">
+                            <td>{{ valrun.start_time }}</td>
+                            <td>{{ valrun.name_tag }}</td>
+                            <td>{{ valrun.data_dataset }} ({{ valrun.data_version }})</td>
+                            <td>{{ valrun.ref_dataset }} ({{ valrun.ref_version }})</td>
+                            <td {% if valrun.progress != 100 and valrun.end_time != null %}class="table-danger"{% endif %}>{% if valrun.progress == 0 and valrun.end_time == null %} Scheduled {% elif valrun.progress == 100 %} Done {% elif valrun.progress == -1 %} Aborted {% elif valrun.end_time != null %} ERROR {% else %}Running ({{ valrun.progress }}&#37;){% endif %}</td>
+                            <td>
+                                <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
+
+                                {% if valrun.end_time and valrun.output_file %}
+                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
+                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
+                                {% endif %}
+
+                                {% if valrun.end_time %}
+                                    <button class="btn btn-sm btn-primary btn-action" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}')"><span class="fas fa-times"></span></button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if myruns.has_other_pages %}
+                    <ul class="pagination">
+                    {% if myruns.has_previous %}
+                        <li><a href="?page={{ myruns.previous_page_number }}">&laquo;</a></li>
+                    {% else %}
+                        <li class="disabled"><span>&laquo;</span></li>
+                    {% endif %}
+                    {% for i in myruns.paginator.page_range %}
+                        {% if myruns.number == i %}
+                            <li class="active"><span>{{ i }}&nbsp;<span class="sr-only">(current)</span> </span> </li>
+                        {% else %}
+                            <li><a href="?page={{ i }}">{{ i }}&nbsp;</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if myruns.has_next %}
+                        <li><a href="?page={{ myruns.next_page_number }}">&raquo;</a></li>
+                    {% else %}
+                        <li class="disabled"><span>&raquo;</span></li>
+                    {% endif %}
+                    </ul>
+                {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        function ajax_delete_result(result_id) {
+        	if (!confirm('Do you really want to delete the result?')) {
+           		return;
+       		}
+            var url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000',result_id);
+
+            $.ajaxSetup({
+  				headers: { "X-CSRFToken": '{{csrf_token}}' }
+			});
+
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                success: function (return_data) {
+                    $('#result_row_'+result_id).remove()
+                }
+            });
+        }
+    </script>
+{% endblock %}
