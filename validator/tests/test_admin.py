@@ -119,6 +119,7 @@ class TestAdmin(TestCase):
 
         ## check the contents of the queue page via its "context" variable
         assert 'workers' in response.context
+        print(response.context['workers'])
         workers = response.context['workers'][0]
         print(workers)
 
