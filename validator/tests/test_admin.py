@@ -1,9 +1,13 @@
+import time
+
+from celery.app import shared_task
+from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
-
 from django.test import TestCase
 from django.urls.base import reverse
 
+from valentina.celery import app
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetVersion
@@ -12,9 +16,13 @@ from validator.models import ValidationRun
 from validator.validation import globals
 
 
+@shared_task(bind=True)
+def execute_test_job(self, parameter):
+    print(parameter)
+    time.sleep(10)
+
 ## See also: https://stackoverflow.com/a/11887308/
 class TestAdmin(TestCase):
-
     def setUp(self):
         self.user_credentials = {
             'username': 'testuser',
@@ -89,6 +97,41 @@ class TestAdmin(TestCase):
             self.client.login(**self.admin_credentials)
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
+
+    def test_queue_page(self):
+        ## we can only run this test if we have a celery env set up
+        if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER') and settings.CELERY_TASK_ALWAYS_EAGER):
+            return
+
+        queue_name = 'unittestqueue'
+
+        url = reverse('admin:system-settings')
+
+        ## add a queue so that the queue page has something to show
+        app.control.add_consumer(queue_name, reply=True)
+        ## start a job so that it can be listed on the queue page
+        execute_test_job.apply_async(args=['hello'], queue=queue_name)
+
+        ## make sure the queue page works
+        self.client.login(**self.admin_credentials)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        ## check the contents of the queue page via its "context" variable
+        assert 'workers' in response.context
+        workers = response.context['workers'][0]
+        print(workers)
+
+        assert workers['name'] is not None
+        assert workers['queues'] is not None
+        assert workers['active_tasks'] is not None
+        assert workers['scheduled_tasks'] is not None
+
+        ## the queue we added must show on the page
+        assert queue_name in workers['queues']
+
+        ## the job we started should be listed as active
+#         assert workers['active_tasks'] > 0
 
     def test_maintenance_mode_switching(self):
         # store state to revert back at the end of the test
