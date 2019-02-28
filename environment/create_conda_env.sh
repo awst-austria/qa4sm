@@ -125,7 +125,7 @@ cd $TEMP_DIR
 rm -rf pytesmo
 
 #Clone the  web validation service repo
-sh -c "GIT_SSH_COMMAND='ssh -F $SSH_CONFIG' git clone -b master --single-branch git@git.eodc.eu:QA4SM/web-validation-service.git \"$INSTALL_DIR\""
+git clone https://github.com/awst-austria/qa4sm.git $INSTALL_DIR
 
 # clean up
 rm -Rf $TEMP_DIR
