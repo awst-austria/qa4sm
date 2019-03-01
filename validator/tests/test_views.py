@@ -7,20 +7,20 @@ from time import sleep
 import zipfile
 
 from dateutil.tz import tzlocal
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from validator.models.settings import Settings
 User = get_user_model()
-
+from django.core import mail
 from django.test.testcases import TransactionTestCase
 from django.urls.base import reverse
 import pytest
 from pytz import UTC
 from pytz import utc
 
+from valentina.settings import EMAIL_FROM
 from validator.models import ValidationRun
 from validator.models.dataset import Dataset
 from validator.models.filter import DataFilter
+from validator.models.settings import Settings
 from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from validator.urls import urlpatterns
@@ -55,7 +55,8 @@ class TestViews(TransactionTestCase):
         # second test user
         self.credentials2 = {
             'username': 'seconduser',
-            'password': 'shush!'}
+            'password': 'shush!',
+            'email': 'forgetful@test.com'}
 
         try:
             self.testuser = User.objects.get(username=self.credentials['username'])
@@ -79,8 +80,8 @@ class TestViews(TransactionTestCase):
         self.testrun.output_file.name = str(self.testrun.id) + '/foobar.nc'
         self.testrun.save()
 
-        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about']
-        self.parameter_views = ['result', 'ajax_get_dataset_options', 'ajax_delete_result']
+        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', ]
+        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm']
         self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
     ## Ensure that anonymous access is prevented for private pages
@@ -109,6 +110,7 @@ class TestViews(TransactionTestCase):
     def test_public_views(self):
         for pv in self.public_views:
             url = reverse(pv)
+            self.__logger.debug("Testing {}".format(url))
             response = self.client.get(url, follow=True)
             self.assertEqual(response.status_code, 200)
 
@@ -377,3 +379,70 @@ class TestViews(TransactionTestCase):
             }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 200)
+
+    ## simulate workflow for password reset
+    def test_password_reset(self):
+        ## pattern to get the password reset link from the email
+        reset_url_pattern = reverse('password_reset_confirm', kwargs={'uidb64': 'DUMMY', 'token': 'DUMMY'})
+        reset_url_pattern = reset_url_pattern.replace('DUMMY', '([^/]+)')
+
+        orig_password = self.credentials2['password']
+
+        ## go to the password reset page
+        url = reverse('password_reset')
+        response = self.client.get(url, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        ## send it the user's email
+        response = self.client.post(url, {'email': self.credentials2['email'], })
+        self.assertRedirects(response, reverse('password_reset_done'))
+
+        ## make sure the right email got sent with correct details
+        sent_mail = mail.outbox[0]
+        assert sent_mail
+        assert sent_mail.subject
+        assert sent_mail.body
+        assert sent_mail.from_email == EMAIL_FROM
+        assert self.credentials2['email'] in sent_mail.to
+        assert self.credentials2['username'] in sent_mail.body
+
+        ## check that the email contains a confirmation link with userid and token
+        urls = regex_find('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sent_mail.body)
+        userid = None
+        token = None
+        for u in urls:
+            rmatch = regex_find(reset_url_pattern, u)
+            if rmatch:
+                userid = rmatch[0][0]
+                token = rmatch[0][1]
+
+        assert userid
+        assert token
+
+        ## now try to use the link in the email several times - should only be successful the first time
+        for i in range(1, 3):
+            ## go to the confirmation link given in the email
+            url = reverse('password_reset_confirm', kwargs={'uidb64': userid, 'token': token})
+            response = self.client.get(url)
+
+            ## first time
+            if i == 1:
+                self.assertEqual(response.status_code, 302)
+                ## follow redirect and enter new password - we should be redirected to password_reset_complete
+                url = response.url
+                self.credentials2['password'] = '1superPassword!!'
+                response = self.client.post(url, {'new_password1': self.credentials2['password'], 'new_password2': self.credentials2['password'],})
+                self.assertRedirects(response, reverse('password_reset_complete'))
+            ## second time
+            else:
+                ## no redirect and message that reset wasn't successful
+                self.assertEqual(response.status_code, 200)
+                assert response.context['title'] == 'Password reset unsuccessful'
+
+        ## make sure we can log in with the new password
+        login_success = self.client.login(**self.credentials2)
+        assert login_success
+
+        ## make sure we can't log in with the old password
+        login_success = self.client.login(**{'username': self.credentials2['username'], 'password': orig_password })
+        assert not login_success

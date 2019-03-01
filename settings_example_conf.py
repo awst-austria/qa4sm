@@ -36,6 +36,7 @@ EMAIL_HOST_USER = 'qa4sm@awst.at'
 EMAIL_FROM = 'qa4sm@awst.at'
 EMAIL_USE_TLS = 'yes'
 EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = 'qa4sm@awst.at'
 
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 #EMAIL_FILE_PATH = '/tmp/app-messages'

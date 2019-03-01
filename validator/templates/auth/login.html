@@ -1,9 +1,10 @@
-{% extends 'validator/login_base.html' %}
+{% extends 'auth/login_base.html' %}
 {% load widget_tweaks %}
 
 {% block content %}
 <form class="form-signin" method="post" action="{% url 'login' %}?next={{next}}">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
 
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
 
@@ -28,6 +29,7 @@
     {% endwith %}
 
     <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-    <input type="hidden" name="next" value="{{ next }}" />
+
+    <div class="mt-3"><a href="{% url 'password_reset' %}" class="mt-5">Forgotten your password?</a></div>
 </form>
 {% endblock %}
