@@ -407,7 +407,7 @@ class TestViews(TransactionTestCase):
         assert self.credentials2['username'] in sent_mail.body
 
         ## check that the email contains a confirmation link with userid and token
-        urls = regex_find('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sent_mail.body)
+        urls = regex_find(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sent_mail.body)
         userid = None
         token = None
         for u in urls:
