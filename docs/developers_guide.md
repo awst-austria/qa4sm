@@ -13,7 +13,7 @@
 
 ## How to set up development environment
 
-Note: The environment setup is automated for the production environment in `[git_repos]/dockerize/create_conda_env.sh`. This guide describes how to do a similar setup on your development machine. If you suspect this guide is not up to date, check the script and see if it has steps that may be missing here.
+Note: The environment setup is automated for the production environment in [environment/create_conda_env.sh]. This guide describes how to do a similar setup on your development machine. If you suspect this guide is not up to date, check the script and see if it has steps that may be missing here.
 
 If you've got a Linux system, you can also try to run the `create_conda_env.sh` script on your system to create the conda environment. You've got to set 4 shell variables before running the script and point them to 4 directories on your system:
 
@@ -114,7 +114,7 @@ Set password for database root user:
 
 Create webapp database and user: 
 
-In the qsql shell, run the commands from `[gitrepos]/web-validation-service/valentina/sql/create_postgres_db.txt`
+In the qsql shell, run the commands from `[gitrepos]/valentina/sql/create_postgres_db.txt`
 
     CREATE DATABASE valentina;
     CREATE USER django WITH PASSWORD 's3cr3t';
@@ -125,7 +125,7 @@ In the qsql shell, run the commands from `[gitrepos]/web-validation-service/vale
 
 ### Create conda Python virtual environment
 
-    conda create --yes -n valentina -c conda-forge python=3.6 numpy scipy pandas netCDF4 cython pytest pip matplotlib pyproj django pyresample pygrib
+    conda create --yes -n valentina -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
     source activate valentina
 
 Download [matplotlib basemap](https://github.com/matplotlib/basemap/releases) and install:
@@ -137,6 +137,7 @@ Install other dependencies into Python environment with pip:
 
     pip install pynetcf
     pip install ascat
+    pip install ismn
     pip install pybufr-ecmwf
     pip install c3s_sm
     pip install coverage
@@ -146,27 +147,20 @@ Install other dependencies into Python environment with pip:
     pip install psycopg2-binary
     pip install pytest-cov
     pip install pytest-mpl
-    pip install celery
+    pip install celery==4.1.1
     pip install celery[redis]
     pip install gldas
     pip install smap-io
     pip install django-countries
+    pip install cartopy
+    pip install --upgrade --force-reinstall netcdf4
 
-Install dependencies that are not available via pip (e.g. private TU libraries). You may need an EODC Gitlab account to get them. Use a temporary directory to check out the source and install it.
+Install dependencies that are not available via pip (e.g. unreleased TU libraries). Use a temporary directory to check out the source and install it.
 
     export TMP_DIR="/tmp/valentina_lib_install"
     mkdir -p $TMPDIR
 
-    # ismn
-    git clone -b master --single-branch git@git.eodc.eu:pbuttinger/ismn.git
-    cd ismn
-    rm requirements.txt # ignore requirements
-    touch requirements.txt
-    python setup.py install
-    cd $TMP_DIR
-    rm -rf ismn
-
-    # latest pytesmo trunk
+    # install latest pytesmo trunk
     git clone -b master --single-branch https://github.com/TUW-GEO/pytesmo.git
     cd pytesmo
     rm requirements.txt # ignore requirements
@@ -177,22 +171,24 @@ Install dependencies that are not available via pip (e.g. private TU libraries).
 
 ### Get source code
 
-Check out the QA4SM source code from [EODC Gitlab](https://git.eodc.eu/QA4SM/web-validation-service) to create your sandbox:
+Check out the QA4SM source code from [GitHub](https://github.com/awst-austria/qa4sm) to create your sandbox:
 
-    git clone git@git.eodc.eu:QA4SM/web-validation-service.git
+    git clone git@github.com:awst-austria/qa4sm.git
 
 ### Create webapp configuration file
 
-    cd web-validation-service/valentina
+    cd valentina
     ./init_config.sh dev
 
-This should create `web-validation-service/valentina/valentina/settings_conf.py` from the template in `web-validation-service/valentina/settings_example_conf.py`.
+This should create `valentina/settings_conf.py` from the template in `settings_example_conf.py`.
 
-Adapt the former to match your local configuration:
+If the `init_conig.sh` doesn't work for you, copy `settings_example_conf.py` into the `valentina` subfolder yourself and set the variables appropriately.
+
+Adapt the `valentina/settings_conf.py` to match your local configuration:
 
 - Set `DATA_FOLDER` to the folder where you keep the (geo)data, see the datasets folder section for more info.
 - If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
-- Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `web-validation-service/valentina/valentina/settings.py` and ideally should be left unchanged.
+- Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
 
 ### Datasets folder
@@ -221,7 +217,7 @@ The folders are used in `validator.validation.readers.create_reader` to create t
 
 Go to webapp folder (if you haven't done so already):
 
-    cd web-validation-service/valentina
+    cd valentina
 
 Set up Django app:
 
@@ -247,7 +243,7 @@ If you've installed those services on your machine, you can (re)start them with:
 
 Start a celery worker with the shell script:
 
-`web-validation-service/valentina/start_celery_worker`
+`valentina/start_celery_worker`
 
 ### Run Django development server
 
@@ -259,21 +255,23 @@ Now you should be able to see the landing page. You can log in with the admin us
 
 You can access the webapp's admin panel you appending "admin/" to the URL, e.g. <http://127.0.0.1:8000/admin/>. There you can create more users by clicking "Add" next to the "Users" row.
 
-Depending the `LOG_FILE` in your `settings_conf.py` file, the webapp's logfile should be written to `web-validation-service/valentina/valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
+Depending the `LOG_FILE` in your `settings_conf.py` file, the webapp's logfile should be written to `valentina/valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
 
 ### Integrated Development Envionment
 
-It's up you which Python IDE you want to use for development. 
+It's up you which Python IDE you want to use for development.
 
 We use Eclipse with PyDev. Since Django templates consist of HTML and JavaScript, the [Eclipse IDE for JavaScript and Web Developers](https://www.eclipse.org/downloads/packages/release/2018-09/r/eclipse-ide-javascript-and-web-developers) can be helpful. If you want to use Eclipse, you should probably check what the latest version is and use that.
 
 To install PyDev, use Eclipse's `Help > Install New Software...` menu and the PyDev update URL `http://www.pydev.org/updates`. [PyDev install manual](http://www.pydev.org/manual_101_install.html).
 
-To add the webapp project to Eclipse, use `File > Import > General > Existing Projects into Workspace` and set the root directory to `web-validation-service/valentina` folder.
+To add the webapp project to Eclipse, use `File > Import > General > Existing Projects into Workspace` and set the root directory to `valentina` folder.
+
+In case you don't want to use Eclipse, one alternative is [PyCharm](https://www.jetbrains.com/pycharm/).
 
 ### Webapp walkthrough
 
-The code for the webapp lives in two submodules of the `web-validation-service/valentina` folder: `valentina` and `validator`. The first contains the Django "project", the second the Django "app" - [see here for the Django tutorial that explains projects and apps.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
+The code for the webapp lives in two submodules of the `valentina` folder: `valentina` and `validator`. The first contains the Django "project", the second the Django "app" - [see here for the Django tutorial that explains projects and apps.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
 
 The `valentina` module exists to conform to the Django structure. It contains mainly configuration in `settings.py`, `settings_conf.py`, `celery.py`. Most of the interesting stuff is happening in the `validator` module.
 
@@ -283,7 +281,8 @@ Module|Functionality
 --- | ---
 admin|Customisations of the webapp’s admin pages, e.g. controls to activate new users.
 formats|Changes to date formats so that most international date formats are accepted by webapp.
-forms|Python representations of the forms used by the main webapp (not admin forms, those are in admin). HTML templates are in templates.
+forms|Python representations of the forms used by the main webapp (not admin forms, those are in admin). HTML templates are in templates, see below.
+management| Customised Django commands that can be passed to `manage.py` on the command line, similar to the standard `runserver` or `makemigration`.
 migrations|Django migrations that create and update the app’s database. If you want to learn about migrations, [see here](https://docs.djangoproject.com/en/2.1/topics/migrations/).
 models|Domain objects of the app. Django will automatically create database tables and rows for these classes and instances (if used correctly).
 static|Static files the webapp delivers to the client as they are, such as JavaScript, CSS, fonts, and image files.
@@ -300,9 +299,13 @@ urls.py|Django specific file containing the mapping of URLs to views.
 
 ### How to run integration / unit tests
 
-Go to `web-validation-service/valentina` and run
+Go to `valentina` and run
 
     pytest
+
+Congratulations, your development environment is now set up and you can develop ;-)
+
+## Tips and Tricks
 
 ### Django migration tricks
 
