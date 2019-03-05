@@ -15,14 +15,24 @@ from validator.validation.globals import METRICS
 
 __logger = logging.getLogger(__name__)
 
-def generate_graph(validation_run, outfolder, variable, label):
+_metric_value_ranges = {
+    'R' : [-1, 1],
+    'p_R' : [0, 1],
+    'rho' : [-1, 1],
+    'p_rho' : [0, 1],
+    'RMSD' : [0, None],
+    'BIAS' : [None, None],
+    'n_obs' : [0, None],
+    'urmsd' : [0, None],
+    'RSS' : [0, None],
+    }
+
+
+def generate_boxplot(validation_run, outfolder, variable, label, values):
     if not validation_run.output_file:
         return None
 
     filename = path.join(outfolder, 'boxplot_{}.png'.format(variable))
-
-    with netCDF4.Dataset(validation_run.output_file.path) as ds:
-        values = ds.variables[variable][:]
 
     values = [x for x in values if (np.isnan(x) != True)]
 
@@ -42,14 +52,13 @@ def generate_graph(validation_run, outfolder, variable, label):
 
     return filename
 
-def generate_overview_map(validation_run, outfolder):
+def generate_overview_map(validation_run, outfolder, variable, label, values):
     if not validation_run.output_file:
         return None
 
-    filename = path.join(outfolder, 'overview.png')
+    filename = path.join(outfolder, 'overview_{}.png'.format(variable))
 
     with netCDF4.Dataset(validation_run.output_file.path) as ds:
-        values = ds.variables['R'][:]
         lats = ds.variables['lat'][:]
         lons = ds.variables['lon'][:]
 
@@ -58,9 +67,12 @@ def generate_overview_map(validation_run, outfolder):
 
     the_plot = None
 
+    v_min = _metric_value_ranges[variable][0]
+    v_max = _metric_value_ranges[variable][1]
+
     # do scatter plot for ISMN and heatmap for everything else
     if(validation_run.ref_dataset.short_name == globals.ISMN):
-        the_plot = plt.scatter(lons, lats, c=values, cmap=cm, s=3, vmin=-1.0, vmax=1.0)
+        the_plot = plt.scatter(lons, lats, c=values, cmap=cm, s=3, vmin=v_min, vmax=v_max)
 
     else:
         values_alt = np.empty((720, 1440,))
@@ -74,11 +86,15 @@ def generate_overview_map(validation_run, outfolder):
             values_alt[nearest_lat_idx][nearest_lon_idx] = values[i]
 
         extent = [-180.0, 180.0, -90.0, 90.0]
-        the_plot = plt.imshow(values_alt, cmap=cm, interpolation='none', extent=extent, vmin=-1.0, vmax=1.0)
+        the_plot = plt.imshow(values_alt, cmap=cm, interpolation='none', extent=extent, vmin=v_min, vmax=v_max)
 
-    plt.colorbar(the_plot, orientation='horizontal', label="Pearson's r", pad=0.05)
+    plt.colorbar(the_plot, orientation='horizontal', label=label, pad=0.05)
 
-    plt.title("Pearson's r")
+    plt.title('Validation {} ({}) vs {} ({})'.format(
+        validation_run.data_dataset.pretty_name,
+        validation_run.data_version.pretty_name,
+        validation_run.ref_dataset.pretty_name,
+        validation_run.ref_version.pretty_name))
     ax.coastlines()
     ax.add_feature(cfeature.STATES, linewidth=0.5)
     ax.add_feature(cfeature.BORDERS, linewidth=0.5)
@@ -93,9 +109,13 @@ def generate_all_graphs(validation_run, outfolder):
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
     with ZipFile(zipfilename, 'w') as myzip:
         for metric in METRICS:
-            fn = generate_graph(validation_run, outfolder, metric, METRICS[metric])
+            with netCDF4.Dataset(validation_run.output_file.path) as ds:
+                values = ds.variables[metric][:]
+
+            fn = generate_boxplot(validation_run, outfolder, metric, METRICS[metric], values)
             arcname = path.basename(fn)
             myzip.write(fn, arcname=arcname)
-        fn=generate_overview_map(validation_run, outfolder)
-        arcname = path.basename(fn)
-        myzip.write(fn, arcname=arcname)
+
+            fn=generate_overview_map(validation_run, outfolder, metric, METRICS[metric], values)
+            arcname = path.basename(fn)
+            myzip.write(fn, arcname=arcname)

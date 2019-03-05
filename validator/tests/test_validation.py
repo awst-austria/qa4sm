@@ -6,10 +6,10 @@ from zipfile import ZipFile
 from dateutil.tz import tzlocal
 from django.conf import settings
 from django.contrib.auth import get_user_model
+User = get_user_model()
 from validator.validation.graphics import generate_all_graphs
 from os import path
 import shutil
-User = get_user_model()
 from django.test import TestCase
 import netCDF4
 import pytest
@@ -409,8 +409,8 @@ class TestValidation(TestCase):
 
     def test_generate_graphs_from_no_file(self):
         run = ValidationRun()
-        val.generate_graph(run, '/nosuchdir/', 'R', 'The non-existing graph')
-        val.generate_overview_map(run, '/nosuchdir/')
+        val.generate_boxplot(run, '/nosuchdir/', 'R', 'The non-existing graph')
+        val.generate_overview_map(run, '/nosuchdir/', 'R', 'The non-existing graph')
 
 #     @pytest.mark.long_running
     def test_generate_graphs(self):
