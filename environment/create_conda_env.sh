@@ -113,7 +113,7 @@ rm -rf pytesmo
 
 #Clone the  web validation service repo
 echo "Checking out code to $INSTALL_DIR"
-git clone -b master --single-branch https://github.com/awst-austria/qa4sm.git $INSTALL_DIR
+git clone -b master --single-branch https://github.com/awst-austria/qa4sm.git "$INSTALL_DIR"
 
 # clean up
 rm -Rf $TEMP_DIR
