@@ -3,9 +3,6 @@
 # Script that creates the conda/python environment for the web validation service and
 # installs the service.
 #
-# Before running it you need to copy a private ssh key next to into the same folder 
-# which can be used to clone the necessary repositories.
-#
 #Celery requires RabbitMQ and Redis installed locally. Since the Reddis package in the 
 # debain repository seems to be broken, Redis and RabitMQ has to be installed manually.
 
@@ -40,7 +37,6 @@ TMP_BASE_DIR="/tmp/"
 TEMP_DIR=$(mktemp -d -p $TMP_BASE_DIR -t "web-val.XXXXXXXX")
 chmod 700 $TEMP_DIR
 echo "Tmp dir: $TEMP_DIR"
-SSH_CONFIG="$TEMP_DIR/ssh_config"
 
 # clean up
 if [[ -e "$INSTALL_DIR" ]]; then
@@ -51,15 +47,6 @@ if [[ -e "$PYTHON_ENV_DIR" ]]; then
 fi
 
 mkdir "$INSTALL_DIR"
-
-# prepare ssh config file for git
-echo -e "Host github.com\n\tStrictHostKeyChecking no\n\tIdentityFile $TEMP_DIR/id_rsa\n" > $SSH_CONFIG
-echo -e "Host git.eodc.eu\n\tStrictHostKeyChecking no\n\tIdentityFile $TEMP_DIR/id_rsa\n" >> $SSH_CONFIG
-
-# copy ssh key
-touch $TEMP_DIR/id_rsa
-chmod 600 $TEMP_DIR/id_rsa
-cp "$THIS_SCRIPT_DIR/id_rsa" "$TEMP_DIR/id_rsa"
 
 # download basemap only if not present
 if [ ! -e "$MATPLOTLIB_BASEMAP_PKG" ]; then
