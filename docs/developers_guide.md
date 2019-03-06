@@ -22,7 +22,7 @@ If you've got a Linux system, you can also try to run the `create_conda_env.sh` 
     export TOOL_DIR="<tools_dir>"
     export PYTHON_ENV_DIR="<pytenv_dir>"
 
-Where `<install_dir>` is the place you want to put the webapp git sandbox, `<conda_dir>` is the place you want to install miniconda, `<tools_dir>` is the place you want to store the downloaded install packages of conda and basemap, and `<pytenv_dir>` is the place you want to put the conda environment for the webapp.
+Where `<install_dir>` is the place you want to put the webapp git sandbox, `<conda_dir>` is the place you want to install miniconda, `<tools_dir>` is the place you want to store the downloaded install package of conda, and `<pytenv_dir>` is the place you want to put the conda environment for the webapp.
 
 ### Install required development tools
 
@@ -127,11 +127,6 @@ In the qsql shell, run the commands from `[gitrepos]/valentina/sql/create_postgr
 
     conda create --yes -n valentina -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
     source activate valentina
-
-Download [matplotlib basemap](https://github.com/matplotlib/basemap/releases) and install:
-
-    curl -Lo mpl_basemap.tar.gz https://github.com/matplotlib/basemap/archive/v1.1.0.tar.gz
-    pip install mpl_basemap.tar.gz
 
 Install other dependencies into Python environment with pip:
 

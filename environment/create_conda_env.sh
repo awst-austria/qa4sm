@@ -27,10 +27,8 @@ echo "$INSTALL_DIR, $MINICONDA_PATH, $TOOL_DIR, $PYTHON_ENV_DIR, $THIS_SCRIPT_DI
 
 # external software
 MINICONDA_URL="https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-MATPLOTLIB_BASEMAP_URL="https://github.com/matplotlib/basemap/archive/v1.1.0.tar.gz"
 
 MINICONDA_PKG="$TOOL_DIR/miniconda.sh"
-MATPLOTLIB_BASEMAP_PKG="$TOOL_DIR/mpl_basemap.tar.gz"
 
 # tmp dir structure
 TMP_BASE_DIR="/tmp/"
@@ -47,12 +45,6 @@ if [[ -e "$PYTHON_ENV_DIR" ]]; then
 fi
 
 mkdir "$INSTALL_DIR"
-
-# download basemap only if not present
-if [ ! -e "$MATPLOTLIB_BASEMAP_PKG" ]; then
-    echo "Downloading matplotlib basemap"
-    curl -L -s -o $MATPLOTLIB_BASEMAP_PKG $MATPLOTLIB_BASEMAP_URL
-fi
 
 #Install conda and create virtual env.
 echo "Downloading miniconda installer"
@@ -79,7 +71,6 @@ export PATH="$MINICONDA_PATH/bin:$PATH"
 conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
 source activate $PYTHON_ENV_DIR
 
-pip install $MATPLOTLIB_BASEMAP_PKG
 pip install pynetcf
 pip install ascat
 pip install ismn

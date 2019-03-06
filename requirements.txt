@@ -6,7 +6,6 @@ cython
 pytest
 matplotlib
 pyproj
-basemap>=1.1.0
 django>=2.1
 pyresample
 pynetcf
