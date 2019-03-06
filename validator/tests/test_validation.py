@@ -142,8 +142,9 @@ class TestValidation(TestCase):
             filename = 'boxplot_{}.png'.format(metric)
             filename = os.path.join(outdir, filename)
             assert os.path.isfile(filename)
-        filename = os.path.join(outdir, 'overview.png')
-        assert os.path.isfile(filename)
+            filename2 = 'overview_{}.png'.format(metric)
+            filename2 = os.path.join(outdir, filename2)
+            assert os.path.isfile(filename2)
 
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -409,8 +410,8 @@ class TestValidation(TestCase):
 
     def test_generate_graphs_from_no_file(self):
         run = ValidationRun()
-        val.generate_boxplot(run, '/nosuchdir/', 'R', 'The non-existing graph')
-        val.generate_overview_map(run, '/nosuchdir/', 'R', 'The non-existing graph')
+        val.generate_boxplot(run, '/nosuchdir/', 'R', 'The non-existing graph', None)
+        val.generate_overview_map(run, '/nosuchdir/', 'R', 'The non-existing graph', None)
 
 #     @pytest.mark.long_running
     def test_generate_graphs(self):
