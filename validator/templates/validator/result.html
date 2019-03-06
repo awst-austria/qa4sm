@@ -66,40 +66,38 @@
 
     {% if val.output_file %}
         <div class="container">
-            <div class="row">
-
-                <div class="col-md-6" id="id_graph_box">
-                    <div class="card mb-4 box-shadow">
-                        <a id="id_boxplot_link" href="#" class="center-text mt-3">
-                            <img id="id_boxplot" class="card-img-top figure-thumb" alt="#" title="#" src="#">
-                        </a>
-                        <div class="card-body">
-                            <p id="id_graph_legend" class="card-text">Description goes here</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <select id="id_graph_variable" name="graph_variable" class="btn custom-select custom-select-sm d-block btn-select col-sm-5">
-                                        {% for key, label in metrics.items %}
-                                            <option value="{{ key }}">{{ label }}</option>
-                                        {% endfor %}
-                                    </select>
-
-                                    <button type="button" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';">Download all graphs</button>
-                                </div>
-                            </div>
-                        </div>
+            <div class="card-deck">
+                <div id="result_files" class="card mb-4 box-shadow">
+                    <div class="card-header center-text">
+                        <h4 class="my-0 font-weight-normal">Result files</h4>
                     </div>
-                </div>
 
-                <div class="col-md-6" id="netcdf_box">
-                    <div class="card mb-4 box-shadow">
-                        <a id="id_overview_link" href="/media/{{val.id}}/overview_R.png" class="center-text mt-3">
-                            <img id="id_overview" class="card-img-top figure-thumb" alt="NetCDF visualisation" src="/media/{{val.id}}/overview_R.png">
-                        </a>
-                        <div class="card-body">
-                            <p class="card-text">NetCDF file containing all calculated metrics.</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <button type="button" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_file.url }}';">Download results in NetCDF</button>
-                            </div>
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <figure class="figure" style="max-width: 50%;">
+                                <a id="id_boxplot_link" href="#" class="center-text">
+                                    <img id="id_boxplot" src="#" alt="#" title="#" class="figure-thumb img-fluid">
+                                </a>
+                                <figcaption id="id_boxplot_label" class="figure-caption">Description goes here</figcaption>
+                            </figure>
+                            <figure class="figure" style="max-width: 50%;">
+                                <a id="id_overview_link" href="#" class="center-text">
+                                    <img id="id_overview" src="#" alt="#" title="#" class="figure-thumb img-fluid">
+                                </a>
+                                <figcaption id="id_overview_label" class="figure-caption">Description goes here</figcaption>
+                            </figure>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';">Download all graphs</button>
+
+                            <select id="id_graph_variable" style="width: 12rem;" name="graph_variable" class="btn custom-select custom-select-sm d-block btn-select mx-3">
+                                {% for key, label in metrics.items %}
+                                    <option value="{{ key }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_file.url }}';">Download results in NetCDF</button>
                         </div>
                     </div>
                 </div>
@@ -115,13 +113,21 @@
 <script type="text/javascript">
     function changePlot(metric) {
         var labels = {{json_metrics|safe}}
-        var graph_url = '{{ val.output_dir_url }}' + 'boxplot_' + metric + '.png';
-        var graph_legend = 'Boxplot of the distribution of ' + labels[metric] + ' for all evaluated locations.'
-        $("#id_boxplot").attr("src", graph_url);
-        $("#id_boxplot").attr("alt", graph_legend);
-        $("#id_boxplot").attr("title", graph_legend);
-        $("#id_boxplot_link").attr("href", graph_url);
-        $("#id_graph_legend").html(graph_legend);
+        var boxplot_url = '{{ val.output_dir_url }}' + 'boxplot_' + metric + '.png';
+        var overview_url = '{{ val.output_dir_url }}' + 'overview_' + metric + '.png';
+        var boxplot_label = 'Boxplot of the distribution of ' + labels[metric] + ' for all evaluated locations.'
+        var overview_label = 'The distribution of ' + labels[metric] + ' values plotted on a map.'
+        $("#id_boxplot").attr("src", boxplot_url);
+        $("#id_boxplot").attr("alt", boxplot_label);
+        $("#id_boxplot").attr("title", boxplot_label);
+        $("#id_boxplot_link").attr("href", boxplot_url);
+        $("#id_boxplot_label").html(boxplot_label);
+
+        $("#id_overview").attr("src", overview_url);
+        $("#id_overview").attr("alt", overview_label);
+        $("#id_overview").attr("title", overview_label);
+        $("#id_overview_link").attr("href", overview_url);
+        $("#id_overview_label").html(overview_label);
     }
 
     // change the plot when the selection is changed

@@ -13,4 +13,4 @@ valentina/settings_conf.py
 output
 junit.xml
 emails
-static
+/static/

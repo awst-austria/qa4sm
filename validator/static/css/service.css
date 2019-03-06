@@ -61,13 +61,6 @@ html {
     min-width: 5.5rem;
 }
 
-.figure-thumb {
-    max-width: 95%;
-    height: auto;
-    margin-right: auto;
-    margin-left: auto;
-}
-
 .box-shadow {
     box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
