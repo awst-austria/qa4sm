@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 plt.switch_backend('agg') ## this allows headless graph production
 import logging
-from os import path
-from zipfile import ZipFile
+from os import path, remove
+from zipfile import ZipFile, ZIP_DEFLATED
 
 import netCDF4
 
@@ -32,7 +32,8 @@ def generate_boxplot(validation_run, outfolder, variable, label, values):
     if not validation_run.output_file:
         return None
 
-    filename = path.join(outfolder, 'boxplot_{}.png'.format(variable))
+    png_filename = path.join(outfolder, 'boxplot_{}.png'.format(variable))
+    svg_filename = path.join(outfolder, 'boxplot_{}.svg'.format(variable))
 
     values = [x for x in values if (np.isnan(x) != True)]
 
@@ -47,16 +48,18 @@ def generate_boxplot(validation_run, outfolder, variable, label, values):
     ax.get_xaxis().set_visible(False)
     plt.tight_layout()
 
-    plt.savefig(filename)
+    plt.savefig(png_filename)
+    plt.savefig(svg_filename)
     plt.clf()
 
-    return filename
+    return [png_filename, svg_filename]
 
 def generate_overview_map(validation_run, outfolder, variable, label, values):
     if not validation_run.output_file:
         return None
 
-    filename = path.join(outfolder, 'overview_{}.png'.format(variable))
+    png_filename = path.join(outfolder, 'overview_{}.png'.format(variable))
+    svg_filename = path.join(outfolder, 'overview_{}.svg'.format(variable))
 
     with netCDF4.Dataset(validation_run.output_file.path) as ds:
         lats = ds.variables['lat'][:]
@@ -100,22 +103,29 @@ def generate_overview_map(validation_run, outfolder, variable, label, values):
     ax.add_feature(cfeature.BORDERS, linewidth=0.5)
 
     plt.tight_layout()
-    plt.savefig(filename,bbox_inches = 'tight', pad_inches = 0.1, dpi=200)
+    plt.savefig(png_filename, bbox_inches = 'tight', pad_inches = 0.1, dpi=200)
+    plt.savefig(svg_filename, bbox_inches = 'tight', pad_inches = 0.1, dpi=200)
     plt.clf()
-    return filename
+    return [png_filename, svg_filename]
 
 def generate_all_graphs(validation_run, outfolder):
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
-    with ZipFile(zipfilename, 'w') as myzip:
+    with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         for metric in METRICS:
             with netCDF4.Dataset(validation_run.output_file.path) as ds:
                 values = ds.variables[metric][:]
 
-            fn = generate_boxplot(validation_run, outfolder, metric, METRICS[metric], values)
-            arcname = path.basename(fn)
-            myzip.write(fn, arcname=arcname)
+            file1, file2 = generate_boxplot(validation_run, outfolder, metric, METRICS[metric], values)
+            arcname = path.basename(file1)
+            myzip.write(file1, arcname=arcname)
+            arcname = path.basename(file2)
+            myzip.write(file2, arcname=arcname)
+            remove(file2) # we don't need the vector image anywhere but in the zip
 
-            fn=generate_overview_map(validation_run, outfolder, metric, METRICS[metric], values)
-            arcname = path.basename(fn)
-            myzip.write(fn, arcname=arcname)
+            file1, file2 = generate_overview_map(validation_run, outfolder, metric, METRICS[metric], values)
+            arcname = path.basename(file1)
+            myzip.write(file1, arcname=arcname)
+            arcname = path.basename(file2)
+            myzip.write(file2, arcname=arcname)
+            remove(file2) # we don't need the vector image anywhere but in the zip
