@@ -172,7 +172,8 @@ Check out the QA4SM source code from [GitHub](https://github.com/awst-austria/qa
 
 ### Create webapp configuration file
 
-    cd valentina
+Change into your sandbox directory and run
+
     ./init_config.sh dev
 
 This should create `valentina/settings_conf.py` from the template in `settings_example_conf.py`.
