@@ -408,11 +408,6 @@ class TestValidation(TestCase):
         result = val.first_file_in('/tmp', 'there_really_should_be_no_extension_like_this')
         assert result is None
 
-    def test_generate_graphs_from_no_file(self):
-        run = ValidationRun()
-        val.generate_boxplot(run, '/nosuchdir/', 'R', 'The non-existing graph', None)
-        val.generate_overview_map(run, '/nosuchdir/', 'R', 'The non-existing graph', None)
-
 #     @pytest.mark.long_running
     def test_generate_graphs(self):
         infile1 = 'testdata/c3s_ismn.nc'
