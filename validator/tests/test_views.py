@@ -81,7 +81,7 @@ class TestViews(TransactionTestCase):
         self.testrun.save()
 
         self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', ]
-        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm']
+        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm','stop_validation']
         self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
     ## Ensure that anonymous access is prevented for private pages
