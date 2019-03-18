@@ -12,14 +12,27 @@ from django.db import connections
 import logging
 from django.http.response import HttpResponseBadRequest, JsonResponse
 from django.template import loader
+from django.shortcuts import get_object_or_404
+from django.http.response import HttpResponse
 from validator.forms.validation_run import FilterCheckboxSelectMultiple
 from django.forms.models import ModelMultipleChoiceField
 from validator.models import Dataset
 from validator.models import Settings
+from validator.models import ValidationRun
+from validator.validation.validation import stop_running_validation
 
 
 __logger = logging.getLogger(__name__)
 
+@login_required(login_url='/login/')
+def stop_validation(request, result_uuid):
+    if request.method == "DELETE":
+        validation_run = get_object_or_404(ValidationRun, pk=result_uuid)
+        if(validation_run.user != request.user):
+            return HttpResponse(status=403)
+        
+        stop_running_validation(result_uuid)
+        return HttpResponse("Validation stopped.", status=200)
 
 ## TODO: find nicer way to restrict access (not repeating login_required on every view)
 @login_required(login_url='/login/')
