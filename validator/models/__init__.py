@@ -5,3 +5,4 @@ from .variable import DataVariable
 from .dataset import Dataset
 from .validation_run import ValidationRun
 from .settings import Settings
+from .celery_task import CeleryTask
