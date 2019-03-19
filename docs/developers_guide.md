@@ -87,7 +87,7 @@ Start redis, e.g. with:
 
 Ubuntu/Debian:
 
-    sudo apt postgresql postgresql-contrib
+    sudo apt install postgresql postgresql-contrib
 
 Start with:
 
@@ -112,9 +112,9 @@ Set password for database root user:
     psql
     \password postgres
 
-Create webapp database and user: 
+Create webapp database and user:
 
-In the qsql shell, run the commands from `[gitrepos]/valentina/sql/create_postgres_db.txt`
+In the qsql shell, run the commands from `[gitrepos]/qa4sm/sql/create_postgres_db.txt`
 
     CREATE DATABASE valentina;
     CREATE USER django WITH PASSWORD 's3cr3t';
@@ -153,7 +153,7 @@ Install other dependencies into Python environment with pip:
 Install dependencies that are not available via pip (e.g. unreleased TU libraries). Use a temporary directory to check out the source and install it.
 
     export TMP_DIR="/tmp/valentina_lib_install"
-    mkdir -p $TMPDIR
+    mkdir -p $TMP_DIR
 
     # install latest pytesmo trunk
     git clone -b master --single-branch https://github.com/TUW-GEO/pytesmo.git
@@ -168,7 +168,11 @@ Install dependencies that are not available via pip (e.g. unreleased TU librarie
 
 Check out the QA4SM source code from [GitHub](https://github.com/awst-austria/qa4sm) to create your sandbox:
 
+a.) Use the following command if you have your ssh key setup already:
     git clone git@github.com:awst-austria/qa4sm.git
+
+b.) Use the following command for anonymous checkout:
+    git clone https://github.com/awst-austria/qa4sm.git
 
 ### Create webapp configuration file
 
@@ -184,7 +188,7 @@ Adapt the `valentina/settings_conf.py` to match your local configuration:
 
 - Set `DATA_FOLDER` to the folder where you keep the (geo)data, see the datasets folder section for more info.
 - If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
-- Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/valentina/settings.py` and ideally should be left unchanged.
+- Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `qa4sm/valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
 
 ### Datasets folder
@@ -213,7 +217,7 @@ The folders are used in `validator.validation.readers.create_reader` to create t
 
 Go to webapp folder (if you haven't done so already):
 
-    cd valentina
+    cd qa4sm
 
 Set up Django app:
 
@@ -251,7 +255,7 @@ Now you should be able to see the landing page. You can log in with the admin us
 
 You can access the webapp's admin panel you appending "admin/" to the URL, e.g. <http://127.0.0.1:8000/admin/>. There you can create more users by clicking "Add" next to the "Users" row.
 
-Depending the `LOG_FILE` in your `settings_conf.py` file, the webapp's logfile should be written to `valentina/valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
+Depending the `LOG_FILE` in your `settings_conf.py` file, the webapp's logfile should be written to `valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
 
 ### Integrated Development Envionment
 
@@ -261,13 +265,13 @@ We use Eclipse with PyDev. Since Django templates consist of HTML and JavaScript
 
 To install PyDev, use Eclipse's `Help > Install New Software...` menu and the PyDev update URL `http://www.pydev.org/updates`. [PyDev install manual](http://www.pydev.org/manual_101_install.html).
 
-To add the webapp project to Eclipse, use `File > Import > General > Existing Projects into Workspace` and set the root directory to `valentina` folder.
+To add the webapp project to Eclipse, use `File > Import > General > Existing Projects into Workspace` and set the root directory to `qa4sm` folder.
 
 In case you don't want to use Eclipse, one alternative is [PyCharm](https://www.jetbrains.com/pycharm/).
 
 ### Webapp walkthrough
 
-The code for the webapp lives in two submodules of the `valentina` folder: `valentina` and `validator`. The first contains the Django "project", the second the Django "app" - [see here for the Django tutorial that explains projects and apps.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
+The code for the webapp lives in two submodules of the `qa4sm` folder: `valentina` and `validator`. The first contains the Django "project", the second the Django "app" - [see here for the Django tutorial that explains projects and apps.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
 
 The `valentina` module exists to conform to the Django structure. It contains mainly configuration in `settings.py`, `settings_conf.py`, `celery.py`. Most of the interesting stuff is happening in the `validator` module.
 
@@ -290,7 +294,7 @@ views|Django views for the webapp. They define the behaviour of the app’s (sub
 apps.py|Django specific file that currently defines the name of the app.
 hacks.py|Bin for hacks we have to use but rather wouldn’t. If you can, avoid creating those ;-)
 mailer.py|Email functionality, including (for now) wording of the automatic emails sent by the app.
-metrics.py|Contains the EssentialMetrics class that defines the metrics to be produced by the webapp on validation. 
+metrics.py|Contains the EssentialMetrics class that defines the metrics to be produced by the webapp on validation.
 urls.py|Django specific file containing the mapping of URLs to views.
 
 ### How to run integration / unit tests
@@ -307,7 +311,7 @@ Congratulations, your development environment is now set up and you can develop 
 
 To convert database content or fill the database with default entries, you can write your own data migrations, see [data migrations](https://docs.djangoproject.com/en/2.1/topics/migrations/#data-migrations).
 
-In short: 
+In short:
 Create an empty migration as a template to use
 
     python manage.py makemigrations --empty validator
@@ -318,21 +322,21 @@ Example migration:
 
 
     from django.db import migrations
-    
+
     def fill_progress(apps, schema_editor):
         ValidationRun = apps.get_model('validator', 'ValidationRun')
-        
+
         for run in ValidationRun.objects.all():
             if (run.progress == 0) and (run.end_time is not None):
                 run.progress = 100
                 run.save()
-            
+
     class Migration(migrations.Migration):
-    
+
         dependencies = [
             ('validator', '0010_auto_20181030_1158'),
         ]
-    
+
         operations = [
             migrations.RunPython(fill_progress),
         ]
@@ -355,7 +359,7 @@ Delete tables and all other tables that depend on them:
 
     DROP TABLE validator_dataset, validator_dataset_filters, validator_dataset_variables, validator_dataset_versions, validator_datasetversion, validator_datavariable CASCADE;
 
-Quit connection: 
+Quit connection:
 
     \q
 
@@ -371,5 +375,3 @@ Django will create pretty graphs visualising your data models if you ask nicely:
 6. Look at `my_project_visualized.png`.
 
 For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_models.html>.
-
-
