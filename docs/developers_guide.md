@@ -368,8 +368,18 @@ Django will create pretty graphs visualising your data models if you ask nicely:
 1. `pip install django-extensions`
 1. Add `'django_extensions'` to `INSTALLED_APPS` in `settings.py`.
 1. Run `python manage.py graph_models -a -g -o my_project_visualized.png`
-6. Look at `my_project_visualized.png`.
+1. Look at `my_project_visualized.png`.
+
+To get a graph of the valiator app excluding some admin classes:
+
+    python manage.py graph_models -g -X "Settings,User,AbstractUser" -o validator.png validator
+
+To get an editable dot file of the above graph:
+
+    python manage.py graph_models -g -X "Settings,User,AbstractUser" validator > validator.dot
+
+To get from the dot file to a png file (presumably after editing):
+
+    dot -Tpng validator.dot -o validator.png
 
 For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_models.html>.
-
-
