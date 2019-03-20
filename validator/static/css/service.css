@@ -68,3 +68,26 @@ html {
 .indented {
     margin-left: 1rem;
 }
+
+.nav-tabs .nav-item:not(:last-child) {
+    margin-right: initial;
+}
+
+.nav-tabs .nav-item {
+    margin-left: .25rem;
+    margin-top: .25rem;
+    line-height: .8;
+}
+
+.nav-tabs .nav-link {
+    color: #888a85;
+    border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.tab-plus {
+    margin-left: auto;
+    margin-right: 1.3rem;
+    margin-top: .2rem;
+    margin-bottom: .2rem;
+    padding: 0 .35rem;
+}
