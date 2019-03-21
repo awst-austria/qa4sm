@@ -382,4 +382,10 @@ To get from the dot file to a png file (presumably after editing):
 
     dot -Tpng validator.dot -o validator.png
 
+Possible changes to the diagram:
+
+- Removing arrowheads: `arrowhead=none arrowtail=none` [in the `// Relations` section at the end of the dot file]
+- Change lines: edit `splines  = ...` [at the top of the file]. For options see `man dot`; least ugly results with `splines = polyline` or `splines = true`.
+- Add labels to start/end of lines: edit label to add `[label="ref_filters" headlabel="start" taillabel="end"]`
+
 For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_models.html>.
