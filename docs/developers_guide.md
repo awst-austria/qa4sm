@@ -112,7 +112,7 @@ Set password for database root user:
     psql
     \password postgres
 
-Create webapp database and user: 
+Create webapp database and user:
 
 In the qsql shell, run the commands from `[gitrepos]/valentina/sql/create_postgres_db.txt`
 
@@ -290,7 +290,7 @@ views|Django views for the webapp. They define the behaviour of the app’s (sub
 apps.py|Django specific file that currently defines the name of the app.
 hacks.py|Bin for hacks we have to use but rather wouldn’t. If you can, avoid creating those ;-)
 mailer.py|Email functionality, including (for now) wording of the automatic emails sent by the app.
-metrics.py|Contains the EssentialMetrics class that defines the metrics to be produced by the webapp on validation. 
+metrics.py|Contains the EssentialMetrics class that defines the metrics to be produced by the webapp on validation.
 urls.py|Django specific file containing the mapping of URLs to views.
 
 ### How to run integration / unit tests
@@ -307,7 +307,7 @@ Congratulations, your development environment is now set up and you can develop 
 
 To convert database content or fill the database with default entries, you can write your own data migrations, see [data migrations](https://docs.djangoproject.com/en/2.1/topics/migrations/#data-migrations).
 
-In short: 
+In short:
 Create an empty migration as a template to use
 
     python manage.py makemigrations --empty validator
@@ -318,21 +318,21 @@ Example migration:
 
 
     from django.db import migrations
-    
+
     def fill_progress(apps, schema_editor):
         ValidationRun = apps.get_model('validator', 'ValidationRun')
-        
+
         for run in ValidationRun.objects.all():
             if (run.progress == 0) and (run.end_time is not None):
                 run.progress = 100
                 run.save()
-            
+
     class Migration(migrations.Migration):
-    
+
         dependencies = [
             ('validator', '0010_auto_20181030_1158'),
         ]
-    
+
         operations = [
             migrations.RunPython(fill_progress),
         ]
@@ -355,7 +355,7 @@ Delete tables and all other tables that depend on them:
 
     DROP TABLE validator_dataset, validator_dataset_filters, validator_dataset_variables, validator_dataset_versions, validator_datasetversion, validator_datavariable CASCADE;
 
-Quit connection: 
+Quit connection:
 
     \q
 
@@ -389,3 +389,40 @@ Possible changes to the diagram:
 - Add labels to start/end of lines: edit label to add `[label="ref_filters" headlabel="start" taillabel="end"]`
 
 For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_models.html>.
+
+
+### Fixtures
+
+#### Create fixtures
+
+[Fixtures documentation](https://docs.djangoproject.com/en/2.1/howto/initial-data/#providing-data-with-fixtures).
+
+Dump database contents into separate files:
+
+    python manage.py dumpdata validator.DataVariable > variable.json
+    python manage.py dumpdata validator.DatasetVersion > versions.json
+    python manage.py dumpdata validator.DataFilter > filters.json
+    python manage.py dumpdata validator.Dataset > dataset.json
+
+Put json files into `validator/fixtures/` (and pretty-print them with an editor for better readability).
+
+#### Apply fixtures
+
+Set up database contents with the fixtures:
+
+    python manage.py loaddata versions variables filters datasets
+
+#### Reset migrations
+
+Recreate migrations from models:
+
+Delete database.
+Delete `validator/migrations`.
+
+    python manage.py makemigrations validator
+
+You should now have a new migration: `validator/migrations/0001_initial.py`
+
+    python manage.py migrate
+
+Then apply fixtures and create superuser.
