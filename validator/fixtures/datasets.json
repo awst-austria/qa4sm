@@ -1,0 +1,125 @@
+[
+	{
+		"model": "validator.dataset",
+		"pk": 1,
+		"fields": {
+			"short_name": "C3S",
+			"pretty_name": "C3S",
+			"help_text": "",
+			"source_reference": "",
+			"citation": "",
+			"is_reference": false,
+			"versions": [
+				1
+			],
+			"variables": [
+				1
+			],
+			"filters": [
+				1,
+				3,
+				4,
+				5,
+				6,
+				7
+			]
+		}
+	},
+	{
+		"model": "validator.dataset",
+		"pk": 2,
+		"fields": {
+			"short_name": "SMAP",
+			"pretty_name": "SMAP level 3",
+			"help_text": "",
+			"source_reference": "",
+			"citation": "",
+			"is_reference": false,
+			"versions": [
+				2
+			],
+			"variables": [
+				2
+			],
+			"filters": [
+				1
+			]
+		}
+	},
+	{
+		"model": "validator.dataset",
+		"pk": 3,
+		"fields": {
+			"short_name": "ASCAT",
+			"pretty_name": "H-SAF ASCAT SSM CDR",
+			"help_text": "",
+			"source_reference": "",
+			"citation": "",
+			"is_reference": false,
+			"versions": [
+				3
+			],
+			"variables": [
+				3
+			],
+			"filters": [
+				1,
+				10,
+				11,
+				12,
+				13,
+				14
+			]
+		}
+	},
+	{
+		"model": "validator.dataset",
+		"pk": 4,
+		"fields": {
+			"short_name": "ISMN",
+			"pretty_name": "ISMN",
+			"help_text": "",
+			"source_reference": "",
+			"citation": "",
+			"is_reference": true,
+			"versions": [
+				4,
+				5,
+				6
+			],
+			"variables": [
+				4
+			],
+			"filters": [
+				1,
+				2
+			]
+		}
+	},
+	{
+		"model": "validator.dataset",
+		"pk": 5,
+		"fields": {
+			"short_name": "GLDAS",
+			"pretty_name": "GLDAS",
+			"help_text": "",
+			"source_reference": "",
+			"citation": "",
+			"is_reference": true,
+			"versions": [
+				7,
+				8
+			],
+			"variables": [
+				5,
+				6,
+				7,
+				8
+			],
+			"filters": [
+				1,
+				9
+			]
+		}
+	}
+]
