@@ -39,6 +39,8 @@ class TestViews(TransactionTestCase):
 
     __logger = logging.getLogger(__name__)
 
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
+
 # class TestViews(TestCase):
     def setUp(self):
         self.__logger = logging.getLogger(__name__)

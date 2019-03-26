@@ -28,6 +28,8 @@ from validator.validation.globals import OUTPUT_FOLDER
 
 class TestValidation(TestCase):
 
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
+
     def setUp(self):
         self.always_eager = None
         if hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER'):
