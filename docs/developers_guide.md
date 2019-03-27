@@ -227,6 +227,10 @@ Create admin user for webapp:
 
 Keep note of the username and password you enter here, you'll need it to log into the webapp later.
 
+Populate the database with information about the datasets:
+
+    python manage.py loaddata versions variables filters datasets
+
 ### Start necessary servers
 
 If you haven't set up Postgres, Redis, and RabbitMQ, skip to the next section.
@@ -337,6 +341,33 @@ Example migration:
             migrations.RunPython(fill_progress),
         ]
 
+#### Reset migrations
+
+To recreate migrations from scratch:
+
+Delete database?
+
+Delete `validator/migrations`.
+
+    python manage.py makemigrations validator
+
+You should now have a new migration: `validator/migrations/0001_initial.py`
+
+#### Squash migrations
+
+Combine all migrations up to migration `x`:
+
+    python manage.py squashmigrations validator x
+
+The resulting `validator/migrations/0001_squashed_...` file contains a list `replaces = [...]` in the `Migration` class that details the other migrations it replaces. If you want to use a "from-scratch" migration (see above), you can copy the `replaces` list into that and it should be treated like a squashed migration.
+
+#### Dump ops db 
+
+And omit stuff that creates problems on import:
+
+    python manage.py dumpdata --exclude=auth --exclude=contenttypes > ~/dbdump.json
+
+
 ### Postgres tricks
 
 Connect to Postgres database with command line client:
@@ -397,7 +428,7 @@ For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_
 
 [Fixtures documentation](https://docs.djangoproject.com/en/2.1/howto/initial-data/#providing-data-with-fixtures).
 
-Dump database contents into separate files:
+Dump database contents into separate files for readability:
 
     python manage.py dumpdata validator.DataVariable > variable.json
     python manage.py dumpdata validator.DatasetVersion > versions.json
@@ -411,18 +442,3 @@ Put json files into `validator/fixtures/` (and pretty-print them with an editor 
 Set up database contents with the fixtures:
 
     python manage.py loaddata versions variables filters datasets
-
-#### Reset migrations
-
-Recreate migrations from models:
-
-Delete database.
-Delete `validator/migrations`.
-
-    python manage.py makemigrations validator
-
-You should now have a new migration: `validator/migrations/0001_initial.py`
-
-    python manage.py migrate
-
-Then apply fixtures and create superuser.
