@@ -8,11 +8,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
-from validator.models import DataFilter
-from validator.models import Dataset
-from validator.models.version import DatasetVersion
-from validator.models.variable import DataVariable
-from validator.models.dataset_configuration import DatasetConfiguration
 
 
 class ValidationRun(models.Model):
@@ -53,17 +48,11 @@ class ValidationRun(models.Model):
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
     
-    dataset_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.PROTECT, related_name='data_dataset', null=True)
-
-    
 
     scaling_ref = models.CharField(max_length=4, choices=SCALING_REF_CHOICES, default=SCALE_DATA)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
-
-    data_filters = models.ManyToManyField(DataFilter, related_name='data_filters')
-    ref_filters = models.ManyToManyField(DataFilter, related_name='ref_filters')
 
     output_file = models.FileField(null=True)
 
