@@ -27,15 +27,6 @@ class ValidationRun(models.Model):
 #         (CDF_MATCH, 'CDF matching with 5-th order spline fitting'),
         )
 
-    ## scaling reference options
-    SCALE_DATA = 'data'
-    SCALE_REF = 'ref'
-
-    SCALING_REF_CHOICES = (
-        (SCALE_DATA, 'data to reference'),
-        (SCALE_REF, 'reference to data'),
-        )
-
     ## fields
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -48,8 +39,6 @@ class ValidationRun(models.Model):
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
     
-
-    scaling_ref = models.CharField(max_length=4, choices=SCALING_REF_CHOICES, default=SCALE_DATA)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
@@ -66,7 +55,7 @@ class ValidationRun(models.Model):
                                    'interval_to': 'From must be before To',})
 
     def __str__(self):
-        return "id: {}, user: {}, start: {}, {} ({}) vs {} ({})".format(self.id, self.user, self.start_time, self.data_dataset, self.data_version, self.ref_dataset, self.ref_version)
+        return "id: {}, user: {}, start: {} )".format(self.id, self.user, self.start_time)
 
     def output_dir_url(self):
         if bool(self.output_file) is False:
