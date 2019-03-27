@@ -12,6 +12,7 @@ from validator.models import DataFilter
 from validator.models import Dataset
 from validator.models.version import DatasetVersion
 from validator.models.variable import DataVariable
+from validator.models.dataset_configuration import DatasetConfiguration
 
 
 class ValidationRun(models.Model):
@@ -51,13 +52,10 @@ class ValidationRun(models.Model):
     error_points = models.IntegerField(default=0)
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
+    
+    dataset_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.PROTECT, related_name='data_dataset', null=True)
 
-    data_dataset = models.ForeignKey(to=Dataset, on_delete=models.PROTECT, related_name='data_dataset', null=True)
-    data_version = models.ForeignKey(to=DatasetVersion, on_delete=models.PROTECT, related_name='data_version', null=True)
-    data_variable = models.ForeignKey(to=DataVariable, on_delete=models.PROTECT, related_name='data_variable', null=True)
-    ref_dataset = models.ForeignKey(to=Dataset, on_delete=models.PROTECT, related_name='ref_dataset', null=True)
-    ref_version = models.ForeignKey(to=DatasetVersion, on_delete=models.PROTECT, related_name='ref_version', null=True)
-    ref_variable = models.ForeignKey(to=DataVariable, on_delete=models.PROTECT, related_name='ref_variable', null=True)
+    
 
     scaling_ref = models.CharField(max_length=4, choices=SCALING_REF_CHOICES, default=SCALE_DATA)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
