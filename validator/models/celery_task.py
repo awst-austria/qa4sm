@@ -1,5 +1,7 @@
-from django.db import models
 import uuid
+
+from django.db import models
+
 from validator.models.validation_run import ValidationRun
 
 
@@ -9,4 +11,4 @@ class CeleryTask(models.Model):
     celery_task = models.UUIDField(null=False)
 
     def __str__(self):
-        return self.short_name
+        return "task: {}".format(self.celery_task)

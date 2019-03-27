@@ -30,9 +30,11 @@ def stop_validation(request, result_uuid):
         validation_run = get_object_or_404(ValidationRun, pk=result_uuid)
         if(validation_run.user != request.user):
             return HttpResponse(status=403)
-        
+
         stop_running_validation(result_uuid)
         return HttpResponse("Validation stopped.", status=200)
+
+    return HttpResponse(status=405) # if we're not DELETEing, send back "Method not Allowed"
 
 ## TODO: find nicer way to restrict access (not repeating login_required on every view)
 @login_required(login_url='/login/')
