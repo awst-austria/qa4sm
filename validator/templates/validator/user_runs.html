@@ -79,14 +79,14 @@
 {% block javascript %}
     <script>
         function ajax_delete_result(result_id) {
-        	if (!confirm('Do you really want to delete the result?')) {
-           		return;
-       		}
+            if (!confirm('Do you really want to delete the result?')) {
+                   return;
+               }
             var url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000',result_id);
 
             $.ajaxSetup({
-  				headers: { "X-CSRFToken": '{{csrf_token}}' }
-			});
+                  headers: { "X-CSRFToken": '{{csrf_token}}' }
+            });
 
             $.ajax({
                 url: url,
@@ -96,23 +96,24 @@
                 }
             });
         }
-        
+
         function ajax_stop_validation(result_id) {
-        	console.log('ajax_stop_validation');
-        	if (!confirm('Do you really want to stop the validation?')) {
-           		return;
-       		}
-            var url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000',result_id);
+            if (!confirm('Do you really want to stop the validation?')) {
+                return;
+            }
+            var url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', result_id);
 
             $.ajaxSetup({
-  				headers: { "X-CSRFToken": '{{csrf_token}}' }
-			});
+                headers : {
+                    "X-CSRFToken" : '{{csrf_token}}'
+                }
+            });
 
             $.ajax({
-                url: url,
-                type: 'DELETE',
-                success: function (return_data) {
-                	location.reload();
+                url : url,
+                type : 'DELETE',
+                success : function(return_data) {
+                    location.reload();
                 }
             });
         }
