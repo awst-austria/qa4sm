@@ -4,7 +4,7 @@ from validator.models.validation_run import ValidationRun
 
 
 class CeleryTask(models.Model):
-    validation = models.ForeignKey(to=ValidationRun, on_delete=models.PROTECT, related_name='validation', null=False)
+    validation = models.ForeignKey(to=ValidationRun, on_delete=models.PROTECT, related_name='celery_tasks', null=False)
     celery_task = models.UUIDField(null=False)
 
     def __str__(self):

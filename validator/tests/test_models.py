@@ -21,6 +21,11 @@ class TestModels(TestCase):
         print(run_str)
         assert run_str is not None
 
+    def test_validation_run_external_relations(self):
+        run = ValidationRun()
+        tasks = run.celery_tasks.all()
+        assert tasks is not None
+
     def test_validation_run_output_dir_url(self):
         run = ValidationRun()
         assert run.output_dir_url() is None
