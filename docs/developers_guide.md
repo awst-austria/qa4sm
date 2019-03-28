@@ -243,7 +243,7 @@ If you've installed those services on your machine, you can (re)start them with:
 
 Start a celery worker with the shell script:
 
-`valentina/start_celery_worker`
+`qa4sm/start_celery_worker.sh`
 
 ### Run Django development server
 
@@ -299,7 +299,7 @@ urls.py|Django specific file containing the mapping of URLs to views.
 
 ### How to run integration / unit tests
 
-Go to `valentina` and run
+Go to `qa4sm` and run
 
     pytest
 
