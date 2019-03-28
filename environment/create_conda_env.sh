@@ -88,6 +88,7 @@ pip install celery[redis]
 pip install gldas
 pip install smap-io
 pip install django-countries
+pip install seaborn
 pip install cartopy
 pip install --upgrade --force-reinstall netcdf4
 

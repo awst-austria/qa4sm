@@ -29,6 +29,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('myruns/', views.user_runs, name='myruns'),
     path('validate/', views.validation, name='validation'),
+    path('validate/<uuid:result_uuid>', views.stop_validation, name='stop_validation'),
     path('result/<uuid:result_uuid>/', views.result, name='result'),
 
     path('ajax/get-dataset-options/', views.ajax_get_dataset_options, name='ajax_get_dataset_options'),

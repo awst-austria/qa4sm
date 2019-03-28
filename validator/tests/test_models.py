@@ -4,12 +4,13 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 import pytest
 
-from validator.models import ValidationRun
+from validator.models import CeleryTask
 from validator.models import DataFilter
+from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetVersion
-from validator.models import DataVariable
 from validator.models import Settings
+from validator.models import ValidationRun
 
 
 class TestModels(TestCase):
@@ -19,6 +20,11 @@ class TestModels(TestCase):
         run_str = str(run)
         print(run_str)
         assert run_str is not None
+
+    def test_validation_run_external_relations(self):
+        run = ValidationRun()
+        tasks = run.celery_tasks.all()
+        assert tasks is not None
 
     def test_validation_run_output_dir_url(self):
         run = ValidationRun()
@@ -124,3 +130,9 @@ class TestModels(TestCase):
         settings.delete()
         settings = Settings.load()
         assert settings
+
+    def test_celery_task_str(self):
+        task = CeleryTask()
+        task_str = str(task)
+        print(task_str)
+        assert task_str is not None

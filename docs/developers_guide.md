@@ -231,6 +231,10 @@ Create admin user for webapp:
 
 Keep note of the username and password you enter here, you'll need it to log into the webapp later.
 
+Populate the database with information about the datasets:
+
+    python manage.py loaddata versions variables filters datasets
+
 ### Start necessary servers
 
 If you haven't set up Postgres, Redis, and RabbitMQ, skip to the next section.
@@ -341,6 +345,33 @@ Example migration:
             migrations.RunPython(fill_progress),
         ]
 
+#### Reset migrations
+
+To recreate migrations from scratch:
+
+Delete database?
+
+Delete `validator/migrations`.
+
+    python manage.py makemigrations validator
+
+You should now have a new migration: `validator/migrations/0001_initial.py`
+
+#### Squash migrations
+
+Combine all migrations up to migration `x`:
+
+    python manage.py squashmigrations validator x
+
+The resulting `validator/migrations/0001_squashed_...` file contains a list `replaces = [...]` in the `Migration` class that details the other migrations it replaces. If you want to use a "from-scratch" migration (see above), you can copy the `replaces` list into that and it should be treated like a squashed migration.
+
+#### Dump ops db 
+
+And omit stuff that creates problems on import:
+
+    python manage.py dumpdata --exclude=auth --exclude=contenttypes > ~/dbdump.json
+
+
 ### Postgres tricks
 
 Connect to Postgres database with command line client:
@@ -372,6 +403,46 @@ Django will create pretty graphs visualising your data models if you ask nicely:
 1. `pip install django-extensions`
 1. Add `'django_extensions'` to `INSTALLED_APPS` in `settings.py`.
 1. Run `python manage.py graph_models -a -g -o my_project_visualized.png`
-6. Look at `my_project_visualized.png`.
+1. Look at `my_project_visualized.png`.
+
+To get a graph of the valiator app excluding some admin classes:
+
+    python manage.py graph_models -g -X "Settings,User,AbstractUser" -o validator.png validator
+
+To get an editable dot file of the above graph:
+
+    python manage.py graph_models -g -X "Settings,User,AbstractUser" validator > validator.dot
+
+To get from the dot file to a png file (presumably after editing):
+
+    dot -Tpng validator.dot -o validator.png
+
+Possible changes to the diagram:
+
+- Removing arrowheads: `arrowhead=none arrowtail=none` [in the `// Relations` section at the end of the dot file]
+- Change lines: edit `splines  = ...` [at the top of the file]. For options see `man dot`; least ugly results with `splines = polyline` or `splines = true`.
+- Add labels to start/end of lines: edit label to add `[label="ref_filters" headlabel="start" taillabel="end"]`
 
 For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_models.html>.
+
+
+### Fixtures
+
+#### Create fixtures
+
+[Fixtures documentation](https://docs.djangoproject.com/en/2.1/howto/initial-data/#providing-data-with-fixtures).
+
+Dump database contents into separate files for readability:
+
+    python manage.py dumpdata validator.DataVariable > variable.json
+    python manage.py dumpdata validator.DatasetVersion > versions.json
+    python manage.py dumpdata validator.DataFilter > filters.json
+    python manage.py dumpdata validator.Dataset > dataset.json
+
+Put json files into `validator/fixtures/` (and pretty-print them with an editor for better readability).
+
+#### Apply fixtures
+
+Set up database contents with the fixtures:
+
+    python manage.py loaddata versions variables filters datasets

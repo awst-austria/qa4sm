@@ -28,10 +28,19 @@
                             <td>{{ valrun.name_tag }}</td>
                             <td>{{ valrun.data_dataset }} ({{ valrun.data_version }})</td>
                             <td>{{ valrun.ref_dataset }} ({{ valrun.ref_version }})</td>
-                            <td {% if valrun.progress != 100 and valrun.end_time != null %}class="table-danger"{% endif %}>{% if valrun.progress == 0 and valrun.end_time == null %} Scheduled {% elif valrun.progress == 100 %} Done {% elif valrun.progress == -1 %} Aborted {% elif valrun.end_time != null %} ERROR {% else %}Running ({{ valrun.progress }}&#37;){% endif %}</td>
+                            <td {% if valrun.progress != 100 and valrun.end_time != null %}class="table-danger"{% endif %}>
+                                {% if valrun.progress == 0 and valrun.end_time == null %} Scheduled
+                                {% elif valrun.progress == 100 %} Done
+                                {% elif valrun.progress == -1 %} Aborted
+                                {% elif valrun.end_time != null %} ERROR
+                                {% else %} Running ({{ valrun.progress }}&#37;)
+                                {% endif %}
+                            </td>
                             <td>
                                 <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
-
+                                {% if valrun.progress > -1 and valrun.progress < 100 and valrun.end_time == null %}
+                                <button class="btn btn-sm btn-primary btn-action" title="Stop validation" onclick="ajax_stop_validation('{{ valrun.id }}')"><span class="fas fa-stop"></span></button>
+                                {% endif %}
                                 {% if valrun.end_time and valrun.output_file %}
                                     <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
                                     <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
@@ -77,20 +86,41 @@
 {% block javascript %}
     <script>
         function ajax_delete_result(result_id) {
-        	if (!confirm('Do you really want to delete the result?')) {
-           		return;
-       		}
+            if (!confirm('Do you really want to delete the result?')) {
+                   return;
+               }
             var url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000',result_id);
 
             $.ajaxSetup({
-  				headers: { "X-CSRFToken": '{{csrf_token}}' }
-			});
+                  headers: { "X-CSRFToken": '{{csrf_token}}' }
+            });
 
             $.ajax({
                 url: url,
                 type: 'DELETE',
                 success: function (return_data) {
                     $('#result_row_'+result_id).remove()
+                }
+            });
+        }
+
+        function ajax_stop_validation(result_id) {
+            if (!confirm('Do you really want to stop the validation?')) {
+                return;
+            }
+            var url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', result_id);
+
+            $.ajaxSetup({
+                headers : {
+                    "X-CSRFToken" : '{{csrf_token}}'
+                }
+            });
+
+            $.ajax({
+                url : url,
+                type : 'DELETE',
+                success : function(return_data) {
+                    location.reload();
                 }
             });
         }

@@ -39,6 +39,8 @@ class TestViews(TransactionTestCase):
 
     __logger = logging.getLogger(__name__)
 
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
+
 # class TestViews(TestCase):
     def setUp(self):
         self.__logger = logging.getLogger(__name__)
@@ -81,7 +83,7 @@ class TestViews(TransactionTestCase):
         self.testrun.save()
 
         self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', ]
-        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm']
+        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm','stop_validation']
         self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
     ## Ensure that anonymous access is prevented for private pages
@@ -226,6 +228,51 @@ class TestViews(TransactionTestCase):
         self.client.login(**self.credentials)
         validation_params = {'scaling_ref': 'nosuchthing', 'scaling_method': 'doesnt exist'}
         result = self.client.post(url, validation_params)
+        self.assertEqual(result.status_code, 200)
+
+    def test_submit_validation_and_cancel(self):
+        start_url = reverse('validation')
+        self.client.login(**self.credentials)
+        validation_params = {
+            'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
+            'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
+            'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'ref_dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
+            'ref_version': DatasetVersion.objects.get(short_name=globals.GLDAS_TEST).id,
+            'ref_variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+            'scaling_ref': ValidationRun.SCALE_REF,
+            'scaling_method': ValidationRun.MEAN_STD,
+        }
+        result = self.client.post(start_url, validation_params)
+        self.assertEqual(result.status_code, 302)
+
+        validation_url = result.url
+
+        match = regex_find('/(result)/(.*)/', result.url)
+        assert match
+        assert match[0]
+        assert match[0][0] == 'result'
+        assert match[0][1]
+
+        # now let's try out cancelling the validation in it's various forms...
+        result_id = match[0][1]
+        cancel_url = reverse('stop_validation', kwargs={'result_uuid': result_id})
+
+        # check that the cancel url does something even if we're not DELETEing
+        self.client.login(**self.credentials2)
+        result = self.client.get(cancel_url)
+
+        # check that nobody but the owner can cancel the validation
+        result = self.client.delete(cancel_url)
+        self.assertEqual(result.status_code, 403)
+
+        # check that the owner can cancel it
+        self.client.login(**self.credentials)
+        result = self.client.delete(cancel_url)
+        self.assertEqual(result.status_code, 200)
+
+        # after cancelling, we still get a result for the validation
+        result = self.client.get(validation_url)
         self.assertEqual(result.status_code, 200)
 
     ## Stress test the server!
