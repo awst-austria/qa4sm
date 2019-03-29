@@ -148,6 +148,7 @@ Install other dependencies into Python environment with pip:
     pip install smap-io
     pip install django-countries
     pip install cartopy
+    pip install seaborn
     pip install --upgrade --force-reinstall netcdf4
 
 Install dependencies that are not available via pip (e.g. unreleased TU libraries). Use a temporary directory to check out the source and install it.
