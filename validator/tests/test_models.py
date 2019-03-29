@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from django.core.management import call_command
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 import pytest
@@ -10,9 +10,29 @@ from validator.models import Dataset
 from validator.models import DatasetVersion
 from validator.models import DataVariable
 from validator.models import Settings
+from validator.models.dataset_configuration import DatasetConfiguration
+
 
 
 class TestModels(TestCase):
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    
+    def test_validation_configuration(self):
+        run = ValidationRun()
+        run.start_time="2018-01-01"
+        run.save()
+        
+        dc=DatasetConfiguration()
+        dc.validation=run
+        dc.dataset=Dataset.objects.get(pk=1)
+        dc.version=DatasetVersion.objects.get(pk=1)
+        dc.variable=DataVariable.objects.get(pk=1)
+        dc.reference=True
+        dc.scaling_reference=True
+        
+        dc.save()
+        
+        assert len(run.dataset_configurations.all()) == 1
 
     def test_validation_run_str(self):
         run = ValidationRun()

@@ -4,9 +4,9 @@ from django.urls.base import reverse
 
 # for tutorial see https://djangobook.com/customizing-change-lists-forms/
 class ValidationRunAdmin(ModelAdmin):
-    list_display = ('id', 'start_time', 'end_time', 'user', 'name_tag', 'data_dataset', 'ref_dataset', 'open_button', )
+    list_display = ('id', 'start_time', 'end_time', 'user', 'name_tag', 'open_button', )
     search_fields = ('name_tag', )
-    list_filter = ('start_time', 'end_time', 'user', 'data_dataset', 'ref_dataset')
+    list_filter = ('start_time', 'end_time', 'user')
     ordering = ('-start_time', '-end_time',)
 
     def __init__(self, model, admin_site):

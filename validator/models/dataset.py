@@ -18,6 +18,9 @@ class Dataset(models.Model):
     variables = models.ManyToManyField(DataVariable, related_name='variables')
 
     filters = models.ManyToManyField(DataFilter, related_name='filters')
+    
+    # many-to-one relationships coming from other models:
+    # dataset_configuration from DatasetConfiguration
 
     def __str__(self):
         return self.short_name

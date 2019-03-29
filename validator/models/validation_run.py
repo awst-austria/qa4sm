@@ -44,6 +44,11 @@ class ValidationRun(models.Model):
     interval_to = models.DateTimeField(null=True)
 
     output_file = models.FileField(null=True)
+    
+    # many-to-one relationships coming from other models:
+    # dataset_configuration from DatasetConfiguration
+
+
 
     def clean(self):
         if self.interval_from is None and self.interval_to is not None:

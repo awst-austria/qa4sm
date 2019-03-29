@@ -7,6 +7,9 @@ class DataVariable(models.Model):
 
     min_value = models.FloatField(null=True)
     max_value = models.FloatField(null=True)
+    
+    # many-to-one relationships coming from other models:
+    # dataset_configuration from DatasetConfiguration
 
     def __str__(self):
         return self.short_name
