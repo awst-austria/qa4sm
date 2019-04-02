@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.utils.timezone import now
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -15,23 +16,34 @@ from validator.models import ValidationRun
 
 class TestModels(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
-    
+
     def test_validation_configuration(self):
         run = ValidationRun()
-        run.start_time="2018-01-01"
+        run.start_time = now()
         run.save()
-        
-        dc=DatasetConfiguration()
-        dc.validation=run
-        dc.dataset=Dataset.objects.get(pk=1)
-        dc.version=DatasetVersion.objects.get(pk=1)
-        dc.variable=DataVariable.objects.get(pk=1)
-        dc.reference=True
-        dc.scaling_reference=True
-        
+
+        dc = DatasetConfiguration()
+        dc.validation = run
+        dc.dataset = Dataset.objects.get(pk=1)
+        dc.version = DatasetVersion.objects.get(pk=1)
+        dc.variable = DataVariable.objects.get(pk=1)
+
         dc.save()
-        
+
+        run.reference_configuration = dc
+        run.scaling_ref = dc
+
+        run.save()
+
         assert len(run.dataset_configurations.all()) == 1
+        assert run.reference_configuration
+        assert run.scaling_ref
+
+    def test_dataset_configuration(self):
+        dc = DatasetConfiguration()
+        dc_str = str(dc)
+        print(dc_str)
+        assert dc_str is not None
 
     def test_validation_run_str(self):
         run = ValidationRun()
@@ -43,6 +55,8 @@ class TestModels(TestCase):
         run = ValidationRun()
         tasks = run.celery_tasks.all()
         assert tasks is not None
+        data_configs = run.dataset_configurations.all()
+        assert data_configs is not None
 
     def test_validation_run_output_dir_url(self):
         run = ValidationRun()

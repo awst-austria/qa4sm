@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
+from validator.models import DatasetConfiguration
 
 
 class ValidationRun(models.Model):
@@ -38,7 +39,10 @@ class ValidationRun(models.Model):
     error_points = models.IntegerField(default=0)
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
+
+    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='ref_validation_run', null=True)
     
+    scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='scaling_ref_validation_run', null=True)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
@@ -46,11 +50,7 @@ class ValidationRun(models.Model):
     output_file = models.FileField(null=True)
     
     # many-to-one relationships coming from other models:
-    # dataset_configuration from DatasetConfiguration
-
-
-
-    # many-to-one relationships coming from other models:
+    # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
 
     def clean(self):
