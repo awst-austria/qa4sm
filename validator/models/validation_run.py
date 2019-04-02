@@ -50,6 +50,9 @@ class ValidationRun(models.Model):
 
 
 
+    # many-to-one relationships coming from other models:
+    # celery_tasks from CeleryTask
+
     def clean(self):
         if self.interval_from is None and self.interval_to is not None:
             raise ValidationError({'interval_from': 'What has an end must have a beginning.',})

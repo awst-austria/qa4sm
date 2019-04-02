@@ -230,6 +230,51 @@ class TestViews(TransactionTestCase):
         result = self.client.post(url, validation_params)
         self.assertEqual(result.status_code, 200)
 
+    def test_submit_validation_and_cancel(self):
+        start_url = reverse('validation')
+        self.client.login(**self.credentials)
+        validation_params = {
+            'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
+            'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
+            'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'ref_dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
+            'ref_version': DatasetVersion.objects.get(short_name=globals.GLDAS_TEST).id,
+            'ref_variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+            'scaling_ref': ValidationRun.SCALE_REF,
+            'scaling_method': ValidationRun.MEAN_STD,
+        }
+        result = self.client.post(start_url, validation_params)
+        self.assertEqual(result.status_code, 302)
+
+        validation_url = result.url
+
+        match = regex_find('/(result)/(.*)/', result.url)
+        assert match
+        assert match[0]
+        assert match[0][0] == 'result'
+        assert match[0][1]
+
+        # now let's try out cancelling the validation in it's various forms...
+        result_id = match[0][1]
+        cancel_url = reverse('stop_validation', kwargs={'result_uuid': result_id})
+
+        # check that the cancel url does something even if we're not DELETEing
+        self.client.login(**self.credentials2)
+        result = self.client.get(cancel_url)
+
+        # check that nobody but the owner can cancel the validation
+        result = self.client.delete(cancel_url)
+        self.assertEqual(result.status_code, 403)
+
+        # check that the owner can cancel it
+        self.client.login(**self.credentials)
+        result = self.client.delete(cancel_url)
+        self.assertEqual(result.status_code, 200)
+
+        # after cancelling, we still get a result for the validation
+        result = self.client.get(validation_url)
+        self.assertEqual(result.status_code, 200)
+
     ## Stress test the server!
     @pytest.mark.long_running
     def no_test_submit_lots_of_validations(self): # deactivate the test until we found out what makes it hang

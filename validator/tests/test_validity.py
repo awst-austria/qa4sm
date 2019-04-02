@@ -23,8 +23,12 @@ import validator.validation as val
 
 '''
     Tests to check that the validation process really produces valid results ;-)
+    This is just a stub that should be filled by TU Wien.
 '''
 class TestValidity(TestCase):
+
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
+
     # run before every test case
     def setUp(self):
         settings.CELERY_TASK_ALWAYS_EAGER = True # run without parallelisation, everything in one process
