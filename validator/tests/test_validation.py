@@ -1,5 +1,7 @@
 from datetime import datetime
+from os import path
 import os, errno
+import shutil
 import time
 from zipfile import ZipFile
 
@@ -7,8 +9,6 @@ from dateutil.tz import tzlocal
 from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from os import path
-import shutil
 from django.test import TestCase
 import netCDF4
 import pytest
@@ -19,9 +19,11 @@ import pandas as pd
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
+from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ValidationRun
 import validator.validation as val
+
 from validator.validation.globals import OUTPUT_FOLDER
 
 
@@ -61,13 +63,25 @@ class TestValidation(TestCase):
     def generate_default_validation(self):
         run = ValidationRun()
         run.start_time = datetime.now(tzlocal())
-        run.data_dataset = Dataset.objects.get(short_name='C3S')
-        run.data_version = DatasetVersion.objects.get(short_name='C3S_V201706')
-        run.data_variable = DataVariable.objects.get(short_name='C3S_sm')
+        run.save()
 
-        run.ref_dataset = Dataset.objects.get(short_name='ISMN')
-        run.ref_version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        run.ref_variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        data_c = DatasetConfiguration()
+        data_c.validation = run
+        data_c.dataset = Dataset.objects.get(short_name='C3S')
+        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201706')
+        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.save()
+
+        ref_c = DatasetConfiguration()
+        ref_c.validation = run
+        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.save()
+
+        run.reference_configuration = ref_c
+        run.scaling_ref = ref_c
+        run.save()
 
         return run
 
@@ -161,17 +175,22 @@ class TestValidation(TestCase):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        run.scaling_ref = ValidationRun.SCALE_REF
+        #run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
 
-        run.save() ## need to save before adding filters because django m2m relations work that way
+        run.save()
 
-        run.data_filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-        run.data_filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.ref_filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+        for config in run.dataset_configurations.all():
+            if config == run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+            config.save()
 
         run_id = run.id
 
