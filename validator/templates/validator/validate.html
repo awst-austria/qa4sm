@@ -23,49 +23,78 @@
                                 <span class="input-group-text fas fa-question-circle help-icon"
                                     title="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."></span>
                             </div>
-                            <div class="card-body">
 
-                                <div class="mb-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
+                            <nav>
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <a class="nav-item nav-link active" id="nav-dataset1-tab" data-toggle="tab" href="#nav-dataset1" role="tab" aria-controls="nav-dataset1" aria-selected="true">C3S</a>
+                                    <a class="nav-item nav-link" id="nav-dataset2-tab" data-toggle="tab" href="#nav-dataset2" role="tab" aria-controls="nav-dataset2" aria-selected="false">SMAP</a>
+                                    <a class="nav-item nav-link" id="nav-dataset3-tab" data-toggle="tab" href="#nav-dataset3" role="tab" aria-controls="nav-dataset3" aria-selected="false">ASCAT</a>
+                                    <a class="tab-plus btn btn-primary" href="#"><span class="fas fa-plus" title="Add another dataset"></span></a>
+                                </div>
+                            </nav>
+
+                            <div class="card-body tab-content">
+                                <div class="tab-pane fade show active" id="nav-dataset1" role="tabpanel" aria-labelledby="nav-dataset1-tab">
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
+                                            </div>
+                                            {% render_field form.data_dataset class="custom-select d-block" %}
                                         </div>
-                                        {% render_field form.data_dataset class="custom-select d-block" %}
+                                        {% for error in form.data_dataset.errors %}
+                                            <div class="custom-invalid-feedback">
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
                                     </div>
-                                    {% for error in form.data_dataset.errors %}
-                                        <div class="custom-invalid-feedback">
-                                            {{ error }}
+
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text addon-w" id="data-addon2">Version</span>
+                                            </div>
+                                            {% render_field form.data_version class="custom-select d-block" %}
                                         </div>
-                                    {% endfor %}
+                                        {% for error in form.data_version.errors %}
+                                            <div class="custom-invalid-feedback">
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text addon-w" id="data-addon3">Variable</span>
+                                            </div>
+                                            {% render_field form.data_variable class="custom-select d-block" %}
+                                        </div>
+                                        {% for error in form.data_variable.errors %}
+                                            <div class="custom-invalid-feedback">
+                                                {{ error }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <hr/>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input" id="{{form.filter_data.auto_id}}" name="{{form.filter_data.name}}"
+                                            {{ form.filter_data.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'data-filters')">
+                                        <label class="custom-control-label" for="{{form.filter_data.auto_id}}">{{form.filter_data.label}}</label>
+
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="Only data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
+                                    </div>
+
+                                    <div id="data-filters" class="indented">
+                                        {{ form.data_filters }}
+                                    </div>
                                 </div>
 
-                                <div class="mb-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text addon-w" id="data-addon2">Version</span>
-                                        </div>
-                                        {% render_field form.data_version class="custom-select d-block" %}
-                                    </div>
-                                    {% for error in form.data_version.errors %}
-                                        <div class="custom-invalid-feedback">
-                                            {{ error }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-
-                                <div class="mb-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text addon-w" id="data-addon3">Variable</span>
-                                        </div>
-                                        {% render_field form.data_variable class="custom-select d-block" %}
-                                    </div>
-                                    {% for error in form.data_variable.errors %}
-                                        <div class="custom-invalid-feedback">
-                                            {{ error }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                                <div class="tab-pane fade" id="nav-dataset2" role="tabpanel" aria-labelledby="nav-dataset2-tab">2nd dataset here</div>
+                                <div class="tab-pane fade" id="nav-dataset3" role="tabpanel" aria-labelledby="nav-dataset3-tab">3rd dataset here</div>
 
                             </div>
                         </div>
@@ -76,8 +105,10 @@
                                 <span class="input-group-text fas fa-question-circle help-icon"
                                     title="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."></span>
                             </div>
-                            <div class="card-body">
 
+                            <div style="min-height: 2.1rem;"></div>
+
+                            <div class="card-body">
                                 <div class="mb-3">
                                     <div class="input-group">
                                         <div class="input-group-prepend">
@@ -119,6 +150,21 @@
                                         </div>
                                     {% endfor %}
                                 </div>
+
+                                <hr/>
+
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input" id="{{form.filter_ref.auto_id}}" name="{{form.filter_ref.name}}"
+                                        {{ form.filter_ref.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
+                                    <label class="custom-control-label" for="{{form.filter_ref.auto_id}}">{{form.filter_ref.label}}</label>
+                                    <span class="input-group-text fas fa-question-circle help-icon"
+                                        title="Only reference data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
+                                </div>
+
+                                <div id="ref-filters" class="indented">
+                                    {{ form.ref_filters }}
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -172,54 +218,9 @@
 
                         <div class="card mb-4 shadow-sm">
                             <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Data Filtering</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Only data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
-                            </div>
-                            <div class="card-body">
-
-                                <div class="custom-control custom-checkbox">
-                                    <input class="custom-control-input" id="{{form.filter_data.auto_id}}" name="{{form.filter_data.name}}"
-                                        {{ form.filter_data.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'data-filters')">
-                                    <label class="custom-control-label" for="{{form.filter_data.auto_id}}">{{form.filter_data.label}}</label>
-                                </div>
-
-                                <div id="data-filters" class="indented">
-                                    {{ form.data_filters }}
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Reference Filtering</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Only reference data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
-                            </div>
-                            <div class="card-body">
-
-                                <div class="custom-control custom-checkbox">
-                                    <input class="custom-control-input" id="{{form.filter_ref.auto_id}}" name="{{form.filter_ref.name}}"
-                                        {{ form.filter_ref.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
-                                    <label class="custom-control-label" for="{{form.filter_ref.auto_id}}">{{form.filter_ref.label}}</label>
-                                </div>
-
-                                <div id="ref-filters" class="indented">
-                                    {{ form.ref_filters }}
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-deck">
-
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
                                 <h4 class="my-0 font-weight-normal">Scaling</h4>
                                 <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="The data values will be scaled to the reference value range (or vice versa) using the selected method."></span>
+                                    title="The data values will be scaled to the value range of the selected dataset using the selected method."></span>
                             </div>
                             <div class="card-body">
 
@@ -229,7 +230,7 @@
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Scale</span>
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
                                                 </div>
                                                 {% render_field form.scaling_ref class="custom-select d-block" %}
                                             </div>
