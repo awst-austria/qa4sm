@@ -99,41 +99,4 @@ class Migration(migrations.Migration):
         ),        
         
         migrations.RunPython(update_validation_runs),        
-        
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='data_dataset',
-        ),
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='data_filters',
-        ),
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='data_variable',
-        ),
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='data_version',
-        ),
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='ref_dataset',
-        ),
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='ref_filters',
-        ),
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='ref_variable',
-        ),
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='ref_version',
-        ),        
-        migrations.RemoveField(
-            model_name='validationrun',
-            name='old_scaling_ref',
-        ),
     ]
