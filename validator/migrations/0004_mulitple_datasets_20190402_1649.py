@@ -15,7 +15,7 @@ def update_validation_runs(apps, schema_editor):
     ValidationRun = apps.get_model('validator', 'ValidationRun')
     DatasetConfiguration = apps.get_model('validator', 'DatasetConfiguration')
     for run in ValidationRun.objects.all():
-        
+
         dataset_c = DatasetConfiguration()
         dataset_c.validation = run
         dataset_c.dataset = run.data_dataset
@@ -25,7 +25,7 @@ def update_validation_runs(apps, schema_editor):
 
         dataset_c.filters.set(run.data_filters.all())
         dataset_c.save()
-        
+
         reference_c = DatasetConfiguration()
         reference_c.validation = run
         reference_c.dataset = run.ref_dataset
@@ -42,14 +42,14 @@ def update_validation_runs(apps, schema_editor):
 
         reference_c.filters.set(run.ref_filters.all())
         reference_c.save()
-        
+
         run.reference_configuration = reference_c
-        
+
         if run.scaling_ref == SCALE_DATA:
             run.scaling_ref = reference_c
         else:
             run.scaling_ref = dataset_c
-        
+
         run.save()
 
 class Migration(migrations.Migration):
@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
             model_name='validationrun',
             name='reference_configuration',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='ref_validation_run', to='validator.DatasetConfiguration'),
-        ),        
-        
-        migrations.RunPython(update_validation_runs),        
+        ),
+
+        migrations.RunPython(update_validation_runs),
     ]
