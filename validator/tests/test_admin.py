@@ -23,6 +23,9 @@ def execute_test_job(self, parameter):
 
 ## See also: https://stackoverflow.com/a/11887308/
 class TestAdmin(TestCase):
+
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
+
     def setUp(self):
         self.user_credentials = {
             'username': 'testuser',

@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from os import path
 from re import sub as regex_sub
+import uuid
 
 from django.conf import settings
 
@@ -25,6 +26,7 @@ from validator.validation.readers import create_reader
 from validator.validation.filters import setup_filtering
 from validator.validation.batches import create_jobs
 from validator.validation.graphics import generate_all_graphs
+from validator.models.celery_task import CeleryTask
 
 
 __logger = logging.getLogger(__name__)
@@ -152,6 +154,7 @@ def check_and_store_results(validation_run, job, results, save_path):
 
 def run_validation(validation_id):
     validation_run = ValidationRun.objects.get(pk=validation_id)
+    validation_aborted_flag=False;
 
 
 #     if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')==False) or (settings.CELERY_TASK_ALWAYS_EAGER==False):
@@ -178,12 +181,38 @@ def run_validation(validation_id):
             #job_id = execute_job.delay(validation_id, j)
             async_results.append(job_id)
             job_table[job_id] = j
+            celery_task=CeleryTask()
+            celery_task.validation=validation_run
+            celery_task.celery_task=uuid.UUID(job_id.id).hex
+            celery_task.save()
 
         executed_jobs = 0
         for async_result in async_results:
             try:
-                result_dict=async_result.get() # calling result.AsyncResult.get
-                async_result.forget()
+                wait_for_result=True
+                while wait_for_result:
+                    try:
+                        result_dict=async_result.get(timeout=10) # calling result.AsyncResult.get
+                        async_result.forget()
+                        try:
+                            celery_task=CeleryTask.objects.get(celery_task=async_result.id)
+                            celery_task.delete()
+                        except Exception:
+                            __logger.info('Celery task does not exists. ID: {}'.format(async_result.id))
+                        break
+                    except Exception:   #async_result.get timeout
+                        try:
+                            celery_task=CeleryTask.objects.get(celery_task=async_result.id)
+                            __logger.info('Celery task timeout. Continue...')
+                        except Exception:
+                            # Missing async result -> the validation has been cancelled
+                            validation_run.progress=-1
+                            validation_run.save()
+                            __logger.info('Validation got cancelled')
+                            validation_aborted_flag=True
+                            return validation_run
+                            
+                
                 results = result_dict['result']
                 job = result_dict['job']
                 check_and_store_results(validation_run, job, results, save_path)
@@ -192,10 +221,14 @@ def run_validation(validation_id):
                 validation_run.error_points += num_gpis_from_job(job_table[async_result])
                 __logger.exception('Celery could not execute the job. Job ID: {} Error: {}'.format(async_result.id,async_result.info))
             finally:
+                if validation_aborted_flag:
+                    return
                 executed_jobs +=1
                 validation_run.progress=round(((validation_run.ok_points + validation_run.error_points)/validation_run.total_points)*100)
                 validation_run.save()
                 __logger.info("Validation {} is {} % done...".format(validation_run.id, validation_run.progress))
+                
+                
 
         set_outfile(validation_run, run_dir)
         validation_run.save() # let's save before we do anything else...
@@ -210,12 +243,24 @@ def run_validation(validation_id):
 
     finally:
         validation_run.end_time = datetime.now(tzlocal())
-        __logger.info("Validation finished: {}. Jobs: {}, Errors: {}, OK: {}".format(
-            validation_run, validation_run.total_points, validation_run.error_points, validation_run.ok_points))
-        if (validation_run.error_points + validation_run.ok_points) != validation_run.total_points:
-            __logger.warn("Caution, # of gpis, # of errors, and # of OK points don't match!")
         validation_run.save()
+        __logger.info("Validation finished: {}. Jobs: {}, Errors: {}, OK: {}, End time: {} ".format(
+            validation_run, validation_run.total_points, validation_run.error_points, validation_run.ok_points,validation_run.end_time))
+        if validation_aborted_flag==False:
+            if (validation_run.error_points + validation_run.ok_points) != validation_run.total_points:
+                __logger.warn("Caution, # of gpis, # of errors, and # of OK points don't match!")
+                validation_run.save()
 
-        send_val_done_notification(validation_run)
+            send_val_done_notification(validation_run)
 
+    print('Valrun: {}'.format(validation_run))
     return validation_run
+
+def stop_running_validation(validation_id):
+    validation_run = ValidationRun.objects.get(pk=validation_id)
+    celery_tasks=CeleryTask.objects.filter(validation=validation_run)
+    for task in celery_tasks:
+        app.control.revoke(task.celery_task)
+        task.delete()
+    
+    

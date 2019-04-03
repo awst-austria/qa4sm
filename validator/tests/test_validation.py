@@ -7,7 +7,6 @@ from dateutil.tz import tzlocal
 from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from validator.validation.graphics import generate_all_graphs
 from os import path
 import shutil
 from django.test import TestCase
@@ -27,6 +26,8 @@ from validator.validation.globals import OUTPUT_FOLDER
 
 
 class TestValidation(TestCase):
+
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     def setUp(self):
         self.always_eager = None
@@ -407,6 +408,10 @@ class TestValidation(TestCase):
     def test_first_file_in_nothing_found(self):
         result = val.first_file_in('/tmp', 'there_really_should_be_no_extension_like_this')
         assert result is None
+
+    def test_count_gpis_exception(self):
+        num = val.num_gpis_from_job(None)
+        assert num == 1
 
 #     @pytest.mark.long_running
     def test_generate_graphs(self):
