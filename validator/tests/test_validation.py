@@ -212,20 +212,23 @@ class TestValidation(TestCase):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        run.ref_dataset = Dataset.objects.get(short_name='GLDAS')
-        run.ref_version = DatasetVersion.objects.get(short_name='GLDAS_TEST')
-        run.ref_variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
+        run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_TEST')
+        run.reference_configuration.variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
+        run.reference_configuration.save()
 
         run.interval_from = datetime(2005, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2006, 1, 1, tzinfo=UTC)
 
-        run.save() ## need to save before adding filters because django m2m relations work that way
+        run.save()
 
-        run.data_filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-        run.data_filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-
-        run.ref_filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.ref_filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
 
         run_id = run.id
 
@@ -247,17 +250,23 @@ class TestValidation(TestCase):
     def test_validation_ascat(self):
         run = self.generate_default_validation()
         run.user = self.testuser
-        run.data_dataset = Dataset.objects.get(short_name='ASCAT')
-        run.data_version = DatasetVersion.objects.get(short_name='ASCAT_H113')
-        run.data_variable = DataVariable.objects.get(short_name='ASCAT_sm')
 
-        run.scaling_ref = ValidationRun.SCALE_REF
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.dataset = Dataset.objects.get(short_name='ASCAT')
+                config.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
+                config.variable = DataVariable.objects.get(short_name='ASCAT_sm')
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        #run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
 
-        run.save() ## need to save before adding filters because django m2m relations work that way
+        run.save()
 
         run_id = run.id
 
@@ -410,9 +419,14 @@ class TestValidation(TestCase):
             for version in vs:
                 run = ValidationRun()
                 run.start_time = datetime.now(tzlocal())
-                run.ref_dataset = dataset
-                run.ref_version = version
-                run.ref_variable = dataset.variables.first()
+                run.save()
+
+                ref_c = DatasetConfiguration()
+                ref_c.validation = run
+                ref_c.dataset = dataset
+                ref_c.version = version
+                ref_c.variable = dataset.variables.first()
+                ref_c.save()
 
                 total_points, jobs = val.create_jobs(run)
                 print(version)
