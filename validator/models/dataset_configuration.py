@@ -16,4 +16,8 @@ class DatasetConfiguration(models.Model):
 #     reference = models.BooleanField()
 
     def __str__(self):
-        return "Data set: {}, version: {}, variable: {}".format(self.dataset.short_name, self.version.short_name, self.variable.short_name)
+        return "Data set: {}, version: {}, variable: {}".format(
+            self.dataset if hasattr(self, 'dataset') else "none",
+            self.version if hasattr(self, 'version') else "none",
+            self.variable if hasattr(self, 'variable') else "none",
+            )
