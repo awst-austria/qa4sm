@@ -439,15 +439,15 @@ class TestValidation(TestCase):
 
         # create validation object and data folder for it
         v = self.generate_default_validation()
-        v.ref_dataset = Dataset.objects.get(short_name='ISMN')
-        v.save()
+        # scatterplot
+        v.reference_configuration.dataset = Dataset.objects.get(short_name='ISMN')
+        v.reference_configuration.save()
         run_dir = path.join(OUTPUT_FOLDER, str(v.id))
         val.mkdir_if_not_exists(run_dir)
 
         # copy our netcdf data file there and link it in the validation object
         # then generate the graphs
 
-        # heatmap
         shutil.copy(infile1, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
@@ -461,11 +461,11 @@ class TestValidation(TestCase):
         val.mkdir_if_not_exists(run_dir)
 
         # do the same for the other netcdf file
-        # scatterplot
         shutil.copy(infile2, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
-        v.ref_dataset = Dataset.objects.get(short_name='GLDAS')
-        v.save()
+        # heatmap
+        v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
+        v.reference_configuration.save()
         val.generate_all_graphs(v, run_dir)
 
         assert len(os.listdir(run_dir)) >= 12
