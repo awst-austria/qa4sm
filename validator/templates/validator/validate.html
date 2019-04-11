@@ -324,8 +324,14 @@
             });
         }
 
+        function change_tab_name() {
+            var datasetName = $(this).find('option:selected').text();
+            var tabId = '#' + $(this).attr('id').replace(/dataset$/, 'tab');
+            $(tabId).text(datasetName);
+        }
+
         {% for dc_form in dc_formset.forms %}
-            $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload
+            $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
         {% endfor %}
         /* $("#{{ val_form.ref_dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload */
     </script>
