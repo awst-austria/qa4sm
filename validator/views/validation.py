@@ -1,26 +1,33 @@
 from datetime import datetime
+import logging
 from multiprocessing import Process
 
 from dateutil.tz import tzlocal
 from django.contrib.auth.decorators import login_required
+from django.db import connections
+from django.forms import formset_factory
+from django.forms.models import ModelMultipleChoiceField
+from django.http.response import HttpResponse
+from django.http.response import HttpResponseBadRequest, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-
-from validator.forms import ValidationRunForm
-from validator.validation import run_validation
-from django.db import connections
-import logging
-from django.http.response import HttpResponseBadRequest, JsonResponse
 from django.template import loader
-from django.shortcuts import get_object_or_404
-from django.http.response import HttpResponse
-from validator.forms.validation_run import FilterCheckboxSelectMultiple
-from django.forms.models import ModelMultipleChoiceField
+
+from validator.forms import DatasetConfigurationForm
+from validator.forms import FilterCheckboxSelectMultiple
+from validator.forms import ValidationRunForm
+from validator.models import DataFilter
 from validator.models import Dataset
 from validator.models import Settings
 from validator.models import ValidationRun
+from validator.validation import run_validation
+import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
+from re import sub as regex_subs
 
+# see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
+DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, validate_max=True)
 
 __logger = logging.getLogger(__name__)
 
@@ -36,17 +43,23 @@ def stop_validation(request, result_uuid):
 
     return HttpResponse(status=405) # if we're not DELETEing, send back "Method not Allowed"
 
-## TODO: find nicer way to restrict access (not repeating login_required on every view)
 @login_required(login_url='/login/')
 def validation(request):
+    dc_prefix = 'datasets'
+    initial_values = [{'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
+                       'dataset': Dataset.objects.get(short_name=val_globals.C3S), }]
+
     if request.method == "POST":
         if Settings.load().maintenance_mode:
             __logger.info('Redirecting to the validation page because the system is in maintenance mode.')
             return redirect('validation')
 
-        form = ValidationRunForm(request.POST)
-        if form.is_valid():
-            newrun = form.save(commit=False)
+        # formset for data configurations for our new validation
+        dc_formset = DatasetConfigurationFormSet(request.POST, prefix=dc_prefix, initial=initial_values)
+        # form for the rest of the validation parameters
+        val_form = ValidationRunForm(request.POST)
+        if val_form.is_valid() and dc_formset.is_valid():
+            newrun = val_form.save(commit=False)
             newrun.user = request.user
             newrun.start_time = datetime.now(tzlocal())
 
@@ -67,24 +80,30 @@ def validation(request):
                                                 microsecond=999999,
                                                 tzinfo=newrun.interval_to.tzinfo)
             newrun.save() # save the validation run
-            form.save_m2m() # save many-to-many related objects, e.g. filters. If you don't do this, filters won't get saved!
             run_id = newrun.id
+
+            # attach all dataset configurations to the validation and save them
+            for dc_form in dc_formset:
+                dc = dc_form.save(commit=False)
+                dc.validation = newrun
+                dc.save()
+                dc_form.save_m2m() # save many-to-many related objects, e.g. filters. If you don't do this, filters won't get saved!
 
             # need to close all db connections before forking, see
             # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
             connections.close_all()
 
-            ## TODO: Check if we want to use celery: http://docs.celeryproject.org/en/latest/getting-started/first-steps-with-celery.html#tut-celery
-            p = Process(target=run_validation, kwargs={"validation_id": run_id})
-            p.start()
+#             p = Process(target=run_validation, kwargs={"validation_id": run_id})
+#             p.start()
 
             return redirect('result', result_uuid=run_id)
         else:
-            __logger.error("Errors in validation form {}".format(form.errors))
+            __logger.error("Errors in validation form {}\n{}".format(val_form.errors, dc_formset.errors))
     else:
-        form = ValidationRunForm()
+        val_form = ValidationRunForm()
+        dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=initial_values)
 
-    return render(request, 'validator/validate.html', {'form': form,'maintenance_mode':Settings.load().maintenance_mode})
+    return render(request, 'validator/validate.html', {'val_form': val_form, 'dc_formset': dc_formset, 'maintenance_mode':Settings.load().maintenance_mode})
 
 
 ## Ajax stuff required for validation view
@@ -103,39 +122,30 @@ def __render_options(entity_list):
     return content
 
 # render filters as html checkboxes with descriptions
-def __render_filters(filters, selected_type):
-    widget_name='data_filters'
-    widget_id='id_data_filters'
-    if selected_type == 'ref':
-        widget_name='ref_filters'
-        widget_id='id_ref_filters'
-
+def __render_filters(filters, filter_widget_id):
+    widget_name = regex_subs(r'^id_', '', filter_widget_id)
     filter_field = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=filters, required=False)
     filter_html = filter_field.widget.render(
         name=widget_name,
         value=filters[0].id, # this pre-selects the first filter in the form
-        attrs={'id': widget_id})
+        attrs={'id': filter_widget_id})
     return filter_html
 
 ## returns the options for the variable and version select dropdowns and the filter checkboxes based on the selected dataset
 @login_required(login_url='/login/')
 def ajax_get_dataset_options(request):
     selected_dataset_name = request.GET.get('dataset_id')
-    selected_type = request.GET.get('dataset_type')
+    filter_widget_id = request.GET.get('filter_widget_id')
 
     try:
         selected_dataset = Dataset.objects.get(pk=selected_dataset_name)
     except:
         return HttpResponseBadRequest("Not a valid dataset")
 
-    # ignore pranksters who send other types than 'ref' or 'data'
-    if selected_type != 'ref':
-        selected_type = 'data'
-
     response_data = {
         'versions': __render_options(selected_dataset.versions.all().order_by('pretty_name')),
         'variables': __render_options(selected_dataset.variables.all()),
-        'filters': __render_filters(selected_dataset.filters.all(), selected_type),
+        'filters': __render_filters(selected_dataset.filters.all(), filter_widget_id),
         }
 
     return JsonResponse(response_data)

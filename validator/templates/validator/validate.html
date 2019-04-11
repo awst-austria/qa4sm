@@ -1,5 +1,6 @@
 {% extends 'validator/base.html' %}
 {% load widget_tweaks %}
+{% load static %}
 
 {% block content %}
     <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}">
@@ -26,75 +27,77 @@
 
                             <nav>
                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                    <a class="nav-item nav-link active" id="nav-dataset1-tab" data-toggle="tab" href="#nav-dataset1" role="tab" aria-controls="nav-dataset1" aria-selected="true">C3S</a>
-                                    <a class="nav-item nav-link" id="nav-dataset2-tab" data-toggle="tab" href="#nav-dataset2" role="tab" aria-controls="nav-dataset2" aria-selected="false">SMAP</a>
-                                    <a class="nav-item nav-link" id="nav-dataset3-tab" data-toggle="tab" href="#nav-dataset3" role="tab" aria-controls="nav-dataset3" aria-selected="false">ASCAT</a>
-                                    <a class="tab-plus btn btn-primary" href="#"><span class="fas fa-plus" title="Add another dataset"></span></a>
+                                    {% for dc_form in dc_formset %}
+                                        <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}" role="tab" aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %}>C3S</a>
+                                    {% endfor %}
+                                        <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
                                 </div>
                             </nav>
 
-                            <div class="card-body tab-content">
-                                <div class="tab-pane fade show active" id="nav-dataset1" role="tabpanel" aria-labelledby="nav-dataset1-tab">
-                                    <div class="mb-3">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
+                            {{ dc_formset.management_form }}
+
+                            <div id="dc_form_container" class="card-body tab-content">
+
+                                {% for dc_form in dc_formset.forms %}
+                                    <div class="dc_form tab-pane fade {% if forloop.first %}show active{% endif %}" id="id_{{ dc_form.prefix }}" role="tabpanel" aria-labelledby="id_{{ dc_form.prefix }}-tab">
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
+                                                </div>
+                                                {% render_field dc_form.dataset class="custom-select d-block" %}
                                             </div>
-                                            {% render_field form.data_dataset class="custom-select d-block" %}
+                                            {% for error in dc_form.dataset.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
                                         </div>
-                                        {% for error in form.data_dataset.errors %}
-                                            <div class="custom-invalid-feedback">
-                                                {{ error }}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
 
-                                    <div class="mb-3">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text addon-w" id="data-addon2">Version</span>
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="data-addon2">Version</span>
+                                                </div>
+                                                {% render_field dc_form.version class="custom-select d-block" %}
                                             </div>
-                                            {% render_field form.data_version class="custom-select d-block" %}
+                                            {% for error in dc_form.version.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
                                         </div>
-                                        {% for error in form.data_version.errors %}
-                                            <div class="custom-invalid-feedback">
-                                                {{ error }}
-                                            </div>
-                                        {% endfor %}
-                                    </div>
 
-                                    <div class="mb-3">
-                                        <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text addon-w" id="data-addon3">Variable</span>
+                                        <div class="mb-3">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="data-addon3">Variable</span>
+                                                </div>
+                                                {% render_field dc_form.variable class="custom-select d-block" %}
                                             </div>
-                                            {% render_field form.data_variable class="custom-select d-block" %}
+                                            {% for error in dc_form.variable.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
                                         </div>
-                                        {% for error in form.data_variable.errors %}
-                                            <div class="custom-invalid-feedback">
-                                                {{ error }}
-                                            </div>
-                                        {% endfor %}
+
+                                        <hr/>
+
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" id="{{dc_form.filter_dataset.auto_id}}" name="{{dc_form.prefix}}-{{dc_form.filter_dataset.name}}"
+                                                {{ dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this)">
+                                            <label class="custom-control-label" for="{{dc_form.filter_dataset.auto_id}}">{{dc_form.filter_dataset.label}}</label>
+
+                                            <span class="input-group-text fas fa-question-circle help-icon"
+                                                title="Only data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
+                                        </div>
+
+                                        <div id="id_{{dc_form.prefix}}-filters" class="indented tabSpecific">
+                                            {{ dc_form.filters }}
+                                        </div>
                                     </div>
-
-                                    <hr/>
-
-                                    <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input" id="{{form.filter_data.auto_id}}" name="{{form.filter_data.name}}"
-                                            {{ form.filter_data.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'data-filters')">
-                                        <label class="custom-control-label" for="{{form.filter_data.auto_id}}">{{form.filter_data.label}}</label>
-
-                                        <span class="input-group-text fas fa-question-circle help-icon"
-                                            title="Only data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
-                                    </div>
-
-                                    <div id="data-filters" class="indented">
-                                        {{ form.data_filters }}
-                                    </div>
-                                </div>
-
-                                <div class="tab-pane fade" id="nav-dataset2" role="tabpanel" aria-labelledby="nav-dataset2-tab">2nd dataset here</div>
-                                <div class="tab-pane fade" id="nav-dataset3" role="tabpanel" aria-labelledby="nav-dataset3-tab">3rd dataset here</div>
+                                {% endfor %}
 
                             </div>
                         </div>
@@ -114,9 +117,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon1">Dataset</span>
                                         </div>
-                                        {% render_field form.ref_dataset class="custom-select d-block" %}
+                                        {% render_field val_form.ref_dataset class="custom-select d-block" %}
                                     </div>
-                                    {% for error in form.ref_dataset.errors %}
+                                    {% for error in val_form.ref_dataset.errors %}
                                         <div class="custom-invalid-feedback">
                                             {{ error }}
                                         </div>
@@ -128,9 +131,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon2">Version</span>
                                         </div>
-                                        {% render_field form.ref_version class="custom-select d-block" %}
+                                        {% render_field val_form.ref_version class="custom-select d-block" %}
                                     </div>
-                                    {% for error in form.ref_version.errors %}
+                                    {% for error in val_form.ref_version.errors %}
                                         <div class="custom-invalid-feedback">
                                             {{ error }}
                                         </div>
@@ -142,9 +145,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon3">Variable</span>
                                         </div>
-                                        {% render_field form.ref_variable class="custom-select d-block" %}
+                                        {% render_field val_form.ref_variable class="custom-select d-block" %}
                                     </div>
-                                    {% for error in form.ref_variable.errors %}
+                                    {% for error in val_form.ref_variable.errors %}
                                         <div class="custom-invalid-feedback">
                                             {{ error }}
                                         </div>
@@ -154,15 +157,15 @@
                                 <hr/>
 
                                 <div class="custom-control custom-checkbox">
-                                    <input class="custom-control-input" id="{{form.filter_ref.auto_id}}" name="{{form.filter_ref.name}}"
-                                        {{ form.filter_ref.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
-                                    <label class="custom-control-label" for="{{form.filter_ref.auto_id}}">{{form.filter_ref.label}}</label>
+                                    <input class="custom-control-input" id="{{val_form.filter_ref.auto_id}}" name="{{val_form.filter_ref.name}}"
+                                        {{ val_form.filter_ref.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
+                                    <label class="custom-control-label" for="{{val_form.filter_ref.auto_id}}">{{val_form.filter_ref.label}}</label>
                                     <span class="input-group-text fas fa-question-circle help-icon"
                                         title="Only reference data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
                                 </div>
 
                                 <div id="ref-filters" class="indented">
-                                    {{ form.ref_filters }}
+                                    {{ val_form.ref_filters }}
                                 </div>
 
                             </div>
@@ -186,9 +189,9 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon1">From</span>
                                                 </div>
-                                                {% render_field form.interval_from class="custom-select d-block" %}
+                                                {% render_field val_form.interval_from class="custom-select d-block" %}
                                             </div>
-                                            {% for error in form.interval_from.errors %}
+                                            {% for error in val_form.interval_from.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
@@ -200,9 +203,9 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon2">To</span>
                                                 </div>
-                                                {% render_field form.interval_to class="custom-select d-block" %}
+                                                {% render_field val_form.interval_to class="custom-select d-block" %}
                                             </div>
-                                            {% for error in form.interval_to.errors %}
+                                            {% for error in val_form.interval_to.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
@@ -232,9 +235,9 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
                                                 </div>
-                                                {% render_field form.scaling_ref class="custom-select d-block" %}
+                                                {% render_field val_form.scaling_ref class="custom-select d-block" %}
                                             </div>
-                                            {% for error in form.scaling_ref.errors %}
+                                            {% for error in val_form.scaling_ref.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
@@ -246,9 +249,9 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
                                                 </div>
-                                                {% render_field form.scaling_method class="custom-select d-block" %}
+                                                {% render_field val_form.scaling_method class="custom-select d-block" %}
                                             </div>
-                                            {% for error in form.scaling_method.errors %}
+                                            {% for error in val_form.scaling_method.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
@@ -264,12 +267,12 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text addon-w" id="tag-addon1">Name your validation</span>
                         </div>
-                        {% render_field form.name_tag class="d-block form-control" %}
+                        {% render_field val_form.name_tag class="d-block form-control" %}
                         <div class="input-group-append">
                             <span class="input-group-text fas fa-question-circle" id="tag-addon2" title="You can optionally name the validation to make it easier to identify in your list of validations."></span>
                         </div>
                     </div>
-                    {% for error in form.name_tag.errors %}
+                    {% for error in val_form.name_tag.errors %}
                         <div class="custom-invalid-feedback">
                             {{ error }}
                         </div>
@@ -285,16 +288,19 @@
 
 {% block javascript %}
     <script type="text/javascript">
-        function toggleFiltering(checkbox, groupid) {
-            filterboxes = $( '#' + groupid ).find('input:checkbox')
-            newDisabledValue = !checkbox.checked
-            for (f of filterboxes) {
-                f.disabled=newDisabledValue
+        function toggleFiltering(checkbox) {
+            var groupId = checkbox.id.replace(/filter_dataset$/, 'filters')
+            var filterboxes = $('#' + groupId).find('input:checkbox');
+            var newDisabledValue = !checkbox.checked;
+            for (var f of filterboxes) {
+                f.disabled=newDisabledValue;
             }
         }
         // on page load, call once:
-        toggleFiltering($('#{{form.filter_data.auto_id}}')[0], 'data-filters')
-        toggleFiltering($('#{{form.filter_ref.auto_id}}')[0], 'ref-filters')
+        {% for dc_form in dc_formset.forms %}
+            toggleFiltering($('#{{dc_form.filter_dataset.auto_id}}')[0]);
+        {% endfor %}
+        /* toggleFiltering($('#{{val_form.filter_ref.auto_id}}')[0]); */
     </script>
 
     <script type="text/javascript">
@@ -302,19 +308,15 @@
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
             var widgetId = $(this).attr('id');
-            var datasetType = (widgetId == '{{ form.ref_dataset.auto_id }}') ? 'ref' : 'data';
+            var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             $.ajax({
                 url: url,
-                data: { 'dataset_id': datasetId, 'dataset_type': datasetType },
+                data: { 'dataset_id': datasetId, 'filter_widget_id': filterWidgetId },
                 success: function (return_data) {
-                    var version_widget = "#{{ form.data_version.auto_id }}";
-                    var variable_widget = "#{{ form.data_variable.auto_id }}";
-                    var filter_widget = "#data-filters";
-                    if (datasetType == 'ref') {
-                        version_widget = "#{{ form.ref_version.auto_id }}";
-                        variable_widget = "#{{ form.ref_variable.auto_id }}";
-                        var filter_widget = "#ref-filters";
-                    }
+                    var dataset_widget = "#" + widgetId;
+                    var version_widget = dataset_widget.replace(/dataset$/, "version");
+                    var variable_widget = dataset_widget.replace(/dataset$/, "variable");
+                    var filter_widget = "#" + filterWidgetId;
                     $(version_widget).html(return_data['versions']);
                     $(variable_widget).html(return_data['variables']);
                     $(filter_widget).html(return_data['filters']);
@@ -322,8 +324,75 @@
             });
         }
 
-        $("#{{ form.data_dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload
-        $("#{{ form.ref_dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload
+        {% for dc_form in dc_formset.forms %}
+            $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload
+        {% endfor %}
+        /* $("#{{ val_form.ref_dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload */
     </script>
+
+    <script type="text/javascript">
+        function cloneTab(tabContentClass, tabLinkClass, formsetPrefix, addButton) {
+            var selector = tabContentClass + ':last';
+            var link_selector = tabLinkClass + ':last';
+            var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
+            var maxSelector = '#id_' + formsetPrefix + '-MAX_NUM_FORMS';
+
+            var totalNoForms = $(totalSelector).val();
+            var oldId = $(selector).attr('id');
+            var newId = 'id_' + formsetPrefix + '-' + totalNoForms;
+            var newTabId = newId + '-tab';
+
+            // de-select currently selected tab
+            $(tabContentClass + '.active').removeClass( "active show" );
+            $(tabLinkClass + '.active').removeAttr('aria-selected');
+            $(tabLinkClass + '.active').removeClass( "active show" );
+
+            // clone tab content
+            var newElement = $(selector).clone(true);
+            newElement.attr('id', newId);
+            newElement.attr('aria-labelledby', newTabId);
+
+            newElement.find(':input').each(function() {
+                var id = $(this).attr('id').replace(oldId, newId);
+                var name = id.replace(/^id_/, '')
+                $(this).attr({'name': name, 'id': id});
+            });
+            newElement.find('label').each(function() {
+                var newFor = $(this).attr('for').replace(oldId, newId);
+                $(this).attr('for', newFor);
+            });
+            newElement.find('.tabSpecific').each(function() {
+                var id = $(this).attr('id').replace(oldId, newId);
+                $(this).attr('id', id);
+            });
+
+            // clone tab link
+            var newLink = $(link_selector).clone(false);
+            newLink.attr('id', newTabId);
+            newLink.attr('href', '#' + newId);
+            newLink.attr('aria-controls', '#' + newId);
+
+            totalNoForms++;
+            $(totalSelector).val(totalNoForms);
+
+            // insert new tab and link and select it
+            $(selector).after(newElement);
+            $(link_selector).after(newLink);
+            newLink.tab('show')
+
+            // prevent addition of new tabs if max reached
+            if ( totalNoForms >= $(maxSelector).val() ) {
+                addButton.hide();
+            }
+
+            // trigger change event on dataset select so that dependent parameters are set correctly
+            $('#' + newId + '-dataset').change();
+        }
+
+        $('#add_dc_form').click(function() {
+            cloneTab('.dc_form', '.dc_form_link', 'datasets', $(this));
+        });
+    </script>
+
 {% endblock %}
 
