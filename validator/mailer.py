@@ -16,14 +16,12 @@ def send_val_done_notification(val_run):
         url = SITE_URL + reverse('result', kwargs={'result_uuid': val_run.id})
 
         subject = '[QA4SM] Validation finished'
-        body = 'Dear {} {},\n\nYour validation of {} ({}) against {} ({}) data has been completed.\nThe results are available at: {}.\n\nBest regards,\nQA4SM team'.format(
+        body = 'Dear {} {},\n\nYour validation has been completed.\nThe results are available at: {}.\n\nBest regards,\nQA4SM team'.format(
             val_run.user.first_name,
             val_run.user.last_name,
-            val_run.data_dataset,
-            val_run.data_version,
-            val_run.ref_dataset,
-            val_run.ref_version,
             url)
+        
+        __logger.debug(body)
 
         _send_email(recipients=[val_run.user.email],
                     subject=subject,
