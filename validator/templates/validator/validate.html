@@ -117,9 +117,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon1">Dataset</span>
                                         </div>
-                                        {% render_field val_form.ref_dataset class="custom-select d-block" %}
+                                        {% render_field ref_dc_form.dataset class="custom-select d-block" %}
                                     </div>
-                                    {% for error in val_form.ref_dataset.errors %}
+                                    {% for error in ref_dc_form.dataset.errors %}
                                         <div class="custom-invalid-feedback">
                                             {{ error }}
                                         </div>
@@ -131,9 +131,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon2">Version</span>
                                         </div>
-                                        {% render_field val_form.ref_version class="custom-select d-block" %}
+                                        {% render_field ref_dc_form.version class="custom-select d-block" %}
                                     </div>
-                                    {% for error in val_form.ref_version.errors %}
+                                    {% for error in ref_dc_form.version.errors %}
                                         <div class="custom-invalid-feedback">
                                             {{ error }}
                                         </div>
@@ -145,9 +145,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon3">Variable</span>
                                         </div>
-                                        {% render_field val_form.ref_variable class="custom-select d-block" %}
+                                        {% render_field ref_dc_form.variable class="custom-select d-block" %}
                                     </div>
-                                    {% for error in val_form.ref_variable.errors %}
+                                    {% for error in ref_dc_form.variable.errors %}
                                         <div class="custom-invalid-feedback">
                                             {{ error }}
                                         </div>
@@ -157,17 +157,16 @@
                                 <hr/>
 
                                 <div class="custom-control custom-checkbox">
-                                    <input class="custom-control-input" id="{{val_form.filter_ref.auto_id}}" name="{{val_form.filter_ref.name}}"
-                                        {{ val_form.filter_ref.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
-                                    <label class="custom-control-label" for="{{val_form.filter_ref.auto_id}}">{{val_form.filter_ref.label}}</label>
+                                    <input class="custom-control-input" id="{{ref_dc_form.filter_dataset.auto_id}}" name="{{ref_dc_form.prefix}}-{{ref_dc_form.filter_dataset.name}}"
+                                        {{ ref_dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
+                                    <label class="custom-control-label" for="{{ref_dc_form.filter_dataset.auto_id}}">{{ref_dc_form.filter_dataset.label}}</label>
                                     <span class="input-group-text fas fa-question-circle help-icon"
                                         title="Only reference data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
                                 </div>
 
-                                <div id="ref-filters" class="indented">
-                                    {{ val_form.ref_filters }}
+                                <div id="id_{{ref_dc_form.prefix}}-filters" class="indented">
+                                    {{ ref_dc_form.filters }}
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -300,7 +299,7 @@
         {% for dc_form in dc_formset.forms %}
             toggleFiltering($('#{{dc_form.filter_dataset.auto_id}}')[0]);
         {% endfor %}
-        /* toggleFiltering($('#{{val_form.filter_ref.auto_id}}')[0]); */
+        toggleFiltering($('#{{ref_dc_form.filter_dataset.auto_id}}')[0]);
     </script>
 
     <script type="text/javascript">
@@ -333,7 +332,7 @@
         {% for dc_form in dc_formset.forms %}
             $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
         {% endfor %}
-        /* $("#{{ val_form.ref_dataset.auto_id }}").change(ajax_change_dataset).change(); // second change() to call change on pageload */
+        $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
     </script>
 
     <script type="text/javascript">

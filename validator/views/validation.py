@@ -46,8 +46,12 @@ def stop_validation(request, result_uuid):
 @login_required(login_url='/login/')
 def validation(request):
     dc_prefix = 'datasets'
-    initial_values = [{'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
-                       'dataset': Dataset.objects.get(short_name=val_globals.C3S), }]
+    ref_repfix = 'ref'
+    data_initial_values = [{'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
+                            'dataset': Dataset.objects.get(short_name=val_globals.C3S), }]
+
+    ref_initial_values = {'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
+                          'dataset': Dataset.objects.get(short_name=val_globals.ISMN), }
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:
@@ -55,7 +59,9 @@ def validation(request):
             return redirect('validation')
 
         # formset for data configurations for our new validation
-        dc_formset = DatasetConfigurationFormSet(request.POST, prefix=dc_prefix, initial=initial_values)
+        dc_formset = DatasetConfigurationFormSet(request.POST, prefix=dc_prefix, initial=data_initial_values)
+        # form for the reference configuration
+        ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
         # form for the rest of the validation parameters
         val_form = ValidationRunForm(request.POST)
         if val_form.is_valid() and dc_formset.is_valid():
@@ -89,6 +95,16 @@ def validation(request):
                 dc.save()
                 dc_form.save_m2m() # save many-to-many related objects, e.g. filters. If you don't do this, filters won't get saved!
 
+            ref_dc = ref_dc_form.save(commit=False)
+            ref_dc.validation = newrun
+            ref_dc.save()
+            ref_dc_form.save_m2m() # save many-to-many related objects, e.g. filters. If you don't do this, filters won't get saved!
+
+            newrun.reference_configuration = ref_dc
+            # TODO: let the user decide which dataset to use as scaling ref
+            newrun.scaling_ref = ref_dc
+            newrun.save()
+
             # need to close all db connections before forking, see
             # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
             connections.close_all()
@@ -101,9 +117,10 @@ def validation(request):
             __logger.error("Errors in validation form {}\n{}".format(val_form.errors, dc_formset.errors))
     else:
         val_form = ValidationRunForm()
-        dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=initial_values)
+        dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=data_initial_values)
+        ref_dc_form = DatasetConfigurationForm(prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
 
-    return render(request, 'validator/validate.html', {'val_form': val_form, 'dc_formset': dc_formset, 'maintenance_mode':Settings.load().maintenance_mode})
+    return render(request, 'validator/validate.html', {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form, 'maintenance_mode':Settings.load().maintenance_mode})
 
 
 ## Ajax stuff required for validation view
