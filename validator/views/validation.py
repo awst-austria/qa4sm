@@ -1,9 +1,11 @@
 from datetime import datetime
 import logging
 from multiprocessing import Process
+from re import sub as regex_subs
 
 from dateutil.tz import tzlocal
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.db import connections
 from django.forms import formset_factory
 from django.forms.models import ModelMultipleChoiceField
@@ -24,10 +26,10 @@ from validator.models import ValidationRun
 from validator.validation import run_validation
 import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
-from re import sub as regex_subs
+
 
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
-DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, validate_max=True)
+DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
 
 __logger = logging.getLogger(__name__)
 
@@ -60,11 +62,21 @@ def validation(request):
 
         # formset for data configurations for our new validation
         dc_formset = DatasetConfigurationFormSet(request.POST, prefix=dc_prefix, initial=data_initial_values)
+
+        ## apparently, a missing management form on the formset is a reason to throw a hissy fit err...
+        ## ValidationError - instead of just appending it to dc_formset.non_form_errors. Whatever...
+        try:
+            dc_formset.is_valid()
+        except ValidationError as e:
+            __logger.exception(e)
+            if e.code == 'missing_management_form':
+                return HttpResponseBadRequest('Not a valid request: ' + e.message)
+
         # form for the reference configuration
         ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
         # form for the rest of the validation parameters
         val_form = ValidationRunForm(request.POST)
-        if val_form.is_valid() and dc_formset.is_valid():
+        if val_form.is_valid() and dc_formset.is_valid() and ref_dc_form.is_valid():
             newrun = val_form.save(commit=False)
             newrun.user = request.user
             newrun.start_time = datetime.now(tzlocal())
@@ -95,6 +107,7 @@ def validation(request):
                 dc.save()
                 dc_form.save_m2m() # save many-to-many related objects, e.g. filters. If you don't do this, filters won't get saved!
 
+            # also attach the reference config
             ref_dc = ref_dc_form.save(commit=False)
             ref_dc.validation = newrun
             ref_dc.save()
@@ -114,7 +127,7 @@ def validation(request):
 
             return redirect('result', result_uuid=run_id)
         else:
-            __logger.error("Errors in validation form {}\n{}".format(val_form.errors, dc_formset.errors))
+            __logger.error("Errors in validation form {}\n{}\n{}".format(val_form.errors, dc_formset.errors, ref_dc_form.errors))
     else:
         val_form = ValidationRunForm()
         dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=data_initial_values)

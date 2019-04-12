@@ -25,6 +25,12 @@
                                     title="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."></span>
                             </div>
 
+                            {% for error in dc_formset.non_form_errors %}
+                                <div class="custom-invalid-feedback">
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+
                             <nav>
                                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                     {% for dc_form in dc_formset %}
