@@ -15,14 +15,26 @@ def send_val_done_notification(val_run):
 
         url = SITE_URL + reverse('result', kwargs={'result_uuid': val_run.id})
 
+        # enumerate datasets with "and" and Oxford comma.
+        dataset_string = ''
+        and_position = val_run.dataset_configurations.count() - 1 - (1 if val_run.reference_configuration is not None else 0)
+        i = 0
+        for dc in val_run.dataset_configurations.all():
+            if dc.id != val_run.reference_configuration.id:
+                if (i != 0):
+                    dataset_string += ", "
+                    if (i == and_position):
+                        dataset_string += "and "
+                dataset_string += "{} ({})".format(dc.dataset.pretty_name, dc.version.pretty_name)
+                i += 1
+
         subject = '[QA4SM] Validation finished'
-        body = 'Dear {} {},\n\nYour validation of {} ({}) against {} ({}) data has been completed.\nThe results are available at: {}.\n\nBest regards,\nQA4SM team'.format(
+        body = 'Dear {} {},\n\nYour validation of {} against {} ({}) data has been completed.\nThe results are available at: {}.\n\nBest regards,\nQA4SM team'.format(
             val_run.user.first_name,
             val_run.user.last_name,
-            val_run.data_dataset,
-            val_run.data_version,
-            val_run.ref_dataset,
-            val_run.ref_version,
+            dataset_string,
+            val_run.reference_configuration.dataset.pretty_name,
+            val_run.reference_configuration.version.pretty_name,
             url)
 
         _send_email(recipients=[val_run.user.email],
