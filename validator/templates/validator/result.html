@@ -18,7 +18,6 @@
         <p class="lead text-muted">Your validation of {{ val.data_dataset }} data against {{ val.ref_dataset }} reference data has finished. You can see the results below.</p>
     </div>
 
-
     <div class="container center-text">
         <div class="card-deck">
             <div id="result_summary" class="card mb-4 shadow-sm">
@@ -27,33 +26,45 @@
                 </div>
                 <div class="card-body">
                     <ul>
+                        <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
                         {% if val.name_tag %}
                             <li>Validation name: {{ val.name_tag }}</li>
                         {% endif %}
-                        <li>Compared '{{ val.data_variable.pretty_name }}' variable from {{ val.data_dataset }} dataset (version {{ val.data_version }}) to '{{ val.ref_variable.pretty_name }}' variable from {{ val.ref_dataset }} reference (version {{ val.ref_version }}).</li>
-                        <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
+
+                        <li>Compared {{ val.dataset_configurations.count }} datasets:
+                            <ul>
+                                {% for dc in val.dataset_configurations.all %}
+                                    {% if dc.id != val.reference_configuration.id %}
+                                        <li>
+                                            <em>Dataset {{ forloop.counter }}:</em> {{ dc.dataset.pretty_name }} ({{ dc.version.pretty_name }}, {{ dc.variable.pretty_name }})
+                                            [Filters:
+                                            {% if not dc.filters.all %}
+                                                none
+                                            {% else %}
+                                                {% for filter in dc.filters.all %} {{ filter.description }}; {% endfor %}
+                                            {% endif %}]
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <li>
+                                    <em>Reference:</em> {{ val.reference_configuration.dataset.pretty_name }} ({{ val.reference_configuration.version.pretty_name }}, {{ val.reference_configuration.variable.pretty_name }})
+                                    [Filters:
+                                    {% if not val.reference_configuration.filters.all %}
+                                        none
+                                    {% else %}
+                                        {% for filter in val.reference_configuration.filters.all %} {{ filter.description }}; {% endfor %}
+                                    {% endif %}]
+                                </li>
+                            </ul>
+                        </li>
+
                         <li>Processing took {{ run_time }} minutes (wall time).</li>
                         {% if val.interval_from and val.interval_to %}
-                            <li>Validation period: {{ val.interval_from }} to {{ val.interval_to }}.</li>
+                            <li>Validation period / temporal filter: {{ val.interval_from }} to {{ val.interval_to }}.</li>
                         {% else %}
                             <li>Validated over entire available timespan.</li>
                         {% endif %}
-
-                        <li>Data filters:
-                            {% if not val.data_filters.all %}
-                                none
-                            {% else %}
-                                {% for filter in val.data_filters.all %} {{ filter.description }}; {% endfor %}
-                            {% endif %}
-                        </li>
-
-                        <li>Reference filters:
-                            {% if not val.ref_filters.all %}
-                                none
-                            {% else %}
-                                {% for filter in val.ref_filters.all %} {{ filter.description }}; {% endfor %}
-                            {% endif %}
-                        </li>
 
                         <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>
                             {% widthratio error_rate 1 100 %}% ({{ val.error_points }} of {{ val.total_points }}) of the processed locations (grid points) produced errors during calculation.
