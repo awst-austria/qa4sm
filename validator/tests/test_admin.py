@@ -50,17 +50,6 @@ class TestAdmin(TestCase):
         }
         self.testadmin = User.objects.create_user(**self.admin_credentials)
 
-        self.validation_params = {
-            'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
-            'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
-            'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
-            'ref_dataset': Dataset.objects.get(short_name=globals.ISMN).id,
-            'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
-            'ref_variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
-            'scaling_ref': ValidationRun.SCALE_REF,
-            'scaling_method': ValidationRun.MEAN_STD,
-        }
-
     def test_access_control(self):
         login_url = reverse('admin:login')
         urls = [
@@ -158,6 +147,21 @@ class TestAdmin(TestCase):
                 self.assertEqual(Settings.load().maintenance_mode, orig_mm)
 
     def test_maintenance_mode_redirection(self):
+        validation_params = {
+            'datasets-TOTAL_FORMS': 1,
+            'datasets-INITIAL_FORMS': 1,
+            'datasets-MIN_NUM_FORMS': 1,
+            'datasets-MAX_NUM_FORMS': 5,
+            'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3S).id,
+            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
+            'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
+            'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
+            'scaling_method': ValidationRun.MEAN_STD,
+            #'scaling_ref': ValidationRun.SCALE_REF,
+        }
+
         # store state to revert back at the end of the test
         settings = Settings.load()
         orig_mm = settings.maintenance_mode
@@ -173,7 +177,7 @@ class TestAdmin(TestCase):
 
         # try to run a validation as a regular user
         self.client.login(**self.user_credentials)
-        result = self.client.post(validation_url, self.validation_params)
+        result = self.client.post(validation_url, validation_params)
 
         # check that we're redirected back to the validation page
         self.assertRedirects(result, validation_url)
