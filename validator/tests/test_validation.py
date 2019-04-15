@@ -428,6 +428,9 @@ class TestValidation(TestCase):
                 ref_c.variable = dataset.variables.first()
                 ref_c.save()
 
+                run.reference_configuration = ref_c
+                run.save()
+
                 total_points, jobs = val.create_jobs(run)
                 print(version)
                 print(len(jobs))

@@ -12,12 +12,12 @@ def create_jobs(validation_run):
     jobs = []
     total_points = 0
 
-    ref_reader = create_reader(validation_run.ref_dataset, validation_run.ref_version)
+    ref_reader = create_reader(validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
     ref_reader = ref_reader.reader
 
     # if we've got data on a grid, process one cell at a time
     if isinstance(ref_reader, GriddedBase):
-        if validation_run.ref_version.short_name == globals.GLDAS_TEST:
+        if validation_run.reference_configuration.version.short_name == globals.GLDAS_TEST:
             cells = [1253]
         else:
             cells = ref_reader.grid.get_cells()
@@ -36,7 +36,7 @@ def create_jobs(validation_run):
 
     # if we've got ISMN data, process one network at a time
     elif isinstance(ref_reader, ISMN_Interface):
-        ids = ref_reader.get_dataset_ids(variable=validation_run.ref_variable.pretty_name, min_depth=0, max_depth=0.1)
+        ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=0, max_depth=0.1)
         mdata = ref_reader.metadata[ids]
         networks = np.unique(mdata['network'])
 
