@@ -1,12 +1,21 @@
+from datetime import datetime
 import logging
 
+from dateutil.tz.tz import tzlocal
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
 from django.core import mail as mail
 from django.test import TestCase
 
 import validator.mailer as val_mail
+from validator.models import DataVariable
+from validator.models import Dataset
+from validator.models import DatasetConfiguration
+from validator.models import DatasetVersion
 from validator.models import ValidationRun
+from validator.validation import globals
+
 
 class DontMailMe(object):
     """
@@ -16,6 +25,8 @@ class DontMailMe(object):
 class TestMailer(TestCase):
 
     __logger = logging.getLogger(__name__)
+
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     def setUp(self):
         self.user_data = {
@@ -41,8 +52,35 @@ class TestMailer(TestCase):
         self.__logger.debug(mail.outbox[0].body)
 
     def test_val_finished(self):
+        test_datasets = [Dataset.objects.get(short_name=globals.C3S),
+                         Dataset.objects.get(short_name=globals.ASCAT),
+                         Dataset.objects.get(short_name=globals.SMAP),]
+
         run = ValidationRun()
+        run.start_time = datetime.now(tzlocal())
+        run.end_time = datetime.now(tzlocal())
         run.user = self.testuser
+        run.save()
+
+        for ds in test_datasets:
+            data_c = DatasetConfiguration()
+            data_c.validation = run
+            data_c.dataset = ds
+            data_c.version = ds.versions.first()
+            data_c.variable = ds.variables.first()
+            data_c.save()
+
+        ref_c = DatasetConfiguration()
+        ref_c.validation = run
+        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.save()
+
+        run.reference_configuration = ref_c
+        run.scaling_ref = ref_c
+        run.save()
+
         val_mail.send_val_done_notification(run)
         self.check_outbox()
 

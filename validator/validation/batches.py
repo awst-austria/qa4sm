@@ -17,7 +17,7 @@ def create_jobs(validation_run):
 
     # if we've got data on a grid, process one cell at a time
     if isinstance(ref_reader, GriddedBase):
-        if validation_run.ref_version.short_name == globals.GLDAS_TEST:
+        if validation_run.reference_configuration.version.short_name == globals.GLDAS_TEST:
             cells = [1253]
         else:
             cells = ref_reader.grid.get_cells()

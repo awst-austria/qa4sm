@@ -162,34 +162,33 @@ class TestViews(TransactionTestCase):
     def test_ajax_get_dataset_options_view(self):
         url = reverse('ajax_get_dataset_options')
         self.client.login(**self.credentials)
-        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id, 'dataset_type': 'ref'})
+        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id, 'filter_widget_id': 'id_datasets-0-filters'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
         assert return_data['versions']
         assert return_data['variables']
+        assert return_data['filters']
 
         response = self.client.get(url, {'dataset_id': ''})
         self.assertEqual(response.status_code, 400)
-
-        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.C3S).id, 'dataset_type': 'data'})
-        self.assertEqual(response.status_code, 200)
-        return_data = json.loads(response.content)
-        assert return_data['versions']
-        assert return_data['variables']
 
     ## Submit a validation with minimum parameters set
     def test_submit_validation_min(self):
         url = reverse('validation')
         self.client.login(**self.credentials)
         validation_params = {
-            'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
-            'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
-            'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
-            'ref_dataset': Dataset.objects.get(short_name=globals.ISMN).id,
-            'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
-            'ref_variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
-            'scaling_ref': ValidationRun.SCALE_REF,
+            'datasets-TOTAL_FORMS': 1,
+            'datasets-INITIAL_FORMS': 1,
+            'datasets-MIN_NUM_FORMS': 1,
+            'datasets-MAX_NUM_FORMS': 5,
+            'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3S).id,
+            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
+            'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
+            'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
             'scaling_method': ValidationRun.MEAN_STD,
+            #'scaling_ref': ValidationRun.SCALE_REF,
         }
         result = self.client.post(url, validation_params)
         self.assertEqual(result.status_code, 302)
@@ -197,27 +196,48 @@ class TestViews(TransactionTestCase):
 
     ## Submit a validation with all possible parameters set
     def test_submit_validation_max(self):
+        test_datasets = [Dataset.objects.get(short_name=globals.C3S),
+                         Dataset.objects.get(short_name=globals.ASCAT),
+                         Dataset.objects.get(short_name=globals.SMAP),
+                         Dataset.objects.get(short_name=globals.C3S),
+                         Dataset.objects.get(short_name=globals.ASCAT),]
+
         url = reverse('validation')
         self.client.login(**self.credentials)
+
+        # make me one with everything
         validation_params = {
-            'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
-            'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
-            'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
-            'ref_dataset': Dataset.objects.get(short_name=globals.ISMN).id,
-            'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
-            'ref_variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
-            'scaling_ref': ValidationRun.SCALE_REF,
-            'scaling_method': ValidationRun.MEAN_STD,
-            'filter_data': True,
-            'data_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
-            'data_filters': DataFilter.objects.get(name='FIL_C3S_FLAG_0').id,
-            'filter_ref': True,
+            'datasets-TOTAL_FORMS': len(test_datasets),
+            'datasets-INITIAL_FORMS': 1,
+            'datasets-MIN_NUM_FORMS': 1,
+            'datasets-MAX_NUM_FORMS': 5,
+
+            'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
+            'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
+            'ref-filter_dataset': True,
             'ref_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
             'ref_filters': DataFilter.objects.get(name='FIL_ISMN_GOOD').id,
+
             'interval_from': datetime(1978,1,1),
             'interval_to': datetime(1998,1,1),
+
+            'scaling_method': ValidationRun.MEAN_STD,
+            #'scaling_ref': ValidationRun.SCALE_REF,
             'name_tag': 'unit test tag so that I can remember my validation',
         }
+
+        # put in as many datasets as possible
+        for ds_no, test_ds in enumerate(test_datasets, start=0):
+            ds_dict = {
+                'datasets-' + str(ds_no) + '-dataset': test_ds.id,
+                'datasets-' + str(ds_no) + '-version': test_ds.versions.first().id,
+                'datasets-' + str(ds_no) + '-variable': test_ds.variables.first().id,
+                'datasets-' + str(ds_no) + '-filter_dataset': True,
+                'datasets-' + str(ds_no) + '-filters': test_ds.filters.last().id,
+                }
+            validation_params.update(ds_dict)
+
         result = self.client.post(url, validation_params)
         self.assertEqual(result.status_code, 302)
         self.assertTrue(result.url.startswith('/result/'))
@@ -226,22 +246,42 @@ class TestViews(TransactionTestCase):
     def test_submit_validation_invalid(self):
         url = reverse('validation')
         self.client.login(**self.credentials)
-        validation_params = {'scaling_ref': 'nosuchthing', 'scaling_method': 'doesnt exist'}
+
+        # with only one parameter, we'll get complaints about the missing formset management hidden inputs
+        # see https://docs.djangoproject.com/en/2.2/topics/forms/formsets/#understanding-the-managementform
+        validation_params = {'scaling_method': 'doesnt exist'}
         result = self.client.post(url, validation_params)
-        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.status_code, 400)
+
+        ## with a wrong number of dataset configuration forms, we should get an error in the form
+        for totalnum in [10, 0]:
+            validation_params = {
+                'datasets-TOTAL_FORMS': totalnum,
+                'datasets-INITIAL_FORMS': 1,
+                'datasets-MIN_NUM_FORMS': 1,
+                'datasets-MAX_NUM_FORMS': 1000,
+                'scaling_method': 'doesnt exist',
+            }
+            result = self.client.post(url, validation_params)
+            self.assertEqual(result.status_code, 200)
+            assert result.context['dc_formset']._non_form_errors
 
     def test_submit_validation_and_cancel(self):
         start_url = reverse('validation')
         self.client.login(**self.credentials)
         validation_params = {
-            'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
-            'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
-            'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
-            'ref_dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
-            'ref_version': DatasetVersion.objects.get(short_name=globals.GLDAS_TEST).id,
-            'ref_variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
-            'scaling_ref': ValidationRun.SCALE_REF,
+            'datasets-TOTAL_FORMS': 1,
+            'datasets-INITIAL_FORMS': 1,
+            'datasets-MIN_NUM_FORMS': 1,
+            'datasets-MAX_NUM_FORMS': 5,
+            'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3S).id,
+            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
+            'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'ref-dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.GLDAS_TEST).id,
+            'ref-variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
             'scaling_method': ValidationRun.MEAN_STD,
+            #'scaling_ref': ValidationRun.SCALE_REF,
         }
         result = self.client.post(start_url, validation_params)
         self.assertEqual(result.status_code, 302)
@@ -393,7 +433,7 @@ class TestViews(TransactionTestCase):
             'first_name': 'Chuck',
             'last_name': 'Norris',
             'organisation': 'Texas Rangers',
-            'organisation': 'United States of America',
+            'country': 'US',
             'terms_consent': True,
             }
         result = self.client.post(url, user_info)

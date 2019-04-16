@@ -368,7 +368,7 @@ Combine all migrations up to migration `x`:
 
 The resulting `validator/migrations/0001_squashed_...` file contains a list `replaces = [...]` in the `Migration` class that details the other migrations it replaces. If you want to use a "from-scratch" migration (see above), you can copy the `replaces` list into that and it should be treated like a squashed migration.
 
-#### Dump ops db 
+#### Dump ops db
 
 And omit stuff that creates problems on import:
 
@@ -449,3 +449,16 @@ Put json files into `validator/fixtures/` (and pretty-print them with an editor 
 Set up database contents with the fixtures:
 
     python manage.py loaddata versions variables filters datasets
+
+### Database bulk changes
+
+To assign validation runs to a specific user in bulk:
+
+    python manage.py shell
+
+    from validator.models import ValidationRun
+    from validator.models import User
+    myuser = User.objects.get(username='admin')
+    for run in ValidationRun.objects.all():
+        run.user = myuser
+        run.save()
