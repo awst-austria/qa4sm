@@ -51,30 +51,31 @@ def save_validation_config(validation_run):
         else:
             ds.val_interval_to=validation_run.interval_to.strftime('%Y-%m-%d %H:%M')
 
-        if validation_run.data_filters.all():
-            ds.val_data_filters = '; '.join([x.description for x in validation_run.data_filters.all()])
-        else:
-            ds.val_data_filters = 'N/A'
-
-        if validation_run.ref_filters.all():
-            ds.val_ref_filters = '; '.join([x.description for x in validation_run.ref_filters.all()])
-        else:
-            ds.val_ref_filters = 'N/A'
-
         datasets=""
-        for dataset_config in validation_run.dataset_configurations:
-            datasets=datasets+'Dataset: {}, version: {}, variable: {};'.format(dataset_config.dataset.short_name,
-                                                                               dataset_config.version.short_name,
-                                                                               dataset_config.variable.short_name)
+        for dataset_config in validation_run.dataset_configurations.all():
+            if dataset_config.filters.all():
+                filters = '; '.join([x.description for x in dataset_config.filters.all()])
+            else:
+                filters = 'N/A'
+
+            datasets = datasets + 'Dataset: {}, version: {}, variable: {}, filters: {};'\
+                .format(dataset_config.dataset.short_name,
+                        dataset_config.version.short_name,
+                        dataset_config.variable.short_name,
+                        filters)
         ds.val_data_datasets=datasets
 
         if validation_run.reference_configuration is not None:
-            ds.val_ref_dataset='Dataset: {}, version: {}, variable: {};'.format(validation_run.reference_configuration.dataset.short_name,
-                                                                                validation_run.reference_configuration.version.short_name,
-                                                                                validation_run.reference_configuration.variable.short_name)
+            ds.val_ref_dataset = datasets + 'Dataset: {}, version: {}, variable: {};'\
+                .format(validation_run.reference_configuration.dataset.short_name,
+                        validation_run.reference_configuration.version.short_name,
+                        validation_run.reference_configuration.variable.short_name,)
 
-        ds.val_scaling_ref='Dataset: {}, version: {}, variable: {};'.format(validation_run.scaling_ref.dataset.short_name,
-                                                                            validation_run.scaling_ref.version.short_name)
+        if validation_run.scaling_ref is not None:
+            ds.val_scaling_ref = 'Dataset: {}, version: {}, variable: {};'\
+                .format(validation_run.scaling_ref.dataset.short_name,
+                        validation_run.scaling_ref.version.short_name,
+                        validation_run.scaling_ref.variable.short_name)
 
         ds.val_scaling_method=validation_run.scaling_method
         ds.close()
