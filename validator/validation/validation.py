@@ -61,35 +61,38 @@ def save_validation_config(validation_run):
         else:
             ds.val_ref_filters = 'N/A'
 
-        ds.val_data_dataset=validation_run.data_dataset.pretty_name
-        ds.val_data_version=validation_run.data_version.pretty_name
-        ds.val_data_variable=validation_run.data_variable.pretty_name
-        ds.val_ref_dataset=validation_run.ref_dataset.pretty_name
-        ds.val_ref_version=validation_run.ref_version.pretty_name
-        ds.val_ref_variable=validation_run.ref_variable.pretty_name
-
-        ds.val_scaling_ref=validation_run.scaling_ref
+        datasets=""
+        for dataset_config in validation_run.dataset_configurations:
+            datasets=datasets+'Dataset: {}, version: {}, variable: {};'.format(dataset_config.dataset.short_name,
+                                                                               dataset_config.version.short_name,
+                                                                               dataset_config.variable.short_name)    
+        ds.val_data_datasets=datasets
+        
+        if validation_run.reference_configuration is not None:
+            ds.val_ref_dataset='Dataset: {}, version: {}, variable: {};'.format(validation_run.reference_configuration.dataset.short_name,
+                                                                                validation_run.reference_configuration.version.short_name,
+                                                                                validation_run.reference_configuration.variable.short_name)
+        
+        ds.val_scaling_ref='Dataset: {}, version: {}, variable: {};'.format(validation_run.scaling_ref.dataset.short_name,
+                                                                            validation_run.scaling_ref.version.short_name)
+        
         ds.val_scaling_method=validation_run.scaling_method
         ds.close()
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
 
 def create_pytesmo_validation(validation_run):
-    data_reader = create_reader(validation_run.data_dataset, validation_run.data_version)
-    ref_reader = create_reader(validation_run.ref_dataset, validation_run.ref_version)
-
-    data_reader = setup_filtering(data_reader, list(validation_run.data_filters.all()), validation_run.data_dataset, validation_run.data_variable)
-    ref_reader = setup_filtering(ref_reader, list(validation_run.ref_filters.all()), validation_run.ref_dataset, validation_run.ref_variable)
-
-    datasets = {
-            validation_run.ref_dataset.short_name: {
-                'class': ref_reader,
-                'columns': [validation_run.ref_variable.pretty_name]
-                },
-            validation_run.data_dataset.short_name: {
-                'class': data_reader,
-                'columns': [validation_run.data_variable.pretty_name]
-                }}
+    datasets={}
+    for dataset_config in validation_run.dataset_configurations:
+        reader = create_reader(dataset_config.dataset, dataset_config.version)
+        reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.version)
+        datasets[dataset_config.dataset.short_name]={'class':reader,'columns':[dataset_config.variable.pretty_name]}
+    
+    if(validation_run.reference_configuration is not None):
+        reader = create_reader(validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
+        reader = setup_filtering(reader, list(validation_run.reference_configuration.filters.all()), validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
+        datasets[validation_run.reference_configuration.dataset.short_name]={'class':reader,'columns':[validation_run.reference_configuration.variable.pretty_name]}
+    
 
     period = None
     if validation_run.interval_from is not None and validation_run.interval_to is not None:
@@ -98,15 +101,15 @@ def create_pytesmo_validation(validation_run):
     metrics = EssentialMetrics()
 
     if validation_run.scaling_ref == ValidationRun.SCALE_REF:
-        scaling_ref=validation_run.data_dataset.short_name ## if you scale the reference dataset, the scaling reference is the normal dataset %-P
+        scaling_ref=validation_run.dataset_configurations[0].dataset.short_name ## if you scale the reference dataset, the scaling reference is the normal dataset %-P
     else:
-        scaling_ref=validation_run.ref_dataset.short_name
+        scaling_ref=validation_run.reference_configuration.dataset.short_name
 
 
     val = Validation(
             datasets,
-            spatial_ref=validation_run.ref_dataset.short_name,
-            temporal_ref=validation_run.data_dataset.short_name,
+            spatial_ref=validation_run.reference_configuration.dataset.short_name,
+#            temporal_ref=validation_run.data_dataset.short_name,                    #In case of more datasets, which one should be the reference?
             temporal_window=0.5,
             scaling=validation_run.scaling_method,
             scaling_ref=scaling_ref,
