@@ -65,34 +65,30 @@ def save_validation_config(validation_run):
         for dataset_config in validation_run.dataset_configurations:
             datasets=datasets+'Dataset: {}, version: {}, variable: {};'.format(dataset_config.dataset.short_name,
                                                                                dataset_config.version.short_name,
-                                                                               dataset_config.variable.short_name)    
+                                                                               dataset_config.variable.short_name)
         ds.val_data_datasets=datasets
-        
+
         if validation_run.reference_configuration is not None:
             ds.val_ref_dataset='Dataset: {}, version: {}, variable: {};'.format(validation_run.reference_configuration.dataset.short_name,
                                                                                 validation_run.reference_configuration.version.short_name,
                                                                                 validation_run.reference_configuration.variable.short_name)
-        
+
         ds.val_scaling_ref='Dataset: {}, version: {}, variable: {};'.format(validation_run.scaling_ref.dataset.short_name,
                                                                             validation_run.scaling_ref.version.short_name)
-        
+
         ds.val_scaling_method=validation_run.scaling_method
         ds.close()
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
 
 def create_pytesmo_validation(validation_run):
-    datasets={}
-    for dataset_config in validation_run.dataset_configurations:
+    ds_list = []
+    for dataset_config in validation_run.dataset_configurations.all():
         reader = create_reader(dataset_config.dataset, dataset_config.version)
-        reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.version)
-        datasets[dataset_config.dataset.short_name]={'class':reader,'columns':[dataset_config.variable.pretty_name]}
-    
-    if(validation_run.reference_configuration is not None):
-        reader = create_reader(validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
-        reader = setup_filtering(reader, list(validation_run.reference_configuration.filters.all()), validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
-        datasets[validation_run.reference_configuration.dataset.short_name]={'class':reader,'columns':[validation_run.reference_configuration.variable.pretty_name]}
-    
+        reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.variable)
+        ds_list.append( (dataset_config.dataset.short_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
+
+    datasets=dict(ds_list)
 
     period = None
     if validation_run.interval_from is not None and validation_run.interval_to is not None:
@@ -100,19 +96,12 @@ def create_pytesmo_validation(validation_run):
 
     metrics = EssentialMetrics()
 
-    if validation_run.scaling_ref == ValidationRun.SCALE_REF:
-        scaling_ref=validation_run.dataset_configurations[0].dataset.short_name ## if you scale the reference dataset, the scaling reference is the normal dataset %-P
-    else:
-        scaling_ref=validation_run.reference_configuration.dataset.short_name
-
-
     val = Validation(
             datasets,
             spatial_ref=validation_run.reference_configuration.dataset.short_name,
-#            temporal_ref=validation_run.data_dataset.short_name,                    #In case of more datasets, which one should be the reference?
             temporal_window=0.5,
             scaling=validation_run.scaling_method,
-            scaling_ref=scaling_ref,
+            scaling_ref=validation_run.scaling_ref.dataset.short_name,
             metrics_calculators={(2, 2): metrics.calc_metrics},
             period=period)
 
@@ -214,8 +203,8 @@ def run_validation(validation_id):
                             __logger.info('Validation got cancelled')
                             validation_aborted_flag=True
                             return validation_run
-                            
-                
+
+
                 results = result_dict['result']
                 job = result_dict['job']
                 check_and_store_results(validation_run, job, results, save_path)
@@ -230,8 +219,8 @@ def run_validation(validation_id):
                 validation_run.progress=round(((validation_run.ok_points + validation_run.error_points)/validation_run.total_points)*100)
                 validation_run.save()
                 __logger.info("Validation {} is {} % done...".format(validation_run.id, validation_run.progress))
-                
-                
+
+
 
         set_outfile(validation_run, run_dir)
         validation_run.save() # let's save before we do anything else...
@@ -265,5 +254,5 @@ def stop_running_validation(validation_id):
     for task in celery_tasks:
         app.control.revoke(task.celery_task_id)
         task.delete()
-    
-    
+
+
