@@ -157,8 +157,8 @@ def run_validation(validation_id):
     validation_aborted_flag=False;
 
 
-#     if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')==False) or (settings.CELERY_TASK_ALWAYS_EAGER==False):
-    app.control.add_consumer(validation_run.user.username, reply=True)
+    if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')==False) or (settings.CELERY_TASK_ALWAYS_EAGER==False):
+        app.control.add_consumer(validation_run.user.username, reply=True)
 
     try:
         __logger.info("Starting validation: {}".format(validation_id))
