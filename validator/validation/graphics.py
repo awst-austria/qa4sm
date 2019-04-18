@@ -1,11 +1,13 @@
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-plt.switch_backend('agg') ## this allows headless graph production
 import matplotlib.ticker as mticker
+# plt.switch_backend('agg') ## this allows headless graph production
 import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 import netCDF4
 import seaborn as sns
+import pandas as pd
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
@@ -22,7 +24,7 @@ _metric_value_ranges = {
     'rho': [-1, 1],
     'p_rho': [0, 1],
     'RMSD': [0, None],
-    'BIAS': [-0.1, 0.1],
+    'BIAS': [None, None],
     'n_obs': [0, None],
     'urmsd': [0, None],
     'RSS': [0, None],
@@ -68,13 +70,13 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
     png_filename = path.join(outfolder, 'boxplot_{}.png'.format(variable))
     svg_filename = path.join(outfolder, 'boxplot_{}.svg'.format(variable))
 
-    values = values[~np.isnan(values)]
+    values = values.melt(value_vars=values.columns, var_name='Validation')
 
     # use seaborn library for boxplot
-    sns.set_palette('RdYlBu_r')
     sns.set_style("whitegrid")
-    sns.boxplot(y=values, width=0.15, showfliers=False)
+    ax = sns.boxplot(data=values, x='Validation', y='value', width=0.15, showfliers=False, color='white')
     sns.despine()
+    ax.set_ylim(_metric_value_ranges[variable])
 
     plt.title('Validation {} ({}) vs {} ({})'.format(
         validation_run.data_dataset.pretty_name,
@@ -82,6 +84,8 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
         validation_run.ref_dataset.pretty_name,
         validation_run.ref_version.pretty_name))
     plt.ylabel(label + _metric_description[variable].format(_metric_units[unit_ref]))
+    plt.text(-0.14, -0.14, u'\u00A9 QA4SM (www.qa4sm.eodc.eu)', fontsize=10, color='black',
+             ha='left', va='bottom', alpha=0.5, transform=ax.transAxes)
     plt.tight_layout()
     plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1,)
     plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0.1,)
@@ -97,32 +101,29 @@ def generate_overview_map(validation_run, outfolder, variable, label, values, un
         lats = ds.variables['lat'][:]
         lons = ds.variables['lon'][:]
 
-    ax = plt.axes(projection=ccrs.PlateCarree())
+    data_crs = ccrs.PlateCarree()
+    ax = plt.axes(projection=data_crs)
     cm = plt.cm.get_cmap(_colormaps[variable])
     ax.outline_patch.set_linewidth(0.2)
 
     v_min = _metric_value_ranges[variable][0]
     v_max = _metric_value_ranges[variable][1]
 
+    padding = 5
+    extent = [lons.min()-padding, lons.max()+padding, lats.min()-padding, lats.max()+padding]
+    lon_interval = extent[1] - extent[0]
+    lat_interval = extent[3] - extent[2]
+
     # do scatter plot for ISMN and heatmap for everything else
     if validation_run.ref_dataset.short_name == globals.ISMN:
         # change size of markers dependent on zoom level
-        lon_interval = max(lons) - min(lons)
         markersize = 1.5 * (360 / lon_interval)
         the_plot = plt.scatter(lons, lats, c=values, cmap=cm, s=markersize, vmin=v_min, vmax=v_max,
                                edgecolors='black', linewidths=0.05, zorder=3)
     else:
-        lats_map = np.arange(89.875, -60, -0.25)
-        lons_map = np.arange(-179.875, 180, 0.25)
-        values_map = np.empty((len(lats_map), len(lons_map)))
-        values_map[:] = np.nan
-
-        for i in range(0, len(values)):
-            values_map[np.where(lats_map == lats[i])[0][0]][np.where(lons_map == lons[i])[0][0]] = values[i]
-
-        extent = [-179.875, 179.875, -59.875, 89.875]
-        the_plot = plt.imshow(values_map, cmap=cm, interpolation='none', extent=extent,
-                              vmin=v_min, vmax=v_max, zorder=1)
+        ax.set_extent(extent, crs=data_crs)
+        lons, lats = np.meshgrid(lons, lats)
+        the_plot = ax.pcolormesh(lons, lats, values, cmap=cm, transform=data_crs, vmin=v_min, vmax=v_max)
 
     plt.title('Validation {} ({}) vs {} ({})'.format(
         validation_run.data_dataset.pretty_name,
@@ -133,28 +134,38 @@ def generate_overview_map(validation_run, outfolder, variable, label, values, un
     ax.add_feature(cfeature.STATES, linewidth=0.05, zorder=2)
     ax.add_feature(cfeature.BORDERS, linewidth=0.1, zorder=2)
     ax.add_feature(cfeature.LAND, color='white', zorder=0)
+    ax.text(0, -0.30, u'\u00A9 QA4SM (www.qa4sm.eodc.eu)', fontsize=5,
+            color='black', ha='left', va='bottom', alpha=0.5, transform=ax.transAxes)
 
     # add gridlines
+    grid_interval_lon = 5 * round((lon_interval/3) / 5)
+    grid_interval_lat = 5 * round((lat_interval/3) / 5)
+    if grid_interval_lat > 30:
+        grid_interval_lat = 30
+    if grid_interval_lon > 30:
+        grid_interval_lon = 30
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0.2, color='gray', alpha=0.5, linestyle='--')
     gl.xlabels_top = False
     gl.ylabels_left = False
-    gl.xlocator = mticker.FixedLocator(np.arange(-180, 181, 45))
-    gl.ylocator = mticker.FixedLocator(np.arange(-90, 91, 30))
+    gl.xlocator = mticker.FixedLocator(np.arange(-180, 181, grid_interval_lon))
+    gl.ylocator = mticker.FixedLocator(np.arange(-90, 91, grid_interval_lat))
     gl.xformatter = LONGITUDE_FORMATTER
     gl.yformatter = LATITUDE_FORMATTER
     gl.xlabel_style = {'size': 4, 'color': 'black'}
     gl.ylabel_style = {'size': 4, 'color': 'black'}
 
     # add colorbar
-    cbar = plt.colorbar(the_plot, orientation='horizontal', pad=0.05, aspect=40)
+    cbar = plt.colorbar(the_plot, orientation='horizontal', pad=0.05)
     cbar.set_label(label + _metric_description[variable].format(_metric_units[unit_ref]), size=5)
     cbar.outline.set_linewidth(0.2)
     cbar.outline.set_edgecolor('black')
     cbar.ax.tick_params(width=0.2, labelsize=4)
 
-    plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1, dpi=200)
-    plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0.1, dpi=200)
+    # plt.tight_layout()
+    plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1, dpi=300)
+    plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0.1, dpi=300)
     plt.close()
+
     return [png_filename, svg_filename]
 
 
@@ -173,19 +184,32 @@ def generate_all_graphs(validation_run, outfolder):
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         for metric in METRICS:
+            print(metric)
+            values = pd.DataFrame()
+            data = None
             with netCDF4.Dataset(validation_run.output_file.path) as ds:
-                values = ds.variables[metric][:]
+                items = [i for i in ds.variables.keys() if i.split('__')[0] == metric]
+                for i in items:
+                    data = ds.variables[i][:]
+                    try:
+                        values[i.split('__')[1]] = data.compressed()
+                    except:
+                        # e.g. n_obs
+                        values[i] = data.compressed()
 
-            file1, file2 = generate_boxplot(validation_run, outfolder, metric, METRICS[metric], values, unit_ref)
-            arcname = path.basename(file1)
-            myzip.write(file1, arcname=arcname)
-            arcname = path.basename(file2)
-            myzip.write(file2, arcname=arcname)
-            remove(file2) # we don't need the vector image anywhere but in the zip
+                if data is not None:
+                    file1, file2 = generate_overview_map(validation_run, outfolder, metric, METRICS[metric], data,
+                                                         unit_ref)
+                    arcname = path.basename(file1)
+                    myzip.write(file1, arcname=arcname)
+                    arcname = path.basename(file2)
+                    myzip.write(file2, arcname=arcname)
+                    remove(file2)  # we don't need the vector image anywhere but in the zip
 
-            file1, file2 = generate_overview_map(validation_run, outfolder, metric, METRICS[metric], values, unit_ref)
-            arcname = path.basename(file1)
-            myzip.write(file1, arcname=arcname)
-            arcname = path.basename(file2)
-            myzip.write(file2, arcname=arcname)
-            remove(file2) # we don't need the vector image anywhere but in the zip
+            if not values.empty:
+                file1, file2 = generate_boxplot(validation_run, outfolder, metric, METRICS[metric], values, unit_ref)
+                arcname = path.basename(file1)
+                myzip.write(file1, arcname=arcname)
+                arcname = path.basename(file2)
+                myzip.write(file2, arcname=arcname)
+                remove(file2)  # we don't need the vector image anywhere but in the zip
