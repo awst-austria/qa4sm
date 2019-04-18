@@ -203,6 +203,8 @@ def run_validation(validation_id):
                         except Exception:    
                             __logger.debug('Validation got cancelled')
                             validation_aborted_flag=True
+                            validation_run.progress=-1
+                            validation_run.save()
                             return validation_run
                     finally:
                         try:
@@ -257,7 +259,6 @@ def run_validation(validation_id):
 
 def stop_running_validation(validation_id):
     validation_run = ValidationRun.objects.get(pk=validation_id)
-    validation_run.end_time=datetime.now(tzlocal())
     validation_run.progress=-1
     validation_run.save()
     
