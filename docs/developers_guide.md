@@ -135,6 +135,7 @@ Install other dependencies into Python environment with pip:
     pip install ismn
     pip install pybufr-ecmwf
     pip install c3s_sm
+    pip install esa_cci_sm
     pip install coverage
     pip install pygeogrids
     pip install pytest-django
