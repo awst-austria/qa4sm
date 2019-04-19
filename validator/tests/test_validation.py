@@ -124,27 +124,7 @@ class TestValidation(TestCase):
             else:
                 assert ds.val_interval_to == run.interval_to.strftime('%Y-%m-%d %H:%M'),'Wrong validation config attribute. [interval_to]'
 
-            if not run.data_filters.all():
-                assert ds.val_data_filters == 'N/A'
-            else:
-                assert ds.val_data_filters, 'Validation config attribute empty. [data_filters]'
-                assert (ds.val_data_filters.count(';') + 1) == len(run.data_filters.all()), 'Validation config attribute has wrong number of elements. [data_filters]'
-
-            if not run.ref_filters.all():
-                assert ds.val_ref_filters == 'N/A'
-            else:
-                assert ds.val_ref_filters, 'Validation config attribute empty. [ref_filters]'
-                assert (ds.val_ref_filters.count(';') + 1) == len(run.ref_filters.all()), 'Validation config attribute has wrong number of elements. [ref_filters]'
-
-            assert ds.val_data_dataset == run.data_dataset.pretty_name,' Wrong validation config attribute. [data_dataset]'
-            assert ds.val_data_version == run.data_version.pretty_name,' Wrong validation config attribute. [data_version]'
-            assert ds.val_data_variable == run.data_variable.pretty_name,' Wrong validation config attribute. [data_variable]'
-            assert ds.val_ref_dataset == run.ref_dataset.pretty_name,' Wrong validation config attribute. [ref_dataset]'
-            assert ds.val_ref_version == run.ref_version.pretty_name,' Wrong validation config attribute. [ref_version]'
-            assert ds.val_ref_variable == run.ref_variable.pretty_name,' Wrong validation config attribute. [ref_variable]'
-
-            assert ds.val_scaling_ref == run.scaling_ref,' Wrong validation config attribute. [scaling_ref]'
-            assert ds.val_scaling_method == run.scaling_method,' Wrong validation config attribute. [scaling_method]'
+            
 
         # check zipfile of graphics
         zipfile = os.path.join(outdir, 'graphs.zip')
@@ -164,6 +144,7 @@ class TestValidation(TestCase):
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
         # let's see if the output file gets cleaned up when the model is deleted
+        
         ncfile = run.output_file.path
         outdir = os.path.dirname(ncfile)
         assert os.path.isfile(ncfile)

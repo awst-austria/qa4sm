@@ -191,7 +191,7 @@ def run_validation(validation_id):
                             raise e
                         
                         try:
-                            celery_task=CeleryTask.objects.get(celery_task=async_result.id)
+                            celery_task=CeleryTask.objects.get(celery_task_id=uuid.UUID(async_result.id).hex)
                             __logger.debug('Celery task timeout. Continue...')
                         except Exception:    
                             __logger.debug('Validation got cancelled')
@@ -201,11 +201,11 @@ def run_validation(validation_id):
                             return validation_run
                     finally:
                         try:
-                            celery_task=CeleryTask.objects.get(celery_task=async_result.id)
+                            celery_task=CeleryTask.objects.get(celery_task_id=uuid.UUID(async_result.id).hex)
                             celery_task.delete()
                         except Exception:
-                            __logger.debug('Celery task does not exists. Validation run: {} Celery task ID: {}'.format(validation_id,
-                                                                                                                       async_result.id))
+                            __logger.debug('Celery task does not exists. Validation run: {} Celery task ID: {} - {}'.format(validation_id,
+                                                                                                                       async_result.id,uuid.UUID(async_result.id).hex))
                         
                 results = result_dict['result']
                 job = result_dict['job']

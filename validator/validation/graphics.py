@@ -77,12 +77,13 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
     ax = sns.boxplot(data=values, x='Validation', y='value', width=0.15, showfliers=False, color='white')
     sns.despine()
     ax.set_ylim(_metric_value_ranges[variable])
-
-    plt.title('Validation {} ({}) vs {} ({})'.format(
-        validation_run.data_dataset.pretty_name,
-        validation_run.data_version.pretty_name,
-        validation_run.ref_dataset.pretty_name,
-        validation_run.ref_version.pretty_name))
+    
+    plot_title="Validation "
+    for dataset_config in validation_run.dataset_configurations.all():
+        plot_title=plot_title+' {} ({}) vs'.format(dataset_config.dataset.pretty_name,dataset_config.version.pretty_name)
+    plot_title = plot_title[:-(len(plot_title)-plot_title.rfind(' vs'))]
+        
+    plt.title(plot_title)
     plt.ylabel(label + _metric_description[variable].format(_metric_units[unit_ref]))
     plt.text(-0.14, -0.14, u'\u00A9 QA4SM (www.qa4sm.eodc.eu)', fontsize=10, color='black',
              ha='left', va='bottom', alpha=0.5, transform=ax.transAxes)
@@ -115,7 +116,7 @@ def generate_overview_map(validation_run, outfolder, variable, label, values, un
     lat_interval = extent[3] - extent[2]
 
     # do scatter plot for ISMN and heatmap for everything else
-    if validation_run.ref_dataset.short_name == globals.ISMN:
+    if validation_run.reference_configuration.dataset.short_name == globals.ISMN:
         # change size of markers dependent on zoom level
         markersize = 1.5 * (360 / lon_interval)
         the_plot = plt.scatter(lons, lats, c=values, cmap=cm, s=markersize, vmin=v_min, vmax=v_max,
@@ -125,11 +126,12 @@ def generate_overview_map(validation_run, outfolder, variable, label, values, un
         lons, lats = np.meshgrid(lons, lats)
         the_plot = ax.pcolormesh(lons, lats, values, cmap=cm, transform=data_crs, vmin=v_min, vmax=v_max)
 
-    plt.title('Validation {} ({}) vs {} ({})'.format(
-        validation_run.data_dataset.pretty_name,
-        validation_run.data_version.pretty_name,
-        validation_run.ref_dataset.pretty_name,
-        validation_run.ref_version.pretty_name), fontsize=8)
+    plot_title="Validation "
+    for dataset_config in validation_run.dataset_configurations.all():
+        plot_title=plot_title+' {} ({}) vs'.format(dataset_config.dataset.pretty_name,dataset_config.version.pretty_name)
+    plot_title = plot_title[:-(len(plot_title)-plot_title.rfind(' vs'))]
+    
+    plt.title(plot_title,fontsize=8)
     ax.coastlines(linewidth=0.2, zorder=2)
     ax.add_feature(cfeature.STATES, linewidth=0.05, zorder=2)
     ax.add_feature(cfeature.BORDERS, linewidth=0.1, zorder=2)
@@ -177,10 +179,8 @@ def generate_all_graphs(validation_run, outfolder):
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
     # get units for plot labels
-    if validation_run.scaling_ref == 'data':
-        unit_ref = validation_run.data_dataset.short_name
-    else:
-        unit_ref = validation_run.ref_dataset.short_name
+
+    unit_ref = validation_run.reference_configuration.dataset.short_name
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         for metric in METRICS:
