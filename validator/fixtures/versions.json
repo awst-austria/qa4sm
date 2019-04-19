@@ -70,5 +70,23 @@
 			"pretty_name": "TEST",
 			"help_text": ""
 		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 10,
+		"fields": {
+			"short_name": "C3S_V201812",
+			"pretty_name": "v201812",
+			"help_text": "C3S from December 2018"
+		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 11,
+		"fields": {
+			"short_name": "ISMN_V20190222",
+			"pretty_name": "20190222 global",
+			"help_text": "ISMN data set from 2019-02-22"
+		}
 	}
 ]
