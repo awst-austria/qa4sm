@@ -178,7 +178,6 @@ def run_validation(validation_id):
         job_table = {}
         for j in jobs:
             job_id = execute_job.apply_async(args=[validation_id, j], queue=validation_run.user.username)
-            #job_id = execute_job.delay(validation_id, j)
             async_results.append(job_id)
             job_table[job_id] = j
             celery_task=CeleryTask()
@@ -189,30 +188,32 @@ def run_validation(validation_id):
         executed_jobs = 0
         for async_result in async_results:
             try:
-                wait_for_result=True
-                while wait_for_result:
+                while True:
                     try:
                         result_dict=async_result.get(timeout=10) # calling result.AsyncResult.get
                         async_result.forget()
+                        break
+                    except Exception as e:
+                        if e.__class__.__name__ != 'TimeoutError':
+                            raise e
+                        
+                        try:
+                            celery_task=CeleryTask.objects.get(celery_task=async_result.id)
+                            __logger.debug('Celery task timeout. Continue...')
+                        except Exception:    
+                            __logger.debug('Validation got cancelled')
+                            validation_aborted_flag=True
+                            validation_run.progress=-1
+                            validation_run.save()
+                            return validation_run
+                    finally:
                         try:
                             celery_task=CeleryTask.objects.get(celery_task=async_result.id)
                             celery_task.delete()
                         except Exception:
-                            __logger.info('Celery task does not exists. ID: {}'.format(async_result.id))
-                        break
-                    except Exception:   #async_result.get timeout
-                        try:
-                            celery_task=CeleryTask.objects.get(celery_task=async_result.id)
-                            __logger.info('Celery task timeout. Continue...')
-                        except Exception:
-                            # Missing async result -> the validation has been cancelled
-                            validation_run.progress=-1
-                            validation_run.save()
-                            __logger.info('Validation got cancelled')
-                            validation_aborted_flag=True
-                            return validation_run
-                            
-                
+                            __logger.debug('Celery task does not exists. Validation run: {} Celery task ID: {}'.format(validation_id,
+                                                                                                                       async_result.id))
+                        
                 results = result_dict['result']
                 job = result_dict['job']
                 check_and_store_results(validation_run, job, results, save_path)
@@ -258,7 +259,11 @@ def run_validation(validation_id):
 
 def stop_running_validation(validation_id):
     validation_run = ValidationRun.objects.get(pk=validation_id)
+    validation_run.progress=-1
+    validation_run.save()
+    
     celery_tasks=CeleryTask.objects.filter(validation=validation_run)
+    
     for task in celery_tasks:
         app.control.revoke(task.celery_task)
         task.delete()
