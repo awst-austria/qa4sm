@@ -88,5 +88,14 @@
 			"pretty_name": "20190222 global",
 			"help_text": "ISMN data set from 2019-02-22"
 		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 12,
+		"fields": {
+			"short_name": "ESA_CCI_SM_C_V04_4",
+			"pretty_name": "v04.4",
+			"help_text": ""
+		}
 	}
 ]
