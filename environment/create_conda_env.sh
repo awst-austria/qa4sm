@@ -71,6 +71,7 @@ export PATH="$MINICONDA_PATH/bin:$PATH"
 conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
 source activate $PYTHON_ENV_DIR
 
+pip install sqlparse
 pip install pynetcf
 pip install ascat
 pip install ismn

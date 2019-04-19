@@ -130,6 +130,7 @@ In the qsql shell, run the commands from `[gitrepos]/sql/create_postgres_db.txt`
 
 Install other dependencies into Python environment with pip:
 
+    pip install sqlparse
     pip install pynetcf
     pip install ascat
     pip install ismn
