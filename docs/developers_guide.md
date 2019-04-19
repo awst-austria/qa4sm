@@ -438,10 +438,10 @@ For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_
 
 Dump database contents into separate files for readability:
 
-    python manage.py dumpdata validator.DataVariable > variable.json
+    python manage.py dumpdata validator.DataVariable > variables.json
     python manage.py dumpdata validator.DatasetVersion > versions.json
     python manage.py dumpdata validator.DataFilter > filters.json
-    python manage.py dumpdata validator.Dataset > dataset.json
+    python manage.py dumpdata validator.Dataset > datasets.json
 
 Put json files into `validator/fixtures/` (and pretty-print them with an editor for better readability).
 
