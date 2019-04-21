@@ -18,6 +18,8 @@ ISMN = 'ISMN'
 GLDAS = 'GLDAS'
 SMAP = 'SMAP'
 ASCAT = 'ASCAT'
+CCI = 'ESA_CCI_SM_combined'
+SMOS = 'SMOS'
 
 ## dataset versions
 C3S_V201706 = 'C3S_V201706'

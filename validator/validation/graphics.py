@@ -47,7 +47,9 @@ _metric_units = {
     'C3S': r'm^3 m^{-3}',
     'GLDAS': r'm^3 m^{-3}',
     'ASCAT': r'percentage of saturation',
-    'SMAP': r'm^3 m^{-3}'
+    'SMAP': r'm^3 m^{-3}',
+    'ESA_CCI_SM_combined': r'm^3 m^{-3}',
+    'SMOS': r'm^3 m^{-3}'
 }
 
 # colormaps used for plotting metrics
