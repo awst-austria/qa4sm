@@ -136,6 +136,8 @@ Install other dependencies into Python environment with pip:
     pip install ismn
     pip install pybufr-ecmwf
     pip install c3s_sm
+    pip install esa_cci_sm
+    pip install smos
     pip install coverage
     pip install pygeogrids
     pip install pytest-django
@@ -369,7 +371,7 @@ Combine all migrations up to migration `x`:
 
 The resulting `validator/migrations/0001_squashed_...` file contains a list `replaces = [...]` in the `Migration` class that details the other migrations it replaces. If you want to use a "from-scratch" migration (see above), you can copy the `replaces` list into that and it should be treated like a squashed migration.
 
-#### Dump ops db 
+#### Dump ops db
 
 And omit stuff that creates problems on import:
 
@@ -438,10 +440,10 @@ For further hints see <https://django-extensions.readthedocs.io/en/latest/graph_
 
 Dump database contents into separate files for readability:
 
-    python manage.py dumpdata validator.DataVariable > variable.json
+    python manage.py dumpdata validator.DataVariable > variables.json
     python manage.py dumpdata validator.DatasetVersion > versions.json
     python manage.py dumpdata validator.DataFilter > filters.json
-    python manage.py dumpdata validator.Dataset > dataset.json
+    python manage.py dumpdata validator.Dataset > datasets.json
 
 Put json files into `validator/fixtures/` (and pretty-print them with an editor for better readability).
 
