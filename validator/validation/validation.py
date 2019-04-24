@@ -51,31 +51,24 @@ def save_validation_config(validation_run):
         else:
             ds.val_interval_to=validation_run.interval_to.strftime('%Y-%m-%d %H:%M')
 
-        datasets=""
-        for dataset_config in validation_run.dataset_configurations.all():
+        for i, dataset_config in enumerate(validation_run.dataset_configurations.all()):
             if dataset_config.filters.all():
                 filters = '; '.join([x.description for x in dataset_config.filters.all()])
             else:
                 filters = 'N/A'
 
-            datasets = datasets + 'Dataset: {}, version: {}, variable: {}, filters: {};'\
-                .format(dataset_config.dataset.short_name,
-                        dataset_config.version.short_name,
-                        dataset_config.variable.short_name,
-                        filters)
-        ds.val_data_datasets=datasets
+            ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
+            ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
+            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.short_name)
+            ds.setncattr('val_dc_filters' + str(i), filters)
 
-        if validation_run.reference_configuration is not None:
-            ds.val_ref_dataset = datasets + 'Dataset: {}, version: {}, variable: {};'\
-                .format(validation_run.reference_configuration.dataset.short_name,
-                        validation_run.reference_configuration.version.short_name,
-                        validation_run.reference_configuration.variable.short_name,)
+            if ((validation_run.reference_configuration is not None) and
+                (dataset_config.id == validation_run.reference_configuration.id)):
+                ds.val_ref = 'val_dc_dataset' + str(i)
 
-        if validation_run.scaling_ref is not None:
-            ds.val_scaling_ref = 'Dataset: {}, version: {}, variable: {};'\
-                .format(validation_run.scaling_ref.dataset.short_name,
-                        validation_run.scaling_ref.version.short_name,
-                        validation_run.scaling_ref.variable.short_name)
+            if ((validation_run.scaling_ref is not None) and
+                (dataset_config.id == validation_run.scaling_ref.id)):
+                ds.val_scaling_ref = 'val_dc_dataset' + str(i)
 
         ds.val_scaling_method=validation_run.scaling_method
         ds.close()
@@ -189,11 +182,11 @@ def run_validation(validation_id):
                     except Exception as e:
                         if e.__class__.__name__ != 'TimeoutError':
                             raise e
-                        
+
                         try:
                             celery_task=CeleryTask.objects.get(celery_task_id=uuid.UUID(async_result.id).hex)
                             __logger.debug('Celery task timeout. Continue...')
-                        except Exception:    
+                        except Exception:
                             __logger.debug('Validation got cancelled')
                             validation_aborted_flag=True
                             validation_run.progress=-1
@@ -206,7 +199,7 @@ def run_validation(validation_id):
                         except Exception:
                             __logger.debug('Celery task does not exists. Validation run: {} Celery task ID: {} - {}'.format(validation_id,
                                                                                                                        async_result.id,uuid.UUID(async_result.id).hex))
-                        
+
                 results = result_dict['result']
                 job = result_dict['job']
                 check_and_store_results(validation_run, job, results, save_path)
@@ -254,9 +247,9 @@ def stop_running_validation(validation_id):
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_run.progress=-1
     validation_run.save()
-    
+
     celery_tasks=CeleryTask.objects.filter(validation=validation_run)
-    
+
     for task in celery_tasks:
         app.control.revoke(task.celery_task)
         task.delete()
