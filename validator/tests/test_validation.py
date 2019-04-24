@@ -32,11 +32,11 @@ class TestValidation(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     def setUp(self):
-#         self.always_eager = None
-#         if hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER'):
-#             self.always_eager = settings.CELERY_TASK_ALWAYS_EAGER
-#
-#         settings.CELERY_TASK_ALWAYS_EAGER = True # run without parallelisation, everything in one process
+        self.always_eager = None
+        if hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER'):
+            self.always_eager = settings.CELERY_TASK_ALWAYS_EAGER
+
+        settings.CELERY_TASK_ALWAYS_EAGER = True # run without parallelisation, everything in one process
 
         self.metrics = ['gpi', 'lon', 'lat'] + list(val.METRICS.keys())
 
@@ -57,8 +57,8 @@ class TestValidation(TestCase):
             if e.errno != errno.EEXIST:
                 raise
 
-#     def tearDown(self):
-#         settings.CELERY_TASK_ALWAYS_EAGER = self.always_eager
+    def tearDown(self):
+        settings.CELERY_TASK_ALWAYS_EAGER = self.always_eager
 
     def generate_default_validation(self):
         run = ValidationRun()
