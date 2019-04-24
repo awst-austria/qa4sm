@@ -5,21 +5,23 @@ from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
 from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 from django.test import TestCase
 import netCDF4
 import pytest
 from pytz import UTC
 
-from django.contrib.auth import get_user_model
-from validator.models import Dataset
-from validator.models import DatasetVersion
-from validator.models import DataVariable
-User = get_user_model()
-
 import numpy as np
+from validator.models import DataVariable
+from validator.models import Dataset
+from validator.models import DatasetConfiguration
+from validator.models import DatasetVersion
 from validator.models import ValidationRun
 from validator.models.filter import DataFilter
 import validator.validation as val
+
 
 '''
     Tests to check that the validation process really produces valid results ;-)
@@ -105,30 +107,37 @@ class TestValidity(TestCase):
     @pytest.mark.long_running
     def test_validation_c3s_ismn(self):
         run = ValidationRun()
-        run.user = self.testuser
         run.start_time = datetime.now(tzlocal())
-
-        # set data set
-        run.data_dataset = Dataset.objects.get(short_name='C3S')
-        run.data_version = DatasetVersion.objects.get(short_name='C3S_V201706')
-        run.data_variable = DataVariable.objects.get(short_name='C3S_sm')
-
-        # set reference set
-        run.ref_dataset = Dataset.objects.get(short_name='ISMN')
-        run.ref_version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        run.ref_variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
-
+        run.user = self.testuser
         # set validation period
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.save()
 
-        run.save() ## need to save before adding filters because django m2m relations work that way
+        data_c = DatasetConfiguration()
+        data_c.validation = run
+        data_c.dataset = Dataset.objects.get(short_name='C3S')
+        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201706')
+        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.save() # object needs to be saved before m2m relationship can be used
 
-        run.data_filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-        run.data_filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.ref_filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-#         run.ref_filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-#         run.ref_filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
+        data_c.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+        data_c.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        data_c.save()
+
+        ref_c = DatasetConfiguration()
+        ref_c.validation = run
+        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.save()
+
+        ref_c.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+        ref_c.save()
+
+        run.reference_configuration = ref_c
+        run.scaling_ref = ref_c
+        run.save()
 
         run_id = run.id
 
