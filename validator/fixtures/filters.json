@@ -115,5 +115,41 @@
 			"description": "No processing flags raised",
 			"help_text": "No processing flags (indicating data values are changed based on thresholds) are set"
 		}
+	},
+	{
+		"model": "validator.datafilter",
+		"pk": 15,
+		"fields": {
+			"name": "FIL_SMOS_QUAL_RECOMMENDED",
+			"description": "Soil moisture values are retrieved and recommended",
+			"help_text": "Soil moisture values are retrieved and recommended (Quality_flag == 0)"
+		}
+	},
+	{
+		"model": "validator.datafilter",
+		"pk": 16,
+		"fields": {
+			"name": "FIL_SMOS_SOIL_UNFROZEN",
+			"description": "Soils not frozen",
+			"help_text": "Soils not frozen (Scene_flags != 00001000 and Soil_Temperature_Level1 >= 273)"
+		}
+	},
+	{
+		"model": "validator.datafilter",
+		"pk": 17,
+		"fields": {
+			"name": "FIL_SMOS_SCENE_UNPOLLUTED",
+			"description": "Scene not polluted",
+			"help_text": "Scene not polluted (Scene_flags != 00000100)"
+		}
+	},
+	{
+		"model": "validator.datafilter",
+		"pk": 18,
+		"fields": {
+			"name": "FIL_SMOS_RMSE_ACCEPTABLE",
+			"description": "RMSE of brightness temperature within acceptable limits (< 12 K)",
+			"help_text": "RMSE of brightness temperature within acceptable limits (< 12 K) (Processing_Flags ! = 00000001)"
+		}
 	}
 ]
