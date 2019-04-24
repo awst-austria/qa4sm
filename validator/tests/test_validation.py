@@ -237,9 +237,8 @@ class TestValidation(TestCase):
                 config.dataset = Dataset.objects.get(short_name='ASCAT')
                 config.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
                 config.variable = DataVariable.objects.get(short_name='ASCAT_sm')
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+                config.filters.clear()
+                config.save()
 
         #run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
