@@ -4,6 +4,7 @@ import os, errno
 import shutil
 import time
 from zipfile import ZipFile
+from re import search as regex_search
 
 from dateutil.tz import tzlocal
 from django.conf import settings
@@ -117,14 +118,41 @@ class TestValidation(TestCase):
             if(run.interval_from is None):
                 assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
             else:
-                assert ds.val_interval_from == run.interval_from.strftime('%Y-%m-%d %H:%M'),'Wrong validation config attribute. [interval_from]'
+                assert ds.val_interval_from == run.interval_from.strftime('%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_from]'
 
             if(run.interval_to is None):
                 assert ds.val_interval_to == "N/A", 'Wrong validation config attribute. [interval_to]'
             else:
-                assert ds.val_interval_to == run.interval_to.strftime('%Y-%m-%d %H:%M'),'Wrong validation config attribute. [interval_to]'
+                assert ds.val_interval_to == run.interval_to.strftime('%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_to]'
 
+            for d_index, dataset_config in enumerate(run.dataset_configurations.all()):
+                ds_name = 'val_dc_dataset' + str(d_index)
+                stored_dataset = ds.getncattr(ds_name)
+                stored_version = ds.getncattr('val_dc_version' + str(d_index))
+                stored_variable = ds.getncattr('val_dc_variable' + str(d_index))
+                stored_filters = ds.getncattr('val_dc_filters' + str(d_index))
 
+                # check dataset, version, variable
+                assert stored_dataset == dataset_config.dataset.short_name, 'Wrong dataset config attribute. [dataset]'
+                assert stored_version == dataset_config.version.short_name, 'Wrong dataset config attribute. [version]'
+                assert stored_variable == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable]'
+
+                # check filters
+                if not dataset_config.filters.all():
+                    assert stored_filters == 'N/A', 'Wrong dataset config filters (should be none)'
+                else:
+                    assert stored_filters, 'Wrong dataset config filters (shouldn\'t be empty)'
+                    for fil in dataset_config.filters.all():
+                        assert fil.description in stored_filters, 'Wrong dataset config filters'
+
+                # check reference
+                if dataset_config.id == run.reference_configuration.id:
+                    assert ds.val_ref == ds_name, 'Wrong validation config attribute. [reference_configuration]'
+
+                if dataset_config.id == run.scaling_ref.id:
+                    assert ds.val_scaling_ref == ds_name, 'Wrong validation config attribute. [scaling_ref]'
+
+            assert ds.val_scaling_method == run.scaling_method,' Wrong validation config attribute. [scaling_method]'
 
         # check zipfile of graphics
         zipfile = os.path.join(outdir, 'graphs.zip')
