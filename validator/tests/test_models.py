@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 import pytest
 
+import numpy as np
+
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -44,6 +46,41 @@ class TestModels(TestCase):
         dc_str = str(dc)
         print(dc_str)
         assert dc_str is not None
+
+    def test_ds_config_order(self):
+        run = ValidationRun()
+        run.start_time = now()
+        run.save()
+
+        # create dataset configs in order of dataset ids
+        for i in range(1, 5):
+            dc = DatasetConfiguration()
+            dc.validation = run
+            dc.dataset = Dataset.objects.get(pk=i)
+            dc.version = dc.dataset.versions.first()
+            dc.variable = dc.dataset.variables.first()
+            dc.save()
+
+        run.reference_configuration = dc
+        run.scaling_ref = dc
+        run.save()
+
+        # check that we can get the order of dataset configs from the validation run
+        orderorder = run.get_datasetconfiguration_order()
+        assert orderorder
+
+        # check that they have the same order when using all()
+        for i, dsc in enumerate(run.dataset_configurations.all(), 1):
+            assert dsc.dataset.id == i
+            assert dsc.id == orderorder[i-1]
+
+        # randomly change the order
+        newworldorder = np.random.permutation(range(1, 5))
+        run.set_datasetconfiguration_order(newworldorder)
+
+        # make sure the new order is used
+        for i, dsc in enumerate(run.dataset_configurations.all(), 1):
+            assert dsc.id == newworldorder[i-1]
 
     def test_validation_run_str(self):
         run = ValidationRun()

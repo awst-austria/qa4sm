@@ -21,3 +21,7 @@ class DatasetConfiguration(models.Model):
             self.version if hasattr(self, 'version') else "none",
             self.variable if hasattr(self, 'variable') else "none",
             )
+
+    class Meta:
+        # https://docs.djangoproject.com/en/2.2/ref/models/options/#order-with-respect-to
+        order_with_respect_to = 'validation'
