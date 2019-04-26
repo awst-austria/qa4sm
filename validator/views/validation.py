@@ -122,8 +122,8 @@ def validation(request):
             # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
             connections.close_all()
 
-#             p = Process(target=run_validation, kwargs={"validation_id": run_id})
-#             p.start()
+            p = Process(target=run_validation, kwargs={"validation_id": run_id})
+            p.start()
 
             return redirect('result', result_uuid=run_id)
         else:
