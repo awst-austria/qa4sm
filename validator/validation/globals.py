@@ -6,12 +6,15 @@ METRICS = {'R' : 'Pearson\'s r',
            'p_R' : 'Pearson\'s r p-value',
            'rho' : 'Spearman\'s rho',
            'p_rho' : 'Spearman\'s rho p-value',
-           'RMSD' : 'Root-mean-square deviation',
-           'BIAS' : 'Bias (difference of means)',
+           'rmsd' : 'Root-mean-square deviation',
+           'bias' : 'Bias (difference of means)',
            'n_obs' : '# observations',
-           'urmsd' : 'Unbiased root-mean-square deviation',
-           'RSS' : 'Residual sum of squares',
-           }
+           'ubRMSD' : 'Unbiased root-mean-square deviation',
+#            'RSS' : 'Residual sum of squares',
+           'mse' : 'Mean square error',
+           'mse_corr' : 'Mean square error correlation',
+           'mse_bias' : 'Mean square error bias',
+           'mse_var' : 'Mean square error variance',}
 
 C3S = 'C3S'
 ISMN = 'ISMN'
