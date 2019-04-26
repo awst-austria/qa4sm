@@ -5,6 +5,7 @@ import shutil
 import time
 from zipfile import ZipFile
 from re import search as regex_search
+from re import IGNORECASE
 
 from dateutil.tz import tzlocal
 from django.conf import settings
@@ -101,19 +102,33 @@ class TestValidation(TestCase):
 
         ## check netcdf output
         length=-1
+        num_vars=-1
         with netCDF4.Dataset(run.output_file.path) as ds:
-            for variable in self.metrics:
-                values = ds.variables[variable][:]
-                assert values is not None
+            ## check the metrics contained in thef ile
+            for metric in self.metrics:
+                ## This gets all variables in the netcdf file that start with the name of the current metric
+                metric_vars = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
 
-                if length == -1:
-                    length = len(values)
-                    assert length > 0, 'Variable {} has no entries'.format(variable)
+                ## check that all metrics have the same number of variables (depends on number of input datasets)
+                if num_vars == -1:
+                    num_vars = len(metric_vars)
+                    assert num_vars > 0, 'No variables containing metric {}'.format(metric)
                 else:
-                    assert len(values) == length, 'Variable {} doesn\'t match other variables in length'.format(variable)
+                    assert len(metric_vars) == num_vars, 'Number of variables for metric {} doesn\'t match number for other metrics'.format(metric)
 
-                nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
-                assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(variable, nan_ratio)
+                ## check the values of the variables for formal criteria (not empty, matches lenght of other variables, doesn't have too many NaNs)
+                for m_var in metric_vars:
+                    values = m_var[:]
+                    assert values is not None
+
+                    if length == -1:
+                        length = len(values)
+                        assert length > 0, 'Variable {} has no entries'.format(m_var.name)
+                    else:
+                        assert len(values) == length, 'Variable {} doesn\'t match other variables in length'.format(m_var.name)
+
+                    nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
+                    assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
 
             if(run.interval_from is None):
                 assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
@@ -180,6 +195,7 @@ class TestValidation(TestCase):
         assert not os.path.exists(outdir)
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
     def test_validation(self):
         run = self.generate_default_validation()
         run.user = self.testuser
