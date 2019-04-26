@@ -1,32 +1,29 @@
-import logging
 from datetime import datetime
+import logging
 from os import path
 from re import sub as regex_sub
 import uuid
 
-from django.conf import settings
-
-from valentina.celery import app
-
 from celery.app import shared_task
 from dateutil.tz import tzlocal
+from django.conf import settings
 from netCDF4 import Dataset
+from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names
 from pytesmo.validation_framework.results_manager import netcdf_results_manager
 from pytesmo.validation_framework.validation import Validation
 
 import numpy as np
+from valentina.celery import app
 from validator.mailer import send_val_done_notification
-from validator.metrics import EssentialMetrics
 from validator.models import ValidationRun
-
-
-from validator.validation.util import mkdir_if_not_exists, first_file_in
-from validator.validation.globals import OUTPUT_FOLDER
-from validator.validation.readers import create_reader
-from validator.validation.filters import setup_filtering
-from validator.validation.batches import create_jobs
-from validator.validation.graphics import generate_all_graphs
 from validator.models.celery_task import CeleryTask
+from validator.validation.batches import create_jobs
+from validator.validation.filters import setup_filtering
+from validator.validation.globals import OUTPUT_FOLDER
+from validator.validation.graphics import generate_all_graphs
+from validator.validation.readers import create_reader
+from validator.validation.util import mkdir_if_not_exists, first_file_in
+from pytesmo.validation_framework.data_manager import DataManager
 
 
 __logger = logging.getLogger(__name__)
@@ -77,27 +74,40 @@ def save_validation_config(validation_run):
 
 def create_pytesmo_validation(validation_run):
     ds_list = []
+    ref_name = None
+    scaling_ref_name = None
     for dataset_config in validation_run.dataset_configurations.all():
         reader = create_reader(dataset_config.dataset, dataset_config.version)
         reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.variable)
-        ds_list.append( (dataset_config.dataset.short_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
+        dataset_name = dataset_config.dataset.short_name
+        ds_list.append( (dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
+
+        if ((validation_run.reference_configuration) and
+            (dataset_config.id == validation_run.reference_configuration.id)):
+            ref_name = dataset_name
+        if ((validation_run.scaling_ref) and
+            (dataset_config.id == validation_run.scaling_ref.id)):
+            scaling_ref_name = dataset_name
 
     datasets=dict(ds_list)
+    ds_num = len(ds_list)
 
     period = None
     if validation_run.interval_from is not None and validation_run.interval_to is not None:
         period = [validation_run.interval_from, validation_run.interval_to]
 
-    metrics = EssentialMetrics()
+    datamanager = DataManager(datasets, ref_name=ref_name, period=period)
+    ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
+    metrics = IntercomparisonMetrics(dataset_names=ds_names, other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
 
     val = Validation(
-            datasets,
-            spatial_ref=validation_run.reference_configuration.dataset.short_name,
-            temporal_window=0.5,
-            scaling=validation_run.scaling_method,
-            scaling_ref=validation_run.scaling_ref.dataset.short_name,
-            metrics_calculators={(2, 2): metrics.calc_metrics},
-            period=period)
+        datasets=datamanager,
+        spatial_ref=ref_name,
+        temporal_window=0.5,
+        scaling=validation_run.scaling_method,
+        scaling_ref=scaling_ref_name,
+        metrics_calculators={(ds_num, ds_num): metrics.calc_metrics},
+        period=period)
 
     return val
 
@@ -130,11 +140,8 @@ def check_and_store_results(validation_run, job, results, save_path):
     __logger.debug(job)
 
     if len(results) < 1:
-        __logger.warn('Potentially problematic job: {} - no results'.format(job))
+        __logger.warning('Potentially problematic job: {} - no results'.format(job))
         return
-
-    if np.isnan(next(iter(results.values()))['R'][0]):
-        __logger.warn('Potentially problematic job: {} - R is nan'.format(job))
 
     netcdf_results_manager(results, save_path)
 
@@ -143,8 +150,8 @@ def run_validation(validation_id):
     validation_aborted_flag=False;
 
 
-#     if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')==False) or (settings.CELERY_TASK_ALWAYS_EAGER==False):
-    app.control.add_consumer(validation_run.user.username, reply=True)
+    if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')==False) or (settings.CELERY_TASK_ALWAYS_EAGER==False):
+        app.control.add_consumer(validation_run.user.username, reply=True)
 
     try:
         __logger.info("Starting validation: {}".format(validation_id))
