@@ -1,7 +1,6 @@
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+plt.switch_backend('agg') ## this allows headless graph production
 import matplotlib.ticker as mticker
-# plt.switch_backend('agg') ## this allows headless graph production
 import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
