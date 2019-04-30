@@ -76,10 +76,10 @@ def create_pytesmo_validation(validation_run):
     ds_list = []
     ref_name = None
     scaling_ref_name = None
-    for dataset_config in validation_run.dataset_configurations.all():
+    for ds_num, dataset_config in enumerate(validation_run.dataset_configurations.all(), start=1):
         reader = create_reader(dataset_config.dataset, dataset_config.version)
         reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.variable)
-        dataset_name = dataset_config.dataset.short_name
+        dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
         ds_list.append( (dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
 
         if ((validation_run.reference_configuration) and
@@ -251,6 +251,7 @@ def run_validation(validation_id):
     return validation_run
 
 def stop_running_validation(validation_id):
+    __logger.info("Stopping validation {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_run.progress=-1
     validation_run.save()
