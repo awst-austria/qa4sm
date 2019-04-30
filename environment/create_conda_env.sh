@@ -3,13 +3,13 @@
 # Script that creates the conda/python environment for the web validation service and
 # installs the service.
 #
-#Celery requires RabbitMQ and Redis installed locally. Since the Reddis package in the 
+#Celery requires RabbitMQ and Redis installed locally. Since the Reddis package in the
 # debain repository seems to be broken, Redis and RabitMQ has to be installed manually.
 
 # install paths for miniconda and the app itself:
 if [ "x$INSTALL_DIR" == "x" ]; then
     INSTALL_DIR="/var/lib/qa4sm-web-val"
-fi 
+fi
 if [ "x$MINICONDA_PATH" == "x" ]; then
     MINICONDA_PATH="/opt/miniconda"
 fi
@@ -18,7 +18,7 @@ if [ "x$TOOL_DIR" == "x" ]; then
 fi
 if [ "x$PYTHON_ENV_DIR" == "x" ]; then
     PYTHON_ENV_DIR="/var/lib/qa4sm-conda"
-fi 
+fi
 
 # dir this script is in
 THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
@@ -64,13 +64,15 @@ if [ "$CONDA_HTTP_CODE" != "304" ]; then
         rm -Rf $MINICONDA_PATH
     fi
     bash $MINICONDA_PKG -b -p $MINICONDA_PATH
-fi    
+fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
-    
+
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
 conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
 source activate $PYTHON_ENV_DIR
 
+pip uninstall --yes shapely
+pip install --no-binary :all: shapely
 pip install pynetcf
 pip install ascat
 pip install ismn
