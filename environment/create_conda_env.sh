@@ -78,6 +78,7 @@ pip install ismn
 pip install pybufr-ecmwf
 pip install c3s_sm
 pip install esa_cci_sm
+pip install smos
 pip install coverage
 pip install pygeogrids
 pip install pytest-django

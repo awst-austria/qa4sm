@@ -97,5 +97,14 @@
 			"pretty_name": "v04.4",
 			"help_text": ""
 		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 13,
+		"fields": {
+			"short_name": "SMOS_105_ASC",
+			"pretty_name": "V.105 Ascending",
+			"help_text": ""
+		}
 	}
 ]

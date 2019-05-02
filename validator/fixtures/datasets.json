@@ -149,5 +149,27 @@
 				7
 			]
 		}
+	},
+	{
+		"model": "validator.dataset",
+		"pk": 7,
+		"fields": {
+			"short_name": "SMOS",
+			"pretty_name": "SMOS IC",
+			"help_text": "",
+			"source_reference": "",
+			"citation": "",
+			"is_reference": false,
+			"versions": [
+				13
+			],
+			"variables": [
+				10
+			],
+			"filters": [
+				1,
+				15
+			]
+		}
 	}
 ]

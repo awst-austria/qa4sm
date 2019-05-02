@@ -27,4 +27,5 @@ ascat>=1.0
 cartopy
 ismn>=0.3
 esa_cci_sm>=0.1.1
+smos>=0.1
 seaborn

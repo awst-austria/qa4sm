@@ -97,5 +97,16 @@
 			"min_value": 0.0,
 			"max_value": 1.0
 		}
+	},
+	{
+		"model": "validator.datavariable",
+		"pk": 10,
+		"fields": {
+			"short_name": "SMOS_sm",
+			"pretty_name": "Soil_Moisture",
+			"help_text": "",
+			"min_value": 0.0,
+			"max_value": 1.0
+		}
 	}
 ]
