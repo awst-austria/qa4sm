@@ -54,7 +54,7 @@ def get_used_variables(filters, dataset, variable):
             continue
 
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
-            variables.append('Quality_flag')
+            variables.append('Quality_Flag')
             continue
 
     return variables
@@ -136,7 +136,7 @@ def setup_filtering(reader, filters, dataset, variable):
             continue
 
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'Quality_flag')
+            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'Quality_Flag')
             continue
 
     return filtered_reader
