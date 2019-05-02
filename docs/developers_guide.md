@@ -316,6 +316,26 @@ Congratulations, your development environment is now set up and you can develop 
 
 ## Tips and Tricks
 
+### Cartopy doesn't want to install
+
+1. Make sure proj development files are installed with something like
+
+        zypper install libproj-devel
+
+    or
+
+        apt-get install libproj-dev
+
+1. If pip complains about PEP, add a parameter to ignore it
+
+        pip install --no-use-pep517 cartopy
+
+1. If the compiler complains about `ACCEPT_USE_OF_DEPRECATED_PROJ_API`, define this shell environment variable before running pip
+
+        export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
+
+    then run pip as above.
+
 ### Django migration tricks
 
 To convert database content or fill the database with default entries, you can write your own data migrations, see [data migrations](https://docs.djangoproject.com/en/2.1/topics/migrations/#data-migrations).
@@ -370,7 +390,7 @@ Combine all migrations up to migration `x`:
 
 The resulting `validator/migrations/0001_squashed_...` file contains a list `replaces = [...]` in the `Migration` class that details the other migrations it replaces. If you want to use a "from-scratch" migration (see above), you can copy the `replaces` list into that and it should be treated like a squashed migration.
 
-#### Dump ops db 
+#### Dump ops db
 
 And omit stuff that creates problems on import:
 
