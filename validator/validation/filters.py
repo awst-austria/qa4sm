@@ -53,6 +53,10 @@ def get_used_variables(filters, dataset, variable):
             variables.append('proc_flag')
             continue
 
+        if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
+            variables.append('Quality_flag')
+            continue
+
     return variables
 
 
@@ -104,9 +108,6 @@ def setup_filtering(reader, filters, dataset, variable):
             filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 2, 'mode')
             continue
 
-#         if(fil.name == "FIL_C3S_UNCERT"):
-#             filtered_reader = SelfMaskingAdapter(filtered_reader, '<', 'sm_uncertainty', 'TODO_TRACY')
-
         if(fil.name == "FIL_GLDAS_UNFROZEN"):
             temp_variable = variable.pretty_name.replace("Moi", "TMP")
             filtered_reader = SelfMaskingAdapter(filtered_reader, '<', 0.001, 'SWE_inst')
@@ -133,26 +134,9 @@ def setup_filtering(reader, filters, dataset, variable):
         if(fil.name == "FIL_ASCAT_NO_PROC_FLAGS"):
             filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'proc_flag')
             continue
-        
+
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
             filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'Quality_flag')
             continue
-        '''
-        #TODO this filter is not correct yet - Soils not frozen (Scene_flag != 00001000 and Soil_Temperature_Level1 >= 273)
-        if(fil.name == "FIL_SMOS_SOILS_UNFROZEN"):
-            bitValueTobeFiltered = 8
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '>=', 273, 'Soil_Temperature_Level1')
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '!=', 8, 'Scene_Flags') #TODO bitwise check!!!
-            continue
-        
-         #TODO this filter is not correct yet - Scene not polluted (Scene_flag != 00000100)
-        if(fil.name == "FIL_SMOS_SCENE_UNPOLLUTED"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '!=', 4, 'Scene_flags')
-            continue
-        
-        #TODO this filter is not correct yet - RMSE of brightness temperature within acceptable limits (< 12 K) (Processing_Flags ! = 00000001
-        if(fil.name == "FIL_SMOS_RMSE_ACCEPTABLE"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '!=', 1, 'Processing_flags')
-            continue   
-        '''
+
     return filtered_reader
