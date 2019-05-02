@@ -102,7 +102,7 @@
 		"model": "validator.datasetversion",
 		"pk": 13,
 		"fields": {
-			"short_name": "SMOS_105",
+			"short_name": "SMOS_105_ASC",
 			"pretty_name": "V.105 Ascending",
 			"help_text": ""
 		}

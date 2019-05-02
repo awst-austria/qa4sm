@@ -17,42 +17,55 @@
 			<th scope="col" style="width: 20%">Versions supported</th>
 			<th scope="col" style="width: 13%">Data availability</th>
 			<th scope="col" style="width: 10%">Citation</th>
-			<th scope="col" style="width: 35%">Filters (hover over for additional info)</th>
+			<th scope="col" style="width: 35%">Filters</th>
 		</tr>
         </thead>
         <tbody>
 		<tr>
             <th scope="row">C3S SM</th>
 			<td>The C3S long-term data record provides active, passive and combined (active+passive) soil moisture data
-                on a daily, dekadal and monthly basis. Observations are provided on a quarter degree grid
-                (<a target="_blank" href="http://climers.geo.tuwien.ac.at/c3s/">more information</a>).</td>
-			<td>The QA4SM tool supports version v201706 of the C3S product. Currently, the COMBINED product (combination
+                on a daily, dekadal and monthly basis. Observations are provided on a quarter degree grid. For more information, please visit
+                the <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview">Climate Data Store</a>.
+            </td>
+			<td>The QA4SM tool supports version v201706 and v201812 of the C3S product. Currently, the COMBINED product (combination
                 of active and passive sensors) is supported.</td>
-			<td>In future, it will be possible to download the C3S data from the <a target="_blank" href="https://climate.copernicus.eu/climate-data-store">
-                climate data store</a>.</td>
+			<td>The data can be downloaded from the <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview">Climate Data Store</a>.</td>
 			<td>TBA</td>
 			<td>
                 <ul>
-                <li>Valid range:<br>Filter soil moisture values to ensure they are within the valid range (between 0 and 1 for the COMBINED product).</li>
-                <li>Use data where flag=0: <br>Only use satellite observations where no inconsistencies were detected.</li>
-                <li>Frozen soil or snow-cover: <br>Only use soil moisture data from grids cells without no snow cover or frozen soil (flag != 1).</li>
-                <li>Dense vegetation: <br>Only use soil moisture data from grids cells without dense vegetation (flag != 2).</li>
-                <li>Ascending mode only: <br>Only use satellite observations in ascending mode.</li>
-                <li>Descending mode only: <br>Only use satellite observations from descending mode.</li>
+                    <li>Valid range:<br>Filter soil moisture values to ensure they are within the valid range (between 0 and 1 for the COMBINED product).</li>
+                    <li>Use data where flag=0: <br>Only use satellite observations where no inconsistencies were detected.</li>
+                    <li>Frozen soil or snow-cover: <br>Only use soil moisture data from grids cells without no snow cover or frozen soil (flag != 1).</li>
+                    <li>Dense vegetation: <br>Only use soil moisture data from grids cells without dense vegetation (flag != 2).</li>
+                    <li>Ascending mode only: <br>Only use satellite observations in ascending mode.</li>
+                    <li>Descending mode only: <br>Only use satellite observations from descending mode.</li>
                 </ul>
             </td>
 		</tr>
-		<!--<tr>
-			<th scope="row">ESA CCI SM</th>
-			<td>The ESA CCI soil moisture product combines 11 sensors (7 passive, 4 active) to provide a dataset spanning
-                nearly 40 years (from 1978 to 2016). Observations are provided daily on a quarter degree grid
-                (<a href="https://www.esa-soilmoisture-cci.org/">more information</a>).</td>
-			<td>TBA</td>
-			<td>Data is freely available after registration <a target="_blank" href="https://www.esa-soilmoisture-cci.org/node/145">
-                here</a>.</td>
-			<td>Click <a target="_blank" href="https://www.esa-soilmoisture-cci.org/node/137">here</a></td>
-			<td>See filters specified for the C3S dataset above.</td>
-		</tr>-->
+		<tr>
+			<th scope="row">ESA CCI SM COMBINED</th>
+			<td>The ESA CCI SM long-term data record provides active, passive and combined (active+passive) on a daily basis.
+                Observations are provided on a quarter degree grid. For more information on the ESA CCI SM product, please see
+                the <a target="_blank" href="https://www.esa-soilmoisture-cci.org/">product homepage</a>.</td>
+			<td>v04.4</td>
+			<td><a target="_blank" href="https://www.esa-soilmoisture-cci.org/node/145">Register at ESA CCI</a>, then download through FTP.</td>
+			<td>http://www.esa-soilmoisture-cci.org; <br/>
+                Liu, Y.Y., Dorigo, W.A., Parinussa, R.M., de Jeu, R.A.M. , Wagner, W., McCabe, M.F., Evans, J.P., van Dijk, A.I.J.M. (2012).
+                Trend-preserving blending of passive and active microwave soil moisture retrievals,
+                Remote Sensing of Environment, 123, 280-297, doi: 10.1016/j.rse.2012.03.014.;<br/>
+                Liu, Y.Y., Parinussa, R.M., Dorigo, W.A., De Jeu, R.A.M., Wagner, W., van Dijk, A.I.J.M., McCabe, M.F., & Evans, J.P. (2011).
+                Developing an improved soil moisture dataset by blending passive and active microwave satellite based retrievals.
+                Hydrology and Earth System Sciences, 15, 425-436.;<br/>
+                Wagner, W., W. Dorigo, R. de Jeu, D. Fernandez, J. Benveniste, E. Haas, M. Ertl (2012).
+                Fusion of active and passive microwave observations to create an Essential Climate Variable data record on soil moisture.
+                ISPRS Annals of the Photogrammetry, Remote Sensing and Spatial Information Sciences, Volume I-7, 2012. XXII ISPRS Congress, 25 August - 01 September 2012, Melbourne, Australia.;<br/>
+                Gruber, A., Dorigo, W. Crow, W., & Wagner, W. (2017).
+                Triple collocation-based merging of satellite soil moisture retrievals. IEEE Transactions on Geoscience and Remote Sensing, 1-13.;<br/>
+                Dorigo, W.A., Wagner, W., Albergel, C., Albrecht, F., Balsamo, G., Brocca, L., Chung, D., Ertl, M., Forkel, M., Gruber, A., Haas, E., Hamer, P. D., Hirschi, M., Ikonen, J., de Jeu, R., Kidd, R., Lahoz, W., Liu, Y. Y.,Miralles, D., Mistelbauer, T., Nicolai-Shaw, N., Parinussa, R., Pratola, C., Reimer, C., van der Schalie, R., Seneviratne, S. I. Smolander, T., Lecomte, P. (2017).
+                ESA CCI Soil Moisture for improved Earth system understanding: State-of-the art and future directions, Remote Sensing of Environment. https://doi.org/10.1016/j.rse.2017.07.001.
+            </td>
+			<td>See filters specified for the C3S dataset.</td>
+		</tr>
 		<tr>
 			<th scope="row">SMAP Level 3 SM</th>
 			<td>The NASA SMAP level 3 data set provides global daily soil moisture observations at a 36 km resolution from
@@ -74,9 +87,9 @@
                 global grid (DGG) with a spatial resolution of 25 km. Observations are provided from the ASCAT instrument on-board
                 both Metop-A and Metop-B (<a target="_blank" href="http://hsaf.meteoam.it/description-h25-h108-h111.php">more information</a>).</td>
             <td>The QA4SM tool supports version H113 of the H-SAF ASCAT SSM CDR product.</td>
-            <td>The data can be downloaded from the product homepage <a target="_blank" href="#TODO">TODO</a>.</td>
+            <td>The data can be downloaded from the <a target="_blank" href="http://hsaf.meteoam.it/description-h25-h108-h111.php">product homepage</a>.</td>
             <td>See section 5.2 of <a target="_blank" href="http://hsaf.meteoam.it/documents/PUM/SSM_ASCAT_DR_PUM_v0.6.pdf">this document</a></td>
-            <td>Filters:
+            <td>
                 <ul>
                     <li>Valid range: Filter soil moisture values to ensure they are between 0 and 100.</li>
                     <li>Metop-A observations: Use only observations retrieved using ASCAT on-board Metop-A.</li>
@@ -116,12 +129,13 @@
                 Data is provided from 1952 to present day
                 (<a target="_blank" href="https://ismn.geo.tuwien.ac.at/">more information</a>).</td>
 			<td>The ISMN data is downloaded periodically for use in the QA4SM portal, therefore the version number (and
-                data) will change over time. The current version used in v20180830.</td>
+                data) will change over time. There are currently two versions available within QA4SM: v20180830 and v20190222.</td>
 			<td>Data is freely available after registration <a target="_blank" href="https://ismn.geo.tuwien.ac.at/data-access/">
                 here</a>.</td>
 			<td><a target="_blank" href="https://ismn.geo.tuwien.ac.at/terms-and-conditions/">Terms
-                and conditions</a> and <a target="_blank" href="../../static/files/ISMN_v20180830_Readme.txt">readme
-                (v20180830)</a></td>
+                and conditions</a>, <a target="_blank" href="../../static/files/ISMN_v20180830_Readme.txt">readme
+                (v20180830)</a>, and <a target="_blank" href="../../static/files/ISMN_v20190222_Readme.txt">readme
+                (v20190222)</a></td>
             <td>
                 <ul>
                 <li>Quality flag is "good" (G): <br>More information on the ISMN quality flags can be found  <a target="_blank" href="https://ismn.geo.tuwien.ac.at/data-access/quality-flags/">here</a>.</li>
@@ -133,7 +147,7 @@
 			<td>GLDAS is a land surface model (LSM) which provides soil moisture data at different depths. Different
                 versions are available for different time periods. For more information, visit the LDAS website:
                 <a target="_blank" href="https://ldas.gsfc.nasa.gov/gldas/">NASA Land Data Assimilation Systems Website</a></td>
-			<td>Version 2.1 is supported within the QA4SM tool. This dataset covers the period 2000 to present day.</td>
+			<td>Version 2.1 is supported within the QA4SM tool. This dataset covers the period from the start of 2000 to the end of 2017.</td>
 			<td>Data is freely available after registration <a target="_blank" href="https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H.2.1/">
                 here for version 2.1</a> </td>
 			<td>Click <a target="_blank" href="https://ldas.gsfc.nasa.gov/gldas/GLDASpublications.php">here</a></td>

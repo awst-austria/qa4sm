@@ -28,7 +28,7 @@ def create_reader(dataset, version):
     if dataset.short_name == globals.C3S:
         c3s_data_folder = path.join(folder_name, 'TCDR/063_images_to_ts/combined-daily')
         reader = c3s_read(c3s_data_folder, ioclass_kws={'read_bulk':True})
-        
+
     if dataset.short_name == globals.CCI:
         reader = CCITs(folder_name, ioclass_kws={'read_bulk':True})
 
