@@ -125,7 +125,9 @@ def num_gpis_from_job(job):
 
 @shared_task(bind=True,max_retries=3)
 def execute_job(self,validation_id, job):
-    __logger.debug("Executing validation {}, job: {}".format(validation_id, job))
+    job_id = execute_job.request.id
+    numgpis = num_gpis_from_job(job)
+    __logger.debug("Executing job {} from validation {}, # of gpis: {}".format(job_id, validation_id, numgpis))
     start_time = datetime.now(tzlocal())
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
@@ -134,14 +136,13 @@ def execute_job(self,validation_id, job):
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + (duration.seconds)
-        numgpis = num_gpis_from_job(job)
-        __logger.debug("Finished job {} in validation {}, took {} seconds for {} gpis".format(job, validation_id, duration, numgpis))
+        __logger.debug("Finished job {} from validation {}, took {} seconds for {} gpis".format(job_id, validation_id, duration, numgpis))
         return {'result':result,'job':job}
     except Exception as e:
         self.retry(countdown=2, exc=e)
 
 def check_and_store_results(validation_run, job, results, save_path):
-    __logger.debug(job)
+#     __logger.debug(job)
 
     if len(results) < 1:
         __logger.warn('Potentially problematic job: {} - no results'.format(job))
@@ -158,7 +159,7 @@ def run_validation(validation_id):
 
 
     if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')==False) or (settings.CELERY_TASK_ALWAYS_EAGER==False):
-        app.control.add_consumer(validation_run.user.username, reply=True)
+        app.control.add_consumer(validation_run.user.username, reply=True)  # @UndefinedVariable
 
     try:
         __logger.info("Starting validation: {}".format(validation_id))
@@ -196,11 +197,11 @@ def run_validation(validation_id):
                     except Exception as e:
                         if e.__class__.__name__ != 'TimeoutError':
                             raise e
-                        
+
                         try:
                             celery_task=CeleryTask.objects.get(celery_task=async_result.id)
                             __logger.debug('Celery task timeout. Continue...')
-                        except Exception:    
+                        except Exception:
                             __logger.debug('Validation got cancelled')
                             validation_aborted_flag=True
                             validation_run.progress=-1
@@ -213,7 +214,7 @@ def run_validation(validation_id):
                         except Exception:
                             __logger.debug('Celery task does not exists. Validation run: {} Celery task ID: {}'.format(validation_id,
                                                                                                                        async_result.id))
-                        
+
                 results = result_dict['result']
                 job = result_dict['job']
                 check_and_store_results(validation_run, job, results, save_path)
@@ -228,8 +229,8 @@ def run_validation(validation_id):
                 validation_run.progress=round(((validation_run.ok_points + validation_run.error_points)/validation_run.total_points)*100)
                 validation_run.save()
                 __logger.info("Validation {} is {} % done...".format(validation_run.id, validation_run.progress))
-                
-                
+
+
 
         set_outfile(validation_run, run_dir)
         validation_run.save() # let's save before we do anything else...
@@ -254,18 +255,17 @@ def run_validation(validation_id):
 
             send_val_done_notification(validation_run)
 
-    print('Valrun: {}'.format(validation_run))
+#     print('Valrun: {}'.format(validation_run))
     return validation_run
 
 def stop_running_validation(validation_id):
+    __logger.info("Stopping validation {} ".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_run.progress=-1
     validation_run.save()
-    
+
     celery_tasks=CeleryTask.objects.filter(validation=validation_run)
-    
+
     for task in celery_tasks:
-        app.control.revoke(task.celery_task)
+        app.control.revoke(task.celery_task)  # @UndefinedVariable
         task.delete()
-    
-    
