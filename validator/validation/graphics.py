@@ -222,7 +222,6 @@ def generate_all_graphs(validation_run, outfolder):
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
     # get units for plot labels
-
     unit_ref = validation_run.reference_configuration.dataset.short_name
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
@@ -242,9 +241,7 @@ def generate_all_graphs(validation_run, outfolder):
                     ## build table for current metric, one column per dataset-pair
                     metric_table[pair_name] = metric_col[:].compressed()
 
-                    ## TODO: currently, overview maps are overwritten
-
-                    ## make maps for all columns
+                    ## make overview maps for all columns
                     if metric_col[:] is not None:
                         file1, file2 = generate_overview_map(validation_run, outfolder, metric, METRICS[metric], metric_col[:], dc1, dc2, pair_name, unit_ref, lons, lats)
                         arcname = path.basename(file1)
