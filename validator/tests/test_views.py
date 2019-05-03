@@ -457,7 +457,7 @@ class TestViews(TransactionTestCase):
         self.assertRedirects(response, reverse('password_reset_done'))
 
         ## make sure the right email got sent with correct details
-        sent_mail = mail.outbox[0]
+        sent_mail = mail.outbox[0]  # @UndefinedVariable
         assert sent_mail
         assert sent_mail.subject
         assert sent_mail.body
