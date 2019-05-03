@@ -8,6 +8,7 @@ import zipfile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
+import time
 User = get_user_model()
 from django.core import mail
 from django.test.testcases import TransactionTestCase
@@ -243,6 +244,8 @@ class TestViews(TransactionTestCase):
             'scaling_ref': ValidationRun.SCALE_REF,
             'scaling_method': ValidationRun.MEAN_STD,
         }
+
+        ## start our validation
         result = self.client.post(start_url, validation_params)
         self.assertEqual(result.status_code, 302)
 
@@ -253,6 +256,9 @@ class TestViews(TransactionTestCase):
         assert match[0]
         assert match[0][0] == 'result'
         assert match[0][1]
+
+        ## let it run for a little bit
+        time.sleep(1)
 
         # now let's try out cancelling the validation in it's various forms...
         result_id = match[0][1]
@@ -271,9 +277,14 @@ class TestViews(TransactionTestCase):
         result = self.client.delete(cancel_url)
         self.assertEqual(result.status_code, 200)
 
-        # after cancelling, we still get a result for the validation
+        ## let it settle down
+        time.sleep(1)
+
+        # after cancelling, we still get a result for the validation and the cancelled status is indicated
         result = self.client.get(validation_url)
         self.assertEqual(result.status_code, 200)
+        cancelled_val = result.context['val']
+        assert cancelled_val.progress == -1
 
     ## Stress test the server!
     @pytest.mark.long_running
