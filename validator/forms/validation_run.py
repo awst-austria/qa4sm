@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from validator.models import Dataset
 User = get_user_model()
 from django.forms.models import ModelMultipleChoiceField, ModelChoiceIterator
-from validator.models import Settings
 
 import django.forms as forms
 from validator.models import ValidationRun
@@ -32,16 +31,22 @@ class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
 
         return duper
 
+# https://docs.djangoproject.com/en/2.2/ref/forms/fields/#django.forms.ModelChoiceField
+# make sure the pretty name is used in the dropdown for the dataset selection
+class DatasetChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.pretty_name
+
 ## See https://simpleisbetterthancomplex.com/article/2017/08/19/how-to-render-django-form-manually.html
 ## To figure out how to make one dropdown dependent on the selection of another, see:
 ## https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
 class ValidationRunForm(forms.ModelForm):
-    
+
     filter_data = forms.BooleanField(initial=True, required=False, label='Filter data')
     filter_ref = forms.BooleanField(initial=True, required=False, label='Filter reference')
 
-    data_dataset = forms.ModelChoiceField(queryset=Dataset.objects.filter(is_reference=False), required=True)
-    ref_dataset = forms.ModelChoiceField(queryset=Dataset.objects.filter(is_reference=True), required=True)
+    data_dataset = DatasetChoiceField(queryset=Dataset.objects.filter(is_reference=False), required=True)
+    ref_dataset = DatasetChoiceField(queryset=Dataset.objects.filter(is_reference=True), required=True)
 
     data_filters = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=DataFilter.objects.all(), required=False)
     ref_filters = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=DataFilter.objects.all(), required=False)
