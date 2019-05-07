@@ -9,6 +9,7 @@ import zipfile
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 import time
+from django.test.utils import override_settings
 User = get_user_model()
 from django.core import mail
 from django.test.testcases import TransactionTestCase
@@ -42,7 +43,6 @@ class TestViews(TransactionTestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
-# class TestViews(TestCase):
     def setUp(self):
         self.__logger = logging.getLogger(__name__)
 
@@ -50,7 +50,6 @@ class TestViews(TransactionTestCase):
         settings.maintenance_mode = False
         settings.save()
 
-        settings.CELERY_TASK_ALWAYS_EAGER = True
         self.credentials = {
             'username': 'testuser',
             'password': 'secret'}
@@ -284,8 +283,8 @@ class TestViews(TransactionTestCase):
         result = self.client.get(validation_url)
         self.assertEqual(result.status_code, 200)
         cancelled_val = result.context['val']
+        self.__logger.info("Progress {}, end time: {}".format(cancelled_val.progress, cancelled_val.end_time))
         assert cancelled_val.progress == -1
-        self.__logger.info("End time: {}".format(cancelled_val.end_time))
 
     ## Stress test the server!
     @pytest.mark.long_running

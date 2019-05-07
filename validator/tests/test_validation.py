@@ -4,8 +4,9 @@ import time
 from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test.utils import override_settings
+from django.test.testcases import TransactionTestCase
 User = get_user_model()
 from os import path
 import shutil
@@ -24,18 +25,13 @@ from validator.models import ValidationRun
 import validator.validation as val
 from validator.validation.globals import OUTPUT_FOLDER
 
-
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidation(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     def setUp(self):
-        self.always_eager = None
-        if hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER'):
-            self.always_eager = settings.CELERY_TASK_ALWAYS_EAGER
-
-        settings.CELERY_TASK_ALWAYS_EAGER = True # run without parallelisation, everything in one process
-
         self.metrics = ['gpi', 'lon', 'lat'] + list(val.METRICS.keys())
 
         self.user_data = {
@@ -54,9 +50,6 @@ class TestValidation(TestCase):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-
-    def tearDown(self):
-        settings.CELERY_TASK_ALWAYS_EAGER = self.always_eager
 
     def generate_default_validation(self):
         run = ValidationRun()
