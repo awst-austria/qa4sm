@@ -230,6 +230,8 @@ class TestViews(TransactionTestCase):
         result = self.client.post(url, validation_params)
         self.assertEqual(result.status_code, 200)
 
+    @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                       CELERY_TASK_ALWAYS_EAGER=True)
     def test_submit_validation_and_cancel(self):
         start_url = reverse('validation')
         self.client.login(**self.credentials)
@@ -237,9 +239,9 @@ class TestViews(TransactionTestCase):
             'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
             'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
             'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
-            'ref_dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
-            'ref_version': DatasetVersion.objects.get(short_name=globals.GLDAS_TEST).id,
-            'ref_variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+            'ref_dataset': Dataset.objects.get(short_name=globals.ISMN).id,
+            'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_TEST).id,
+            'ref_variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
             'scaling_ref': ValidationRun.SCALE_REF,
             'scaling_method': ValidationRun.MEAN_STD,
         }
@@ -256,7 +258,7 @@ class TestViews(TransactionTestCase):
         assert match[0][0] == 'result'
         assert match[0][1]
 
-        ## let it run for a little bit
+        # let it run a little bit
         time.sleep(1)
 
         # now let's try out cancelling the validation in it's various forms...
