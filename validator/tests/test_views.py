@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import time
 import io
 import json
 import logging
@@ -8,9 +9,9 @@ import zipfile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
-import time
-from django.test.utils import override_settings
 User = get_user_model()
+
+from django.test.utils import override_settings
 from django.core import mail
 from django.test.testcases import TransactionTestCase
 from django.urls.base import reverse
@@ -28,7 +29,6 @@ from validator.models.version import DatasetVersion
 from validator.urls import urlpatterns
 from validator.validation import globals
 
-
 class TestViews(TransactionTestCase):
 
     # This re-inits the database for every test, see
@@ -38,6 +38,8 @@ class TestViews(TransactionTestCase):
     # Apparently, re-initing the db creates a new connection every time, so
     # problem solved.
     serialized_rollback = True
+    databases = '__all__'
+    allow_database_queries = True
 
     __logger = logging.getLogger(__name__)
 
@@ -230,8 +232,6 @@ class TestViews(TransactionTestCase):
         result = self.client.post(url, validation_params)
         self.assertEqual(result.status_code, 200)
 
-    @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
-                       CELERY_TASK_ALWAYS_EAGER=True)
     def test_submit_validation_and_cancel(self):
         start_url = reverse('validation')
         self.client.login(**self.credentials)
