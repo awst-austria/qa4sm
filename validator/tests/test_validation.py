@@ -5,11 +5,11 @@ import shutil
 import time
 from zipfile import ZipFile
 from re import search as regex_search
-from re import IGNORECASE
+from re import IGNORECASE  # @UnresolvedImport
 
 from dateutil.tz import tzlocal
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test.utils import override_settings
 User = get_user_model()
 from django.test import TestCase
 import netCDF4
@@ -28,18 +28,13 @@ import validator.validation as val
 
 from validator.validation.globals import OUTPUT_FOLDER
 
-
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidation(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     def setUp(self):
-        self.always_eager = None
-        if hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER'):
-            self.always_eager = settings.CELERY_TASK_ALWAYS_EAGER
-
-        settings.CELERY_TASK_ALWAYS_EAGER = True # run without parallelisation, everything in one process
-
         self.metrics = ['gpi', 'lon', 'lat'] + list(val.METRICS.keys())
 
         self.user_data = {
@@ -58,9 +53,6 @@ class TestValidation(TestCase):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-
-    def tearDown(self):
-        settings.CELERY_TASK_ALWAYS_EAGER = self.always_eager
 
     def generate_default_validation(self):
         run = ValidationRun()
@@ -180,9 +172,9 @@ class TestValidation(TestCase):
             filename = 'boxplot_{}.png'.format(metric)
             filename = os.path.join(outdir, filename)
             assert os.path.isfile(filename)
-            filename2 = 'overview_{}.png'.format(metric)
-            filename2 = os.path.join(outdir, filename2)
-            assert os.path.isfile(filename2)
+#             filename2 = 'overview_{}.png'.format(metric)
+#             filename2 = os.path.join(outdir, filename2)
+#             assert os.path.isfile(filename2)
 
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -407,7 +399,7 @@ class TestValidation(TestCase):
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
                         else:
-                            data = msk_reader.read_ts(16.366667, 48.2)
+                            data = msk_reader.read_ts(16.6, 48.2)
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1

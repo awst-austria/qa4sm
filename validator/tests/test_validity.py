@@ -4,22 +4,22 @@ from time import sleep
 from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
-from django.conf import settings
-from django.contrib.auth import get_user_model
-User = get_user_model()
-
 from django.test import TestCase
+from django.test.utils import override_settings
 import netCDF4
 import pytest
 from pytz import UTC
 
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 import numpy as np
-from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ValidationRun
-from validator.models.filter import DataFilter
+from validator.models import DataFilter
+from validator.models import DataVariable
 import validator.validation as val
 
 
@@ -27,14 +27,14 @@ import validator.validation as val
     Tests to check that the validation process really produces valid results ;-)
     This is just a stub that should be filled by TU Wien.
 '''
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidity(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     # run before every test case
     def setUp(self):
-        settings.CELERY_TASK_ALWAYS_EAGER = True # run without parallelisation, everything in one process
-
         self.out_variables = ['gpi', 'lon', 'lat'] + list(val.METRICS.keys())
 
         self.user_data = {

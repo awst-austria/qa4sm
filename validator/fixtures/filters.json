@@ -115,5 +115,14 @@
 			"description": "No processing flags raised",
 			"help_text": "No processing flags (indicating data values are changed based on thresholds) are set"
 		}
+	},
+	{
+		"model": "validator.datafilter",
+		"pk": 15,
+		"fields": {
+			"name": "FIL_SMOS_QUAL_RECOMMENDED",
+			"description": "Soil moisture values are retrieved and recommended",
+			"help_text": "Soil moisture values are retrieved and recommended (Quality_Flag == 0)"
+		}
 	}
 ]

@@ -86,5 +86,27 @@
 			"min_value": 0.0,
 			"max_value": 1000.0
 		}
+	},
+	{
+		"model": "validator.datavariable",
+		"pk": 9,
+		"fields": {
+			"short_name": "ESA_CCI_SM_C_sm",
+			"pretty_name": "sm",
+			"help_text": "",
+			"min_value": 0.0,
+			"max_value": 1.0
+		}
+	},
+	{
+		"model": "validator.datavariable",
+		"pk": 10,
+		"fields": {
+			"short_name": "SMOS_sm",
+			"pretty_name": "Soil_Moisture",
+			"help_text": "",
+			"min_value": 0.0,
+			"max_value": 1.0
+		}
 	}
 ]

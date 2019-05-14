@@ -1,10 +1,11 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 from os import path
 from re import sub as regex_sub
 import uuid
 
 from celery.app import shared_task
+from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
 from netCDF4 import Dataset
@@ -12,11 +13,10 @@ from pytesmo.validation_framework.metric_calculators import IntercomparisonMetri
 from pytesmo.validation_framework.results_manager import netcdf_results_manager
 from pytesmo.validation_framework.validation import Validation
 
-import numpy as np
 from valentina.celery import app
 from validator.mailer import send_val_done_notification
 from validator.models import ValidationRun
-from validator.models.celery_task import CeleryTask
+from validator.models import CeleryTask
 from validator.validation.batches import create_jobs
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER
@@ -121,7 +121,9 @@ def num_gpis_from_job(job):
 
 @shared_task(bind=True,max_retries=3)
 def execute_job(self,validation_id, job):
-    __logger.debug("Executing validation {}, job: {}".format(validation_id, job))
+    task_id = execute_job.request.id
+    numgpis = num_gpis_from_job(job)
+    __logger.debug("Executing job {} from validation {}, # of gpis: {}".format(task_id, validation_id, numgpis))
     start_time = datetime.now(tzlocal())
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
@@ -130,32 +132,44 @@ def execute_job(self,validation_id, job):
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + (duration.seconds)
-        numgpis = num_gpis_from_job(job)
-        __logger.debug("Finished job {} in validation {}, took {} seconds for {} gpis".format(job, validation_id, duration, numgpis))
-        return {'result':result,'job':job}
+        __logger.debug("Finished job {} from validation {}, took {} seconds for {} gpis".format(task_id, validation_id, duration, numgpis))
+        return result
     except Exception as e:
         self.retry(countdown=2, exc=e)
 
-def check_and_store_results(validation_run, job, results, save_path):
-    __logger.debug(job)
-
+def check_and_store_results(job_id, results, save_path):
     if len(results) < 1:
-        __logger.warning('Potentially problematic job: {} - no results'.format(job))
+        __logger.warning('Potentially problematic job: {} - no results'.format(job_id))
         return
 
     netcdf_results_manager(results, save_path)
 
+def track_celery_task(validation_run, task_id):
+    celery_task = CeleryTask()
+    celery_task.validation = validation_run
+    celery_task.celery_task_id = uuid.UUID(task_id).hex
+    celery_task.save()
+
+def celery_task_cancelled(task_id):
+    ## stop_running_validation deletes the validation's tasks from the db. so if they don't exist in the db the task was cancelled
+    return not CeleryTask.objects.filter(celery_task_id=task_id).exists()
+
+def untrack_celery_task(task_id):
+    try:
+        celery_task = CeleryTask.objects.get(celery_task_id=task_id)
+        celery_task.delete()
+    except CeleryTask.DoesNotExist:
+        __logger.debug('Task {} already deleted from db.'.format(task_id))
+
 def run_validation(validation_id):
+    __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
-    validation_aborted_flag=False;
+    validation_aborted = False;
 
-
-    if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')==False) or (settings.CELERY_TASK_ALWAYS_EAGER==False):
-        app.control.add_consumer(validation_run.user.username, reply=True)
+    if ((not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (not settings.CELERY_TASK_ALWAYS_EAGER)):
+        app.control.add_consumer(validation_run.user.username, reply=True)  # @UndefinedVariable
 
     try:
-        __logger.info("Starting validation: {}".format(validation_id))
-
         run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
         mkdir_if_not_exists(run_dir)
 
@@ -170,65 +184,58 @@ def run_validation(validation_id):
         async_results = []
         job_table = {}
         for j in jobs:
-            job_id = execute_job.apply_async(args=[validation_id, j], queue=validation_run.user.username)
-            async_results.append(job_id)
-            job_table[job_id] = j
-            celery_task=CeleryTask()
-            celery_task.validation=validation_run
-            celery_task.celery_task_id=uuid.UUID(job_id.id).hex
-            celery_task.save()
+            celery_job = execute_job.apply_async(args=[validation_id, j], queue=validation_run.user.username)
+            async_results.append(celery_job)
+            job_table[celery_job.id] = j
+            track_celery_task(validation_run, celery_job.id)
 
-        executed_jobs = 0
         for async_result in async_results:
             try:
-                while True:
-                    try:
-                        result_dict=async_result.get(timeout=10) # calling result.AsyncResult.get
-                        async_result.forget()
-                        break
-                    except Exception as e:
-                        if e.__class__.__name__ != 'TimeoutError':
-                            raise e
-
+                if not validation_aborted: ## only wait for this task if the validation hasn't been cancelled
+                    task_running = True
+                    while task_running: ## regularly check if the validation has been cancelled in this loop, otherwise we wouldn't notice
                         try:
-                            celery_task=CeleryTask.objects.get(celery_task_id=uuid.UUID(async_result.id).hex)
-                            __logger.debug('Celery task timeout. Continue...')
-                        except Exception:
-                            __logger.debug('Validation got cancelled')
-                            validation_aborted_flag=True
-                            validation_run.progress=-1
-                            validation_run.save()
-                            return validation_run
-                    finally:
-                        try:
-                            celery_task=CeleryTask.objects.get(celery_task_id=uuid.UUID(async_result.id).hex)
-                            celery_task.delete()
-                        except Exception:
-                            __logger.debug('Celery task does not exists. Validation run: {} Celery task ID: {} - {}'.format(validation_id,
-                                                                                                                       async_result.id,uuid.UUID(async_result.id).hex))
+                            results = async_result.get(timeout=10) ## this throws TimeoutError after waiting 10 secs or TaskRevokedError if revoked before starting
+                            ## if we got here, the task is finished now
+                            task_running = False ## stop looping because task finished
+                            if celery_task_cancelled(async_result.id): ## we can still have a cancelled validation that took less than 10 secs
+                                validation_aborted = True
+                            else:
+                                untrack_celery_task(async_result.id)
 
-                results = result_dict['result']
-                job = result_dict['job']
-                check_and_store_results(validation_run, job, results, save_path)
-                validation_run.ok_points += num_gpis_from_job(job_table[async_result])
+                        except (TimeoutError, TaskRevokedError) as te:
+                            ## see if our task got cancelled - if not, just continue loop
+                            if celery_task_cancelled(async_result.id):
+                                task_running = False ## stop looping because we aborted
+                                validation_aborted = True
+                                __logger.debug('Validation got cancelled, dropping task {}: {}'.format(async_result.id, te))
+
+                if validation_aborted:
+                    validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
+                else:
+                    check_and_store_results(async_result.id, results, save_path)
+                    validation_run.ok_points += num_gpis_from_job(job_table[async_result.id])
+
             except Exception:
-                validation_run.error_points += num_gpis_from_job(job_table[async_result])
-                __logger.exception('Celery could not execute the job. Job ID: {} Error: {}'.format(async_result.id,async_result.info))
+                validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
+                __logger.exception('Celery could not execute the job. Job ID: {} Error: {}'.format(async_result.id, async_result.info))
             finally:
-                if validation_aborted_flag:
-                    return
-                executed_jobs +=1
-                validation_run.progress=round(((validation_run.ok_points + validation_run.error_points)/validation_run.total_points)*100)
-                validation_run.save()
-                __logger.info("Validation {} is {} % done...".format(validation_run.id, validation_run.progress))
+                # whether finished or cancelled or failed, forget about this task now
+                async_result.forget()
 
+            if not validation_aborted:
+                validation_run.progress = round(((validation_run.ok_points + validation_run.error_points)/validation_run.total_points)*100)
+            else:
+                validation_run.progress = -1
+            validation_run.save()
+            __logger.info("Dealt with task {}, validation {} is {} % done...".format(async_result.id, validation_run.id, validation_run.progress))
 
-
-        set_outfile(validation_run, run_dir)
-        validation_run.save() # let's save before we do anything else...
-
-        # only store parameters and produce graphs if we have metrics for at least one gpi - otherwise no netcdf output file
-        if validation_run.ok_points > 0:
+        # once all tasks are finished:
+        # only store parameters and produce graphs if validation wasn't cancelled and
+        # we have metrics for at least one gpi - otherwise no netcdf output file
+        if ((not validation_aborted) and (validation_run.ok_points > 0)):
+            set_outfile(validation_run, run_dir)
+            validation_run.save()
             save_validation_config(validation_run)
             generate_all_graphs(validation_run, run_dir)
 
@@ -240,18 +247,13 @@ def run_validation(validation_id):
         validation_run.save()
         __logger.info("Validation finished: {}. Jobs: {}, Errors: {}, OK: {}, End time: {} ".format(
             validation_run, validation_run.total_points, validation_run.error_points, validation_run.ok_points,validation_run.end_time))
-        if validation_aborted_flag==False:
-            if (validation_run.error_points + validation_run.ok_points) != validation_run.total_points:
-                __logger.warn("Caution, # of gpis, # of errors, and # of OK points don't match!")
-                validation_run.save()
 
-            send_val_done_notification(validation_run)
+        send_val_done_notification(validation_run)
 
-    print('Valrun: {}'.format(validation_run))
     return validation_run
 
 def stop_running_validation(validation_id):
-    __logger.info("Stopping validation {}".format(validation_id))
+    __logger.info("Stopping validation {} ".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_run.progress=-1
     validation_run.save()
@@ -259,7 +261,5 @@ def stop_running_validation(validation_id):
     celery_tasks=CeleryTask.objects.filter(validation=validation_run)
 
     for task in celery_tasks:
-        app.control.revoke(task.celery_task)
+        app.control.revoke(task.celery_task_id)  # @UndefinedVariable
         task.delete()
-
-

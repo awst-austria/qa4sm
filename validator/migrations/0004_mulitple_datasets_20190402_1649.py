@@ -33,7 +33,7 @@ def update_validation_runs(apps, schema_editor):
         if run.ref_variable:
             reference_c.variable = run.ref_variable
         else:
-            print("\nWARNING Validation run {} has no reference variable".format(run))
+            print("\nWARNING Validation run {} has no reference variable. Deleting.".format(run))
             run.delete()
             dataset_c.delete()
             continue

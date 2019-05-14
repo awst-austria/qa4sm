@@ -6,7 +6,14 @@ from validator.models import Dataset
 from validator.models import DatasetConfiguration
 from validator.models.filter import DataFilter
 
+# https://docs.djangoproject.com/en/2.2/ref/forms/fields/#django.forms.ModelChoiceField
+# make sure the pretty name is used in the dropdown for the dataset selection
+class DatasetChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.pretty_name
 
+## To figure out how to make one dropdown dependent on the selection of another, see:
+## https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
 class DatasetConfigurationForm(forms.ModelForm):
     class Meta:
         model = DatasetConfiguration
@@ -18,13 +25,13 @@ class DatasetConfigurationForm(forms.ModelForm):
             'filters',
             ]
 
-    dataset = forms.ModelChoiceField(queryset=Dataset.objects.none(), required=True)
-#     ref_dataset = forms.ModelChoiceField(queryset=Dataset.objects.filter(is_reference=True), required=True)
+    dataset = DatasetChoiceField(queryset=Dataset.objects.none(), required=True)
 
     filter_dataset = forms.BooleanField(initial=True, required=False, label='Filter dataset')
 
     # if you change this field, be sure to adapt validator.views.validation.__render_filters
     filters = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=DataFilter.objects.all(), required=False)
+
     # see https://stackoverflow.com/questions/2216974/django-modelform-for-many-to-many-fields/2264722#2264722
     # and https://docs.djangoproject.com/en/2.1/ref/forms/fields/#django.forms.ModelMultipleChoiceField
 

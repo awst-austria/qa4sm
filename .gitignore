@@ -14,3 +14,4 @@ output
 junit.xml
 emails
 /static/
+run_celery/

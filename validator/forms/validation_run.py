@@ -8,8 +8,6 @@ from validator.models import ValidationRun
 
 
 ## See https://simpleisbetterthancomplex.com/article/2017/08/19/how-to-render-django-form-manually.html
-## To figure out how to make one dropdown dependent on the selection of another, see:
-## https://simpleisbetterthancomplex.com/tutorial/2018/01/29/how-to-implement-dependent-or-chained-dropdown-list-with-django.html
 class ValidationRunForm(forms.ModelForm):
 
     class Meta:

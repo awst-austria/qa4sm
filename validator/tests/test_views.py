@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import time
 import io
 import json
 import logging
@@ -9,6 +10,8 @@ import zipfile
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+from django.test.utils import override_settings
 from django.core import mail
 from django.test.testcases import TransactionTestCase
 from django.urls.base import reverse
@@ -36,12 +39,15 @@ class TestViews(TransactionTestCase):
     # Apparently, re-initing the db creates a new connection every time, so
     # problem solved.
     serialized_rollback = True
+    
+    ## https://docs.djangoproject.com/en/2.2/topics/testing/tools/#simpletestcase
+    databases = '__all__'
+    allow_database_queries = True
 
     __logger = logging.getLogger(__name__)
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
-# class TestViews(TestCase):
     def setUp(self):
         self.__logger = logging.getLogger(__name__)
 
@@ -49,7 +55,6 @@ class TestViews(TransactionTestCase):
         settings.maintenance_mode = False
         settings.save()
 
-        settings.CELERY_TASK_ALWAYS_EAGER = True
         self.credentials = {
             'username': 'testuser',
             'password': 'secret'}
@@ -283,6 +288,8 @@ class TestViews(TransactionTestCase):
             'scaling_method': ValidationRun.MEAN_STD,
             #'scaling_ref': ValidationRun.SCALE_REF,
         }
+
+        ## start our validation
         result = self.client.post(start_url, validation_params)
         self.assertEqual(result.status_code, 302)
 
@@ -293,6 +300,9 @@ class TestViews(TransactionTestCase):
         assert match[0]
         assert match[0][0] == 'result'
         assert match[0][1]
+
+        # let it run a little bit
+        time.sleep(1)
 
         # now let's try out cancelling the validation in it's various forms...
         result_id = match[0][1]
@@ -311,9 +321,15 @@ class TestViews(TransactionTestCase):
         result = self.client.delete(cancel_url)
         self.assertEqual(result.status_code, 200)
 
-        # after cancelling, we still get a result for the validation
+        ## let it settle down
+        time.sleep(1)
+
+        # after cancelling, we still get a result for the validation and the cancelled status is indicated
         result = self.client.get(validation_url)
         self.assertEqual(result.status_code, 200)
+        cancelled_val = result.context['val']
+        self.__logger.info("Progress {}, end time: {}".format(cancelled_val.progress, cancelled_val.end_time))
+        assert cancelled_val.progress == -1
 
     ## Stress test the server!
     @pytest.mark.long_running
@@ -332,7 +348,7 @@ class TestViews(TransactionTestCase):
             'ref_dataset': Dataset.objects.get(short_name=globals.ISMN).id,
             'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
             'ref_variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
-            'scaling_ref': ValidationRun.SCALE_REF,
+            #'scaling_ref': ValidationRun.SCALE_REF,
             'scaling_method': ValidationRun.MEAN_STD,
             'filter_data': True,
             'data_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
@@ -485,7 +501,7 @@ class TestViews(TransactionTestCase):
         self.assertRedirects(response, reverse('password_reset_done'))
 
         ## make sure the right email got sent with correct details
-        sent_mail = mail.outbox[0]
+        sent_mail = mail.outbox[0]  # @UndefinedVariable
         assert sent_mail
         assert sent_mail.subject
         assert sent_mail.body
