@@ -3,6 +3,9 @@ import os, errno
 from time import sleep
 from zipfile import ZipFile
 
+from re import search as regex_search
+from re import IGNORECASE  # @UnresolvedImport
+
 from dateutil.tz import tzlocal
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -69,20 +72,33 @@ class TestValidity(TestCase):
 
         ## check netcdf output
         length=-1
+        num_vars=-1
         with netCDF4.Dataset(run.output_file.path) as ds:
-            for variable in self.out_variables:
-                values = ds.variables[variable][:]
-                assert values is not None
+            ## check the metrics contained in the file
+            for metric in self.out_variables:
+                ## This gets all variables in the netcdf file that start with the name of the current metric
+                metric_vars = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
 
-                if length == -1:
-                    length = len(values)
-                    assert length > 0, 'Variable {} has no entries'.format(variable)
+                ## check that all metrics have the same number of variables (depends on number of input datasets)
+                if num_vars == -1:
+                    num_vars = len(metric_vars)
+                    assert num_vars > 0, 'No variables containing metric {}'.format(metric)
                 else:
-                    assert len(values) == length, 'Variable {} doesn\'t match other variables in length'.format(variable)
+                    assert len(metric_vars) == num_vars, 'Number of variables for metric {} doesn\'t match number for other metrics'.format(metric)
 
-                nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
-                ## totally arbitrary ratio of not more than 35% NaNs in the metrics
-                assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(variable, nan_ratio)
+                ## check the values of the variables for formal criteria (not empty, matches lenght of other variables, doesn't have too many NaNs)
+                for m_var in metric_vars:
+                    values = m_var[:]
+                    assert values is not None
+
+                    if length == -1:
+                        length = len(values)
+                        assert length > 0, 'Variable {} has no entries'.format(m_var.name)
+                    else:
+                        assert len(values) == length, 'Variable {} doesn\'t match other variables in length'.format(m_var.name)
+
+                    nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
+                    assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
 
         # check zipfile of graphics
         zipfile = os.path.join(outdir, 'graphs.zip')
