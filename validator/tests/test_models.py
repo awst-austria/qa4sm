@@ -17,7 +17,10 @@ from validator.models import ValidationRun
 
 
 class TestModels(TestCase):
+
     fixtures = ['variables', 'versions', 'datasets', 'filters']
+
+    __logger = logging.getLogger(__name__)
 
     def test_validation_configuration(self):
         run = ValidationRun()
@@ -77,6 +80,11 @@ class TestModels(TestCase):
         # randomly change the order
         newworldorder = np.random.permutation(range(1, 5))
         run.set_datasetconfiguration_order(newworldorder)
+
+        self.__logger.debug('New order {}'.format(newworldorder))
+
+        # reload changed run from db
+        run = ValidationRun.objects.get(pk = run.id)
 
         # make sure the new order is used
         for i, dsc in enumerate(run.dataset_configurations.all(), 1):
