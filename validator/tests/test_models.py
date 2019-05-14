@@ -1,6 +1,7 @@
 from datetime import datetime
-from django.utils.timezone import now
+import logging
 
+from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 import pytest
