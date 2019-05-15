@@ -1,15 +1,12 @@
-import os
 from json import dumps as json_dumps
 
 from django.contrib.auth.decorators import login_required
-from django.http.response import Http404, HttpResponse
+from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import QueryDict
 
 from validator.models import ValidationRun
-from validator.validation import METRICS
-from validator.validation.globals import OUTPUT_FOLDER
+from validator.validation.globals import METRICS
 
 
 @login_required(login_url='/login/')

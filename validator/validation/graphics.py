@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from validator.models.dataset_configuration import DatasetConfiguration
+from fileinput import filename
 plt.switch_backend('agg') ## this allows headless graph production
 import matplotlib.ticker as mticker
 
@@ -9,7 +9,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from re import search as regex_search
 from re import match as regex_match
-from re import IGNORECASE
+from re import IGNORECASE  # @UnresolvedImport
 
 import netCDF4
 import numpy as np
@@ -21,7 +21,7 @@ from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import seaborn as sns
 
 from validator.validation import globals
-from validator.validation.globals import METRICS
+from validator.models import DatasetConfiguration
 
 
 __logger = logging.getLogger(__name__)
@@ -111,17 +111,22 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
     return [png_filename, svg_filename]
 
 
-def generate_overview_map(validation_run, outfolder, variable, label, values, dc1, dc2, pair_name, unit_ref, lons, lats):
-    png_filename = path.join(outfolder, 'overview_{}_{}.png'.format(pair_name, variable))
-    svg_filename = path.join(outfolder, 'overview_{}_{}.svg'.format(pair_name, variable))
+def generate_overview_map(validation_run, outfolder, metric, label, values, dc1, dc2, pair_name, unit_ref, lons, lats):
+    if metric == pair_name:
+        filename = 'overview_{}'.format(metric)
+    else:
+        filename = 'overview_{}_{}'.format(pair_name, metric)
+
+    png_filename = path.join(outfolder, filename + '.png')
+    svg_filename = path.join(outfolder, filename + '.svg')
 
     data_crs = ccrs.PlateCarree()
     ax = plt.axes(projection=data_crs)
-    cm = plt.cm.get_cmap(_colormaps[variable])
+    cm = plt.cm.get_cmap(_colormaps[metric])
     ax.outline_patch.set_linewidth(0.2)
 
-    v_min = _metric_value_ranges[variable][0]
-    v_max = _metric_value_ranges[variable][1]
+    v_min = _metric_value_ranges[metric][0]
+    v_max = _metric_value_ranges[metric][1]
 
     padding = 5
     extent = [lons.min()-padding, lons.max()+padding, lats.min()-padding, lats.max()+padding]
@@ -179,7 +184,7 @@ def generate_overview_map(validation_run, outfolder, variable, label, values, dc
 
     # add colorbar
     cbar = plt.colorbar(the_plot, orientation='horizontal', pad=0.05)
-    cbar.set_label(label + _metric_description[variable].format(_metric_units[unit_ref]), size=5)
+    cbar.set_label(label + _metric_description[metric].format(_metric_units[unit_ref]), size=5)
     cbar.outline.set_linewidth(0.2)
     cbar.outline.set_edgecolor('black')
     cbar.ax.tick_params(width=0.2, labelsize=4)
@@ -207,10 +212,10 @@ def identify_dataset_configs(validation_run, metric_col_name):
         if ((dc1.dataset.short_name != ds1_name) or (dc2.dataset.short_name != ds2_name)):
             raise Exception('Can\'t figure out correct dataset configuration')
 
-    else: # in case we still have an old netcdf file? TODO: remove this
+    else: # this should happen for columns that aren't specific to dataset pairs, e.g. n_obs
         dc1 = validation_run.dataset_configurations.first()
         dc2 = validation_run.dataset_configurations.last()
-        pair_name = '1-{}_2-{}'.format(dc1.dataset.short_name, dc2.dataset.short_name)
+        pair_name = metric_col_name
 
     return [dc1, dc2, pair_name]
 
@@ -225,11 +230,11 @@ def generate_all_graphs(validation_run, outfolder):
     unit_ref = validation_run.reference_configuration.dataset.short_name
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        with netCDF4.Dataset(validation_run.output_file.path) as ds:
+        with netCDF4.Dataset(validation_run.output_file.path, mode='r') as ds:
             lats = ds.variables['lat'][:]
             lons = ds.variables['lon'][:]
 
-            for metric in METRICS:
+            for metric in globals.METRICS:
                 ## get all 'columns' (dataset-pair results) from the netcdf file that start with the current metric name
                 cur_metric_cols = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
 
@@ -243,7 +248,8 @@ def generate_all_graphs(validation_run, outfolder):
 
                     ## make overview maps for all columns
                     if metric_col[:] is not None:
-                        file1, file2 = generate_overview_map(validation_run, outfolder, metric, METRICS[metric], metric_col[:], dc1, dc2, pair_name, unit_ref, lons, lats)
+                        file1, file2 = generate_overview_map(validation_run, outfolder, metric, globals.METRICS[metric], metric_col[:],
+                                                             dc1, dc2, pair_name, unit_ref, lons, lats)
                         arcname = path.basename(file1)
                         myzip.write(file1, arcname=arcname)
                         arcname = path.basename(file2)
@@ -252,7 +258,7 @@ def generate_all_graphs(validation_run, outfolder):
 
                 ## make boxplot graph with boxplots for all columns
                 if not metric_table.empty:
-                    file1, file2 = generate_boxplot(validation_run, outfolder, metric, METRICS[metric], metric_table, unit_ref)
+                    file1, file2 = generate_boxplot(validation_run, outfolder, metric, globals.METRICS[metric], metric_table, unit_ref)
                     arcname = path.basename(file1)
                     myzip.write(file1, arcname=arcname)
                     arcname = path.basename(file2)

@@ -1,17 +1,20 @@
 from datetime import datetime
+import fnmatch
+import logging
 from os import path
 import os, errno
+from re import IGNORECASE  # @UnresolvedImport
+from re import search as regex_search
 import shutil
 import time
 from zipfile import ZipFile
-from re import search as regex_search
-from re import IGNORECASE  # @UnresolvedImport
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 from dateutil.tz import tzlocal
-from django.contrib.auth import get_user_model
-from django.test.utils import override_settings
-User = get_user_model()
 from django.test import TestCase
+from django.test.utils import override_settings
 import netCDF4
 import pytest
 from pytz import UTC
@@ -25,8 +28,9 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ValidationRun
 import validator.validation as val
-
+from validator.validation.globals import METRICS
 from validator.validation.globals import OUTPUT_FOLDER
+
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -34,8 +38,10 @@ class TestValidation(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
+    __logger = logging.getLogger(__name__)
+
     def setUp(self):
-        self.metrics = ['gpi', 'lon', 'lat'] + list(val.METRICS.keys())
+        self.metrics = ['gpi', 'lon', 'lat'] + list(METRICS.keys())
 
         self.user_data = {
             'username': 'testuser',
@@ -95,7 +101,7 @@ class TestValidation(TestCase):
         ## check netcdf output
         length=-1
         num_vars=-1
-        with netCDF4.Dataset(run.output_file.path) as ds:
+        with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
             ## check the metrics contained in thef ile
             for metric in self.metrics:
                 ## This gets all variables in the netcdf file that start with the name of the current metric
@@ -167,14 +173,14 @@ class TestValidation(TestCase):
         with ZipFile(zipfile, 'r') as myzip:
             assert myzip.testzip() is None
 
-        # check graphics
-        for metric in val.METRICS:
-            filename = 'boxplot_{}.png'.format(metric)
-            filename = os.path.join(outdir, filename)
-            assert os.path.isfile(filename)
-#             filename2 = 'overview_{}.png'.format(metric)
-#             filename2 = os.path.join(outdir, filename2)
-#             assert os.path.isfile(filename2)
+        # check diagrams
+        boxplot_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        assert len(boxplot_pngs) == 12
+
+        overview_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == 12 * (run.dataset_configurations.count() - 1)
 
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -486,8 +492,13 @@ class TestValidation(TestCase):
         v.save()
         val.generate_all_graphs(v, run_dir)
 
-        # we should have at least 12 files in that directory
-        assert len(os.listdir(run_dir)) >= 12
+        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        assert len(boxplot_pngs) == 8
+
+        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == 8 * (v.dataset_configurations.count() - 1)
 
         # remove results from first test and recreate dir
         shutil.rmtree(run_dir)
@@ -501,6 +512,12 @@ class TestValidation(TestCase):
         v.reference_configuration.save()
         val.generate_all_graphs(v, run_dir)
 
-        assert len(os.listdir(run_dir)) >= 12
+        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        assert len(boxplot_pngs) == 8
+
+        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == 8 * (v.dataset_configurations.count() - 1)
 
         self.delete_run(v)
