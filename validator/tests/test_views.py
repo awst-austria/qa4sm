@@ -329,7 +329,7 @@ class TestViews(TransactionTestCase):
         self.assertEqual(result.status_code, 200)
         cancelled_val = result.context['val']
         self.__logger.info("Progress {}, end time: {}".format(cancelled_val.progress, cancelled_val.end_time))
-        assert cancelled_val.progress == -1
+        assert cancelled_val.progress <= 0
 
     ## Stress test the server!
     @pytest.mark.long_running

@@ -97,13 +97,13 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
     sns.despine()
     ax.set_ylim(_metric_value_ranges[variable])
 
-    plot_title="Validation " + " vs ".join(
+    plot_title = " vs \n".join(
         ['{} ({})'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in validation_run.dataset_configurations.all()])
 
     plt.title(plot_title)
     plt.ylabel(label + _metric_description[variable].format(_metric_units[unit_ref]))
-    plt.text(-0.14, -0.14, u'made with QA4SM (www.qa4sm.eodc.eu)', fontsize=10, color='black',
-             ha='left', va='bottom', alpha=0.5, transform=ax.transAxes)
+    plt.text(0, 0, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=10, color='black',
+             horizontalalignment='left', verticalalignment='top', alpha=0.5, transform=ax.transAxes)
     plt.tight_layout()
     plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1,)
     plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0.1,)
@@ -154,16 +154,10 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
         the_plot = plt.imshow(values_map, cmap=cm, interpolation='none', extent=extent,
                               vmin=v_min, vmax=v_max, zorder=1)
 
-    plot_title="Validation {} ({}) vs {} ({})".format(
-        dc1.dataset.short_name, dc1.version.short_name, dc2.dataset.short_name, dc2.version.short_name)
-
-    plt.title(plot_title,fontsize=8)
     ax.coastlines(linewidth=0.2, zorder=2)
     ax.add_feature(cfeature.STATES, linewidth=0.05, zorder=2)
     ax.add_feature(cfeature.BORDERS, linewidth=0.1, zorder=2)
     ax.add_feature(cfeature.LAND, color='white', zorder=0)
-    ax.text(0, -0.40, u'made with QA4SM (www.qa4sm.eodc.eu)', fontsize=5,
-            color='black', ha='left', va='bottom', alpha=0.5, transform=ax.transAxes)
 
     # add gridlines
     grid_interval_lon = 5 * round((lon_interval/3) / 5)
@@ -188,6 +182,12 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
     cbar.outline.set_linewidth(0.2)
     cbar.outline.set_edgecolor('black')
     cbar.ax.tick_params(width=0.2, labelsize=4)
+
+    plot_title="{} ({}) vs {} ({})".format(
+        dc1.dataset.short_name, dc1.version.short_name, dc2.dataset.short_name, dc2.version.short_name)
+    plt.title(plot_title,fontsize=8)
+    ax.text(0, -0.60, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=5,
+        color='black', horizontalalignment='left', verticalalignment='top', alpha=0.5, transform=ax.transAxes)
 
 #     plt.tight_layout()
     plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1, dpi=200)
@@ -264,3 +264,21 @@ def generate_all_graphs(validation_run, outfolder):
                     arcname = path.basename(file2)
                     myzip.write(file2, arcname=arcname)
                     remove(file2)  # we don't need the vector image anywhere but in the zip
+
+def get_dataset_pairs(validation_run):
+    pairs = []
+
+    ref = None
+    datasets = []
+    for ds_num, dataset_config in enumerate(validation_run.dataset_configurations.all(), start=1):
+        dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
+        if(dataset_config.id == validation_run.reference_configuration.id):
+            ref = dataset_name
+        else:
+            datasets.append(dataset_name)
+
+    for ds in datasets:
+        pair = '{}_{}'.format(ref, ds)
+        pairs.append(pair)
+
+    return pairs

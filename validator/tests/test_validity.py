@@ -24,6 +24,7 @@ from validator.models import ValidationRun
 from validator.models import DataFilter
 from validator.models import DataVariable
 import validator.validation as val
+from validator.validation import globals
 
 
 '''
@@ -38,7 +39,7 @@ class TestValidity(TestCase):
 
     # run before every test case
     def setUp(self):
-        self.out_variables = ['gpi', 'lon', 'lat'] + list(val.METRICS.keys())
+        self.out_variables = ['gpi', 'lon', 'lat'] + list(globals.METRICS.keys())
 
         self.user_data = {
             'username': 'testuser',

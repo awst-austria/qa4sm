@@ -42,7 +42,7 @@
                             <div class="col" style="max-width: 7rem;">
                                 <strong>Status:</strong><br/>
                                 {% if valrun.progress == 0 and valrun.end_time == null %} Scheduled
-                                {% elif valrun.progress == 100 %} Done
+                                {% elif valrun.progress == 100 and valrun.end_time %} Done
                                 {% elif valrun.progress == -1 %} Aborted
                                 {% elif valrun.end_time != null %} ERROR
                                 {% else %} Running ({{ valrun.progress }}&#37;)

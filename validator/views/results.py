@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
-
+from validator.validation.graphics import get_dataset_pairs
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -54,11 +54,14 @@ def result(request, result_uuid):
         if val_run.total_points != 0:
             error_rate = (val_run.total_points - val_run.ok_points) / val_run.total_points
 
+        pairs = get_dataset_pairs(val_run)
+
         context = {
             'val' : val_run,
             'error_rate' : error_rate,
             'run_time': run_time,
             'metrics': METRICS,
+            'pairs': pairs,
             'json_metrics': json_dumps(METRICS),
             }
 

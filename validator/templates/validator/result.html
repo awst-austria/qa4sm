@@ -103,9 +103,19 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';">Download all graphs</button>
 
-                            <select id="id_graph_variable" style="width: 12rem;" name="graph_variable" class="btn custom-select custom-select-sm d-block btn-select mx-3">
+                            <select id="id_graph_metric" style="width: 12rem;" name="graph_variable"
+                                title="Metric to show in the graphs"
+                                class="btn custom-select custom-select-sm d-block btn-select mx-3">
                                 {% for key, label in metrics.items %}
                                     <option value="{{ key }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+
+                            <select id="id_graph_pair" style="width: 12rem;" name="graph_pair"
+                                title="Dataset pair to show in the graphs"
+                                class="btn custom-select custom-select-sm d-block btn-select mx-3">
+                                {% for pair in pairs %}
+                                    <option value="{{ pair }}">{{ pair }}</option>
                                 {% endfor %}
                             </select>
 
@@ -123,18 +133,24 @@
 
 {% block javascript %}
 <script type="text/javascript">
-    function changePlot(metric) {
+    function changeBoxplot(metric) {
+        var metric = $("#id_graph_metric").val()
         var labels = {{json_metrics|safe}}
         var boxplot_url = '{{ val.output_dir_url }}' + 'boxplot_' + metric + '.png';
-        var overview_url = '{{ val.output_dir_url }}' + 'overview_' + metric + '.png';
         var boxplot_label = 'Boxplot of the distribution of ' + labels[metric] + ' for all evaluated locations.'
-        var overview_label = 'The distribution of ' + labels[metric] + ' values plotted on a map.'
         $("#id_boxplot").attr("src", boxplot_url);
         $("#id_boxplot").attr("alt", boxplot_label);
         $("#id_boxplot").attr("title", boxplot_label);
         $("#id_boxplot_link").attr("href", boxplot_url);
         $("#id_boxplot_label").html(boxplot_label);
+    }
 
+    function changeOverviewMap() {
+        var metric = $("#id_graph_metric").val()
+        var pair = $("#id_graph_pair").val()
+        var labels = {{json_metrics|safe}}
+        var overview_url = '{{ val.output_dir_url }}' + 'overview_' + pair + '_' + metric + '.png';
+        var overview_label = 'The distribution of ' + labels[metric] + ' for dataset pair ' + pair + ' values plotted on a map.'
         $("#id_overview").attr("src", overview_url);
         $("#id_overview").attr("alt", overview_label);
         $("#id_overview").attr("title", overview_label);
@@ -142,12 +158,12 @@
         $("#id_overview_label").html(overview_label);
     }
 
-    // change the plot when the selection is changed
-    $("#id_graph_variable").change(function () {
-        changePlot($(this).val())
-    });
+    // change the plots when the selection of metric and/or dataset pair is changed
+    $("#id_graph_metric").change(changeBoxplot).change(changeOverviewMap);
+    $("#id_graph_pair").change(changeOverviewMap);
 
-    // change the plot once the page loads
-    changePlot($("#id_graph_variable").val())
+    // update the plots once the page loads
+    changeBoxplot()
+    changeOverviewMap()
 </script>
 {% endblock %}
