@@ -84,10 +84,6 @@ class TestModels(TestCase):
         newworldorder = np.random.permutation(orderorder)
         self.__logger.debug('New order {}'.format(newworldorder))
         run.set_datasetconfiguration_order(newworldorder)
-        run.save()
-
-        # reload changed run from db
-        run = ValidationRun.objects.get(pk = run.id)
 
         # make sure the new order is used
         for i, dsc in enumerate(run.dataset_configurations.all(), 1):
