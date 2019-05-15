@@ -102,8 +102,8 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
 
     plt.title(plot_title)
     plt.ylabel(label + _metric_description[variable].format(_metric_units[unit_ref]))
-    plt.text(0, 0, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=10, color='black',
-             horizontalalignment='left', verticalalignment='top', alpha=0.5, transform=ax.transAxes)
+    plt.text(0, -0.14, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=10, color='black',
+             horizontalalignment='left', verticalalignment='bottom', alpha=0.5, transform=ax.transAxes)
     plt.tight_layout()
     plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1,)
     plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0.1,)
@@ -186,8 +186,8 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
     plot_title="{} ({}) vs {} ({})".format(
         dc1.dataset.short_name, dc1.version.short_name, dc2.dataset.short_name, dc2.version.short_name)
     plt.title(plot_title,fontsize=8)
-    ax.text(0, -0.60, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=5,
-        color='black', horizontalalignment='left', verticalalignment='top', alpha=0.5, transform=ax.transAxes)
+    ax.text(0, -0.6, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=5,
+        color='black', horizontalalignment='left', verticalalignment='bottom', alpha=0.5, transform=ax.transAxes)
 
 #     plt.tight_layout()
     plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1, dpi=200)
