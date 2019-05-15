@@ -52,12 +52,13 @@ class TestModels(TestCase):
         assert dc_str is not None
 
     def test_ds_config_order(self):
+        dataset_range = range(1, 6)
         run = ValidationRun()
         run.start_time = now()
         run.save()
 
         # create dataset configs in order of dataset ids
-        for i in range(1, 5):
+        for i in dataset_range:
             dc = DatasetConfiguration()
             dc.validation = run
             dc.dataset = Dataset.objects.get(pk=i)
@@ -71,6 +72,7 @@ class TestModels(TestCase):
 
         # check that we can get the order of dataset configs from the validation run
         orderorder = run.get_datasetconfiguration_order()
+        self.__logger.debug('Orig order {}'.format(orderorder))
         assert orderorder
 
         # check that they have the same order when using all()
@@ -79,16 +81,17 @@ class TestModels(TestCase):
             assert dsc.id == orderorder[i-1]
 
         # randomly change the order
-        newworldorder = np.random.permutation(range(1, 5))
-        run.set_datasetconfiguration_order(newworldorder)
-
+        newworldorder = np.random.permutation(orderorder)
         self.__logger.debug('New order {}'.format(newworldorder))
+        run.set_datasetconfiguration_order(newworldorder)
+        run.save()
 
         # reload changed run from db
         run = ValidationRun.objects.get(pk = run.id)
 
         # make sure the new order is used
         for i, dsc in enumerate(run.dataset_configurations.all(), 1):
+            self.__logger.debug('current id {}'.format(dsc.id))
             assert dsc.id == newworldorder[i-1]
 
     def test_validation_run_str(self):
