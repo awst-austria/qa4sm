@@ -114,8 +114,14 @@ def validation(request):
             ref_dc_form.save_m2m() # save many-to-many related objects, e.g. filters. If you don't do this, filters won't get saved!
 
             newrun.reference_configuration = ref_dc
-            # TODO: let the user decide which dataset to use as scaling ref
-            newrun.scaling_ref = ref_dc
+
+            ## determine the scaling reference. For intercomparison, only the reference makes sense. Otherwise let the user pick.
+            if ((len(dc_formset) == 1) and
+                (val_form.cleaned_data['scaling_ref'] == ValidationRun.SCALE_TO_DATA)):
+                newrun.scaling_ref = dc
+            else:
+                newrun.scaling_ref = ref_dc
+
             newrun.save()
 
             # need to close all db connections before forking, see

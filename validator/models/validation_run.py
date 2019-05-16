@@ -28,6 +28,10 @@ class ValidationRun(models.Model):
 #         (CDF_MATCH, 'CDF matching with 5-th order spline fitting'),
         )
 
+    ## scale to
+    SCALE_TO_REF = 'ref'
+    SCALE_TO_DATA = 'data'
+
     ## fields
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

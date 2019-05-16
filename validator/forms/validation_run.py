@@ -16,10 +16,11 @@ class ValidationRunForm(forms.ModelForm):
         fields = [
             'interval_from',
             'interval_to',
-            #'scaling_ref',
             'scaling_method',
             'name_tag',
             ]
+
+    scaling_ref = forms.fields.ChoiceField(choices=[(ValidationRun.SCALE_TO_REF, 'Reference'), (ValidationRun.SCALE_TO_DATA, 'Data'), ])
 
     def __init__(self, *args, **kwargs):
         super(ValidationRunForm, self).__init__(*args, **kwargs)

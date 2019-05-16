@@ -228,7 +228,7 @@
                             <div class="card-header">
                                 <h4 class="my-0 font-weight-normal">Scaling</h4>
                                 <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="The data values will be scaled to the value range of the selected dataset using the selected method."></span>
+                                    title="The data values will be scaled to the value range of the selected dataset using the selected method. When validating more than one dataset, values will always be scaled to the reference."></span>
                             </div>
                             <div class="card-body">
 
@@ -400,8 +400,14 @@
             $('#' + newId + '-dataset').change();
         }
 
+        function setScalingRef() {
+            $("#id_scaling_ref option[value='data']").remove();
+            $("#id_scaling_ref").val("ref");
+        }
+
         $('#add_dc_form').click(function() {
             cloneTab('.dc_form', '.dc_form_link', 'datasets', $(this));
+            setScalingRef();
         });
     </script>
 
