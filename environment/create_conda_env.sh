@@ -71,6 +71,8 @@ export PATH="$MINICONDA_PATH/bin:$PATH"
 conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
 source activate $PYTHON_ENV_DIR
 
+pip uninstall --yes shapely
+pip install --no-binary :all: shapely
 pip install sqlparse
 pip install pynetcf
 pip install ascat
@@ -92,6 +94,7 @@ pip install gldas
 pip install smap-io
 pip install django-countries
 pip install seaborn
+export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
 pip install cartopy
 pip install --upgrade --force-reinstall netcdf4
 
