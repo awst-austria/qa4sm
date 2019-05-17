@@ -193,7 +193,7 @@ class TestViews(TransactionTestCase):
             'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
             'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
             'scaling_method': ValidationRun.MEAN_STD,
-            #'scaling_ref': ValidationRun.SCALE_REF,
+            'scaling_ref': ValidationRun.SCALE_TO_DATA,
         }
         result = self.client.post(url, validation_params)
         self.assertEqual(result.status_code, 302)
@@ -228,7 +228,7 @@ class TestViews(TransactionTestCase):
             'interval_to': datetime(1998,1,1),
 
             'scaling_method': ValidationRun.MEAN_STD,
-            #'scaling_ref': ValidationRun.SCALE_REF,
+            'scaling_ref': ValidationRun.SCALE_TO_REF,
             'name_tag': 'unit test tag so that I can remember my validation',
         }
 
@@ -286,7 +286,7 @@ class TestViews(TransactionTestCase):
             'ref-version': DatasetVersion.objects.get(short_name=globals.GLDAS_TEST).id,
             'ref-variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
             'scaling_method': ValidationRun.MEAN_STD,
-            #'scaling_ref': ValidationRun.SCALE_REF,
+            'scaling_ref': ValidationRun.SCALE_TO_DATA,
         }
 
         ## start our validation
