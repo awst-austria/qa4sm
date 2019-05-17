@@ -19,7 +19,6 @@ from valentina.settings import BASE_DIR
 
 from cartopy import config as cconfig
 cconfig['data_dir'] = path.join(BASE_DIR, 'cartopy')
-#cconfig['pre_existing_data_dir'] = path.join(BASE_DIR, 'cartopy')
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
