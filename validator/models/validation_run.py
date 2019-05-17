@@ -51,7 +51,7 @@ class ValidationRun(models.Model):
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
 
-    output_file = models.FileField(null=True)
+    output_file = models.FileField(null=True, max_length=250)
     
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
