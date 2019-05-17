@@ -19,6 +19,9 @@ fi
 if [ "x$PYTHON_ENV_DIR" == "x" ]; then
     PYTHON_ENV_DIR="/var/lib/qa4sm-conda"
 fi
+if [ "x$VALENTINA_BRANCH" == "x" ]; then
+    VALENTINA_BRANCH="master"
+fi
 
 # dir this script is in
 THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
@@ -117,8 +120,8 @@ cd $TEMP_DIR
 rm -rf pytesmo
 
 #Clone the  web validation service repo
-echo "Checking out code to $INSTALL_DIR"
-git clone -b master --single-branch https://github.com/awst-austria/qa4sm.git "$INSTALL_DIR"
+echo "Checking out code from branch $VALENTINA_BRANCH to $INSTALL_DIR"
+git clone -b $VALENTINA_BRANCH --single-branch https://github.com/awst-austria/qa4sm.git "$INSTALL_DIR"
 
 # clean up
 rm -Rf $TEMP_DIR
