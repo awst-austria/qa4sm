@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
-from fileinput import filename
 plt.switch_backend('agg') ## this allows headless graph production
 import matplotlib.ticker as mticker
 
+from fileinput import filename
 import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -15,9 +15,15 @@ import netCDF4
 import numpy as np
 import pandas as pd
 
+from valentina.settings import BASE_DIR
+
+from cartopy import config as cconfig
+cconfig['data_dir'] = path.join(BASE_DIR, 'cartopy')
+#cconfig['pre_existing_data_dir'] = path.join(BASE_DIR, 'cartopy')
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
+
 import seaborn as sns
 
 from validator.validation import globals
