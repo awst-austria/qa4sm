@@ -66,9 +66,13 @@
                             <li>Validated over entire available timespan.</li>
                         {% endif %}
 
-                        <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>
-                            {% widthratio error_rate 1 100 %}% ({{ val.error_points }} of {{ val.total_points }}) of the processed locations (grid points) produced errors during calculation.
-                        </li>
+                        {% if val.progress == -1 %}
+                            <li>The validation was cancelled.</li>
+                        {% else %}
+                            <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>
+                                {% widthratio error_rate 1 100 %}% ({{ val.error_points }} of {{ val.total_points }}) of the processed locations (grid points) produced errors during calculation.
+                            </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
