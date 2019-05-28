@@ -180,7 +180,7 @@ def ajax_get_dataset_options(request):
 
     response_data = {
         'versions': __render_options(selected_dataset.versions.all().order_by('pretty_name')),
-        'variables': __render_options(selected_dataset.variables.all()),
+        'variables': __render_options(selected_dataset.variables.all().order_by('id')),
         'filters': __render_filters(selected_dataset.filters.all(), filter_widget_id),
         }
 
