@@ -23,53 +23,75 @@
     <p>
         <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
         and the soil moisture variables provided in the dataset. More details on the supported datasets can be found
-        <a href="{% url 'datasets' %}#data">here</a>.
+        <a href="{% url 'datasets' %}#data">here</a>. 
     </p>
     <p>
-        <b>Step 2</b> - Choose the reference dataset you would like to use for the
+        <b>Step 2</b> - Choose the criteria by which you would like to filter this dataset. 
+        The filters available depend on the data contained within the chosen dataset. For example,
+        you can filter the C3S data to include only data with no inconsistencies detected (flag = 0).
+        Details of the filter options provided for each dataset are given on the supported datasets page
+        <a href="{% url 'datasets' %}">here</a>. You can also hover your mouse pointer over the question mark next to a filter
+        to get a short explanation.
+    </p>
+    <img class="scaled_image mb-3" src="../../static/images/help/data_set_selections.png">
+    <p>
+    	<b>Step 3</b> - You can add additional datasets using the <b>+</b> button. 5 datasets is the maximum allowed.
+    	To define the details of each additional dataset repeat steps 1 and 2 above.
+    </p>
+    <p>
+        <b>Step 4</b> - Choose the reference dataset you would like to use for the
         validation including the dataset name, the version of the dataset, and the soil moisture variables provided in
         the dataset. More details on the supported datasets can be found <a href="{% url 'datasets' %}#ref">here</a>.
     </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/validate_01.png">
 
     <p>
-        <b>Step 3</b> - Choose the date range over which the validation should be performed. Accepted formats are: YYYY*MM*DD
-        or DD*MM*YYYY where * can be any of ".", "/" or "-".
-    </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/validate_02.png">
-
-    <p>
-        <b>Step 4</b> - Choose the criteria by which you would like to filter the data prior to
+        <b>Step 5</b> - Choose the criteria by which you would like to filter the reference data prior to
         running the validation. The filters available depend on the data contained within the chosen dataset. For example,
         you can filter the ISMN data to include only data points where the soil_moisture_flag is "G" for "good".
         Details of the filter options provided for each dataset are given on the supported datasets page
         <a href="{% url 'datasets' %}">here</a>. You can also hover your mouse pointer over the question mark next to a filter
         to get a short explanation.
     </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/validate_03.png">
-
+	<img class="scaled_image mb-3" src="../../static/images/help/reference_data_set_selections.png">
     <p>
-        <b>Step 5</b> - Choose how the data (or reference) will be scaled before metrics calculation.
-        The data can be scaled to the reference or vice versa.
+        <b>Step 6</b> - Choose the date range over which the validation should be performed. Accepted formats are: YYYY*MM*DD
+        or DD*MM*YYYY where * can be any of ".", "/" or "-".
+    </p>
+    <img class="scaled_image mb-3" src="../../static/images/help/validate_02.png">
+    <p>
+        <b>Step 7</b> - Choose how the data (or reference) will be scaled before metrics calculation.
+        The data can be scaled to the reference (default) or vice versa.
+        Note that scaling to data is only available if only one dataset was selected. Multiple datasets
+        will be forced to scale to reference.
         The scaling method determines how values of one dataset are mapped onto the value range of the
         other dataset for better comparability.
     </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/validate_04.png">
+    <img class="scaled_image mb-3" src="../../static/images/help/scaling.png">
 
     <p>
-        <b>Step 6</b> - Optionally name your validation results to make it easier to identify it in
+        <b>Step 8</b> - Optionally name your validation results to make it easier to identify it in
         the list of all your validations.
     </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/validate_05.png">
+    <img class="scaled_image mb-3" src="../../static/images/help/name_your_validation.png">
 
     <p>
-        <b>Step 7</b> - Run the validation process. You'll be notified via e-mail once it's
+        <b>Step 9</b> - Run the validation process. You'll be notified via e-mail once it's
         finished. You don't need to keep the results window (or even your browser) open for
         the validation to run. The email will contain a link to your results.
     </p>
     <img class="scaled_image mb-3" src="../../static/images/help/validate_06.png">
 
+    <a id="results_list"></a>
+    <h1 id="help3" class="h3 mb-3 font-weight-normal">My Validations - Results List Page</h1>
 
+    <p>
+        The list shows all your processed validations, including the currently running ones, sorted by date (latest first).
+        Each validation has some icons on the right side. The folder icon allow to view the 
+        <a href="#results"> results page</a> of your selected validation. The X icon will allow to remove the result.
+        The icon with the arrow pointing downward will allow you to download all the graphs. 
+        The icon with the page will allow you to download the results as a NetCDF file.
+    </p>
+    <img class="scaled_image mb-3" src="../../static/images/help/my_validations_2.png">
 
     <a id="results"></a>
     <h1 class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
@@ -118,14 +140,7 @@
 
 
 
-    <a id="results_list"></a>
-    <h1 id="help3" class="h3 mb-3 font-weight-normal">My Validations - Results List Page</h1>
 
-    <p>
-        The list shows all your processed validations, including the currently running ones, sorted by date (latest first).
-        Click on a validation link to jump to the <a href="#results"> results page</a> of your selected validation.
-    </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/my_validations.png">
 
     <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so at qa4sm (at) awst.at .</p>
 
