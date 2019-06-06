@@ -12,10 +12,22 @@
 
 <div style="text-align: left; max-width: 40rem; width: 100%; margin: auto;">
     <p>
+        <a href="#intercomparison">Intercomparison</a><br/>
         <a href="#validation">Validation</a><br/>
         <a href="#results">Results</a><br/>
         <a href="#results_list">Results list</a><br/>
+
     </p>
+	<a id="intercomparison"></a>
+	<h1 class="h3 mb-3 font-weight-normal">Intercomparison</h1>
+	<p>The QA4SM validation tool allows intercomparison of up to five satellite data sets to a common reference data set.
+	For each reference location (e.g. each ISMN station) we find the nearest observation series in all selected satellite products.
+	All observations series are then scaled (if selected) and temporally matched to the reference series.
+	For validation only the common time stamps (that are available in all satellite products) are used to calculate validation metrics 
+	between the reference and each individual satellite product.
+	This way deviations in the metrics due to different temporal coverage are excluded and validation results represent differences in 
+	the performance of the compared satellite products.
+	</p>
 
     <a id="validation"></a>
     <h1 class="h3 mb-3 font-weight-normal">Validate Page</h1>
@@ -97,7 +109,9 @@
     <h1 class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
 
     <p>
-        The following metrics are calculated during the validation process:
+        The following table shows the metrics which are calculated during the validation process.
+        A <a href="#results_graph">dropdown button</a> allows you to select which of these metrics is represented in the graph.
+        <a href="#results_graph">See below</a>See below.
     </p>
 
     <table class="table table-bordered mb-5">
@@ -105,16 +119,18 @@
             <tr><th scope="col">Name</th> <th scope="col">Description</th></tr>
         </thead>
         <tbody>
-            <tr><th scope="row">bias</th><td>Average Error</td></tr>
-            <tr><th scope="row">RMSD</th><td>Root-mean-square deviation</td></tr>
-            <tr><th scope="row">R</th><td>Pearson correlation coefficient</td></tr>
-            <tr><th scope="row">p_R</th><td>p-value for pearson correlation coefficient</td></tr>
-            <tr><th scope="row">&rho;</th><td>Spearman rank correlation coefficient</td></tr>
-            <tr><th scope="row">p_&rho;</th><td>p-value for spearman rank correlation coefficient</td></tr>
-            <tr><th scope="row">&tau;</th><td>Kendall rank correlation coefficient</td></tr>
-            <tr><th scope="row">p_&tau;</th><td>p-value for kendall rank correlation coefficient</td></tr>
-            <tr><th scope="row">nobs</th><td>Number of valid observations per grid point</td></tr>
-            <tr><th scope="row">bias</th><td>Average Error</td></tr>
+            <tr><th scope="row">Pearson's r</th><td>Pearson correlation coefficient</td></tr>
+            <tr><th scope="row">Pearson's r p-value</th><td>p-value for pearson correlation coefficient</td></tr>
+			<tr><th scope="row">Spearman's rho</th><td>Spearman rank correlation coefficient</td></tr>
+            <tr><th scope="row">Spearman's rho p-value</th><td>p-value for spearman rank correlation coefficient</td></tr>
+            <tr><th scope="row">Root-mean-square deviation</th><td>Root-mean-square deviation</td></tr>                        
+            <tr><th scope="row">Bias (difference of means)</th><td>Average Error</td></tr>
+            <tr><th scope="row"># observations</th><td>Number of Observations</td></tr>  
+            <tr><th scope="row">Unbiased root-mean-square deviation</th><td>Unbiased root-mean-square deviation</td></tr>
+            <tr><th scope="row">Mean square error</th><td>Mean square error</td></tr> 
+            <tr><th scope="row">Mean square error correlation</th><td>Mean square error correlation</td></tr> 
+            <tr><th scope="row">Mean square error bias</th><td>Mean square error bias</td></tr> 
+            <tr><th scope="row">Mean square error variance</th><td>Mean square error variance</td></tr>             
         </tbody>
     </table>
 
@@ -125,21 +141,22 @@
     <img class="scaled_image mb-3" src="../../static/images/help/results_overview.png">
 
     <p>
-        You can view boxplots of the distributions of the calculated metrics across locations
-        by selecting the metric from the dropdown button below the plot. Click on the plot to
-        enlarge it. You can also download all the boxplots in a zipfile by clicking on the
-        Download button.
+        The system can also display a number of boxplot graphs showing one of the calculated metrics.
+        By default the system displays Pearson's r. You can change the selected metric using
+        the dropdown button below the plot. <br>
+        You can also download all the boxplots in a zipfile by clicking on the
+        Download button.<br>
+        In case that more than one data set (not counting the reference data set) was selected,
+        the data set can be changed using the dropdown button with showing the data set names
+        below the graph.
     </p>
+    <a id="results_graph"></a>
     <img class="scaled_image mb-3" src="../../static/images/help/results_graphs.png">
 
     <p>
         Finally, you can download your validation results in a single
         <a target="_blank" href="https://www.unidata.ucar.edu/software/netcdf/">netcdf</a> file.
     </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/results_netcdf.png">
-
-
-
 
 
     <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so at qa4sm (at) awst.at .</p>
