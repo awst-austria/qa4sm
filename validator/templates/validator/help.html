@@ -12,59 +12,59 @@
 
 <div style="text-align: left; max-width: 40rem; width: 100%; margin: auto;">
     <p>
-        <a href="#intercomparison">Intercomparison</a><br/>
-        <a href="#validation">Validation</a><br/>
-        <a href="#results">Results</a><br/>
-        <a href="#results_list">Results list</a><br/>
+        <a href="#validation">Validate Page</a><br/>
+        <a href="#results_list">My Validations - Results List Page</a><br/>
+        <a href="#results">Validation Results Page</a><br/>
 
     </p>
-	<a id="intercomparison"></a>
-	<h1 class="h3 mb-3 font-weight-normal">Intercomparison</h1>
-	<p>The QA4SM validation tool allows intercomparison of up to five satellite data sets to a common reference data set.
-	For each reference location (e.g. each ISMN station) we find the nearest observation series in all selected satellite products.
-	All observations series are then scaled (if selected) and temporally matched to the reference series.
-	For validation only the common time stamps (that are available in all satellite products) are used to calculate validation metrics 
-	between the reference and each individual satellite product.
-	This way deviations in the metrics due to different temporal coverage are excluded and validation results represent differences in 
-	the performance of the compared satellite products.
-	</p>
 
     <a id="validation"></a>
     <h1 class="h3 mb-3 font-weight-normal">Validate Page</h1>
 
     <p>
         <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
-        and the soil moisture variables provided in the dataset. More details on the supported datasets can be found
-        <a href="{% url 'datasets' %}#data">here</a>. 
+        and one of the soil moisture variables provided in the dataset. More details on the supported datasets can be found
+        <a href="{% url 'datasets' %}#data">here</a>.
     </p>
+    <img class="scaled_image mb-3" src="../../static/images/help/data_set_selections.png">
     <p>
-        <b>Step 2</b> - Choose the criteria by which you would like to filter this dataset. 
+        <b>Step 2 [optional]</b> - Choose the criteria by which you would like to filter this dataset.
         The filters available depend on the data contained within the chosen dataset. For example,
         you can filter the C3S data to include only data with no inconsistencies detected (flag = 0).
         Details of the filter options provided for each dataset are given on the supported datasets page
         <a href="{% url 'datasets' %}">here</a>. You can also hover your mouse pointer over the question mark next to a filter
         to get a short explanation.
     </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/data_set_selections.png">
     <p>
-    	<b>Step 3</b> - You can add additional datasets using the <b>+</b> button. 5 datasets is the maximum allowed.
-    	To define the details of each additional dataset repeat steps 1 and 2 above.
+        <b>Step 3 [optional]</b> - If you want to intercompare several datasets, you can add more datasets to the validation
+        using the <b>+</b> button, up to a maximum of five. Configure the settings for the additional datasets by selecting
+        the respective tab and repeating steps 1 and 2 above.<br/>
     </p>
+    <p class="alert alert-info">
+        <b>Intercomparison:</b> The intercomparison mode of QA4SM validates up to five satellite data sets against a common
+        reference data set. For each reference location (e.g. each ISMN station) it finds the nearest observation series in
+        all selected satellite products.
+        All observations series are then scaled (if selected) and temporally matched to the reference series.
+        For validation only the common time stamps (that are available in all satellite products) are used to calculate validation metrics
+        between the reference and each individual satellite product.
+        This way deviations in the metrics due to different temporal coverage are excluded and validation results represent differences in
+        the performance of the compared satellite products.
+    </p>
+    <img class="scaled_image mb-3" src="../../static/images/help/intercomparison.png">
     <p>
         <b>Step 4</b> - Choose the reference dataset you would like to use for the
         validation including the dataset name, the version of the dataset, and the soil moisture variables provided in
         the dataset. More details on the supported datasets can be found <a href="{% url 'datasets' %}#ref">here</a>.
     </p>
-
+    <img class="scaled_image mb-3" src="../../static/images/help/reference_data_set_selections.png">
     <p>
-        <b>Step 5</b> - Choose the criteria by which you would like to filter the reference data prior to
+        <b>Step 5 [optional]</b> - Choose the criteria by which you would like to filter the reference data prior to
         running the validation. The filters available depend on the data contained within the chosen dataset. For example,
         you can filter the ISMN data to include only data points where the soil_moisture_flag is "G" for "good".
         Details of the filter options provided for each dataset are given on the supported datasets page
         <a href="{% url 'datasets' %}">here</a>. You can also hover your mouse pointer over the question mark next to a filter
         to get a short explanation.
     </p>
-	<img class="scaled_image mb-3" src="../../static/images/help/reference_data_set_selections.png">
     <p>
         <b>Step 6</b> - Choose the date range over which the validation should be performed. Accepted formats are: YYYY*MM*DD
         or DD*MM*YYYY where * can be any of ".", "/" or "-".
@@ -73,8 +73,8 @@
     <p>
         <b>Step 7</b> - Choose how the data (or reference) will be scaled before metrics calculation.
         The data can be scaled to the reference (default) or vice versa.
-        Note that scaling to data is only available if only one dataset was selected. Multiple datasets
-        will be forced to scale to reference.
+        Note that in an intercomparision validation (with multiple datasets), only scaling to reference
+        is possible.
         The scaling method determines how values of one dataset are mapped onto the value range of the
         other dataset for better comparability.
     </p>
@@ -97,21 +97,44 @@
     <h1 id="help3" class="h3 mb-3 font-weight-normal">My Validations - Results List Page</h1>
 
     <p>
-        The list shows all your processed validations, including the currently running ones, sorted by date (latest first).
-        Each validation has some icons on the right side. The folder icon allow to view the 
-        <a href="#results"> results page</a> of your selected validation. The X icon will allow to remove the result.
-        The icon with the arrow pointing downward will allow you to download all the graphs. 
-        The icon with the page will allow you to download the results as a NetCDF file.
+        The list shows all your validations, including the currently running ones, sorted by date (latest first).
+        The buttons on the right-hand side of each validation have the following effects:
+        <ul>
+            <li>
+                <span class="fas fa-folder-open"></span> You can access the <a href="#results">results details
+                page</a> of a validation through its folder button.
+            </li>
+            <li>
+                <span class="fas fa-stop"></span> The stop button is only visible while the validation is still
+                running and allows you to abort it.
+            </li>
+            <li>
+                <span class="fas fa-times"></span> The remove button is only visible once the validation has finished
+                or was aborted and will permanently delete the result.
+            </li>
+            <li>
+                <span class="fas fa-download"></span> The download graphs button allows you to download all graphs
+                produced for the validation (in png and svg formats) in a zip archive.
+            </li>
+            <li>
+                <span class="fas fa-file-download"></span> The download NetCDF button  allows you to download the
+                validation result (metrics computed).
+            </li>
+        </ul>
     </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/my_validations_2.png">
+    <img class="scaled_image mb-3" src="../../static/images/help/my_validations.png">
 
     <a id="results"></a>
     <h1 class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
 
     <p>
-        The following table shows the metrics which are calculated during the validation process.
-        A <a href="#results_graph">dropdown button</a> allows you to select which of these metrics is represented in the graph.
-        <a href="#results_graph">See below</a>See below.
+        Once the validation process is finished, you can see short summary of the validation run
+        on the results page.
+    </p>
+    <img class="scaled_image mb-3" src="../../static/images/help/results_overview.png">
+
+    <p>
+        The following metrics are calculated during the validation process:
     </p>
 
     <table class="table table-bordered mb-5">
@@ -121,43 +144,31 @@
         <tbody>
             <tr><th scope="row">Pearson's r</th><td>Pearson correlation coefficient</td></tr>
             <tr><th scope="row">Pearson's r p-value</th><td>p-value for pearson correlation coefficient</td></tr>
-			<tr><th scope="row">Spearman's rho</th><td>Spearman rank correlation coefficient</td></tr>
-            <tr><th scope="row">Spearman's rho p-value</th><td>p-value for spearman rank correlation coefficient</td></tr>
-            <tr><th scope="row">Root-mean-square deviation</th><td>Root-mean-square deviation</td></tr>                        
+            <tr><th scope="row">Spearman's rho</th><td>Spearman rank correlation coefficient</td></tr>
+            <tr><th scope="row">Spearman's rho p-value</th><td>p-value for Spearman rank correlation coefficient</td></tr>
+            <tr><th scope="row">Root-mean-square deviation</th><td>Root-mean-square deviation</td></tr>
             <tr><th scope="row">Bias (difference of means)</th><td>Average Error</td></tr>
-            <tr><th scope="row"># observations</th><td>Number of Observations</td></tr>  
+            <tr><th scope="row"># observations</th><td>Number of Observations</td></tr>
             <tr><th scope="row">Unbiased root-mean-square deviation</th><td>Unbiased root-mean-square deviation</td></tr>
-            <tr><th scope="row">Mean square error</th><td>Mean square error</td></tr> 
-            <tr><th scope="row">Mean square error correlation</th><td>Mean square error correlation</td></tr> 
-            <tr><th scope="row">Mean square error bias</th><td>Mean square error bias</td></tr> 
-            <tr><th scope="row">Mean square error variance</th><td>Mean square error variance</td></tr>             
+            <tr><th scope="row">Mean square error</th><td>Mean square error</td></tr>
+            <tr><th scope="row">Mean square error correlation</th><td>Mean square error correlation</td></tr>
+            <tr><th scope="row">Mean square error bias</th><td>Mean square error bias</td></tr>
+            <tr><th scope="row">Mean square error variance</th><td>Mean square error variance</td></tr>
         </tbody>
     </table>
 
     <p>
-        Once the validation process is finished, a short summary of the validation run
-        is shown on the results page.
-    </p>
-    <img class="scaled_image mb-3" src="../../static/images/help/results_overview.png">
-
-    <p>
-        The system can also display a number of boxplot graphs showing one of the calculated metrics.
-        By default the system displays Pearson's r. You can change the selected metric using
-        the dropdown button below the plot. <br>
-        You can also download all the boxplots in a zipfile by clicking on the
-        Download button.<br>
-        In case that more than one data set (not counting the reference data set) was selected,
-        the data set can be changed using the dropdown button with showing the data set names
-        below the graph.
+        Visualisations of these metrics are displayed in the <i>Result Files</i> section of the page: boxplots and geographical
+        overview maps. You can select the metric shown with the left drop-down button below the graphs.<br/>
+        For an intercomparison validation, all boxplots are combined into one graph. The dataset displayed in the overview
+        map can be selected with the drop-down button on the right.
+        <br/>
+        You can also download a zipfile of all the plots in png and svg (vector) format by clicking on the <i>Download all
+        graphs</i> button, and the result <a target="_blank" href="https://www.unidata.ucar.edu/software/netcdf/">NetCDF</a> file
+        with all metrics with the <i>Download results in NetCDF</i> button.<br/>
     </p>
     <a id="results_graph"></a>
     <img class="scaled_image mb-3" src="../../static/images/help/results_graphs.png">
-
-    <p>
-        Finally, you can download your validation results in a single
-        <a target="_blank" href="https://www.unidata.ucar.edu/software/netcdf/">netcdf</a> file.
-    </p>
-
 
     <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so at qa4sm (at) awst.at .</p>
 
