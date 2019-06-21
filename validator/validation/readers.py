@@ -8,6 +8,7 @@ from ismn.interface import ISMN_Interface
 from smap_io.interface import SMAPTs
 from esa_cci_sm.interface import CCITs
 from smos.smos_ic.interface import SMOSTs
+from ecmwf_models.interface import ERATs
 
 
 from valentina.settings import DATA_FOLDER
@@ -47,6 +48,10 @@ def create_reader(dataset, version):
 
     if dataset.short_name == globals.SMOS:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk':True})
+        
+    if dataset.short_name == globals.ERA5:
+        era5_data_folder = path.join(folder_name, 'ERA5_TS')
+        reader = ERATs(era5_data_folder, ioclass_kws={'read_bulk':True})    
 
 
     if not reader:

@@ -106,5 +106,26 @@
 			"pretty_name": "V.105 Ascending",
 			"help_text": ""
 		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 14,
+		"fields": {
+			"short_name": "ERA5_test",
+			"pretty_name": "ERA5 test",
+			"help_text": ""
+		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 15,
+		"fields": {
+			"short_name": "sm_temp_from_197901_to_201904",
+			"pretty_name": "temp 191901 TO 201904",
+			"help_text": ""
+		}
 	}
+	
+	
+	
 ]

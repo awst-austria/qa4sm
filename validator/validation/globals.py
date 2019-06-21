@@ -23,6 +23,7 @@ SMAP = 'SMAP'
 ASCAT = 'ASCAT'
 CCI = 'ESA_CCI_SM_combined'
 SMOS = 'SMOS'
+ERA5 = 'ERA5'
 
 ## dataset versions
 C3S_V201706 = 'C3S_V201706'

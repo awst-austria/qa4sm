@@ -108,5 +108,16 @@
 			"min_value": 0.0,
 			"max_value": 1.0
 		}
+	},
+	{
+		"model": "validator.datavariable",
+		"pk": 11,
+		"fields": {
+			"short_name": "ERA5_sm",
+			"pretty_name": "swvl1",
+			"help_text": "",
+			"min_value": 0.0,
+			"max_value": 1.0
+		}
 	}
 ]
