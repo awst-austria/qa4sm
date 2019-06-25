@@ -33,5 +33,7 @@ urlpatterns = [
     path('result/<uuid:result_uuid>/', views.result, name='result'),
 
     path('ajax/get-dataset-options/', views.ajax_get_dataset_options, name='ajax_get_dataset_options'),
+    
+    path('user_profile/',views.user_profile, name='user_profile'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
