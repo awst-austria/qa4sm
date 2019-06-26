@@ -113,7 +113,7 @@
 		"model": "validator.datavariable",
 		"pk": 11,
 		"fields": {
-			"short_name": "ERA5_sm",
+			"short_name": "ERA_sm",
 			"pretty_name": "swvl1",
 			"help_text": "",
 			"min_value": 0.0,
