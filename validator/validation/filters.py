@@ -140,10 +140,10 @@ def setup_filtering(reader, filters, dataset, variable):
             continue
         
         #Note that this filter is similar to the GLDAS one. But since we don't have
-        #snow depth in the nc file yet, this is the preliminary one.
+        #snow depth in the nc file yet, this is the preliminary one. 
         if(fil.name == "FIL_ERA_UNFROZEN"):
             era_temp_variable = variable.pretty_name.replace("wv", "t")
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 1., era_temp_variable)
+            filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 274.15, era_temp_variable)
             continue
 
     return filtered_reader
