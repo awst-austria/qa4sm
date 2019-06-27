@@ -171,5 +171,27 @@
 				15
 			]
 		}
+	},
+	{
+		"model": "validator.dataset",
+		"pk": 8,
+		"fields": {
+			"short_name": "ERA",
+			"pretty_name": "ERA",
+			"help_text": "",
+			"source_reference": "",
+			"citation": "",
+			"is_reference": true,
+			"versions": [
+				14,
+				15
+			],
+			"variables": [
+				11
+			],
+			"filters": [
+				1
+			]
+		}
 	}
 ]

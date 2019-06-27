@@ -106,5 +106,26 @@
 			"pretty_name": "V.105 Ascending",
 			"help_text": ""
 		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 14,
+		"fields": {
+			"short_name": "ERA5_test",
+			"pretty_name": "ERA5 test",
+			"help_text": ""
+		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 15,
+		"fields": {
+			"short_name": "ERA5",
+			"pretty_name": "ERA5",
+			"help_text": ""
+		}
 	}
+	
+	
+	
 ]

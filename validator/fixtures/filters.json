@@ -4,7 +4,7 @@
 		"pk": 1,
 		"fields": {
 			"name": "FIL_ALL_VALID_RANGE",
-			"description": "Variable in valid range (> 0 and < 100%)",
+			"description": "Variable in valid geophysical range",
 			"help_text": "Compared variable is checked for NaNs and invalid values."
 		}
 	},
@@ -123,6 +123,15 @@
 			"name": "FIL_SMOS_QUAL_RECOMMENDED",
 			"description": "Soil moisture values are retrieved and recommended",
 			"help_text": "Soil moisture values are retrieved and recommended (Quality_Flag == 0)"
+		}
+	},
+	{
+		"model": "validator.datafilter",
+		"pk": 16,
+		"fields": {
+			"name": "FIL_ERA_TEMP_UNFROZEN",
+			"description": "Soil not frozen",
+			"help_text": "Corresponding depth soil temperature > 1.0 C"
 		}
 	}
 ]

@@ -87,7 +87,8 @@ _metric_units = {
     'C3S': r'm^3 m^{-3}',
     'GLDAS': r'm^3 m^{-3}',
     'ASCAT': r'percentage of saturation',
-    'SMAP': r'm^3 m^{-3}'
+    'SMAP': r'm^3 m^{-3}',
+    'ERA5': r'm^3 m^{-3}'
 }
 
 def generate_boxplot(validation_run, outfolder, variable, label, values, unit_ref):

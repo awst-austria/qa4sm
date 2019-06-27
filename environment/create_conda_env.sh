@@ -83,6 +83,7 @@ pip install pybufr-ecmwf
 pip install c3s_sm
 pip install esa_cci_sm
 pip install smos
+pip install ecmwf_models
 pip install coverage
 pip install pygeogrids
 pip install pytest-django
