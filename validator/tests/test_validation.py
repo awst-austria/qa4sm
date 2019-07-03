@@ -545,12 +545,11 @@ class TestValidation(TestCase):
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 8
+        assert len(boxplot_pngs) == 12
 
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 8 * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
 
         # remove results 
         shutil.rmtree(run_dir)
-        self.delete_run(v)
