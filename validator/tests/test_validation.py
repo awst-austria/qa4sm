@@ -521,3 +521,36 @@ class TestValidation(TestCase):
         assert len(overview_pngs) == 8 * (v.dataset_configurations.count() - 1)
 
         self.delete_run(v)
+
+#     @pytest.mark.long_running
+    def test_era_graph(self):
+        infile1 = 'testdata/2-ERA.swvl1_with_1-C3S.sm.nc'
+
+
+        # create validation object and data folder for it
+        v = self.generate_default_validation()
+        # scatterplot
+        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA')
+        v.reference_configuration.save()
+        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+        val.mkdir_if_not_exists(run_dir)
+
+        # copy our netcdf data file there and link it in the validation object
+        # then generate the graphs
+
+        shutil.copy(infile1, path.join(run_dir, 'results.nc'))
+        val.set_outfile(v, run_dir)
+        v.save()
+        val.generate_all_graphs(v, run_dir)
+
+        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        assert len(boxplot_pngs) == 8
+
+        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == 8 * (v.dataset_configurations.count() - 1)
+
+        # remove results 
+        shutil.rmtree(run_dir)
+        self.delete_run(v)
