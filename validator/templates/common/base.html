@@ -1,0 +1,75 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {% block additional_styles %}
+    {% endblock %}
+
+    <link href="{% static 'css/solid.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/fontawesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/scheme.css' %}" rel="stylesheet">
+    <link href="{% static 'css/service.css' %}" rel="stylesheet">
+    <title>QA4SM Validation Service</title>
+</head>
+
+<body>
+
+    <div class="navbar navbar-expand-md d-flex flex-md-row p-3 px-md-4 mb-3 border-bottom shadow-sm">
+        <div class="d-flex flex-column navbar-brand">
+            <a class="h5 font-weight-normal my-0" style="color: inherit;" href="{% url 'home' %}">QA4SM Validation Service*</a>
+            <a style="font-size: 65%; padding: 0" class="nav-link"
+                href="{% url 'alpha' %}" title="Expect frequent changes and occasional outages.">*This service is still in active development!</a>
+        </div>
+
+        <ul class="navbar-nav mr-auto">
+            {% url 'validation' as validation_url %}
+            {% url 'myruns' as my_validations_url %}
+            <li class="nav-item">
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == validation_url %} navbar-btn-active {% endif %}" href="{{ validation_url }}">Validate</a>
+            </li>
+            <li class="nav-item">
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == my_validations_url %} navbar-btn-active {% endif %}" href="{{ my_validations_url }}">My Validations</a>
+            </li>
+        </ul>
+
+        <ul class="navbar-nav">
+            {% url 'about' as about_url %}
+            {% url 'terms' as terms_url %}
+            {% url 'help' as help_url %}
+            {% url 'user_profile' as user_profile_url %}
+
+            <li class="nav-item">
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == about_url %} navbar-btn-active {% endif %}" href="{{ about_url }}">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == terms_url %} navbar-btn-active {% endif %}" href="{{ terms_url }}">Terms</a>
+            </li>
+            <li class="nav-item">
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == help_url %} navbar-btn-active {% endif %}" href="{{ help_url }}">Help</a>
+            </li>
+            {% if user.is_authenticated %}
+            	<li class="nav-item">
+                    <a class="navbar-btn btn btn-outline-primary {% if request.path == user_profile_url %} navbar-btn-active {% endif %}" href="{% url 'user_profile' %}">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="navbar-btn btn btn-outline-primary" href="{% url 'logout' %}">Logout</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    {% block javascript %}
+    {% endblock %}
+
+</body>
+</html>

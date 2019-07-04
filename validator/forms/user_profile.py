@@ -18,6 +18,7 @@ class UserProfileForm(UserCreationForm):
                   'organisation',
                   'country',]
 
+<<<<<<< HEAD
     def clean(self):
         form_data = self.cleaned_data
         if form_data['password1'] != form_data['password2']:
@@ -26,6 +27,8 @@ class UserProfileForm(UserCreationForm):
         return form_data
     
     
+=======
+>>>>>>> 192a82a053f2bd402689e8a5302f45dcdd332440
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['readonly'] = True

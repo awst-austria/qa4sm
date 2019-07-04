@@ -1,0 +1,9 @@
+{% extends 'auth/login_base.html' %}
+
+{% block content %}
+<div class="form-signin">
+    <h1 class="h3 mb-3 font-weight-normal">Your account has been deactivated.</h1>
+    <p>Your account will be deleted in 7 days by an admin.</p>
+    <a class="btn btn-lg btn-primary btn-block" href="{% url 'home' %}" role="button">Back to landing page</a>
+</div>
+{% endblock %}
