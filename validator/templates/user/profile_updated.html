@@ -1,0 +1,27 @@
+{% extends 'common/base.html' %} 
+{% load static %} 
+{% load widget_tweaks%} 
+
+{% block additional_styles %}
+<link href="{% static 'css/solid.min.css' %}" rel="stylesheet">
+<link href="{% static 'css/fontawesome.min.css' %}" rel="stylesheet">
+{% endblock %} 
+{% block content %}
+
+
+
+
+
+<div class="container ">
+<div class="card mb-1 border-0">
+<div class="card-body center-text">
+
+	<h1 class="h3 font-weight-normal">User profile updated</h1>
+
+
+	<a class="btn btn-lg btn-primary btn-block"
+		href="{% url 'user_profile' %}" role="button">Back</a>
+</div>
+</div>
+</div>
+{% endblock %}

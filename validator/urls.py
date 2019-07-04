@@ -36,5 +36,6 @@ urlpatterns = [
     
     path('user_profile/',views.user_profile, name='user_profile'),
     path('user_profile_deleted/',views.user_profile, name='user_profile_deleted'),
+    path('user_profile_updated/',views.user_profile_updated, name='user_profile_updated'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
