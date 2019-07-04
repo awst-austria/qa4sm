@@ -35,5 +35,6 @@ urlpatterns = [
     path('ajax/get-dataset-options/', views.ajax_get_dataset_options, name='ajax_get_dataset_options'),
     
     path('user_profile/',views.user_profile, name='user_profile'),
+    path('user_profile_deleted/',views.user_profile, name='user_profile_deleted'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

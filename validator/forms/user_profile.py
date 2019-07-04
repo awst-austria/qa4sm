@@ -18,6 +18,14 @@ class UserProfileForm(UserCreationForm):
                   'organisation',
                   'country',]
 
+    def clean(self):
+        form_data = self.cleaned_data
+        if form_data['password1'] != form_data['password2']:
+            self._errors["password1"] = ["Password do not match"] # Will raise a error message
+            del form_data['password1']
+        return form_data
+    
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['readonly'] = True
