@@ -13,6 +13,7 @@ from validator.forms.user_profile import UserProfileForm
 def user_profile(request):
     
     if request.method == 'POST':
+        print('User profile submit')
         form = UserProfileForm(request.POST,instance=request.user)
         if form.is_valid():
             current_password_hash=request.user.password
@@ -22,7 +23,7 @@ def user_profile(request):
                 newuser.password=current_password_hash
                 
             newuser.save()
-            messages.success(request, 'User profile has been updated.')
+            return redirect('user_profile_updated')
             
         return render(request, 'user/profile.html', {'form': form,})
     
@@ -46,5 +47,5 @@ def user_profile(request):
     return render(request, 'user/profile.html', {'form': form,})
     
     
-def signup_complete(request):
-    return render(request, 'auth/signup_complete.html')
+def user_profile_updated(request):
+    return render(request, 'user/profile_updated.html')
