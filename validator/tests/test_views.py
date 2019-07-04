@@ -87,7 +87,7 @@ class TestViews(TransactionTestCase):
         self.testrun.output_file.name = str(self.testrun.id) + '/foobar.nc'
         self.testrun.save()
 
-        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', ]
+        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', 'user_profile_deactivated']
         self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm','stop_validation']
         self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
@@ -483,6 +483,32 @@ class TestViews(TransactionTestCase):
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 200)
 
+    def test_update_user_profile(self):
+        self.client.login(**self.credentials)
+        
+        url = reverse('user_profile')
+        user_info = {
+            'username': self.credentials['username'],
+            'email': 'chuck@norris.com',
+            }
+        result = self.client.post(url, user_info)
+        self.assertEqual(result.status_code, 302)
+        self.assertRedirects(result, reverse('user_profile_updated'))
+        
+    def test_deactivate_user_profile(self):
+        url = reverse('user_profile')
+        credentials = {
+            'username': 'to_be_deactivated',
+            'password': 'secret'}
+        to_be_deactivated=User.objects.create_user(**credentials)
+        to_be_deactivated.is_active = True
+        to_be_deactivated.save()
+        self.client.login(**credentials)
+        result = self.client.delete(url)
+        to_be_deactivated.refresh_from_db()
+        self.assertEqual(to_be_deactivated.is_active,False)
+        self.assertEqual(result.status_code, 200)
+        
     ## simulate workflow for password reset
     def test_password_reset(self):
         ## pattern to get the password reset link from the email

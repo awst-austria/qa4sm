@@ -35,8 +35,7 @@ urlpatterns = [
     path('ajax/get-dataset-options/', views.ajax_get_dataset_options, name='ajax_get_dataset_options'),
     
     path('user_profile/',views.user_profile, name='user_profile'),
-
-    path('user_profile_deleted/',views.user_profile, name='user_profile_deleted'),
+    path('user_profile_deactivated/',views.user_profile_deactivated, name='user_profile_deactivated'),
     path('user_profile_updated/',views.user_profile_updated, name='user_profile_updated'),
 
 

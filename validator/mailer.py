@@ -59,6 +59,24 @@ def send_new_user_signed_up(user):
                     subject=subject,
                     body=body)
 
+def send_user_account_removal_request(user):
+        __logger.info('Sending mail about user removal request ({}) to admins...'.format(user.username))
+
+        # TODO: figure out how to get this url with reverse
+        url = SITE_URL + '/admin/validator/user/{}/changestatus/'.format(user.id)
+
+        subject = '[QA4SM] User profile removal request'
+        body = 'Dear admins,\n\n A new user account removal request has arrived from {} {} ({}).\nPlease review the account and delete it as soon as possible. \nUser account: {}\n\nBest regards,\nYour webapp'.format(
+            user.first_name,
+            user.last_name,
+            user.username,
+            url)
+
+        _send_email(recipients=[EMAIL_FROM],
+                    subject=subject,
+                    body=body)
+
+
 def send_user_status_changed(user, activate):
         __logger.info('Sending mail to user {} about {}...'.format(
             user.username,

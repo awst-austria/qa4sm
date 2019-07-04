@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model, password_validation
 User = get_user_model()
 from django.contrib.auth.forms import UserCreationForm
 
-import django.forms as forms
-
 
 class UserProfileForm(UserCreationForm):
 
@@ -18,7 +16,6 @@ class UserProfileForm(UserCreationForm):
                   'organisation',
                   'country',]
 
-<<<<<<< HEAD
     def clean(self):
         form_data = self.cleaned_data
         if form_data['password1'] != form_data['password2']:
@@ -26,9 +23,6 @@ class UserProfileForm(UserCreationForm):
             del form_data['password1']
         return form_data
     
-    
-=======
->>>>>>> 192a82a053f2bd402689e8a5302f45dcdd332440
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['readonly'] = True

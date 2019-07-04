@@ -1,9 +1,9 @@
 from django.shortcuts import redirect
 from django.http.response import HttpResponse
 from django.shortcuts import render
-from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
-from validator.models import ValidationRun
+from django.contrib.auth import logout
+from validator.mailer import send_user_status_changed,send_user_account_removal_request
 
 
 from django.contrib.auth.decorators import login_required
@@ -29,10 +29,12 @@ def user_profile(request):
         return render(request, 'user/profile.html', {'form': form,})
     
     elif request.method == 'DELETE':
-        current_user = request.user
-        ValidationRun.objects.filter(user=current_user).delete()
-        print('Deleting user')
-        return HttpResponse("Deleted.", status=200)
+        request.user.is_active= False
+        request.user.save()
+        send_user_account_removal_request(request.user)
+        send_user_status_changed(request.user,False)
+        logout(request)
+        return HttpResponse(status=200)
         
     else:
         if isinstance(request.user, AnonymousUser) == False:
@@ -47,5 +49,9 @@ def user_profile(request):
 
     return render(request, 'user/profile.html', {'form': form,})
     
+@login_required(login_url='/login/')
 def user_profile_updated(request):
     return render(request, 'user/profile_updated.html')
+
+def user_profile_deactivated(request):
+    return render(request, 'user/profile_deactivated.html')

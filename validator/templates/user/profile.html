@@ -77,7 +77,8 @@
         $.ajax({
             url: url,
             type: 'DELETE',
-            success: function (return_data) { // redirect to good by page
+            success: function () {
+            	window.location.href = "{% url 'user_profile_deactivated' %}";
             	}
         });
     }
