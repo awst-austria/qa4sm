@@ -14,8 +14,8 @@ from validator.forms.user_profile import UserProfileForm
 @login_required(login_url='/login/')
 def user_profile(request):
     
+    
     if request.method == 'POST':
-        print('User profile submit')
         form = UserProfileForm(request.POST,instance=request.user)
         if form.is_valid():
             current_password_hash=request.user.password
@@ -39,17 +39,13 @@ def user_profile(request):
         return HttpResponse(status=200)
         
     else:
-        if isinstance(request.user, AnonymousUser) == False:
-            form = UserProfileForm( initial={ 'first_name':request.user.first_name, 
+        form = UserProfileForm( initial={ 'first_name':request.user.first_name, 
                                              'last_name':request.user.last_name, 
                                              'organisation': request.user.organisation, 
                                              'username': request.user.username, 
                                              'country': request.user.country,
                                              'email':request.user.email})
-        else:
-            form = UserProfileForm()
-
-    return render(request, 'user/profile.html', {'form': form,})
+        return render(request, 'user/profile.html', {'form': form,})
     
 @login_required(login_url='/login/')
 def user_profile_updated(request):
