@@ -63,8 +63,7 @@ def send_user_account_removal_request(user):
         __logger.info('Sending mail about user removal request ({}) to admins...'.format(user.username))
 
         # TODO: figure out how to get this url with reverse
-        url = SITE_URL + '/admin/validator/user/{}/changestatus/'.format(user.id)
-
+        url = SITE_URL + reverse('admin:validator_user_change', kwargs={'object_id': user.id})
         subject = '[QA4SM] User profile removal request'
         body = 'Dear admins,\n\n A new user account removal request has arrived from {} {} ({}).\nPlease review the account and delete it as soon as possible. \nUser account: {}\n\nBest regards,\nYour webapp'.format(
             user.first_name,
