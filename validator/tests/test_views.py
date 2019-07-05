@@ -9,6 +9,7 @@ import zipfile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
+from validator.forms.user_profile import UserProfileForm
 User = get_user_model()
 
 from django.test.utils import override_settings
@@ -494,6 +495,47 @@ class TestViews(TransactionTestCase):
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 302)
         self.assertRedirects(result, reverse('user_profile_updated'))
+        
+    def test_user_profile_form_validation(self):
+        form_data = {'username':'john_doe',
+                     'password1':'asd12N83poLL',
+                     'password2':'asd12N83poLL',
+                     'country':'AT',
+                     'last_name':'Doe',
+                     'first_name':'John',
+                     'organisation':'????',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertTrue(form.is_valid()) # should pass
+        
+        form_data = {'username':'john_doe',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertTrue(form.is_valid()) # should pass
+        
+        form_data = {'username':'john_doe'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertFalse(form.is_valid()) # should fail because of the missing e-mail field
+        
+        form_data = {'username':'john_doe',
+                     'password1':'asd12N83poLL',
+                     'password2':'asd12N83poLL',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertTrue(form.is_valid()) # should pass
+        
+        form_data = {'username':'john_doe',
+                     'password1':'asd12N83poLL',
+                     'password2':'asd12N8',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertFalse(form.is_valid()) # should fail because paswords don't match
+        
         
     def test_deactivate_user_profile(self):
         url = reverse('user_profile')
