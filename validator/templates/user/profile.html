@@ -48,22 +48,7 @@
         </div>
     </form>
    
-   <script type="text/javascript">
-   const sleep = (milliseconds) => {
-	   return new Promise(resolve => setTimeout(resolve, milliseconds))
-	}
- 
-	document.addEventListener("DOMContentLoaded", function() {
-	   sleep(3000).then(() => {
-		   hide_messages();
-		 })
-	});
-   
-	function hide_messages(){
-	   var elem = document.getElementById('messages');
-	   elem.parentNode.removeChild(elem);
-	}
-	
+   <script type="text/javascript">	
 	function delete_profile() {
         if (!confirm('Do you really want to deactivate your QA4SM account?')) {
             return;
@@ -78,10 +63,9 @@
             url: url,
             type: 'DELETE',
             success: function () {
-            	window.location.href = "{% url 'user_profile_deactivated' %}";
+                window.location.href = "{% url 'user_profile_deactivated' %}";
             	}
         });
     }
-	
    </script>
 {% endblock %}
