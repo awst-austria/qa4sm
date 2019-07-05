@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import logout
 from validator.mailer import send_user_status_changed,send_user_account_removal_request
+from django.contrib.auth import update_session_auth_hash
 
 
 from django.contrib.auth.decorators import login_required
@@ -24,6 +25,7 @@ def user_profile(request):
                 newuser.password=current_password_hash
                 
             newuser.save()
+            update_session_auth_hash(request, newuser)
             return redirect('user_profile_updated')
             
         return render(request, 'user/profile.html', {'form': form,})
