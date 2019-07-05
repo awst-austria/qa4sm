@@ -508,6 +508,8 @@ class TestViews(TransactionTestCase):
         to_be_deactivated.refresh_from_db()
         self.assertEqual(to_be_deactivated.is_active,False)
         self.assertEqual(result.status_code, 200)
+        login_success=self.client.login(**credentials)
+        assert not login_success
         
     ## simulate workflow for password reset
     def test_password_reset(self):
