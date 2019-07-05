@@ -18,6 +18,11 @@ class UserProfileForm(UserCreationForm):
 
     def clean(self):
         form_data = self.cleaned_data
+        if 'password2' not in form_data:    # Workaround for missing password2 key
+            self._errors["password1"] = ["Password do not match"] # Will raise a error message
+            del form_data['password1']
+            return form_data
+            
         if form_data['password1'] != form_data['password2']:
             self._errors["password1"] = ["Password do not match"] # Will raise a error message
             del form_data['password1']
