@@ -1,20 +1,14 @@
 from django.shortcuts import redirect
 from django.http.response import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import logout
 from validator.mailer import send_user_status_changed,send_user_account_removal_request
 from django.contrib.auth import update_session_auth_hash
-
-
 from django.contrib.auth.decorators import login_required
 from validator.forms.user_profile import UserProfileForm
 
-
 @login_required(login_url='/login/')
 def user_profile(request):
-    
-    
     if request.method == 'POST':
         form = UserProfileForm(request.POST,instance=request.user)
         if form.is_valid():
