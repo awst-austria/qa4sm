@@ -1,4 +1,4 @@
-{% extends 'auth/login_base.html' %}
+{% extends 'common/base.html' %}
 
 {% load static %}
 {% load widget_tweaks %}
@@ -9,14 +9,15 @@
 {% endblock %}
 
 {% block content %}
-    <form class="user-form" method="post">
+    <form method="post" class="user-form">
+        <div class="container">
+
         {% csrf_token %}
 
-        <h1 class="h3 mb-3 font-weight-normal">Sign up</h1>
+        <h1 class="h3 font-weight-normal  center-text">User profile</h1>
 
         {% with WIDGET_ERROR_CLASS='is-invalid' %}
             {% for field in form %}
-                {% if field != form.terms_consent %}
                     <label for="{{ field.auto_id }}" class="sr-only">{{ field.label }}</label>
                     <div class="input-group mb-3">
                         {% if field|widget_type == 'lazyselect' %}
@@ -37,22 +38,29 @@
                         {% endfor %}
                         </p>
                     {% endif %}
-                {% endif %}
             {% endfor %}
-            
-            <div class="mb-3">
-                <label for="{{ form.terms_consent.auto_id }}" class="sr-only">{{ form.terms_consent.label }}</label>
-                {% render_field form.terms_consent class="form-control" title=form.terms_consent.help_text style="width: initial; display: initial;" %}
-                I accept the <a href="{% url 'terms' %}">terms, conditions, and privacy policy</a>.
-                {% if field.errors %}
-                    <p class="alert alert-danger small-padding">
-                    {% for error in form.terms_consent.errors %}
-                        {{ error }}
-                    {% endfor %}
-                    </p>
-                {% endif %}
-            </div>
         {% endwith %}
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
+        <button class="btn btn-lg btn-danger btn-block mt-5" onclick="delete_profile()" type="button">Deactivate my account</button>
+
+        </div>
     </form>
+
+   <script type="text/javascript">
+    function delete_profile() {
+        if (!confirm('Do you really want to deactivate your QA4SM account?')) { return; }
+
+        var url = "{% url 'user_profile' %}";
+
+        $.ajaxSetup({
+              headers: { "X-CSRFToken": '{{csrf_token}}' }
+        });
+
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function () { window.location.href = "{% url 'user_profile_deactivated' %}"; }
+        });
+    }
+   </script>
 {% endblock %}

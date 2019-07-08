@@ -45,8 +45,7 @@ def send_val_done_notification(val_run):
 def send_new_user_signed_up(user):
         __logger.info('Sending mail about new user {} to admins...'.format(user.username))
 
-        # TODO: figure out how to get this url with reverse
-        url = SITE_URL + '/admin/validator/user/{}/changestatus/'.format(user.id)
+        url = SITE_URL + reverse('admin:user_change_status', kwargs={'user_id': user.id})
 
         subject = '[QA4SM] New user signed up'
         body = 'Dear admins,\n\nnew user {} {} ({}) has signed up.\nTo activate their account go to: {}\n\nBest regards,\nYour webapp'.format(
@@ -58,6 +57,22 @@ def send_new_user_signed_up(user):
         _send_email(recipients=[EMAIL_FROM],
                     subject=subject,
                     body=body)
+
+def send_user_account_removal_request(user):
+        __logger.info('Sending mail about user removal request ({}) to admins...'.format(user.username))
+
+        url = SITE_URL + reverse('admin:validator_user_change', kwargs={'object_id': user.id})
+        subject = '[QA4SM] User profile removal request'
+        body = 'Dear admins,\n\n A new user account removal request has arrived from {} {} ({}).\nPlease review the account and delete it as soon as possible. \nUser account: {}\n\nBest regards,\nYour webapp'.format(
+            user.first_name,
+            user.last_name,
+            user.username,
+            url)
+
+        _send_email(recipients=[EMAIL_FROM],
+                    subject=subject,
+                    body=body)
+
 
 def send_user_status_changed(user, activate):
         __logger.info('Sending mail to user {} about {}...'.format(

@@ -9,6 +9,7 @@ import zipfile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
+from validator.forms.user_profile import UserProfileForm
 User = get_user_model()
 
 from django.test.utils import override_settings
@@ -39,7 +40,7 @@ class TestViews(TransactionTestCase):
     # Apparently, re-initing the db creates a new connection every time, so
     # problem solved.
     serialized_rollback = True
-    
+
     ## https://docs.djangoproject.com/en/2.2/topics/testing/tools/#simpletestcase
     databases = '__all__'
     allow_database_queries = True
@@ -87,7 +88,7 @@ class TestViews(TransactionTestCase):
         self.testrun.output_file.name = str(self.testrun.id) + '/foobar.nc'
         self.testrun.save()
 
-        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', ]
+        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', 'user_profile_deactivated']
         self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm','stop_validation']
         self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
@@ -482,6 +483,89 @@ class TestViews(TransactionTestCase):
             }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 200)
+
+    def test_update_user_profile(self):
+        self.client.login(**self.credentials)
+
+        url = reverse('user_profile')
+        user_info = {
+            'username': self.credentials['username'],
+            'email': 'chuck@norris.com',
+            'country':'AT',
+            'last_name':'Chuck',
+            'first_name':'Norris',
+            'organisation':'Texas Rangers',
+            }
+        result = self.client.post(url, user_info)
+        self.assertEqual(result.status_code, 302)
+        self.assertRedirects(result, reverse('user_profile_updated'))
+
+    def test_update_user_profile_fail(self):
+        self.client.login(**self.credentials)
+
+        url = reverse('user_profile')
+        user_info = {
+            'username': self.credentials['username'], ## this is too little info, should fail
+            }
+        result = self.client.post(url, user_info)
+        self.assertEqual(result.status_code, 200)
+
+    def test_user_profile_form_validation(self):
+        form_data = {'username':'john_doe',
+                     'password1':'asd12N83poLL',
+                     'password2':'asd12N83poLL',
+                     'country':'AT',
+                     'last_name':'Doe',
+                     'first_name':'John',
+                     'organisation':'????',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertTrue(form.is_valid()) # should pass
+
+        form_data = {'username':'john_doe',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertTrue(form.is_valid()) # should pass
+
+        form_data = {'username':'john_doe'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertFalse(form.is_valid()) # should fail because of the missing e-mail field
+
+        form_data = {'username':'john_doe',
+                     'password1':'asd12N83poLL',
+                     'password2':'asd12N83poLL',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertTrue(form.is_valid()) # should pass
+
+        form_data = {'username':'john_doe',
+                     'password1':'asd12N83poLL',
+                     'password2':'asd12N8',
+                     'email':'john@nowhere.com'
+                     }
+        form = UserProfileForm(data=form_data)
+        self.assertFalse(form.is_valid()) # should fail because passwords don't match
+
+
+    def test_deactivate_user_profile(self):
+        url = reverse('user_profile')
+        credentials = {
+            'username': 'to_be_deactivated',
+            'password': 'secret'}
+        to_be_deactivated=User.objects.create_user(**credentials)
+        to_be_deactivated.is_active = True
+        to_be_deactivated.save()
+        self.client.login(**credentials)
+        result = self.client.delete(url)
+        to_be_deactivated.refresh_from_db()
+        self.assertEqual(to_be_deactivated.is_active,False)
+        self.assertEqual(result.status_code, 200)
+        login_success=self.client.login(**credentials)
+        assert not login_success
 
     ## simulate workflow for password reset
     def test_password_reset(self):
