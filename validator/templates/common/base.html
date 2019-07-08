@@ -52,7 +52,7 @@
                 <a class="navbar-btn btn btn-outline-primary {% if request.path == help_url %} navbar-btn-active {% endif %}" href="{{ help_url }}">Help</a>
             </li>
             {% if user.is_authenticated %}
-            	<li class="nav-item">
+                <li class="nav-item">
                     <a class="navbar-btn btn btn-outline-primary {% if request.path == user_profile_url %} navbar-btn-active {% endif %}" href="{% url 'user_profile' %}">Profile</a>
                 </li>
                 <li class="nav-item">

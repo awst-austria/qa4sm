@@ -40,7 +40,7 @@ class TestViews(TransactionTestCase):
     # Apparently, re-initing the db creates a new connection every time, so
     # problem solved.
     serialized_rollback = True
-    
+
     ## https://docs.djangoproject.com/en/2.2/topics/testing/tools/#simpletestcase
     databases = '__all__'
     allow_database_queries = True
@@ -486,16 +486,30 @@ class TestViews(TransactionTestCase):
 
     def test_update_user_profile(self):
         self.client.login(**self.credentials)
-        
+
         url = reverse('user_profile')
         user_info = {
             'username': self.credentials['username'],
             'email': 'chuck@norris.com',
+            'country':'AT',
+            'last_name':'Chuck',
+            'first_name':'Norris',
+            'organisation':'Texas Rangers',
             }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 302)
         self.assertRedirects(result, reverse('user_profile_updated'))
-        
+
+    def test_update_user_profile_fail(self):
+        self.client.login(**self.credentials)
+
+        url = reverse('user_profile')
+        user_info = {
+            'username': self.credentials['username'], ## this is too little info, should fail
+            }
+        result = self.client.post(url, user_info)
+        self.assertEqual(result.status_code, 200)
+
     def test_user_profile_form_validation(self):
         form_data = {'username':'john_doe',
                      'password1':'asd12N83poLL',
@@ -508,18 +522,18 @@ class TestViews(TransactionTestCase):
                      }
         form = UserProfileForm(data=form_data)
         self.assertTrue(form.is_valid()) # should pass
-        
+
         form_data = {'username':'john_doe',
                      'email':'john@nowhere.com'
                      }
         form = UserProfileForm(data=form_data)
         self.assertTrue(form.is_valid()) # should pass
-        
+
         form_data = {'username':'john_doe'
                      }
         form = UserProfileForm(data=form_data)
         self.assertFalse(form.is_valid()) # should fail because of the missing e-mail field
-        
+
         form_data = {'username':'john_doe',
                      'password1':'asd12N83poLL',
                      'password2':'asd12N83poLL',
@@ -527,16 +541,16 @@ class TestViews(TransactionTestCase):
                      }
         form = UserProfileForm(data=form_data)
         self.assertTrue(form.is_valid()) # should pass
-        
+
         form_data = {'username':'john_doe',
                      'password1':'asd12N83poLL',
                      'password2':'asd12N8',
                      'email':'john@nowhere.com'
                      }
         form = UserProfileForm(data=form_data)
-        self.assertFalse(form.is_valid()) # should fail because paswords don't match
-        
-        
+        self.assertFalse(form.is_valid()) # should fail because passwords don't match
+
+
     def test_deactivate_user_profile(self):
         url = reverse('user_profile')
         credentials = {
@@ -552,7 +566,7 @@ class TestViews(TransactionTestCase):
         self.assertEqual(result.status_code, 200)
         login_success=self.client.login(**credentials)
         assert not login_success
-        
+
     ## simulate workflow for password reset
     def test_password_reset(self):
         ## pattern to get the password reset link from the email

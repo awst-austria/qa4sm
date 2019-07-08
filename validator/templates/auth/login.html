@@ -2,7 +2,7 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<form class="form-signin" method="post" action="{% url 'login' %}?next={{next}}">
+<form class="user-form" method="post" action="{% url 'login' %}?next={{next}}">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}" />
 
@@ -11,10 +11,10 @@
     {% with WIDGET_ERROR_CLASS='is-invalid' %}
 
         <label for="{{ form.username.auto_id }}" class="sr-only">{{ form.username.label }}</label>
-        {% render_field form.username class="form-control form-signin-user" placeholder=form.username.label %}
+        {% render_field form.username class="form-control user-form-user" placeholder=form.username.label %}
 
         <label for="{{ form.password.auto_id }}" class="sr-only">{{ form.password.label }}</label>
-        {% render_field form.password class="form-control form-signin-password" placeholder=form.password.label %}
+        {% render_field form.password class="form-control user-form-password" placeholder=form.password.label %}
 
         {% if form.errors %}
             <p class="alert alert-danger small-padding">

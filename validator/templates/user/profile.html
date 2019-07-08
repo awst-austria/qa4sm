@@ -9,11 +9,9 @@
 {% endblock %}
 
 {% block content %}
-    <form method="post">
-    <div class="container">
+    <form method="post" class="user-form">
+        <div class="container">
 
-                  
-                        
         {% csrf_token %}
 
         <h1 class="h3 font-weight-normal  center-text">User profile</h1>
@@ -43,16 +41,15 @@
             {% endfor %}
         {% endwith %}
         <button class="btn btn-lg btn-primary btn-block" type="submit">Save</button>
-        <button class="btn btn-lg btn-danger btn-block" onclick="delete_profile()" type="button">Deactivate my account</button>
-  
+        <button class="btn btn-lg btn-danger btn-block mt-5" onclick="delete_profile()" type="button">Deactivate my account</button>
+
         </div>
     </form>
-   
-   <script type="text/javascript">	
-	function delete_profile() {
-        if (!confirm('Do you really want to deactivate your QA4SM account?')) {
-            return;
-           }
+
+   <script type="text/javascript">
+    function delete_profile() {
+        if (!confirm('Do you really want to deactivate your QA4SM account?')) { return; }
+
         var url = "{% url 'user_profile' %}";
 
         $.ajaxSetup({
@@ -62,9 +59,7 @@
         $.ajax({
             url: url,
             type: 'DELETE',
-            success: function () {
-                window.location.href = "{% url 'user_profile_deactivated' %}";
-            	}
+            success: function () { window.location.href = "{% url 'user_profile_deactivated' %}"; }
         });
     }
    </script>
