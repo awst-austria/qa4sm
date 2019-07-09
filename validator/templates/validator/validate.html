@@ -90,7 +90,7 @@
 
                                         <hr/>
 
-                                        <div class="custom-control custom-checkbox">
+                                        <div class="custom-control custom-switch">
                                             <input class="custom-control-input" id="{{dc_form.filter_dataset.auto_id}}" name="{{dc_form.prefix}}-{{dc_form.filter_dataset.name}}"
                                                 {{ dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this)">
                                             <label class="custom-control-label" for="{{dc_form.filter_dataset.auto_id}}">{{dc_form.filter_dataset.label}}</label>
@@ -162,7 +162,7 @@
 
                                 <hr/>
 
-                                <div class="custom-control custom-checkbox">
+                                <div class="custom-control custom-switch">
                                     <input class="custom-control-input" id="{{ref_dc_form.filter_dataset.auto_id}}" name="{{ref_dc_form.prefix}}-{{ref_dc_form.filter_dataset.name}}"
                                         {{ ref_dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
                                     <label class="custom-control-label" for="{{ref_dc_form.filter_dataset.auto_id}}">{{ref_dc_form.filter_dataset.label}}</label>
@@ -189,7 +189,7 @@
                                 <div class="container">
                                     <div class="row">
 
-                                        <div class="custom-control custom-checkbox">
+                                        <div class="custom-control custom-switch">
                                             <input class="custom-control-input" id="{{val_form.anomalies.auto_id}}" name="{{val_form.anomalies.name}}"
                                                 {{ val_form.anomalies.initial|yesno:'checked,,' }} type="checkbox">
                                             <label class="custom-control-label" for="{{val_form.anomalies.auto_id}}">Calculate anomalies</label>
