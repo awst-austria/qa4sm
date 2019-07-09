@@ -268,6 +268,44 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
+    @pytest.mark.long_running
+    def test_validation_era_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name='ERA')
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name='ERA5_test')
+        run.reference_configuration.variable = DataVariable.objects.get(short_name='ERA_sm')
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA_TEMP_UNFROZEN'))
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2005, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2006, 1, 1, tzinfo=UTC)
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run, "Didn't find validation in database"
+
+        assert new_run.total_points == 400, "Number of gpis is off"
+        assert new_run.error_points == 0, "Too many error gpis"
+        assert new_run.ok_points == 400, "OK points are off"
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
     @pytest.mark.long_running
     def test_validation_ascat(self):
