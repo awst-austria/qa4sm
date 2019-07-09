@@ -522,7 +522,7 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
-#     @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_era_graph(self):
         infile1 = 'testdata/2-ERA.swvl1_with_1-C3S.sm.nc'
 
