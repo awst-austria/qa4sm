@@ -15,6 +15,7 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import Settings
 from validator.models import ValidationRun
+from validator.models.celery_task import CeleryTask
 
 
 class TestModels(TestCase):
@@ -207,3 +208,9 @@ class TestModels(TestCase):
         settings.delete()
         settings = Settings.load()
         assert settings
+
+    def test_celery_task(self):
+        task = CeleryTask()
+        task_string = str(task)
+        self.__logger.debug(task_string)
+        assert task_string
