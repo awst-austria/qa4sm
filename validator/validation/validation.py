@@ -24,6 +24,7 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from pytesmo.validation_framework.data_manager import DataManager
+from pytesmo.validation_framework.adapters import AnomalyAdapter
 
 
 __logger = logging.getLogger(__name__)
@@ -79,6 +80,10 @@ def create_pytesmo_validation(validation_run):
     for ds_num, dataset_config in enumerate(validation_run.dataset_configurations.all(), start=1):
         reader = create_reader(dataset_config.dataset, dataset_config.version)
         reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.variable)
+
+        if validation_run.anomalies:
+            reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name])
+
         dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
         ds_list.append( (dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
 

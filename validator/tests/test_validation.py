@@ -324,6 +324,42 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
+    @pytest.mark.long_running
+    def test_validation_anomalies(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.anomalies = True
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_TEST')
+        run.reference_configuration.variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
+        run.reference_configuration.save()
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run
+        assert new_run.total_points == 51
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 51
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
     def test_errors(self):
         dataset = Dataset()
         dataset.short_name = 'gibtsnicht'
@@ -551,5 +587,5 @@ class TestValidation(TestCase):
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
 
-        # remove results 
+        # remove results
         shutil.rmtree(run_dir)

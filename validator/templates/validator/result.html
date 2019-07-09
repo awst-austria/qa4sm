@@ -59,6 +59,8 @@
                             </ul>
                         </li>
 
+                        <li>Validation metrics calculated from {% if val.anomalies %}anomalies{% else %}absolute values{% endif %}.</li>
+
                         <li>Processing took {{ run_time }} minutes (wall time).</li>
                         {% if val.interval_from and val.interval_to %}
                             <li>Validation period / temporal filter: {{ val.interval_from }} to {{ val.interval_to }}.</li>

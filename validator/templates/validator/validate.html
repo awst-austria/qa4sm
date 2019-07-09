@@ -180,6 +180,33 @@
                     <div class="card-deck">
                         <div class="card mb-4 shadow-sm">
                             <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Validation Options</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="Options to select different validation types."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="container">
+                                    <div class="row">
+
+                                        <div class="custom-control custom-checkbox">
+                                            <input class="custom-control-input" id="{{val_form.anomalies.auto_id}}" name="{{val_form.anomalies.name}}"
+                                                {{ val_form.anomalies.initial|yesno:'checked,,' }} type="checkbox">
+                                            <label class="custom-control-label" for="{{val_form.anomalies.auto_id}}">Calculate anomalies</label>
+
+                                            <span class="input-group-text fas fa-question-circle help-icon ml-2"
+                                                title="Calculate metrics from anomalies instead of absolute values."></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-deck">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
                                 <h4 class="my-0 font-weight-normal">Validation Period</h4>
                                 <span class="input-group-text fas fa-question-circle help-icon"
                                     title="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval."></span>

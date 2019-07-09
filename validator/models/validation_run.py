@@ -45,14 +45,15 @@ class ValidationRun(models.Model):
     progress = models.IntegerField(default=0)
 
     reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='ref_validation_run', null=True)
-    
+
     scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='scaling_ref_validation_run', null=True)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
+    anomalies = models.BooleanField(default=False)
 
     output_file = models.FileField(null=True, max_length=250)
-    
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
