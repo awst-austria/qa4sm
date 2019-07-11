@@ -405,7 +405,7 @@ class TestValidation(TestCase):
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
                         else:
-                            data = msk_reader.read_ts(16.6, 48.2)
+                            data = msk_reader.read_ts(16.366667, 48.2)
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
@@ -435,7 +435,7 @@ class TestValidation(TestCase):
 
     def test_create_jobs(self):
         for dataset in Dataset.objects.all():
-            print(dataset.short_name)
+            self.__logger.info(dataset.short_name)
             vs = dataset.versions.all()
 
             for version in vs:
