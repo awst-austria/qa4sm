@@ -405,7 +405,7 @@ class TestValidation(TestCase):
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
                         else:
-                            data = msk_reader.read_ts(16.366667, 48.2)
+                            data = msk_reader.read_ts(16.6, 48.2)
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
