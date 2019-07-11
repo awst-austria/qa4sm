@@ -152,9 +152,13 @@ Install other dependencies into Python environment with pip:
     pip install gldas
     pip install smap-io
     pip install django-countries
-    pip install cartopy
     pip install seaborn
     pip install --upgrade --force-reinstall netcdf4
+
+Cartopy is also required, however, you first have to accept the use of the deprecated pyproj to get this to work:
+
+    export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
+    pip install cartopy
 
 Install dependencies that are not available via pip (e.g. unreleased TU libraries). Use a temporary directory to check out the source and install it.
 
