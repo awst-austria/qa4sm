@@ -51,7 +51,6 @@ class TestAdmin(TestCase):
         }
         self.testadmin = User.objects.create_user(**self.admin_credentials)
 
-    @pytest.mark.needs_advanced_setup
     def test_access_control(self):
         login_url = reverse('admin:login')
         urls = [
@@ -92,6 +91,7 @@ class TestAdmin(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
+    @pytest.mark.needs_advanced_setup
     def test_queue_page(self):
         ## we can only run this test if we have a celery env set up
         if (hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER') and settings.CELERY_TASK_ALWAYS_EAGER):
