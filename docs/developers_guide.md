@@ -160,19 +160,10 @@ Cartopy is also required, however, you first have to accept the use of the depre
     export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
     pip install cartopy
 
-Install dependencies that are not available via pip (e.g. unreleased TU libraries). Use a temporary directory to check out the source and install it.
+Pytesmo is available via pypi, however, as this is constantly in development and there is not new release everytime there is a new feature, it is recommended to install directly from the github master branch:
 
-    export TMP_DIR="/tmp/valentina_lib_install"
-    mkdir -p $TMP_DIR
-
-    # install latest pytesmo trunk
-    git clone -b master --single-branch https://github.com/TUW-GEO/pytesmo.git
-    cd pytesmo
-    rm requirements.txt # ignore requirements
-    touch requirements.txt
-    python setup.py install
-    cd $TMP_DIR
-    rm -rf pytesmo
+    pip install git+https://github.com/TUW-GEO/pytesmo.git
+    
 
 ### Get source code
 
