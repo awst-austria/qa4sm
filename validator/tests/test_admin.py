@@ -3,6 +3,7 @@ import time
 from celery.app import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
+import pytest
 User = get_user_model()
 from django.test import TestCase
 from django.urls.base import reverse
@@ -50,6 +51,7 @@ class TestAdmin(TestCase):
         }
         self.testadmin = User.objects.create_user(**self.admin_credentials)
 
+    @pytest.mark.needs_advanced_setup
     def test_access_control(self):
         login_url = reverse('admin:login')
         urls = [
