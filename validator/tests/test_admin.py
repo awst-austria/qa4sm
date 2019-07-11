@@ -3,8 +3,9 @@ import time
 from celery.app import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
-import pytest
 User = get_user_model()
+import pytest
+import logging
 from django.test import TestCase
 from django.urls.base import reverse
 
@@ -26,6 +27,8 @@ def execute_test_job(self, parameter):
 class TestAdmin(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
+
+    __logger = logging.getLogger(__name__)
 
     def setUp(self):
         self.user_credentials = {
@@ -55,7 +58,6 @@ class TestAdmin(TestCase):
         login_url = reverse('admin:login')
         urls = [
             reverse('admin:index'),
-            reverse('admin:system-settings'),
             reverse('admin:validator_validationrun_changelist'),
             reverse('admin:validator_user_changelist'),
             reverse('admin:validator_user_change', kwargs={'object_id': self.testuser.id}),
@@ -63,7 +65,7 @@ class TestAdmin(TestCase):
             ]
 
         for url in urls:
-            print(url)
+            self.__logger.info(url)
 
             # anonymous
             self.client.logout()
@@ -100,6 +102,11 @@ class TestAdmin(TestCase):
         queue_name = 'unittestqueue'
 
         url = reverse('admin:system-settings')
+
+        # first, try accessing page without login - should fail
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '{}?next={}'.format(reverse('admin:login'), url))
 
         ## add a queue so that the queue page has something to show
         app.control.add_consumer(queue_name, reply=True)
