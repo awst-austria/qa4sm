@@ -332,7 +332,9 @@ urls.py|Django specific file containing the mapping of URLs to views.
 
 ## How to run integration / unit tests
 
-Go to to your qa4sm folder and run
+To run the tests, you will need the testdata. For this data, please contact the developers directly. Once you have this test data it should go in to the data folder specified in the settings file. 
+
+Once you have the test data, you can go to to your qa4sm folder and run:
 
     pytest
 
