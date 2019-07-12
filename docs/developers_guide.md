@@ -1,5 +1,22 @@
 # QA4SM webapp / Valentina developers' guide
 
+## Get source code
+
+Check out the QA4SM source code from [GitHub](https://github.com/awst-austria/qa4sm).
+
+- Use the following command for anonymous checkout:
+
+        git clone https://github.com/awst-austria/qa4sm.git
+
+- Use the following command if you have your ssh key set up in GitHub already:
+
+        git clone git@github.com:awst-austria/qa4sm.git
+
+This creates the qa4sm folder. Within this are the webapp folders:
+
+    valentina
+    validator
+
 ## Minimum requirements
 
 - Git client
@@ -11,11 +28,25 @@
 - RabbitMQ (for Celery)
 - Postgres database (instead of SQlite default)
 
+## Integrated Development Envionment
+
+It's up you which Python IDE you want to use for development.
+
+We use Eclipse with PyDev. Since Django templates consist of HTML and JavaScript, the [Eclipse IDE for JavaScript and Web Developers](https://www.eclipse.org/downloads/packages/release/2018-09/r/eclipse-ide-javascript-and-web-developers) can be helpful. If you want to use Eclipse, you should probably check what the latest version is and use that.
+
+To install PyDev, use Eclipse's `Help > Install New Software...` menu and the PyDev update URL `http://www.pydev.org/updates`. [PyDev install manual](http://www.pydev.org/manual_101_install.html).
+
+To add the webapp project to Eclipse, use `File > Import > General > Existing Projects into Workspace` and set the root directory to your qa4sm folder.
+
+In case you don't want to use Eclipse, one alternative is [PyCharm](https://www.jetbrains.com/pycharm/).
+
 ## How to set up development environment
 
-Note: The environment setup is automated for the production environment in [environment/create_conda_env.sh]. This guide describes how to do a similar setup on your development machine. If you suspect this guide is not up to date, check the script and see if it has steps that may be missing here.
+Note: The environment setup is automated for the production environment in [environment/create_conda_env.sh]. This guide describes how to do a similar setup on your development machine. 
 
-If you've got a Linux system, you can also try to run the `create_conda_env.sh` script on your system to create the conda environment. You've got to set 4 shell variables before running the script and point them to 4 directories on your system:
+### Set up using the create_conda_env.sh script
+
+If you've got a Linux system, you can try to run the `create_conda_env.sh` script on your system to create the conda environment. You've got to set 4 shell variables before running the script and point them to 4 directories on your system:
 
     export INSTALL_DIR="<install_dir>"
     export MINICONDA_PATH="<conda_dir>"
@@ -24,11 +55,17 @@ If you've got a Linux system, you can also try to run the `create_conda_env.sh` 
 
 Where `<install_dir>` is the place you want to put the webapp git sandbox, `<conda_dir>` is the place you want to install miniconda, `<tools_dir>` is the place you want to store the downloaded install package of conda, and `<pytenv_dir>` is the place you want to put the conda environment for the webapp.
 
-### Install required development tools
+### Set up without the script
+If using the script does not work, you need to follow the instructions in this guide.#
+
+If you suspect this guide is not up to date, check the script and see if it has steps that may be missing here.
+
+
+## Install required development tools
 
 **Note:** If you don't install Redis and RabbitMQ, you've got to set the corresponding Celery config variable - see "Create webapp configuration file" below.
 
-#### git
+### git
 Ubuntu/Debian:
 
     sudo apt install git
@@ -36,7 +73,7 @@ SUSE:
 
     sudo zypper install git
 
-#### Miniconda
+### Miniconda
 
 Get latest Miniconda (Python 3) from <https://repo.continuum.io/miniconda/>. For 64bit Linux, use <https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh>.
 
@@ -44,9 +81,9 @@ Run installer, e.g.
 
     bash Miniconda3-latest-Linux-x86_64.sh -b -p <MINICONDA_INSTALL_PATH>
 
-### Install optional tools
+## Install optional tools
 
-#### rabbitmq-server
+### rabbitmq-server
 Ubuntu/Debian:
 
     sudo apt install rabbitmq-server
@@ -64,7 +101,7 @@ Start RabbitMQ, e.g. with:
 
     sudo rcrabbitmq-server start
 
-#### redis
+### redis
 
 Ubuntu/Debian:
 
@@ -83,7 +120,7 @@ Start redis, e.g. with:
 
     sudo systemctl restart redis.target
 
-#### Postgresql server
+### Postgresql server
 
 Ubuntu/Debian:
 
@@ -123,7 +160,7 @@ In the qsql shell, run the commands from `[gitrepos]/sql/create_postgres_db.txt`
     ALTER ROLE django SET timezone TO 'UTC';
     GRANT ALL PRIVILEGES ON DATABASE valentina TO django;
 
-### Create conda Python virtual environment
+## Create conda Python virtual environment
 
     conda create --yes -n valentina -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
     source activate valentina
@@ -153,6 +190,7 @@ Install other dependencies into Python environment with pip:
     pip install smap-io
     pip install django-countries
     pip install seaborn
+    pip install ecmwf-models
     pip install --upgrade --force-reinstall netcdf4
 
 Cartopy is also required, however, you first have to accept the use of the deprecated pyproj to get this to work:
@@ -165,21 +203,9 @@ Pytesmo is available via pypi, however, as this is constantly in development and
     pip install git+https://github.com/TUW-GEO/pytesmo.git
     
 
-### Get source code
+## Create webapp configuration file
 
-Check out the QA4SM source code from [GitHub](https://github.com/awst-austria/qa4sm) to create your sandbox.
-
-- Use the following command for anonymous checkout:
-
-        git clone https://github.com/awst-austria/qa4sm.git
-
-- Use the following command if you have your ssh key set up in GitHub already:
-
-        git clone git@github.com:awst-austria/qa4sm.git
-
-### Create webapp configuration file
-
-Change into your sandbox directory and run
+Change into your cloned qa4sm directory and run:
 
     ./init_config.sh dev
 
@@ -193,10 +219,13 @@ Adapt the `valentina/settings_conf.py` to match your local configuration:
 - If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
 - Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
+- Set the `LOG_FILE` location to where you want the log files to be written to.
 
-### Datasets folder
+For the folders specified for the `DATA_FOLDER` and `LOG_FILE` settings, make sure the directories exist in your system, otherwise, the `Init Django` section of this guide will throw an error.
 
-Your datasets folder should have the following structure so that the webapp can find the data:
+## Datasets folder
+
+Your datasets folder should have the following structure so that the webapp can find the data (note this is not all of the datasets available but gives an idea of the folder structure):
 
     ASCAT/ASCAT_H113
         data/xxxx.nc
@@ -216,9 +245,9 @@ Your datasets folder should have the following structure so that the webapp can 
 
 The folders are used in `validator.validation.readers.create_reader` to create the necessary data readers. The general folder structure is `<dataset_name>/<version_name>`, using the names in the webapp database. As always, capitalisation makes a difference ;-)
 
-### Init Django
+## Init Django
 
-Go into webapp folder (if you haven't done so already), e.g.:
+Go into qa4sm folder (if you haven't done so already), e.g.:
 
     cd qa4sm
 
@@ -228,15 +257,19 @@ Set up Django app:
     python manage.py migrate
     python manage.py collectstatic
 
+The first of these will prepare the migration, the second will apply it (and should result in a list of things applied with OK at the end of each line), the third will result in copying of files.
+
 Create admin user for webapp:
 
     python manage.py createsuperuser
 
-Keep note of the username and password you enter here, you'll need it to log into the webapp later.
+Keep note of the username, email and password you enter here, you'll need it to log into the webapp later. This should result in the message "Superuser created successfully."
 
 Populate the database with information about the datasets:
 
     python manage.py loaddata versions variables filters datasets
+
+This should result in the message "Installed x object(s) from y fixture(s)".
 
 ### Start necessary servers
 
@@ -254,39 +287,32 @@ Start a celery worker with the shell script:
 
 ### Run Django development server
 
+Run the following:
+
     python manage.py runserver
 
 Check the output of this command for the URL to point your browser to - e.g. <http://127.0.0.1:8000/>.
 
 Now you should be able to see the landing page. You can log in with the admin user you created in section "Init Django".
 
-You can access the webapp's admin panel you appending "admin/" to the URL, e.g. <http://127.0.0.1:8000/admin/>. There you can create more users by clicking "Add" next to the "Users" row.
+You can access the webapp's admin panel by appending "admin/" to the URL, e.g. <http://127.0.0.1:8000/admin/>. There you can create more users by clicking "Add" next to the "Users" row.
 
-Depending the `LOG_FILE` in your `settings_conf.py` file, the webapp's logfile should be written to `valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
+Depending on the `LOG_FILE` setting in your `settings_conf.py` file, the webapp's logfile should be written to `valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
 
-### Integrated Development Envionment
+If, when you try to log in, it gives a verification failed error, try going to `valentina/settings.py` and commenting out the `CSRF_COOKIE_SECURE` setting. Then log in again. 
 
-It's up you which Python IDE you want to use for development.
+## Webapp walkthrough
 
-We use Eclipse with PyDev. Since Django templates consist of HTML and JavaScript, the [Eclipse IDE for JavaScript and Web Developers](https://www.eclipse.org/downloads/packages/release/2018-09/r/eclipse-ide-javascript-and-web-developers) can be helpful. If you want to use Eclipse, you should probably check what the latest version is and use that.
-
-To install PyDev, use Eclipse's `Help > Install New Software...` menu and the PyDev update URL `http://www.pydev.org/updates`. [PyDev install manual](http://www.pydev.org/manual_101_install.html).
-
-To add the webapp project to Eclipse, use `File > Import > General > Existing Projects into Workspace` and set the root directory to your qa4sm folder.
-
-In case you don't want to use Eclipse, one alternative is [PyCharm](https://www.jetbrains.com/pycharm/).
-
-### Webapp walkthrough
-
-The code for the webapp lives in two submodules of the your qa4sm sandbox: `valentina` and `validator`. The first contains the Django "project", the second the Django "app" - [see here for the Django tutorial that explains projects and apps.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
+The code for the webapp lives in two submodules of the your qa4sm folder: `valentina` and `validator`. The first contains the Django "project", the second the Django "app" - [see here for the Django tutorial that explains projects and apps.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
 
 The `valentina` module exists to conform to the Django structure. It contains mainly configuration in `settings.py`, `settings_conf.py`, `celery.py`. Most of the interesting stuff is happening in the `validator` module.
 
-#### Contents of the validator module
+### Contents of the validator module
 
 Module|Functionality
 --- | ---
 admin|Customisations of the webapp’s admin pages, e.g. controls to activate new users.
+fixtures|Settings relating to the datasets used in the webapp.
 formats|Changes to date formats so that most international date formats are accepted by webapp.
 forms|Python representations of the forms used by the main webapp (not admin forms, those are in admin). HTML templates are in templates, see below.
 management| Customised Django commands that can be passed to `manage.py` on the command line, similar to the standard `runserver` or `makemigration`.
@@ -304,7 +330,7 @@ mailer.py|Email functionality, including (for now) wording of the automatic emai
 metrics.py|Contains the EssentialMetrics class that defines the metrics to be produced by the webapp on validation.
 urls.py|Django specific file containing the mapping of URLs to views.
 
-### How to run integration / unit tests
+## How to run integration / unit tests
 
 Go to to your qa4sm folder and run
 
@@ -328,7 +354,7 @@ Congratulations, your development environment is now set up and you can develop 
 
         pip install --no-use-pep517 cartopy
 
-1. If the compiler complains about `ACCEPT_USE_OF_DEPRECATED_PROJ_API`, define this shell environment variable before running pip
+1. If the compiler complains about `ACCEPT_USE_OF_DEPRECATED_PROJ_API`, define this shell environment variable before running pip. Note that this is also included in the instructions above and in the installation script.
 
         export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
 
