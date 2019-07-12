@@ -435,7 +435,7 @@ class TestValidation(TestCase):
 
     def test_create_jobs(self):
         for dataset in Dataset.objects.all():
-            print(dataset.short_name)
+            self.__logger.info(dataset.short_name)
             vs = dataset.versions.all()
 
             for version in vs:
@@ -522,7 +522,7 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
-#     @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_era_graph(self):
         infile1 = 'testdata/2-ERA.swvl1_with_1-C3S.sm.nc'
 

@@ -4,7 +4,6 @@ import pygeogrids.netcdf  # bugfix
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
-from validator.validation import globals
 from validator.validation.readers import create_reader
 
 
@@ -17,10 +16,7 @@ def create_jobs(validation_run):
 
     # if we've got data on a grid, process one cell at a time
     if isinstance(ref_reader, GriddedBase):
-        if validation_run.reference_configuration.version.short_name == globals.GLDAS_TEST:
-            cells = [1253]
-        else:
-            cells = ref_reader.grid.get_cells()
+        cells = ref_reader.grid.get_cells()
 
         jobs = []
         for cell in cells:
