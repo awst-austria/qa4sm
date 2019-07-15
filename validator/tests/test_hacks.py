@@ -23,13 +23,13 @@ class TestHacks(TestCase):
 
         timezone_reader = TimezoneAdapter(c3s_reader)
 
-        orig_data = c3s_reader.read_ts(567036)
-        data = timezone_reader.read_ts(567036)
+        orig_data = c3s_reader.read_ts(16.366667, 48.2)
+        data = timezone_reader.read_ts(16.366667, 48.2)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
         self.assertTrue(data.index.tz is None)
 
-        orig_data = c3s_reader.read(567036)
-        data = timezone_reader.read(567036)
+        orig_data = c3s_reader.read(16.366667, 48.2)
+        data = timezone_reader.read(16.366667, 48.2)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
         self.assertTrue(data.index.tz is None)
 
