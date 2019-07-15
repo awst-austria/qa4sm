@@ -69,6 +69,7 @@ def save_validation_config(validation_run):
                 ds.val_scaling_ref = 'val_dc_dataset' + str(i)
 
         ds.val_scaling_method=validation_run.scaling_method
+        ds.val_anomalies="35_AVG" if validation_run.anomalies else "N/A"
         ds.close()
     except Exception:
         __logger.exception('Validation configuration could not be stored.')

@@ -138,6 +138,11 @@ class TestValidation(TestCase):
             else:
                 assert ds.val_interval_to == run.interval_to.strftime('%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_to]'
 
+            if(run.anomalies):
+                assert ds.val_anomalies == "35_AVG"
+            else:
+                assert ds.val_anomalies == "N/A"
+
             for d_index, dataset_config in enumerate(run.dataset_configurations.all()):
                 ds_name = 'val_dc_dataset' + str(d_index)
                 stored_dataset = ds.getncattr(ds_name)
