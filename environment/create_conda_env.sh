@@ -71,7 +71,7 @@ fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
 
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
+conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib cartopy
 source activate $PYTHON_ENV_DIR
 
 pip uninstall --yes shapely
@@ -79,7 +79,7 @@ pip install --no-binary :all: shapely
 pip install sqlparse
 pip install pynetcf
 pip install ascat
-pip install pybufr-ecmwf
+# pip install pybufr-ecmwf
 pip install c3s_sm
 pip install esa_cci_sm
 pip install smos
@@ -97,8 +97,8 @@ pip install gldas
 pip install smap-io
 pip install django-countries
 pip install seaborn
-export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
-pip install cartopy
+# export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
+# pip install cartopy
 pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 pip install ismn
