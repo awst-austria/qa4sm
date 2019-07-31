@@ -7,6 +7,7 @@ import uuid
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
+from pytz import UTC
 from django.conf import settings
 from netCDF4 import Dataset
 from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names
@@ -94,7 +95,17 @@ def create_pytesmo_validation(validation_run):
 
     period = None
     if validation_run.interval_from is not None and validation_run.interval_to is not None:
-        period = [validation_run.interval_from, validation_run.interval_to]
+        ## while pytesmo can't deal with timezones, normalise the validation period to utc; can be removed once pytesmo can do timezones
+        startdate = validation_run.interval_from
+        enddate = validation_run.interval_to
+
+        if startdate.tzinfo is not None:
+            startdate = startdate.astimezone(UTC).replace(tzinfo=None)
+
+        if enddate.tzinfo is not None:
+            enddate = enddate.astimezone(UTC).replace(tzinfo=None)
+
+        period = [startdate, enddate]
 
     datamanager = DataManager(datasets, ref_name=ref_name, period=period)
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
