@@ -23,7 +23,7 @@ SMAP = 'SMAP'
 ASCAT = 'ASCAT'
 CCI = 'ESA_CCI_SM_combined'
 SMOS = 'SMOS'
-ERA = 'ERA'
+ERA5 = 'ERA5'
 
 ## dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -35,7 +35,7 @@ GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
 GLDAS_TEST = 'GLDAS_TEST'
 ASCAT_H113 = 'ASCAT_H113'
 ERA5_test = 'ERA5_test'
-ERA5 = 'ERA5'
+ERA5_20190613 = 'ERA5_20190613'
 
 ## dataset data variables
 C3S_sm = 'C3S_sm'
@@ -46,4 +46,4 @@ GLDAS_SoilMoi0_10cm_inst = 'GLDAS_SoilMoi0_10cm_inst'
 GLDAS_SoilMoi10_40cm_inst = 'GLDAS_SoilMoi10_40cm_inst'
 GLDAS_SoilMoi40_100cm_inst = 'GLDAS_SoilMoi40_100cm_inst'
 GLDAS_SoilMoi100_200cm_inst = 'GLDAS_SoilMoi100_200cm_inst'
-ERA_sm = 'ERA_sm'
+ERA5_sm = 'ERA5_sm'
