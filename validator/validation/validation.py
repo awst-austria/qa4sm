@@ -25,7 +25,8 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from pytesmo.validation_framework.data_manager import DataManager
-from pytesmo.validation_framework.adapters import AnomalyAdapter
+from pytesmo.validation_framework.adapters import AnomalyAdapter,\
+    AnomalyClimAdapter
 
 
 __logger = logging.getLogger(__name__)
@@ -70,7 +71,11 @@ def save_validation_config(validation_run):
                 ds.val_scaling_ref = 'val_dc_dataset' + str(i)
 
         ds.val_scaling_method=validation_run.scaling_method
-        ds.val_anomalies="35_AVG" if validation_run.anomalies else "N/A"
+
+        ds.val_anomalies = validation_run.anomalies
+        if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
+            ds.val_anomalies_from = validation_run.anomalies_from.strftime('%Y-%m-%d %H:%M')
+            ds.val_anomalies_to = validation_run.anomalies_to.strftime('%Y-%m-%d %H:%M')
         ds.close()
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
@@ -83,8 +88,11 @@ def create_pytesmo_validation(validation_run):
         reader = create_reader(dataset_config.dataset, dataset_config.version)
         reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.variable)
 
-        if validation_run.anomalies:
+        if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name])
+        if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
+            anomalies_baseline=[validation_run.anomalies_from, validation_run.anomalies_to]
+            reader = AnomalyClimAdapter(reader, columns=[dataset_config.variable.pretty_name], timespan=anomalies_baseline)
 
         dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
         ds_list.append( (dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
@@ -230,7 +238,7 @@ def run_validation(validation_id):
                 if validation_aborted:
                     validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 else:
-                    check_and_store_results(async_result.id, results, save_path)
+                    check_and_store_results(async_result.id, results, run_dir)
                     validation_run.ok_points += num_gpis_from_job(job_table[async_result.id])
 
             except Exception:

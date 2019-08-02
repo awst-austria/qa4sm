@@ -10,6 +10,7 @@ import time
 from zipfile import ZipFile
 
 from django.contrib.auth import get_user_model
+from _datetime import tzinfo
 User = get_user_model()
 
 from dateutil.tz import tzlocal
@@ -30,7 +31,7 @@ from validator.models import ValidationRun
 import validator.validation as val
 from validator.validation.globals import METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-
+from validator.validation import globals
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -138,10 +139,13 @@ class TestValidation(TestCase):
             else:
                 assert ds.val_interval_to == run.interval_to.strftime('%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_to]'
 
-            if(run.anomalies):
-                assert ds.val_anomalies == "35_AVG"
+            assert run.anomalies == ds.val_anomalies, 'Wrong validation config attribute. [anomalies]'
+            if(run.anomalies == ValidationRun.CLIMATOLOGY):
+                assert ds.val_anomalies_from == run.anomalies_from.strftime('%Y-%m-%d %H:%M'), 'Anomalies baseline start wrong'
+                assert ds.val_anomalies_to == run.anomalies_to.strftime('%Y-%m-%d %H:%M'), 'Anomalies baseline end wrong'
             else:
-                assert ds.val_anomalies == "N/A"
+                assert 'val_anomalies_from' not in ds.ncattrs(), 'Anomalies baseline period start should not be set'
+                assert 'val_anomalies_to' not in ds.ncattrs(), 'Anomalies baseline period end should not be set'
 
             for d_index, dataset_config in enumerate(run.dataset_configurations.all()):
                 ds_name = 'val_dc_dataset' + str(d_index)
@@ -274,15 +278,15 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
     @pytest.mark.long_running
-    def test_validation_era_ref(self):
+    def test_validation_era5_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name='ERA')
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name='ERA5_test')
-        run.reference_configuration.variable = DataVariable.objects.get(short_name='ERA_sm')
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_test)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA_TEMP_UNFROZEN'))
+#         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA_TEMP_UNFROZEN'))
         run.reference_configuration.save()
 
         run.interval_from = datetime(2005, 1, 1, tzinfo=UTC)
@@ -292,7 +296,7 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+#                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -368,24 +372,16 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
     @pytest.mark.long_running
-    def test_validation_anomalies(self):
+    def test_validation_anomalies_moving_avg(self):
         run = self.generate_default_validation()
         run.user = self.testuser
-
-        run.anomalies = True
-
-        run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_TEST')
-        run.reference_configuration.variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
-        run.reference_configuration.save()
-
+        run.anomalies = ValidationRun.MOVING_AVG_35_D
         run.save()
 
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.save()
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -397,9 +393,40 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 51
+        assert new_run.total_points == 4
         assert new_run.error_points == 0
-        assert new_run.ok_points == 51
+        assert new_run.ok_points == 4
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    @pytest.mark.long_running
+    def test_validation_anomalies_climatology(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+        run.anomalies = ValidationRun.CLIMATOLOGY
+        # make sure there is data for the climatology time period!
+        run.anomalies_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59, tzinfo=UTC)
+        run.save()
+
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.save()
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run
+        assert new_run.total_points == 4
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 4
         self.check_results(new_run)
         self.delete_run(new_run)
 
