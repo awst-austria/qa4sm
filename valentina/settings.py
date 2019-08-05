@@ -174,6 +174,6 @@ try:
     CSRF_COOKIE_SECURE = not DEBUG
 except NameError:
     CSRF_COOKIE_SECURE = True
-print("Running with CSRF_COOKIE_SECURE = {}".format(CSRF_COOKIE_SECURE))
+# print("Running with CSRF_COOKIE_SECURE = {}".format(CSRF_COOKIE_SECURE))
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
