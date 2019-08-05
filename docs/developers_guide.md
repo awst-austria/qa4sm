@@ -216,7 +216,7 @@ If the `init_conig.sh` doesn't work for you, copy `settings_example_conf.py` int
 Adapt the `valentina/settings_conf.py` to match your local configuration:
 
 - Set `DATA_FOLDER` to the folder where you keep the (geo)data, see the datasets folder section for more info.
-- If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
+- If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True` and `CELERY_TASK_EAGER_PROPAGATES = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
 - Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
 - Set the `LOG_FILE` location to where you want the log files to be written to.
