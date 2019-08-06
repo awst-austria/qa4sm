@@ -49,7 +49,7 @@ def create_reader(dataset, version):
     if dataset.short_name == globals.SMOS:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk':True})
         
-    if dataset.short_name == globals.ERA:
+    if dataset.short_name == globals.ERA5:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})    
 
 

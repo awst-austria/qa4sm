@@ -285,16 +285,18 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
+
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA)
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_test)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA_sm)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-#         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA_TEMP_UNFROZEN'))
+#        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+
         run.reference_configuration.save()
 
         run.interval_from = datetime(2005, 1, 1, tzinfo=UTC)
@@ -644,7 +646,7 @@ class TestValidation(TestCase):
         # create validation object and data folder for it
         v = self.generate_default_validation()
         # scatterplot
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA')
+        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5')
         v.reference_configuration.save()
         run_dir = path.join(OUTPUT_FOLDER, str(v.id))
         val.mkdir_if_not_exists(run_dir)

@@ -176,8 +176,8 @@
 		"model": "validator.dataset",
 		"pk": 8,
 		"fields": {
-			"short_name": "ERA",
-			"pretty_name": "ERA",
+			"short_name": "ERA5",
+			"pretty_name": "ERA5",
 			"help_text": "",
 			"source_reference": "",
 			"citation": "",
