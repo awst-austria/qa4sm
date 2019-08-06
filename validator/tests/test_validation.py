@@ -154,8 +154,16 @@ class TestValidation(TestCase):
                 stored_variable = ds.getncattr('val_dc_variable' + str(d_index))
                 stored_filters = ds.getncattr('val_dc_filters' + str(d_index))
 
+                stored_dataset_pretty = ds.getncattr('val_dc_dataset_pretty_name' + str(d_index))
+                stored_version_pretty = ds.getncattr('val_dc_version_pretty_name' + str(d_index))
+                stored_variable_pretty = ds.getncattr('val_dc_variable_pretty_name' + str(d_index))
+
                 # check dataset, version, variable
-                assert stored_dataset == dataset_config.dataset.short_name, 'Wrong dataset config attribute. [dataset]'
+                assert stored_dataset == dataset_config.dataset.pretty_name, 'Wrong dataset config attribute. [dataset pretty name]'
+                assert stored_version_pretty == dataset_config.version.pretty_name, 'Wrong dataset config attribute. [version pretty name]'
+                assert stored_variable_pretty == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable pretty name]'
+
+                assert stored_dataset_pretty == dataset_config.dataset.short_name, 'Wrong dataset config attribute. [dataset]'
                 assert stored_version == dataset_config.version.short_name, 'Wrong dataset config attribute. [version]'
                 assert stored_variable == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable]'
 
