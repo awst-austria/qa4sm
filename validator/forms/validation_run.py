@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 import django.forms as forms
+from validator.forms import YearChoiceField
 from validator.models import ValidationRun
 
 
@@ -18,16 +19,30 @@ class ValidationRunForm(forms.ModelForm):
             'interval_to',
             'scaling_method',
             'name_tag',
+            'anomalies',
+            'anomalies_from',
+            'anomalies_to',
             ]
 
     scaling_ref = forms.fields.ChoiceField(choices=[(ValidationRun.SCALE_TO_REF, 'Reference'), (ValidationRun.SCALE_TO_DATA, 'Data'), ])
+
+    anomalies_from = YearChoiceField(required=False, is_interval_start=True)
+    anomalies_to = YearChoiceField(required=False, is_interval_start=False)
 
     def __init__(self, *args, **kwargs):
         super(ValidationRunForm, self).__init__(*args, **kwargs)
         ## Specifiy the fields of the model that are OPTIONAL in the form:
         self.fields['interval_from'].required = False
         self.fields['interval_to'].required = False
+        self.fields['anomalies'].required = False
 
         ## give default/initial values to widgets
         self.fields['interval_from'].initial = datetime(1978, 1, 1).strftime('%Y-%m-%d')
         self.fields['interval_to'].initial = datetime.now().strftime('%Y-%m-%d')
+
+    def clean(self):
+        values = super(ValidationRunForm, self).clean()
+        if(('anomalies' in values) and (values['anomalies'] != ValidationRun.CLIMATOLOGY)):
+            values['anomalies_from'] = None
+            values['anomalies_to'] = None
+        return values

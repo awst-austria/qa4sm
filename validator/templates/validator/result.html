@@ -59,6 +59,18 @@
                             </ul>
                         </li>
 
+                        {% if val.anomalies != 'none' %}
+                            <li>Validation metrics calculated from anomalies
+                                {% if val.anomalies == 'climatology' %}
+                                    against climatology computed on years {{ val.anomalies_from|date:"Y" }} through {{ val.anomalies_to|date:"Y" }}.
+                                {% elif val.anomalies == 'moving_avg_35_d' %}
+                                    against 35 day moving average.
+                                {% endif %}
+                            </li>
+                        {% else %}
+                            <li>Validation metrics calculated from absolute values.</li>
+                        {% endif %}
+
                         <li>Processing took {{ run_time }} minutes (wall time).</li>
                         {% if val.interval_from and val.interval_to %}
                             <li>Validation period / temporal filter: {{ val.interval_from }} to {{ val.interval_to }}.</li>

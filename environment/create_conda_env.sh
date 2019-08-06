@@ -100,26 +100,11 @@ pip install seaborn
 # export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
 # pip install cartopy
 pip install --upgrade --force-reinstall netcdf4
-pip install pytesmo
+# pip install pytesmo
+pip install git+https://github.com/TUW-GEO/pytesmo.git
 pip install ismn
 
 cd $TEMP_DIR
-
-# git clone -b master --single-branch https://github.com/TUW-GEO/ismn.git
-# cd ismn
-# rm requirements.txt
-# touch requirements.txt
-# python setup.py install
-# cd $TEMP_DIR
-# rm -rf ismn
-#
-# git clone -b master --single-branch https://github.com/TUW-GEO/pytesmo.git
-# cd pytesmo
-# rm requirements.txt
-# touch requirements.txt
-# python setup.py install
-# cd $TEMP_DIR
-# rm -rf pytesmo
 
 #Clone the  web validation service repo
 echo "Checking out code from branch $VALENTINA_BRANCH to $INSTALL_DIR"

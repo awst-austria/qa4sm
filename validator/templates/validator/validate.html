@@ -90,7 +90,7 @@
 
                                         <hr/>
 
-                                        <div class="custom-control custom-checkbox">
+                                        <div class="custom-control custom-switch">
                                             <input class="custom-control-input" id="{{dc_form.filter_dataset.auto_id}}" name="{{dc_form.prefix}}-{{dc_form.filter_dataset.name}}"
                                                 {{ dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this)">
                                             <label class="custom-control-label" for="{{dc_form.filter_dataset.auto_id}}">{{dc_form.filter_dataset.label}}</label>
@@ -162,7 +162,7 @@
 
                                 <hr/>
 
-                                <div class="custom-control custom-checkbox">
+                                <div class="custom-control custom-switch">
                                     <input class="custom-control-input" id="{{ref_dc_form.filter_dataset.auto_id}}" name="{{ref_dc_form.prefix}}-{{ref_dc_form.filter_dataset.name}}"
                                         {{ ref_dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
                                     <label class="custom-control-label" for="{{ref_dc_form.filter_dataset.auto_id}}">{{ref_dc_form.filter_dataset.label}}</label>
@@ -172,6 +172,70 @@
 
                                 <div id="id_{{ref_dc_form.prefix}}-filters" class="indented">
                                     {{ ref_dc_form.filters }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-deck">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Anomalies</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="Optionally calculate metrics from anomalies instead of absolute values. For anomalies against climatology you have to specify the time period over which the climatology is computed."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="container">
+                                    <div class="column">
+
+                                        <div class="row">
+
+                                            <div class="col-sm pl-0">
+                                                <div class="input-group" title="Anomalies calculation method: no anomalies, anomalies against 35 day moving average or anomalies against a climatology calculated from the given timespan.">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
+                                                    </div>
+                                                    {% render_field val_form.anomalies class="custom-select d-block" %}
+                                                </div>
+                                                {% for error in val_form.anomalies.errors %}
+                                                    <div class="custom-invalid-feedback">
+                                                        {{ error }}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <div class="col-sm anomalies-period"> <!-- style="visibility: hidden;" -->
+                                                <div class="input-group" title="Start of period to calculate climatology from.">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text addon-w" id="scaling_addon2">From</span>
+                                                    </div>
+                                                    {% render_field val_form.anomalies_from class="custom-select d-block" %}
+                                                </div>
+                                                {% for error in val_form.anomalies_from.errors %}
+                                                    <div class="custom-invalid-feedback">
+                                                        {{ error }}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                            <div class="col-sm pr-0 anomalies-period"> <!--  style="visibility: hidden;" -->
+                                                <div class="input-group" title="End of period to calculate climatology from.">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text addon-w" id="scaling_addon2">To</span>
+                                                    </div>
+                                                    {% render_field val_form.anomalies_to class="custom-select d-block" %}
+                                                </div>
+                                                {% for error in val_form.anomalies_to.errors %}
+                                                    <div class="custom-invalid-feedback">
+                                                        {{ error }}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -339,6 +403,23 @@
             $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
         {% endfor %}
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
+    </script>
+
+    <script type="text/javascript">
+        function onChangeAnomalies() {
+            var anomMethod = $(this).val();
+            var dateBoxes = $('div.anomalies-period');
+            var dateSelectors = dateBoxes.find('select')
+
+            if(anomMethod == 'climatology') {
+                dateSelectors.prop('disabled', false);
+                dateBoxes.css('visibility', 'visible');
+            } else {
+                dateSelectors.prop('disabled', true);
+                dateBoxes.css('visibility', 'hidden');
+            }
+        }
+        $('#{{ val_form.anomalies.auto_id }}').change(onChangeAnomalies).change(); // last change() to call change on pageload
     </script>
 
     <script type="text/javascript">

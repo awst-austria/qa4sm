@@ -10,6 +10,7 @@ import time
 from zipfile import ZipFile
 
 from django.contrib.auth import get_user_model
+from _datetime import tzinfo
 User = get_user_model()
 
 from dateutil.tz import tzlocal
@@ -137,6 +138,14 @@ class TestValidation(TestCase):
                 assert ds.val_interval_to == "N/A", 'Wrong validation config attribute. [interval_to]'
             else:
                 assert ds.val_interval_to == run.interval_to.strftime('%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_to]'
+
+            assert run.anomalies == ds.val_anomalies, 'Wrong validation config attribute. [anomalies]'
+            if(run.anomalies == ValidationRun.CLIMATOLOGY):
+                assert ds.val_anomalies_from == run.anomalies_from.strftime('%Y-%m-%d %H:%M'), 'Anomalies baseline start wrong'
+                assert ds.val_anomalies_to == run.anomalies_to.strftime('%Y-%m-%d %H:%M'), 'Anomalies baseline end wrong'
+            else:
+                assert 'val_anomalies_from' not in ds.ncattrs(), 'Anomalies baseline period start should not be set'
+                assert 'val_anomalies_to' not in ds.ncattrs(), 'Anomalies baseline period end should not be set'
 
             for d_index, dataset_config in enumerate(run.dataset_configurations.all()):
                 ds_name = 'val_dc_dataset' + str(d_index)
@@ -269,7 +278,7 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
 
-
+    @pytest.mark.long_running
     def test_validation_era5_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
@@ -278,7 +287,8 @@ class TestValidation(TestCase):
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_test)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-#         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+#        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+
         run.reference_configuration.save()
 
         run.interval_from = datetime(2005, 1, 1, tzinfo=UTC)
@@ -306,9 +316,6 @@ class TestValidation(TestCase):
         assert new_run.ok_points == 400, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
-
-
-
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
     @pytest.mark.long_running
@@ -360,6 +367,65 @@ class TestValidation(TestCase):
         ## fetch results from db
         new_run = ValidationRun.objects.get(pk=run_id)
 
+        assert new_run.total_points == 4
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 4
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    @pytest.mark.long_running
+    def test_validation_anomalies_moving_avg(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+        run.anomalies = ValidationRun.MOVING_AVG_35_D
+        run.save()
+
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.save()
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run
+        assert new_run.total_points == 4
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 4
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    @pytest.mark.long_running
+    def test_validation_anomalies_climatology(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+        run.anomalies = ValidationRun.CLIMATOLOGY
+        # make sure there is data for the climatology time period!
+        run.anomalies_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59, tzinfo=UTC)
+        run.save()
+
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.save()
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run
         assert new_run.total_points == 4
         assert new_run.error_points == 0
         assert new_run.ok_points == 4
@@ -593,5 +659,5 @@ class TestValidation(TestCase):
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
 
-        # remove results 
+        # remove results
         shutil.rmtree(run_dir)

@@ -225,6 +225,10 @@ class TestViews(TransactionTestCase):
             'ref_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
             'ref_filters': DataFilter.objects.get(name='FIL_ISMN_GOOD').id,
 
+            'anomalies' : ValidationRun.CLIMATOLOGY,
+            'anomalies_from' : '1978',
+            'anomalies_to' : '1998',
+
             'interval_from': datetime(1978,1,1),
             'interval_to': datetime(1998,1,1),
 

@@ -46,6 +46,7 @@ if [ "x$ENV" == "xjenkins" ]; then
     DEBUGFLAG="True"
     SSL_SECURITY=""
     DATA_FOLDER="/data/qa4sm/data/"
+    DBSM="sqlite"
 fi
 
 if [ "x$ENV" == "xdev" ]; then

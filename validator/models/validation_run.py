@@ -32,6 +32,16 @@ class ValidationRun(models.Model):
     SCALE_TO_REF = 'ref'
     SCALE_TO_DATA = 'data'
 
+    ## anomalies
+    MOVING_AVG_35_D = "moving_avg_35_d"
+    CLIMATOLOGY = "climatology"
+    NO_ANOM = "none"
+    ANOMALIES_METHODS = (
+        (NO_ANOM, 'don\'t calculate'),
+        (MOVING_AVG_35_D, '35 day moving average'),
+        (CLIMATOLOGY, 'climatology'),
+        )
+
     ## fields
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -45,14 +55,18 @@ class ValidationRun(models.Model):
     progress = models.IntegerField(default=0)
 
     reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='ref_validation_run', null=True)
-    
+
     scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='scaling_ref_validation_run', null=True)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
+    anomalies = models.CharField(max_length=20, choices=ANOMALIES_METHODS, default=NO_ANOM)
+    # only applicable if anomalies with climatology is selected
+    anomalies_from = models.DateTimeField(null=True)
+    anomalies_to = models.DateTimeField(null=True)
 
     output_file = models.FileField(null=True, max_length=250)
-    
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
@@ -65,6 +79,16 @@ class ValidationRun(models.Model):
         if self.interval_from is not None and self.interval_to is not None and self.interval_from > self.interval_to:
             raise ValidationError({'interval_from': 'From must be before To',
                                    'interval_to': 'From must be before To',})
+
+        if self.anomalies == self.CLIMATOLOGY:
+            if self.anomalies_from is None or self.anomalies_to is None:
+                raise ValidationError({'anomalies': 'Need valid time period to calculate climatology from.',})
+            if self.anomalies_from > self.anomalies_to:
+                raise ValidationError({'anomalies_from': 'Start of climatology period must be before end.',
+                                       'anomalies_to': 'Start of climatology period must be before end.',})
+        else:
+            if self.anomalies_from is not None or self.anomalies_to is not None:
+                raise ValidationError({'anomalies': 'Time period makes no sense for anomalies calculation without climatology.',})
 
     def __str__(self):
         return "id: {}, user: {}, start: {} )".format(self.id, self.user, self.start_time)
