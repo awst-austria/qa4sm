@@ -154,10 +154,18 @@ class TestValidation(TestCase):
                 stored_variable = ds.getncattr('val_dc_variable' + str(d_index))
                 stored_filters = ds.getncattr('val_dc_filters' + str(d_index))
 
+                stored_dataset_pretty = ds.getncattr('val_dc_dataset_pretty_name' + str(d_index))
+                stored_version_pretty = ds.getncattr('val_dc_version_pretty_name' + str(d_index))
+                stored_variable_pretty = ds.getncattr('val_dc_variable_pretty_name' + str(d_index))
+
                 # check dataset, version, variable
                 assert stored_dataset == dataset_config.dataset.short_name, 'Wrong dataset config attribute. [dataset]'
                 assert stored_version == dataset_config.version.short_name, 'Wrong dataset config attribute. [version]'
                 assert stored_variable == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable]'
+
+                assert stored_dataset_pretty == dataset_config.dataset.pretty_name, 'Wrong dataset config attribute. [dataset pretty name]'
+                assert stored_version_pretty == dataset_config.version.pretty_name, 'Wrong dataset config attribute. [version pretty name]'
+                assert stored_variable_pretty == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable pretty name]'
 
                 # check filters
                 if not dataset_config.filters.all():
@@ -629,35 +637,3 @@ class TestValidation(TestCase):
         assert len(overview_pngs) == 8 * (v.dataset_configurations.count() - 1)
 
         self.delete_run(v)
-
-    @pytest.mark.long_running
-    def test_era_graph(self):
-        infile1 = 'testdata/2-ERA.swvl1_with_1-C3S.sm.nc'
-
-
-        # create validation object and data folder for it
-        v = self.generate_default_validation()
-        # scatterplot
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5')
-        v.reference_configuration.save()
-        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
-        val.mkdir_if_not_exists(run_dir)
-
-        # copy our netcdf data file there and link it in the validation object
-        # then generate the graphs
-
-        shutil.copy(infile1, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        v.save()
-        val.generate_all_graphs(v, run_dir)
-
-        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
-        self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
-
-        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
-
-        # remove results
-        shutil.rmtree(run_dir)
