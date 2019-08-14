@@ -61,6 +61,10 @@ class ValidationRun(models.Model):
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
     anomalies = models.CharField(max_length=20, choices=ANOMALIES_METHODS, default=NO_ANOM)
+    min_lat = models.FloatField(null=True)
+    min_lon = models.FloatField(null=True)
+    max_lat = models.FloatField(null=True)
+    max_lon = models.FloatField(null=True)
     # only applicable if anomalies with climatology is selected
     anomalies_from = models.DateTimeField(null=True)
     anomalies_to = models.DateTimeField(null=True)
