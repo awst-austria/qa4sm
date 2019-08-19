@@ -37,11 +37,15 @@
         </ul>
 
         <ul class="navbar-nav">
+        	{% url 'datasets' as datasets_url %}
             {% url 'about' as about_url %}
             {% url 'terms' as terms_url %}
             {% url 'help' as help_url %}
             {% url 'user_profile' as user_profile_url %}
 
+            <li class="nav-item">
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == datasets_url %} navbar-btn-active {% endif %}" href="{{ datasets_url }}">Datasets</a>
+            </li>
             <li class="nav-item">
                 <a class="navbar-btn btn btn-outline-primary {% if request.path == about_url %} navbar-btn-active {% endif %}" href="{{ about_url }}">About</a>
             </li>
