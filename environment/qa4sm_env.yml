@@ -141,7 +141,7 @@ dependencies:
     - pygeobase==0.3.18
     - pygeogrids==0.2.5
     - pynetcf==0.1.18
-    - pytesmo==0.7.0.post0.dev19+ng00cf9f9
+    - pytesmo==0.7.0
     - pytest-cov==2.7.1
     - pytest-django==3.5.1
     - pytest-mpl==0.10
