@@ -10,7 +10,7 @@ import time
 from zipfile import ZipFile
 
 from django.contrib.auth import get_user_model
-from _datetime import tzinfo
+from validator.validation.batches import _geographic_subsetting
 User = get_user_model()
 
 from dateutil.tz import tzlocal
@@ -574,6 +574,39 @@ class TestValidation(TestCase):
                 print(len(jobs))
                 print(total_points)
                 self._check_jobs(total_points, jobs)
+
+    def test_geographic_subetting(self):
+        # austria bounding box
+        min_lat = 9.48
+        min_lon = 46.43
+        max_lat = 16.98
+        max_lon = 49.04
+
+        # we need the reader just to get the grid
+        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
+        gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+
+        subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+
+        assert len(subgpis) > 100
+        assert len(sublats) == len(subgpis)
+        assert len(sublons) == len(subgpis)
+
+        assert not np.any(sublats > max_lat), "subsetting error: max_lat"
+        assert not np.any(sublats < min_lat), "subsetting error: min_lat"
+        assert not np.any(sublons > max_lon), "subsetting error: max_lon"
+        assert not np.any(sublons < min_lon), "subsetting error: min_lon"
+
+    def test_no_geographic_subetting(self):
+        # we need the reader just to get the grid
+        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
+        gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+
+        subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, None, None, None, None)
+
+        assert np.array_equal(gpis, subgpis)
+        assert np.array_equal(lats, sublats)
+        assert np.array_equal(lons, sublons)
 
     def test_mkdir_exception(self):
         with pytest.raises(PermissionError):
