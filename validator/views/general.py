@@ -18,6 +18,3 @@ def terms(request):
 
 def datasets(request):
     return render(request, 'validator/datasets.html')
-
-def about(request):
-    return render(request, 'validator/about.html')
