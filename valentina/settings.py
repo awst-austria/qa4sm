@@ -177,3 +177,4 @@ except NameError:
 # print("Running with CSRF_COOKIE_SECURE = {}".format(CSRF_COOKIE_SECURE))
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
+APP_VERSION = '1.0.0'
