@@ -1,0 +1,17 @@
+#!/bin/sh
+
+VERSIONFILE="version.txt"
+
+CHANGED=$(git diff --name-only HEAD^1 HEAD | grep $VERSIONFILE)
+
+if [ "x$CHANGED" != "x" ]; then
+	GDIR=$(git rev-parse --git-dir)
+	VERSIONPATH="$GDIR/../$VERSIONFILE"
+	VERSION=$(cat $VERSIONPATH)
+	DATE=$(date "+%F")
+
+	echo "**************************************************************"
+	echo "You've commited a change to $VERSIONFILE. PLEASE IMMEDIATELY TAG YOUR NEW VERSION with:"
+	echo "git tag -a $VERSION -m \"Version $VERSION, created $DATE\""
+	echo "**************************************************************"
+fi
