@@ -286,23 +286,21 @@
                         </div>
                     </div>
                     
-                    ddd
                     <div class="card-deck">
                         <div class="card mb-4 shadow-sm">
                             <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Spatial subsetting</h4>
+                                <h4 class="my-0 font-weight-normal">Spatial Subsetting</h4>
                                 <span class="input-group-text fas fa-question-circle help-icon"
                                     title="Restricts the input and reference data to the bounding box given."></span>
                             </div>
                             <div class="card-body">
-
                                 <div class="container">
                                     <div class="row">
 
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Min. lat</span>
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">Lower left lat</span>
                                                 </div>
                                                 {% render_field val_form.min_lat class="custom-select d-block" %}
                                             </div>
@@ -316,7 +314,7 @@
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Max. lat</span>
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">Upper right lat </span>
                                                 </div>
                                                 {% render_field val_form.max_lat class="custom-select d-block" %}
                                             </div>
@@ -330,11 +328,10 @@
                                     </div>
                                     
                                     <div class="row">
-
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Min. lon</span>
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">Lower left long</span>
                                                 </div>
                                                 {% render_field val_form.min_lon class="custom-select d-block" %}
                                             </div>
@@ -348,7 +345,7 @@
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Max. lon</span>
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">Upper right long</span>
                                                 </div>
                                                 {% render_field val_form.max_lon class="custom-select d-block" %}
                                             </div>
@@ -358,12 +355,63 @@
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                        
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer">
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
+                                Select on map
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-deck">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header">
+                                <h4 class="my-0 font-weight-normal">Validation Period</h4>
+                                <span class="input-group-text fas fa-question-circle help-icon"
+                                    title="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval."></span>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="container">
+                                    <div class="row">
+
+                                        <div class="col-sm pl-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="scaling_addon1">From</span>
+                                                </div>
+                                                {% render_field val_form.interval_from class="custom-select d-block" %}
+                                            </div>
+                                            {% for error in val_form.interval_from.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="col-sm pr-0">
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text addon-w" id="scaling_addon2">To</span>
+                                                </div>
+                                                {% render_field val_form.interval_to class="custom-select d-block" %}
+                                            </div>
+                                            {% for error in val_form.interval_to.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
                     
 
                     <div class="card-deck">
@@ -433,9 +481,100 @@
             {% endif %}
         {% endwith %}
     </form>
+    
+    
+<div class="modal" id="mapDialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">Select bounding box</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+       <div style="width: 760px; height: 400px;" id="spatialFilterMap"></div>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button id="setCoordinatesButton" type="button" onclick="setCoordinates()" class="btn btn-primary" id="useCoordinatesButton" data-dismiss="modal">Use coordinates</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>    
 {% endblock %}
 
 {% block javascript %}
+    <link rel="stylesheet" href="/static/leaflet/leaflet.css" />
+    <script src="/static/leaflet/leaflet.js"></script>
+    <link rel="stylesheet" href="/static/leaflet/leaflet.draw.css" />
+    <script src="/static/leaflet/leaflet.draw.js"></script>
+
+    <script type="text/javascript">
+		var map = L.map('spatialFilterMap');
+		var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+		var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+		var osm = new L.TileLayer(osmUrl, {minZoom: 1, maxZoom: 20, attribution: osmAttrib});
+		var drawnItems = new L.FeatureGroup();
+
+		map.addLayer(drawnItems);
+
+		var drawControl = new L.Control.Draw({
+				draw: {
+        		polygon: false,
+        		polyline: false,
+        		circle: false,
+        		circlemarker: false,
+        		marker: false
+    		},
+    		edit: {
+        		featureGroup: drawnItems
+    		}
+		});
+		map.addControl(drawControl);
+
+		function setCoordinates(){
+			coordinates=drawnItems.getLayers()[0].getLatLngs();
+
+			$('#id_min_lat').val(coordinates[0][0].lat);
+			$('#id_min_lon').val(coordinates[0][0].lng);
+
+			$('#id_max_lat').val(coordinates[0][2].lat);
+			$('#id_max_lon').val(coordinates[0][2].lng);
+		}
+
+		map.on('draw:created', function (e) {
+    		var type = e.layerType,
+        	layer = e.layer;
+
+    		if (type === 'rectangle') {
+        		layer.on('mouseover', function() {
+            	//alert(layer.getLatLngs());     
+        		});
+    		}
+
+	    	drawnItems.addLayer(layer);
+	    	$('#setCoordinatesButton').prop('disabled', false);
+		});
+
+
+		$('#mapDialog').on('show.bs.modal', function(){
+	  		setTimeout(function() {		  
+	    		map.invalidateSize();
+	    		$('#setCoordinatesButton').prop('disabled', true);
+	    		drawnItems.clearLayers();
+	  		}, 10);
+	 	});
+
+		map.setView(new L.LatLng(51.3, 32.0),3.4);
+		map.addLayer(osm);
+	</script>
+    
     <script type="text/javascript">
         function toggleFiltering(checkbox) {
             var groupId = checkbox.id.replace(/filter_dataset$/, 'filters')
