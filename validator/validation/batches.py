@@ -20,12 +20,6 @@ def create_jobs(validation_run):
     jobs = []
     total_points = 0
 
-    ## TODO: take values from validation_run object!
-    min_lat = 0
-    min_lon = 0
-    max_lat = 90
-    max_lon = 90
-
     ref_reader = create_reader(validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
     ref_reader = ref_reader.reader
 
@@ -37,7 +31,7 @@ def create_jobs(validation_run):
         for cell in cells:
             gpis, lons, lats = ref_reader.grid.grid_points_for_cell(cell)
 
-            gpis, lats, lons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+            gpis, lats, lons = _geographic_subsetting(gpis, lats, lons, validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
 
             if isinstance(gpis, np.ma.MaskedArray):
                 gpis = gpis.compressed()
@@ -62,7 +56,7 @@ def create_jobs(validation_run):
             lats = net_data['latitude']
             gpis = ids[net_ids]
 
-            gpis, lats, lons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+            gpis, lats, lons = _geographic_subsetting(gpis, lats, lons,  validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
 
             if len(gpis) > 0:
                 jobs.append((gpis, lons, lats))
