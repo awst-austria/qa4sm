@@ -584,9 +584,9 @@ class TestValidation(TestCase):
 
         # we need the reader just to get the grid
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
-        gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+        gpis, lons, lats, cells = c3s_reader.reader.grid.get_grid_points()
 
-        subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+        subgpis, sublons, sublats = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
 
         assert len(subgpis) > 100
         assert len(sublats) == len(subgpis)
@@ -607,6 +607,51 @@ class TestValidation(TestCase):
         assert np.array_equal(gpis, subgpis)
         assert np.array_equal(lats, sublats)
         assert np.array_equal(lons, sublons)
+
+    def test_geographic_subetting_across_dateline(self):
+        test_coords = [(-34.30, -221.13, 80.17, -111.44), # dateline left
+                       (-58.81, 127.61, 77.15, 256.99) # dateline right
+                       ]
+
+        russia_gpi = 898557
+        russia_gpi2 = 898567
+
+        for min_lat, min_lon, max_lat, max_lon in test_coords:
+            c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
+            gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+
+            subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+
+            assert len(subgpis) > 100
+            assert len(sublats) == len(subgpis)
+            assert len(sublons) == len(subgpis)
+            assert russia_gpi in subgpis
+            assert russia_gpi2 in subgpis
+
+    def test_geographic_subsetting_shifted(self):
+        ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
+        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
+        gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+
+        test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1), # americas
+                       (9.79, -710.50, 70.14, -545.27, 2), #asia
+                       (-55.37, 1303.24, 68.39, 1415.03, 1), # americas
+                       (7.01, 1473.39, 68.39, 1609.80, 2), # asia
+                       ]
+
+        panama_gpi = 566315
+        india_gpi = 683588
+
+        for min_lat, min_lon, max_lat, max_lon, area in test_coords:
+            subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+
+            assert len(subgpis) > 100
+            assert len(sublats) == len(subgpis)
+            assert len(sublons) == len(subgpis)
+            if area == 1:
+                assert panama_gpi in subgpis
+            elif area == 2:
+                assert india_gpi in subgpis
 
     def test_mkdir_exception(self):
         with pytest.raises(PermissionError):

@@ -7,14 +7,41 @@ from pygeobase.io_base import GriddedBase
 from validator.validation.readers import create_reader
 
 # very basic geographic subsetting with only a bounding box. simple should also be quick :-)
-def _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon):
+def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon):
     if (min_lat is not None and min_lon is not None and max_lat is not None and max_lon is not None) :
-        index = np.where((lats <= max_lat) & (lats >= min_lat) & (lons <= max_lon) & (lons >= min_lon))
+
+        # shift back to "normal" coordinates if shifted to the right
+        if (min_lon > 180.0):
+            shift = round(min_lon / 360.0) * 360.0
+            min_lon -= shift
+            max_lon -= shift
+
+        # shift back to "normal" coordinates if shifted to the left
+        if (max_lon < -180.0):
+            shift = round(max_lon / -360.0) * 360.0
+            min_lon += shift
+            max_lon += shift
+
+        ## handle special case of bounding box across antimeridian
+        if((max_lon > 180.0) or (min_lon < -180.0) ):
+            if(max_lon > 180.0):
+                new_min_lon = min_lon
+                new_max_lon = max_lon - 360.0
+            if(min_lon < -180.0):
+                new_min_lon = min_lon + 360.0
+                new_max_lon = max_lon
+
+            index = np.where(((lats <= max_lat) & (lats >= min_lat) & (lons <= 180.0) & (lons >= new_min_lon)) |
+                             ((lats <= max_lat) & (lats >= min_lat) & (lons <= new_max_lon) & (lons >= -180.0)))
+        ## handle "normal" case of bounding box not across antimeridian
+        else:
+            index = np.where((lats <= max_lat) & (lats >= min_lat) & (lons <= max_lon) & (lons >= min_lon))
+
         gpis = gpis[index]
         lats = lats[index]
         lons = lons[index]
 
-    return gpis, lats, lons
+    return gpis, lons, lats, index
 
 def create_jobs(validation_run):
     jobs = []
@@ -31,7 +58,7 @@ def create_jobs(validation_run):
         for cell in cells:
             gpis, lons, lats = ref_reader.grid.grid_points_for_cell(cell)
 
-            gpis, lats, lons = _geographic_subsetting(gpis, lats, lons, validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
+            gpis, lons, lats, index = _geographic_subsetting(gpis, lats, lons, validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
 
             if isinstance(gpis, np.ma.MaskedArray):
                 gpis = gpis.compressed()
@@ -56,7 +83,7 @@ def create_jobs(validation_run):
             lats = net_data['latitude']
             gpis = ids[net_ids]
 
-            gpis, lats, lons = _geographic_subsetting(gpis, lats, lons,  validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
+            gpis, lons, lats, index = _geographic_subsetting(gpis, lats, lons,  validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
 
             if len(gpis) > 0:
                 jobs.append((gpis, lons, lats))
