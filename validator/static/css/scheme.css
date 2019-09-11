@@ -100,6 +100,22 @@ a:hover {
     color: #ffffff;
 }
 
+.modal-header {
+    padding: .5rem 1.25rem;
+    background-color: #00AAE3;
+    color: #ffffff;
+}
+
+.modal-header .close {
+    color: #ffffff;
+    opacity: .9;
+}
+
+.modal-header .close:not(:disabled):not(.disabled):focus,
+.modal-header .close:not(:disabled):not(.disabled):hover {
+    opacity: 1;
+}
+
 .input-group-text {
     background-color: #00AAE3;
     color: #ffffff;
