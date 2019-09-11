@@ -244,51 +244,6 @@
                     <div class="card-deck">
                         <div class="card mb-4 shadow-sm">
                             <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Validation Period</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval."></span>
-                            </div>
-                            <div class="card-body">
-
-                                <div class="container">
-                                    <div class="row">
-
-                                        <div class="col-sm pl-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">From</span>
-                                                </div>
-                                                {% render_field val_form.interval_from class="custom-select" %}
-                                            </div>
-                                            {% for error in val_form.interval_from.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div class="col-sm pr-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon2">To</span>
-                                                </div>
-                                                {% render_field val_form.interval_to class="custom-select" %}
-                                            </div>
-                                            {% for error in val_form.interval_to.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-deck">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
                                 <h4 class="my-0 font-weight-normal">Spatial Subsetting</h4>
                                 <span class="input-group-text fas fa-question-circle help-icon"
                                     title="Restricts the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on the map by clicking on the globe button."></span>
@@ -504,7 +459,7 @@
         map.addLayer(drawnItems);
 
         var drawControl = new L.Control.Draw({
-                draw: {
+            draw: {
                 polygon: false,
                 polyline: false,
                 circle: false,
