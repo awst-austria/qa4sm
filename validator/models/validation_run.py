@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from validator.models import DatasetConfiguration
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class ValidationRun(models.Model):
@@ -61,9 +62,9 @@ class ValidationRun(models.Model):
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
     anomalies = models.CharField(max_length=20, choices=ANOMALIES_METHODS, default=NO_ANOM)
-    min_lat = models.FloatField(null=True)
+    min_lat = models.FloatField(null=True, validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)])
     min_lon = models.FloatField(null=True)
-    max_lat = models.FloatField(null=True)
+    max_lat = models.FloatField(null=True, validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)])
     max_lon = models.FloatField(null=True)
     # only applicable if anomalies with climatology is selected
     anomalies_from = models.DateTimeField(null=True)
@@ -76,6 +77,8 @@ class ValidationRun(models.Model):
     # celery_tasks from CeleryTask
 
     def clean(self):
+        super(ValidationRun, self).clean()
+
         if self.interval_from is None and self.interval_to is not None:
             raise ValidationError({'interval_from': 'What has an end must have a beginning.',})
         if self.interval_from is not None and self.interval_to is None:
@@ -93,6 +96,14 @@ class ValidationRun(models.Model):
         else:
             if self.anomalies_from is not None or self.anomalies_to is not None:
                 raise ValidationError({'anomalies': 'Time period makes no sense for anomalies calculation without climatology.',})
+
+        box = {'min_lat': self.min_lat, 'min_lon': self.min_lon, 'max_lat': self.max_lat, 'max_lon': self.max_lon}
+        if (any(x is None for x in box.values()) and any(x is not None for x in box.values())):
+            affected_fields = {}
+            for key, value in box.items():
+                if value is None:
+                    affected_fields[key] = 'For spatial subsetting, please set all bounding box coordinates.'
+            raise ValidationError(affected_fields)
 
     def __str__(self):
         return "id: {}, user: {}, start: {} )".format(self.id, self.user, self.start_time)
