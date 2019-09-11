@@ -51,7 +51,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
                                                 </div>
-                                                {% render_field dc_form.dataset class="custom-select d-block" %}
+                                                {% render_field dc_form.dataset class="custom-select" %}
                                             </div>
                                             {% for error in dc_form.dataset.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -65,7 +65,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="data-addon2">Version</span>
                                                 </div>
-                                                {% render_field dc_form.version class="custom-select d-block" %}
+                                                {% render_field dc_form.version class="custom-select" %}
                                             </div>
                                             {% for error in dc_form.version.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -79,7 +79,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="data-addon3">Variable</span>
                                                 </div>
-                                                {% render_field dc_form.variable class="custom-select d-block" %}
+                                                {% render_field dc_form.variable class="custom-select" %}
                                             </div>
                                             {% for error in dc_form.variable.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -123,7 +123,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon1">Dataset</span>
                                         </div>
-                                        {% render_field ref_dc_form.dataset class="custom-select d-block" %}
+                                        {% render_field ref_dc_form.dataset class="custom-select" %}
                                     </div>
                                     {% for error in ref_dc_form.dataset.errors %}
                                         <div class="custom-invalid-feedback">
@@ -137,7 +137,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon2">Version</span>
                                         </div>
-                                        {% render_field ref_dc_form.version class="custom-select d-block" %}
+                                        {% render_field ref_dc_form.version class="custom-select" %}
                                     </div>
                                     {% for error in ref_dc_form.version.errors %}
                                         <div class="custom-invalid-feedback">
@@ -151,7 +151,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text addon-w" id="ref-addon3">Variable</span>
                                         </div>
-                                        {% render_field ref_dc_form.variable class="custom-select d-block" %}
+                                        {% render_field ref_dc_form.variable class="custom-select" %}
                                     </div>
                                     {% for error in ref_dc_form.variable.errors %}
                                         <div class="custom-invalid-feedback">
@@ -196,7 +196,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
                                                     </div>
-                                                    {% render_field val_form.anomalies class="custom-select d-block" %}
+                                                    {% render_field val_form.anomalies class="custom-select" %}
                                                 </div>
                                                 {% for error in val_form.anomalies.errors %}
                                                     <div class="custom-invalid-feedback">
@@ -210,7 +210,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text addon-w" id="scaling_addon2">From</span>
                                                     </div>
-                                                    {% render_field val_form.anomalies_from class="custom-select d-block" %}
+                                                    {% render_field val_form.anomalies_from class="custom-select" %}
                                                 </div>
                                                 {% for error in val_form.anomalies_from.errors %}
                                                     <div class="custom-invalid-feedback">
@@ -224,7 +224,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text addon-w" id="scaling_addon2">To</span>
                                                     </div>
-                                                    {% render_field val_form.anomalies_to class="custom-select d-block" %}
+                                                    {% render_field val_form.anomalies_to class="custom-select" %}
                                                 </div>
                                                 {% for error in val_form.anomalies_to.errors %}
                                                     <div class="custom-invalid-feedback">
@@ -258,7 +258,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon1">From</span>
                                                 </div>
-                                                {% render_field val_form.interval_from class="custom-select d-block" %}
+                                                {% render_field val_form.interval_from class="custom-select" %}
                                             </div>
                                             {% for error in val_form.interval_from.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -272,7 +272,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon2">To</span>
                                                 </div>
-                                                {% render_field val_form.interval_to class="custom-select d-block" %}
+                                                {% render_field val_form.interval_to class="custom-select" %}
                                             </div>
                                             {% for error in val_form.interval_to.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -291,7 +291,7 @@
                             <div class="card-header">
                                 <h4 class="my-0 font-weight-normal">Spatial Subsetting</h4>
                                 <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Restricts the input and reference data to the bounding box given."></span>
+                                    title="Restricts the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on the map by clicking on the globe button."></span>
                             </div>
                             <div class="card-body">
                                 <div class="container">
@@ -300,41 +300,16 @@
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Lower left lat</span>
+                                                    <span class="input-group-text addon-w" id="scaling_addon_ll" title="Lower left bounding box corner">Lower left</span>
                                                 </div>
-                                                {% render_field val_form.min_lat class="custom-select d-block" %}
+                                                {% render_field val_form.min_lat placeholder="Lat" title="Lat" class="form-control" %}
+                                                {% render_field val_form.min_lon placeholder="Lon" title="Lon" class="form-control" %}
                                             </div>
                                             {% for error in val_form.min_lat.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
                                             {% endfor %}
-                                        </div>
-
-                                        <div class="col-sm pl-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Upper right lat </span>
-                                                </div>
-                                                {% render_field val_form.max_lat class="custom-select d-block" %}
-                                            </div>
-                                            {% for error in val_form.max_lat.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-sm pl-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Lower left long</span>
-                                                </div>
-                                                {% render_field val_form.min_lon class="custom-select d-block" %}
-                                            </div>
                                             {% for error in val_form.min_lon.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
@@ -342,13 +317,23 @@
                                             {% endfor %}
                                         </div>
 
-                                        <div class="col-sm pl-0">
+                                        <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
+                                            <span class="fas fa-globe" ></span>
+                                        </button>
+
+                                        <div class="col-sm pr-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Upper right long</span>
+                                                    <span class="input-group-text addon-w" id="scaling_addon_ur" title="Upper right bounding box corner">Upper right</span>
                                                 </div>
-                                                {% render_field val_form.max_lon class="custom-select d-block" %}
+                                                {% render_field val_form.max_lat placeholder="Lat" title="Lat" class="form-control" %}
+                                                {% render_field val_form.max_lon placeholder="Lon" title="Lon" class="form-control" %}
                                             </div>
+                                            {% for error in val_form.max_lat.errors %}
+                                                <div class="custom-invalid-feedback">
+                                                    {{ error }}
+                                                </div>
+                                            {% endfor %}
                                             {% for error in val_form.max_lon.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
@@ -357,12 +342,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="card-footer">
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
-                                Select on map
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -384,7 +363,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon1">From</span>
                                                 </div>
-                                                {% render_field val_form.interval_from class="custom-select d-block" %}
+                                                {% render_field val_form.interval_from class="form-control" %}
                                             </div>
                                             {% for error in val_form.interval_from.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -398,7 +377,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon2">To</span>
                                                 </div>
-                                                {% render_field val_form.interval_to class="custom-select d-block" %}
+                                                {% render_field val_form.interval_to class="form-control" %}
                                             </div>
                                             {% for error in val_form.interval_to.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -432,7 +411,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
                                                 </div>
-                                                {% render_field val_form.scaling_ref class="custom-select d-block" %}
+                                                {% render_field val_form.scaling_ref class="custom-select" %}
                                             </div>
                                             {% for error in val_form.scaling_ref.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -446,7 +425,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
                                                 </div>
-                                                {% render_field val_form.scaling_method class="custom-select d-block" %}
+                                                {% render_field val_form.scaling_method class="custom-select" %}
                                             </div>
                                             {% for error in val_form.scaling_method.errors %}
                                                 <div class="custom-invalid-feedback">
@@ -464,7 +443,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text addon-w" id="tag-addon1">Name your validation</span>
                         </div>
-                        {% render_field val_form.name_tag class="d-block form-control" %}
+                        {% render_field val_form.name_tag class="form-control" %}
                         <div class="input-group-append">
                             <span class="input-group-text fas fa-question-circle" id="tag-addon2" title="You can optionally name the validation to make it easier to identify in your list of validations."></span>
                         </div>
