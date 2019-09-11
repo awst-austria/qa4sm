@@ -136,6 +136,24 @@ class TestModels(TestCase):
         run.interval_to = datetime(2005, 1, 1)
         run.clean()
 
+        ## object with no spatial subsetting should be valid
+        run.min_lat = None
+        run.max_lat = None
+        run.min_lon = None
+        run.max_lon = None
+        run.clean()
+
+        ## spatial subsetting with only two coords should be invalid
+        run.min_lat = -45.0
+        run.max_lat = +45.0
+        with pytest.raises(ValidationError):
+            run.clean()
+
+        ## spatial subsetting with four coords should be valid
+        run.min_lon = -120.0
+        run.max_lon = +120.0
+        run.clean()
+
     def test_data_filter_str(self):
         myfilter = DataFilter()
         filter_str = str(myfilter)
