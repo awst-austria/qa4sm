@@ -72,7 +72,14 @@ a:hover {
     border-color: #4760E5;
 }
 
-.btn-primary:hover, .btn-primary:not(:disabled):not(.disabled):active {
+.btn-primary:disabled {
+    opacity: 0.5;
+    color: #fff;
+    background-color: #4760E5;
+    border-color: #4760E5;
+}
+
+.btn-primary:not(:disabled):not(.disabled):hover, .btn-primary:not(:disabled):not(.disabled):active {
     color: #fff;
     background-color: #213FE0;
     border-color: #213FE0;
