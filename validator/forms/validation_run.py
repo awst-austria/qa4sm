@@ -39,6 +39,10 @@ class ValidationRunForm(forms.ModelForm):
         self.fields['interval_from'].required = False
         self.fields['interval_to'].required = False
         self.fields['anomalies'].required = False
+        self.fields['min_lat'].required = False
+        self.fields['min_lon'].required = False
+        self.fields['max_lat'].required = False
+        self.fields['max_lon'].required = False
 
         ## give default/initial values to widgets
         self.fields['interval_from'].initial = datetime(1978, 1, 1).strftime('%Y-%m-%d')
