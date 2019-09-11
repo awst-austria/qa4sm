@@ -285,7 +285,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="card-deck">
                         <div class="card mb-4 shadow-sm">
                             <div class="card-header">
@@ -310,7 +310,7 @@
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                        
+
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
@@ -324,9 +324,9 @@
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                        
+
                                     </div>
-                                    
+
                                     <div class="row">
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
@@ -341,7 +341,7 @@
                                                 </div>
                                             {% endfor %}
                                         </div>
-                                        
+
                                         <div class="col-sm pl-0">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
@@ -358,7 +358,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="card-footer">
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
                                 Select on map
@@ -411,8 +411,8 @@
                             </div>
                         </div>
                     </div>
-                    
-                    
+
+
 
                     <div class="card-deck">
 
@@ -481,8 +481,8 @@
             {% endif %}
         {% endwith %}
     </form>
-    
-    
+
+
 <div class="modal" id="mapDialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -506,7 +506,7 @@
 
     </div>
   </div>
-</div>    
+</div>
 {% endblock %}
 
 {% block javascript %}
@@ -516,65 +516,65 @@
     <script src="/static/leaflet/leaflet.draw.js"></script>
 
     <script type="text/javascript">
-		var map = L.map('spatialFilterMap');
-		var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-		var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
-		var osm = new L.TileLayer(osmUrl, {minZoom: 1, maxZoom: 20, attribution: osmAttrib});
-		var drawnItems = new L.FeatureGroup();
+        var map = L.map('spatialFilterMap');
+        var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
+        var osm = new L.TileLayer(osmUrl, {minZoom: 1, maxZoom: 20, attribution: osmAttrib});
+        var drawnItems = new L.FeatureGroup();
 
-		map.addLayer(drawnItems);
+        map.addLayer(drawnItems);
 
-		var drawControl = new L.Control.Draw({
-				draw: {
-        		polygon: false,
-        		polyline: false,
-        		circle: false,
-        		circlemarker: false,
-        		marker: false
-    		},
-    		edit: {
-        		featureGroup: drawnItems
-    		}
-		});
-		map.addControl(drawControl);
+        var drawControl = new L.Control.Draw({
+                draw: {
+                polygon: false,
+                polyline: false,
+                circle: false,
+                circlemarker: false,
+                marker: false
+            },
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
 
-		function setCoordinates(){
-			coordinates=drawnItems.getLayers()[0].getLatLngs();
+        function setCoordinates(){
+            coordinates=drawnItems.getLayers()[0].getLatLngs();
 
-			$('#id_min_lat').val(coordinates[0][0].lat);
-			$('#id_min_lon').val(coordinates[0][0].lng);
+            $('#id_min_lat').val(coordinates[0][0].lat);
+            $('#id_min_lon').val(coordinates[0][0].lng);
 
-			$('#id_max_lat').val(coordinates[0][2].lat);
-			$('#id_max_lon').val(coordinates[0][2].lng);
-		}
+            $('#id_max_lat').val(coordinates[0][2].lat);
+            $('#id_max_lon').val(coordinates[0][2].lng);
+        }
 
-		map.on('draw:created', function (e) {
-    		var type = e.layerType,
-        	layer = e.layer;
+        map.on('draw:created', function (e) {
+            var type = e.layerType,
+            layer = e.layer;
 
-    		if (type === 'rectangle') {
-        		layer.on('mouseover', function() {
-            	//alert(layer.getLatLngs());     
-        		});
-    		}
+            if (type === 'rectangle') {
+                layer.on('mouseover', function() {
+                //alert(layer.getLatLngs());
+                });
+            }
 
-	    	drawnItems.addLayer(layer);
-	    	$('#setCoordinatesButton').prop('disabled', false);
-		});
+            drawnItems.addLayer(layer);
+            $('#setCoordinatesButton').prop('disabled', false);
+        });
 
 
-		$('#mapDialog').on('show.bs.modal', function(){
-	  		setTimeout(function() {		  
-	    		map.invalidateSize();
-	    		$('#setCoordinatesButton').prop('disabled', true);
-	    		drawnItems.clearLayers();
-	  		}, 10);
-	 	});
+        $('#mapDialog').on('show.bs.modal', function(){
+              setTimeout(function() {
+                map.invalidateSize();
+                $('#setCoordinatesButton').prop('disabled', true);
+                drawnItems.clearLayers();
+              }, 10);
+         });
 
-		map.setView(new L.LatLng(51.3, 32.0),3.4);
-		map.addLayer(osm);
-	</script>
-    
+        map.setView(new L.LatLng(51.3, 32.0),3.4);
+        map.addLayer(osm);
+    </script>
+
     <script type="text/javascript">
         function toggleFiltering(checkbox) {
             var groupId = checkbox.id.replace(/filter_dataset$/, 'filters')
