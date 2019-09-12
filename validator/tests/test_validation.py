@@ -623,7 +623,7 @@ class TestValidation(TestCase):
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
         gpis, lons, lats, cells = c3s_reader.reader.grid.get_grid_points()
 
-        subgpis, sublons, sublats = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
+        subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
 
         assert len(subgpis) > 100
         assert len(sublats) == len(subgpis)
@@ -639,7 +639,7 @@ class TestValidation(TestCase):
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
         gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
 
-        subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, None, None, None, None)
+        subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, None, None, None, None)
 
         assert np.array_equal(gpis, subgpis)
         assert np.array_equal(lats, sublats)
@@ -657,7 +657,7 @@ class TestValidation(TestCase):
             c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
             gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
 
-            subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+            subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
 
             assert len(subgpis) > 100
             assert len(sublats) == len(subgpis)
@@ -680,7 +680,7 @@ class TestValidation(TestCase):
         india_gpi = 683588
 
         for min_lat, min_lon, max_lat, max_lon, area in test_coords:
-            subgpis, sublats, sublons = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+            subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
 
             assert len(subgpis) > 100
             assert len(sublats) == len(subgpis)
