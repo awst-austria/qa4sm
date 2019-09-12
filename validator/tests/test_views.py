@@ -229,6 +229,11 @@ class TestViews(TransactionTestCase):
             'anomalies_from' : '1978',
             'anomalies_to' : '1998',
 
+            'min_lat' : '20.07094414427701',
+            'min_lon' : '-134.82421875000003',
+            'max_lat' : '51.47764573196917',
+            'max_lon' : '-57.83203125000001',
+
             'interval_from': datetime(1978,1,1),
             'interval_to': datetime(1998,1,1),
 
