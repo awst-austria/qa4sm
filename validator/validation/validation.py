@@ -83,7 +83,7 @@ def save_validation_config(validation_run):
             ds.val_anomalies_to = validation_run.anomalies_to.strftime('%Y-%m-%d %H:%M')
 
         if all(x is not None for x in [validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon]):
-            ds.val_spatial_subset = "[%f %f %f %f]".format(validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
+            ds.val_spatial_subset = "[{}, {}, {}, {}]".format(validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
 
         ds.close()
     except Exception:

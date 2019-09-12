@@ -148,7 +148,7 @@ class TestValidation(TestCase):
                 assert 'val_anomalies_to' not in ds.ncattrs(), 'Anomalies baseline period end should not be set'
 
             if all(x is not None for x in [run.min_lat, run.min_lon, run.max_lat, run.max_lon]):
-                assert ds.val_spatial_subset == "[%f %f %f %f]".format(run.min_lat, run.min_lon, run.max_lat, run.max_lon)
+                assert ds.val_spatial_subset == "[{}, {}, {}, {}]".format(run.min_lat, run.min_lon, run.max_lat, run.max_lon)
 
             for d_index, dataset_config in enumerate(run.dataset_configurations.all()):
                 ds_name = 'val_dc_dataset' + str(d_index)
