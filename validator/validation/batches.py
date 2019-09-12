@@ -41,6 +41,10 @@ def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
         lats = lats[index]
         lons = lons[index]
 
+    # if no geographic subsetting, make an index that covers all gpis
+    else:
+        index = np.arange(len(gpis))
+
     return gpis, lons, lats, index
 
 def create_jobs(validation_run):
