@@ -147,6 +147,9 @@ class TestValidation(TestCase):
                 assert 'val_anomalies_from' not in ds.ncattrs(), 'Anomalies baseline period start should not be set'
                 assert 'val_anomalies_to' not in ds.ncattrs(), 'Anomalies baseline period end should not be set'
 
+            if all(x is not None for x in [run.min_lat, run.min_lon, run.max_lat, run.max_lon]):
+                assert ds.val_spatial_subset == "[%f %f %f %f]".format(run.min_lat, run.min_lon, run.max_lat, run.max_lon)
+
             for d_index, dataset_config in enumerate(run.dataset_configurations.all()):
                 ds_name = 'val_dc_dataset' + str(d_index)
                 stored_dataset = ds.getncattr(ds_name)
@@ -417,6 +420,40 @@ class TestValidation(TestCase):
         # make sure there is data for the climatology time period!
         run.anomalies_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59, tzinfo=UTC)
+        run.save()
+
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.save()
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run
+        assert new_run.total_points == 4
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 4
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    @pytest.mark.long_running
+    def test_validation_spatial_subsetting(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        ## usa bounding box
+        run.min_lat = 22.42
+        run.min_lon = -131.57
+        run.max_lat = 51.60
+        run.max_lon = -58.62
+
         run.save()
 
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))

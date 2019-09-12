@@ -81,6 +81,10 @@ def save_validation_config(validation_run):
         if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
             ds.val_anomalies_from = validation_run.anomalies_from.strftime('%Y-%m-%d %H:%M')
             ds.val_anomalies_to = validation_run.anomalies_to.strftime('%Y-%m-%d %H:%M')
+
+        if all(x is not None for x in [validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon]):
+            ds.val_spatial_subset = "[%f %f %f %f]".format(validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
+
         ds.close()
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
