@@ -246,7 +246,7 @@
                             <div class="card-header">
                                 <h4 class="my-0 font-weight-normal">Spatial Subsetting</h4>
                                 <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Restricts the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on the map by clicking on the globe button."></span>
+                                    title="Restrict the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on a map by clicking on the globe button."></span>
                             </div>
                             <div class="card-body">
                                 <div class="container">
@@ -429,7 +429,7 @@
                 </div>
 
                 <div class="modal-body">
-                    <div style="width: 760px; height: 400px;" id="spatialFilterMap"></div>
+                    <div style="width: 100%; height: 60vh;" id="spatialFilterMap"></div>
                 </div>
 
                 <div class="modal-footer">
@@ -450,14 +450,12 @@
     <script src="/static/leaflet/leaflet.draw.js"></script>
 
     <script type="text/javascript">
-        var map = L.map('spatialFilterMap');
+        var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
+        var map = L.map('spatialFilterMap', { maxBounds: bounds });
         var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
         var osm = new L.TileLayer(osmUrl, {minZoom: 1, maxZoom: 20, attribution: osmAttrib});
         var drawnItems = new L.FeatureGroup();
-
-        map.addLayer(drawnItems);
-
         var drawControl = new L.Control.Draw({
             draw: {
                 polygon: false,
@@ -470,7 +468,10 @@
                 featureGroup: drawnItems
             }
         });
+        map.addLayer(drawnItems);
         map.addControl(drawControl);
+        map.setView(new L.LatLng(48.2, 16.37), 3.4);
+        map.addLayer(osm);
 
         function setCoordinates(){
             coordinates=drawnItems.getLayers()[0].getLatLngs();
@@ -480,33 +481,41 @@
 
             $('#id_max_lat').val(coordinates[0][2].lat);
             $('#id_max_lon').val(coordinates[0][2].lng);
+
+            $('#mapDialog').modal('hide');
+        }
+
+        function drawBoxFromCoordinates() {
+            var min_lat = $('#id_min_lat').val();
+            var min_lon = $('#id_min_lon').val();
+            var max_lat = $('#id_max_lat').val();
+            var max_lon = $('#id_max_lon').val();
+
+            if(min_lat && min_lon && max_lat && max_lon) {
+                var bounds = [[min_lat, min_lon], [max_lat, max_lon]];
+                var boundingBox = L.rectangle(bounds);
+                drawnItems.addLayer(boundingBox);
+                map.fitBounds(bounds);
+                $('#setCoordinatesButton').prop('disabled', false);
+            }
         }
 
         map.on('draw:created', function (e) {
-            var type = e.layerType,
-            layer = e.layer;
+            var type = e.layerType, layer = e.layer;
 
-            if (type === 'rectangle') {
-                layer.on('mouseover', function() {
-                //alert(layer.getLatLngs());
-                });
-            }
-
+            drawnItems.clearLayers();
             drawnItems.addLayer(layer);
             $('#setCoordinatesButton').prop('disabled', false);
         });
 
-
         $('#mapDialog').on('show.bs.modal', function(){
-              setTimeout(function() {
+            setTimeout(function() {
                 map.invalidateSize();
                 $('#setCoordinatesButton').prop('disabled', true);
                 drawnItems.clearLayers();
-              }, 10);
-         });
-
-        map.setView(new L.LatLng(51.3, 32.0),3.4);
-        map.addLayer(osm);
+                drawBoxFromCoordinates()
+                }, 10);
+        });
     </script>
 
     <script type="text/javascript">
