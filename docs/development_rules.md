@@ -4,7 +4,7 @@
 
 ## Development guidelines
 
-- Try to understand the task: discuss (your) items in detail during the planning meetint and/or before starting; ask questions; if necessary, split the task if it becomes too large.
+- Try to understand the task: discuss (your) items in detail during the planning meeting and/or before starting; ask questions; if necessary, split the task if it becomes too large.
 - Set priorities of your tasks, especially where others' tasks rely on yours.
 - Discuss open issues and resulting issues with the team in regular meetings or in chat.
 - The master branch in git should always build and pass the tests.

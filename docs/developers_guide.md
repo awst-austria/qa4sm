@@ -17,6 +17,8 @@ This creates the qa4sm folder. Within this are the webapp folders:
     valentina
     validator
 
+If you want to work on QA4SM releases, be sure to use the git hooks in the `hooks` folder (for remembering to tag correctly). Either copy the scripts in that folder to `.git/hooks/` or [set your custom hooks directory to 'hooks'](https://stackoverflow.com/questions/427207/can-git-hook-scripts-be-managed-along-with-the-repository/37861972#37861972).
+
 ## Minimum requirements
 
 - Git client
