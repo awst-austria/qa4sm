@@ -509,12 +509,12 @@
         });
 
         $('#mapDialog').on('show.bs.modal', function(){
-            setTimeout(function() {
-                map.invalidateSize();
+            setTimeout(function() { // wait until the dialog is drawn to be able to adjust the map to it
                 $('#setCoordinatesButton').prop('disabled', true);
+                map.invalidateSize();
                 drawnItems.clearLayers();
                 drawBoxFromCoordinates()
-                }, 10);
+                }, 10 /* ms */);
         });
     </script>
 
