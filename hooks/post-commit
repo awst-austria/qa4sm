@@ -1,0 +1,15 @@
+#!/bin/sh
+
+VERSIONFILE="valentina/version.py"
+
+CHANGED=$(git diff --name-only HEAD^1 HEAD | grep $VERSIONFILE)
+
+if [ "x$CHANGED" != "x" ]; then
+	VERSION=$(git show HEAD:$VERSIONFILE | sed -e "s|APP_VERSION *= *'\([^']\+\)'|\1|g")
+	DATE=$(date "+%F")
+
+	echo "**************************************************************"
+	echo "You've commited a change to $VERSIONFILE. PLEASE IMMEDIATELY TAG YOUR NEW VERSION with:"
+	echo "git tag -a v$VERSION -m \"Version v$VERSION, created $DATE\""
+	echo "**************************************************************"
+fi
