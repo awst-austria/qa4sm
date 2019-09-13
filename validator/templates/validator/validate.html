@@ -276,6 +276,9 @@
                                             <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
                                                 <span class="fas fa-globe" ></span>
                                             </button>
+                                            <button type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
+                                                <span class="fas fa-trash-alt" ></span>
+                                            </button>
                                         </div>
 
                                         <div class="col-sm pr-0">
@@ -485,6 +488,13 @@
             $('#mapDialog').modal('hide');
         }
 
+        function clearCoordinates(){
+            $('#id_min_lat').val('');
+            $('#id_min_lon').val('');
+            $('#id_max_lat').val('');
+            $('#id_max_lon').val('');
+        }
+
         function drawBoxFromCoordinates() {
             var min_lat = $('#id_min_lat').val();
             var min_lon = $('#id_min_lon').val();
@@ -506,6 +516,12 @@
             drawnItems.clearLayers();
             drawnItems.addLayer(layer);
             $('#setCoordinatesButton').prop('disabled', false);
+        });
+
+        map.on('draw:deleted', function (e) {
+            if(drawnItems.getLayers().length == 0) {
+                $('#setCoordinatesButton').prop('disabled', true);
+            }
         });
 
         $('#mapDialog').on('show.bs.modal', function(){
