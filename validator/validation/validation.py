@@ -27,6 +27,7 @@ from validator.validation.util import mkdir_if_not_exists, first_file_in
 from pytesmo.validation_framework.data_manager import DataManager
 from pytesmo.validation_framework.adapters import AnomalyAdapter,\
     AnomalyClimAdapter
+from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
 
 
 __logger = logging.getLogger(__name__)
@@ -41,6 +42,10 @@ def set_outfile(validation_run, run_dir):
 def save_validation_config(validation_run):
     try:
         ds = Dataset(path.join(OUTPUT_FOLDER, validation_run.output_file.name), "a", format="NETCDF4")
+
+        ds.qa4sm_version = APP_VERSION
+        ds.qa4sm_env_url = ENV_FILE_URL_TEMPLATE.format(APP_VERSION)
+
         if(validation_run.interval_from is None):
             ds.val_interval_from="N/A"
         else:

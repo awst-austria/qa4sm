@@ -10,8 +10,11 @@ import time
 from zipfile import ZipFile
 
 from django.contrib.auth import get_user_model
-from validator.validation.batches import _geographic_subsetting
 User = get_user_model()
+
+from validator.validation.batches import _geographic_subsetting
+import valentina
+from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
 
 from dateutil.tz import tzlocal
 from django.test import TestCase
@@ -103,7 +106,10 @@ class TestValidation(TestCase):
         length=-1
         num_vars=-1
         with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
-            ## check the metrics contained in thef ile
+            assert ds.qa4sm_version == valentina.settings.APP_VERSION
+            assert ds.qa4sm_env_url == ENV_FILE_URL_TEMPLATE.format(APP_VERSION)
+
+            ## check the metrics contained in the file
             for metric in self.metrics:
                 ## This gets all variables in the netcdf file that start with the name of the current metric
                 metric_vars = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
