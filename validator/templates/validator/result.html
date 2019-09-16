@@ -78,6 +78,13 @@
                             <li>Validated over entire available timespan.</li>
                         {% endif %}
 
+                        {% if val.min_lat and val.min_lon and val.max_lat and val.max_lon %}
+                            <li>Spatial filter bounding box: [{{ val.min_lat }}, {{ val.min_lon }}, {{ val.max_lat }}, {{ val.max_lon }}].</li>
+                        {% else %}
+                            <li>Validated globally.</li>
+                        {% endif %}
+
+
                         {% if val.progress == -1 %}
                             <li>The validation was cancelled.</li>
                         {% else %}
