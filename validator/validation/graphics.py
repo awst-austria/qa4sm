@@ -204,7 +204,7 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
     return [png_filename, svg_filename]
 
 def identify_dataset_configs(validation_run, metric_col_name):
-    ds_match = regex_match(r'.*_between_(([0-9]+)-(.*)_([0-9]+)-(.*))', metric_col_name)
+    ds_match = regex_match(r'.*_between_(([0-9]+)-(.*)_and_([0-9]+)-(.*))', metric_col_name)
     if ds_match:
         pair_name = ds_match.group(1)
         dc1_num = int(ds_match.group(2))
