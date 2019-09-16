@@ -708,7 +708,7 @@ class TestValidation(TestCase):
         num = val.num_gpis_from_job(None)
         assert num == 1
 
-#     @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_generate_graphs(self):
         infile1 = 'testdata/c3s_ismn.nc'
         infile2 = 'testdata/c3s_gldas.nc'
