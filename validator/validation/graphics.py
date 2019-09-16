@@ -285,7 +285,7 @@ def get_dataset_pairs(validation_run):
             datasets.append(dataset_name)
 
     for ds in datasets:
-        pair = '{}_{}'.format(ref, ds)
+        pair = '{}_and_{}'.format(ref, ds)
         pairs.append(pair)
 
     return pairs
