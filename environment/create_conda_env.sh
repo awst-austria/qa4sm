@@ -100,8 +100,8 @@ pip install seaborn
 # export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
 # pip install cartopy
 pip install --upgrade --force-reinstall netcdf4
-# pip install pytesmo
-pip install git+https://github.com/TUW-GEO/pytesmo.git
+pip install pytesmo
+#pip install git+https://github.com/TUW-GEO/pytesmo.git
 pip install ismn
 
 cd $TEMP_DIR
