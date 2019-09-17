@@ -154,6 +154,32 @@ class TestModels(TestCase):
         run.max_lon = +120.0
         run.clean()
 
+        ## climatology with moving average should be valid without time period
+        run.anomalies = ValidationRun.MOVING_AVG_35_D
+        run.clean()
+
+        ## climatology without anomalies time period should be invalid
+        run.anomalies = ValidationRun.CLIMATOLOGY
+        with pytest.raises(ValidationError):
+            run.clean()
+
+        ## climatology with broken time period should be invalid
+        run.anomalies_from = datetime(2005, 1, 1)
+        run.anomalies_to = datetime(2000, 1, 1)
+        with pytest.raises(ValidationError):
+            run.clean()
+
+        ## climatology with correct time period should be invalid
+        run.anomalies_from = datetime(2000, 1, 1)
+        run.anomalies_to = datetime(2005, 1, 1)
+        run.clean()
+
+        ## climatology with moving average should be invalid with time period
+        run.anomalies = ValidationRun.MOVING_AVG_35_D
+        with pytest.raises(ValidationError):
+            run.clean()
+
+
     def test_data_filter_str(self):
         myfilter = DataFilter()
         filter_str = str(myfilter)
