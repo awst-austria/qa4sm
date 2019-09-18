@@ -38,9 +38,9 @@ class ValidationRun(models.Model):
     CLIMATOLOGY = "climatology"
     NO_ANOM = "none"
     ANOMALIES_METHODS = (
-        (NO_ANOM, 'don\'t calculate'),
+        (NO_ANOM, 'Do not calculate'),
         (MOVING_AVG_35_D, '35 day moving average'),
-        (CLIMATOLOGY, 'climatology'),
+        (CLIMATOLOGY, 'Climatology'),
         )
 
     ## fields
