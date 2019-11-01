@@ -18,42 +18,136 @@
                 <div class="container center-text">
 
                     <div class="card-deck">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Data</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."></span>
-                            </div>
 
-                            {% for error in dc_formset.non_form_errors %}
-                                <div class="custom-invalid-feedback">
-                                    {{ error }}
+                        <div id="data_accordion" style="width:50%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="data_header">
+                                    <h4 class="my-0 font-weight-normal">Data</h4>
+
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle"
+                                            title="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."></span>
+
+                                        <a class="input-group-text" data-toggle="collapse" href="#data_collapse" role="button" aria-expanded="true" aria-controls="data_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
                                 </div>
-                            {% endfor %}
 
-                            <nav>
-                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                    {% for dc_form in dc_formset %}
-                                        <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}" role="tab" aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %}>Dataset</a>
+                                <div id="data_collapse" class="collapse show" aria-labelledby="data_header" data-parent="#data_accordion">
+                                    {% for error in dc_formset.non_form_errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
                                     {% endfor %}
-                                        <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
+
+                                    <nav>
+                                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                            {% for dc_form in dc_formset %}
+                                                <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}" role="tab" aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %}>Dataset</a>
+                                            {% endfor %}
+                                                <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
+                                        </div>
+                                    </nav>
+
+                                    {{ dc_formset.management_form }}
+
+                                    <div id="dc_form_container" class="card-body tab-content">
+
+                                        {% for dc_form in dc_formset.forms %}
+                                            <div class="dc_form tab-pane fade {% if forloop.first %}show active{% endif %}" id="id_{{ dc_form.prefix }}" role="tabpanel" aria-labelledby="id_{{ dc_form.prefix }}-tab">
+                                                <div class="mb-3">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
+                                                        </div>
+                                                        {% render_field dc_form.dataset class="custom-select" %}
+                                                    </div>
+                                                    {% for error in dc_form.dataset.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="data-addon2">Version</span>
+                                                        </div>
+                                                        {% render_field dc_form.version class="custom-select" %}
+                                                    </div>
+                                                    {% for error in dc_form.version.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="data-addon3">Variable</span>
+                                                        </div>
+                                                        {% render_field dc_form.variable class="custom-select" %}
+                                                    </div>
+                                                    {% for error in dc_form.variable.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <hr/>
+
+                                                <div class="custom-control custom-switch">
+                                                    <input class="custom-control-input" id="{{dc_form.filter_dataset.auto_id}}" name="{{dc_form.prefix}}-{{dc_form.filter_dataset.name}}"
+                                                        {{ dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this)">
+                                                    <label class="custom-control-label" for="{{dc_form.filter_dataset.auto_id}}">{{dc_form.filter_dataset.label}}</label>
+
+                                                    <span class="input-group-text fas fa-question-circle help-icon"
+                                                        title="Only data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
+                                                </div>
+
+                                                <div id="id_{{dc_form.prefix}}-filters" class="indented tabSpecific">
+                                                    {{ dc_form.filters }}
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
                                 </div>
-                            </nav>
+                            </div>
+                        </div>
 
-                            {{ dc_formset.management_form }}
+                        <div id="ref_accordion" style="width:50%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="ref_header">
+                                    <h4 class="my-0 font-weight-normal">Reference</h4>
 
-                            <div id="dc_form_container" class="card-body tab-content">
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."></span>
+                                        <a class="input-group-text" data-toggle="collapse" href="#ref_collapse" role="button" aria-expanded="true" aria-controls="ref_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
+                                </div>
 
-                                {% for dc_form in dc_formset.forms %}
-                                    <div class="dc_form tab-pane fade {% if forloop.first %}show active{% endif %}" id="id_{{ dc_form.prefix }}" role="tabpanel" aria-labelledby="id_{{ dc_form.prefix }}-tab">
+                                <div id="ref_collapse" class="collapse show" aria-labelledby="ref_header" data-parent="#ref_accordion">
+                                    <div style="min-height: 2.1rem;"></div>
+
+                                    <div class="card-body">
                                         <div class="mb-3">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="data-addon1">Dataset</span>
+                                                    <span class="input-group-text addon-w" id="ref-addon1">Dataset</span>
                                                 </div>
-                                                {% render_field dc_form.dataset class="custom-select" %}
+                                                {% render_field ref_dc_form.dataset class="custom-select" %}
                                             </div>
-                                            {% for error in dc_form.dataset.errors %}
+                                            {% for error in ref_dc_form.dataset.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
@@ -63,11 +157,11 @@
                                         <div class="mb-3">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="data-addon2">Version</span>
+                                                    <span class="input-group-text addon-w" id="ref-addon2">Version</span>
                                                 </div>
-                                                {% render_field dc_form.version class="custom-select" %}
+                                                {% render_field ref_dc_form.version class="custom-select" %}
                                             </div>
-                                            {% for error in dc_form.version.errors %}
+                                            {% for error in ref_dc_form.version.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
@@ -77,11 +171,11 @@
                                         <div class="mb-3">
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="data-addon3">Variable</span>
+                                                    <span class="input-group-text addon-w" id="ref-addon3">Variable</span>
                                                 </div>
-                                                {% render_field dc_form.variable class="custom-select" %}
+                                                {% render_field ref_dc_form.variable class="custom-select" %}
                                             </div>
-                                            {% for error in dc_form.variable.errors %}
+                                            {% for error in ref_dc_form.variable.errors %}
                                                 <div class="custom-invalid-feedback">
                                                     {{ error }}
                                                 </div>
@@ -91,214 +185,15 @@
                                         <hr/>
 
                                         <div class="custom-control custom-switch">
-                                            <input class="custom-control-input" id="{{dc_form.filter_dataset.auto_id}}" name="{{dc_form.prefix}}-{{dc_form.filter_dataset.name}}"
-                                                {{ dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this)">
-                                            <label class="custom-control-label" for="{{dc_form.filter_dataset.auto_id}}">{{dc_form.filter_dataset.label}}</label>
-
+                                            <input class="custom-control-input" id="{{ref_dc_form.filter_dataset.auto_id}}" name="{{ref_dc_form.prefix}}-{{ref_dc_form.filter_dataset.name}}"
+                                                {{ ref_dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
+                                            <label class="custom-control-label" for="{{ref_dc_form.filter_dataset.auto_id}}">{{ref_dc_form.filter_dataset.label}}</label>
                                             <span class="input-group-text fas fa-question-circle help-icon"
-                                                title="Only data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
+                                                title="Only reference data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
                                         </div>
 
-                                        <div id="id_{{dc_form.prefix}}-filters" class="indented tabSpecific">
-                                            {{ dc_form.filters }}
-                                        </div>
-                                    </div>
-                                {% endfor %}
-
-                            </div>
-                        </div>
-
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Reference</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."></span>
-                            </div>
-
-                            <div style="min-height: 2.1rem;"></div>
-
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text addon-w" id="ref-addon1">Dataset</span>
-                                        </div>
-                                        {% render_field ref_dc_form.dataset class="custom-select" %}
-                                    </div>
-                                    {% for error in ref_dc_form.dataset.errors %}
-                                        <div class="custom-invalid-feedback">
-                                            {{ error }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-
-                                <div class="mb-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text addon-w" id="ref-addon2">Version</span>
-                                        </div>
-                                        {% render_field ref_dc_form.version class="custom-select" %}
-                                    </div>
-                                    {% for error in ref_dc_form.version.errors %}
-                                        <div class="custom-invalid-feedback">
-                                            {{ error }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-
-                                <div class="mb-3">
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text addon-w" id="ref-addon3">Variable</span>
-                                        </div>
-                                        {% render_field ref_dc_form.variable class="custom-select" %}
-                                    </div>
-                                    {% for error in ref_dc_form.variable.errors %}
-                                        <div class="custom-invalid-feedback">
-                                            {{ error }}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-
-                                <hr/>
-
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input" id="{{ref_dc_form.filter_dataset.auto_id}}" name="{{ref_dc_form.prefix}}-{{ref_dc_form.filter_dataset.name}}"
-                                        {{ ref_dc_form.filter_dataset.initial|yesno:'checked,,' }} type="checkbox" onclick="toggleFiltering(this, 'ref-filters')">
-                                    <label class="custom-control-label" for="{{ref_dc_form.filter_dataset.auto_id}}">{{ref_dc_form.filter_dataset.label}}</label>
-                                    <span class="input-group-text fas fa-question-circle help-icon"
-                                        title="Only reference data which meet the specified criteria will be used in the validation. Several filters can be simultaneously selected for one dataset. You can also omit filtering completely."></span>
-                                </div>
-
-                                <div id="id_{{ref_dc_form.prefix}}-filters" class="indented">
-                                    {{ ref_dc_form.filters }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-deck">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Anomalies</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Optionally calculates metrics from anomalies instead of absolute values. First, a climatology is computed using the chosen method and time period (only whole years are used), then the anomalies are calculated based on this. &quot;35 day moving average&quot; means that the climatology is calculated as a moving average of the data; &quot;climatology&quot; means that the average for each day of the year is calculated."></span>
-                            </div>
-                            <div class="card-body">
-
-                                <div class="container">
-                                    <div class="column">
-
-                                        <div class="row">
-
-                                            <div class="col-sm pl-0">
-                                                <div class="input-group" title="Anomalies calculation method: no anomalies, anomalies against 35 day moving average or anomalies against a climatology calculated from the given timespan.">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
-                                                    </div>
-                                                    {% render_field val_form.anomalies class="custom-select" %}
-                                                </div>
-                                                {% for error in val_form.anomalies.errors %}
-                                                    <div class="custom-invalid-feedback">
-                                                        {{ error }}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-
-                                            <div class="col-sm anomalies-period"> <!-- style="visibility: hidden;" -->
-                                                <div class="input-group" title="Start of period to calculate climatology from.">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text addon-w" id="scaling_addon2">From</span>
-                                                    </div>
-                                                    {% render_field val_form.anomalies_from class="custom-select" %}
-                                                </div>
-                                                {% for error in val_form.anomalies_from.errors %}
-                                                    <div class="custom-invalid-feedback">
-                                                        {{ error }}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-
-                                            <div class="col-sm pr-0 anomalies-period"> <!--  style="visibility: hidden;" -->
-                                                <div class="input-group" title="End of period to calculate climatology from.">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text addon-w" id="scaling_addon2">To</span>
-                                                    </div>
-                                                    {% render_field val_form.anomalies_to class="custom-select" %}
-                                                </div>
-                                                {% for error in val_form.anomalies_to.errors %}
-                                                    <div class="custom-invalid-feedback">
-                                                        {{ error }}
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-deck">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Spatial Subsetting</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Restrict the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on a map by clicking on the globe button."></span>
-                            </div>
-                            <div class="card-body">
-                                <div class="container">
-                                    <div class="row">
-
-                                        <div class="col-sm pl-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon_ll" title="Lower left bounding box corner">Lower left</span>
-                                                </div>
-                                                {% render_field val_form.min_lat placeholder="Lat" title="Lat" class="form-control" %}
-                                                {% render_field val_form.min_lon placeholder="Lon" title="Lon" class="form-control" %}
-                                            </div>
-                                            {% for error in val_form.min_lat.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                            {% for error in val_form.min_lon.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div>
-                                            <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
-                                                <span class="fas fa-globe" ></span>
-                                            </button>
-                                            <button type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
-                                                <span class="fas fa-trash-alt" ></span>
-                                            </button>
-                                        </div>
-
-                                        <div class="col-sm pr-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon_ur" title="Upper right bounding box corner">Upper right</span>
-                                                </div>
-                                                {% render_field val_form.max_lat placeholder="Lat" title="Lat" class="form-control" %}
-                                                {% render_field val_form.max_lon placeholder="Lon" title="Lon" class="form-control" %}
-                                            </div>
-                                            {% for error in val_form.max_lat.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                            {% for error in val_form.max_lon.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
+                                        <div id="id_{{ref_dc_form.prefix}}-filters" class="indented">
+                                            {{ ref_dc_form.filters }}
                                         </div>
                                     </div>
                                 </div>
@@ -307,43 +202,73 @@
                     </div>
 
                     <div class="card-deck">
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Validation Period</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval."></span>
-                            </div>
-                            <div class="card-body">
+                        <div id="anom_accordion" style="width:100%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="anom_header">
+                                    <h4 class="my-0 font-weight-normal">Anomalies</h4>
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="Optionally calculates metrics from anomalies instead of absolute values. First, a climatology is computed using the chosen method and time period (only whole years are used), then the anomalies are calculated based on this. &quot;35 day moving average&quot; means that the climatology is calculated as a moving average of the data; &quot;climatology&quot; means that the average for each day of the year is calculated."></span>
+                                        <a class="input-group-text" data-toggle="collapse" href="#anom_collapse" role="button" aria-expanded="false" aria-controls="anom_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
+                                </div>
 
-                                <div class="container">
-                                    <div class="row">
+                                <div id="anom_collapse" class="collapse" aria-labelledby="anom_header" data-parent="#anom_accordion">
+                                    <div class="card-body">
 
-                                        <div class="col-sm pl-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">From</span>
+                                        <div class="container">
+                                            <div class="column">
+
+                                                <div class="row">
+
+                                                    <div class="col-sm pl-0">
+                                                        <div class="input-group" title="Anomalies calculation method: no anomalies, anomalies against 35 day moving average or anomalies against a climatology calculated from the given timespan.">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
+                                                            </div>
+                                                            {% render_field val_form.anomalies class="custom-select" %}
+                                                        </div>
+                                                        {% for error in val_form.anomalies.errors %}
+                                                            <div class="custom-invalid-feedback">
+                                                                {{ error }}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+
+                                                    <div class="col-sm anomalies-period"> <!-- style="visibility: hidden;" -->
+                                                        <div class="input-group" title="Start of period to calculate climatology from.">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text addon-w" id="scaling_addon2">From</span>
+                                                            </div>
+                                                            {% render_field val_form.anomalies_from class="custom-select" %}
+                                                        </div>
+                                                        {% for error in val_form.anomalies_from.errors %}
+                                                            <div class="custom-invalid-feedback">
+                                                                {{ error }}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+
+                                                    <div class="col-sm pr-0 anomalies-period"> <!--  style="visibility: hidden;" -->
+                                                        <div class="input-group" title="End of period to calculate climatology from.">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text addon-w" id="scaling_addon2">To</span>
+                                                            </div>
+                                                            {% render_field val_form.anomalies_to class="custom-select" %}
+                                                        </div>
+                                                        {% for error in val_form.anomalies_to.errors %}
+                                                            <div class="custom-invalid-feedback">
+                                                                {{ error }}
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+
                                                 </div>
-                                                {% render_field val_form.interval_from class="form-control" %}
+
                                             </div>
-                                            {% for error in val_form.interval_from.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div class="col-sm pr-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon2">To</span>
-                                                </div>
-                                                {% render_field val_form.interval_to class="form-control" %}
-                                            </div>
-                                            {% for error in val_form.interval_to.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
@@ -351,47 +276,184 @@
                         </div>
                     </div>
 
+                    <div class="card-deck">
+                        <div id="spatial_accordion" style="width:100%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="spatial_header">
+                                    <h4 class="my-0 font-weight-normal">Spatial Subsetting</h4>
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="Restrict the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on a map by clicking on the globe button."></span>
+                                        <a class="input-group-text" data-toggle="collapse" href="#spatial_collapse" role="button" aria-expanded="true" aria-controls="spatial_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="spatial_collapse" class="collapse show" aria-labelledby="spatial_header" data-parent="#spatial_accordion">
+                                    <div class="card-body">
+                                        <div class="container">
+                                            <div class="row">
 
+                                                <div class="col-sm pl-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon_ll" title="Lower left bounding box corner">Lower left</span>
+                                                        </div>
+                                                        {% render_field val_form.min_lat placeholder="Lat" title="Lat" class="form-control" %}
+                                                        {% render_field val_form.min_lon placeholder="Lon" title="Lon" class="form-control" %}
+                                                    </div>
+                                                    {% for error in val_form.min_lat.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                    {% for error in val_form.min_lon.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                <div>
+                                                    <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
+                                                        <span class="fas fa-globe" ></span>
+                                                    </button>
+                                                    <button type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
+                                                        <span class="fas fa-trash-alt" ></span>
+                                                    </button>
+                                                </div>
+
+                                                <div class="col-sm pr-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon_ur" title="Upper right bounding box corner">Upper right</span>
+                                                        </div>
+                                                        {% render_field val_form.max_lat placeholder="Lat" title="Lat" class="form-control" %}
+                                                        {% render_field val_form.max_lon placeholder="Lon" title="Lon" class="form-control" %}
+                                                    </div>
+                                                    {% for error in val_form.max_lat.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                    {% for error in val_form.max_lon.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="card-deck">
+                        <div id="temporal_accordion" style="width:100%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="temporal_header">
+                                    <h4 class="my-0 font-weight-normal">Validation Period</h4>
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval."></span>
+                                        <a class="input-group-text" data-toggle="collapse" href="#temporal_collapse" role="button" aria-expanded="true" aria-controls="temporal_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="temporal_collapse" class="collapse show" aria-labelledby="temporal_header" data-parent="#temporal_accordion">
+                                    <div class="card-body">
 
-                        <div class="card mb-4 shadow-sm">
-                            <div class="card-header">
-                                <h4 class="my-0 font-weight-normal">Scaling</h4>
-                                <span class="input-group-text fas fa-question-circle help-icon"
-                                    title="The data values will be scaled to the value range of the selected dataset using the selected method. When validating more than one dataset, values will always be scaled to the reference."></span>
-                            </div>
-                            <div class="card-body">
+                                        <div class="container">
+                                            <div class="row">
 
-                                <div class="container">
-                                    <div class="row">
-
-                                        <div class="col-sm pl-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
+                                                <div class="col-sm pl-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon1">From</span>
+                                                        </div>
+                                                        {% render_field val_form.interval_from class="form-control" %}
+                                                    </div>
+                                                    {% for error in val_form.interval_from.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
                                                 </div>
-                                                {% render_field val_form.scaling_ref class="custom-select" %}
+
+                                                <div class="col-sm pr-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon2">To</span>
+                                                        </div>
+                                                        {% render_field val_form.interval_to class="form-control" %}
+                                                    </div>
+                                                    {% for error in val_form.interval_to.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
                                             </div>
-                                            {% for error in val_form.scaling_ref.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                        <div class="col-sm pr-0">
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
+                    <div class="card-deck">
+                        <div id="scaling_accordion" style="width:100%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="scaling_header">
+                                    <h4 class="my-0 font-weight-normal">Scaling</h4>
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="The data values will be scaled to the value range of the selected dataset using the selected method. When validating more than one dataset, values will always be scaled to the reference."></span>
+                                        <a class="input-group-text" data-toggle="collapse" href="#scaling_collapse" role="button" aria-expanded="false" aria-controls="scaling_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="scaling_collapse" class="collapse" aria-labelledby="scaling_header" data-parent="#scaling_accordion">
+                                    <div class="card-body">
+
+                                        <div class="container">
+                                            <div class="row">
+
+                                                <div class="col-sm pl-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
+                                                        </div>
+                                                        {% render_field val_form.scaling_ref class="custom-select" %}
+                                                    </div>
+                                                    {% for error in val_form.scaling_ref.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
                                                 </div>
-                                                {% render_field val_form.scaling_method class="custom-select" %}
+
+                                                <div class="col-sm pr-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
+                                                        </div>
+                                                        {% render_field val_form.scaling_method class="custom-select" %}
+                                                    </div>
+                                                    {% for error in val_form.scaling_method.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
                                             </div>
-                                            {% for error in val_form.scaling_method.errors %}
-                                                <div class="custom-invalid-feedback">
-                                                    {{ error }}
-                                                </div>
-                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>

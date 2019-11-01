@@ -167,3 +167,30 @@ a:hover {
     margin-left: auto;
     margin-right: auto;
 }
+
+a[aria-expanded=true] .fa-plus-circle {
+   display: none;
+}
+a[aria-expanded=false] .fa-minus-circle {
+   display: none;
+}
+
+.card-menu {
+    float: right;
+    display: flex;
+}
+
+.card-menu > * {
+    border: initial;
+    padding: initial;
+}
+
+.card-menu > a:hover {
+    background-color: inherit;
+    color: inherit;
+    text-decoration: none;
+}
+
+.card-menu > :not(:last-child) {
+    margin-right: .3em;
+}
