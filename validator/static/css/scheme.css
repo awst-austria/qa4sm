@@ -68,12 +68,13 @@
     background-color: rgba(255, 108, 92, .15);
 }
 
-a {
+a, .link-primary {
     color: #4760E5;
 }
 
-a:hover {
+a:hover, .link-primary:hover {
     color: #213FE0;
+    text-decoration: underline;
 }
 
 .btn-primary {
