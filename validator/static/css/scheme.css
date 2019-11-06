@@ -53,6 +53,16 @@
     color: rgb(255, 108, 92);
 }
 
+.custom-control-input:checked ~ .custom-control-label::before {
+    color: #fff;
+    border-color: #4760E5;
+    background-color: #4760E5;
+}
+
+.custom-switch .custom-control-input:disabled:checked ~ .custom-control-label::before {
+    background-color: rgba(71, 96, 229,.5);
+}
+
 .alert-danger {
     color: rgb(255, 108, 92);
     background-color: rgba(255, 108, 92, .15);
