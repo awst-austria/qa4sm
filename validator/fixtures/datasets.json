@@ -194,5 +194,27 @@
 				16
 			]
 		}
-	}
+	},
+	{
+        "model": "validator.dataset",
+        "pk": 9,
+        "fields": {
+            "short_name": "ERA5-Land",
+            "pretty_name": "ERA5-Land",
+            "help_text": "",
+            "source_reference": "",
+            "citation": "",
+            "is_reference": true,
+            "versions": [
+                16
+            ],
+            "variables": [
+                12
+            ],
+            "filters": [
+                16,
+                17
+            ]
+        }
+    }
 ]
