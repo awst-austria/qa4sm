@@ -1,0 +1,134 @@
+[
+    {
+        "model": "validator.datavariable",
+        "pk": 1,
+        "fields": {
+            "short_name": "C3S_sm",
+            "pretty_name": "sm",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 2,
+        "fields": {
+            "short_name": "SMAP_soil_moisture",
+            "pretty_name": "soil_moisture",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 3,
+        "fields": {
+            "short_name": "ASCAT_sm",
+            "pretty_name": "sm",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 100.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 4,
+        "fields": {
+            "short_name": "ISMN_soil_moisture",
+            "pretty_name": "soil moisture",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 5,
+        "fields": {
+            "short_name": "GLDAS_SoilMoi0_10cm_inst",
+            "pretty_name": "SoilMoi0_10cm_inst",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 100.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 6,
+        "fields": {
+            "short_name": "GLDAS_SoilMoi10_40cm_inst",
+            "pretty_name": "SoilMoi10_40cm_inst",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 300.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 7,
+        "fields": {
+            "short_name": "GLDAS_SoilMoi40_100cm_inst",
+            "pretty_name": "SoilMoi40_100cm_inst",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 600.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 8,
+        "fields": {
+            "short_name": "GLDAS_SoilMoi100_200cm_inst",
+            "pretty_name": "SoilMoi100_200cm_inst",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 1000.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 9,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_sm",
+            "pretty_name": "sm",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 10,
+        "fields": {
+            "short_name": "SMOS_sm",
+            "pretty_name": "Soil_Moisture",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 11,
+        "fields": {
+            "short_name": "ERA5_sm",
+            "pretty_name": "swvl1",
+            "help_text": "",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 12,
+        "fields": {
+            "short_name": "ERA5-Land_sm",
+            "pretty_name": "swvl1",
+            "help_text": "Soil Water Layer 1",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
+    }
+]

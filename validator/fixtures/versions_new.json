@@ -1,0 +1,137 @@
+[
+    {
+        "model": "validator.datasetversion",
+        "pk": 1,
+        "fields": {
+            "short_name": "C3S_V201706",
+            "pretty_name": "v201706",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 2,
+        "fields": {
+            "short_name": "SMAP_V5_PM",
+            "pretty_name": "v5 PM/ascending",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 3,
+        "fields": {
+            "short_name": "ASCAT_H113",
+            "pretty_name": "H113",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 4,
+        "fields": {
+            "short_name": "ISMN_V20180712_TEST",
+            "pretty_name": "20180712 testset",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 5,
+        "fields": {
+            "short_name": "ISMN_V20180712_MINI",
+            "pretty_name": "20180712 mini testset",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 6,
+        "fields": {
+            "short_name": "ISMN_V20180830_GLOBAL",
+            "pretty_name": "20180830 global",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 7,
+        "fields": {
+            "short_name": "GLDAS_NOAH025_3H_2_1",
+            "pretty_name": "NOAH025 3H.2.1",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 8,
+        "fields": {
+            "short_name": "GLDAS_TEST",
+            "pretty_name": "TEST",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 10,
+        "fields": {
+            "short_name": "C3S_V201812",
+            "pretty_name": "v201812",
+            "help_text": "C3S from December 2018"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 11,
+        "fields": {
+            "short_name": "ISMN_V20190222",
+            "pretty_name": "20190222 global",
+            "help_text": "ISMN data set from 2019-02-22"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 12,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_V04_4",
+            "pretty_name": "v04.4",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 13,
+        "fields": {
+            "short_name": "SMOS_105_ASC",
+            "pretty_name": "V.105 Ascending",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 14,
+        "fields": {
+            "short_name": "ERA5_test",
+            "pretty_name": "ERA5 test",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 15,
+        "fields": {
+            "short_name": "ERA5_20190613",
+            "pretty_name": "v20190613",
+            "help_text": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 16,
+        "fields": {
+            "short_name": "ERA5-Land_V20190904",
+            "pretty_name": "v20190904",
+            "help_text": "Downloaded at 2019/09/04"
+        }
+    }
+]
