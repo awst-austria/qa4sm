@@ -64,7 +64,7 @@ class SystemSettingsAdmin(ModelAdmin):
                 for w in workers:
                     w['active_tasks'] = len(active_tasks[w['name']])
                     w['scheduled_tasks'] = len(sched_tasks[w['name']])
-        except ConnectionResetError as cre:
+        except Exception  as cre:
             self.__logger.exception('Can\'t get queue information: ', cre)
 
         context = {
