@@ -38,6 +38,7 @@ ASCAT_H113 = 'ASCAT_H113'
 ERA5_test = 'ERA5_test'
 ERA5_20190613 = 'ERA5_20190613'
 ERA5_Land_V20190904 = 'ERA5-Land_V20190904'
+ERA5_Land_test = 'ERA5-Land_test'
 
 ## dataset data variables
 C3S_sm = 'C3S_sm'
