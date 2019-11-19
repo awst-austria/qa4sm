@@ -185,7 +185,7 @@
 		<tr>
 			<th scope="row">ERA5</th>
 			<td>ERA5 is a global reanalysis product provided by ECMWF. It provides global, sub-daily simulations of variables for land, 
-				atmosphere and ocean waves. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5 Volumetric Soil Moisture 
+				atmosphere and ocean waves. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5 Volumetric Soil Moisture and Soil Temperature
 				with a spatial resolution of 0.25° Lat. * 0.25° Lon were converted into a time series format via daily averages. 
 				The ERA5 dataset starts in 1979. The version number used in QA4SM indicates the date 
 				when the original data was downloaded. For more details about ERA5 please see 
@@ -195,6 +195,27 @@
 			<td>Data is freely available with a CDS account. See <a target="_blank" href="https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation#ERA5datadocumentation-HowtodownloadERA5">
                 ECMWF Confluence - ERA5 Download</a> </td>
 			<td>Click <a target="_blank" href="https://confluence.ecmwf.int/display/CKB/What+is+ERA5">here</a></td>
+            <td>
+                <ul>
+                <li>Frozen soil: <br>Only use soil moisture data from grids cells where there is no frozen soil.</li>
+                </ul>
+            </td>
+		</tr>
+        <tr>
+			<th scope="row">ERA5-Land</th>
+			<td>ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis.
+                The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5-Land Volumetric Soil Moisture and Soil Temperature
+				with a spatial resolution of 0.1° Lat. * 0.1° Lon were converted into a time series format from daily averages.
+                ERA5-Land is available from January 2001 onward. The Soil Temperature variable (stl1) is used to mask
+                Soil Moisture (swvl1) under frozen conditions if selected. The version number used in QA4SM indicates the date
+				when the original data was downloaded. For more details please see
+
+                <a target="_blank" href="https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation">ECMWF Confluence - ERA5-Land Documentation</a></td>
+			<td>Version 20190904 is a snapshot of the reanalysis dataset from this point in time.</td>
+			<td>2001 - 2018</td>
+			<td>Data is freely available with a CDS account. See <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form">
+                Copernicus Climate Data Store Confluence - ERA5-Land Download</a> </td>
+			<td>Click <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview">here</a></td>
             <td>
                 <ul>
                 <li>Frozen soil: <br>Only use soil moisture data from grids cells where there is no frozen soil.</li>
