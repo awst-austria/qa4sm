@@ -199,7 +199,7 @@
         "model": "validator.dataset",
         "pk": 9,
         "fields": {
-            "short_name": "ERA5-Land",
+            "short_name": "ERA5_LAND",
             "pretty_name": "ERA5-Land",
             "help_text": "",
             "source_reference": "",
@@ -207,7 +207,7 @@
             "is_reference": true,
             "versions": [
                 16,
-		17
+                17
             ],
             "variables": [
                 12

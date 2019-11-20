@@ -138,7 +138,7 @@
         "model": "validator.datafilter",
         "pk": 17,
         "fields": {
-            "name": "FIL_ERA5-Land_TEMP_UNFROZEN",
+            "name": "FIL_ERA5_LAND_TEMP_UNFROZEN",
             "description": "Soil not frozen",
             "help_text": "Corresponding depth soil temperature > 1.0 C"
         }

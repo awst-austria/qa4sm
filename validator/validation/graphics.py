@@ -90,7 +90,7 @@ _metric_units = {
     'ASCAT': r'percentage of saturation',
     'SMAP': r'm^3 m^{-3}',
     'ERA5': r'm^3 m^{-3}',
-    'ERA5-Land': r'm^3 m^{-3}'
+    'ERA5_LAND': r'm^3 m^{-3}'
 }
 
 def safe_arange(start, stop, step):
@@ -153,7 +153,7 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
         the_plot = plt.scatter(lons, lats, c=values, cmap=cm, s=markersize, vmin=v_min, vmax=v_max,
                                edgecolors='black', linewidths=0.05, zorder=3)
     else:
-        if validation_run.reference_configuration.dataset.short_name == globals.ERA5_Land:
+        if validation_run.reference_configuration.dataset.short_name == globals.ERA5_LAND:
             dy, dx = -0.1, 0.1
         else:
             dy, dx = -0.25, 0.25
@@ -226,6 +226,7 @@ def identify_dataset_configs(validation_run, metric_col_name):
         dc1 = DatasetConfiguration.objects.get(pk = ds_order[dc1_num - 1])
         dc2 = DatasetConfiguration.objects.get(pk = ds_order[dc2_num - 1])
 
+        print(dc1.dataset.short_name , ds1_name, dc2.dataset.short_name,ds2_name)
         if ((dc1.dataset.short_name != ds1_name) or (dc2.dataset.short_name != ds2_name)):
             raise Exception('Can\'t figure out correct dataset configuration')
 

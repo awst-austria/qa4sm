@@ -62,7 +62,7 @@ def get_used_variables(filters, dataset, variable):
             variables.append(era_temp_variable)
             continue
 
-        if(fil.name == "FIL_ERA5-Land_TEMP_UNFROZEN"):
+        if(fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN"):
             era_temp_variable = variable.pretty_name.replace("wv", "t")
             variables.append(era_temp_variable)
             continue
@@ -155,7 +155,7 @@ def setup_filtering(reader, filters, dataset, variable):
             filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 274.15, era_temp_variable)
             continue
 
-        if(fil.name == "FIL_ERA5-Land_TEMP_UNFROZEN"):
+        if(fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN"):
             era_temp_variable = variable.pretty_name.replace("wv", "t")
             filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 274.15, era_temp_variable)
             continue
