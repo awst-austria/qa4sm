@@ -89,8 +89,14 @@ _metric_units = {
     'GLDAS': r'm^3 m^{-3}',
     'ASCAT': r'percentage of saturation',
     'SMAP': r'm^3 m^{-3}',
-    'ERA5': r'm^3 m^{-3}'
+    'ERA5': r'm^3 m^{-3}',
+    'ERA5_LAND': r'm^3 m^{-3}'
 }
+
+def safe_arange(start, stop, step):
+    f_step = (1. / float(step))
+    vals = np.arange(float(start) * f_step, float(stop) * f_step , float(step) * f_step)
+    return vals / f_step
 
 def generate_boxplot(validation_run, outfolder, variable, label, values, unit_ref):
     png_filename = path.join(outfolder, 'boxplot_{}.png'.format(variable))
@@ -147,13 +153,17 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
         the_plot = plt.scatter(lons, lats, c=values, cmap=cm, s=markersize, vmin=v_min, vmax=v_max,
                                edgecolors='black', linewidths=0.05, zorder=3)
     else:
-        lats_map = np.arange(extent[3], extent[2], -0.25)
-        lons_map = np.arange(extent[0], extent[1], 0.25)
+        if validation_run.reference_configuration.dataset.short_name == globals.ERA5_LAND:
+            dy, dx = -0.1, 0.1
+        else:
+            dy, dx = -0.25, 0.25
+        lats_map = safe_arange(extent[3], extent[2], dy)
+        lons_map = safe_arange(extent[0], extent[1], dx)
 #         lats_map = np.arange(89.875, -60, -0.25)
 #         lons_map = np.arange(-179.875, 180, 0.25)
         values_map = np.empty((len(lats_map), len(lons_map)))
         values_map[:] = np.nan
-
+        
         for i in range(0, len(values)):
             values_map[np.where(lats_map == lats[i])[0][0]][np.where(lons_map == lons[i])[0][0]] = values[i]
 

@@ -52,6 +52,8 @@ def create_reader(dataset, version):
     if dataset.short_name == globals.ERA5:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})    
 
+    if dataset.short_name == globals.ERA5_LAND:
+        reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})
 
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))

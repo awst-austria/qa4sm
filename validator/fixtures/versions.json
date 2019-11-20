@@ -124,6 +124,24 @@
 			"pretty_name": "v20190613",
 			"help_text": ""
 		}
+	},
+	{
+		"model": "validator.datasetversion",
+       	"pk": 16,
+     	"fields": {
+            "short_name": "ERA5_LAND_V20190904",
+            "pretty_name": "v20190904",
+            "help_text": ""
+		}
+	},
+	{
+		"model": "validator.datasetversion",
+		"pk": 17,
+		"fields": {
+			"short_name": "ERA5_LAND_TEST",
+			"pretty_name": "ERA5-Land test",
+			"help_text": ""
+		}
 	}
 	
 	
