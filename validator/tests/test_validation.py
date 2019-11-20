@@ -712,6 +712,7 @@ class TestValidation(TestCase):
     def test_generate_graphs(self):
         infile1 = 'testdata/c3s_ismn.nc'
         infile2 = 'testdata/c3s_gldas.nc'
+        infile3 = 'testdata/c3s_era5land.nc'
 
         # create validation object and data folder for it
         v = self.generate_default_validation()
@@ -742,6 +743,7 @@ class TestValidation(TestCase):
         val.mkdir_if_not_exists(run_dir)
 
         # do the same for the other netcdf file
+
         shutil.copy(infile2, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         # heatmap
@@ -756,5 +758,27 @@ class TestValidation(TestCase):
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+
+        # remove results from first test and recreate dir
+        shutil.rmtree(run_dir)
+        val.mkdir_if_not_exists(run_dir)
+
+        # do the same for the other netcdf file
+
+        shutil.copy(infile3, path.join(run_dir, 'results.nc'))
+        val.set_outfile(v, run_dir)
+        # heatmap
+        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
+        v.reference_configuration.save()
+        val.generate_all_graphs(v, run_dir)
+
+        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        assert len(boxplot_pngs) == 12
+
+        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+
 
         self.delete_run(v)

@@ -226,7 +226,6 @@ def identify_dataset_configs(validation_run, metric_col_name):
         dc1 = DatasetConfiguration.objects.get(pk = ds_order[dc1_num - 1])
         dc2 = DatasetConfiguration.objects.get(pk = ds_order[dc2_num - 1])
 
-        print(dc1.dataset.short_name , ds1_name, dc2.dataset.short_name,ds2_name)
         if ((dc1.dataset.short_name != ds1_name) or (dc2.dataset.short_name != ds2_name)):
             raise Exception('Can\'t figure out correct dataset configuration')
 
