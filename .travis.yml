@@ -1,0 +1,59 @@
+dist: xenial
+os:
+  - linux
+services:
+  - xvfb
+language: python
+sudo: false
+addons:
+  apt:
+    packages:
+      - gfortran
+      - gcc
+      - libgrib-api-dev
+notifications:
+  email: false
+python:
+  # We don't actually use the Travis Python, but this keeps it organized.
+  - "3.6"
+  # - "3.7"
+install:
+  # You may want to periodically update this, although the conda update
+  # conda line below will keep everything up-to-date.  We do this
+  # conditionally because it saves us some downloading if the version is
+  # the same.
+  - wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+
+  #- export INSTALL_DIR="<install_dir>"
+  #- export MINICONDA_PATH="<conda_dir>"
+  #- export TOOL_DIR="<tools_dir>"
+  #- export PYTHON_ENV_DIR="<pytenv_dir>"
+
+  - conda create -f environment/qa4sm_env.yml -n qa4sm
+  - source activate qa4sm
+
+  - bash ./init_config.sh jenkins
+
+  #- python manage.py makemigrations
+  - python manage.py migrate
+  #- python manage.py collectstatic
+
+  - python manage.py loaddata versions variables filters datasets
+
+  - pip list
+  - which pip
+  - which python
+
+script:
+  - pytest -m "not long_running"
+after_success:
+  # report coverage results to coveralls.io
+  #- pip install coveralls
+  #- coveralls
