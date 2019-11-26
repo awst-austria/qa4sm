@@ -36,7 +36,7 @@ install:
   #- export TOOL_DIR="<tools_dir>"
   #- export PYTHON_ENV_DIR="<pytenv_dir>"
 
-  - conda create -f environment/qa4sm_env.yml -n qa4sm
+  - conda env create -f environment/qa4sm_env.yml -n qa4sm
   - source activate qa4sm
 
   - bash ./init_config.sh jenkins
