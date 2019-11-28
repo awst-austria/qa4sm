@@ -69,6 +69,7 @@ if [ "x$ENV" == "xtest" ]; then
     SSL_SECURITY=""
     DATA_FOLDER="$DIRNAME/../testdata/input_data"
     DBSM="sqlite"
+    LOGFILE="/tmp/log/valentina/valentina.log"
 fi
 
 
