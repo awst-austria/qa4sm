@@ -67,7 +67,7 @@ if [ "x$ENV" == "xtest" ]; then
     DEBUGFLAG="True"
     ALLOWED_HOSTS="['127.0.0.1', 'localhost']"
     SSL_SECURITY=""
-    DATA_FOLDER="$DIRNAME/../testdata/input_data"
+    DATA_FOLDER="$DIRNAME/testdata/input_data"
     DBSM="sqlite"
     LOGFILE="/tmp/log/valentina/valentina.log"
 fi

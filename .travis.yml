@@ -40,7 +40,7 @@ install:
   - source activate qa4sm
 
   - bash ./init_config.sh test
-
+  - mkdir -p /tmp/log/valentina
   #- python manage.py makemigrations
   - python manage.py migrate
   #- python manage.py collectstatic
