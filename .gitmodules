@@ -1,0 +1,4 @@
+[submodule "testdata"]
+	path = testdata
+	url = https://github.com/wpreimes/qa4sm-testdata
+	branch = master
