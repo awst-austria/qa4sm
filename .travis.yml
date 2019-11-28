@@ -39,7 +39,7 @@ install:
   - conda env create -f environment/qa4sm_env.yml -n qa4sm
   - source activate qa4sm
 
-  - bash ./init_config.sh jenkins
+  - bash ./init_config.sh test
 
   #- python manage.py makemigrations
   - python manage.py migrate
@@ -52,7 +52,7 @@ install:
   - which python
 
 script:
-  - pytest -m "not long_running"
+  - pytest
 after_success:
   # report coverage results to coveralls.io
   #- pip install coveralls

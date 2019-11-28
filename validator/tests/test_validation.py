@@ -14,7 +14,7 @@ User = get_user_model()
 
 from validator.validation.batches import _geographic_subsetting
 import valentina
-from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
+from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE, BASE_DIR
 
 from dateutil.tz import tzlocal
 from django.test import TestCase
@@ -35,6 +35,8 @@ import validator.validation as val
 from validator.validation.globals import METRICS
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation import globals
+from pygeogrids.netcdf import load_grid
+
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -72,7 +74,7 @@ class TestValidation(TestCase):
         data_c = DatasetConfiguration()
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201706')
+        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
         data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
         data_c.save()
 
@@ -227,8 +229,8 @@ class TestValidation(TestCase):
         #run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
 
-        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
         run.save()
 
@@ -248,9 +250,10 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 4
+        assert new_run.total_points == 9 # 9 ismn stations in hawaii testdata
         assert new_run.error_points == 0
-        assert new_run.ok_points == 4
+        assert new_run.ok_points == 9
+
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -384,9 +387,9 @@ class TestValidation(TestCase):
         ## fetch results from db
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 4
+        assert new_run.total_points == 9
         assert new_run.error_points == 0
-        assert new_run.ok_points == 4
+        assert new_run.ok_points == 9
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -517,7 +520,7 @@ class TestValidation(TestCase):
                 if dataset.short_name == val.globals.ISMN:
                     data = reader.read_ts(0)
                 else:
-                    data = reader.read_ts(16.366667, 48.2) ## vienna calling...
+                    data = reader.read_ts(-155.42, 19.78) ## hawaii calling...
                 assert data is not None
                 assert isinstance(data, pd.DataFrame)
 
@@ -618,12 +621,12 @@ class TestValidation(TestCase):
                 print(total_points)
                 self._check_jobs(total_points, jobs)
 
-    def test_geographic_subetting(self):
-        # austria bounding box
-        min_lat = 9.48
-        min_lon = 46.43
-        max_lat = 16.98
-        max_lon = 49.04
+    def test_geographic_subsetting(self):
+        # hawaii bounding box
+        min_lat = 18.625 # ll
+        min_lon = -156.375  # ll
+        max_lat = 20.375  # ur
+        max_lon = -154.625  # ur
 
         # we need the reader just to get the grid
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
@@ -631,7 +634,7 @@ class TestValidation(TestCase):
 
         subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
 
-        assert len(subgpis) > 100
+        assert len(subgpis) == 16.
         assert len(sublats) == len(subgpis)
         assert len(sublons) == len(subgpis)
 
@@ -640,7 +643,7 @@ class TestValidation(TestCase):
         assert not np.any(sublons > max_lon), "subsetting error: max_lon"
         assert not np.any(sublons < min_lon), "subsetting error: min_lon"
 
-    def test_no_geographic_subetting(self):
+    def test_no_geographic_subsetting(self):
         # we need the reader just to get the grid
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
         gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
@@ -651,7 +654,7 @@ class TestValidation(TestCase):
         assert np.array_equal(lats, sublats)
         assert np.array_equal(lons, sublons)
 
-    def test_geographic_subetting_across_dateline(self):
+    def test_geographic_subsetting_across_dateline(self):
         test_coords = [(-34.30, -221.13, 80.17, -111.44), # dateline left
                        (-58.81, 127.61, 77.15, 256.99) # dateline right
                        ]
@@ -660,8 +663,11 @@ class TestValidation(TestCase):
         russia_gpi2 = 898567
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
-            c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
-            gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+            global_qdeg_grid_path = os.path.join(BASE_DIR, 'testdata', 'input_data', 'global_qdeg_grid.nc')
+            assert os.path.isfile(global_qdeg_grid_path)
+            #c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
+            grid = load_grid(global_qdeg_grid_path)
+            gpis, lats, lons, cells = grid.get_grid_points()
 
             subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
 
@@ -673,8 +679,10 @@ class TestValidation(TestCase):
 
     def test_geographic_subsetting_shifted(self):
         ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201706'))
-        gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+        global_qdeg_grid_path = os.path.join(BASE_DIR, 'testdata', 'input_data', 'global_qdeg_grid.nc')
+        assert os.path.isfile(global_qdeg_grid_path)
+        grid = load_grid(global_qdeg_grid_path)
+        gpis, lats, lons, cells = grid.get_grid_points()
 
         test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1), # americas
                        (9.79, -710.50, 70.14, -545.27, 2), #asia
@@ -782,3 +790,8 @@ class TestValidation(TestCase):
 
 
         self.delete_run(v)
+
+
+if __name__ == '__main__':
+    test = TestValidation()
+    test.test_validation()
