@@ -128,13 +128,13 @@ class TestValidity(TestCase):
         run.user = self.testuser
         # set validation period
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
         run.save()
 
         data_c = DatasetConfiguration()
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201706')
+        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
         data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
         data_c.save() # object needs to be saved before m2m relationship can be used
 

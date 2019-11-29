@@ -15,3 +15,5 @@ junit.xml
 emails
 /static/
 run_celery/
+.coverage*
+*/python_metadata/*

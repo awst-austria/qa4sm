@@ -1,0 +1,4 @@
+[submodule "testdata"]
+	path = testdata
+	url = https://github.com/awst-austria/qa4sm-testdata
+	branch = master
