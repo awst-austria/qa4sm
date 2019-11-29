@@ -2,14 +2,14 @@
 ## Will be imported from settings.py
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'z=p24(y^*h!&8(soze-v*(joi$=o4!*1ng(_d7e9)aejy7_xpr'
+SECRET_KEY = 'f83!*i*xha#a$$%p1b5_vh3bs*s(s5u!=a$0-f257zk2p41+os'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-DATA_FOLDER = '/home/wpreimes/QA4SM/qa4sm/testdata/input_data'
+DATA_FOLDER = './testdata/input_data'
 
-LOG_FILE = '/home/wpreimes/QA4SM/log/valentina/valentina.log'
+LOG_FILE = '/tmp/log/valentina/valentina.log'
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -40,5 +40,5 @@ EMAIL_USE_TLS = 'yes'
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'qa4sm@awst.at'
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/home/wpreimes/QA4SM/tmp/app-messages'
+#EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+#EMAIL_FILE_PATH = '/tmp/app-messages'

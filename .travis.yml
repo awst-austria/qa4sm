@@ -31,19 +31,13 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
 
-  #- export INSTALL_DIR="<install_dir>"
-  #- export MINICONDA_PATH="<conda_dir>"
-  #- export TOOL_DIR="<tools_dir>"
-  #- export PYTHON_ENV_DIR="<pytenv_dir>"
-
   - conda env create -f environment/qa4sm_env.yml -n qa4sm
   - source activate qa4sm
 
   - bash ./init_config.sh test
   - mkdir -p /tmp/log/valentina
-  #- python manage.py makemigrations
+
   - python manage.py migrate
-  #- python manage.py collectstatic
 
   - python manage.py loaddata versions variables filters datasets
 
@@ -52,7 +46,7 @@ install:
   - which python
 
 script:
-  - pytest
+  - pytest -m "not needs_advanced_setup"
 after_success:
   # report coverage results to coveralls.io
   #- pip install coveralls

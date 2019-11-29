@@ -271,8 +271,8 @@ class TestValidation(TestCase):
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
         run.reference_configuration.save()
 
-        run.interval_from = datetime(2005, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2006, 1, 1, tzinfo=UTC)
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
 
         run.save()
 
@@ -291,9 +291,9 @@ class TestValidation(TestCase):
 
         assert new_run
 
-        assert new_run.total_points == 51
+        assert new_run.total_points == 21
         assert new_run.error_points == 0
-        assert new_run.ok_points == 51
+        assert new_run.ok_points == 21
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -311,8 +311,8 @@ class TestValidation(TestCase):
 
         run.reference_configuration.save()
 
-        run.interval_from = datetime(2005, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2006, 1, 1, tzinfo=UTC)
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
 
         run.save()
 
@@ -331,9 +331,9 @@ class TestValidation(TestCase):
 
         assert new_run, "Didn't find validation in database"
 
-        assert new_run.total_points == 400, "Number of gpis is off"
+        assert new_run.total_points == 12, "Number of gpis is off"
         assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 400, "OK points are off"
+        assert new_run.ok_points == 12, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -366,9 +366,9 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 4
+        assert new_run.total_points == 9
         assert new_run.error_points == 0
-        assert new_run.ok_points == 4
+        assert new_run.ok_points == 9
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -415,9 +415,9 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 4
+        assert new_run.total_points == 9
         assert new_run.error_points == 0
-        assert new_run.ok_points == 4
+        assert new_run.ok_points == 9
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -427,7 +427,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
-        run.anomalies_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.anomalies_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59, tzinfo=UTC)
         run.save()
 
@@ -446,9 +446,9 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 4
+        assert new_run.total_points == 9
         assert new_run.error_points == 0
-        assert new_run.ok_points == 4
+        assert new_run.ok_points == 9
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -457,11 +457,11 @@ class TestValidation(TestCase):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        ## usa bounding box
-        run.min_lat = 22.42
-        run.min_lon = -131.57
-        run.max_lat = 51.60
-        run.max_lon = -58.62
+        # hawaii bounding box
+        run.min_lat = 18.625 # ll
+        run.min_lon = -156.375  # ll
+        run.max_lat = 20.375  # ur
+        run.max_lon = -154.625  # ur
 
         run.save()
 
@@ -480,9 +480,9 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 4
+        assert new_run.total_points == 9
         assert new_run.error_points == 0
-        assert new_run.ok_points == 4
+        assert new_run.ok_points == 9
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -567,7 +567,7 @@ class TestValidation(TestCase):
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
                         else:
-                            data = msk_reader.read_ts(16.6, 48.2)
+                            data = msk_reader.read_ts(-155.42, 19.78)  # 16.6, 48.2)
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
@@ -718,9 +718,9 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_generate_graphs(self):
-        infile1 = 'testdata/c3s_ismn.nc'
-        infile2 = 'testdata/c3s_gldas.nc'
-        infile3 = 'testdata/c3s_era5land.nc'
+        infile1 = 'testdata/output_data/c3s_ismn.nc'
+        infile2 = 'testdata/output_data/c3s_gldas.nc'
+        infile3 = 'testdata/output_data/c3s_era5land.nc'
 
         # create validation object and data folder for it
         v = self.generate_default_validation()
@@ -790,8 +790,3 @@ class TestValidation(TestCase):
 
 
         self.delete_run(v)
-
-
-if __name__ == '__main__':
-    test = TestValidation()
-    test.test_validation()
