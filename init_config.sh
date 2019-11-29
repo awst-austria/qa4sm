@@ -45,7 +45,7 @@ if [ "x$ENV" == "xjenkins" ]; then
     FORCE_SCRIPT_NAME=''
     DEBUGFLAG="True"
     SSL_SECURITY=""
-    DATA_FOLDER="/data/qa4sm/data/"
+    DATA_FOLDER="/data/qa4sm/testdata/input_data"
     DBSM="sqlite"
 fi
 
