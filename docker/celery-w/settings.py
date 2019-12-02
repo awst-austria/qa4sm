@@ -14,40 +14,6 @@ import os
 import django
 from valentina.settings_conf import *
 from valentina.version import APP_VERSION
-import django.core.management.utils
-
-SECRET_KEY = django.core.management.utils.get_random_secret_key()
-
-DATA_FOLDER = '/var/lib/qa4sm-web-val/valentina/data/'
-
-LOG_FILE = 'valentina.log'
-
-ALLOWED_HOSTS = os.environ['QA4SM_ALLOWED_HOSTS'].split(',')
-
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-
-FORCE_SCRIPT_NAME = ''
-
-#Celery settings
-CELERY_BROKER_URL = os.environ['QA4SM_RABBIT_URL']
-CELERY_RESULT_BACKEND = os.environ['QA4SM_REDIS']
-CELERY_ACCEPT_CONTENT = ['json','pickle']
-CELERY_TASK_SERIALIZER = 'pickle'
-CELERY_RESULT_SERIALIZER = 'pickle'
-CELERY_BROKER_TRANSPORT_OPTIONS = {'max_retries': 3,'interval_start': 1,'interval_step': 1,'interval_max': 3,}
-
-## Email settings
-EMAIL_HOST = os.environ['QA4SM_EMAIL_HOST']
-EMAIL_PORT = os.environ['QA4SM_EMAIL_PORT']
-EMAIL_HOST_USER = os.environ['QA4SM_EMAIL_HOST_USER']
-EMAIL_FROM = os.environ['QA4SM_EMAIL_FROM']
-EMAIL_USE_TLS = os.environ['QA4SM_EMAIL_USE_TLS']
-EMAIL_HOST_PASSWORD = os.environ['QA4SM_EMAIL_HOST_PASSWORD']
-DEFAULT_FROM_EMAIL = os.environ['QA4SM_DEFAULT_FROM_EMAIL']
-
-
-# ###
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -107,17 +73,16 @@ WSGI_APPLICATION = 'valentina.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
 DATABASES = {
-        'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'valentina',
-        'USER': 'django',
-        'PASSWORD': os.environ['QA4SM_DB_PASS'],
-        'HOST': os.environ['QA4SM_DB_HOST'],
-        'PORT': '',
-        }
+    'default': {
+    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    'NAME': os.environ['QA4SM_DB_NAME'],
+    'USER': os.environ['QA4SM_DB_USER'],
+    'PASSWORD': os.environ['QA4SM_DB_PASSWORD'],
+    'HOST': os.environ['QA4SM_DB_HOST'],
+    'PORT': '',
     }
+}
 
 AUTH_USER_MODEL = 'validator.User'
 
@@ -198,7 +163,10 @@ LOGGING = {
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
-CSRF_COOKIE_SECURE = True
+#try:
+#    CSRF_COOKIE_SECURE = not DEBUG
+#except NameError:
+#    CSRF_COOKIE_SECURE = True
 # print("Running with CSRF_COOKIE_SECURE = {}".format(CSRF_COOKIE_SECURE))
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
