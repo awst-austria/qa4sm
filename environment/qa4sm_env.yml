@@ -3,123 +3,124 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - _libgcc_mutex=0.1=main
-  - asn1crypto=0.24.0=py36_1003
-  - atomicwrites=1.3.0=py_0
-  - attrs=19.1.0=py_0
-  - bzip2=1.0.8=h516909a_1
-  - ca-certificates=2019.9.11=hecc5488_0
-  - cartopy=0.17.0=py36h4331854_1006
-  - certifi=2019.9.11=py36_0
-  - cffi=1.12.3=py36h8022711_0
-  - chardet=3.0.4=py36_1003
-  - configobj=5.0.6=py_0
-  - cryptography=2.7=py36h72c5cf5_0
-  - curl=7.65.3=hf8cf82a_0
-  - cycler=0.10.0=py_1
-  - cython=0.29.13=py36he1b5a44_0
-  - dbus=1.13.6=he372182_0
-  - django=2.2.5=py36_0
-  - eccodes=2.13.1=hec26673_1
-  - expat=2.2.5=he1b5a44_1003
-  - fontconfig=2.13.1=h86ecdb6_1001
-  - freetype=2.10.0=he983fc9_1
-  - geos=3.7.2=he1b5a44_2
-  - gettext=0.19.8.1=hc5be6a0_1002
-  - glib=2.58.3=h6f030ca_1002
-  - gst-plugins-base=1.14.5=h0935bb2_0
-  - gstreamer=1.14.5=h36ae1b5_0
-  - hdf4=4.2.13=h9a582f1_1002
-  - hdf5=1.10.5=nompi_h3c11f04_1103
-  - icu=64.2=he1b5a44_1
-  - idna=2.8=py36_1000
-  - importlib_metadata=0.22=py36_0
-  - jasper=1.900.1=h07fcdf6_1006
-  - jpeg=9c=h14c3975_1001
-  - kiwisolver=1.1.0=py36hc9558a2_0
-  - krb5=1.16.3=h05b26f9_1001
-  - libaec=1.0.4=hf484d3e_0
-  - libblas=3.8.0=12_openblas
-  - libcblas=3.8.0=12_openblas
-  - libcurl=7.65.3=hda55be3_0
-  - libedit=3.1.20170329=hf8c457e_1001
-  - libffi=3.2.1=he1b5a44_1006
-  - libgcc-ng=9.1.0=hdf63c60_0
-  - libgfortran-ng=7.3.0=hdf63c60_0
-  - libiconv=1.15=h516909a_1005
-  - liblapack=3.8.0=12_openblas
-  - libnetcdf=4.6.2=h303dfb8_1003
-  - libopenblas=0.3.7=h6e990d7_1
-  - libpng=1.6.37=hed695b0_0
-  - libssh2=1.8.2=h22169c7_2
-  - libstdcxx-ng=9.1.0=hdf63c60_0
-  - libtiff=4.0.10=h57b8799_1003
-  - libuuid=2.32.1=h14c3975_1000
-  - libxcb=1.13=h14c3975_1002
-  - libxml2=2.9.9=hee79883_5
-  - lz4-c=1.8.3=he1b5a44_1001
-  - matplotlib=3.1.1=py36_1
-  - matplotlib-base=3.1.1=py36he7580a8_1
-  - more-itertools=7.2.0=py_0
-  - ncurses=6.1=hf484d3e_1002
-  - numpy=1.17.2=py36h95a1406_0
-  - olefile=0.46=py_0
-  - openssl=1.1.1c=h516909a_0
-  - owslib=0.18.0=py_0
-  - packaging=19.0=py_0
-  - pandas=0.25.1=py36hb3f55d8_0
-  - pcre=8.41=hf484d3e_1003
-  - pillow=6.1.0=py36h6b7be26_1
-  - pip=19.2.3=py36_0
-  - pluggy=0.12.0=py_0
-  - proj4=6.1.1=hc80f0dc_1
-  - pthread-stubs=0.4=h14c3975_1001
-  - py=1.8.0=py_0
-  - pycparser=2.19=py36_1
-  - pyepsg=0.4.0=py_0
-  - pygrib=2.0.4=py36hf3f1b0b_0
-  - pykdtree=1.3.1=py36h3010b51_1002
-  - pyopenssl=19.0.0=py36_0
-  - pyparsing=2.4.2=py_0
-  - pyproj=2.3.1=py36h2fd02e8_0
-  - pyqt=5.9.2=py36hcca6a23_4
-  - pyresample=1.13.0=py36hb3f55d8_0
-  - pyshp=2.1.0=py_0
-  - pysocks=1.7.0=py36_0
-  - pytest=5.1.2=py36_0
-  - python=3.6.7=h357f687_1005
-  - python-dateutil=2.8.0=py_0
-  - pytz=2019.2=py_0
-  - pyyaml=5.1.2=py36h516909a_0
-  - qt=5.9.7=h0c104cb_3
-  - readline=8.0=hf8c457e_0
-  - requests=2.22.0=py36_1
-  - scipy=1.3.1=py36h921218d_2
-  - setuptools=41.2.0=py36_0
-  - sip=4.19.8=py36hf484d3e_1000
-  - six=1.12.0=py36_1000
-  - sqlite=3.29.0=hcee41ef_1
-  - sqlparse=0.3.0=py_0
-  - tk=8.6.9=hed695b0_1003
-  - tornado=6.0.3=py36h516909a_0
-  - urllib3=1.25.3=py36_0
-  - wcwidth=0.1.7=py_1
-  - wheel=0.33.6=py36_0
-  - xorg-libxau=1.0.9=h14c3975_0
-  - xorg-libxdmcp=1.1.3=h516909a_0
-  - xz=5.2.4=h14c3975_1001
-  - yaml=0.1.7=h14c3975_1001
-  - zipp=0.6.0=py_0
-  - zlib=1.2.11=h516909a_1006
-  - zstd=1.4.0=h3b9ef0a_0
+  - _libgcc_mutex=0.1
+  - attrs=19.3.0
+  - bzip2=1.0.8
+  - ca-certificates=2019.11.28
+  - cartopy=0.17.0
+  - certifi=2019.11.28
+  - cffi=1.13.2
+  - chardet=3.0.4
+  - configobj=5.0.6
+  - cryptography=2.8
+  - curl=7.65.3
+  - cycler=0.10.0
+  - cython=0.29.14
+  - dbus=1.13.6
+  - django=2.2.8
+  - eccodes=2.14.1
+  - expat=2.2.5
+  - fontconfig=2.13.1
+  - freetype=2.10.0
+  - geos=3.8.0
+  - gettext=0.19.8.1
+  - glib=2.58.3
+  - gst-plugins-base=1.14.5
+  - gstreamer=1.14.5
+  - hdf4=4.2.13
+  - hdf5=1.10.5
+  - icu=64.2
+  - idna=2.8
+  - importlib_metadata=1.1.0
+  - jasper=1.900.1
+  - jpeg=9c
+  - kiwisolver=1.1.0
+  - krb5=1.16.3
+  - libaec=1.0.4
+  - libblas=3.8.0
+  - libcblas=3.8.0
+  - libclang=9.0.0
+  - libcurl=7.65.3
+  - libedit=3.1.20170329
+  - libffi=3.2.1
+  - libgcc-ng=9.2.0
+  - libgfortran-ng=7.3.0
+  - libiconv=1.15
+  - liblapack=3.8.0
+  - libllvm9=9.0.0
+  - libnetcdf=4.7.1
+  - libopenblas=0.3.7
+  - libpng=1.6.37
+  - libssh2=1.8.2
+  - libstdcxx-ng=9.2.0
+  - libtiff=4.1.0
+  - libuuid=2.32.1
+  - libxcb=1.13
+  - libxkbcommon=0.9.1
+  - libxml2=2.9.10
+  - lz4-c=1.8.3
+  - matplotlib=3.1.2
+  - matplotlib-base=3.1.2
+  - more-itertools=7.2.0
+  - ncurses=6.1
+  - nspr=4.23
+  - nss=3.47
+  - olefile=0.46
+  - openssl=1.1.1d
+  - owslib=0.19.0
+  - packaging=19.2
+  - pandas=0.25.3
+  - pcre=8.43
+  - pillow=6.2.1
+  - pip=19.3.1
+  - pluggy=0.12.0
+  - proj=6.2.1
+  - pthread-stubs=0.4
+  - py=1.8.0
+  - pycparser=2.19
+  - pyepsg=0.4.0
+  - pygrib=2.0.4
+  - pykdtree=1.3.1
+  - pyopenssl=19.1.0
+  - pyparsing=2.4.5
+  - pyproj=2.4.2.post1
+  - pyqt=5.12.3
+  - pyresample=1.13.2
+  - pyshp=2.1.0
+  - pysocks=1.7.1
+  - pytest=5.3.1
+  - python=3.6.7
+  - python-dateutil=2.8.1
+  - pytz=2019.3
+  - pyyaml=5.1.2
+  - qt=5.12.5
+  - readline=8.0
+  - requests=2.22.0
+  - scipy=1.3.2
+  - setuptools=42.0.2
+  - six=1.13.0
+  - sqlite=3.30.1
+  - sqlparse=0.3.0
+  - tk=8.6.10
+  - tornado=6.0.3
+  - urllib3=1.25.7
+  - wcwidth=0.1.7
+  - wheel=0.33.6
+  - xorg-libxau=1.0.9
+  - xorg-libxdmcp=1.1.3
+  - xz=5.2.4
+  - yaml=0.2.2
+  - zipp=0.6.0
+  - zlib=1.2.11
+  - zstd=1.4.4
   - pip:
-    - amqp==2.5.1
+    - amqp==2.5.2
     - ascat==1.0
     - billiard==3.5.0.5
     - c3s-sm==0.1.1
-    - cdsapi==0.2.3
+    - cdsapi==0.2.5
     - celery==4.1.1
-    - cftime==1.0.3.4
+    - cftime==1.0.4.2
     - configparser==4.0.2
     - coverage==4.5.4
     - datedown==0.3
@@ -127,32 +128,35 @@ dependencies:
     - django-widget-tweaks==1.4.5
     - ease-grid==0.1
     - ecmwf-api-client==1.5.4
-    - ecmwf-models==0.5
+    - ecmwf-models==0.6
     - esa-cci-sm==0.1.1
     - gldas==0.5
     - h5py==2.10.0
-    - ismn==0.3.1
-    - kombu==4.6.4
-    - lxml==4.4.1
-    - netcdf4==1.5.2
+    - ismn==0.3.2
+    - kombu==4.6.6
+    - lxml==4.4.2
+    - netcdf4==1.5.3
     - nose==1.3.7
+    - numpy==1.17.4
     - parse==1.12.1
-    - psycopg2-binary==2.8.3
+    - psycopg2-binary==2.8.4
     - pygeobase==0.3.18
     - pygeogrids==0.2.6
     - pynetcf==0.1.18
-    - pytesmo==0.7.1
-    - pytest-cov==2.7.1
-    - pytest-django==3.5.1
-    - pytest-mpl==0.10
-    - redis==3.3.8
-    - repurpose==0.6
+    - pyqt5-sip==4.19.18
+    - pyqtwebengine==5.12.1
+    - pytesmo==0.8
+    - pytest-cov==2.8.1
+    - pytest-django==3.7.0
+    - pytest-mpl==0.11
+    - redis==3.3.11
+    - repurpose==0.7.1
     - seaborn==0.9.0
     - shapely==1.6.4.post2
     - smap-io==0.3
     - smecv-grid==0.2
     - smos==0.1
-    - tqdm==4.35.0
+    - tqdm==4.40.0
     - trollsift==0.2.1
     - vine==1.3.0
-    - xarray==0.12.3
+    - xarray==0.14.1
