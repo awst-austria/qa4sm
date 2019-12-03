@@ -11,7 +11,7 @@ PYTHON_ENV_DIR="$2"
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 
 echo "Creating conda environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib cartopy
+conda create --yes --prefix "$PYTHON_ENV_DIR" -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib cartopy
 conda activate "$PYTHON_ENV_DIR"
 
 export USE_CYTHON=True
@@ -46,5 +46,5 @@ pip install pytesmo
 #pip install git+https://github.com/TUW-GEO/pytesmo.git
 pip install ismn
 
-conda env export --no-builds --prefix=$PYTHON_ENV_DIR > qa4sm_env.yml
+conda env export --no-builds --prefix="$PYTHON_ENV_DIR" > qa4sm_env.yml
 sed -i '/^prefix:/d' qa4sm_env.yml
