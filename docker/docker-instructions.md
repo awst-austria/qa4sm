@@ -11,12 +11,19 @@
 - webapp/run.sh
 - celery-w/run.sh
 
+## Set password for the email account
+Set the `EMAIL_HOST_PASSWORD` in webapp/settings_conf.py
+
 ## Build the required containers
 * webapp/build.sh
 * celery-w/build.sh
 
 ## Start containers
-* [container name]/run.sh
+* db/run.sh
+* rabbitmq/run.sh
+* redis/run.sh
+* webapp/run.sh
+* celery-w/run.sh
 
 ## Webapp default admin account
 * Defined in webapp/entrypoint.sh
