@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - _libgcc_mutex=0.1
+  - asgiref=3.2.3
   - attrs=19.3.0
   - bzip2=1.0.8
   - ca-certificates=2019.11.28
@@ -17,7 +18,7 @@ dependencies:
   - cycler=0.10.0
   - cython=0.29.14
   - dbus=1.13.6
-  - django=2.2.8
+  - django=3.0
   - eccodes=2.14.1
   - expat=2.2.5
   - fontconfig=2.13.1
@@ -63,7 +64,7 @@ dependencies:
   - matplotlib-base=3.1.2
   - more-itertools=7.2.0
   - ncurses=6.1
-  - nspr=4.23
+  - nspr=4.24
   - nss=3.47
   - olefile=0.46
   - openssl=1.1.1d
@@ -92,7 +93,7 @@ dependencies:
   - python=3.6.7
   - python-dateutil=2.8.1
   - pytz=2019.3
-  - pyyaml=5.1.2
+  - pyyaml=5.2
   - qt=5.12.5
   - readline=8.0
   - requests=2.22.0
