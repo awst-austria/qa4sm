@@ -11,6 +11,12 @@
 - webapp/run.sh
 - celery-w/run.sh
 
+# Set the desired QA4SM branch to be built
+In `webapp/Dockerfile` and `celery-w/Dockerfile` set the correct git branch to be checked out for build.
+Replace "dockerize" with the desired branch or tag in the following line:
+`RUN git clone -b dockerize --single-branch https://github.com/awst-austria/qa4sm.git /tmp/qa4sm-git`
+
+
 ## Set password for the email account
 Set the `EMAIL_HOST_PASSWORD` in webapp/settings_conf.py
 
