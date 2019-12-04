@@ -8,6 +8,7 @@ fi
 MINICONDA_PATH="$1"
 PYTHON_ENV_DIR="$2"
 
+export PATH="$MINICONDA_PATH/bin:$PATH"
 source $MINICONDA_PATH/etc/profile.d/conda.sh
 
 echo "Creating conda environment in $PYTHON_ENV_DIR"
