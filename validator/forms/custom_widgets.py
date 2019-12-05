@@ -26,6 +26,7 @@ class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
                     duper['help_text'] = fil.help_text
                     duper['parameterised'] = fil.parameterised
                     duper['dialog_name'] = fil.dialog_name
+                    duper['default_parameter'] = fil.default_parameter
                     break
 
         return duper
