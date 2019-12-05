@@ -16,9 +16,8 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.template import loader
 
-from validator.forms import DatasetConfigurationForm
-from validator.forms import FilterCheckboxSelectMultiple
-from validator.forms import ValidationRunForm
+from validator.forms import DatasetConfigurationForm, FilterCheckboxSelectMultiple,\
+    ValidationRunForm, ParamFilterChoiceField, ParamFilterSelectMultiple
 from validator.models import DataFilter
 from validator.models import Dataset
 from validator.models import Settings
@@ -158,12 +157,21 @@ def __render_options(entity_list):
     return content
 
 # render filters as html checkboxes with descriptions
-def __render_filters(filters, filter_widget_id):
+def __render_filters(filters, filter_widget_id, parametrised = False):
     widget_name = regex_subs(r'^id_', '', filter_widget_id)
-    filter_field = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=filters, required=False)
+    if parametrised:
+        filter_field = ParamFilterChoiceField(widget=ParamFilterSelectMultiple, queryset=filters, required=False)
+    else:
+        filter_field = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=filters, required=False)
+
+    preselected = None
+    if filters:
+        # pre-select the first filter
+        preselected = filters[0].id
+
     filter_html = filter_field.widget.render(
         name=widget_name,
-        value=filters[0].id, # this pre-selects the first filter in the form
+        value=preselected,
         attrs={'id': filter_widget_id})
     return filter_html
 
@@ -172,6 +180,7 @@ def __render_filters(filters, filter_widget_id):
 def ajax_get_dataset_options(request):
     selected_dataset_name = request.GET.get('dataset_id')
     filter_widget_id = request.GET.get('filter_widget_id')
+    param_filter_widget_id = request.GET.get('param_filter_widget_id')
 
     try:
         selected_dataset = Dataset.objects.get(pk=selected_dataset_name)
@@ -181,7 +190,8 @@ def ajax_get_dataset_options(request):
     response_data = {
         'versions': __render_options(selected_dataset.versions.all().order_by('pretty_name')),
         'variables': __render_options(selected_dataset.variables.all().order_by('id')),
-        'filters': __render_filters(selected_dataset.filters.all(), filter_widget_id),
+        'filters': __render_filters(selected_dataset.filters.filter(parameterised=False), filter_widget_id, parametrised = False),
+        'paramfilters': __render_filters(selected_dataset.filters.filter(parameterised=True), param_filter_widget_id, parametrised = True),
         }
 
     return JsonResponse(response_data)

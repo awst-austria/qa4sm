@@ -1,11 +1,13 @@
 from datetime import datetime
 
-from django.forms.models import ModelChoiceIterator
+from django.forms.models import ModelChoiceIterator, ModelMultipleChoiceField
 from pytz import UTC
 
 import django.forms as forms
+from validator.models import ParametrisedFilter
 
-
+## check if switching to this approach is better:
+## https://medium.com/@alfarhanzahedi/customizing-modelmultiplechoicefield-in-a-django-form-96e3ae7e1a07
 class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     """
     Hackaround to render the data filters checkboxes with help texts and correct
@@ -15,16 +17,52 @@ class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     template_name = 'widgets/filter_checkbox_select.html'
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        duper = super(forms.CheckboxSelectMultiple, self).create_option(name, value, label, selected, index, subindex, attrs)
+        duper = super(FilterCheckboxSelectMultiple, self).create_option(name, value, label, selected, index, subindex, attrs)
 
         if isinstance(self.choices, ModelChoiceIterator):
             for fil in self.choices.queryset:
                 if fil.id == value:
                     duper['label'] = fil.description
                     duper['help_text'] = fil.help_text
+                    duper['parameterised'] = fil.parameterised
+                    duper['dialog_name'] = fil.dialog_name
                     break
 
         return duper
+
+class ParamFilterSelectMultiple(FilterCheckboxSelectMultiple):
+    # match selected filters with their parameters; parameters must be passed in fields with the same name with '_params' appended
+    def value_from_datadict(self, data, files, name):
+        params_name = name + "_params"
+        filter_ids = super(FilterCheckboxSelectMultiple, self).value_from_datadict(data, files, name)
+        parameters = super(FilterCheckboxSelectMultiple, self).value_from_datadict(data, files, params_name)
+        if filter_ids and parameters:
+            return list(zip(filter_ids, parameters))
+        else:
+            return (None, None)
+
+class ParamFilterChoiceField(ModelMultipleChoiceField):
+
+    ## return new (unsaved) ParametrisedFilter objects; their dataset_config property needs
+    ## to be set later, e.g. in the using form's _save_m2m method
+    def clean(self, value):
+        ## assume that we get a list of tuples of filter id and parameter strings, e.g.:
+        ## [('17', 'temp > 0'), ('18', 'RISMA, SCAN, SNOTEL')]
+        if isinstance(value, list):
+            # unzip again
+            filter_ids, params = list(zip(*value))
+
+            # clean the filter_ids, returns queryset of filters
+            filters = super(ParamFilterChoiceField, self).clean(filter_ids)
+
+            # create new ParametrisedFilter objects (but don't save yet)
+            param_filters = []
+            for f, p in zip(filters, params):
+                param_filters.append( ParametrisedFilter(filter=f, parameters=p) )
+
+            return param_filters
+        else:
+            return []
 
 
 class YearChoiceField(forms.fields.ChoiceField):

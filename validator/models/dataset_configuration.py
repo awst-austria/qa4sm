@@ -1,7 +1,7 @@
 from django.db import models
 
-from validator.models import DataFilter
-from validator.models import Dataset
+from validator.models.filter import DataFilter
+from validator.models.dataset import Dataset
 from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 
@@ -13,7 +13,7 @@ class DatasetConfiguration(models.Model):
     version = models.ForeignKey(to=DatasetVersion, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     variable = models.ForeignKey(to=DataVariable, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     filters = models.ManyToManyField(DataFilter, related_name='dataset_configurations')
-#     reference = models.BooleanField()
+    parametrised_filters = models.ManyToManyField(DataFilter, through='ParametrisedFilter')
 
     def __str__(self):
         return "Data set: {}, version: {}, variable: {}".format(

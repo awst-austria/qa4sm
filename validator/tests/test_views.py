@@ -168,7 +168,7 @@ class TestViews(TransactionTestCase):
     def test_ajax_get_dataset_options_view(self):
         url = reverse('ajax_get_dataset_options')
         self.client.login(**self.credentials)
-        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id, 'filter_widget_id': 'id_datasets-0-filters'})
+        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id, 'filter_widget_id': 'id_datasets-0-filters', 'param_filter_widget_id': 'id_datasets-0-paramfilters'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
         assert return_data['versions']

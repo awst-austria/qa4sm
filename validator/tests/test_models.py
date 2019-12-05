@@ -15,7 +15,8 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import Settings
 from validator.models import ValidationRun
-from validator.models.celery_task import CeleryTask
+from validator.models import CeleryTask
+from validator.models import ParametrisedFilter
 
 
 class TestModels(TestCase):
@@ -258,3 +259,32 @@ class TestModels(TestCase):
         task_string = str(task)
         self.__logger.debug(task_string)
         assert task_string
+
+    def test_parametrised_filter(self):
+        pfilter = ParametrisedFilter()
+        pfstring = str(pfilter)
+        assert pfstring
+
+        myfilter = DataFilter()
+        myfilter.id = 1337
+        myfilter.name = 'FIL_ISMN_NETWORKS'
+        myfilter.description = 'Pick ISMN networks:'
+        myfilter.help_text = 'Pick them now!'
+        myfilter.parameterised = True
+        myfilter.dialog_name = 'ismn_dialog'
+
+        pfilter.filter = myfilter
+        pfilter.parameters = "AMMA-CATCH,CARBOAFRICA"
+        pfstring = str(pfilter)
+        assert pfstring
+
+        pfilter.clean()
+
+        clean_except = False
+        try:
+            pfilter.filter.parameterised = False
+            pfilter.clean()
+        except ValidationError:
+            clean_except = True
+
+        assert clean_except

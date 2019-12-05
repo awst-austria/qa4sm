@@ -1,6 +1,7 @@
 from .settings import Settings
 from .custom_user import User
 from .filter import DataFilter
+from .parametrised_filter import ParametrisedFilter
 from .version import DatasetVersion
 from .variable import DataVariable
 from .dataset import Dataset

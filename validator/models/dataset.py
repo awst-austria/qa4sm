@@ -1,7 +1,7 @@
 from django.db import models
-from validator.models import DataFilter
-from validator.models import DataVariable
-from validator.models import DatasetVersion
+from validator.models.filter import DataFilter
+from validator.models.variable import DataVariable
+from validator.models.version import DatasetVersion
 
 
 class Dataset(models.Model):

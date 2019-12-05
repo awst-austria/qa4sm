@@ -113,6 +113,9 @@
                                                 <div id="id_{{dc_form.prefix}}-filters" class="indented tabSpecific">
                                                     {{ dc_form.filters }}
                                                 </div>
+                                                <div id="id_{{dc_form.prefix}}-paramfilters" class="indented tabSpecific">
+                                                    {{ dc_form.parametrised_filters }}
+                                                </div>
                                             </div>
                                         {% endfor %}
 
@@ -195,6 +198,10 @@
                                         <div id="id_{{ref_dc_form.prefix}}-filters" class="indented">
                                             {{ ref_dc_form.filters }}
                                         </div>
+                                        <div id="id_{{ref_dc_form.prefix}}-paramfilters" class="indented">
+                                            {{ ref_dc_form.parametrised_filters }}
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -506,6 +513,8 @@
         </div>
     </div>
 
+    {% include "validator/ismn_dialog.html" %}
+
 {% endblock %}
 
 {% block javascript %}
@@ -598,11 +607,14 @@
 
     <script type="text/javascript">
         function toggleFiltering(checkbox) {
-            var groupId = checkbox.id.replace(/filter_dataset$/, 'filters')
-            var filterboxes = $('#' + groupId).find('input:checkbox');
-            var newDisabledValue = !checkbox.checked;
-            for (var f of filterboxes) {
-                f.disabled=newDisabledValue;
+            const filtergroups = ['filters', 'paramfilters'];
+            for (const group of filtergroups) {
+                var groupId = checkbox.id.replace(/filter_dataset$/, group)
+                var filterboxes = $('#' + groupId).find('input:checkbox');
+                var newDisabledValue = !checkbox.checked;
+                for (var f of filterboxes) {
+                    f.disabled=newDisabledValue;
+                }
             }
         }
         // on page load, call once:
@@ -618,17 +630,20 @@
             var datasetId = $(this).val();
             var widgetId = $(this).attr('id');
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
+            var paramFilterWidgetId = widgetId.replace(/dataset$/, "paramfilters");
             $.ajax({
                 url: url,
-                data: { 'dataset_id': datasetId, 'filter_widget_id': filterWidgetId },
+                data: { 'dataset_id': datasetId, 'filter_widget_id': filterWidgetId, 'param_filter_widget_id': paramFilterWidgetId },
                 success: function (return_data) {
                     var dataset_widget = "#" + widgetId;
                     var version_widget = dataset_widget.replace(/dataset$/, "version");
                     var variable_widget = dataset_widget.replace(/dataset$/, "variable");
                     var filter_widget = "#" + filterWidgetId;
+                    var param_filter_widget = "#" + paramFilterWidgetId;
                     $(version_widget).html(return_data['versions']);
                     $(variable_widget).html(return_data['variables']);
                     $(filter_widget).html(return_data['filters']);
+                    $(param_filter_widget).html(return_data['paramfilters']);
                 }
             });
         }
