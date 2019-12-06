@@ -630,7 +630,7 @@
             var datasetId = $(this).val();
             var widgetId = $(this).attr('id');
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
-            var paramFilterWidgetId = widgetId.replace(/dataset$/, "paramfilters");
+            var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
             $.ajax({
                 url: url,
                 data: { 'dataset_id': datasetId, 'filter_widget_id': filterWidgetId, 'param_filter_widget_id': paramFilterWidgetId },
