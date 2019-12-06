@@ -196,7 +196,7 @@
 		"pk": 18,
 		"fields": {
 			"name": "FIL_ISMN_NETWORKS",
-			"description": "Pick ISMN networks:",
+			"description": "Use ISMN networks:",
 			"help_text": "Select the ISMN networks to use in this validation",
 			"parameterised": true,
 			"dialog_name": "ismn_networks",
