@@ -16,10 +16,10 @@ Remove after https://github.com/TUW-GEO/pytesmo/issues/150 is fixed.
 class TimezoneAdapter(object):
 
     def __init__(self, reader):
-        self.reader = reader
+        self.cls = reader
 
     def read_ts(self, *args, **kwargs):
-        data = self.reader.read_ts(*args, **kwargs)
+        data = self.cls.read_ts(*args, **kwargs)
 
         if type(data) is TS or issubclass(type(data), TS):
             data = data.data
@@ -30,7 +30,7 @@ class TimezoneAdapter(object):
         return data
 
     def read(self, *args, **kwargs):
-        data = self.reader.read(*args, **kwargs)
+        data = self.cls.read(*args, **kwargs)
 
         if type(data) is TS or issubclass(type(data), TS):
             data = data.data

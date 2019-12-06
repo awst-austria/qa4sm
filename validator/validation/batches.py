@@ -5,6 +5,7 @@ from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
 from validator.validation.readers import create_reader
+from validator.validation.filters import setup_filtering
 
 # very basic geographic subsetting with only a bounding box. simple should also be quick :-)
 def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon):
@@ -52,7 +53,13 @@ def create_jobs(validation_run):
     total_points = 0
 
     ref_reader = create_reader(validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
-    ref_reader = ref_reader.reader
+
+    # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
+    ref_reader = setup_filtering(ref_reader, list(validation_run.reference_configuration.filters.all()),\
+                                 list(validation_run.reference_configuration.parametrisedfilter_set.all()),\
+                                 validation_run.reference_configuration.dataset, validation_run.reference_configuration.variable)
+    while(hasattr(ref_reader, 'cls')):
+        ref_reader = ref_reader.cls
 
     # if we've got data on a grid, process one cell at a time
     if isinstance(ref_reader, GriddedBase):

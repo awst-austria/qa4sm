@@ -9,14 +9,10 @@ import shutil
 import time
 from zipfile import ZipFile
 
-from django.contrib.auth import get_user_model
-User = get_user_model()
-
-from validator.validation.batches import _geographic_subsetting
-import valentina
-from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
-
 from dateutil.tz import tzlocal
+from django.contrib.auth import get_user_model
+from symbol import parameters
+User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
 import netCDF4
@@ -25,16 +21,21 @@ from pytz import UTC
 
 import numpy as np
 import pandas as pd
-from validator.models import DataFilter
+import valentina
+from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
+from validator.models import DataFilter, dataset_configuration
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
+from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
+from validator.validation import globals
 import validator.validation as val
+from validator.validation.batches import _geographic_subsetting
 from validator.validation.globals import METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-from validator.validation import globals
+
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -177,12 +178,15 @@ class TestValidation(TestCase):
                 assert stored_variable_pretty == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable pretty name]'
 
                 # check filters
-                if not dataset_config.filters.all():
+                if not dataset_config.filters.all() and not dataset_config.parametrisedfilter_set.all():
                     assert stored_filters == 'N/A', 'Wrong dataset config filters (should be none)'
                 else:
                     assert stored_filters, 'Wrong dataset config filters (shouldn\'t be empty)'
                     for fil in dataset_config.filters.all():
                         assert fil.description in stored_filters, 'Wrong dataset config filters'
+                    for pfil in dataset_config.parametrisedfilter_set.all():
+                        assert pfil.filter.description in stored_filters, 'Wrong dataset config parametrised filters'
+                        assert pfil.parameters in stored_filters, 'Wrong dataset config parametrised filters: no parameters'
 
                 # check reference
                 if dataset_config.id == run.reference_configuration.id:
@@ -240,6 +244,10 @@ class TestValidation(TestCase):
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
 
         run_id = run.id
 
@@ -500,9 +508,6 @@ class TestValidation(TestCase):
         validation_run = ValidationRun()
         val.save_validation_config(validation_run)
 
-#         no_masking_reader = val.setup_filtering(None, None, None, None)
-#         assert not no_masking_reader
-
     def test_readers(self):
         start_time = time.time()
 
@@ -534,7 +539,10 @@ class TestValidation(TestCase):
             DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
             DataFilter.objects.get(name="FIL_ISMN_GOOD"),
             ]
-        msk_reader = val.setup_filtering(reader, data_filters, dataset, variable)
+        param_filters = [
+            ParametrisedFilter(filter = DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters = "  COSMOS , SCAN "),
+            ]
+        msk_reader = val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
 
         assert msk_reader is not None
         data = msk_reader.read_ts(0)
@@ -560,7 +568,12 @@ class TestValidation(TestCase):
                 for variable in va:
                     for data_filter in fils:
                         print("Testing {} version {} variable {} filter {}".format(dataset, version, variable, data_filter.name))
-                        msk_reader = val.setup_filtering(reader, [data_filter], dataset, variable)
+                        if data_filter.parameterised:
+                            pfilter = ParametrisedFilter(filter = data_filter, parameters = data_filter.default_parameter)
+                            msk_reader = val.setup_filtering(reader, [], [pfilter], dataset, variable)
+                        else:
+                            msk_reader = val.setup_filtering(reader, [data_filter], [], dataset, variable)
+
                         assert msk_reader is not None
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
@@ -628,7 +641,7 @@ class TestValidation(TestCase):
 
         # we need the reader just to get the grid
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
-        gpis, lons, lats, cells = c3s_reader.reader.grid.get_grid_points()
+        gpis, lons, lats, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
 
@@ -644,7 +657,7 @@ class TestValidation(TestCase):
     def test_no_geographic_subsetting(self):
         # we need the reader just to get the grid
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
-        gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+        gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, None, None, None, None)
 
@@ -662,7 +675,7 @@ class TestValidation(TestCase):
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
             c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
-            gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+            gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
             subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
 
@@ -675,7 +688,7 @@ class TestValidation(TestCase):
     def test_geographic_subsetting_shifted(self):
         ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
         c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
-        gpis, lats, lons, cells = c3s_reader.reader.grid.get_grid_points()
+        gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
         test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1), # americas
                        (9.79, -710.50, 70.14, -545.27, 2), #asia

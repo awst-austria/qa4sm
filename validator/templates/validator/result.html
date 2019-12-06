@@ -38,10 +38,11 @@
                                         <li>
                                             <em>Dataset {{ forloop.counter }}:</em> {{ dc.dataset.pretty_name }} ({{ dc.version.pretty_name }}, {{ dc.variable.pretty_name }})
                                             [Filters:
-                                            {% if not dc.filters.all %}
+                                            {% if not dc.filters.all and not dc.parametrisedfilter_set.all %}
                                                 none
                                             {% else %}
                                                 {% for filter in dc.filters.all %} {{ filter.description }}; {% endfor %}
+                                                {% for pfilter in dc.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
                                             {% endif %}]
                                         </li>
                                     {% endif %}
@@ -50,10 +51,11 @@
                                 <li>
                                     <em>Reference:</em> {{ val.reference_configuration.dataset.pretty_name }} ({{ val.reference_configuration.version.pretty_name }}, {{ val.reference_configuration.variable.pretty_name }})
                                     [Filters:
-                                    {% if not val.reference_configuration.filters.all %}
+                                    {% if not val.reference_configuration.filters.all and not val.reference_configuration.parametrisedfilter_set.all %}
                                         none
                                     {% else %}
                                         {% for filter in val.reference_configuration.filters.all %} {{ filter.description }}; {% endfor %}
+                                        {% for pfilter in val.reference_configuration.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
                                     {% endif %}]
                                 </li>
                             </ul>

@@ -62,13 +62,13 @@ class ValidationRun(models.Model):
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
     anomalies = models.CharField(max_length=20, choices=ANOMALIES_METHODS, default=NO_ANOM)
-    min_lat = models.FloatField(null=True, validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)])
-    min_lon = models.FloatField(null=True)
-    max_lat = models.FloatField(null=True, validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)])
-    max_lon = models.FloatField(null=True)
+    min_lat = models.FloatField(null=True, blank=True, validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)])
+    min_lon = models.FloatField(null=True, blank=True)
+    max_lat = models.FloatField(null=True, blank=True, validators=[MinValueValidator(-90.0), MaxValueValidator(90.0)])
+    max_lon = models.FloatField(null=True, blank=True)
     # only applicable if anomalies with climatology is selected
-    anomalies_from = models.DateTimeField(null=True)
-    anomalies_to = models.DateTimeField(null=True)
+    anomalies_from = models.DateTimeField(null=True, blank=True)
+    anomalies_to = models.DateTimeField(null=True, blank=True)
 
     output_file = models.FileField(null=True, max_length=250)
 

@@ -1,6 +1,9 @@
 import logging
 
 from pytesmo.validation_framework.adapters import SelfMaskingAdapter
+from numpy import inner
+from ismn.interface import ISMN_Interface
+from re import sub as regex_sub
 
 __logger = logging.getLogger(__name__)
 
@@ -70,21 +73,36 @@ def get_used_variables(filters, dataset, variable):
     return variables
 
 
-def setup_filtering(reader, filters, dataset, variable):
+def setup_filtering(reader, filters, param_filters, dataset, variable):
 
     # figure out which variables we have to load because we want to use them
     load_vars = get_used_variables(filters, dataset, variable)
 
     # restrict the variables that are read from file in the reader
-    if hasattr(reader.reader, 'parameters'):
-        __logger.debug("Replacing existing variables to read: {}".format(reader.reader.parameters))
-        reader.reader.parameters = load_vars
+    if hasattr(reader.cls, 'parameters'):
+        __logger.debug("Replacing existing variables to read: {}".format(reader.cls.parameters))
+        reader.cls.parameters = load_vars
 
-    if not filters:
+    if not filters and not param_filters:
         __logger.debug('No filters to apply for dataset {}.'.format(dataset))
         return reader
 
     filtered_reader = reader
+
+    for pfil in param_filters:
+        __logger.debug("Setting up parametrised filter {} for dataset {} with parameter {}".format(pfil.filter.name, dataset, pfil.parameters))
+
+        if(pfil.filter.name == "FIL_ISMN_NETWORKS" and pfil.parameters):
+            inner_reader = filtered_reader
+            while(hasattr(inner_reader, 'cls')):
+                inner_reader = inner_reader.cls
+
+            if isinstance(inner_reader, ISMN_Interface):
+                param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters) # replace whitespace around commas
+                param = regex_sub(r'(^[ ]+|[ ]+$)', '', param) # replace whitespace at start and end of string
+                networks = param.split(',')
+                inner_reader.activate_network(networks)
+            continue
 
     for fil in filters:
         __logger.debug("Setting up filter {} for dataset {}.".format(fil.name, dataset))

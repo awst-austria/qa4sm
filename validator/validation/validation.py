@@ -59,7 +59,12 @@ def save_validation_config(validation_run):
         for i, dataset_config in enumerate(validation_run.dataset_configurations.all()):
             if dataset_config.filters.all():
                 filters = '; '.join([x.description for x in dataset_config.filters.all()])
-            else:
+            if dataset_config.parametrisedfilter_set.all():
+                if filters:
+                    filters += ';'
+                filters += '; '.join([pf.filter.description + " " + pf.parameters for pf in dataset_config.parametrisedfilter_set.all()])
+
+            if not filters:
                 filters = 'N/A'
 
             ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
@@ -100,7 +105,7 @@ def create_pytesmo_validation(validation_run):
     scaling_ref_name = None
     for ds_num, dataset_config in enumerate(validation_run.dataset_configurations.all(), start=1):
         reader = create_reader(dataset_config.dataset, dataset_config.version)
-        reader = setup_filtering(reader, list(dataset_config.filters.all()), dataset_config.dataset, dataset_config.variable)
+        reader = setup_filtering(reader, list(dataset_config.filters.all()), list(dataset_config.parametrisedfilter_set.all()), dataset_config.dataset, dataset_config.variable)
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name])
