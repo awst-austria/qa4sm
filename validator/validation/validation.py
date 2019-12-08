@@ -57,6 +57,7 @@ def save_validation_config(validation_run):
             ds.val_interval_to=validation_run.interval_to.strftime('%Y-%m-%d %H:%M')
 
         for i, dataset_config in enumerate(validation_run.dataset_configurations.all()):
+            filters = None
             if dataset_config.filters.all():
                 filters = '; '.join([x.description for x in dataset_config.filters.all()])
             if dataset_config.parametrisedfilter_set.all():
