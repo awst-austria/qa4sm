@@ -100,7 +100,8 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
             if isinstance(inner_reader, ISMN_Interface):
                 param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters) # replace whitespace around commas
                 param = regex_sub(r'(^[ ]+|[ ]+$)', '', param) # replace whitespace at start and end of string
-                networks = param.split(',')
+                paramnetlist = param.split(',')
+                networks = [ n for n in paramnetlist if n in inner_reader.list_networks() ]
                 inner_reader.activate_network(networks)
             continue
 
