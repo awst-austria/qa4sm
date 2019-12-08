@@ -13,15 +13,15 @@
                     .ismn_label { display:inline-block; }
                     .ismn_indent { margin-left: 1rem; }
                 </style>
-                
+
                 <p>
-                    You can find more information about the ISMN networks on the <a href="https://ismn.geo.tuwien.ac.at/en/sites/networks/" 
+                    You can find more information about the ISMN networks on the <a href="https://ismn.geo.tuwien.ac.at/en/sites/networks/"
                     target="_blank">ISMN networks list</a>.
                 </p>
 
                 <div>
                     <div class="custom-control custom-switch">
-                        <input class="custom-control-input" id="id_continent_africa" value="Africa" type="checkbox" name="continent_africa" 
+                        <input class="custom-control-input" id="id_continent_africa" value="Africa" type="checkbox" name="continent_africa"
                             onchange="toggleISMNContinent(this)" checked>
                         <label class="custom-control-label" for="id_continent_africa"></label>
                         <div onclick="$('#id_collapse_africa').collapse('toggle')" class="ismn_label link-primary">Africa</div>
@@ -361,7 +361,7 @@
 
                 <div>
                     <div class="custom-control custom-switch">
-                        <input class="custom-control-input" id="id_continent_south_america" value="south_america" type="checkbox" name="continent_south_america" 
+                        <input class="custom-control-input" id="id_continent_south_america" value="south_america" type="checkbox" name="continent_south_america"
                             onchange="toggleISMNContinent(this)" checked>
                         <label class="custom-control-label" for="id_continent_south_america"></label>
                         <div onclick="$('#id_collapse_south_america').collapse('toggle')" class="ismn_label link-primary">South America</div>
@@ -394,4 +394,30 @@
             f.checked=newValue;
         }
     }
+
+    function setISMNNetworks() {
+        alert('set!');
+    }
+
+    $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
+        var callerId = e.relatedTarget.id;
+        var hiddenId = callerId.replace(/_link$/, '_params');
+        var ismnDialog = $(e.currentTarget);
+        var preselectedNetworks = $('#' + hiddenId).val();
+        preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, ''); // clean string from whitespace
+        var netList = preselectedNetworks.split(',');
+
+        for (var cb of ismnDialog.find('input:checkbox')) { // reset all checkboxes
+            if(cb.id.match('^id_continent_')) { // check continents
+                cb.checked=true;
+            } else { // uncheck networks
+                cb.checked=false;
+            }
+        }
+
+        for (var net of netList) { // check the preselected networks
+            ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
+        }
+    });
+
 </script>
