@@ -102,6 +102,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 param = regex_sub(r'(^[ ]+|[ ]+$)', '', param) # replace whitespace at start and end of string
                 paramnetlist = param.split(',')
                 networks = [ n for n in paramnetlist if n in inner_reader.list_networks() ]
+                __logger.debug('Available networks: ' + ';'.join(inner_reader.list_networks()))
                 __logger.debug('Selected networks: ' + ';'.join(networks))
                 inner_reader.activate_network(networks)
             continue
