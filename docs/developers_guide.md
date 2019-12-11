@@ -19,6 +19,11 @@ This creates the qa4sm folder. Within this are the webapp folders:
 
 If you want to work on QA4SM releases, be sure to use the git hooks in the `hooks` folder (for remembering to tag correctly). Either copy the scripts in that folder to `.git/hooks/` or [set your custom hooks directory to 'hooks'](https://stackoverflow.com/questions/427207/can-git-hook-scripts-be-managed-along-with-the-repository/37861972#37861972).
 
+To fetch the test data necessary for the unit tests into the `testdata` folder:
+
+    git submodule init
+    git submodule update
+
 ## Minimum requirements
 
 - Git client
@@ -44,7 +49,7 @@ In case you don't want to use Eclipse, one alternative is [PyCharm](https://www.
 
 ## How to set up development environment
 
-In short: download and install Miniconda and use the official environment file to create a conda environment. Optionally set up the services used in operations - if you want to work on the parallelisation part of the webapp or test with the 'real' database system. If you don't, you don't need to install any services, only conda.
+TLDR: download and install Miniconda and use the official environment file to create a conda environment. Optionally set up the backend services - if you want to work on the parallelisation part of the webapp or test with the 'real' database system. If you don't, you don't need to install any services, only conda. You can also start with the easy installation and add the services later on.
 
 ## Install required development tools
 
@@ -147,50 +152,17 @@ In the qsql shell, run the commands from `[gitrepos]/sql/create_postgres_db.txt`
 
 ## Create conda Python virtual environment
 
-    conda create --yes -n valentina -c conda-forge python=3.6 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib
-    source activate valentina
+Change into your cloned qa4sm directory and create an environment with:
 
-Install other dependencies into Python environment with pip:
+    conda env create -f environment/qa4sm_env.yml -n valentina
 
-    pip uninstall --yes shapely
-    pip install --no-binary :all: shapely
-    pip install sqlparse
-    pip install pynetcf
-    pip install ascat
-    pip install ismn
-    pip install pybufr-ecmwf
-    pip install c3s_sm
-    pip install esa_cci_sm
-    pip install smos
-    pip install coverage
-    pip install pygeogrids
-    pip install pytest-django
-    pip install django-widget-tweaks
-    pip install psycopg2-binary
-    pip install pytest-cov
-    pip install pytest-mpl
-    pip install celery==4.1.1
-    pip install celery[redis]
-    pip install gldas
-    pip install smap-io
-    pip install django-countries
-    pip install seaborn
-    pip install ecmwf-models
-    pip install --upgrade --force-reinstall netcdf4
+Then activate it with:
 
-Cartopy is also required, however, you first have to accept the use of the deprecated pyproj to get this to work:
-
-    export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
-    pip install cartopy
-
-Pytesmo is available via pypi, however, as this is constantly in development and there is not new release everytime there is a new feature, it is recommended to install directly from the github master branch:
-
-    pip install git+https://github.com/TUW-GEO/pytesmo.git
-    
+    conda activate valentina
 
 ## Create webapp configuration file
 
-Change into your cloned qa4sm directory and run:
+In your cloned qa4sm directory run:
 
     ./init_config.sh dev
 
@@ -200,7 +172,7 @@ If the `init_conig.sh` doesn't work for you, copy `settings_example_conf.py` int
 
 Adapt the `valentina/settings_conf.py` to match your local configuration:
 
-- Set `DATA_FOLDER` to the folder where you keep the (geo)data, see the datasets folder section for more info.
+- Set `DATA_FOLDER` to the folder where you keep the (geo)data, see the datasets folder section for more info. If you don't have other data, set it to the `testdata` folder.
 - If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True` and `CELERY_TASK_EAGER_PROPAGATES = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
 - Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
@@ -210,7 +182,7 @@ For the folders specified for the `DATA_FOLDER` and `LOG_FILE` settings, make su
 
 ## Datasets folder
 
-Your datasets folder should have the following structure so that the webapp can find the data (note this is not all of the datasets available but gives an idea of the folder structure):
+Your datasets folder should have the following structure so that the webapp can find the data (note these are not all of the datasets available but you should get an idea of the folder structure):
 
     ASCAT/ASCAT_H113
         data/xxxx.nc
@@ -232,11 +204,7 @@ The folders are used in `validator.validation.readers.create_reader` to create t
 
 ## Init Django
 
-Go into qa4sm folder (if you haven't done so already), e.g.:
-
-    cd qa4sm
-
-Set up Django app:
+Go to your qa4sm folder and init the database and the static files:
 
     python manage.py makemigrations
     python manage.py migrate
@@ -248,7 +216,7 @@ Create admin user for webapp:
 
     python manage.py createsuperuser
 
-Keep note of the username, email and password you enter here, you'll need it to log into the webapp later. This should result in the message "Superuser created successfully."
+Keep note of the username, email, and password you enter here, you'll need it to log into the webapp later. This should result in the message "Superuser created successfully."
 
 Populate the database with information about the datasets:
 
@@ -284,7 +252,7 @@ You can access the webapp's admin panel by appending "admin/" to the URL, e.g. <
 
 Depending on the `LOG_FILE` setting in your `settings_conf.py` file, the webapp's logfile should be written to `valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
 
-If, when you try to log in, it gives a verification failed error, try going to `valentina/settings.py` and commenting out the `CSRF_COOKIE_SECURE` setting. Then log in again. 
+If, when you try to log in, you get a verification failed error, try going to `valentina/settings.py` and commenting out the `CSRF_COOKIE_SECURE` setting. Then log in again.
 
 ## Webapp walkthrough
 
@@ -312,20 +280,21 @@ views|Django views for the webapp. They define the behaviour of the app’s (sub
 apps.py|Django specific file that currently defines the name of the app.
 hacks.py|Bin for hacks we have to use but rather wouldn’t. If you can, avoid creating those ;-)
 mailer.py|Email functionality, including (for now) wording of the automatic emails sent by the app.
-metrics.py|Contains the EssentialMetrics class that defines the metrics to be produced by the webapp on validation.
 urls.py|Django specific file containing the mapping of URLs to views.
 
 ## How to run integration / unit tests
 
-To run the tests, you will need the testdata. For this data, please contact the developers directly. Once you have this test data it should go in to the data folder specified in the settings file. 
-
-Once you have the test data, you can go to to your qa4sm folder and run:
+Go to to your qa4sm folder and run:
 
     pytest
 
 Congratulations, your development environment is now set up and you can develop ;-)
 
 ## Tips and Tricks
+
+## Creating new environment file
+
+If you need to create a new environment file with the latest dependencies, look at `environment/recreate_environment_file.sh`, edit it to include dependencies you want to add/update. Then run it - output should be an updated `environment/qa4sm_env.yml` file.
 
 ### Cartopy doesn't want to install
 
@@ -401,7 +370,7 @@ Combine all migrations up to migration `x`:
 
 The resulting `validator/migrations/0001_squashed_...` file contains a list `replaces = [...]` in the `Migration` class that details the other migrations it replaces. If you want to use a "from-scratch" migration (see above), you can copy the `replaces` list into that and it should be treated like a squashed migration.
 
-#### Dump ops db 
+#### Dump ops db
 
 And omit stuff that creates problems on import:
 
