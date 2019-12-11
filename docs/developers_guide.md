@@ -44,28 +44,9 @@ In case you don't want to use Eclipse, one alternative is [PyCharm](https://www.
 
 ## How to set up development environment
 
-Note: The environment setup is automated for the production environment in [environment/create_conda_env.sh]. This guide describes how to do a similar setup on your development machine. 
-
-### Set up using the create_conda_env.sh script
-
-If you've got a Linux system, you can try to run the `create_conda_env.sh` script on your system to create the conda environment. You've got to set 4 shell variables before running the script and point them to 4 directories on your system:
-
-    export INSTALL_DIR="<install_dir>"
-    export MINICONDA_PATH="<conda_dir>"
-    export TOOL_DIR="<tools_dir>"
-    export PYTHON_ENV_DIR="<pytenv_dir>"
-
-Where `<install_dir>` is the place you want to put the webapp git sandbox, `<conda_dir>` is the place you want to install miniconda, `<tools_dir>` is the place you want to store the downloaded install package of conda, and `<pytenv_dir>` is the place you want to put the conda environment for the webapp.
-
-### Set up without the script
-If using the script does not work, you need to follow the instructions in this guide.#
-
-If you suspect this guide is not up to date, check the script and see if it has steps that may be missing here.
-
+In short: download and install Miniconda and use the official environment file to create a conda environment. Optionally set up the services used in operations - if you want to work on the parallelisation part of the webapp or test with the 'real' database system. If you don't, you don't need to install any services, only conda.
 
 ## Install required development tools
-
-**Note:** If you don't install Redis and RabbitMQ, you've got to set the corresponding Celery config variable - see "Create webapp configuration file" below.
 
 ### git
 Ubuntu/Debian:
@@ -84,6 +65,8 @@ Run installer, e.g.
     bash Miniconda3-latest-Linux-x86_64.sh -b -p <MINICONDA_INSTALL_PATH>
 
 ## Install optional tools
+
+**Note:** If you don't install Redis and RabbitMQ, you've got to set the corresponding Celery config variable - see "Create webapp configuration file" below.
 
 ### rabbitmq-server
 Ubuntu/Debian:
