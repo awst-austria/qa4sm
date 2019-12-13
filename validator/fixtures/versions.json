@@ -147,9 +147,9 @@
         "model": "validator.datasetversion",
         "pk": 18,
         "fields": {
-            "short_name": "ISMN_V20191025",
-            "pretty_name": "20191025 global",
-            "help_text": "ISMN from 2019-10-25"
+            "short_name": "ISMN_V20191211",
+            "pretty_name": "20191211 global",
+            "help_text": "ISMN from 2019-12-11"
         }
     }
 ]
