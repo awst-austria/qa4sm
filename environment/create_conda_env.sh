@@ -103,6 +103,8 @@ pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 #pip install git+https://github.com/TUW-GEO/pytesmo.git
 pip install ismn
+pip install git+https://github.com/TUW-GEO/qa4sm-reader.git
+
 
 cd $TEMP_DIR
 

@@ -46,6 +46,7 @@ pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 #pip install git+https://github.com/TUW-GEO/pytesmo.git
 pip install ismn
+pip install git+https://github.com/TUW-GEO/qa4sm-reader.git
 
 conda env export --no-builds --prefix="$PYTHON_ENV_DIR" > qa4sm_env.yml
 sed -i '/^prefix:/d' qa4sm_env.yml
