@@ -10,14 +10,9 @@ Updating dependency versions can be done at any time during the development but 
 
 ## Dependency version management
 
-1. Create a new environment, e.g. with the `environment/create_conda_env.sh` script or by updating single python packages.
+1. Create a new environment, e.g. with the `environment/recreate_environment_file.sh` script or by updating single python packages in `environment/qa4sm_env.yml`.
 2. Test for regressions/problems by running all integration/unit tests with `pytest -m ""` and fix all issues (in particular those coming from updated dependencies).
-3. Generate an updated version of the conda environment descriptor file `qa4sm_env.yml` and copy it to the `environment` folder of the QA4SM repository:
-
-        conda env export --prefix=$PYTHON_ENV_DIR > qa4sm_env.yml
-
-    where `PYTHON_ENV_DIR` is the absolute path to the qa4sm virtual environment.
-
+3. Test for regressions manually by inspecting all pages and all major functionality of the webapp.
 4. Verify that the generated environment file can be used to recreate the environment with (after deactivating other conda environments):
 
         conda env create -f qa4sm_env.yml -n my_environment_name
@@ -62,9 +57,9 @@ If you have access to the AWST buildserver, you can do steps 1-4 by running buil
 
     Source: <https://vitalflux.com/software-build-release-versioning-strategy/>
 
-5. Create a release-notes.md file in the root of the repository using the template at the end of this procedure. It should contain the new version number and list new features, fixes and improvements in the new release.
+5. Create a release-notes.md file in the root of the repository using the template at the end of this procedure. It should contain the new version number and list new features, fixes and improvements in the new release. Add it to the repository.
 
-6. TODO: Add the version number to a file accessible by the webapp itself.
+6. Update the version number in `valentina/version.py`. Commit your release notes and version increase.
 
 7. Commit your changes again and create an annotated tag using the following command:
 
