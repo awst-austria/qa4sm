@@ -34,6 +34,8 @@ install:
   - conda env create -f environment/qa4sm_env.yml -n qa4sm
   - source activate qa4sm
 
+  - pip install git+https://github.com/TUW-GEO/qa4sm-reader.git
+
   - bash ./init_config.sh test
   - mkdir -p /tmp/log/valentina
 
