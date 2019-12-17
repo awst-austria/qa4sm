@@ -206,11 +206,11 @@ class TestValidation(TestCase):
         # check diagrams
         boxplot_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        assert len(boxplot_pngs) == 13
 
         overview_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (run.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == 13 * (run.dataset_configurations.count() - 1)
 
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
