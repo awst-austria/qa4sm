@@ -302,9 +302,9 @@ class TestValidation(TestCase):
 
         assert new_run
 
-        assert new_run.total_points == 21
+        assert new_run.total_points == 19
         assert new_run.error_points == 0
-        assert new_run.ok_points == 21
+        assert new_run.ok_points == 19
         self.check_results(new_run)
         self.delete_run(new_run)
 
