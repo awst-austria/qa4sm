@@ -42,7 +42,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 class TestValidation(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
-    hawaii_coordinates = [18.39665, -161.08154, 22.91482, -153.91845]
+    hawaii_coordinates = [18.16464, -158.79638, 22.21588, -155.06103]
 
     __logger = logging.getLogger(__name__)
 
@@ -346,9 +346,9 @@ class TestValidation(TestCase):
 
         assert new_run, "Didn't find validation in database"
 
-        assert new_run.total_points == 12, "Number of gpis is off"
+        assert new_run.total_points == 11, "Number of gpis is off"
         assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 12, "OK points are off"
+        assert new_run.ok_points == 11, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
 
