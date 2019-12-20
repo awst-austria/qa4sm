@@ -29,7 +29,9 @@ def create_reader(dataset, version):
         c3s_data_folder = path.join(folder_name, 'TCDR/063_images_to_ts/combined-daily')
         reader = c3s_read(c3s_data_folder, ioclass_kws={'read_bulk':True})
 
-    if dataset.short_name == globals.CCI:
+    if (dataset.short_name == globals.CCI or
+        dataset.short_name == globals.CCIA or
+        dataset.short_name == globals.CCIP):
         reader = CCITs(folder_name, ioclass_kws={'read_bulk':True})
 
     if dataset.short_name == globals.GLDAS:
@@ -48,9 +50,9 @@ def create_reader(dataset, version):
 
     if dataset.short_name == globals.SMOS:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk':True})
-        
+
     if dataset.short_name == globals.ERA5:
-        reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})    
+        reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})
 
     if dataset.short_name == globals.ERA5_LAND:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})

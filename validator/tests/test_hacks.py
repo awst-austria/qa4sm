@@ -33,7 +33,7 @@ class TestHacks(TestCase):
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
         self.assertTrue(data.index.tz is None)
 
-        ismn_data_folder = path.join(DATA_FOLDER, 'ISMN/ISMN_V20180830_GLOBAL')
+        ismn_data_folder = path.join(DATA_FOLDER, 'ISMN/ISMN_V20191211')
         ismn_reader = ISMN_Interface(ismn_data_folder)
 
         timezone_reader2 = TimezoneAdapter(ismn_reader)

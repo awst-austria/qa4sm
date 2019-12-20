@@ -42,6 +42,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 class TestValidation(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
+    hawaii_coordinates = [18.39665, -161.08154, 22.91482, -153.91845]
 
     __logger = logging.getLogger(__name__)
 
@@ -271,7 +272,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_TEST')
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
         run.reference_configuration.variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
@@ -279,6 +280,10 @@ class TestValidation(TestCase):
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
 
         run.save()
 
@@ -310,7 +315,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_test)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 #        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
@@ -319,6 +324,10 @@ class TestValidation(TestCase):
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
 
         run.save()
 

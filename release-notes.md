@@ -1,11 +1,11 @@
-QA4SM v1.0.0 - Release notes 2019-12-17
+QA4SM v1.1.0 - Release notes 2019-12-20
 =======================================================
 
-First 'official' release at the end of QA4SM phase 1.
+Updating datasets.
 
 # New features
 
-1. Added parametrised filters
-2. Added ISMN network selection filter
-3. Added ERA5-Land dataset
+1. Added ESA CCI SM v4.5 active, passive, and combined
+2. Removed old test datasets
+3. Updated tests accordingly
 

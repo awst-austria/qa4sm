@@ -293,8 +293,12 @@ class TestViews(TransactionTestCase):
             'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
             'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
             'ref-dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
-            'ref-version': DatasetVersion.objects.get(short_name=globals.GLDAS_TEST).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.GLDAS_NOAH025_3H_2_1).id,
             'ref-variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+            'min_lat' : '18.39665',
+            'min_lon' : '-161.08154',
+            'max_lat' : '22.91482',
+            'max_lon' : '-153.91845',
             'scaling_method': ValidationRun.MEAN_STD,
             'scaling_ref': ValidationRun.SCALE_TO_DATA,
         }

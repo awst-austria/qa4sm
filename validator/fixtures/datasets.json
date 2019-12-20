@@ -79,15 +79,12 @@
         "fields": {
             "short_name": "ISMN",
             "pretty_name": "ISMN",
-            "help_text": "",
-            "source_reference": "",
-            "citation": "",
+            "help_text": "-",
+            "source_reference": "-",
+            "citation": "-",
             "is_reference": true,
             "versions": [
-                4,
                 5,
-                6,
-                11,
                 18
             ],
             "variables": [
@@ -111,8 +108,7 @@
             "citation": "",
             "is_reference": true,
             "versions": [
-                7,
-                8
+                7
             ],
             "variables": [
                 5,
@@ -132,12 +128,13 @@
         "fields": {
             "short_name": "ESA_CCI_SM_combined",
             "pretty_name": "ESA CCI SM combined",
-            "help_text": "",
-            "source_reference": "",
-            "citation": "",
+            "help_text": "-",
+            "source_reference": "-",
+            "citation": "-",
             "is_reference": false,
             "versions": [
-                12
+                12,
+                19
             ],
             "variables": [
                 9
@@ -185,7 +182,6 @@
             "citation": "",
             "is_reference": true,
             "versions": [
-                14,
                 15
             ],
             "variables": [
@@ -203,13 +199,12 @@
         "fields": {
             "short_name": "ERA5_LAND",
             "pretty_name": "ERA5-Land",
-            "help_text": "",
-            "source_reference": "",
-            "citation": "",
+            "help_text": "-",
+            "source_reference": "-",
+            "citation": "-",
             "is_reference": true,
             "versions": [
-                16,
-                17
+                16
             ],
             "variables": [
                 12
@@ -217,6 +212,58 @@
             "filters": [
                 1,
                 17
+            ]
+        }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 10,
+        "fields": {
+            "short_name": "ESA_CCI_SM_active",
+            "pretty_name": "ESA CCI SM active",
+            "help_text": "-",
+            "source_reference": "-",
+            "citation": "-",
+            "is_reference": false,
+            "versions": [
+                20
+            ],
+            "variables": [
+                13
+            ],
+            "filters": [
+                1,
+                3,
+                4,
+                5,
+                6,
+                7
+            ]
+        }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 11,
+        "fields": {
+            "short_name": "ESA_CCI_SM_passive",
+            "pretty_name": "ESA CCI SM passive",
+            "help_text": "-",
+            "source_reference": "-",
+            "citation": "-",
+            "is_reference": false,
+            "versions": [
+                21
+            ],
+            "variables": [
+                14
+            ],
+            "filters": [
+                1,
+                3,
+                4,
+                5,
+                6,
+                7
             ]
         }
     }
