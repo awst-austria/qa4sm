@@ -559,6 +559,7 @@ class TestValidation(TestCase):
         start_time = time.time()
 
         for dataset in Dataset.objects.all():
+            print(dataset)
             vs = dataset.versions.all()
             va = dataset.variables.all()
             fils = dataset.filters.all()
@@ -566,23 +567,33 @@ class TestValidation(TestCase):
             for version in vs:
                 reader = val.create_reader(dataset, version)
                 for variable in va:
+                    print(variable)
                     for data_filter in fils:
                         print("Testing {} version {} variable {} filter {}".format(dataset, version, variable, data_filter.name))
                         if data_filter.parameterised:
+                            print('ParameterisedFilter')
                             pfilter = ParametrisedFilter(filter = data_filter, parameters = data_filter.default_parameter)
                             msk_reader = val.setup_filtering(reader, [], [pfilter], dataset, variable)
                         else:
+                            print('Not ParameterisedFilter')
                             msk_reader = val.setup_filtering(reader, [data_filter], [], dataset, variable)
 
                         assert msk_reader is not None
                         if dataset.short_name == val.globals.ISMN:
+                            print('read ismn')
                             data = msk_reader.read_ts(0)
                         else:
+                            print('read not ismn')
                             data = msk_reader.read_ts(-155.42, 19.78) ## hawaii
+                        print('reading worked')
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
                         assert not data[variable.pretty_name].empty
+                        msk_reader = None
+                reader = None
+            dataset = None
+            time.sleep(2)
 
         print("Test duration: {}".format(time.time() - start_time))
 
