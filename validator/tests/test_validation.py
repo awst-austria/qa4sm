@@ -585,6 +585,7 @@ class TestValidation(TestCase):
                         else:
                             print('read not ismn')
                             data = msk_reader.read_ts(-155.42, 19.78) ## hawaii
+                            print(data)
                         print('reading worked')
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
@@ -593,7 +594,6 @@ class TestValidation(TestCase):
                         msk_reader = None
                 reader = None
             dataset = None
-            time.sleep(2)
 
         print("Test duration: {}".format(time.time() - start_time))
 
