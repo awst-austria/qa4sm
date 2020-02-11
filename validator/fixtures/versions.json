@@ -124,5 +124,77 @@
             "pretty_name": "v04.5",
             "help_text": "-"
         }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 22,
+        "fields": {
+            "short_name": "ESA_CCI_SM_P_V04_7",
+            "pretty_name": "v04.7",
+            "help_text": "-"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 23,
+        "fields": {
+            "short_name": "ESA_CCI_SM_A_V04_7",
+            "pretty_name": "v04.7",
+            "help_text": "-"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 24,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_V04_7",
+            "pretty_name": "v04.7",
+            "help_text": "-"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 25,
+        "fields": {
+            "short_name": "ESA_CCI_SM_P_V05_2",
+            "pretty_name": "v05.2",
+            "help_text": "-"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 26,
+        "fields": {
+            "short_name": "ESA_CCI_SM_A_V05_2",
+            "pretty_name": "v05.2",
+            "help_text": "-"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 27,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_V05_2",
+            "pretty_name": "v05.2",
+            "help_text": "-"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 28,
+        "fields": {
+            "short_name": "C3S_V201912",
+            "pretty_name": "v201912",
+            "help_text": "C3S from December 2019"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 29,
+        "fields": {
+            "short_name": "SMAP_V6_PM",
+            "pretty_name": "v5 PM/ascending",
+            "help_text": "-"
+        }
     }
 ]
