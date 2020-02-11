@@ -124,7 +124,8 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
     return [png_filename, svg_filename]
 
 
-def generate_overview_map(validation_run, outfolder, metric, label, values, dc1, dc2, pair_name, unit_ref, lons, lats):
+def generate_overview_map(validation_run, outfolder, metric, label, values, dc1, dc2,
+                          pair_name, unit_ref, lons, lats, draw_grid=True):
     if metric == pair_name:
         filename = 'overview_{}'.format(metric)
     else:
@@ -155,10 +156,13 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
     else:
         if validation_run.reference_configuration.dataset.short_name == globals.ERA5_LAND:
             dy, dx = -0.1, 0.1
+            lats_map = safe_arange(extent[3], extent[2], dy)
+            lons_map = safe_arange(extent[0], extent[1], dx)
         else:
             dy, dx = -0.25, 0.25
-        lats_map = safe_arange(extent[3], extent[2], dy)
-        lons_map = safe_arange(extent[0], extent[1], dx)
+            lats_map = np.arange(extent[3], extent[2], dy)
+            lons_map = np.arange(extent[0], extent[1], dx)
+
 #         lats_map = np.arange(89.875, -60, -0.25)
 #         lons_map = np.arange(-179.875, 180, 0.25)
         values_map = np.empty((len(lats_map), len(lons_map)))
@@ -183,15 +187,18 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
         grid_interval_lat = 30
     if grid_interval_lon > 30:
         grid_interval_lon = 30
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0.2, color='gray', alpha=0.5, linestyle='--')
-    gl.xlabels_top = False
-    gl.ylabels_left = False
-    gl.xlocator = mticker.FixedLocator(np.arange(-180, 181, grid_interval_lon))
-    gl.ylocator = mticker.FixedLocator(np.arange(-90, 91, grid_interval_lat))
-    gl.xformatter = LONGITUDE_FORMATTER
-    gl.yformatter = LATITUDE_FORMATTER
-    gl.xlabel_style = {'size': 4, 'color': 'black'}
-    gl.ylabel_style = {'size': 4, 'color': 'black'}
+
+    if draw_grid:
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0.2,
+                          color='gray', alpha=0.5, linestyle='--')
+        gl.xlabels_top = False
+        gl.ylabels_left = False
+        gl.xlocator = mticker.FixedLocator(np.arange(-180, 181, grid_interval_lon))
+        gl.ylocator = mticker.FixedLocator(np.arange(-90, 91, grid_interval_lat))
+        gl.xformatter = LONGITUDE_FORMATTER
+        gl.yformatter = LATITUDE_FORMATTER
+        gl.xlabel_style = {'size': 4, 'color': 'black'}
+        gl.ylabel_style = {'size': 4, 'color': 'black'}
 
     # add colorbar
     cbar = plt.colorbar(the_plot, orientation='horizontal', pad=0.05)
@@ -236,7 +243,7 @@ def identify_dataset_configs(validation_run, metric_col_name):
 
     return [dc1, dc2, pair_name]
 
-def generate_all_graphs(validation_run, outfolder):
+def generate_all_graphs(validation_run, outfolder, map_grid=True):
     if not validation_run.output_file:
         return None
 
@@ -246,41 +253,42 @@ def generate_all_graphs(validation_run, outfolder):
     # get units for plot labels
     unit_ref = validation_run.reference_configuration.dataset.short_name
 
+    ds =  netCDF4.Dataset(validation_run.output_file.path, mode='r')
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        with netCDF4.Dataset(validation_run.output_file.path, mode='r') as ds:
-            lats = ds.variables['lat'][:]
-            lons = ds.variables['lon'][:]
+        lats = ds.variables['lat'][:]
+        lons = ds.variables['lon'][:]
 
-            for metric in globals.METRICS:
-                ## get all 'columns' (dataset-pair results) from the netcdf file that start with the current metric name
-                cur_metric_cols = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
+        for metric in globals.METRICS:
+            ## get all 'columns' (dataset-pair results) from the netcdf file that start with the current metric name
+            cur_metric_cols = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
 
-                metric_table = pd.DataFrame()
-                for metric_col in cur_metric_cols:
-                    ## figure out dataset configurations for current pair
-                    dc1, dc2, pair_name = identify_dataset_configs(validation_run, metric_col.name)
+            metric_table = pd.DataFrame()
+            for metric_col in cur_metric_cols:
+                ## figure out dataset configurations for current pair
+                dc1, dc2, pair_name = identify_dataset_configs(validation_run, metric_col.name)
 
-                    ## build table for current metric, one column per dataset-pair
-                    metric_table[pair_name] = metric_col[:].compressed()
+                ## build table for current metric, one column per dataset-pair
+                metric_table[pair_name] = metric_col[:].compressed()
 
-                    ## make overview maps for all columns
-                    if metric_col[:] is not None:
-                        file1, file2 = generate_overview_map(validation_run, outfolder, metric, globals.METRICS[metric], metric_col[:],
-                                                             dc1, dc2, pair_name, unit_ref, lons, lats)
-                        arcname = path.basename(file1)
-                        myzip.write(file1, arcname=arcname)
-                        arcname = path.basename(file2)
-                        myzip.write(file2, arcname=arcname)
-                        remove(file2)  # we don't need the vector image anywhere but in the zip
-
-                ## make boxplot graph with boxplots for all columns
-                if not metric_table.empty:
-                    file1, file2 = generate_boxplot(validation_run, outfolder, metric, globals.METRICS[metric], metric_table, unit_ref)
+                ## make overview maps for all columns
+                if metric_col[:] is not None:
+                    file1, file2 = generate_overview_map(validation_run, outfolder, metric, globals.METRICS[metric], metric_col[:],
+                                                         dc1, dc2, pair_name, unit_ref, lons, lats, draw_grid=map_grid)
                     arcname = path.basename(file1)
                     myzip.write(file1, arcname=arcname)
                     arcname = path.basename(file2)
                     myzip.write(file2, arcname=arcname)
                     remove(file2)  # we don't need the vector image anywhere but in the zip
+
+            ## make boxplot graph with boxplots for all columns
+            if not metric_table.empty:
+                file1, file2 = generate_boxplot(validation_run, outfolder, metric, globals.METRICS[metric], metric_table, unit_ref)
+                arcname = path.basename(file1)
+                myzip.write(file1, arcname=arcname)
+                arcname = path.basename(file2)
+                myzip.write(file2, arcname=arcname)
+                remove(file2)  # we don't need the vector image anywhere but in the zip
+    ds.close()
 
 def get_dataset_pairs(validation_run):
     pairs = []
