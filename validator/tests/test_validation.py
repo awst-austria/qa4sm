@@ -733,7 +733,7 @@ class TestValidation(TestCase):
         assert num == 1
 
     @pytest.mark.long_running
-    def test_generate_graphs(self):
+    def test_generate_graphs(self, map_grid=False):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
         infile2 = 'testdata/output_data/c3s_gldas.nc'
         infile3 = 'testdata/output_data/c3s_era5land.nc'
@@ -752,7 +752,7 @@ class TestValidation(TestCase):
         shutil.copy(infile1, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir, map_grid=False)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
@@ -774,7 +774,7 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir, map_grid=False)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
@@ -795,7 +795,7 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir, map_grid=False)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
