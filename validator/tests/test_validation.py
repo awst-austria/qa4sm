@@ -569,6 +569,7 @@ class TestValidation(TestCase):
         start_time = time.time()
 
         for dataset in Dataset.objects.all():
+            print(dataset.pretty_name)
             vs = dataset.versions.all()
             va = dataset.variables.all()
             fils = dataset.filters.all()
@@ -733,6 +734,7 @@ class TestValidation(TestCase):
         assert num == 1
 
     @pytest.mark.long_running
+    @pytest.mark.graphs
     def test_generate_graphs(self, map_grid=False):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
         infile2 = 'testdata/output_data/c3s_gldas.nc'
@@ -807,3 +809,11 @@ class TestValidation(TestCase):
 
 
         self.delete_run(v)
+
+
+if __name__ == '__main__':
+    import unittest
+    suite = unittest.TestSuite()
+    suite.addTest(TestValidation("test_setup_filtering_max"))
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
