@@ -809,11 +809,3 @@ class TestValidation(TestCase):
 
 
         self.delete_run(v)
-
-
-if __name__ == '__main__':
-    import unittest
-    suite = unittest.TestSuite()
-    suite.addTest(TestValidation("test_setup_filtering_max"))
-    runner = unittest.TextTestRunner()
-    runner.run(suite)
