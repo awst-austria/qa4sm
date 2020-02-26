@@ -160,8 +160,8 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
             lons_map = safe_arange(extent[0], extent[1], dx)
         else:
             dy, dx = -0.25, 0.25
-            lats_map = np.arange(extent[3], extent[2], dy)
-            lons_map = np.arange(extent[0], extent[1], dx)
+            lats_map = safe_arange(extent[3], extent[2], dy)
+            lons_map = safe_arange(extent[0], extent[1], dx)
 
 #         lats_map = np.arange(89.875, -60, -0.25)
 #         lons_map = np.arange(-179.875, 180, 0.25)
