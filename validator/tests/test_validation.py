@@ -569,7 +569,7 @@ class TestValidation(TestCase):
         start_time = time.time()
 
         for dataset in Dataset.objects.all():
-            print(dataset.pretty_name)
+            self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
             va = dataset.variables.all()
             fils = dataset.filters.all()

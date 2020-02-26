@@ -48,7 +48,7 @@ install:
 script:
   - pytest -m "not needs_advanced_setup and not long_running and not graphs"
   - pytest -m "not needs_advanced_setup and long_running and not graphs"
-  - pytest -m "not needs_advanced_setup and long_running and graphs"
+  - pytest -m "graphs"
 after_success:
   # report coverage results to coveralls.io
   #- pip install coveralls
