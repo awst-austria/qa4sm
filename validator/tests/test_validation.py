@@ -735,7 +735,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     @pytest.mark.graphs
-    def test_generate_graphs(self, map_grid=False):
+    def test_generate_graphs(self, map_grid=True):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
         infile2 = 'testdata/output_data/c3s_gldas.nc'
         infile3 = 'testdata/output_data/c3s_era5land.nc'
