@@ -253,42 +253,42 @@ def generate_all_graphs(validation_run, outfolder, map_grid=True):
     # get units for plot labels
     unit_ref = validation_run.reference_configuration.dataset.short_name
 
-    ds =  netCDF4.Dataset(validation_run.output_file.path, mode='r')
+
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        lats = ds.variables['lat'][:]
-        lons = ds.variables['lon'][:]
+        with netCDF4.Dataset(validation_run.output_file.path, mode='r') as ds:
+            lats = ds.variables['lat'][:]
+            lons = ds.variables['lon'][:]
 
-        for metric in globals.METRICS:
-            ## get all 'columns' (dataset-pair results) from the netcdf file that start with the current metric name
-            cur_metric_cols = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
+            for metric in globals.METRICS:
+                ## get all 'columns' (dataset-pair results) from the netcdf file that start with the current metric name
+                cur_metric_cols = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
 
-            metric_table = pd.DataFrame()
-            for metric_col in cur_metric_cols:
-                ## figure out dataset configurations for current pair
-                dc1, dc2, pair_name = identify_dataset_configs(validation_run, metric_col.name)
+                metric_table = pd.DataFrame()
+                for metric_col in cur_metric_cols:
+                    ## figure out dataset configurations for current pair
+                    dc1, dc2, pair_name = identify_dataset_configs(validation_run, metric_col.name)
 
-                ## build table for current metric, one column per dataset-pair
-                metric_table[pair_name] = metric_col[:].compressed()
+                    ## build table for current metric, one column per dataset-pair
+                    metric_table[pair_name] = metric_col[:].compressed()
 
-                ## make overview maps for all columns
-                if metric_col[:] is not None:
-                    file1, file2 = generate_overview_map(validation_run, outfolder, metric, globals.METRICS[metric], metric_col[:],
-                                                         dc1, dc2, pair_name, unit_ref, lons, lats, draw_grid=map_grid)
+                    ## make overview maps for all columns
+                    if metric_col[:] is not None:
+                        file1, file2 = generate_overview_map(validation_run, outfolder, metric, globals.METRICS[metric], metric_col[:],
+                                                             dc1, dc2, pair_name, unit_ref, lons, lats, draw_grid=map_grid)
+                        arcname = path.basename(file1)
+                        myzip.write(file1, arcname=arcname)
+                        arcname = path.basename(file2)
+                        myzip.write(file2, arcname=arcname)
+                        remove(file2)  # we don't need the vector image anywhere but in the zip
+
+                ## make boxplot graph with boxplots for all columns
+                if not metric_table.empty:
+                    file1, file2 = generate_boxplot(validation_run, outfolder, metric, globals.METRICS[metric], metric_table, unit_ref)
                     arcname = path.basename(file1)
                     myzip.write(file1, arcname=arcname)
                     arcname = path.basename(file2)
                     myzip.write(file2, arcname=arcname)
                     remove(file2)  # we don't need the vector image anywhere but in the zip
-
-            ## make boxplot graph with boxplots for all columns
-            if not metric_table.empty:
-                file1, file2 = generate_boxplot(validation_run, outfolder, metric, globals.METRICS[metric], metric_table, unit_ref)
-                arcname = path.basename(file1)
-                myzip.write(file1, arcname=arcname)
-                arcname = path.basename(file2)
-                myzip.write(file2, arcname=arcname)
-                remove(file2)  # we don't need the vector image anywhere but in the zip
-    ds.close()
 
 def get_dataset_pairs(validation_run):
     pairs = []
