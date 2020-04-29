@@ -61,6 +61,18 @@
                             </ul>
                         </li>
 
+                        {% if val.min_lat and val.min_lon and val.max_lat and val.max_lon %}
+                            <li>Spatial filter bounding box: [{{ val.min_lat }}, {{ val.min_lon }}, {{ val.max_lat }}, {{ val.max_lon }}].</li>
+                        {% else %}
+                            <li>Validated globally.</li>
+                        {% endif %}
+
+                        {% if val.interval_from and val.interval_to %}
+                            <li>Validation period / temporal filter: {{ val.interval_from }} to {{ val.interval_to }}.</li>
+                        {% else %}
+                            <li>Validated over entire available timespan.</li>
+                        {% endif %}
+
                         {% if val.anomalies != 'none' %}
                             <li>Validation metrics calculated from anomalies
                                 {% if val.anomalies == 'climatology' %}
@@ -73,19 +85,18 @@
                             <li>Validation metrics calculated from absolute values.</li>
                         {% endif %}
 
+                        <li>Scaling reference: {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
+                                    [Filters:
+                                    {% if not val.scaling_ref.filters.all and not val.scaling_ref.parametrisedfilter_set.all %}
+                                        none
+                                    {% else %}
+                                        {% for filter in val.scaling_ref.filters.all %} {{ filter.description }}; {% endfor %}
+                                        {% for pfilter in val.scaling_ref.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
+                                    {% endif %}]
+                        </li>
+                        <li>Scaling method: {{ val.get_scaling_method_display }}.</li>
+
                         <li>Processing took {{ run_time }} minutes (wall time).</li>
-                        {% if val.interval_from and val.interval_to %}
-                            <li>Validation period / temporal filter: {{ val.interval_from }} to {{ val.interval_to }}.</li>
-                        {% else %}
-                            <li>Validated over entire available timespan.</li>
-                        {% endif %}
-
-                        {% if val.min_lat and val.min_lon and val.max_lat and val.max_lon %}
-                            <li>Spatial filter bounding box: [{{ val.min_lat }}, {{ val.min_lon }}, {{ val.max_lat }}, {{ val.max_lon }}].</li>
-                        {% else %}
-                            <li>Validated globally.</li>
-                        {% endif %}
-
 
                         {% if val.progress == -1 %}
                             <li>The validation was cancelled.</li>
