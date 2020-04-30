@@ -2,228 +2,69 @@
 
 {% block content %}
 
+<style type="text/css">
+.table ul {
+    margin-left: -1.5em;
+}
+</style>
+
 <div style="width: 100%; margin: auto; max-width: 85rem;">
 
-    <a id="data"></a><h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated</h1>
+    {% for ref_flag in ref_flags %}
 
-	<p>
-        The following datasets can be validated within the QA4SM tool. These datasets are available in the "data" section of the validate page.
-	</p>
-	<table id="table_small1" class="table table-bordered">
-        <thead class="thead-dark">
-        <tr>
-			<th scope="col" style="width: 7%">Dataset</th>
-			<th scope="col" style="width: 20%">Details</th>
-			<th scope="col" style="width: 20%">Versions supported</th>
-			<th scope="col" style="width: 10%">Time Range Covered</th>
-			<th scope="col" style="width: 13%">Data availability</th>
-			<th scope="col" style="width: 10%">Citation</th>
-			<th scope="col" style="width: 20%">Filters</th>
-		</tr>
-        </thead>
-        <tbody>
-		<tr>
-            <th scope="row">C3S SM</th>
-			<td>The C3S long-term data record provides active, passive and combined (active+passive) soil moisture data
-                on a daily, dekadal and monthly basis. Observations are provided on a quarter degree grid. For more information, please visit
-                the <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview">Climate Data Store</a>.
-            </td>
-			<td>The QA4SM tool supports version v201706 and v201812 of the C3S product. Currently, the COMBINED product (combination
-                of active and passive sensors) is supported.</td>
-            <td>1978 - 2018 (both versions)</td>
-			<td>The data can be downloaded from the <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview">Climate Data Store</a>.</td>
-			<td><a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview">See Climate Data Store</a></td>
-			<td>
-                <ul>
-                    <li>Valid range:<br>Filter soil moisture values to ensure they are within the valid range (between 0 and 1 for the COMBINED product).</li>
-                    <li>Use data where flag=0: <br>Only use satellite observations where no inconsistencies were detected.</li>
-                    <li>Frozen soil or snow-cover: <br>Only use soil moisture data from grids cells without no snow cover or frozen soil (flag != 1).</li>
-                    <li>Dense vegetation: <br>Only use soil moisture data from grids cells without dense vegetation (flag != 2).</li>
-                    <li>Ascending mode only: <br>Only use satellite observations in ascending mode.</li>
-                    <li>Descending mode only: <br>Only use satellite observations from descending mode.</li>
-                </ul>
-            </td>
-		</tr>
-		<tr>
-			<th scope="row">ESA CCI SM COMBINED</th>
-			<td>The ESA CCI SM long-term data record provides active, passive and combined (active+passive) on a daily basis.
-                Observations are provided on a quarter degree grid. For more information on the ESA CCI SM product, please see
-                the <a target="_blank" href="https://www.esa-soilmoisture-cci.org/">product homepage</a>.</td>
-			<td>v04.4</td>
-			<td>1978 - 2018</td>
-			<td><a target="_blank" href="https://www.esa-soilmoisture-cci.org/node/145">Register at ESA CCI</a>, then download through FTP.</td>
-			<td>http://www.esa-soilmoisture-cci.org; <br/>
-                Liu, Y.Y., Dorigo, W.A., Parinussa, R.M., de Jeu, R.A.M. , Wagner, W., McCabe, M.F., Evans, J.P., van Dijk, A.I.J.M. (2012).
-                Trend-preserving blending of passive and active microwave soil moisture retrievals,
-                Remote Sensing of Environment, 123, 280-297, doi: 10.1016/j.rse.2012.03.014.;<br/>
-                Liu, Y.Y., Parinussa, R.M., Dorigo, W.A., De Jeu, R.A.M., Wagner, W., van Dijk, A.I.J.M., McCabe, M.F., & Evans, J.P. (2011).
-                Developing an improved soil moisture dataset by blending passive and active microwave satellite based retrievals.
-                Hydrology and Earth System Sciences, 15, 425-436.;<br/>
-                Wagner, W., W. Dorigo, R. de Jeu, D. Fernandez, J. Benveniste, E. Haas, M. Ertl (2012).
-                Fusion of active and passive microwave observations to create an Essential Climate Variable data record on soil moisture.
-                ISPRS Annals of the Photogrammetry, Remote Sensing and Spatial Information Sciences, Volume I-7, 2012. XXII ISPRS Congress, 25 August - 01 September 2012, Melbourne, Australia.;<br/>
-                Gruber, A., Dorigo, W. Crow, W., & Wagner, W. (2017).
-                Triple collocation-based merging of satellite soil moisture retrievals. IEEE Transactions on Geoscience and Remote Sensing, 1-13.;<br/>
-                Dorigo, W.A., Wagner, W., Albergel, C., Albrecht, F., Balsamo, G., Brocca, L., Chung, D., Ertl, M., Forkel, M., Gruber, A., Haas, E., Hamer, P. D., Hirschi, M., Ikonen, J., de Jeu, R., Kidd, R., Lahoz, W., Liu, Y. Y.,Miralles, D., Mistelbauer, T., Nicolai-Shaw, N., Parinussa, R., Pratola, C., Reimer, C., van der Schalie, R., Seneviratne, S. I. Smolander, T., Lecomte, P. (2017).
-                ESA CCI Soil Moisture for improved Earth system understanding: State-of-the art and future directions, Remote Sensing of Environment. https://doi.org/10.1016/j.rse.2017.07.001.
-            </td>
-			<td>See filters specified for the C3S dataset.</td>
-		</tr>
-		<tr>
-			<th scope="row">SMAP Level 3 SM</th>
-			<td>The NASA SMAP level 3 data set provides global daily soil moisture observations at a 36 km resolution from
-                the SMAP sensor (<a target="_blank" href="https://nsidc.org/data/SPL3SMP">more information</a>).</td>
-			<td>The QA4SM tool supports version 5 of the SMAP L3 Soil moisture product.</td>
-			<td>2015 - 2018</td>
-			<td>The data can be downloaded from the product homepage <a target="_blank" href="https://nsidc.org/data/SPL3SMP">
-                here</a>.</td>
-			<td>Click <a target="_blank" href="https://nsidc.org/data/SPL3SMP">here</a></td>
-			<td>
-                <ul>
-                <li>Valid range: <br> Observations are filtered to ensure they are within the valid range (between 0 and 1)</li>
-                </ul>
-            </td>
-		</tr>
-        <tr>
-            <th scope="row">H-SAF ASCAT SSM CDR</th>
-            <td>
-                The ASCAT dataset from the EUMETSAT H-SAF portal provides global daily soil moisture observations on a discrete
-                global grid (DGG) with a spatial resolution of 25 km. Observations are provided from the ASCAT instrument on-board
-                both Metop-A and Metop-B (<a target="_blank" href="http://hsaf.meteoam.it/description-h25-h108-h111.php">more information</a>).</td>
-            <td>The QA4SM tool supports version H113 of the H-SAF ASCAT SSM CDR product.</td>
-            <td>2007 - 2017</td>
-            <td>The data can be downloaded from the <a target="_blank" href="http://hsaf.meteoam.it/description-h25-h108-h111.php">product homepage</a>.</td>
-            <td>See section 5.2 of <a target="_blank" href="http://hsaf.meteoam.it/documents/PUM/SSM_ASCAT_DR_PUM_v0.6.pdf">this document</a></td>
-            <td>
-                <ul>
-                    <li>Valid range: Filter soil moisture values to ensure they are between 0 and 100.</li>
-                    <li>Metop-A observations: Use only observations retrieved using ASCAT on-board Metop-A.</li>
-                    <li>Metop-B observations: Use only observations retrieved using ASCAT on-board Metop-B.</li>
-                    <li>Soil not frozen (or state not known):</li>
-                    <li>No confidence flags raised:</li>
-                    <li>No processing flags raised:</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">SMOS IC</th>
-            <td>The <a target="_blank" href="https://www.catds.fr/Products/Available-products-from-CEC-SM/SMOS-IC">SMOS IC product</a>
-                generated by INRA and CESBIO provides global soil moisture and VOD based on the two parameter inversion of the
-                <a target="_blank" href="https://www.sciencedirect.com/science/article/pii/S0034425706004238">L-MEB model</a>.</td>
+        {% if not ref_flag %}
+            <a id="data"></a><h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated</h1>
+            <p>
+                The following datasets can be validated within the QA4SM tool. These datasets are available in the "data" section of the validate page.
+            </p>
+        {% else %}
+            <a id="ref"></a><h1 class="h3 mb-3 font-weight-normal">Datasets - Reference Data</h1>
+            <p>
+                The following datasets can be used as a reference within the QA4SM tool. These datasets are available in the
+                "reference" section of the validate page.
+            </p>
+        {% endif %}
 
-            <td>The QA4SM tool supports version 105 ascending.</td>
-            <td>2010 - 2018</td>
-            <td>The data can be downloaded from the <a target="_blank" href="https://www.catds.fr/Products/Available-products-from-CEC-SM/SMOS-IC">product homepage</a>.</td>
-            <td><a target="_blank" href="https://www.catds.fr/Products/Available-products-from-CEC-SM/SMOS-IC">See this page.</a></td>
-            <td>
-                <ul>
-                    <li>Valid range: Filter soil moisture values to ensure they are between 0 and 1 m3 / m3.</li>
-                    <li>Soil moisture values are retrieved and recommended (Quality_Flag == 0)</li>
-                </ul>
-            </td>
-        </tr>
-        </tbody>
-	</table>
 
-    <br>
-	<a id="ref"></a><h1 class="h3 mb-3 font-weight-normal">Datasets - Reference Data</h1>
-    <p>
-        The following datasets can be used as a reference within the QA4SM tool. These datasets are available in the
-        "reference" section of the validate page.
-	</p>
+        <table id="table_{% if not ref_flag %}datasets{% else %}references{% endif %}" class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col" style="width: 10%">Dataset</th>
+                    <th scope="col" style="width: 20%">Details</th>
+                    <th scope="col" style="width: 15%">Versions supported</th>
+                    <th scope="col" style="width: 5%">Time Range Covered</th>
+                    <th scope="col" style="width: 15%">Data availability</th>
+                    <th scope="col" style="width: 10%">Citation</th>
+                    <th scope="col" style="width: 20%">Filters</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dataset in datasets %}
+                    {% if dataset.is_reference == ref_flag %}
+                        <tr>
+                            <th scope="row">{{ dataset.pretty_name }}</th>
+                            <td>{{ dataset.detailed_description |safe }}</td>
+                            <td>
+                                <ul>
+                                    {% for version in dataset.versions.all %} <li>{{ version.pretty_name }}: {{ version.help_text }}</li> {% endfor %}
+                                </ul>
+                            </td>
+                            <td>{{ dataset.time_range_covered }}</td>
+                            <td>{{ dataset.source_reference |safe }}</td>
+                            <td>{{ dataset.citation |safe }}</td>
+                            <td>
+                                <ul>
+                                    {% for filter in dataset.filters.all %} <li>{{ filter.description }}: {{ filter.help_text }}</li> {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
 
-	<table id="table_small2" class="table table-bordered">
-		<thead class="thead-dark">
-        <tr>
-            <th scope="col" style="width: 7%">Dataset</th>
-			<th scope="col" style="width: 20%">Details</th>
-			<th scope="col" style="width: 20%">Versions supported</th>
-			<th scope="col" style="width: 10%">Time Range Covered</th>
-			<th scope="col" style="width: 13%">Data availability</th>
-			<th scope="col" style="width: 10%">Citation</th>
-			<th scope="col" style="width: 20%">Filters</th>
-		</tr>
-        </thead>
-        <tbody>
-		<tr>
-			<th scope="row">ISMN</th>
-			<td>The ISMN provides in-situ soil moisture data from over 2600 monitoring stations worldwide. The data is
-                harmonised and quality controlled to ensure the highest quality data is provided through the portal.
-                Data is provided from 1952 to present day
-                (<a target="_blank" href="https://ismn.geo.tuwien.ac.at/">more information</a>).</td>
-			<td>The ISMN data is downloaded periodically for use in the QA4SM portal, therefore the version number (and
-                data) will change over time. There are currently two versions available within QA4SM: v20180830 and v20190222.</td>
-			<td>Station dependent</td>
-			<td>Data is freely available after registration <a target="_blank" href="https://ismn.geo.tuwien.ac.at/data-access/">
-                here</a>.</td>
-			<td><a target="_blank" href="https://ismn.geo.tuwien.ac.at/terms-and-conditions/">Terms
-                and conditions</a>, <a target="_blank" href="../../static/files/ISMN_v20180830_Readme.txt">readme
-                (v20180830)</a>, and <a target="_blank" href="../../static/files/ISMN_v20190222_Readme.txt">readme
-                (v20190222)</a></td>
-            <td>
-                <ul>
-                <li>Quality flag is "good" (G): <br>More information on the ISMN quality flags can be found  <a target="_blank" href="https://ismn.geo.tuwien.ac.at/data-access/quality-flags/">here</a>.</li>
-                </ul>
-            </td>
-		</tr>
-        <tr>
-			<th scope="row">GLDAS</th>
-			<td>GLDAS is a land surface model (LSM) which provides soil moisture data at different depths. Different
-                versions are available for different time periods. For more information, visit the LDAS website:
-                <a target="_blank" href="https://ldas.gsfc.nasa.gov/gldas/">NASA Land Data Assimilation Systems Website</a></td>
-			<td>Version 2.1 is supported within the QA4SM tool. This dataset covers the period from the start of 2000 to the end of 2017.</td>
-			<td>2000-2017</td>
-			<td>Data is freely available after registration <a target="_blank" href="https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H.2.1/">
-                here for version 2.1</a> </td>
-			<td>Click <a target="_blank" href="https://ldas.gsfc.nasa.gov/gldas/GLDASpublications.php">here</a></td>
-            <td>
-                <ul>
-                <li>Frozen soil or snow-cover: <br>Only use soil moisture data from grids cells where there is no snow cover or frozen soil.</li>
-                </ul>
-            </td>
-		</tr>
-		<tr>
-			<th scope="row">ERA5</th>
-			<td>ERA5 is a global reanalysis product provided by ECMWF. It provides global, sub-daily simulations of variables for land, 
-				atmosphere and ocean waves. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5 Volumetric Soil Moisture and Soil Temperature
-				with a spatial resolution of 0.25° Lat. * 0.25° Lon were converted into a time series format via daily averages. 
-				The ERA5 dataset starts in 1979. The version number used in QA4SM indicates the date 
-				when the original data was downloaded. For more details about ERA5 please see 
-                <a target="_blank" href="https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation">ECMWF Confluence - ERA5 Documentation</a></td>
-			<td>Version 20190613 is a snapshot of the reanalysis dataset from this point in time</td>
-			<td>1979 - 2018</td>
-			<td>Data is freely available with a CDS account. See <a target="_blank" href="https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation#ERA5datadocumentation-HowtodownloadERA5">
-                ECMWF Confluence - ERA5 Download</a> </td>
-			<td>Click <a target="_blank" href="https://confluence.ecmwf.int/display/CKB/What+is+ERA5">here</a></td>
-            <td>
-                <ul>
-                <li>Frozen soil: <br>Only use soil moisture data from grids cells where there is no frozen soil.</li>
-                </ul>
-            </td>
-		</tr>
-        <tr>
-			<th scope="row">ERA5-Land</th>
-			<td>ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis.
-                The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5-Land Volumetric Soil Moisture and Soil Temperature
-				with a spatial resolution of 0.1° Lat. * 0.1° Lon were converted into a time series format from daily averages.
-                ERA5-Land is available from January 2001 onward. The Soil Temperature variable (stl1) is used to mask
-                Soil Moisture (swvl1) under frozen conditions if selected. The version number used in QA4SM indicates the date
-				when the original data was downloaded. For more details please see
-
-                <a target="_blank" href="https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation">ECMWF Confluence - ERA5-Land Documentation</a></td>
-			<td>Version 20190904 is a snapshot of the reanalysis dataset from this point in time.</td>
-			<td>2001 - 2018</td>
-			<td>Data is freely available with a CDS account. See <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form">
-                Copernicus Climate Data Store Confluence - ERA5-Land Download</a> </td>
-			<td>Click <a target="_blank" href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview">here</a></td>
-            <td>
-                <ul>
-                <li>Frozen soil: <br>Only use soil moisture data from grids cells where there is no frozen soil.</li>
-                </ul>
-            </td>
-		</tr>
-        </tbody>
-	</table>
+    {% endfor %}
 </div>
 
 {% endblock %}

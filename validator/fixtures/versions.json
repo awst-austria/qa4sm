@@ -5,7 +5,7 @@
         "fields": {
             "short_name": "C3S_V201706",
             "pretty_name": "v201706",
-            "help_text": ""
+            "help_text": "C3S from June 2017"
         }
     },
     {
@@ -32,7 +32,7 @@
         "fields": {
             "short_name": "ISMN_V20180712_MINI",
             "pretty_name": "20180712 mini testset",
-            "help_text": ""
+            "help_text": "Test dataset with only 4 stations"
         }
     },
     {
@@ -41,7 +41,7 @@
         "fields": {
             "short_name": "GLDAS_NOAH025_3H_2_1",
             "pretty_name": "NOAH025 3H.2.1",
-            "help_text": ""
+            "help_text": "Version 2.1"
         }
     },
     {
@@ -77,7 +77,7 @@
         "fields": {
             "short_name": "ERA5_20190613",
             "pretty_name": "v20190613",
-            "help_text": ""
+            "help_text": "snapshot of the reanalysis dataset from 2019-06-13"
         }
     },
     {
@@ -86,7 +86,7 @@
         "fields": {
             "short_name": "ERA5_LAND_V20190904",
             "pretty_name": "v20190904",
-            "help_text": ""
+            "help_text": "snapshot of the reanalysis dataset from 2019-09-04"
         }
     },
     {
@@ -125,7 +125,7 @@
             "help_text": "-"
         }
     },
-        {
+    {
         "model": "validator.datasetversion",
         "pk": 22,
         "fields": {
