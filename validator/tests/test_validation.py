@@ -204,14 +204,15 @@ class TestValidation(TestCase):
         with ZipFile(zipfile, 'r') as myzip:
             assert myzip.testzip() is None
 
+        n_metrics = len(globals.METRICS.keys())
         # check diagrams
         boxplot_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (run.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (run.dataset_configurations.count() - 1)
 
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -568,6 +569,7 @@ class TestValidation(TestCase):
         start_time = time.time()
 
         for dataset in Dataset.objects.all():
+            self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
             va = dataset.variables.all()
             fils = dataset.filters.all()
@@ -732,7 +734,8 @@ class TestValidation(TestCase):
         assert num == 1
 
     @pytest.mark.long_running
-    def test_generate_graphs(self):
+    @pytest.mark.graphs
+    def test_generate_graphs(self, map_grid=True):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
         infile2 = 'testdata/output_data/c3s_gldas.nc'
         infile3 = 'testdata/output_data/c3s_era5land.nc'
@@ -751,15 +754,16 @@ class TestValidation(TestCase):
         shutil.copy(infile1, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        n_metrics = len(globals.METRICS.keys())
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
         # remove results from first test and recreate dir
         shutil.rmtree(run_dir)
@@ -772,15 +776,15 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
         # remove results from first test and recreate dir
         shutil.rmtree(run_dir)
@@ -793,15 +797,15 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
 
         self.delete_run(v)
