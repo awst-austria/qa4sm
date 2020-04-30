@@ -732,6 +732,7 @@ class TestValidation(TestCase):
         assert num == 1
 
     @pytest.mark.long_running
+    @pytest.mark.graphs
     def test_generate_graphs(self):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
         infile2 = 'testdata/output_data/c3s_gldas.nc'

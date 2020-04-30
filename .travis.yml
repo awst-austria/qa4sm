@@ -46,7 +46,7 @@ install:
   - which python
 
 script:
-  - pytest -m "not needs_advanced_setup"
+  - pytest -m "not needs_advanced_setup and not graphs"
 after_success:
   # report coverage results to coveralls.io
   #- pip install coveralls
