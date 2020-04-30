@@ -18,6 +18,11 @@ from validator.admin.user_status_change import *  # @UnusedWildImport
 class CustomUserAdmin(UserAdmin):
     actions = [] # need to 'override' the parent actions so that we don't change all ModelAdmin actions!
 
+    ## define which columns appear in the list view. Add the action buttons at the end.
+    readonly_fields = ('user_actions', )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'organisation', 'is_active', 'is_staff', 'date_joined', 'user_actions', )
+    ordering = ('-date_joined', )
+
     def __init__(self, model, admin_site):
         super(CustomUserAdmin, self).__init__(model, admin_site)
         self.actions += [bulk_user_activation, bulk_user_deactivation,
@@ -31,9 +36,6 @@ class CustomUserAdmin(UserAdmin):
             if (field_name == 'Permissions' and 'fields' in attributes):
                 attributes['fields'] = ('user_actions', ) + attributes['fields']
 
-        ## define which columns appear in the list view. Add the action buttons at the end.
-        self.readonly_fields = ('user_actions', )
-        self.list_display = ('username', 'email', 'first_name', 'last_name', 'organisation', 'is_active', 'is_staff', 'user_actions', )
 
     ## add the url for our user status change action
     def get_urls(self):
