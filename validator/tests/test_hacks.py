@@ -26,7 +26,7 @@ class TestHacks(TestCase):
         orig_data = c3s_reader.read_ts(-155.42, 19.78)
         data = timezone_reader.read_ts(-155.42, 19.78)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
-        self.assertTrue(data.index.tz is None)
+        self.assertTrue(not hasattr(data.index, 'tz') or data.index.tz is None)
 
         orig_data = c3s_reader.read(-155.42, 19.78)
         data = timezone_reader.read(-155.42, 19.78)
