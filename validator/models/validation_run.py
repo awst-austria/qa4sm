@@ -1,3 +1,4 @@
+from datetime import timedelta
 from os import path
 from re import sub as regex_sub
 from shutil import rmtree
@@ -5,11 +6,14 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
+from django.utils import timezone
+
+from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
 from validator.models import DatasetConfiguration
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class ValidationRun(models.Model):
@@ -72,9 +76,30 @@ class ValidationRun(models.Model):
 
     output_file = models.FileField(null=True, max_length=250)
 
+    is_archived = models.BooleanField(default=False)
+    last_extended = models.DateTimeField(null=True, blank=True)
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
+
+    @property
+    def expiry_date(self):
+        if (self.is_archived or (self.end_time is None)):
+            return None
+
+        initial_date = self.last_extended if self.last_extended else self.end_time
+        return initial_date + timedelta(days=VALIDATION_EXPIRY_DAYS)
+
+    @property
+    def is_expired(self):
+        e = self.expiry_date
+        return (e and (timezone.now() > e))
+
+    @property
+    def is_near_expiry(self):
+        e = self.expiry_date
+        return (e and (timezone.now() > e - timedelta(days=VALIDATION_EXPIRY_WARNING_DAYS)))
 
     def clean(self):
         super(ValidationRun, self).clean()

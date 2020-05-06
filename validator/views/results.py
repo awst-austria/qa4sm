@@ -1,13 +1,16 @@
 from json import dumps as json_dumps
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import QueryDict
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
 
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_pairs
+
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -41,6 +44,40 @@ def result(request, result_uuid):
 
         val_run.delete()
         return HttpResponse("Deleted.", status=200)
+
+    elif(request.method == 'PATCH'):
+        ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+        if(val_run.user != request.user):
+            return HttpResponse(status=403)
+
+        #maintenance_mode = request.POST.get('maintenance_mode', '')
+        patch_params = QueryDict(request.body)
+
+        if 'archive' in patch_params:
+            archive_mode = patch_params['archive']
+
+            if archive_mode == 'true':
+                val_run.is_archived = True
+            elif archive_mode == 'false':
+                val_run.last_extended = timezone.now()
+                val_run.is_archived = False
+            else:
+                return HttpResponse("Wrong parameter.", status=400)
+
+            val_run.save()
+            return HttpResponse("Changed.", status=200)
+
+        if 'extend' in patch_params:
+            extend = patch_params['extend']
+
+            if extend != 'true':
+                return HttpResponse("Wrong parameter.", status=400)
+
+            val_run.last_extended = timezone.now()
+            val_run.save()
+            return HttpResponse(val_run.expiry_date, status=200)
+
+        return HttpResponse("Wrong parameter.", status=400)
 
     # not DELETE
     else:

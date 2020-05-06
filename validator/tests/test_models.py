@@ -18,6 +18,10 @@ from validator.models import ValidationRun
 from validator.models import CeleryTask
 from validator.models import ParametrisedFilter
 
+from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
+from datetime import timedelta
+from django.utils import timezone
+
 
 class TestModels(TestCase):
 
@@ -180,6 +184,53 @@ class TestModels(TestCase):
         with pytest.raises(ValidationError):
             run.clean()
 
+    def test_validation_run_expiry(self):
+        assert VALIDATION_EXPIRY_DAYS >= 1
+        assert VALIDATION_EXPIRY_WARNING_DAYS >= 1
+        assert VALIDATION_EXPIRY_WARNING_DAYS < VALIDATION_EXPIRY_DAYS
+
+        ## while the validation is running, we don't have an expiry date
+        run = ValidationRun()
+        assert run.expiry_date is None
+        assert not run.is_expired
+        assert not run.is_near_expiry
+
+        ## once the validation has finished, it can expire
+        run.end_time = timezone.now()
+        assert run.expiry_date == (run.end_time + timedelta(days=VALIDATION_EXPIRY_DAYS))
+        assert not run.is_expired
+        assert not run.is_near_expiry
+
+        ## move us to the warning period
+        run.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS-VALIDATION_EXPIRY_WARNING_DAYS+1)
+        assert not run.is_expired
+        assert run.is_near_expiry
+
+        ## make the validation expire
+        run.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS+1)
+        assert run.is_expired
+        assert run.is_near_expiry
+
+        ## once the validation has been extended, it expires based on the extension date
+        run.end_time = timezone.now() - timedelta(days=7)
+        run.last_extended = timezone.now()
+        assert run.expiry_date == (run.last_extended + timedelta(days=VALIDATION_EXPIRY_DAYS))
+
+        ## move us to the warning period
+        run.last_extended = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS-VALIDATION_EXPIRY_WARNING_DAYS+1)
+        assert not run.is_expired
+        assert run.is_near_expiry
+
+        ## make the validation expire
+        run.last_extended = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS+1)
+        assert run.is_expired
+        assert run.is_near_expiry
+
+        ## if a validation is archived, it does not expire
+        run.is_archived = True
+        assert run.expiry_date is None
+        assert not run.is_expired
+        assert not run.is_near_expiry
 
     def test_data_filter_str(self):
         myfilter = DataFilter()

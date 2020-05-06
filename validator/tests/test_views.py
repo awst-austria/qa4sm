@@ -1,26 +1,27 @@
 from datetime import datetime, timedelta
-import time
 import io
 import json
 import logging
 from re import findall as regex_find
 from time import sleep
+import time
 import zipfile
 
+from dateutil import parser
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
-from validator.forms.user_profile import UserProfileForm
 User = get_user_model()
 
-from django.test.utils import override_settings
 from django.core import mail
 from django.test.testcases import TransactionTestCase
+from django.test.utils import override_settings
 from django.urls.base import reverse
 import pytest
 from pytz import UTC
 from pytz import utc
 
 from valentina.settings import EMAIL_FROM
+from validator.forms.user_profile import UserProfileForm
 from validator.models import ValidationRun
 from validator.models.dataset import Dataset
 from validator.models.filter import DataFilter
@@ -128,6 +129,52 @@ class TestViews(TransactionTestCase):
         self.client.login(**self.credentials)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_change_result_expiry(self):
+        url = reverse('result', kwargs={'result_uuid': self.testrun.id})
+
+        ## only owners should be able to change validations
+        self.client.login(**self.credentials2)
+        response = self.client.patch(url, 'extend=true',  content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 403)
+
+        ## try out normal expiry extension
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'extend=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        new_expiry_date = parser.parse(response.content)
+        self.assertTrue(new_expiry_date is not None)
+        assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date == new_expiry_date
+
+        ## invalid expiry extension
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'extend=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+        assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date == new_expiry_date
+
+        ## valid archiving
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'archive=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is None
+
+        ## valid un-archiving
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'archive=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is not None
+
+        ## invalid archiving
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'archive=asdf', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+        assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is not None
+
+        ## completely invalid parameter
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'levelup=1up', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+        assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is not None
 
     def test_delete_result(self):
         # create result to delete:

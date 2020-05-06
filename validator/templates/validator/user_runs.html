@@ -13,7 +13,23 @@
             {% for valrun in myruns %}
                 <div class="card mb-4 mx-0 box-shadow" id="result_row_{{ valrun.id }}">
                     <div class="card-header">
-                        <h5 class="my-0" style="float: left"><span class=" font-weight-normal">Started:</span> {{ valrun.start_time }}</h5>
+                        <h5 class="my-0" style="float: left">
+                            {% if valrun.expiry_date %}
+                                {% if valrun.is_near_expiry %}
+                                    <span class="fas fa-bomb" title="This validation will SOON be automatically removed during cleanup on {{ valrun.expiry_date }}."></span>
+                                {% else %}
+                                    <span class="fas fa-calendar" title="This validation will be automatically removed during cleanup on {{ valrun.expiry_date }}."></span>
+                                {% endif %}
+                            {% else %}
+                                {% if not valrun.end_time %}
+                                    <span class="fas fa-running" title="This validation is still running."></span>
+                                {% endif %}
+                                {% if valrun.is_archived %}
+                                    <span class="fas fa-archive" title="This validation has been archived. It will NOT be automatically removed during cleanup."></span>
+                                {% endif %}
+                            {% endif %}
+                            <span class=" font-weight-normal">Started:</span> {{ valrun.start_time }}
+                        </h5>
                         {% if valrun.name_tag %}
                             <h5 class="my-0" style="float: right"><span class=" font-weight-normal">Name:</span> {{ valrun.name_tag }}</h5>
                         {% endif %}
@@ -54,13 +70,18 @@
                                 {% if valrun.progress > -1 and valrun.progress < 100 and valrun.end_time == null %}
                                 <button class="btn btn-sm btn-primary btn-action" title="Cancel validation" onclick="ajax_stop_validation('{{ valrun.id }}')"><span class="fas fa-stop"></span></button>
                                 {% endif %}
-                                {% if valrun.end_time and valrun.output_file %}
-                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
-                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
-                                {% endif %}
-
                                 {% if valrun.end_time %}
+                                    {% if valrun.output_file %}
+                                        <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
+                                        <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
+                                    {% endif %}
                                     <button class="btn btn-sm btn-primary btn-action" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}')"><span class="fas fa-times"></span></button>
+                                    {% if valrun.is_archived %}
+                                        <button class="btn btn-sm btn-primary btn-action" title="Un-archive" onclick="ajax_archive_result('{{ valrun.id }}', false)"><span class="fas fa-calendar"></span></button>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-primary btn-action" title="Extend lifespan" onclick="ajax_extend_result('{{ valrun.id }}', true)"><span class="fas fa-calendar-plus"></span></button>
+                                        <button class="btn btn-sm btn-primary btn-action" title="Archive" onclick="ajax_archive_result('{{ valrun.id }}', true)"><span class="fas fa-archive"></span></button>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -139,6 +160,46 @@
                 url : url,
                 type : 'DELETE',
                 success : function(return_data) { location.reload(); }
+            });
+        }
+
+        function ajax_archive_result(result_id, archive) {
+            if (!confirm('Do you want to '+ (archive ? 'archive' : 'un-archive') +' the result'+ (archive ? '' : ' (allow auto-cleanup)') +'?')) {
+                   return;
+               }
+            var url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000',result_id);
+
+            $.ajaxSetup({
+                  headers: { "X-CSRFToken": '{{csrf_token}}' }
+            });
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                data : { "archive" : archive },
+                success : function(return_data) { location.reload(); }
+            });
+        }
+
+        function ajax_extend_result(result_id) {
+            if (!confirm('Do you want to extend the lifespan of this result?')) {
+                   return;
+               }
+            var url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000',result_id);
+
+            $.ajaxSetup({
+                  headers: { "X-CSRFToken": '{{csrf_token}}' }
+            });
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                data : { "extend" : true },
+                success : function(return_data) {
+                    var newExpiry = new Date(return_data);
+                    alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString())
+                    location.reload();
+                }
             });
         }
     </script>
