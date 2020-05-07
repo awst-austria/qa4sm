@@ -92,6 +92,7 @@ class TestMailer(TestCase):
         run.end_time = run.start_time + timedelta(days=1)
         run.user = self.testuser
         run.save()
+        assert not run.expiry_notified
 
         val_mail.send_val_expiry_notification(run)
         self.check_outbox()
