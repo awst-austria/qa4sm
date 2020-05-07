@@ -96,6 +96,8 @@ class TestMailer(TestCase):
         val_mail.send_val_expiry_notification(run)
         self.check_outbox()
 
+        assert ValidationRun.objects.get(pk=run.id).expiry_notified
+
     def test_user_signup(self):
         val_mail.send_new_user_signed_up(self.testuser)
         self.check_outbox()

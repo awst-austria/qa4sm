@@ -78,6 +78,7 @@ class ValidationRun(models.Model):
 
     is_archived = models.BooleanField(default=False)
     last_extended = models.DateTimeField(null=True, blank=True)
+    expiry_notified = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration

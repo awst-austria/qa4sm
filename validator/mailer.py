@@ -60,6 +60,9 @@ def send_val_expiry_notification(val_run):
                     subject=subject,
                     body=body)
 
+        val_run.expiry_notified = True
+        val_run.save()
+
 def send_new_user_signed_up(user):
         __logger.info('Sending mail about new user {} to admins...'.format(user.username))
 
