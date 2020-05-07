@@ -94,12 +94,12 @@ class ValidationRun(models.Model):
     @property
     def is_expired(self):
         e = self.expiry_date
-        return (e and (timezone.now() > e))
+        return ((e is not None) and (timezone.now() > e))
 
     @property
     def is_near_expiry(self):
         e = self.expiry_date
-        return (e and (timezone.now() > e - timedelta(days=VALIDATION_EXPIRY_WARNING_DAYS)))
+        return ((e is not None) and (timezone.now() > e - timedelta(days=VALIDATION_EXPIRY_WARNING_DAYS)))
 
     def clean(self):
         super(ValidationRun, self).clean()

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 from dateutil.tz.tz import tzlocal
@@ -8,6 +8,7 @@ User = get_user_model()
 from django.core import mail as mail
 from django.test import TestCase
 
+from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
 import validator.mailer as val_mail
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -82,6 +83,17 @@ class TestMailer(TestCase):
         run.save()
 
         val_mail.send_val_done_notification(run)
+        self.check_outbox()
+
+    def test_val_expired(self):
+        run = ValidationRun()
+        now = datetime.now(tzlocal())
+        run.start_time = now - timedelta(days=VALIDATION_EXPIRY_DAYS-VALIDATION_EXPIRY_WARNING_DAYS)
+        run.end_time = run.start_time + timedelta(days=1)
+        run.user = self.testuser
+        run.save()
+
+        val_mail.send_val_expiry_notification(run)
         self.check_outbox()
 
     def test_user_signup(self):
