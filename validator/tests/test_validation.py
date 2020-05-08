@@ -11,7 +11,6 @@ from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
-from symbol import parameters
 User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -23,7 +22,7 @@ import numpy as np
 import pandas as pd
 import valentina
 from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
-from validator.models import DataFilter, dataset_configuration
+from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetConfiguration

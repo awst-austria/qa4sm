@@ -50,7 +50,6 @@ def result(request, result_uuid):
         if(val_run.user != request.user):
             return HttpResponse(status=403)
 
-        #maintenance_mode = request.POST.get('maintenance_mode', '')
         patch_params = QueryDict(request.body)
 
         if 'archive' in patch_params:
