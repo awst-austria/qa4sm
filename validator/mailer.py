@@ -29,13 +29,14 @@ def send_val_done_notification(val_run):
                 i += 1
 
         subject = '[QA4SM] Validation finished'
-        body = 'Dear {} {},\n\nyour validation of {} against {} ({}) data has been completed.\nThe results are available at: {}.\n\nBest regards,\nQA4SM team'.format(
+        body = 'Dear {} {},\n\nyour validation of {} against {} ({}) data has been completed.\nThe results are available at: {}.\nYou have until {} to inspect your validation - then it will be automatically removed (unless archived).\n\nBest regards,\nQA4SM team'.format(
             val_run.user.first_name,
             val_run.user.last_name,
             dataset_string,
             val_run.reference_configuration.dataset.pretty_name,
             val_run.reference_configuration.version.pretty_name,
-            url)
+            url,
+            val_run.expiry_date)
 
         _send_email(recipients=[val_run.user.email],
                     subject=subject,
