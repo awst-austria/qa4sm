@@ -17,6 +17,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         validations = ValidationRun.objects.filter(end_time__isnull=False) ## no, you can't filter for is_expired because it isn't in the database. but you can exclude running validations
         cleaned_up = []
+        notified = []
         for validation in validations:
             ## notify user about upcoming expiry if not already done
             if ((validation.is_near_expiry) and (not validation.expiry_notified)):
@@ -28,6 +29,7 @@ class Command(BaseCommand):
                     validation.save()
 
                 send_val_expiry_notification(validation)
+                notified.append(str(validation.id))
                 continue
 
             ## if validation is expired and user was notified, get rid of it
@@ -35,4 +37,4 @@ class Command(BaseCommand):
                 validation.delete()
                 cleaned_up.append(str(validation.id))
 
-        self.stdout.write(self.style.SUCCESS('Auto-cleaned validations: %s' % cleaned_up))
+        self.stdout.write(self.style.SUCCESS('Notified validations: {}\nAuto-cleaned validations: {}'.format(notified, cleaned_up)))
