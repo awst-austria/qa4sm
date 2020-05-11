@@ -15,6 +15,3 @@ def userhelp(request):
 
 def terms(request):
     return render(request, 'validator/terms.html')
-
-def datasets(request):
-    return render(request, 'validator/datasets.html')
