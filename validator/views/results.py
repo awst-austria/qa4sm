@@ -55,15 +55,10 @@ def result(request, result_uuid):
         if 'archive' in patch_params:
             archive_mode = patch_params['archive']
 
-            if archive_mode == 'true':
-                val_run.is_archived = True
-            elif archive_mode == 'false':
-                val_run.last_extended = timezone.now()
-                val_run.is_archived = False
-            else:
+            if not ((archive_mode == 'true') or (archive_mode == 'false')):
                 return HttpResponse("Wrong parameter.", status=400)
 
-            val_run.save()
+            val_run.archive(unarchive = (archive_mode == 'false'))
             return HttpResponse("Changed.", status=200)
 
         if 'extend' in patch_params:
@@ -72,8 +67,7 @@ def result(request, result_uuid):
             if extend != 'true':
                 return HttpResponse("Wrong parameter.", status=400)
 
-            val_run.last_extended = timezone.now()
-            val_run.save()
+            val_run.extend_lifespan()
             return HttpResponse(val_run.expiry_date, status=200)
 
         return HttpResponse("Wrong parameter.", status=400)

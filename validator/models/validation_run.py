@@ -102,6 +102,23 @@ class ValidationRun(models.Model):
         e = self.expiry_date
         return ((e is not None) and (timezone.now() > e - timedelta(days=VALIDATION_EXPIRY_WARNING_DAYS)))
 
+    def archive(self, unarchive=False, commit=True):
+        if unarchive:
+            self.extend_lifespan(commit=False)
+            self.is_archived = False
+        else:
+            self.is_archived = True
+
+        if commit:
+            self.save()
+
+    def extend_lifespan(self, commit=True):
+        self.last_extended = timezone.now()
+        self.expiry_notified = False;
+
+        if commit:
+            self.save()
+
     def clean(self):
         super(ValidationRun, self).clean()
 

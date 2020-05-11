@@ -227,8 +227,24 @@ class TestModels(TestCase):
         assert run.is_near_expiry
 
         ## if a validation is archived, it does not expire
-        run.is_archived = True
+        run.archive(commit=False)
+        assert run.is_archived
         assert run.expiry_date is None
+        assert not run.is_expired
+        assert not run.is_near_expiry
+
+        ## if validation is un-archived, it should be extended automatically
+        run.archive(unarchive=True, commit=False)
+        assert not run.is_archived
+        assert not run.expiry_notified
+        assert run.last_extended is not None
+        assert not run.is_expired
+        assert not run.is_near_expiry
+
+        ## extend again, for good measure
+        run.extend_lifespan(commit=False)
+        assert not run.expiry_notified
+        assert run.last_extended is not None
         assert not run.is_expired
         assert not run.is_near_expiry
 
