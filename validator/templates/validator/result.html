@@ -124,15 +124,17 @@
                         </li>
                     </ul>
 
-                    <div style="float: right;">
-                        <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove</button>
-                        {% if val.is_archived %}
-                            <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ val.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>
-                        {% else %}
-                            <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ val.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>
-                            <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span> Archive</button>
-                        {% endif %}
-                    </div>
+                    {% if is_owner %}
+                        <div style="float: right;">
+                            <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove</button>
+                            {% if val.is_archived %}
+                                <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ val.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>
+                            {% else %}
+                                <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ val.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>
+                                <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span> Archive</button>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

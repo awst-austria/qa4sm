@@ -72,8 +72,11 @@ def result(request, result_uuid):
 
         return HttpResponse("Wrong parameter.", status=400)
 
-    # not DELETE
+    # by default, show page
     else:
+        ## tell template whether it's the owner of the validation - to show action buttons
+        is_owner = (val_run.user == request.user)
+
         ## TODO: get time in format like '2 minutes', '5 hours'
         run_time = None
         if val_run.end_time is not None:
@@ -87,6 +90,7 @@ def result(request, result_uuid):
         pairs = get_dataset_pairs(val_run)
 
         context = {
+            'is_owner': is_owner,
             'val' : val_run,
             'error_rate' : error_rate,
             'run_time': run_time,
