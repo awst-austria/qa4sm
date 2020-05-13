@@ -109,7 +109,7 @@
                         <li>
                             {% if val.expiry_date %}
                                 {% if val.is_near_expiry %}
-                                    <span class="fas fa-bomb"></span>
+                                    <span class="fas fa-exclamation-triangle"></span>
                                     This validation will SOON be automatically removed during cleanup on {{ val.expiry_date }}.
                                 {% else %}
                                     <span class="fas fa-calendar-alt"></span>
