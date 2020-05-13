@@ -12,7 +12,6 @@ from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
-from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
 from validator.models import DatasetConfiguration
 
 
@@ -92,7 +91,7 @@ class ValidationRun(models.Model):
             return None
 
         initial_date = self.last_extended if self.last_extended else self.end_time
-        return initial_date + timedelta(days=VALIDATION_EXPIRY_DAYS)
+        return initial_date + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
 
     @property
     def is_expired(self):
@@ -102,7 +101,7 @@ class ValidationRun(models.Model):
     @property
     def is_near_expiry(self):
         e = self.expiry_date
-        return ((e is not None) and (timezone.now() > e - timedelta(days=VALIDATION_EXPIRY_WARNING_DAYS)))
+        return ((e is not None) and (timezone.now() > e - timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)))
 
     def archive(self, unarchive=False, commit=True):
         if unarchive:

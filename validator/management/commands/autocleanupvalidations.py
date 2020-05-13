@@ -3,7 +3,7 @@ from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
+from django.conf import settings
 from validator.mailer import send_val_expiry_notification
 from validator.models import ValidationRun
 
@@ -24,8 +24,8 @@ class Command(BaseCommand):
 
                 ## if already a quarter of the warning period has passed without a notification being sent (could happen when service is down),
                 ## extend the validation so that the user gets the full warning period
-                if timezone.now() + timedelta(days=VALIDATION_EXPIRY_WARNING_DAYS/4) > validation.expiry_date:
-                    validation.last_extended = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS - VALIDATION_EXPIRY_WARNING_DAYS)
+                if timezone.now() + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS/4) > validation.expiry_date:
+                    validation.last_extended = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS)
                     validation.save()
 
                 send_val_expiry_notification(validation)
