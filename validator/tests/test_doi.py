@@ -8,20 +8,22 @@ from os import path
 import shutil
 
 from django.contrib.auth import get_user_model
-from django.test.utils import override_settings
 User = get_user_model()
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from validator.doi import get_doi_for_validation
-from validator.models import ValidationRun
+from validator.models import DataVariable, Dataset, DatasetConfiguration, DatasetVersion, ValidationRun
 from validator.validation import set_outfile, mkdir_if_not_exists
 from validator.validation.globals import OUTPUT_FOLDER
+
 
 # use zenodo test sandbox to avoid generating real dois
 @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
 class TestDOI(TestCase):
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     __logger = logging.getLogger(__name__)
 
@@ -45,6 +47,24 @@ class TestDOI(TestCase):
         val.start_time = timezone.now() - timedelta(days=1)
         val.end_time = timezone.now()
         val.user = self.testuser
+        val.save()
+
+        data_c = DatasetConfiguration()
+        data_c.validation = val
+        data_c.dataset = Dataset.objects.get(short_name='C3S')
+        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
+        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.save()
+
+        ref_c = DatasetConfiguration()
+        ref_c.validation = val
+        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20191211')
+        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.save()
+
+        val.reference_configuration = ref_c
+        val.scaling_ref = ref_c
         val.save()
 
         ## set valid output file for validation
