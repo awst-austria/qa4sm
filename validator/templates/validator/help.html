@@ -130,31 +130,85 @@
 
     <p>
         The list shows all your validations, including the currently running ones, sorted by date (latest first).
-        The buttons on the right-hand side of each validation have the following effects:
-        <ul>
-            <li>
-                <span class="fas fa-folder-open"></span> You can access the <a href="#results">results details
-                page</a> of a validation through its folder button.
-            </li>
-            <li>
-                <span class="fas fa-stop"></span> The stop button is only visible while the validation is still
-                running and allows you to abort it.
-            </li>
-            <li>
-                <span class="fas fa-times"></span> The remove button is only visible once the validation has finished
-                or was aborted and will permanently delete the result.
-            </li>
-            <li>
-                <span class="fas fa-download"></span> The download graphs button allows you to download all graphs
-                produced for the validation (in png and svg formats) in a zip archive.
-            </li>
-            <li>
-                <span class="fas fa-file-download"></span> The download NetCDF button  allows you to download the
-                validation result (metrics computed).
-            </li>
-        </ul>
     </p>
+
     <img class="scaled_image mb-3" src="../../static/images/help/my_validations.png">
+
+    <p>
+        <i>Note:</i> Your validations will be automatically removed {{ expiry_period }} days after completion by our
+        auto-cleanup process, unless you extend or archive them. You will be warned via email about validation expiry
+        {{ warning_period }} days before deletion.
+    </p>
+
+    <p>
+        The icons in the validations' title bars indicate the following:
+    </p>
+
+    <ul>
+        <li>
+            <span class="fas fa-ban"></span> The validation was cancelled.
+        </li>
+        <li>
+            <span class="fas fa-running"></span> The validation is still running and has no results yet.
+        </li>
+        <li>
+            <span class="fas fa-calendar-alt"></span> The validation has completed. It will be removed
+            by the auto-cleanup process {{ expiry_period }} days after completion, unless you extend or archive it.
+            You can see the expiration date by hovering your mouse over the icon.
+        </li>
+        <li>
+            <span class="fas fa-archive"></span> The validation has been archived and won't be automatically removed
+            by the cleanup process.
+        </li>
+        <li>
+            <span class="fas fa-exclamation-triangle"></span> The validation will expire within the next
+            {{ warning_period }} days and will then be removed by the auto-cleanup process, unless you extend or archive it.
+            You can see the expiration date by hovering your mouse over the icon.
+        </li>
+    </ul>
+
+    <p>
+        The buttons on the right-hand side of each validation have the following effects:
+    </p>
+
+    <ul>
+        <li>
+            <span class="fas fa-folder-open"></span> You can access the <a href="#results">results details
+            page</a> of a validation through its folder button.
+        </li>
+        <li>
+            <span class="fas fa-stop"></span> The stop button is only visible while the validation is still
+            running and allows you to abort it.
+        </li>
+        <li>
+            <span class="fas fa-times"></span> The remove button is only visible once the validation has finished
+            or was aborted and will permanently delete the result.
+        </li>
+        <li>
+            <span class="fas fa-download"></span> The download graphs button allows you to download all graphs
+            produced for the validation (in png and svg formats) in a zip archive.
+        </li>
+        <li>
+            <span class="fas fa-file-download"></span> The download NetCDF button  allows you to download the
+            validation result (metrics computed).
+        </li>
+
+        <li>
+            <span class="fas fa-calendar-plus"></span> With the extend lifespan button, you can reset the auto-cleanup
+            period of a result and thus postpone its automatic removal. You can use this if you're not sure yet whether
+            you want to keep it - you will have another {{ expiry_period }} days to decide and will be notified
+            (again) before deletion.
+        </li>
+        <li>
+            <span class="fas fa-archive"></span> With the archive button, you can exclude a validation from auto-cleanup
+            and thus keep it indefinitely.
+        </li>
+        <li>
+            <span class="fas fa-calendar-alt"></span> With the un-archive button, you can make a validation eligible for
+            auto-cleanup again. It will be automatically extended, so you will have another {{ expiry_period }} days before
+            deletion and will be notified (again).
+        </li>
+    </ul>
 
     <a id="results"></a>
     <h1 class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
@@ -164,6 +218,33 @@
         on the results page.
     </p>
     <img class="scaled_image mb-3" src="../../static/images/help/results_overview.png">
+
+    <p>
+        The buttons at the bottom of the result overview have the following effects:
+    </p>
+
+    <ul>
+        <li>
+            <span class="fas fa-times"></span> <span class="font-weight-bold">Remove</span> will permanently delete the result.
+        </li>
+        <li>
+            <span class="fas fa-calendar-plus"></span> <span class="font-weight-bold">Renew</span> will reset the auto-cleanup
+            period of a result and thus postpone its automatic removal. You can use this if you're not sure yet whether
+            you want to keep it - you will have another {{ expiry_period }} days to decide and will be notified
+            (again) before deletion.
+        </li>
+        <li>
+            <span class="fas fa-archive"></span> <span class="font-weight-bold">Archive</span> will exclude a validation from auto-cleanup
+            and thus keep it indefinitely.
+        </li>
+        <li>
+            <span class="fas fa-calendar-alt"></span> <span class="font-weight-bold">Un-archive</span> will make a validation eligible for
+            auto-cleanup again. It will be automatically extended, so you will have another {{ expiry_period }} days before
+            deletion and will be notified (again).
+        </li>
+    </ul>
+
+
 
     <p>
         The following metrics are calculated during the validation process:

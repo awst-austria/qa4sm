@@ -22,7 +22,9 @@
                                     <span class="fas fa-calendar-alt" title="This validation will be automatically removed during cleanup on {{ valrun.expiry_date }}."></span>
                                 {% endif %}
                             {% else %}
-                                {% if not valrun.end_time %}
+                                {% if valrun.progress == -1 %}
+                                    <span class="fas fa-ban" title="This validation was cancelled."></span>
+                                {% elif not valrun.end_time %}
                                     <span class="fas fa-running" title="This validation is still running."></span>
                                 {% endif %}
                                 {% if valrun.is_archived %}
