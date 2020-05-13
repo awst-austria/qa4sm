@@ -103,6 +103,7 @@ pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 #pip install git+https://github.com/TUW-GEO/pytesmo.git
 pip install ismn
+pip install requests
 
 cd $TEMP_DIR
 

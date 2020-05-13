@@ -7,8 +7,7 @@ from valentina.settings import EMAIL_FROM
 
 __logger = logging.getLogger(__name__)
 
-## TODO: put into settings? Get from django?
-SITE_URL = "https://qa4sm.eodc.eu"
+from valentina.settings import SITE_URL
 
 def send_val_done_notification(val_run):
         __logger.info('Sending mail about validation {} to user {}...'.format(val_run.id, val_run.user))

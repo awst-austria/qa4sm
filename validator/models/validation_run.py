@@ -80,6 +80,8 @@ class ValidationRun(models.Model):
     last_extended = models.DateTimeField(null=True, blank=True)
     expiry_notified = models.BooleanField(default=False)
 
+    doi = models.CharField(max_length=255, blank=True)
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
