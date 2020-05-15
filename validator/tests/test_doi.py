@@ -78,4 +78,5 @@ class TestDOI(TestCase):
         get_doi_for_validation(val)
 
         val = ValidationRun.objects.get(pk=val.id)
+        self.__logger.debug(val.doi)
         assert val.doi

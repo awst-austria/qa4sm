@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, password_validation
 User = get_user_model()
+
 from django.contrib.auth.forms import UserCreationForm
 
 import django.forms as forms
@@ -20,6 +21,7 @@ class SignUpForm(UserCreationForm):
                   'last_name',
                   'organisation',
                   'country',
+                  'orcid',
                   'terms_consent',]
 
     def __init__(self, *args, **kwargs):
@@ -32,3 +34,5 @@ class SignUpForm(UserCreationForm):
         self.fields['last_name'].help_text = 'Optional.'
         self.fields['organisation'].help_text = 'Optional. The organisation (university, company, etc.) you work for or represent.'
         self.fields['country'].help_text = 'Optional. The country where your organisation (or you) resides.'
+        self.fields['orcid'].help_text = 'Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM.'
+        self.fields['orcid'].label = 'ORCID'

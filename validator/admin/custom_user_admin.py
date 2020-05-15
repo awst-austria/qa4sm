@@ -20,7 +20,7 @@ class CustomUserAdmin(UserAdmin):
 
     ## define which columns appear in the list view. Add the action buttons at the end.
     readonly_fields = ('user_actions', )
-    list_display = ('username', 'email', 'first_name', 'last_name', 'organisation', 'is_active', 'is_staff', 'date_joined', 'user_actions', )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'organisation', 'orcid', 'is_active', 'is_staff', 'date_joined', 'user_actions', )
     ordering = ('-date_joined', )
 
     def __init__(self, model, admin_site):
@@ -31,7 +31,7 @@ class CustomUserAdmin(UserAdmin):
             ## add the organisation field to the Personal info part of the user
             ## admin form
             if (field_name == 'Personal info' and 'fields' in attributes):
-                attributes['fields'] += ('organisation', 'country',)
+                attributes['fields'] += ('organisation', 'country', 'orcid')
 #             ## add the action button(s) (change status) to the detail view
             if (field_name == 'Permissions' and 'fields' in attributes):
                 attributes['fields'] = ('user_actions', ) + attributes['fields']

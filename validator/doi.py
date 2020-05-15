@@ -37,7 +37,7 @@ def get_doi_for_validation(val):
         raise Exception("Could not upload result file to new DOI")
 
     ## add metadata to new entry
-    title = "Validation of  " + (" vs \n".join(['{} ({})'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in val.dataset_configurations.all()]))
+    title = "Validation of  " + (" vs \n".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in val.dataset_configurations.all()]))
 
     if val.user.first_name and val.user.last_name:
         name = '{}, {}'.format(val.user.last_name, val.user.first_name)

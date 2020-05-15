@@ -14,7 +14,9 @@ class UserProfileForm(UserCreationForm):
                   'first_name',
                   'last_name',
                   'organisation',
-                  'country',]
+                  'country',
+                  'orcid',
+                  ]
 
     def clean(self):
         form_data = self.cleaned_data
@@ -26,7 +28,7 @@ class UserProfileForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs['readonly'] = True
+        self.fields['username'].disabled = True
         self.fields['password1'].required = False
         self.fields['password2'].required = False
         self.fields['password1'].help_text = ' '.join(password_validation.password_validators_help_texts())
@@ -37,3 +39,5 @@ class UserProfileForm(UserCreationForm):
         self.fields['last_name'].help_text = 'Optional.'
         self.fields['organisation'].help_text = 'Optional. The organisation (university, company, etc.) you work for or represent.'
         self.fields['country'].help_text = 'Optional. The country where your organisation (or you) resides.'
+        self.fields['orcid'].help_text = 'Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM.'
+        self.fields['orcid'].label = 'ORCID'

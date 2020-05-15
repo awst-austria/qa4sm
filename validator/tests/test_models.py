@@ -3,6 +3,9 @@ from datetime import timedelta
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
@@ -26,6 +29,29 @@ class TestModels(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     __logger = logging.getLogger(__name__)
+
+    def test_user(self):
+        user = User()
+        user.clean()
+
+        ## test valid orcids
+        for testorcid in [
+            "0000-0002-1825-0097",
+            "0000-0002-9079-593X", ]:
+
+            user.orcid = testorcid
+            user.clean()
+            assert user
+
+        # test invalid orcids
+        for testorcid in [
+            "lah.",
+            "0000-0002-1825-0097-5555",
+            "0000-0002-9abc-593X", ]:
+
+            with self.assertRaises(ValidationError):
+                user.orcid = testorcid
+                user.clean()
 
     def test_validation_configuration(self):
         run = ValidationRun()
