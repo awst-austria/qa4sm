@@ -27,7 +27,7 @@ def get_doi_for_validation(val):
 
     ## add file to new entry
     with open(val.output_file.path, 'rb') as result_file:
-        data = {'name': 'results.nc'}
+        data = {'name': str(val.id) + '.nc'}
         files = {'file': result_file}
         r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/files'.format(deposition_id), params=access_param, data=data, files=files)
         __logger.debug('New DOI, add files, status: ' + str(r.status_code))
