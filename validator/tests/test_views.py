@@ -502,8 +502,7 @@ class TestViews(TransactionTestCase):
     ## try signing up a new user with all fields given
     def test_signup_new_user_full(self):
         url = reverse('signup')
-        user_info = {
-            'username': 'chuck_norris',
+        user_info = {'username': 'chuck_norris',
             'password1': 'Fae6eij7NuoY5Fa1thii',
             'password2': 'Fae6eij7NuoY5Fa1thii',
             'email': 'chuck@norris.com',
@@ -511,6 +510,7 @@ class TestViews(TransactionTestCase):
             'last_name': 'Norris',
             'organisation': 'Texas Rangers',
             'country': 'US',
+            'orcid': '0000-0002-1825-0097',
             'terms_consent': True,
             }
         result = self.client.post(url, user_info)
@@ -552,6 +552,7 @@ class TestViews(TransactionTestCase):
             'username': self.credentials['username'],
             'email': 'chuck@norris.com',
             'country':'AT',
+            'orcid': '0000-0002-1825-0097',
             'last_name':'Chuck',
             'first_name':'Norris',
             'organisation':'Texas Rangers',
@@ -578,20 +579,18 @@ class TestViews(TransactionTestCase):
                      'last_name':'Doe',
                      'first_name':'John',
                      'organisation':'????',
-                     'email':'john@nowhere.com'
+                     'email':'john@nowhere.com',
+                     'orcid':'0000-0002-1825-0097',
                      }
-        form = UserProfileForm(data=form_data)
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertTrue(form.is_valid()) # should pass
 
-        form_data = {'username':'john_doe',
-                     'email':'john@nowhere.com'
-                     }
-        form = UserProfileForm(data=form_data)
+        form_data = { 'email':'john@nowhere.com' }
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertTrue(form.is_valid()) # should pass
 
-        form_data = {'username':'john_doe'
-                     }
-        form = UserProfileForm(data=form_data)
+        form_data = { 'username':'john_doe' }
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertFalse(form.is_valid()) # should fail because of the missing e-mail field
 
         form_data = {'username':'john_doe',
@@ -599,7 +598,7 @@ class TestViews(TransactionTestCase):
                      'password2':'asd12N83poLL',
                      'email':'john@nowhere.com'
                      }
-        form = UserProfileForm(data=form_data)
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertTrue(form.is_valid()) # should pass
 
         form_data = {'username':'john_doe',
@@ -607,7 +606,7 @@ class TestViews(TransactionTestCase):
                      'password2':'asd12N8',
                      'email':'john@nowhere.com'
                      }
-        form = UserProfileForm(data=form_data)
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertFalse(form.is_valid()) # should fail because passwords don't match
 
 

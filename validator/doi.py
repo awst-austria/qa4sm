@@ -53,6 +53,9 @@ def get_doi_for_validation(val):
     if val.user.organisation:
         creator['affiliation'] = val.user.organisation
 
+    if val.user.orcid:
+        creator['orcid'] = val.user.orcid
+
     keywords = ['soil moisture', 'validation', 'qa4sm', ]
     dataset_names = set([dc.dataset.pretty_name for dc in val.dataset_configurations.all()])
     for dn in dataset_names:

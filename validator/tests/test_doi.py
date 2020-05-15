@@ -36,6 +36,7 @@ class TestDOI(TestCase):
             'last_name': 'Norris',
             'organisation': 'Texas Rangers',
             'country' : 'US',
+            'orcid' : '0000-0002-1825-0097',
             }
         self.testuser = User.objects.create_user(**self.user_data)
 
