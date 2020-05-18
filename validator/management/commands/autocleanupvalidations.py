@@ -34,7 +34,8 @@ class Command(BaseCommand):
 
             ## if validation is expired and user was notified, get rid of it
             elif (validation.is_expired and validation.expiry_notified):
+                vid = str(validation.id)
                 validation.delete()
-                cleaned_up.append(str(validation.id))
+                cleaned_up.append(vid)
 
         self.stdout.write(self.style.SUCCESS('Notified validations: {}\nAuto-cleaned validations: {}'.format(notified, cleaned_up)))
