@@ -86,4 +86,5 @@ def get_doi_for_validation(val):
         raise Exception("Could not publish new DOI")
 
     val.doi = r.json()['doi']
+    val.is_archived = True
     val.save()

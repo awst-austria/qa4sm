@@ -5,7 +5,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.utils import timezone
 
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
@@ -41,6 +40,10 @@ def result(request, result_uuid):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
         if(val_run.user != request.user):
             return HttpResponse(status=403)
+
+        ## check that our validation can be deleted; it can't if it already has a DOI
+        if(not val_run.is_deletable):
+            return HttpResponse(status=405)
 
         val_run.delete()
         return HttpResponse("Deleted.", status=200)

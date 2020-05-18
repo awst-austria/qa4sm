@@ -195,8 +195,20 @@ class TestViews(TransactionTestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
 
-        # try to delete own result, should succeed
+        # log in as owner of result
         self.client.login(**self.credentials)
+
+        # try deleting a result that already has a DOI, should be blocked
+        run.doi = '10.1000/182'
+        run.save()
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 405)
+
+        # remove DOI again
+        run.doi = ''
+        run.save()
+
+        # try to delete own result, should succeed
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
 

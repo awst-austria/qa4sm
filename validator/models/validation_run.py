@@ -103,6 +103,10 @@ class ValidationRun(models.Model):
         e = self.expiry_date
         return ((e is not None) and (timezone.now() > e - timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)))
 
+    @property
+    def is_deletable(self):
+        return not self.doi
+
     def archive(self, unarchive=False, commit=True):
         if unarchive:
             self.extend_lifespan(commit=False)

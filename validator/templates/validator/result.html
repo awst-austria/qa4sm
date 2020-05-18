@@ -124,7 +124,7 @@
                         </li>
                     </ul>
 
-                    {% if is_owner %}
+                    {% if is_owner and val.is_deletable %}
                         <div style="float: right;">
                             <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove</button>
                             {% if val.is_archived %}

@@ -272,6 +272,16 @@ class TestModels(TestCase):
         assert not run.is_expired
         assert not run.is_near_expiry
 
+    def test_deleteable(self):
+        run = ValidationRun()
+        assert run.is_deletable
+
+        run.doi = '10.1000/182'
+        assert not run.is_deletable
+
+        run.doi = ''
+        assert run.is_deletable
+
     def test_data_filter_str(self):
         myfilter = DataFilter()
         filter_str = str(myfilter)
