@@ -6,3 +6,4 @@ from .user_profile import *
 from .about import *
 from .datasets import *
 from .help import *
+from .published_results import *
