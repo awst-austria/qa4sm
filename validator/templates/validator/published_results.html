@@ -7,6 +7,10 @@
 
     <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
         <h1 class="jumbotron-heading">Published validations</h1>
+        <p class="lead text-muted">
+            The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/">Zenodo</a> and
+            can be referenced with a <a target="_blank" href="https://www.doi.org/">DOI</a>.
+        </p>
     </div>
 
     <div class="card-deck mb-3">
@@ -41,8 +45,10 @@
                                 {{ valrun.reference_configuration.variable.pretty_name }}
                             </div>
 
-                            <!-- <div class="col" style="max-width: 7rem;">
-                            </div> -->
+                            <div class="col" style="max-width: 7rem;">
+                                <strong>Created:</strong><br/>
+                                {{ valrun.start_time|date:"Y-m-d" }}
+                            </div>
 
                             <div class="col" style="text-align: right; max-width: 6.8rem;">
                                 <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
