@@ -27,7 +27,9 @@
                                 {% elif not valrun.end_time %}
                                     <span class="fas fa-running" title="This validation is still running."></span>
                                 {% endif %}
-                                {% if valrun.is_archived %}
+                                {% if valrun.doi %}
+                                    <a class="doilink" target="_blank" href="https://doi.org/{{ valrun.doi }}"><span class="fas fa-book" title="This result has been published with zenodo. It will NOT be automatically removed during cleanup."></span></a>
+                                {% elif valrun.is_archived %}
                                     <span class="fas fa-archive" title="This validation has been archived. It will NOT be automatically removed during cleanup."></span>
                                 {% endif %}
                             {% endif %}

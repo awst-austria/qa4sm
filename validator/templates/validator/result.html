@@ -117,16 +117,14 @@
                                         This validation will be automatically removed during cleanup on {{ val.expiry_date }}.
                                     {% endif %}
                                 {% else %}
-                                    {% if val.is_archived %}
+                                    {% if val.doi %}
+                                        <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank" href="https://doi.org/{{ val.doi }}">{{ val.doi }}</a>.
+                                    {% elif val.is_archived %}
                                         <span class="fas fa-archive"></span>
                                         This validation has been archived. It will NOT be automatically removed during cleanup.
                                     {% endif %}
                                 {% endif %}
                             </li>
-                        {% endif %}
-
-                        {% if val.doi %}
-                            <li>This result was published on zenodo with DOI <a target="_blank" href="https://doi.org/{{ val.doi }}">{{ val.doi }}</a>.</h5></li>
                         {% endif %}
                     </ul>
 

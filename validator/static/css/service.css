@@ -91,3 +91,7 @@ html {
     margin-bottom: .2rem;
     padding: 0 .35rem;
 }
+
+a.doilink {
+    color: white;
+}
