@@ -2,7 +2,10 @@ import json
 import logging
 
 from django.conf import settings
+from django.urls.base import reverse
 import requests
+
+from valentina.settings import SITE_URL
 
 
 __logger = logging.getLogger(__name__)
@@ -37,7 +40,10 @@ def get_doi_for_validation(val):
         raise Exception("Could not upload result file to new DOI")
 
     ## add metadata to new entry
-    title = "Validation of  " + (" vs \n".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in val.dataset_configurations.all()]))
+    val_url = SITE_URL + reverse('result', kwargs={'result_uuid': val.id})
+    title = "Validation of " + (" vs \n".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in val.dataset_configurations.all()]))
+
+    description = 'QA4SM validation of soil moisture data: ' + (" vs \n".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in val.dataset_configurations.all()])) + '. URL: ' + val_url + '. Produced on QA4SM (' + settings.SITE_URL + ')'
 
     if val.user.first_name and val.user.last_name:
         name = '{}, {}'.format(val.user.last_name, val.user.first_name)
@@ -65,7 +71,7 @@ def get_doi_for_validation(val):
         'metadata': {
             'title': title,
             'upload_type': 'dataset',
-            'description': title + ', run on QA4SM (' + settings.SITE_URL + ')',
+            'description': description,
             'keywords' : keywords,
             'creators': [creator]
             }
