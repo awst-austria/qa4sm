@@ -27,17 +27,17 @@
                         </h3>
                     </div>
 
-                    {% if user.is_authenticated %}
-                        <p>
-                            <a style="width: 5em;" class="btn btn-lg btn-primary" href="{% url 'validation' %}" role="button">Try it</a>
-                        </p>
-                    {% else %}
-                        <p>
-                            <a style="width: 5em; margin-right: 1em" class="btn btn-lg btn-primary" href="{% url 'signup' %}" role="button">Sign up</a>
-                            <span class="carousel-desc">or</span>
-                            <a style="width: 5em; margin-left: 1em" class="btn btn-lg btn-primary" href="{% url 'login' %}" role="button">Log in</a>
-                        </p>
-                    {% endif %}
+                    <p>
+                        <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'published_results' %}" role="button">See results</a>
+                        <span style="margin-left: 1em; margin-right: 1em;" class="carousel-desc">or</span>
+                        {% if user.is_authenticated %}
+                            <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'validation' %}" role="button">Try it</a>
+                        {% else %}
+                            <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'signup' %}" role="button">Sign up</a>
+                            <span style="margin-left: 1em; margin-right: 1em;" class="carousel-desc">or</span>
+                            <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'login' %}" role="button">Log in</a>
+                        {% endif %}
+                    </p>
 
                 </div>
                 <div class="carousel-item">
@@ -140,9 +140,6 @@
             Hosted on <a href="https://www.eodc.eu/">EODC</a>.
         </p>
     </footer>
-
-    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
 
     <script type="text/javascript">
         var modalImg = $("#modalImg")[0]

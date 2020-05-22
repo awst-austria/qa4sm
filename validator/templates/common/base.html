@@ -26,41 +26,39 @@
         <ul class="navbar-nav mr-auto">
             {% url 'validation' as validation_url %}
             {% url 'myruns' as my_validations_url %}
-            <li class="nav-item">
-                <a class="navbar-btn btn btn-outline-primary {% if request.path == validation_url %} navbar-btn-active {% endif %}" href="{{ validation_url }}">Validate</a>
-            </li>
-            <li class="nav-item">
-                <a class="navbar-btn btn btn-outline-primary {% if request.path == my_validations_url %} navbar-btn-active {% endif %}" href="{{ my_validations_url }}">My Validations</a>
-            </li>
-        </ul>
-
-        <ul class="navbar-nav">
-        	{% url 'datasets' as datasets_url %}
+            {% url 'published_results' as published_url %}
+            {% url 'datasets' as datasets_url %}
             {% url 'about' as about_url %}
             {% url 'terms' as terms_url %}
             {% url 'help' as help_url %}
             {% url 'user_profile' as user_profile_url %}
 
             <li class="nav-item">
-                <a class="navbar-btn btn btn-outline-primary {% if request.path == about_url %} navbar-btn-active {% endif %}" href="{{ about_url }}">About</a>
+                <div class="dropdown show">
+                    <a class="navbar-btn btn btn-outline-primary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">Menu</a>
+
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item {% if request.path == about_url %} navbar-btn-active {% endif %}" href="{{ about_url }}"><span class="fas fa-info-circle"></span> About</a>
+                        <a class="dropdown-item {% if request.path == help_url %} navbar-btn-active {% endif %}" href="{{ help_url }}"><span class="fas fa-question-circle"></span> Help</a>
+                        <a class="dropdown-item {% if request.path == datasets_url %} navbar-btn-active {% endif %}" href="{{ datasets_url }}"><span class="fas fa-database"></span> Datasets</a>
+                        <a class="dropdown-item {% if request.path == terms_url %} navbar-btn-active {% endif %}" href="{{ terms_url }}"><span class="fas fa-balance-scale"></span> Terms</a>
+                        {% if user.is_authenticated %}
+                            <a class="dropdown-item {% if request.path == user_profile_url %} navbar-btn-active {% endif %}" href="{% url 'user_profile' %}"><span class="fas fa-user-cog"></span> Profile</a>
+                            <a class="dropdown-item" href="{% url 'logout' %}"><span class="fas fa-door-open"></span> Logout</a>
+                        {% endif %}
+                    </div>
+                </div>
             </li>
             <li class="nav-item">
-                <a class="navbar-btn btn btn-outline-primary {% if request.path == help_url %} navbar-btn-active {% endif %}" href="{{ help_url }}">Help</a>
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == validation_url %} navbar-btn-active {% endif %}" href="{{ validation_url }}"><span class="fas fa-cogs"></span> Validate</a>
             </li>
             <li class="nav-item">
-                <a class="navbar-btn btn btn-outline-primary {% if request.path == datasets_url %} navbar-btn-active {% endif %}" href="{{ datasets_url }}">Datasets</a>
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == my_validations_url %} navbar-btn-active {% endif %}" href="{{ my_validations_url }}"><span class="fas fa-user-circle"></span> My Validations</a>
             </li>
             <li class="nav-item">
-                <a class="navbar-btn btn btn-outline-primary {% if request.path == terms_url %} navbar-btn-active {% endif %}" href="{{ terms_url }}">Terms</a>
+                <a class="navbar-btn btn btn-outline-primary {% if request.path == published_url %} navbar-btn-active {% endif %}" href="{{ published_url }}"><span class="fas fa-book"></span> Published Validations</a>
             </li>
-            {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="navbar-btn btn btn-outline-primary {% if request.path == user_profile_url %} navbar-btn-active {% endif %}" href="{% url 'user_profile' %}">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a class="navbar-btn btn btn-outline-primary" href="{% url 'logout' %}">Logout</a>
-                </li>
-            {% endif %}
         </ul>
     </div>
 
