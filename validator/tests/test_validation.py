@@ -108,7 +108,7 @@ class TestValidation(TestCase):
         with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
             assert ds.qa4sm_version == settings.APP_VERSION
             assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
-            assert run.id in ds.url
+            assert str(run.id) in ds.url
             assert settings.SITE_URL in ds.url
 
             ## check the metrics contained in the file
