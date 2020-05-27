@@ -67,9 +67,8 @@ function ajax_publish_result(result_id) {
         data : { "publish" : true },
         success : function(return_data) { location.reload(); },
         error : function(return_data) {
-            $('#publishing_spinner').hide();
             var errorText = return_data.responseText.replace(/.*\'(.*)\'.*/g, '$1');
-            alert('Could not publish your results: ' + errorText);
+            alert('Could not publish your results: ' + errorText + '\n\nPlease try again in a few minutes and if the issue persists email ' + admin_mail);
             },
         beforeSend: function() {
             $('#publishingNote').show();
