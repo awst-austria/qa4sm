@@ -24,6 +24,8 @@ FORCE_SCRIPT_NAME=''
 SSL_SECURITY=""
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/"
 
+# this token needs to be set as an evironment variable when this script is run
+# e.g. in the CI (Jenkins credentials or Travis secrets)
 if [ "x$DOI_ACCESS_TOKEN_ENV" == "x" ]; then
     export DOI_ACCESS_TOKEN_ENV="notset"
 fi
