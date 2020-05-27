@@ -81,3 +81,12 @@ class TestDOI(TestCase):
         val = ValidationRun.objects.get(pk=val.id)
         self.__logger.debug(val.doi)
         assert val.doi
+        firstdoi = val.doi
+
+        ## try to upload the same data with the same title again - it should work but yield a different doi
+        get_doi_for_validation(val)
+
+        val = ValidationRun.objects.get(pk=val.id)
+        self.__logger.debug(val.doi)
+        assert val.doi
+        assert val.doi != firstdoi

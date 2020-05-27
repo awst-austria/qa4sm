@@ -80,6 +80,7 @@ class ValidationRun(models.Model):
     expiry_notified = models.BooleanField(default=False)
 
     doi = models.CharField(max_length=255, blank=True)
+    publishing_in_progress = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -104,7 +105,7 @@ class ValidationRun(models.Model):
         return ((e is not None) and (timezone.now() > e - timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)))
 
     @property
-    def is_deletable(self):
+    def is_unpublished(self):
         return not self.doi
 
     def archive(self, unarchive=False, commit=True):

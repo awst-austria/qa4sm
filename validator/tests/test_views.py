@@ -16,11 +16,11 @@ from django.core import mail
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls.base import reverse
+from django.conf import settings
 import pytest
 from pytz import UTC
 from pytz import utc
 
-from valentina.settings import EMAIL_FROM
 from validator.forms.user_profile import UserProfileForm
 from validator.models import ValidationRun
 from validator.models.dataset import Dataset
@@ -30,6 +30,10 @@ from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from validator.urls import urlpatterns
 from validator.validation import globals
+from os import path
+import shutil
+from validator.validation.globals import OUTPUT_FOLDER
+from validator.validation import set_outfile, mkdir_if_not_exists
 
 
 class TestViews(TransactionTestCase):
@@ -175,6 +179,50 @@ class TestViews(TransactionTestCase):
         response = self.client.patch(url, 'levelup=1up', content_type='application/x-www-form-urlencoded;')
         self.assertEqual(response.status_code, 400)
         assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is not None
+
+    @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
+    def test_result_publishing(self):
+        infile = 'testdata/output_data/c3s_era5land.nc'
+
+        url = reverse('result', kwargs={'result_uuid': self.testrun.id})
+
+        ## only owners should be able to change validations
+        self.client.login(**self.credentials2)
+        response = self.client.patch(url, 'publish=true',  content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 403)
+
+        self.client.login(**self.credentials)
+
+        # shouldn't work because of incorrect parameter
+        response = self.client.patch(url, 'publish=asdf', content_type='application/x-www-form-urlencoded;')
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.content is not None)
+
+        # remove file path from validation
+        self.testrun.output_file = None
+        self.testrun.save()
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+
+        # shouldn't work because of missing file path in validation
+        response = self.client.patch(url, 'publish=true', content_type='application/x-www-form-urlencoded;')
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.content is not None)
+
+        ## set valid output file for validation
+        run_dir = path.join(OUTPUT_FOLDER, str(self.testrun.id))
+        mkdir_if_not_exists(run_dir)
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
+        set_outfile(self.testrun, run_dir)
+        self.testrun.save()
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+
+        # should work now
+        response = self.client.patch(url, 'publish=true', content_type='application/x-www-form-urlencoded;')
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.content is not None)
 
     def test_delete_result(self):
         # create result to delete:
@@ -660,7 +708,7 @@ class TestViews(TransactionTestCase):
         assert sent_mail
         assert sent_mail.subject
         assert sent_mail.body
-        assert sent_mail.from_email == EMAIL_FROM
+        assert sent_mail.from_email == settings.EMAIL_FROM
         assert self.credentials2['email'] in sent_mail.to
         assert self.credentials2['username'] in sent_mail.body
 

@@ -13,7 +13,6 @@
     </div>
 
 {% else %}
-
     <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
         <h1 class="jumbotron-heading">Validation Results</h1>
     </div>
@@ -128,8 +127,8 @@
                         {% endif %}
                     </ul>
 
-                    {% if is_owner and val.is_deletable %}
-                        <div style="float: right;">
+                    {% if is_owner and val.is_unpublished %}
+                        <div id="patchButtonGroup" style="float: right;" class="{% if val.publishing_in_progress %} collapse {% endif %}">
                             <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove</button>
                             {% if val.is_archived %}
                                 <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ val.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>
@@ -137,8 +136,13 @@
                                 <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ val.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>
                                 <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span> Archive</button>
                             {% endif %}
+                            <button class="btn btn-sm btn-primary" title="Publish on Zenodo" onclick="ajax_publish_result('{{ val.id }}')"><span class="fas fa-book"></span> Publish</button>
                         </div>
                     {% endif %}
+                    <div id="publishingNote" class="small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}" style="float: right">
+                        <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing in progress...</span></div>
+                        Publishing in progress...
+                    </div>
                 </div>
             </div>
         </div>
@@ -243,10 +247,8 @@
 
 <script type="text/javascript">
     csrf_token = '{{csrf_token}}';
-    archive_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
-    delete_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+    result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
     stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
-    extend_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
 </script>
 <script src="{% static 'js/results_buttons.js' %}"></script>
 

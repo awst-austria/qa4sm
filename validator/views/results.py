@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, render
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_pairs
+from validator.doi import get_doi_for_validation
 
 
 @login_required(login_url='/login/')
@@ -42,7 +43,7 @@ def result(request, result_uuid):
             return HttpResponse(status=403)
 
         ## check that our validation can be deleted; it can't if it already has a DOI
-        if(not val_run.is_deletable):
+        if(not val_run.is_unpublished):
             return HttpResponse(status=405)
 
         val_run.delete()
@@ -72,6 +73,21 @@ def result(request, result_uuid):
 
             val_run.extend_lifespan()
             return HttpResponse(val_run.expiry_date, status=200)
+
+        if 'publish' in patch_params:
+            publish = patch_params['publish']
+
+            if publish != 'true':
+                return HttpResponse("Wrong parameter.", status=400)
+
+            try:
+                get_doi_for_validation(val_run)
+            except Exception as e:
+                ## TODO: fix this so that it returns the message string
+                m = getattr(e, 'message', repr(e))
+                return HttpResponse(m, status=400)
+
+            return HttpResponse("Published.", status=200)
 
         return HttpResponse("Wrong parameter.", status=400)
 

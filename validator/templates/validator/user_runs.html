@@ -70,26 +70,31 @@
                                 {% endif %}
                             </div>
 
-                            <div class="col" style="text-align: right; max-width: 6.8rem;">
+                            <div class="col" style="text-align: right; max-width: 8.75rem;">
                                 <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
                                 {% if valrun.progress > -1 and valrun.progress < 100 and valrun.end_time == null %}
                                 <button class="btn btn-sm btn-primary btn-action" title="Cancel validation" onclick="ajax_stop_validation('{{ valrun.id }}')"><span class="fas fa-stop"></span></button>
                                 {% endif %}
                                 {% if valrun.end_time %}
-                                    {% if valrun.is_deletable %}
-                                        <button class="btn btn-sm btn-primary btn-action" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}')"><span class="fas fa-times"></span></button>
-                                    {% endif %}
                                     {% if valrun.output_file %}
                                         <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
                                         <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
                                     {% endif %}
-                                    {% if valrun.is_deletable %}
-                                        {% if valrun.is_archived %}
-                                            <button class="btn btn-sm btn-primary btn-action" title="Un-archive" onclick="ajax_archive_result('{{ valrun.id }}', false)"><span class="fas fa-calendar-alt"></span></button>
-                                        {% else %}
-                                            <button class="btn btn-sm btn-primary btn-action" title="Extend lifespan" onclick="ajax_extend_result('{{ valrun.id }}', true)"><span class="fas fa-calendar-plus"></span></button>
-                                            <button class="btn btn-sm btn-primary btn-action" title="Archive" onclick="ajax_archive_result('{{ valrun.id }}', true)"><span class="fas fa-archive"></span></button>
-                                        {% endif %}
+                                    {% if valrun.is_unpublished %}
+                                        <span id="patchButtonGroup" class="{% if valrun.publishing_in_progress %} collapse {% endif %}">
+                                            <button class="btn btn-sm btn-primary btn-action" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}')"><span class="fas fa-times"></span></button>
+                                            {% if valrun.is_archived %}
+                                                <button class="btn btn-sm btn-primary btn-action" title="Un-archive" onclick="ajax_archive_result('{{ valrun.id }}', false)"><span class="fas fa-calendar-alt"></span></button>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-primary btn-action" title="Extend lifespan" onclick="ajax_extend_result('{{ valrun.id }}', true)"><span class="fas fa-calendar-plus"></span></button>
+                                                <button class="btn btn-sm btn-primary btn-action" title="Archive" onclick="ajax_archive_result('{{ valrun.id }}', true)"><span class="fas fa-archive"></span></button>
+                                            {% endif %}
+                                            <button class="btn btn-sm btn-primary btn-action" title="Publish on Zenodo" onclick="ajax_publish_result('{{ valrun.id }}')"><span class="fas fa-book"></span></button>
+                                        </span>
+                                        <div id="publishingNote" class="small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}" style="float: right; margin-top:0.5em;">
+                                            <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing...</span></div>
+                                            Publishing...
+                                        </div>
                                     {% endif %}
                                 {% endif %}
                             </div>
@@ -139,10 +144,8 @@
 {% block javascript %}
     <script type="text/javascript">
         csrf_token = '{{csrf_token}}';
-        archive_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
-        delete_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+        result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
         stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
-        extend_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
     </script>
     <script src="{% static 'js/results_buttons.js' %}"></script>
 {% endblock %}
