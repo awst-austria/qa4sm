@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from valentina.settings import APP_VERSION
+from django.conf import settings
 
 def about(request):
-    return render(request, 'validator/about.html',{'app_version' : APP_VERSION})
+    return render(request, 'validator/about.html',{'app_version' : settings.APP_VERSION})

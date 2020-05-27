@@ -20,9 +20,7 @@ from pytz import UTC
 
 import numpy as np
 import pandas as pd
-import valentina
 from django.conf import settings
-#from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -108,8 +106,10 @@ class TestValidation(TestCase):
         length=-1
         num_vars=-1
         with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
-            assert ds.qa4sm_version == valentina.settings.APP_VERSION
+            assert ds.qa4sm_version == settings.APP_VERSION
             assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
+            assert run.id in ds.url
+            assert settings.SITE_URL in ds.url
 
             ## check the metrics contained in the file
             for metric in self.metrics:

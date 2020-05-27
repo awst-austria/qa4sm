@@ -10,8 +10,8 @@ from esa_cci_sm.interface import CCITs
 from smos.smos_ic.interface import SMOSTs
 from ecmwf_models.interface import ERATs
 
+from django.conf import settings
 
-from valentina.settings import DATA_FOLDER
 from validator.hacks import TimezoneAdapter
 from validator.validation import globals
 from validator.validation.util import first_file_in
@@ -20,7 +20,7 @@ from validator.validation.util import first_file_in
 def create_reader(dataset, version):
     reader = None
 
-    folder_name = path.join(DATA_FOLDER, dataset.short_name, version.short_name)
+    folder_name = path.join(settings.DATA_FOLDER, dataset.short_name, version.short_name)
 
     if dataset.short_name == globals.ISMN:
         reader = ISMN_Interface(folder_name)

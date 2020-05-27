@@ -15,10 +15,10 @@ import netCDF4
 import numpy as np
 import pandas as pd
 
-from valentina.settings import BASE_DIR
+from django.conf import settings
 
 from cartopy import config as cconfig
-cconfig['data_dir'] = path.join(BASE_DIR, 'cartopy')
+cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER

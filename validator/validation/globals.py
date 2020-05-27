@@ -1,6 +1,7 @@
-from valentina.settings import MEDIA_ROOT
+from django.conf import settings
 
-OUTPUT_FOLDER = MEDIA_ROOT
+
+OUTPUT_FOLDER = settings.MEDIA_ROOT
 
 METRICS = {'R' : 'Pearson\'s r',
            'p_R' : 'Pearson\'s r p-value',
