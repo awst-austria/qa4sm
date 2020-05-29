@@ -8,6 +8,7 @@ import requests
 
 __logger = logging.getLogger(__name__)
 
+## See https://developers.zenodo.org/#rest-api for documentation
 def get_doi_for_validation(val):
     if ((not val.id) or (not val.output_file) or (not val.output_file.path) or (not val.user)):
         raise ValueError("Can't create DOI for broken validation")
