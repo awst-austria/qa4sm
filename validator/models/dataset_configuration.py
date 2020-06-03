@@ -12,8 +12,8 @@ class DatasetConfiguration(models.Model):
     dataset = models.ForeignKey(to=Dataset, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     version = models.ForeignKey(to=DatasetVersion, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     variable = models.ForeignKey(to=DataVariable, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
-    filters = models.ManyToManyField(DataFilter, related_name='dataset_configurations')
-    parametrised_filters = models.ManyToManyField(DataFilter, through='ParametrisedFilter')
+    filters = models.ManyToManyField(DataFilter, related_name='dataset_configurations', blank=True)
+    parametrised_filters = models.ManyToManyField(DataFilter, through='ParametrisedFilter', blank=True)
 
     def __str__(self):
         return "Data set: {}, version: {}, variable: {}".format(
