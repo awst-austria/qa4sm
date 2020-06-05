@@ -1,10 +1,28 @@
 import logging
 
+import numpy as np
+import pandas as pd
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
 
 __logger = logging.getLogger(__name__)
+
+'''
+Bitmask filter for SMOS, you can only exclude data on set bits (not on unset bits)
+'''
+def smos_exclude_bitmask(data, bitmask):
+    intdata = data
+
+    if type(intdata) is pd.Series:
+        intdata = intdata.values
+
+    ## Replace nans with the bitmask we want to _exclude_, so they will be
+    ## filtered out.
+    intdata = np.nan_to_num(intdata, nan=bitmask)
+    intdata = intdata.astype(int)
+    mask = (intdata & bitmask) != bitmask
+    return mask
 
 '''
 Get the variables that need to be loaded for filtering the data on them.
@@ -57,6 +75,19 @@ def get_used_variables(filters, dataset, variable):
 
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
             variables.append('Quality_Flag')
+            continue
+
+        if(fil.name == "FIL_SMOS_UNFROZEN"):
+            variables.append('Scene_Flags')
+            variables.append('Soil_Temperature_Level1')
+            continue
+
+        if(fil.name == "FIL_SMOS_UNPOLLUTED"):
+            variables.append('Scene_Flags')
+            continue
+
+        if(fil.name == "FIL_SMOS_BRIGHTNESS"):
+            variables.append('Processing_Flags')
             continue
 
         if(fil.name == "FIL_ERA5_TEMP_UNFROZEN"):
@@ -169,6 +200,19 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
 
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
             masking_filters.append( ('Quality_Flag', '==', 0) )
+            continue
+
+        if(fil.name == "FIL_SMOS_UNFROZEN"):
+            masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00001000) )
+            masking_filters.append( ('Soil_Temperature_Level1', '>=', 273) )
+            continue
+
+        if(fil.name == "FIL_SMOS_UNPOLLUTED"):
+            masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00000100) )
+            continue
+
+        if(fil.name == "FIL_SMOS_BRIGHTNESS"):
+            masking_filters.append( ('Processing_Flags', smos_exclude_bitmask, 0b00000001) )
             continue
 
         #snow depth in the nc file yet, this is the preliminary one.
