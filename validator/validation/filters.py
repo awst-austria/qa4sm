@@ -1,8 +1,6 @@
 import logging
 
-from pytesmo.validation_framework.adapters import SelfMaskingAdapter,\
-    AdvancedMaskingAdapter
-from numpy import inner
+from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
 
