@@ -202,5 +202,41 @@
             "dialog_name": "ismn_networks",
             "default_parameter": "AMMA-CATCH,BIEBRZA-S-1,BNZ-LTER,CARBOAFRICA,COSMOS,CTP-SMTMN,DAHRA,FLUXNET-AMERIFLUX,FMI,FR-Aqui,HOBE,iRON,LAB-net,MySMNet,OZNET,PBO-H2O,REMEDHUS,RISMA,RSMN,SCAN,SMOSMANIA,TERENO,USCRN,WEGENERNET,WSMN"
         }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 19,
+        "fields": {
+            "name": "FIL_SMOS_UNFROZEN",
+            "description": "Soil not frozen",
+            "help_text": "Scene_Flags != 00001000 and Soil_Temperature_Level1 >= 273",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": ""
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 20,
+        "fields": {
+            "name": "FIL_SMOS_UNPOLLUTED",
+            "description": "Scene not polluted",
+            "help_text": "Scene_Flags != 00000100",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": ""
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 21,
+        "fields": {
+            "name": "FIL_SMOS_BRIGHTNESS",
+            "description": "RMSE of brightness temperature within acceptable limits (< 12 K)",
+            "help_text": "Processing_Flags ! = 00000001",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": ""
+        }
     }
 ]
