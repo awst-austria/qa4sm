@@ -13,6 +13,9 @@ def get_doi_for_validation(val):
     if ((not val.id) or (not val.output_file) or (not val.output_file.path) or (not val.user)):
         raise ValueError("Can't create DOI for broken validation")
 
+    if (val.publishing_in_progress):
+        raise ValueError("Publishing already in progress")
+
     json_header = {"Content-Type": "application/json"}
     access_param = {'access_token': settings.DOI_ACCESS_TOKEN}
 

@@ -50,7 +50,7 @@ function ajax_archive_result(result_id, archive) {
     });
 }
 
-function ajax_publish_result(result_id) {
+function ajax_publish_result(caller, result_id) {
     if (!confirm('Are you sure you want to publish this result?\nThis can\'t be undone and you won\'t be able to delete the result later.\n\nPublishing can take a few minutes.')) {
         return;
     }
@@ -71,12 +71,12 @@ function ajax_publish_result(result_id) {
             alert('Could not publish your results: ' + errorText + '\n\nPlease try again in a few minutes and if the issue persists email ' + admin_mail);
             },
         beforeSend: function() {
-            $('#publishingNote').show();
-            $('#patchButtonGroup').hide();
+            $(caller).closest('.patchButtonGroup').next('.publishingNote').show();
+            $(caller).closest('.patchButtonGroup').hide();
             },
         complete: function() {
-            $('#publishingNote').hide();
-            $('#patchButtonGroup').show();
+            $(caller).closest('.patchButtonGroup').next('.publishingNote').hide();
+            $(caller).closest('.patchButtonGroup').show();
             }
     });
 }

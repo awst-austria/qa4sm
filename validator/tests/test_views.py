@@ -218,6 +218,15 @@ class TestViews(TransactionTestCase):
         self.testrun.save()
         self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
 
+        ## simulate that publishing is already in progress
+        self.testrun.publishing_in_progress = True
+        self.testrun.save()
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+        response = self.client.patch(url, 'publish=true', content_type='application/x-www-form-urlencoded;')
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.content is not None)
+
         # should work now
         response = self.client.patch(url, 'publish=true', content_type='application/x-www-form-urlencoded;')
         self.__logger.debug("{} {}".format(response.status_code, response.content))
