@@ -73,7 +73,7 @@ class ValidationRun(models.Model):
     anomalies_from = models.DateTimeField(null=True, blank=True)
     anomalies_to = models.DateTimeField(null=True, blank=True)
 
-    output_file = models.FileField(null=True, max_length=250)
+    output_file = models.FileField(null=True, max_length=250, blank=True)
 
     is_archived = models.BooleanField(default=False)
     last_extended = models.DateTimeField(null=True, blank=True)
