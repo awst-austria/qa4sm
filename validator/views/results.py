@@ -33,7 +33,6 @@ def user_runs(request):
     return render(request, 'validator/user_runs.html', context)
 
 
-@login_required(login_url='/login/')
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
 
