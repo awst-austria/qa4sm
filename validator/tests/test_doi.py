@@ -8,6 +8,7 @@ from os import path
 import shutil
 
 from django.contrib.auth import get_user_model
+import pytest
 User = get_user_model()
 
 from django.test import TestCase
@@ -22,6 +23,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 
 # use zenodo test sandbox to avoid generating real dois
 @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
+@pytest.mark.long_running
 class TestDOI(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
