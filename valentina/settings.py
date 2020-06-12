@@ -29,6 +29,7 @@ SITE_URL = "https://qa4sm.eodc.eu"
 ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environment/qa4sm_env.yml"
 
 DOI_REGISTRATION_URL="https://zenodo.org/api/deposit/depositions"
+DOI_URL_PREFIX="https://doi.org/"
 
 # Application definition
 INSTALLED_APPS = [

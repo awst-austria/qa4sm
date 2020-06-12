@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 from django.urls.base import reverse
+import netCDF4
 import requests
 
 
@@ -36,18 +37,7 @@ def get_doi_for_validation(val):
         deposition_id = r.json()['id']
         __logger.debug('New DOI id: ' + str(deposition_id))
 
-        ## add file to new entry
-        with open(val.output_file.path, 'rb') as result_file:
-            data = {'name': str(val.id) + '.nc'}
-            files = {'file': result_file}
-            r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/files'.format(deposition_id), params=access_param, data=data, files=files)
-            __logger.debug('New DOI, add files, status: ' + str(r.status_code))
-            __logger.debug(r.json())
-
-        if r.status_code != 201:
-            raise RuntimeError("Could not upload result file to new DOI")
-
-        ## add metadata to new entry
+        ## add metadata to new entry and get reserved DOI
         val_url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': val.id})
         title = "Validation of " + (" vs \n".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in val.dataset_configurations.all()]))
 
@@ -81,7 +71,8 @@ def get_doi_for_validation(val):
                 'upload_type': 'dataset',
                 'description': description,
                 'keywords' : keywords,
-                'creators': [creator]
+                'creators': [creator],
+                'prereserve_doi': True,
                 }
             }
         r = requests.put(settings.DOI_REGISTRATION_URL + '/{}'.format(deposition_id), params=access_param, data=json.dumps(data), headers=json_header)
@@ -90,6 +81,24 @@ def get_doi_for_validation(val):
 
         if r.status_code != 200:
             raise RuntimeError("Could not upload metadata to new DOI")
+
+        reserved_doi = r.json()['metadata']['prereserve_doi']['doi']
+        __logger.debug('Reserved DOI {} for deposition ID {}'.format(reserved_doi, deposition_id))
+
+        ## put pre-reserved DOI into results file
+        with netCDF4.Dataset(val.output_file.path, 'a', format='NETCDF4') as ds:
+            ds.doi = settings.DOI_URL_PREFIX + reserved_doi
+
+        ## add file to new entry
+        with open(val.output_file.path, 'rb') as result_file:
+            data = {'name': str(val.id) + '.nc'}
+            files = {'file': result_file}
+            r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/files'.format(deposition_id), params=access_param, data=data, files=files)
+            __logger.debug('New DOI, add files, status: ' + str(r.status_code))
+            __logger.debug(r.json())
+
+        if r.status_code != 201:
+            raise RuntimeError("Could not upload result file to new DOI")
 
         ## PUBLISH new entry
         r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/actions/publish'.format(deposition_id), params=access_param)

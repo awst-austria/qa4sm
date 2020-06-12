@@ -6,6 +6,7 @@ from datetime import timedelta
 import logging
 from os import path
 import shutil
+import netCDF4
 
 from django.contrib.auth import get_user_model
 import pytest
@@ -85,6 +86,10 @@ class TestDOI(TestCase):
         assert val.doi
         firstdoi = val.doi
 
+        ## check that the DOI was correctly stored in the netcdf file
+        with netCDF4.Dataset(val.output_file.path, mode='r') as ds:
+            assert val.doi in ds.doi
+
         ## try to upload the same data with the same title again - it should work but yield a different doi
         get_doi_for_validation(val)
 
@@ -92,3 +97,7 @@ class TestDOI(TestCase):
         self.__logger.debug(val.doi)
         assert val.doi
         assert val.doi != firstdoi
+
+        ## check that the DOI was correctly stored in the netcdf file
+        with netCDF4.Dataset(val.output_file.path, mode='r') as ds:
+            assert val.doi in ds.doi
