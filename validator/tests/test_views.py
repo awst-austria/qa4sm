@@ -101,7 +101,6 @@ class TestViews(TransactionTestCase):
     def test_views_deny_anonymous(self):
         login_url = reverse('login')
         testurls = [ reverse(tv) for tv in self.private_views ]
-        testurls.append(reverse('result', kwargs={'result_uuid': self.testrun.id}))
 
         for url in testurls:
             self.__logger.info(url)
