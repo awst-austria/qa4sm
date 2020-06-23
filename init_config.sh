@@ -17,7 +17,7 @@ NEWKEY=${NEWKEY//&/\\&}
 # default values (for ops)
 LOGFILE="/var/log/valentina/valentina.log"
 DEBUGFLAG="False"
-ALLOWED_HOSTS="['qa4sm.eodc.eu','localhost']"
+ALLOWED_HOSTS="['qa4sm.eu','localhost']"
 STATIC_URL='/static/'
 MEDIA_URL='/media/'
 FORCE_SCRIPT_NAME=''

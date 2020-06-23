@@ -32,13 +32,13 @@ DBSM = 'sqlite'
 DB_PASSWORD = 's3cr3t'
 
 ## Email settings
-EMAIL_HOST = 'bsmtp.a1.net'
+EMAIL_HOST = 'smtp.ionos.de'
 EMAIL_PORT = '587'
-EMAIL_HOST_USER = 'qa4sm@awst.at'
-EMAIL_FROM = 'qa4sm@awst.at'
+EMAIL_HOST_USER = 'support@qa4sm.eu'
+EMAIL_FROM = 'support@qa4sm.eu'
 EMAIL_USE_TLS = 'yes'
 EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'qa4sm@awst.at'
+DEFAULT_FROM_EMAIL = 'support@qa4sm.eu'
 
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 #EMAIL_FILE_PATH = '/tmp/app-messages'

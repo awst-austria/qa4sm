@@ -24,7 +24,7 @@ LOGIN_REDIRECT_URL = 'validation'
 
 STATIC_ROOT=os.path.join(BASE_DIR, 'static/')
 
-SITE_URL = "https://qa4sm.eodc.eu"
+SITE_URL = "https://qa4sm.eu"
 
 ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environment/qa4sm_env.yml"
 
