@@ -79,7 +79,42 @@ class TestDOI(TestCase):
         set_outfile(val, run_dir)
         val.save()
 
-        ## use the form to generate the necessary metadata
+        ## test the publishing form
+
+        # no name given
+        val.user.first_name = None
+        val.user.last_name = None
+        form = PublishingForm(validation=val)
+        assert form
+
+        # only first name given
+        val.user.first_name = self.user_data['first_name']
+        form = PublishingForm(validation=val)
+        assert form
+        val.user.first_name = None
+
+        # only last name given
+        val.user.last_name = self.user_data['last_name']
+        form = PublishingForm(validation=val)
+        assert form
+
+        # first and last name given but not a real orcid id
+        val.user.first_name = self.user_data['first_name']
+        val.user.orcid = 'not a real orcid'
+        form = PublishingForm(validation=val)
+
+        caught_orcid_error = False
+        try:
+            assert form.pub_metadata
+        except:
+            caught_orcid_error = True
+
+        assert caught_orcid_error
+
+        # fix orcid
+        val.user.orcid = self.user_data['orcid']
+
+        ## finally everything should be ok and we can use the form to generate the necessary metadata
         form = PublishingForm(validation=val)
         metadata = form.pub_metadata
 

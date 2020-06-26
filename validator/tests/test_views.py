@@ -10,6 +10,7 @@ import zipfile
 from dateutil import parser
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
+from validator.forms import PublishingForm
 User = get_user_model()
 
 from django.core import mail
@@ -35,6 +36,7 @@ import shutil
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation import set_outfile, mkdir_if_not_exists
 
+from django.utils.http import urlencode
 
 class TestViews(TransactionTestCase):
 
@@ -185,18 +187,34 @@ class TestViews(TransactionTestCase):
 
         url = reverse('result', kwargs={'result_uuid': self.testrun.id})
 
+        # use the publishing form to convert the validation metadata to a dict
+        metadata = PublishingForm()._formdata_from_validation(self.testrun)
+
         ## only owners should be able to change validations
         self.client.login(**self.credentials2)
-        response = self.client.patch(url, 'publish=true',  content_type='application/x-www-form-urlencoded;')
+        response = self.client.patch(url, urlencode(metadata))
         self.assertEqual(response.status_code, 403)
 
         self.client.login(**self.credentials)
 
         # shouldn't work because of incorrect parameter
-        response = self.client.patch(url, 'publish=asdf', content_type='application/x-www-form-urlencoded;')
+        metadata['publish'] = 'asdf'
+        response = self.client.patch(url, urlencode(metadata))
         self.__logger.debug("{} {}".format(response.status_code, response.content))
         self.assertEqual(response.status_code, 400)
         self.assertTrue(response.content is not None)
+
+        metadata['publish'] = 'true'
+
+        # shouldn't work because input metadata is not valid
+        orig_orcid = metadata['orcid']
+        metadata['orcid'] = 'this is no orcid'
+        response = self.client.patch(url, urlencode(metadata))
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 420)
+        self.assertTrue(response.content is not None)
+
+        metadata['orcid'] = orig_orcid
 
         # remove file path from validation
         self.testrun.output_file = None
@@ -204,7 +222,7 @@ class TestViews(TransactionTestCase):
         self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
 
         # shouldn't work because of missing file path in validation
-        response = self.client.patch(url, 'publish=true', content_type='application/x-www-form-urlencoded;')
+        response = self.client.patch(url, urlencode(metadata))
         self.__logger.debug("{} {}".format(response.status_code, response.content))
         self.assertEqual(response.status_code, 400)
         self.assertTrue(response.content is not None)
@@ -221,7 +239,7 @@ class TestViews(TransactionTestCase):
         self.testrun.publishing_in_progress = True
         self.testrun.save()
         self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
-        response = self.client.patch(url, 'publish=true', content_type='application/x-www-form-urlencoded;')
+        response = self.client.patch(url, urlencode(metadata))
         self.__logger.debug("{} {}".format(response.status_code, response.content))
         self.assertEqual(response.status_code, 400)
         self.assertTrue(response.content is not None)
@@ -231,7 +249,7 @@ class TestViews(TransactionTestCase):
         self.testrun.save()
 
         # should work now
-        response = self.client.patch(url, 'publish=true', content_type='application/x-www-form-urlencoded;')
+        response = self.client.patch(url, urlencode(metadata))
         self.__logger.debug("{} {}".format(response.status_code, response.content))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.content is not None)
