@@ -50,12 +50,14 @@ function ajax_archive_result(result_id, archive) {
     });
 }
 
-function ajax_publish_result(caller, result_id) {
-    if (!confirm('Are you sure you want to publish this result?\nThis can\'t be undone and you won\'t be able to delete the result later.\n\nPublishing can take a few minutes.')) {
-        return;
-    }
+function ajax_publish_result(result_id) {
+    $('#publishDialog').modal('hide');
 
-    var url = result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
+    var url = result_url.replace('00000000-0000-0000-0000-000000000000', result_id);
+
+    // convert publishing form to dictionary
+    var formdata =  $('#publishing_form').serializeArray();
+    formdata.push({ name: 'publish', value: 'true'});
 
     $.ajaxSetup({
           headers: { "X-CSRFToken": csrf_token }
@@ -64,20 +66,27 @@ function ajax_publish_result(caller, result_id) {
     $.ajax({
         url: url,
         type: 'PATCH',
-        data : { "publish" : true },
-        success : function(return_data) { location.reload(); },
+        data : formdata,
+        success: function (return_data) { location.reload(); },
         error : function(return_data) {
-            var errorText = return_data.responseText.replace(/.*\'(.*)\'.*/g, '$1');
-            alert('Could not publish your results: ' + errorText + '\n\nPlease try again in a few minutes and if the issue persists email ' + admin_mail);
-            },
-        beforeSend: function() {
-            $(caller).closest('.patchButtonGroup').next('.publishingNote').show();
-            $(caller).closest('.patchButtonGroup').hide();
-            },
-        complete: function() {
-            $(caller).closest('.patchButtonGroup').next('.publishingNote').hide();
-            $(caller).closest('.patchButtonGroup').show();
+            if (return_data.status = '420') {
+                // form validation error
+                $('#publishDialog').replaceWith(return_data.responseText);
+                $('#publishDialog').modal('show');
+            } else {
+                // other, unexpected error
+                var errorText = return_data.responseText.replace(/.*\'(.*)\'.*/g, '$1');
+                alert('Could not publish your results: ' + errorText + '\n\nPlease try again in a few minutes and if the issue persists email ' + admin_mail);
             }
+        },
+        beforeSend: function() {
+            $('.publishingNote').show();
+            $('.patchButtonGroup').hide();
+        },
+        complete: function() {
+            $('.publishingNote').hide();
+            $('.patchButtonGroup').show();
+        }
     });
 }
 

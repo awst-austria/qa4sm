@@ -79,6 +79,10 @@ html {
     min-width: 6.5rem;
 }
 
+.addon-w-pub {
+    min-width: 7rem;
+}
+
 .box-shadow {
     box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }

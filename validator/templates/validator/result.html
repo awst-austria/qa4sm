@@ -137,7 +137,9 @@
                                 <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span> Archive</button>
                             {% endif %}
                             {% if val.output_file %}
-                                <button class="btn btn-sm btn-primary" title="Publish on Zenodo" onclick="ajax_publish_result(this, '{{ val.id }}')"><span class="fas fa-book"></span> Publish</button>
+                                <button type="button" title="Publish on Zenodo" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#publishDialog">
+                                    <span class="fas fa-book" ></span> Publish
+                                </button>
                             {% endif %}
                         </div>
                         {% if val.output_file %}
@@ -208,6 +210,16 @@
 
 {% endblock %}
 
+
+{% block dialogs %}
+
+{% if is_owner %}
+    {% include "validator/publishing_dialog.html" %}
+{% endif %}
+
+{% endblock %}
+
+
 {% block javascript %}
 <script type="text/javascript">
     function changeBoxplot(metric) {
@@ -254,6 +266,9 @@
     result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
     stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
 </script>
-<script src="{% static 'js/results_buttons.js' %}"></script>
+
+{% if is_owner %}
+    <script src="{% static 'js/results_buttons.js' %}"></script>
+{% endif %}
 
 {% endblock %}

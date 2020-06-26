@@ -30,6 +30,7 @@ ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environm
 
 DOI_REGISTRATION_URL="https://zenodo.org/api/deposit/depositions"
 DOI_URL_PREFIX="https://doi.org/"
+ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 
 # Application definition
 INSTALLED_APPS = [

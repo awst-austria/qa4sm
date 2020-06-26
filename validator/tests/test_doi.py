@@ -10,6 +10,7 @@ import netCDF4
 
 from django.contrib.auth import get_user_model
 import pytest
+from validator.forms import PublishingForm
 User = get_user_model()
 
 from django.test import TestCase
@@ -78,8 +79,12 @@ class TestDOI(TestCase):
         set_outfile(val, run_dir)
         val.save()
 
+        ## use the form to generate the necessary metadata
+        form = PublishingForm(validation=val)
+        metadata = form.pub_metadata
+
         ## create a test doi on zenodo's sandbox service
-        get_doi_for_validation(val)
+        get_doi_for_validation(val, metadata)
 
         val = ValidationRun.objects.get(pk=val.id)
         self.__logger.debug(val.doi)
@@ -90,8 +95,11 @@ class TestDOI(TestCase):
         with netCDF4.Dataset(val.output_file.path, mode='r') as ds:
             assert val.doi in ds.doi
 
+        form = PublishingForm(validation=val)
+        metadata = form.pub_metadata
+
         ## try to upload the same data with the same title again - it should work but yield a different doi
-        get_doi_for_validation(val)
+        get_doi_for_validation(val, metadata)
 
         val = ValidationRun.objects.get(pk=val.id)
         self.__logger.debug(val.doi)
