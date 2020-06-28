@@ -204,7 +204,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
 
         if(fil.name == "FIL_SMOS_UNFROZEN"):
             masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00001000) )
-            masking_filters.append( ('Soil_Temperature_Level1', '>=', 273) )
             continue
 
         if(fil.name == "FIL_SMOS_UNPOLLUTED"):

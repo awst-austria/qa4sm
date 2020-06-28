@@ -209,7 +209,7 @@
         "fields": {
             "name": "FIL_SMOS_UNFROZEN",
             "description": "Soil not frozen",
-            "help_text": "Scene_Flags != 00001000 and Soil_Temperature_Level1 >= 273",
+            "help_text": "Scene_Flag 00001000 is not set, meaning: Soil_Temperature_Level1 >= 273",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": ""
@@ -221,7 +221,7 @@
         "fields": {
             "name": "FIL_SMOS_UNPOLLUTED",
             "description": "Scene not polluted",
-            "help_text": "Scene_Flags != 00000100",
+            "help_text": "Scene_Flag 00000100 not set, meaning: water+urban+ice <= 10% of the pixel",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": ""
