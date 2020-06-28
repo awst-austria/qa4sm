@@ -238,5 +238,29 @@
             "dialog_name": null,
             "default_parameter": ""
         }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 22,
+        "fields": {
+            "name": "FIL_SMOS_TOPO_NO_MODERATE",
+            "description": "Exclude moderate topo",
+            "help_text": "Scene_Flag 00000001 not set",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": ""
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 23,
+        "fields": {
+            "name": "FIL_SMOS_TOPO_NO_STRONG",
+            "description": "Exclude strong topo",
+            "help_text": "Scene_Flag 00000010 is not set",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": ""
+        }
     }
 ]

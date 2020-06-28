@@ -202,12 +202,20 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
             masking_filters.append( ('Quality_Flag', '==', 0) )
             continue
 
-        if(fil.name == "FIL_SMOS_UNFROZEN"):
-            masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00001000) )
+        if(fil.name == "FIL_SMOS_TOPO_NO_MODERATE"):
+            masking_filters.append( ('Processing_Flags', smos_exclude_bitmask, 0b00000001) )
+            continue
+
+        if(fil.name == "FIL_SMOS_TOPO_NO_STRONG"):
+            masking_filters.append( ('Processing_Flags', smos_exclude_bitmask, 0b00000010) )
             continue
 
         if(fil.name == "FIL_SMOS_UNPOLLUTED"):
             masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00000100) )
+            continue
+
+        if(fil.name == "FIL_SMOS_UNFROZEN"):
+            masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00001000) )
             continue
 
         if(fil.name == "FIL_SMOS_BRIGHTNESS"):
