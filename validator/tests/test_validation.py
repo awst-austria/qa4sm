@@ -10,9 +10,10 @@ import time
 from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
+
 from django.contrib.auth import get_user_model
-from symbol import parameters
 User = get_user_model()
+
 from django.test import TestCase
 from django.test.utils import override_settings
 import netCDF4
@@ -23,13 +24,14 @@ import numpy as np
 import pandas as pd
 import valentina
 from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
-from validator.models import DataFilter, dataset_configuration
+from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
+from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting
@@ -65,6 +67,8 @@ class TestValidation(TestCase):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+
+        set_dataset_paths()
 
     def generate_default_validation(self):
         run = ValidationRun()
