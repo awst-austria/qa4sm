@@ -66,12 +66,12 @@ class TestCommands(TestCase):
                 self.__logger.debug('setting empty path for: ' + dataset.short_name)
 
 
-        ## instruct the command to change only the empty paths, give a default path, and accept the default every time
+        ## instruct the command to change only the empty paths, give no default path, and set a new path every time
         user_input = [
             'u',
-            new_test_path,
+            '',
         ]
-        user_input.extend([''] * num_changed)
+        user_input.extend([new_test_path] * num_changed)
         args = []
         opts = {}
         with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
@@ -89,12 +89,12 @@ class TestCommands(TestCase):
 
         ## second round of testing!
 
-        ## instruct the command to change all paths, give no default path, and set a test path every time
+        ## instruct the command to change all paths, give a default path, and accept the suggestion every time
         user_input = [
             '',
-            '',
+            new_test_path2,
         ]
-        user_input.extend([new_test_path2] * Dataset.objects.count())
+        user_input.extend([''] * Dataset.objects.count())
         args = []
         opts = {}
         with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
@@ -104,7 +104,7 @@ class TestCommands(TestCase):
         # check that the datasets were changed correctly
         for counter, dataset in enumerate(Dataset.objects.all().order_by('id')):
             self.__logger.debug('checking path second time for ' + dataset.short_name)
-            assert new_test_path2 == dataset.storage_path
+            assert new_test_path2 in dataset.storage_path
 
 
         ## third round of testing!
