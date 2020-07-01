@@ -124,5 +124,6 @@ class TestCommands(TestCase):
         # check that the datasets were changed correctly
         for counter, dataset in enumerate(Dataset.objects.all().order_by('id')):
             self.__logger.debug('checking path second time for ' + dataset.short_name)
-            assert new_test_path2 == dataset.storage_path
+            assert new_test_path2 in dataset.storage_path
+            assert dataset.short_name in dataset.storage_path
 
