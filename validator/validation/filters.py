@@ -1,6 +1,5 @@
 import logging
 
-import numpy as np
 import pandas as pd
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
@@ -12,16 +11,12 @@ __logger = logging.getLogger(__name__)
 Bitmask filter for SMOS, you can only exclude data on set bits (not on unset bits)
 '''
 def smos_exclude_bitmask(data, bitmask):
-    intdata = data
+    thedata = data
 
-    if type(intdata) is pd.Series:
-        intdata = intdata.values
+    if type(thedata) is pd.Series:
+        thedata = thedata.values
 
-    ## Replace nans with the bitmask we want to _exclude_, so they will be
-    ## filtered out.
-    intdata = np.nan_to_num(intdata, nan=bitmask)
-    intdata = intdata.astype(int)
-    mask = (intdata & bitmask) != bitmask
+    mask = (thedata & bitmask) != bitmask
     return mask
 
 '''

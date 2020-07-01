@@ -157,7 +157,7 @@ dependencies:
     - shapely==1.7.0
     - smap-io==0.3
     - smecv-grid==0.2
-    - smos==0.1
+    - smos==0.2
     - tqdm==4.40.0
     - trollsift==0.2.1
     - vine==1.3.0
