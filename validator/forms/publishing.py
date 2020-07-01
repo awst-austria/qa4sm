@@ -15,7 +15,6 @@ def validate_orcid(orcid):
             raise ValidationError('Invalid ORCID identifier.')
 
 _KEYWORD_REGEX = reg_compile(r'\bqa4sm\b', IGNORECASE)
-
 def validate_keywords(keywordlist):
     if not _KEYWORD_REGEX.search(keywordlist):
         raise ValidationError('Missing required keyword')
