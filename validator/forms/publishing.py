@@ -1,5 +1,6 @@
 from re import search as reg_search
 from re import compile as reg_compile
+from re import IGNORECASE  # @UnresolvedImport
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -7,22 +8,32 @@ from django.urls.base import reverse
 
 import django.forms as forms
 
-
 def validate_orcid(orcid):
     if orcid:
         r = reg_search(settings.ORICD_REGEX, orcid)
         if not r or len(r.groups()) < 1:
             raise ValidationError('Invalid ORCID identifier.')
 
+_KEYWORD_REGEX = reg_compile(r'\bqa4sm\b', IGNORECASE)
+
+def validate_keywords(keywordlist):
+    if not _KEYWORD_REGEX.search(keywordlist):
+        raise ValidationError('Missing required keyword')
 
 class PublishingForm(forms.Form):
 
-    title = forms.CharField(label='Title', widget=forms.Textarea(attrs={'rows': '2'}), help_text='Title of the Zenodo entry')
-    description = forms.CharField(label='Description', widget=forms.Textarea(attrs={'rows': '2'}), help_text='Description of the Zenodo entry')
-    keywords = forms.CharField(label='Keywords', widget=forms.Textarea(attrs={'rows': '2'}), help_text='Comma-separated list of keywords to make your results easily searchable')
-    name = forms.CharField(label='Name', help_text='Your name; format: Lastname, Firstnames')
-    affiliation = forms.CharField(label='Affiliation', required=False, help_text='Your organisation or other affiation, optional')
-    orcid = forms.CharField(label='ORCID', required=False, max_length=25, validators=[validate_orcid], help_text='Your personal ORCID id, optional')
+    title = forms.CharField(label='Title', widget=forms.Textarea(attrs={'rows': '2'}),
+                            help_text='Title of the Zenodo entry')
+    description = forms.CharField(label='Description', widget=forms.Textarea(attrs={'rows': '2'}),
+                                  help_text='Description of the Zenodo entry')
+    keywords = forms.CharField(label='Keywords', widget=forms.Textarea(attrs={'rows': '2'}), validators=[validate_keywords],
+                               help_text='Comma-separated list of keywords to make your results easily searchable; must contain keyword "qa4sm"')
+    name = forms.CharField(label='Name',
+                           help_text='Your name; format: Lastname, Firstnames')
+    affiliation = forms.CharField(label='Affiliation', required=False,
+                                  help_text='Your organisation or other affiation, optional')
+    orcid = forms.CharField(label='ORCID', required=False, max_length=25, validators=[validate_orcid],
+                            help_text='Your personal ORCID id, optional')
 
     def __init__(self, data=None, validation=None, *args, **kwargs):
         ## if no data is given, generate defaults from validation

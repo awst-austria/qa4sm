@@ -209,12 +209,15 @@ class TestViews(TransactionTestCase):
         # shouldn't work because input metadata is not valid
         orig_orcid = metadata['orcid']
         metadata['orcid'] = 'this is no orcid'
+        orig_keywords = metadata['keywords']
+        metadata['keywords'] = metadata['keywords'].replace('qa4sm', '')
         response = self.client.patch(url, urlencode(metadata))
         self.__logger.debug("{} {}".format(response.status_code, response.content))
         self.assertEqual(response.status_code, 420)
         self.assertTrue(response.content is not None)
 
         metadata['orcid'] = orig_orcid
+        metadata['keywords'] = orig_keywords
 
         # remove file path from validation
         self.testrun.output_file = None
