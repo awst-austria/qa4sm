@@ -443,7 +443,7 @@ class TestValidation(TestCase):
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
         run.anomalies_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59, tzinfo=UTC)
+        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59)
         run.save()
 
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))

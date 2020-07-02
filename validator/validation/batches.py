@@ -1,6 +1,5 @@
 import numpy as np
 
-import pygeogrids.netcdf  # bugfix
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 

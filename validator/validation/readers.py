@@ -1,6 +1,5 @@
 from os import path
 
-import pygeogrids.netcdf  # bugfix
 from ascat import AscatNc
 from c3s_sm.interface import C3STs as c3s_read
 from gldas.interface import GLDASTs
