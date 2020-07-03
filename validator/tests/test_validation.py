@@ -11,7 +11,6 @@ from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
-from symbol import parameters
 User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -23,7 +22,7 @@ import numpy as np
 import pandas as pd
 import valentina
 from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
-from validator.models import DataFilter, dataset_configuration
+from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetConfiguration
@@ -444,7 +443,7 @@ class TestValidation(TestCase):
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
         run.anomalies_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59, tzinfo=UTC)
+        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59)
         run.save()
 
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -545,6 +544,15 @@ class TestValidation(TestCase):
         version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
         variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         reader = val.create_reader(dataset, version)
+
+        no_msk_reader = val.setup_filtering(reader, None, None, dataset, variable)
+        assert no_msk_reader is not None
+        data = no_msk_reader.read_ts(0)
+        assert data is not None
+        assert isinstance(data, pd.DataFrame)
+        assert len(data.index) > 1
+        assert not data[variable.pretty_name].empty
+
         data_filters = [
             DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
             DataFilter.objects.get(name="FIL_ISMN_GOOD"),
@@ -578,7 +586,7 @@ class TestValidation(TestCase):
                 reader = val.create_reader(dataset, version)
                 for variable in va:
                     for data_filter in fils:
-                        print("Testing {} version {} variable {} filter {}".format(dataset, version, variable, data_filter.name))
+                        self.__logger.debug("Testing {} version {} variable {} filter {}".format(dataset, version, variable, data_filter.name))
                         if data_filter.parameterised:
                             pfilter = ParametrisedFilter(filter = data_filter, parameters = data_filter.default_parameter)
                             msk_reader = val.setup_filtering(reader, [], [pfilter], dataset, variable)

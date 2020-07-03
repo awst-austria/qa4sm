@@ -1,5 +1,5 @@
-import logging
 from datetime import datetime
+import logging
 from os import path
 from re import sub as regex_sub
 import uuid
@@ -7,27 +7,28 @@ import uuid
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
-from pytz import UTC
 from django.conf import settings
 from netCDF4 import Dataset
+from pytesmo.validation_framework.adapters import AnomalyAdapter, \
+    AnomalyClimAdapter
+from pytesmo.validation_framework.data_manager import DataManager
 from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names
 from pytesmo.validation_framework.results_manager import netcdf_results_manager
 from pytesmo.validation_framework.validation import Validation
+from pytz import UTC
+import pytz
 
 from valentina.celery import app
+from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
 from validator.mailer import send_val_done_notification
-from validator.models import ValidationRun
 from validator.models import CeleryTask
+from validator.models import ValidationRun
 from validator.validation.batches import create_jobs
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
-from pytesmo.validation_framework.data_manager import DataManager
-from pytesmo.validation_framework.adapters import AnomalyAdapter,\
-    AnomalyClimAdapter
-from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
 
 
 __logger = logging.getLogger(__name__)
@@ -111,7 +112,8 @@ def create_pytesmo_validation(validation_run):
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name])
         if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
-            anomalies_baseline=[validation_run.anomalies_from, validation_run.anomalies_to]
+            # make sure our baseline period is in UTC and without timezone information
+            anomalies_baseline=[validation_run.anomalies_from.astimezone(tz=pytz.UTC).replace(tzinfo=None), validation_run.anomalies_to.astimezone(tz=pytz.UTC).replace(tzinfo=None)]
             reader = AnomalyClimAdapter(reader, columns=[dataset_config.variable.pretty_name], timespan=anomalies_baseline)
 
         dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
@@ -130,15 +132,8 @@ def create_pytesmo_validation(validation_run):
     period = None
     if validation_run.interval_from is not None and validation_run.interval_to is not None:
         ## while pytesmo can't deal with timezones, normalise the validation period to utc; can be removed once pytesmo can do timezones
-        startdate = validation_run.interval_from
-        enddate = validation_run.interval_to
-
-        if startdate.tzinfo is not None:
-            startdate = startdate.astimezone(UTC).replace(tzinfo=None)
-
-        if enddate.tzinfo is not None:
-            enddate = enddate.astimezone(UTC).replace(tzinfo=None)
-
+        startdate = validation_run.interval_from.astimezone(UTC).replace(tzinfo=None)
+        enddate = validation_run.interval_to.astimezone(UTC).replace(tzinfo=None)
         period = [startdate, enddate]
 
     datamanager = DataManager(datasets, ref_name=ref_name, period=period)
