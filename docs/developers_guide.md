@@ -172,35 +172,12 @@ If the `init_conig.sh` doesn't work for you, copy `settings_example_conf.py` int
 
 Adapt the `valentina/settings_conf.py` to match your local configuration:
 
-- Set `DATA_FOLDER` to the folder where you keep the (geo)data, see the datasets folder section for more info. If you don't have other data, set it to the `testdata` folder.
 - If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True` and `CELERY_TASK_EAGER_PROPAGATES = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
 - Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
 - Set the `LOG_FILE` location to where you want the log files to be written to.
 
-For the folders specified for the `DATA_FOLDER` and `LOG_FILE` settings, make sure the directories exist in your system, otherwise, the `Init Django` section of this guide will throw an error.
-
-## Datasets folder
-
-Your datasets folder should have the following structure so that the webapp can find the data (note these are not all of the datasets available but you should get an idea of the folder structure):
-
-    ASCAT/ASCAT_H113
-        data/xxxx.nc
-        grid
-        static_layer
-
-    C3S/C3S_V201706/TCDR/063_images_to_ts/combined-daily
-
-    GLDAS/GLDAS_NOAH025_3H_2_1
-    GLDAS/GLDAS_TEST
-
-    ISMN/ISMN_V20180712_MINI
-    ISMN/ISMN_V20180712_TEST
-    ISMN/ISMN_V20180830_GLOBAL
-
-    SMAP/SMAP_V5_PM
-
-The folders are used in `validator.validation.readers.create_reader` to create the necessary data readers. The general folder structure is `<dataset_name>/<version_name>`, using the names in the webapp database. As always, capitalisation makes a difference ;-)
+Make sure the `LOG_FILE` folder defined in your settings exist in your system, otherwise, the `Init Django` section of this guide will throw an error.
 
 ## Init Django
 
@@ -253,6 +230,16 @@ You can access the webapp's admin panel by appending "admin/" to the URL, e.g. <
 Depending on the `LOG_FILE` setting in your `settings_conf.py` file, the webapp's logfile should be written to `valentina.log`. If you encounter problems, check this log and the command line output of the Django server.
 
 If, when you try to log in, you get a verification failed error, try going to `valentina/settings.py` and commenting out the `CSRF_COOKIE_SECURE` setting. Then log in again.
+
+## Specifying location of datasets
+
+If you want to try out or host QA4SM beyond running the integration tests, you can use your own data if you make the data locations known to the app. There's an interactive Django command that will prompt you for the data locations:
+
+    python manage.py setdatasetpaths
+
+With it, you can change all dataset paths or just the datasets that don't have a path set yet. You can optionally give a parent data folder from which the dataset subfolder names will be guessed and suggested. If you don't give a parent data folder, the suggestion will be the currently set path (if one is set) - this is useful if you want to change only a few of the paths and just skip over the others.
+
+The folders are used in `validator.validation.readers.create_reader` to create the necessary data readers. The general folder structure is `<dataset_name>/<version_name>`, using the names in the webapp database. As always, capitalisation makes a difference ;-)
 
 ## Webapp walkthrough
 

@@ -22,7 +22,6 @@ STATIC_URL='/static/'
 MEDIA_URL='/media/'
 FORCE_SCRIPT_NAME=''
 SSL_SECURITY=""
-DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/"
 
 
 DB_PASSWORD=""
@@ -45,7 +44,6 @@ if [ "x$ENV" == "xjenkins" ]; then
     FORCE_SCRIPT_NAME=''
     DEBUGFLAG="True"
     SSL_SECURITY=""
-    DATA_FOLDER="/data/qa4sm/testdata/input_data"
     DBSM="sqlite"
 fi
 
@@ -56,7 +54,6 @@ if [ "x$ENV" == "xdev" ]; then
     DEBUGFLAG="True"
     ALLOWED_HOSTS="['127.0.0.1', 'localhost']"
     SSL_SECURITY=""
-    DATA_FOLDER="/data/qa4sm/data/"
     DBSM="sqlite"
 fi
 
@@ -67,10 +64,9 @@ if [ "x$ENV" == "xtest" ]; then
     DEBUGFLAG="True"
     ALLOWED_HOSTS="['127.0.0.1', 'localhost']"
     SSL_SECURITY=""
-    DATA_FOLDER="$DIRNAME/testdata/input_data"
     DBSM="sqlite"
     LOGFILE="/tmp/log/valentina/valentina.log"
 fi
 
 
-sed -e "s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*DATA_FOLDER = .*$|DATA_FOLDER = '$DATA_FOLDER'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
+sed -e "s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
