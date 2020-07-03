@@ -1,13 +1,16 @@
 from json import dumps as json_dumps
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import QueryDict
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
 
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_pairs
+
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -42,8 +45,38 @@ def result(request, result_uuid):
         val_run.delete()
         return HttpResponse("Deleted.", status=200)
 
-    # not DELETE
+    elif(request.method == 'PATCH'):
+        ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+        if(val_run.user != request.user):
+            return HttpResponse(status=403)
+
+        patch_params = QueryDict(request.body)
+
+        if 'archive' in patch_params:
+            archive_mode = patch_params['archive']
+
+            if not ((archive_mode == 'true') or (archive_mode == 'false')):
+                return HttpResponse("Wrong parameter.", status=400)
+
+            val_run.archive(unarchive = (archive_mode == 'false'))
+            return HttpResponse("Changed.", status=200)
+
+        if 'extend' in patch_params:
+            extend = patch_params['extend']
+
+            if extend != 'true':
+                return HttpResponse("Wrong parameter.", status=400)
+
+            val_run.extend_lifespan()
+            return HttpResponse(val_run.expiry_date, status=200)
+
+        return HttpResponse("Wrong parameter.", status=400)
+
+    # by default, show page
     else:
+        ## tell template whether it's the owner of the validation - to show action buttons
+        is_owner = (val_run.user == request.user)
+
         ## TODO: get time in format like '2 minutes', '5 hours'
         run_time = None
         if val_run.end_time is not None:
@@ -57,6 +90,7 @@ def result(request, result_uuid):
         pairs = get_dataset_pairs(val_run)
 
         context = {
+            'is_owner': is_owner,
             'val' : val_run,
             'error_rate' : error_rate,
             'run_time': run_time,

@@ -29,18 +29,40 @@ def send_val_done_notification(val_run):
                 i += 1
 
         subject = '[QA4SM] Validation finished'
-        body = 'Dear {} {},\n\nYour validation of {} against {} ({}) data has been completed.\nThe results are available at: {}.\n\nBest regards,\nQA4SM team'.format(
+        body = 'Dear {} {},\n\nyour validation of {} against {} ({}) data has been completed.\nThe results are available at: {}.\nYou have until {} to inspect your validation - then it will be automatically removed (unless archived).\n\nBest regards,\nQA4SM team'.format(
             val_run.user.first_name,
             val_run.user.last_name,
-
             dataset_string,
             val_run.reference_configuration.dataset.pretty_name,
             val_run.reference_configuration.version.pretty_name,
+            url,
+            val_run.expiry_date)
+
+        _send_email(recipients=[val_run.user.email],
+                    subject=subject,
+                    body=body)
+
+def send_val_expiry_notification(val_run):
+        __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_run.id, val_run.user))
+
+        url = SITE_URL + reverse('result', kwargs={'result_uuid': val_run.id})
+
+        dataset_name = "{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id)
+
+        subject = '[QA4SM] Validation expiring soon'
+        body = 'Dear {} {},\n\nyour validation {} will expire soon.\nIt will be deleted automatically on {} if you take no further action.\nIf you want to extend the validation\'s lifetime or archive it, please visit {}\n\nBest regards,\nQA4SM team'.format(
+            val_run.user.first_name,
+            val_run.user.last_name,
+            dataset_name,
+            val_run.expiry_date,
             url)
 
         _send_email(recipients=[val_run.user.email],
                     subject=subject,
                     body=body)
+
+        val_run.expiry_notified = True
+        val_run.save()
 
 def send_new_user_signed_up(user):
         __logger.info('Sending mail about new user {} to admins...'.format(user.username))

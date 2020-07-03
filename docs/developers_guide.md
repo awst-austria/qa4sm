@@ -279,7 +279,17 @@ Congratulations, your development environment is now set up and you can develop 
 
 ## Tips and Tricks
 
-## Creating new environment file
+### Setting up cronjob for autocleanup
+
+To have the `autocleanupvalidations` command called regularly, it's recommended to have a wrapper script that activates the conda environment and call it with cron. The default installation script installs a script to `/var/lib/qa4sm-web-val/valentina/run_autocleanup.sh`. If the paths in the script don't fit your installation, you'll have to edit them.
+
+You can set up a cronjob for the user that runs the webapp as root like this:
+
+    crontab -e -u www-data
+
+    15 2 * * * /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
+
+### Creating new environment file
 
 If you need to create a new environment file with the latest dependencies, look at `environment/recreate_environment_file.sh`, edit it to include dependencies you want to add/update. Then run it - output should be an updated `environment/qa4sm_env.yml` file.
 

@@ -105,7 +105,36 @@
                                 {% widthratio error_rate 1 100 %}% ({{ val.error_points }} of {{ val.total_points }}) of the processed locations (grid points) produced errors during calculation.
                             </li>
                         {% endif %}
+
+                        <li>
+                            {% if val.expiry_date %}
+                                {% if val.is_near_expiry %}
+                                    <span class="fas fa-exclamation-triangle"></span>
+                                    This validation will SOON be automatically removed during cleanup on {{ val.expiry_date }}.
+                                {% else %}
+                                    <span class="fas fa-calendar-alt"></span>
+                                    This validation will be automatically removed during cleanup on {{ val.expiry_date }}.
+                                {% endif %}
+                            {% else %}
+                                {% if val.is_archived %}
+                                    <span class="fas fa-archive"></span>
+                                    This validation has been archived. It will NOT be automatically removed during cleanup.
+                                {% endif %}
+                            {% endif %}
+                        </li>
                     </ul>
+
+                    {% if is_owner %}
+                        <div style="float: right;">
+                            <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove</button>
+                            {% if val.is_archived %}
+                                <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ val.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>
+                            {% else %}
+                                <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ val.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>
+                                <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span> Archive</button>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -137,7 +166,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';">Download all graphs</button>
+                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';"><span class="fas fa-download"></span> Download all graphs</button>
 
                             <select id="id_graph_metric" style="width: 12rem;" name="graph_variable"
                                 title="Metric to show in the graphs"
@@ -155,7 +184,7 @@
                                 {% endfor %}
                             </select>
 
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_file.url }}';">Download results in NetCDF</button>
+                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" title="Download all results in NetCDF format" onclick="location.href='{{ val.output_file.url }}';"><span class="fas fa-file-download"></span> Download NetCDF</button>
                         </div>
                     </div>
                 </div>
@@ -207,4 +236,14 @@
     changeBoxplot()
     changeOverviewMap()
 </script>
+
+<script type="text/javascript">
+    csrf_token = '{{csrf_token}}';
+    archive_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+    delete_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+    stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+    extend_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+</script>
+<script src="{% static 'js/results_buttons.js' %}"></script>
+
 {% endblock %}
