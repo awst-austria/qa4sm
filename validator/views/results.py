@@ -6,11 +6,11 @@ from django.http import QueryDict
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
+from validator.doi import get_doi_for_validation
+from validator.forms import PublishingForm
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_pairs
-from validator.doi import get_doi_for_validation
-from validator.forms import PublishingForm
 
 
 @login_required(login_url='/login/')

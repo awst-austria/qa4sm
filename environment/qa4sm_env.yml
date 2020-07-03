@@ -147,7 +147,7 @@ dependencies:
     - pynetcf==0.1.18
     - pyqt5-sip==4.19.18
     - pyqtwebengine==5.12.1
-    - pytesmo==0.8
+    - pytesmo==0.9
     - pytest-cov==2.8.1
     - pytest-django==3.7.0
     - pytest-mpl==0.11
@@ -157,7 +157,7 @@ dependencies:
     - shapely==1.7.0
     - smap-io==0.3
     - smecv-grid==0.2
-    - smos==0.1
+    - smos==0.2
     - tqdm==4.40.0
     - trollsift==0.2.1
     - vine==1.3.0

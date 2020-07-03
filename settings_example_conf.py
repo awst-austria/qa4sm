@@ -9,7 +9,6 @@ DOI_ACCESS_TOKEN = 'notset'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-DATA_FOLDER = '/var/lib/qa4sm-web-val/valentina/data/'
 
 LOG_FILE = 'valentina.log'
 

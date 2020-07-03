@@ -595,7 +595,8 @@ class TestViews(TransactionTestCase):
     ## try signing up a new user with all fields given
     def test_signup_new_user_full(self):
         url = reverse('signup')
-        user_info = {'username': 'chuck_norris',
+        user_info = {
+            'username': 'chuck_norris',
             'password1': 'Fae6eij7NuoY5Fa1thii',
             'password2': 'Fae6eij7NuoY5Fa1thii',
             'email': 'chuck@norris.com',

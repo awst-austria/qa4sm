@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0012_auto_20200430_1840'),
+        ('validator', '0013_dataset_storage_path'),
     ]
 
     operations = [
