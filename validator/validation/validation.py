@@ -8,6 +8,7 @@ from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
+from django.urls.base import reverse
 from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
@@ -19,7 +20,6 @@ from pytz import UTC
 import pytz
 
 from valentina.celery import app
-from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
 from validator.mailer import send_val_done_notification
 from validator.models import CeleryTask
 from validator.models import ValidationRun
@@ -44,9 +44,9 @@ def save_validation_config(validation_run):
     try:
         ds = Dataset(path.join(OUTPUT_FOLDER, validation_run.output_file.name), "a", format="NETCDF4")
 
-        ds.qa4sm_version = APP_VERSION
-        ds.qa4sm_env_url = ENV_FILE_URL_TEMPLATE.format(APP_VERSION)
-
+        ds.qa4sm_version = settings.APP_VERSION
+        ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
+        ds.url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': validation_run.id})
         if(validation_run.interval_from is None):
             ds.val_interval_from="N/A"
         else:

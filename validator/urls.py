@@ -32,6 +32,8 @@ urlpatterns = [
     path('validate/<uuid:result_uuid>', views.stop_validation, name='stop_validation'),
     path('result/<uuid:result_uuid>/', views.result, name='result'),
 
+    path('published/', views.published_results, name='published_results'),
+
     path('ajax/get-dataset-options/', views.ajax_get_dataset_options, name='ajax_get_dataset_options'),
 
     path('user_profile/',views.user_profile, name='user_profile'),

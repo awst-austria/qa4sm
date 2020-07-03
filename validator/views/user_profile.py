@@ -38,7 +38,8 @@ def user_profile(request):
                                              'organisation': request.user.organisation,
                                              'username': request.user.username,
                                              'country': request.user.country,
-                                             'email':request.user.email})
+                                             'email':request.user.email,
+                                             'orcid':request.user.orcid,})
         return render(request, 'user/profile.html', {'form': form,})
 
 @login_required(login_url='/login/')

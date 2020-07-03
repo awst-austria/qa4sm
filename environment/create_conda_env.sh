@@ -100,6 +100,7 @@ pip install --upgrade --force-reinstall netcdf4
 pip install --force cftime==1.0.4.2 ## pin cftime to this version because otherwise problems with cftime.DatetimeGregorian; should be fixed in pytesmo at some point
 pip install pytesmo
 pip install ismn
+pip install requests
 
 cd $TEMP_DIR
 

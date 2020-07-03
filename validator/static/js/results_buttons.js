@@ -2,7 +2,7 @@ function ajax_delete_result(result_id) {
     if (!confirm('Do you really want to delete the result?')) {
            return;
     }
-    var url = delete_result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
+    var url = result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
 
     $.ajaxSetup({
           headers: { "X-CSRFToken": csrf_token }
@@ -36,7 +36,7 @@ function ajax_archive_result(result_id, archive) {
     if (!confirm('Do you want to '+ (archive ? 'archive' : 'un-archive') +' the result'+ (archive ? '' : ' (allow auto-cleanup)') +'?')) {
         return;
     }
-    var url = archive_result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
+    var url = result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
 
     $.ajaxSetup({
           headers: { "X-CSRFToken": csrf_token }
@@ -50,11 +50,51 @@ function ajax_archive_result(result_id, archive) {
     });
 }
 
+function ajax_publish_result(result_id) {
+    $('#publishDialog').modal('hide');
+
+    var url = result_url.replace('00000000-0000-0000-0000-000000000000', result_id);
+
+    // convert publishing form to dictionary
+    var formdata =  $('#publishing_form').serializeArray();
+    formdata.push({ name: 'publish', value: 'true'});
+
+    $.ajaxSetup({
+          headers: { "X-CSRFToken": csrf_token }
+    });
+
+    $.ajax({
+        url: url,
+        type: 'PATCH',
+        data : formdata,
+        success: function (return_data) { location.reload(); },
+        error : function(return_data) {
+            if (return_data.status = '420') {
+                // form validation error
+                $('#publishDialog').replaceWith(return_data.responseText);
+                $('#publishDialog').modal('show');
+            } else {
+                // other, unexpected error
+                var errorText = return_data.responseText.replace(/.*\'(.*)\'.*/g, '$1');
+                alert('Could not publish your results: ' + errorText + '\n\nPlease try again in a few minutes and if the issue persists email ' + admin_mail);
+            }
+        },
+        beforeSend: function() {
+            $('.publishingNote').show();
+            $('.patchButtonGroup').hide();
+        },
+        complete: function() {
+            $('.publishingNote').hide();
+            $('.patchButtonGroup').show();
+        }
+    });
+}
+
 function ajax_extend_result(result_id) {
     if (!confirm('Do you want to extend the lifespan of this result?')) {
         return;
     }
-    var url = extend_result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
+    var url = result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
 
     $.ajaxSetup({
           headers: { "X-CSRFToken": csrf_token }

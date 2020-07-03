@@ -6,7 +6,6 @@ from ecmwf_models.interface import ERATs
 from esa_cci_sm.interface import CCITs
 from gldas.interface import GLDASTs
 from ismn.interface import ISMN_Interface
-import pygeogrids.netcdf  # bugfix
 from smap_io.interface import SMAPTs
 from smos.smos_ic.interface import SMOSTs
 

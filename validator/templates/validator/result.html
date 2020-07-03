@@ -7,15 +7,14 @@
 
     <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
         <h1 class="jumbotron-heading">Validation Running...</h1>
-        <p class="lead text-muted">Your validation of {{ val.data_dataset }} data against {{ val.ref_dataset }} reference data is still running. You'll be notified via e-mail once it's finished.</p>
+        <p class="lead text-muted">
+            Your validation is still running. You'll be notified via e-mail once it's finished.</p>
         <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
     </div>
 
 {% else %}
-
     <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
         <h1 class="jumbotron-heading">Validation Results</h1>
-        <p class="lead text-muted">Your validation of {{ val.data_dataset }} data against {{ val.ref_dataset }} reference data has finished. You can see the results below.</p>
     </div>
 
     <div class="container center-text">
@@ -106,26 +105,30 @@
                             </li>
                         {% endif %}
 
-                        <li>
-                            {% if val.expiry_date %}
-                                {% if val.is_near_expiry %}
-                                    <span class="fas fa-exclamation-triangle"></span>
-                                    This validation will SOON be automatically removed during cleanup on {{ val.expiry_date }}.
+                        {% if is_owner %}
+                            <li>
+                                {% if val.expiry_date %}
+                                    {% if val.is_near_expiry %}
+                                        <span class="fas fa-exclamation-triangle"></span>
+                                        This validation will SOON be automatically removed during cleanup on {{ val.expiry_date }}.
+                                    {% else %}
+                                        <span class="fas fa-calendar-alt"></span>
+                                        This validation will be automatically removed during cleanup on {{ val.expiry_date }}.
+                                    {% endif %}
                                 {% else %}
-                                    <span class="fas fa-calendar-alt"></span>
-                                    This validation will be automatically removed during cleanup on {{ val.expiry_date }}.
+                                    {% if val.doi %}
+                                        <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank" href="{{doi_prefix}}{{ val.doi }}">{{ val.doi }}</a>.
+                                    {% elif val.is_archived %}
+                                        <span class="fas fa-archive"></span>
+                                        This validation has been archived. It will NOT be automatically removed during cleanup.
+                                    {% endif %}
                                 {% endif %}
-                            {% else %}
-                                {% if val.is_archived %}
-                                    <span class="fas fa-archive"></span>
-                                    This validation has been archived. It will NOT be automatically removed during cleanup.
-                                {% endif %}
-                            {% endif %}
-                        </li>
+                            </li>
+                        {% endif %}
                     </ul>
 
-                    {% if is_owner %}
-                        <div style="float: right;">
+                    {% if is_owner and val.is_unpublished %}
+                        <div style="float: right;" class="patchButtonGroup{% if val.publishing_in_progress %} collapse {% endif %}">
                             <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove</button>
                             {% if val.is_archived %}
                                 <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ val.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>
@@ -133,7 +136,18 @@
                                 <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ val.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>
                                 <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span> Archive</button>
                             {% endif %}
+                            {% if val.output_file %}
+                                <button type="button" title="Publish on Zenodo" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#publishDialog">
+                                    <span class="fas fa-book" ></span> Publish
+                                </button>
+                            {% endif %}
                         </div>
+                        {% if val.output_file %}
+                            <div class="publishingNote small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}" style="float: right">
+                                <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing in progress...</span></div>
+                                Publishing in progress...
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -196,6 +210,16 @@
 
 {% endblock %}
 
+
+{% block dialogs %}
+
+{% if is_owner %}
+    {% include "validator/publishing_dialog.html" %}
+{% endif %}
+
+{% endblock %}
+
+
 {% block javascript %}
 <script type="text/javascript">
     function changeBoxplot(metric) {
@@ -239,11 +263,12 @@
 
 <script type="text/javascript">
     csrf_token = '{{csrf_token}}';
-    archive_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
-    delete_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+    result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
     stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
-    extend_result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
 </script>
-<script src="{% static 'js/results_buttons.js' %}"></script>
+
+{% if is_owner %}
+    <script src="{% static 'js/results_buttons.js' %}"></script>
+{% endif %}
 
 {% endblock %}

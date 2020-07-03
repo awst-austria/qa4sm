@@ -10,17 +10,18 @@ import zipfile
 from dateutil import parser
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
+from validator.forms import PublishingForm
 User = get_user_model()
 
 from django.core import mail
 from django.test.testcases import TransactionTestCase
 from django.test.utils import override_settings
 from django.urls.base import reverse
+from django.conf import settings
 import pytest
 from pytz import UTC
 from pytz import utc
 
-from valentina.settings import EMAIL_FROM
 from validator.forms.user_profile import UserProfileForm
 from validator.models import ValidationRun
 from validator.models.dataset import Dataset
@@ -30,7 +31,12 @@ from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from validator.urls import urlpatterns
 from validator.validation import globals
+from os import path
+import shutil
+from validator.validation.globals import OUTPUT_FOLDER
+from validator.validation import set_outfile, mkdir_if_not_exists
 
+from django.utils.http import urlencode
 
 class TestViews(TransactionTestCase):
 
@@ -89,7 +95,7 @@ class TestViews(TransactionTestCase):
         self.testrun.output_file.name = str(self.testrun.id) + '/foobar.nc'
         self.testrun.save()
 
-        self.public_views = ['login', 'logout', 'home', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', 'user_profile_deactivated']
+        self.public_views = ['login', 'logout', 'home', 'published_results', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', 'user_profile_deactivated']
         self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm','stop_validation']
         self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
@@ -97,7 +103,6 @@ class TestViews(TransactionTestCase):
     def test_views_deny_anonymous(self):
         login_url = reverse('login')
         testurls = [ reverse(tv) for tv in self.private_views ]
-        testurls.append(reverse('result', kwargs={'result_uuid': self.testrun.id}))
 
         for url in testurls:
             self.__logger.info(url)
@@ -176,6 +181,82 @@ class TestViews(TransactionTestCase):
         self.assertEqual(response.status_code, 400)
         assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is not None
 
+    @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
+    def test_result_publishing(self):
+        infile = 'testdata/output_data/c3s_era5land.nc'
+
+        url = reverse('result', kwargs={'result_uuid': self.testrun.id})
+
+        # use the publishing form to convert the validation metadata to a dict
+        metadata = PublishingForm()._formdata_from_validation(self.testrun)
+
+        ## only owners should be able to change validations
+        self.client.login(**self.credentials2)
+        response = self.client.patch(url, urlencode(metadata))
+        self.assertEqual(response.status_code, 403)
+
+        self.client.login(**self.credentials)
+
+        # shouldn't work because of incorrect parameter
+        metadata['publish'] = 'asdf'
+        response = self.client.patch(url, urlencode(metadata))
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.content is not None)
+
+        metadata['publish'] = 'true'
+
+        # shouldn't work because input metadata is not valid
+        orig_orcid = metadata['orcid']
+        metadata['orcid'] = 'this is no orcid'
+        orig_keywords = metadata['keywords']
+        metadata['keywords'] = metadata['keywords'].replace('qa4sm', '')
+        response = self.client.patch(url, urlencode(metadata))
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 420)
+        self.assertTrue(response.content is not None)
+
+        metadata['orcid'] = orig_orcid
+        metadata['keywords'] = orig_keywords
+
+        # remove file path from validation
+        self.testrun.output_file = None
+        self.testrun.save()
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+
+        # shouldn't work because of missing file path in validation
+        response = self.client.patch(url, urlencode(metadata))
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.content is not None)
+
+        ## set valid output file for validation
+        run_dir = path.join(OUTPUT_FOLDER, str(self.testrun.id))
+        mkdir_if_not_exists(run_dir)
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
+        set_outfile(self.testrun, run_dir)
+        self.testrun.save()
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+
+        ## simulate that publishing is already in progress
+        self.testrun.publishing_in_progress = True
+        self.testrun.save()
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+        response = self.client.patch(url, urlencode(metadata))
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(response.content is not None)
+
+        ## remove in progress flag
+        self.testrun.publishing_in_progress = False
+        self.testrun.save()
+
+        # should work now
+        response = self.client.patch(url, urlencode(metadata))
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.content is not None)
+
     def test_delete_result(self):
         # create result to delete:
         run = ValidationRun()
@@ -195,8 +276,20 @@ class TestViews(TransactionTestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 403)
 
-        # try to delete own result, should succeed
+        # log in as owner of result
         self.client.login(**self.credentials)
+
+        # try deleting a result that already has a DOI, should be blocked
+        run.doi = '10.1000/182'
+        run.save()
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 405)
+
+        # remove DOI again
+        run.doi = ''
+        run.save()
+
+        # try to delete own result, should succeed
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
 
@@ -511,6 +604,7 @@ class TestViews(TransactionTestCase):
             'last_name': 'Norris',
             'organisation': 'Texas Rangers',
             'country': 'US',
+            'orcid': '0000-0002-1825-0097',
             'terms_consent': True,
             }
         result = self.client.post(url, user_info)
@@ -552,6 +646,7 @@ class TestViews(TransactionTestCase):
             'username': self.credentials['username'],
             'email': 'chuck@norris.com',
             'country':'AT',
+            'orcid': '0000-0002-1825-0097',
             'last_name':'Chuck',
             'first_name':'Norris',
             'organisation':'Texas Rangers',
@@ -578,20 +673,18 @@ class TestViews(TransactionTestCase):
                      'last_name':'Doe',
                      'first_name':'John',
                      'organisation':'????',
-                     'email':'john@nowhere.com'
+                     'email':'john@nowhere.com',
+                     'orcid':'0000-0002-1825-0097',
                      }
-        form = UserProfileForm(data=form_data)
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertTrue(form.is_valid()) # should pass
 
-        form_data = {'username':'john_doe',
-                     'email':'john@nowhere.com'
-                     }
-        form = UserProfileForm(data=form_data)
+        form_data = { 'email':'john@nowhere.com' }
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertTrue(form.is_valid()) # should pass
 
-        form_data = {'username':'john_doe'
-                     }
-        form = UserProfileForm(data=form_data)
+        form_data = { 'username':'john_doe' }
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertFalse(form.is_valid()) # should fail because of the missing e-mail field
 
         form_data = {'username':'john_doe',
@@ -599,7 +692,7 @@ class TestViews(TransactionTestCase):
                      'password2':'asd12N83poLL',
                      'email':'john@nowhere.com'
                      }
-        form = UserProfileForm(data=form_data)
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertTrue(form.is_valid()) # should pass
 
         form_data = {'username':'john_doe',
@@ -607,7 +700,7 @@ class TestViews(TransactionTestCase):
                      'password2':'asd12N8',
                      'email':'john@nowhere.com'
                      }
-        form = UserProfileForm(data=form_data)
+        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
         self.assertFalse(form.is_valid()) # should fail because passwords don't match
 
 
@@ -649,7 +742,7 @@ class TestViews(TransactionTestCase):
         assert sent_mail
         assert sent_mail.subject
         assert sent_mail.body
-        assert sent_mail.from_email == EMAIL_FROM
+        assert sent_mail.from_email == settings.EMAIL_FROM
         assert self.credentials2['email'] in sent_mail.to
         assert self.credentials2['username'] in sent_mail.body
 

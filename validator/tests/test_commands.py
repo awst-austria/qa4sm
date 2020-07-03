@@ -7,11 +7,11 @@ import logging
 from unittest.mock import patch
 
 from dateutil.tz.tz import tzlocal
+from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase
 from django.utils import timezone
 
-from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
 from validator.models import Dataset
 from validator.models import ValidationRun
 from validator.tests.testutils import set_dataset_paths
@@ -75,7 +75,7 @@ class TestCommands(TestCase):
 
         ## unexpired validation
         run1 = ValidationRun()
-        run1.start_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS * 4)
+        run1.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
         run1.end_time = timezone.now()
         run1.user = self.testuser
         run1.save()
@@ -83,32 +83,32 @@ class TestCommands(TestCase):
 
         ## 20% of warning period has passed
         run2 = ValidationRun()
-        run2.start_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS * 4)
-        run2.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS - VALIDATION_EXPIRY_WARNING_DAYS * 0.8)
+        run2.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run2.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.8)
         run2.user = self.testuser
         run2.save()
         runid2 = run2.id
 
         ## 80% of warning period has passed
         run3 = ValidationRun()
-        run3.start_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS * 4)
-        run3.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS - VALIDATION_EXPIRY_WARNING_DAYS * 0.2)
+        run3.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run3.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.2)
         run3.user = self.testuser
         run3.save()
         runid3 = run3.id
 
         ## just expired validation
         run4 = ValidationRun()
-        run4.start_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS * 4)
-        run4.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS)
+        run4.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run4.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
         run4.user = self.testuser
         run4.save()
         runid4 = run4.id
 
         ## long expired validation
         run5 = ValidationRun()
-        run5.start_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS * 4)
-        run5.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS * 2)
+        run5.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run5.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 2)
         run5.user = self.testuser
         run5.save()
         runid5 = run5.id

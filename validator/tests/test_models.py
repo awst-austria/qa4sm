@@ -1,26 +1,27 @@
 from datetime import datetime
+from datetime import timedelta
 import logging
 
-from django.utils.timezone import now
+from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils import timezone
+from django.utils.timezone import now
 import pytest
 
 import numpy as np
-
+from validator.models import CeleryTask
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
+from validator.models import ParametrisedFilter
 from validator.models import Settings
 from validator.models import ValidationRun
-from validator.models import CeleryTask
-from validator.models import ParametrisedFilter
-
-from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
-from datetime import timedelta
-from django.utils import timezone
 
 
 class TestModels(TestCase):
@@ -28,6 +29,29 @@ class TestModels(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     __logger = logging.getLogger(__name__)
+
+    def test_user(self):
+        user = User()
+        user.clean()
+
+        ## test valid orcids
+        for testorcid in [
+            "0000-0002-1825-0097",
+            "0000-0002-9079-593X", ]:
+
+            user.orcid = testorcid
+            user.clean()
+            assert user
+
+        # test invalid orcids
+        for testorcid in [
+            "lah.",
+            "0000-0002-1825-0097-5555",
+            "0000-0002-9abc-593X", ]:
+
+            with self.assertRaises(ValidationError):
+                user.orcid = testorcid
+                user.clean()
 
     def test_validation_configuration(self):
         run = ValidationRun()
@@ -185,9 +209,9 @@ class TestModels(TestCase):
             run.clean()
 
     def test_validation_run_expiry(self):
-        assert VALIDATION_EXPIRY_DAYS >= 1
-        assert VALIDATION_EXPIRY_WARNING_DAYS >= 1
-        assert VALIDATION_EXPIRY_WARNING_DAYS < VALIDATION_EXPIRY_DAYS
+        assert settings.VALIDATION_EXPIRY_DAYS >= 1
+        assert settings.VALIDATION_EXPIRY_WARNING_DAYS >= 1
+        assert settings.VALIDATION_EXPIRY_WARNING_DAYS < settings.VALIDATION_EXPIRY_DAYS
 
         ## while the validation is running, we don't have an expiry date
         run = ValidationRun()
@@ -197,32 +221,32 @@ class TestModels(TestCase):
 
         ## once the validation has finished, it can expire
         run.end_time = timezone.now()
-        assert run.expiry_date == (run.end_time + timedelta(days=VALIDATION_EXPIRY_DAYS))
+        assert run.expiry_date == (run.end_time + timedelta(days=settings.VALIDATION_EXPIRY_DAYS))
         assert not run.is_expired
         assert not run.is_near_expiry
 
         ## move us to the warning period
-        run.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS-VALIDATION_EXPIRY_WARNING_DAYS+1)
+        run.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS-settings.VALIDATION_EXPIRY_WARNING_DAYS+1)
         assert not run.is_expired
         assert run.is_near_expiry
 
         ## make the validation expire
-        run.end_time = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS+1)
+        run.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS+1)
         assert run.is_expired
         assert run.is_near_expiry
 
         ## once the validation has been extended, it expires based on the extension date
         run.end_time = timezone.now() - timedelta(days=7)
         run.last_extended = timezone.now()
-        assert run.expiry_date == (run.last_extended + timedelta(days=VALIDATION_EXPIRY_DAYS))
+        assert run.expiry_date == (run.last_extended + timedelta(days=settings.VALIDATION_EXPIRY_DAYS))
 
         ## move us to the warning period
-        run.last_extended = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS-VALIDATION_EXPIRY_WARNING_DAYS+1)
+        run.last_extended = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS+1)
         assert not run.is_expired
         assert run.is_near_expiry
 
         ## make the validation expire
-        run.last_extended = timezone.now() - timedelta(days=VALIDATION_EXPIRY_DAYS+1)
+        run.last_extended = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS+1)
         assert run.is_expired
         assert run.is_near_expiry
 
@@ -247,6 +271,16 @@ class TestModels(TestCase):
         assert run.last_extended is not None
         assert not run.is_expired
         assert not run.is_near_expiry
+
+    def test_deleteable(self):
+        run = ValidationRun()
+        assert run.is_unpublished
+
+        run.doi = '10.1000/182'
+        assert not run.is_unpublished
+
+        run.doi = ''
+        assert run.is_unpublished
 
     def test_data_filter_str(self):
         myfilter = DataFilter()

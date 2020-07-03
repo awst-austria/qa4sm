@@ -12,7 +12,6 @@ from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
-from valentina.settings import VALIDATION_EXPIRY_DAYS, VALIDATION_EXPIRY_WARNING_DAYS
 from validator.models import DatasetConfiguration
 
 
@@ -74,11 +73,14 @@ class ValidationRun(models.Model):
     anomalies_from = models.DateTimeField(null=True, blank=True)
     anomalies_to = models.DateTimeField(null=True, blank=True)
 
-    output_file = models.FileField(null=True, max_length=250)
+    output_file = models.FileField(null=True, max_length=250, blank=True)
 
     is_archived = models.BooleanField(default=False)
     last_extended = models.DateTimeField(null=True, blank=True)
     expiry_notified = models.BooleanField(default=False)
+
+    doi = models.CharField(max_length=255, blank=True)
+    publishing_in_progress = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -90,7 +92,7 @@ class ValidationRun(models.Model):
             return None
 
         initial_date = self.last_extended if self.last_extended else self.end_time
-        return initial_date + timedelta(days=VALIDATION_EXPIRY_DAYS)
+        return initial_date + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
 
     @property
     def is_expired(self):
@@ -100,7 +102,11 @@ class ValidationRun(models.Model):
     @property
     def is_near_expiry(self):
         e = self.expiry_date
-        return ((e is not None) and (timezone.now() > e - timedelta(days=VALIDATION_EXPIRY_WARNING_DAYS)))
+        return ((e is not None) and (timezone.now() > e - timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)))
+
+    @property
+    def is_unpublished(self):
+        return not self.doi
 
     def archive(self, unarchive=False, commit=True):
         if unarchive:

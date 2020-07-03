@@ -176,6 +176,7 @@ Adapt the `valentina/settings_conf.py` to match your local configuration:
 - Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
 - Set the `LOG_FILE` location to where you want the log files to be written to.
+- If you want to publish to the Zenodo sandbox (test environment) with your installation, set the `DOI_ACCESS_TOKEN_ENV` variable to a valid Zenodo sandbox token. To get a token, register an [account with Zenodo sandbox](https://sandbox.zenodo.org/) and [create a token](https://sandbox.zenodo.org/account/settings/applications/tokens/new/).
 
 Make sure the `LOG_FILE` folder defined in your settings exist in your system, otherwise, the `Init Django` section of this guide will throw an error.
 
@@ -461,3 +462,22 @@ To assign validation runs to a specific user in bulk:
     for run in ValidationRun.objects.all():
         run.user = myuser
         run.save()
+
+### Secrets / tokens in continuous builds
+
+#### In Jenkins
+
+Use the `Credentials` menu entry to add a new credential and select `Secret text` as type. Put your token into the `Secret` field and name / describe it as you wish. You can then use it in your build job's configuration page by going to `Build Environment` and checking `Use secret text(s) or file(s)`. This allows you to bind your secret text to an environment variable. Jenkins will set that env variable before running the build and you can use it inside your scripts.
+
+For example, to keep the Zenodo access token secret, put it into Jenkins and bind the secret text to variable `DOI_ACCESS_TOKEN_ENV`. The `init_config.sh` script will inject it into the django config.
+
+#### In Travis
+
+Similar to Jenkins - see [Defining Variables in Repository Settings](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) and [go to the settings page](https://travis-ci.com/github/awst-austria/qa4sm/settings) to set environment variables. Then use in your script as an environment variable.
+
+You could also try [Defining encrypted variables in .travis.yml](https://docs.travis-ci.com/user/environment-variables/#defining-encrypted-variables-in-travisyml) but I never managed to get it to work.
+
+#### Don't leak the secrets!
+
+Travis docs have general [Recommendations on how to avoid leaking secrets to build logs](https://docs.travis-ci.com/user/best-practices-security/#recommendations-on-how-to-avoid-leaking-secrets-to-build-logs).
+If you accidentally leak a secret, repair the leak and generate a new secret, e.g. a new API token for Zenodo.

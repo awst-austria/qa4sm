@@ -1,0 +1,101 @@
+{% extends 'common/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+        <h1 class="jumbotron-heading">Published validations</h1>
+        <p class="lead text-muted">
+            The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/">Zenodo</a> and
+            can be referenced with a <a target="_blank" href="https://www.doi.org/">DOI</a>.
+        </p>
+    </div>
+
+    <div class="card-deck mb-3">
+        <div class="col">
+            {% for valrun in validations %}
+                <div class="card mb-4 mx-0 box-shadow" id="result_row_{{ valrun.id }}">
+                    <div class="card-header">
+                        {% if valrun.name_tag %}
+                            <h5 class="my-0" style="float: left"><span class=" font-weight-normal">Name:</span> {{ valrun.name_tag }}</h5>
+                        {% endif %}
+                        <h5 class="my-0" style="float: right"><span class=" font-weight-normal">DOI:</span>
+                        <a class="doilink" target="_blank" href="{{doi_prefix}}{{ valrun.doi }}">{{ valrun.doi }}</a></h5>
+                    </div>
+                    <div class="card-body" style="padding: 0.5rem 1.25rem;">
+                        <div class="row" style="justify-content: space-between;">
+
+                            <div class="col">
+                                <strong>Data:</strong><br/>
+                                {% for dc in valrun.dataset_configurations.all %}
+                                    {% if dc.id != valrun.reference_configuration.id %}
+                                        {{ dc.dataset.pretty_name }},
+                                        {{ dc.version.pretty_name }},
+                                        {{ dc.variable.pretty_name }}<br/>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="col">
+                                <strong>Reference:</strong><br/>
+                                {{ valrun.reference_configuration.dataset.pretty_name }},
+                                {{ valrun.reference_configuration.version.pretty_name }},
+                                {{ valrun.reference_configuration.variable.pretty_name }}
+                            </div>
+
+                            <div class="col" style="max-width: 7rem;">
+                                <strong>Created:</strong><br/>
+                                {{ valrun.start_time|date:"Y-m-d" }}
+                            </div>
+
+                            <div class="col" style="text-align: right; max-width: 6.8rem;">
+                                <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+
+        {% if validations.has_other_pages %}
+            <nav aria-label="pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if validations.number == 1 %}disabled{%endif%}">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                        <span aria-hidden="true" class="fas fa-angle-double-left"></span>
+                        <span class="sr-only">First</span></a>
+                    </li>
+                    <li class="page-item {% if not validations.has_previous %}disabled{%endif%}">
+                        <a class="page-link" href="?{% if validations.has_previous %}page={{ validations.previous_page_number }}{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true" class="fas fa-angle-left"></span>
+                        <span class="sr-only">Previous</span></a>
+                    </li>
+                    {% for i in validations.paginator.page_range %}
+                        {% if i <= validations.number|add:8 and i >= validations.number|add:-8 %}
+                            <li class="page-item {% if validations.number == i %}active{% endif %}">
+                                <a class="page-link" href="?page={{ i }}">{{ i }} {% if validations.number == i %}<span class="sr-only">(current)</span>{% endif %}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not validations.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="?{% if validations.has_next %}page={{ validations.next_page_number }}{% endif %}" aria-label="Next">
+                        <span aria-hidden="true" class="fas fa-angle-right"></span>
+                        <span class="sr-only">Next</span></a>
+                    </li>
+                    <li class="page-item {% if validations.number == validations.paginator.num_pages %}disabled{% endif %}">
+                        <a class="page-link" href="?page={{ validations.paginator.num_pages }}" aria-label="Next">
+                        <span aria-hidden="true" class="fas fa-angle-double-right"></span>
+                        <span class="sr-only">Next</span></a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

@@ -45,6 +45,24 @@ html {
     margin-right: 1em;
 }
 
+.show > .btn-outline-primary.dropdown-toggle {
+    background-color: inherit;
+    color: #FFDB5C;
+    border-color: #FFDB5C;
+}
+
+.show > .btn-outline-primary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 .2rem rgba(248, 193, 0, .5);
+}
+
+.dropdown-item.navbar-btn-active {
+    color: initial;
+}
+
+.dropdown-item:active, .dropdown-item:focus, .dropdown-item:hover {
+    background-color: rgba(248, 193, 0, .5);
+}
+
 .container {
     max-width: 960px;
 }
@@ -59,6 +77,10 @@ html {
 
 .addon-w {
     min-width: 6.5rem;
+}
+
+.addon-w-pub {
+    min-width: 7rem;
 }
 
 .box-shadow {
@@ -90,4 +112,8 @@ html {
     margin-top: .2rem;
     margin-bottom: .2rem;
     padding: 0 .35rem;
+}
+
+a.doilink {
+    color: white;
 }
