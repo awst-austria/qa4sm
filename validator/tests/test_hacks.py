@@ -31,7 +31,7 @@ class TestHacks(TestCase):
         orig_data = c3s_reader.read(-155.42, 19.78)
         data = timezone_reader.read(-155.42, 19.78)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
-        self.assertTrue(data.index.tz is None)
+        self.assertTrue((not hasattr(data.index, 'tz')) or (data.index.tz is None))
 
         ismn_data_folder = path.join(DATA_FOLDER, 'ISMN/ISMN_V20191211')
         ismn_reader = ISMN_Interface(ismn_data_folder)
@@ -41,4 +41,4 @@ class TestHacks(TestCase):
         orig_data = ismn_reader.read_ts(0)
         data = timezone_reader2.read_ts(0)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
-        self.assertTrue(data.index.tz is None)
+        self.assertTrue((not hasattr(data.index, 'tz')) or (data.index.tz is None))
