@@ -188,7 +188,7 @@ def ajax_get_dataset_options(request):
         return HttpResponseBadRequest("Not a valid dataset")
 
     response_data = {
-        'versions': __render_options(selected_dataset.versions.all().order_by('pretty_name')),
+        'versions': __render_options(selected_dataset.versions.all().order_by('-pretty_name')),
         'variables': __render_options(selected_dataset.variables.all().order_by('id')),
         'filters': __render_filters(selected_dataset.filters.filter(parameterised=False), filter_widget_id, parametrised = False),
         'paramfilters': __render_filters(selected_dataset.filters.filter(parameterised=True), param_filter_widget_id, parametrised = True),
