@@ -1,4 +1,4 @@
-function ajax_delete_result(result_id) {
+function ajax_delete_result(result_id, redirect) {
     if (!confirm('Do you really want to delete the result?')) {
            return;
     }
@@ -11,7 +11,10 @@ function ajax_delete_result(result_id) {
     $.ajax({
         url: url,
         type: 'DELETE',
-        success: function (return_data) { $('#result_row_'+result_id).remove() }
+        success: function (return_data) {
+            $('#result_row_'+result_id).remove();
+            if (redirect) window.location.replace(result_list_url);
+        }
     });
 }
 

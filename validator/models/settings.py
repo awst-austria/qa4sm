@@ -5,6 +5,7 @@ class Settings(models.Model):
         verbose_name_plural = "Settings"
 
     maintenance_mode = models.BooleanField(default=True)
+    news = models.TextField(blank=True)
 
     def save(self, *args, **kwargs):
         self.pk = 1
@@ -17,3 +18,6 @@ class Settings(models.Model):
     def load(cls):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+    def __str__(self):
+        return 'maintenance mode: {}, news: {}'.format(self.maintenance_mode, self.news)

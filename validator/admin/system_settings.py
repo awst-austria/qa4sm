@@ -3,18 +3,19 @@ import logging
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.core.exceptions import PermissionDenied
-from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.urls import path
 
 from valentina.celery import app
 from validator.models import Settings
-
+from django.contrib import messages
 
 # see https://stackoverflow.com/a/53085512/
 class SystemSettingsAdmin(ModelAdmin):
 
     __logger = logging.getLogger(__name__)
+
+    fields = ['maintenance_mode', 'news']
 
     def __init__(self, model, admin_site):
         super(SystemSettingsAdmin, self).__init__(model, admin_site)
@@ -32,19 +33,18 @@ class SystemSettingsAdmin(ModelAdmin):
         if not request.user.is_superuser:
             raise PermissionDenied
 
-        if(request.method == 'POST'):
-            maintenance_mode = request.POST.get('maintenance_mode', '')
-            if ( (maintenance_mode == 'True') or (maintenance_mode == 'False') ):
-                settings = Settings.load()
-                settings.maintenance_mode = maintenance_mode
-                settings.save()
-                return HttpResponse("Saved.", status=200)
-            else:
-                return HttpResponse("Invalid.", status=400)
+        settings = Settings.load()
+        s_form_class = super().get_form(request) # get the existing 'add' form class from the ModelAdmin
+        s_form = None
 
-        # workers=app.control.inspect().active_queues()
-        # workers=app.control.inspect().hello('celery@kk5')
-        # queues = app.control.inspect().active_queues().keys()
+        if(request.method == 'POST'):
+            s_form = s_form_class(data=request.POST) # use the add form for parsing
+            if s_form.is_valid():
+                s = s_form.save(commit=False)
+                self.__logger.debug('Saving settings: {}'.format(s))
+                s.save()
+                messages.add_message(request, messages.INFO, 'Settings have been saved.')
+
 
         workers = []
         try:
@@ -67,8 +67,13 @@ class SystemSettingsAdmin(ModelAdmin):
         except Exception  as cre:
             self.__logger.exception('Can\'t get queue information: ', cre)
 
+
+        if not s_form:
+            # this happens if we don't have errors from a previous POST request to show
+            s_form = s_form_class(instance=settings) # instantiate form with existing settings
+
         context = {
             'workers' : workers,
-            'maintenance_mode' : Settings.load().maintenance_mode
+            'settings_form': s_form,
             }
         return render(request, 'admin/system_settings.html', context)
