@@ -140,20 +140,13 @@ class TestAdmin(TestCase):
 
         url = reverse('admin:system-settings')
 
-        # switch maintenance mode to 'Fake News', '', on, off, and back to original state
-        for mode in ['Fake News', '', True, False, orig_mm]:
+        # switch maintenance mode to a string, empty string, on, off, and back to original state
+        for mode in ['anything', '', True, False, orig_mm]:
             maint_params = { 'maintenance_mode': mode, }
             self.client.login(**self.admin_credentials)
             response = self.client.post(url, maint_params, follow=True)
-
-            # valid modes
-            if isinstance(mode, bool):
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(Settings.load().maintenance_mode, mode)
-            # invalid modes
-            else:
-                self.assertEqual(response.status_code, 400)
-                self.assertEqual(Settings.load().maintenance_mode, orig_mm)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(Settings.load().maintenance_mode, bool(mode))
 
     def test_maintenance_mode_redirection(self):
         validation_params = {

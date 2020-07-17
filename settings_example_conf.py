@@ -4,9 +4,11 @@
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 's3cr3t'
 
+SITE_URL = "https://qa4sm.eu"
+
 DOI_ACCESS_TOKEN = 'notset'
-DOI_REGISTRATION_URL="https://zenodo.org/api/deposit/depositions"
-DOI_URL_PREFIX="https://doi.org/"
+DOI_REGISTRATION_URL = "https://zenodo.org/api/deposit/depositions"
+DOI_URL_PREFIX = "https://doi.org/"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

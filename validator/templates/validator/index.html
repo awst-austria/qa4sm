@@ -76,7 +76,7 @@
                     <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
                     <p class="lead">
                         The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
-                        <ul>
+                        <ul class="list">
                             <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the <a href="https://ismn.geo.tuwien.ac.at/">international soil moisture network</a></li>
                             <li>A traceble and consistent methodology for all comparisons</li>
                             <li>Various filtering and scaling options to assess the impact of these on the validation results</li>
@@ -87,6 +87,16 @@
                     <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
                 </div>
                 <div class="col-md-5">
+
+                    {% if news_text %}
+                        <div class="card news">
+                            <div class="card-body">
+                                <h5 class="card-title">News</h5>
+                                {{ news_text |safe }}
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <img class="scaled_image" id="workflow" src="{% static 'images/qa4am_overview_diagram.png' %}" alt="QA4SM Workflow">
                 </div>
             </div>
