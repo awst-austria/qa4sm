@@ -72,7 +72,7 @@ fi
 if [ "x$ENV" == "xtestenv" ]; then
     SITE_URL="https://test.qa4sm.eu"
     DEBUGFLAG="False"
-    ALLOWED_HOSTS="['127.0.0.1', 'localhost', '10.48.108.24', 'test.qa4sm.eu']"
+    ALLOWED_HOSTS="['127.0.0.1', 'localhost', '10.48.108.24', 'test.qa4sm.eu', '10.10.10.66']"
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
 fi
 
