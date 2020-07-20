@@ -20,22 +20,21 @@
                 <div class="carousel-caption">
                     <div class="text mb-3">
                         <h1>Quality Assurance for Soil Moisture</h1>
-                        <h3 class="carousel-desc">
-                            Validation of satellite soil moisture products
-                            <br />
+                        <h3 class="carousel-desc d-none d-sm-block">
+                            Validation of satellite soil moisture products <br/>
                             against in-situ and model reference data
                         </h3>
                     </div>
 
                     <p>
-                        <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'published_results' %}" role="button">See results</a>
-                        <span style="margin-left: 1em; margin-right: 1em;" class="carousel-desc">or</span>
+                        <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'published_results' %}" role="button">See results</a>
+                        <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
                         {% if user.is_authenticated %}
-                            <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'validation' %}" role="button">Try it</a>
+                            <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'validation' %}" role="button">Try it</a>
                         {% else %}
-                            <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'signup' %}" role="button">Sign up</a>
-                            <span style="margin-left: 1em; margin-right: 1em;" class="carousel-desc">or</span>
-                            <a style="width: 7em;" class="btn btn-lg btn-primary" href="{% url 'login' %}" role="button">Log in</a>
+                            <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'signup' %}" role="button">Sign up</a>
+                            <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
+                            <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'login' %}" role="button">Log in</a>
                         {% endif %}
                     </p>
 
@@ -64,15 +63,14 @@
         <div class="container-marketing">
 
             <div class="overflow">
-                <a href="https://www.ffg.at/"><img src="{% static 'images/logo_ffg.png' %}"></a>
-                <a href="https://www.eodc.eu/"><img src="{% static 'images/logo_eodc.png' %}"></a>
                 <a href="https://www.awst.at/"><img src="{% static 'images/logo_awst.png' %}"></a>
                 <a href="https://www.geo.tuwien.ac.at/"><img src="{% static 'images/logo_tuwien_geo.png' %}"></a>
+                <a href="https://www.ffg.at/"><img src="{% static 'images/logo_ffg.png' %}"></a>
             </div>
 
             <hr class="featurette-divider">
 
-            <div class="row featurette">
+            <div class="row featurette mx-1">
                 <div class="col-md-7">
                     <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
                     <p class="lead">
@@ -104,30 +102,32 @@
 
             <hr class="featurette-divider">
 
-            <div class="row" style="text-align: center;">
-                <div class="col-md-4">
-                    <h3 class="text-muted">Datasets and Settings</h3>
-                    <p>Allows specification of input datasets and settings for your validation</p>
+            <div class="card-deck">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-center mt-0">Datasets and Settings</h4>
+                        <p class="text-muted text-center" style="min-height: 3rem;">Allows specification of input datasets and settings for your validation</p>
+                        <img class="scaled_image img-screen" id="serviceScreenshot1" alt="Validate" src="{% static 'images/validate.png' %}">
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h3 class="text-muted">Results</h3>
-                    <p>Provides a list of all validation results</p>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-center mt-0">Results</h4>
+                        <p class="text-muted text-center" style="min-height: 3rem;">Provides a list of all validation results</p>
+                        <img class="scaled_image img-screen" id="serviceScreenshot2" alt="Results" src="{% static 'images/validation_result_list.png' %}">
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <h3 class="text-muted">Download and Visualize</h3>
-                    <p>Allows download of validation results in netCDF format and as graphics</p>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="text-center mt-0">Download and Visualize</h4>
+                        <p class="text-muted text-center" style="min-height: 3rem;">Allows download of validation results in netCDF format and as graphics</p>
+                        <img class="scaled_image img-screen" id="serviceScreenshot3" alt="Download and Visualize" src="{% static 'images/validation_result_details.png' %}">
+                    </div>
                 </div>
-            </div>
-            <div class="row" style="text-align: center;">
-                <div class="col-md-4">
-                    <img class="scaled_image img-screen" id="serviceScreenshot1" alt="Validate" src="{% static 'images/validate.png' %}">
-                </div>
-                <div class="col-md-4">
-                    <img class="scaled_image img-screen" id="serviceScreenshot2" alt="Results" src="{% static 'images/validation_result_list.png' %}">
-                </div>
-                <div class="col-md-4">
-                    <img class="scaled_image img-screen" id="serviceScreenshot3" alt="Download and Visualize" src="{% static 'images/validation_result_details.png' %}">
-                </div>
+
             </div>
 
             <div id="modalOverlay" class="modal">
@@ -150,6 +150,10 @@
             Hosted on <a href="https://www.eodc.eu/">EODC</a>.
         </p>
     </footer>
+
+{% endblock %}
+
+{% block javascript %}
 
     <script type="text/javascript">
         var modalImg = $("#modalImg")[0]
