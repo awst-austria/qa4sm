@@ -65,6 +65,9 @@ If you have access to the AWST buildserver, you can do steps 1-4 by running buil
 
         git tag -a v1.1.1 -m "Version 1.1.1, created YYYY-mm-dd"
 
+8. Deploy on the ops system from the tag
+9. Don't forget to set the data paths again using the `python manage.py setdatasetpaths` command.
+
 
 ## Release notes template
 
