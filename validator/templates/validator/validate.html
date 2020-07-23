@@ -225,9 +225,9 @@
                                 <div id="spatial_collapse" class="collapse show" aria-labelledby="spatial_header" data-parent="#spatial_accordion">
                                     <div class="card-body">
                                         <div class="container">
-                                            <div class="row">
+                                            <div class="row justify-content-around">
 
-                                                <div class="col-sm pl-0">
+                                                <div class="col-sm px-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text addon-w" id="scaling_addon_ll" title="Lower left bounding box corner">Lower left</span>
@@ -247,7 +247,7 @@
                                                     {% endfor %}
                                                 </div>
 
-                                                <div>
+                                                <div class="px-2 py-2 py-sm-0">
                                                     <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
                                                         <span class="fas fa-globe" ></span>
                                                     </button>
@@ -256,7 +256,7 @@
                                                     </button>
                                                 </div>
 
-                                                <div class="col-sm pr-0">
+                                                <div class="col-sm px-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text addon-w" id="scaling_addon_ur" title="Upper right bounding box corner">Upper right</span>
@@ -303,7 +303,7 @@
                                         <div class="container">
                                             <div class="row">
 
-                                                <div class="col-sm pl-0">
+                                                <div class="col-sm px-0 pr-sm-2 pb-1 py-sm-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text addon-w" id="scaling_addon1">From</span>
@@ -317,7 +317,7 @@
                                                     {% endfor %}
                                                 </div>
 
-                                                <div class="col-sm pr-0">
+                                                <div class="col-sm px-0 pl-sm-2 pt-1 py-sm-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text addon-w" id="scaling_addon2">To</span>
@@ -361,7 +361,7 @@
 
                                                 <div class="row">
 
-                                                    <div class="col-sm pl-0">
+                                                    <div class="col-sm px-0">
                                                         <div class="input-group" title="Anomalies calculation method: no anomalies, anomalies against 35 day moving average or anomalies against a climatology calculated from the given timespan.">
                                                             <div class="input-group-prepend">
                                                                 <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
@@ -375,7 +375,7 @@
                                                         {% endfor %}
                                                     </div>
 
-                                                    <div class="col-sm anomalies-period"> <!-- style="visibility: hidden;" -->
+                                                    <div class="col-sm anomalies-period px-0 px-sm-3 py-2 py-sm-0">
                                                         <div class="input-group" title="Start of period to calculate climatology from.">
                                                             <div class="input-group-prepend">
                                                                 <span class="input-group-text addon-w" id="scaling_addon2">From</span>
@@ -389,7 +389,7 @@
                                                         {% endfor %}
                                                     </div>
 
-                                                    <div class="col-sm pr-0 anomalies-period"> <!--  style="visibility: hidden;" -->
+                                                    <div class="col-sm anomalies-period px-0">
                                                         <div class="input-group" title="End of period to calculate climatology from.">
                                                             <div class="input-group-prepend">
                                                                 <span class="input-group-text addon-w" id="scaling_addon2">To</span>
@@ -433,7 +433,7 @@
                                         <div class="container">
                                             <div class="row">
 
-                                                <div class="col-sm pl-0">
+                                                <div class="col-sm px-0 pr-sm-2 pb-1 py-sm-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
@@ -447,7 +447,7 @@
                                                     {% endfor %}
                                                 </div>
 
-                                                <div class="col-sm pr-0">
+                                                <div class="col-sm px-0 pl-sm-2 pt-1 py-sm-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text addon-w" id="scaling_addon2">Method</span>
