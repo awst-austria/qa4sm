@@ -22,6 +22,19 @@ function save_name(obj, result_id){
     var target_parent = start_editing(obj)
     var new_name = target_parent.find('input.edit_name').val()
 
-    console.log(new_name)
+    var url =  result_url.replace('00000000-0000-0000-0000-000000000000', result_id);
+    var formdata = { "save_name" : true,
+                    "new_name" : new_name};
+
+    $.ajaxSetup({
+        headers : { "X-CSRFToken" : csrf_token }
+    });
+//
+    $.ajax({
+        url: url,
+        type: 'PATCH',
+        data : formdata,
+        success : function(return_data) { location.reload(); }
+    });
 
 }

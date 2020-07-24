@@ -18,7 +18,7 @@ def user_runs(request):
     current_user = request.user
     page = request.GET.get('page', 1)
 
-    cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
+    cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time').order_by('id')
 
     paginator = Paginator(cur_user_runs, 10)
     try:
@@ -51,10 +51,19 @@ def result(request, result_uuid):
 
     elif(request.method == 'PATCH'):
         ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+        print('I found a patch method')
         if(val_run.user != request.user):
             return HttpResponse(status=403)
 
         patch_params = QueryDict(request.body)
+        print(f'patch params are: {patch_params}')
+
+        if 'save_name' in patch_params:
+            val_run.name_tag = patch_params['new_name']
+            val_run.save()
+
+            return HttpResponse("Changed.", status=200)
+
 
         if 'archive' in patch_params:
             archive_mode = patch_params['archive']

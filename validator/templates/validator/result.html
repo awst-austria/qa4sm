@@ -23,20 +23,16 @@
                 <div class="card-header">
                     <h4 class="my-0 font-weight-normal">
                         Summary:
-                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %} {{ val.name_tag }} {% endif %}</span>
+                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %}</span>
                         <input class="d-none edit_name"/>
                         <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name" onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
-                        <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Change Name" onclick="save_name(event, '{{ valrun.id}}')"><span class="fas fa-save"></span></button>
+                        <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Change Name" onclick="save_name(event, '{{ val.id }}')"><span class="fas fa-save"></span></button>
 
                     </h4>
                 </div>
                 <div class="card-body">
                     <ul>
                         <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
-<!--                        {% if val.name_tag %}-->
-<!--                            <li>Validation name: {{ val.name_tag }}</li>-->
-<!--                        {% endif %}-->
-
                         <li>Compared {{ val.dataset_configurations.count }} datasets:
                             <ul>
                                 {% for dc in val.dataset_configurations.all %}
@@ -272,6 +268,7 @@
     csrf_token = '{{csrf_token}}';
     result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
     stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+    user_runs_url = "{% url 'myruns' %}";
 </script>
 
 {% if is_owner %}

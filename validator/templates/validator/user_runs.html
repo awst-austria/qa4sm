@@ -39,17 +39,19 @@
                             {% endif %}
                             <span class=" font-weight-normal">Started:</span> {{ valrun.start_time }}
                         </h5>
-                        {% if valrun.name_tag %}
 <!--                        Monika-->
-                            <h5 class="my-0" style="float: right">
+                        <h5 class="my-0" style="float: right">
                                 <span class=" font-weight-normal">Name:</span>
+                        {% if valrun.name_tag %}
+
                                 <span class="font-weight-normal no_edit_name"> {{ valrun.name_tag }} </span>
+                        {% endif %}
                                 <input class="d-none edit_name"/>
                                 <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name" onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
                                 <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Change Name" onclick="save_name(event, '{{ valrun.id}}')"><span class="fas fa-save"></span></button>
-                            </h5>
+                        </h5>
 <!--                        Monika-->
-                        {% endif %}
+
                     </div>
                     <div class="card-body" style="padding: 0.5rem 1.25rem;">
                         <div class="row" style="justify-content: space-between;">
@@ -153,6 +155,7 @@
         csrf_token = '{{csrf_token}}';
         result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
         stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+        user_runs_url = "{% url 'myruns' %}";
     </script>
     <script src="{% static 'js/results_buttons.js' %}"></script>
 <!--Monika-->
