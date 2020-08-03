@@ -26,7 +26,7 @@
                         <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %}</span>
                         <input class="d-none edit_name"/>
                         <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name" onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
-                        <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Change Name" onclick="save_name(event, '{{ val.id }}')"><span class="fas fa-save"></span></button>
+                        <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Change Name" onclick="ajax_save_name(event, '{{ val.id }}')"><span class="fas fa-save"></span></button>
 
                     </h4>
                 </div>

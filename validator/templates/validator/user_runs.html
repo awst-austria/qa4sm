@@ -48,7 +48,8 @@
                         {% endif %}
                                 <input class="d-none edit_name"/>
                                 <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name" onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
-                                <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Change Name" onclick="save_name(event, '{{ valrun.id}}')"><span class="fas fa-save"></span></button>
+                                <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Save Name" onclick="ajax_save_name(event, '{{ valrun.id}}')"><span class="fas fa-save"></span></button>
+                                <button class="btn btn-sm btn-primary btn-action d-none cancel_saving_btn" title="Cancel" onclick="cancel_editing(event)"><span class="fas fa-ban"></span></button>
                         </h5>
 <!--                        Monika-->
 
