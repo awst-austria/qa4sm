@@ -18,7 +18,7 @@ def user_runs(request):
     current_user = request.user
     page = request.GET.get('page', 1)
 
-    cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time').order_by('id')
+    cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')#.order_by('id')
 
     paginator = Paginator(cur_user_runs, 10)
     try:
