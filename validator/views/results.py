@@ -58,6 +58,11 @@ def result(request, result_uuid):
         patch_params = QueryDict(request.body)
 
         if 'save_name' in patch_params:
+            save_mode = patch_params['save_name']
+
+            if save_mode != 'true':
+                return HttpResponse("Wrong action parameter.", status=400)
+
             val_run.name_tag = patch_params['new_name']
             val_run.save()
 
