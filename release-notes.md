@@ -1,14 +1,11 @@
-QA4SM v1.2.0 - Release notes 2020-07-06
+QA4SM v1.2.1 - Release notes 2020-07-20
 =======================================================
 
 # Changes
 
-1. Moved to new domain qa4sm.eu
-2. Validation auto-cleanup feature
-3. Results are now accessible to anonymous users
-4. Publication feature: get DOIs for validations from Zenodo
-5. Dynamically generate datasets page from information in the application database
-6. Upgraded to latest pytemo version that comes with lots of changes
-7. Added bitmask SMOS filters and refactored filtering
-8. Split up data folder: every dataset can now be in a different location
-9. Various minor fixes
+1. Fix bug that hides DOIs for published validations if user is not the owner
+2. ISMN Test data set is no longer the default reference data set
+3. When deleting a validation result user is now redirected back to overview page
+4. Fix landing page for mobile devices
+5. Add more SMOS-IC filters
+6. Fixes for the auto-cleanup process

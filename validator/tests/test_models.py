@@ -355,6 +355,9 @@ class TestModels(TestCase):
         settings = Settings.load()
         assert settings
 
+        s = str(settings)
+        self.__logger.info(s)
+
     def test_celery_task(self):
         task = CeleryTask()
         task_string = str(task)

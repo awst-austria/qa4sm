@@ -41,11 +41,12 @@
     <div>
         <h2>Settings</h2>
 
-        <div class="container">
-            Maintenance mode:
-            <label class="radio-inline"><input type="radio" name="optradio" onclick="ajax_set_maintenance_mode('True')" {% if maintenance_mode is True %} checked {% endif %} >Enabled</label>
-            <label class="radio-inline"><input type="radio" name="optradio" onclick="ajax_set_maintenance_mode('False')" {% if maintenance_mode is False%} checked {% endif %}>Disabled</label>
-        </div>
+        <form id="settings_form" action="{% url 'admin:system-settings' %}" method="post">
+            {% csrf_token %}
+            {{ settings_form.as_p }}
+            <input style="float: initial;" type="submit" value="Save" class="default" name="_save" />
+        </form>
+
     </div>
 
 <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>

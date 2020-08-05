@@ -27,7 +27,7 @@
                     <div class="card-body" style="padding: 0.5rem 1.25rem;">
                         <div class="row" style="justify-content: space-between;">
 
-                            <div class="col">
+                            <div class="col-sm-4">
                                 <strong>Data:</strong><br/>
                                 {% for dc in valrun.dataset_configurations.all %}
                                     {% if dc.id != valrun.reference_configuration.id %}
@@ -38,19 +38,19 @@
                                 {% endfor %}
                             </div>
 
-                            <div class="col">
+                            <div class="col-sm-4">
                                 <strong>Reference:</strong><br/>
                                 {{ valrun.reference_configuration.dataset.pretty_name }},
                                 {{ valrun.reference_configuration.version.pretty_name }},
                                 {{ valrun.reference_configuration.variable.pretty_name }}
                             </div>
 
-                            <div class="col" style="max-width: 7rem;">
+                            <div class="col-sm" style="max-width: 7rem;">
                                 <strong>Created:</strong><br/>
                                 {{ valrun.start_time|date:"Y-m-d" }}
                             </div>
 
-                            <div class="col" style="text-align: right; max-width: 6.8rem;">
+                            <div class="col-sm" style="text-align: right; max-width: 6.8rem;">
                                 <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
                             </div>
 

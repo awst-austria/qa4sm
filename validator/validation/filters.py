@@ -85,6 +85,14 @@ def get_used_variables(filters, dataset, variable):
             variables.append('Processing_Flags')
             continue
 
+        if(fil.name == "FIL_SMOS_TOPO_NO_MODERATE"):
+            variables.append('Processing_Flags')
+            continue
+
+        if(fil.name == "FIL_SMOS_TOPO_NO_STRONG"):
+            variables.append('Processing_Flags')
+            continue
+
         if(fil.name == "FIL_ERA5_TEMP_UNFROZEN"):
             era_temp_variable = variable.pretty_name.replace("wv", "t")
             variables.append(era_temp_variable)
