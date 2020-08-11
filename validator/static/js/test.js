@@ -8,7 +8,7 @@ function find_parents(obj){
 
 
 function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, removeButton){
-// taking tabs (refered as tabLinkclass in validate.html) and containers (refered as tabContentClass)
+// taking tabs (referred as tabLinkClass in validate.html) and containers (referred as tabContentClass)
 // and choosing the ones to be removed (the active ones)
     var tabs = $(tabLinkClass)
     var containers = $(tabContentClass)
@@ -18,52 +18,48 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
 // taking totalNoForms so that plus sign can be displayed again
     var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
     var totalNoForms = $(totalSelector).val();
+//    console.log(totalNoForms)
     var maxSelector = '#id_' + formsetPrefix + '-MAX_NUM_FORMS';
-
-//    console.log(tab_to_remove)
-//    console.log(container_to_remove)
 
 // this condition enables removing datasets unless there is only one left
 // additionally it's checked if there is the same number of tabs and containers to prevent unexpected errors
     if (tabs.length>1 && containers.length>1 && tabs.length == containers.length){
 
-// taking next tabs and containers, to change their id's
+    // taking next tabs and containers, to change their id's
         var all_next_tabs = tab_to_remove.nextAll(tabLinkClass)
         var all_next_containers = container_to_remove.nextAll(tabContentClass)
 
-//taking next and previous tabs and containers, to make them active after removal current items
+    //taking next and previous tabs and containers, to make them active after removal current items
         var next_tab = tab_to_remove.next()
         var prev_tab = tab_to_remove.prev()
 
         var next_container = container_to_remove.next()
         var prev_container = container_to_remove.prev()
 
-//removing current tab and container
+    //removing current tab and container
         tab_to_remove.remove()
         container_to_remove.remove()
 
+    // showing add button again
         totalNoForms--
          $(totalSelector).val(totalNoForms);
          if (totalNoForms < $(maxSelector).val()) {
                 addButton.show();
             }
 
-// changing attributes of following items
+    // changing attributes of following items
         for (var i=0; i < all_next_tabs.length; i++){
+//            console.log(totalNoForms-(i+1))
             var current_tab = all_next_tabs.slice(i)
             var current_container = all_next_containers.slice(i)
 
-            var old_tab_id = current_tab.attr('id')
+//            var old_tab_id = current_tab.attr('id')
             var old_id = current_container.attr('id')
-            var new_num = parseInt(old_id.slice(-1)) - 1
+            var new_num = totalNoForms-(i+1)
             var new_id = old_id.slice(0,-1) + new_num
             var new_tab_id = new_id + '-tab'
 
-            console.log(old_id)
-            console.log(new_id)
-
-
-// setting new values
+            // setting new values
             current_tab.attr('id', new_tab_id)
             current_tab.attr('href', '#' + new_id)
             current_tab.attr('aria-controls', '#' + new_id)
@@ -77,24 +73,30 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
                 $(this).attr({'name': name, 'id': id});
             });
 
+            current_container.find('label').each(function() {
+                var newFor = $(this).attr('for').replace(old_id, new_id);
+                $(this).attr('for', newFor);
+            });
 
-//            console.log(current_container.find(':input'))
+            current_container.find('.tabSpecific').each(function() {
+                var id = $(this).attr('id').replace(old_id, new_id);
+                $(this).attr('id', id);
+            });
 
-
+           $('#' + new_id + '-dataset').change()
         }
 
-
-
+// checking if there is a tab and a container after the ones removed and set them to be active;
+// if the last one is being removed, setting the previous ones as the active
+// tabLinkClass and tabContentClass are sliced to remove the dot at the beginning
         if (next_tab.hasClass(tabLinkClass.slice(1, ))){
             next_tab.toggleClass('active')
-            console.log(tabLinkClass)
         } else {
             prev_tab.toggleClass('active')
         }
 
         if (next_container.hasClass(tabContentClass.slice(1, ))){
             next_container.toggleClass('active show')
-            console.log(tabContentClass)
         } else {
             prev_container.toggleClass('active show')
         }
