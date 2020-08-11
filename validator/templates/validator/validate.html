@@ -48,6 +48,7 @@
                                                 <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}" role="tab" aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %}>Dataset</a>
                                             {% endfor %}
                                                 <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
+                                                <a id="remove_dc_form" class="tab-minus btn btn-primary" href="javascript:void(0)"><span class="fas fa-minus" title="Remove active dataset"></span></a>
                                         </div>
                                     </nav>
 
@@ -523,8 +524,13 @@
 {% block javascript %}
     <link rel="stylesheet" href="/static/leaflet/leaflet.css" />
     <script src="/static/leaflet/leaflet.js"></script>
+
     <link rel="stylesheet" href="/static/leaflet/leaflet.draw.css" />
     <script src="/static/leaflet/leaflet.draw.js"></script>
+
+<!--Monika-->
+    <script src="/static/js/test.js"></script>
+<!--Monika-->
 
     <script type="text/javascript">
         var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
@@ -681,7 +687,7 @@
     </script>
 
     <script type="text/javascript">
-        function cloneTab(tabContentClass, tabLinkClass, formsetPrefix, addButton) {
+        function cloneTab(tabContentClass, tabLinkClass, formsetPrefix, removeButton ,addButton) {
             var selector = tabContentClass + ':last';
             var link_selector = tabLinkClass + ':last';
             var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
@@ -693,7 +699,7 @@
             var newTabId = newId + '-tab';
 
             // de-select currently selected tab
-            $(tabContentClass + '.active').removeClass( "active show" );
+            $(tabContentClass + '.active').removeClass( "active show");
             $(tabLinkClass + '.active').removeAttr('aria-selected');
             $(tabLinkClass + '.active').removeClass( "active show" );
 
@@ -703,14 +709,20 @@
             newElement.attr('aria-labelledby', newTabId);
 
             newElement.find(':input').each(function() {
+<!--                console.log($(this).attr('id'))-->
                 var id = $(this).attr('id').replace(oldId, newId);
                 var name = id.replace(/^id_/, '')
                 $(this).attr({'name': name, 'id': id});
+<!--                console.log($(this).attr('id'))-->
             });
+
             newElement.find('label').each(function() {
+<!--            console.log($(this).attr('for'));-->
                 var newFor = $(this).attr('for').replace(oldId, newId);
                 $(this).attr('for', newFor);
+<!--            console.log(newFor);-->
             });
+
             newElement.find('.tabSpecific').each(function() {
                 var id = $(this).attr('id').replace(oldId, newId);
                 $(this).attr('id', id);
@@ -735,6 +747,11 @@
                 addButton.hide();
             }
 
+           // show remove button
+            if ( totalNoForms > 1 ) {
+                removeButton.show();
+            }
+
             // trigger change event on dataset select so that dependent parameters are set correctly
             $('#' + newId + '-dataset').change();
         }
@@ -745,10 +762,11 @@
         }
 
         $('#add_dc_form').click(function() {
-            cloneTab('.dc_form', '.dc_form_link', 'datasets', $(this));
+            cloneTab('.dc_form', '.dc_form_link', 'datasets', $('#remove_dc_form') ,$(this));
             setScalingRef();
         });
     </script>
+
 
 {% endblock %}
 
