@@ -131,8 +131,7 @@ html {
 }
 
 .tab-minus {
-    margin-left: auto;
-    margin-left: 0.3rem;
+    margin-left: 0.3;
     margin-top: .2rem;
     margin-bottom: .2rem;
     padding: 0 .35rem;

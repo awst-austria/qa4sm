@@ -709,18 +709,14 @@
             newElement.attr('aria-labelledby', newTabId);
 
             newElement.find(':input').each(function() {
-<!--                console.log($(this).attr('id'))-->
                 var id = $(this).attr('id').replace(oldId, newId);
                 var name = id.replace(/^id_/, '')
                 $(this).attr({'name': name, 'id': id});
-<!--                console.log($(this).attr('id'))-->
             });
 
             newElement.find('label').each(function() {
-<!--            console.log($(this).attr('for'));-->
                 var newFor = $(this).attr('for').replace(oldId, newId);
                 $(this).attr('for', newFor);
-<!--            console.log(newFor);-->
             });
 
             newElement.find('.tabSpecific').each(function() {
@@ -746,11 +742,15 @@
             if ( totalNoForms >= $(maxSelector).val() ) {
                 addButton.hide();
             }
-
-           // show remove button
+           // show remove button and change its
             if ( totalNoForms > 1 ) {
+                $(removeButton).css('margin-left', '0.3rem')
                 removeButton.show();
             }
+            if (totalNoForms == $(maxSelector).val()) {
+                $(removeButton).css('margin-left', 'auto');
+            }
+
 
             // trigger change event on dataset select so that dependent parameters are set correctly
             $('#' + newId + '-dataset').change();

@@ -37,9 +37,10 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
         totalNoForms--
          $(totalSelector).val(totalNoForms);
          if (totalNoForms < $(maxSelector).val()) {
+                $(removeButton).css('margin-left', '0.3rem')
                 addButton.show();
             }
-         if (totalNoForms <= 1) {
+         if (totalNoForms == 1) {
                 removeButton.hide();
             }
 
