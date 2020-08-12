@@ -38,14 +38,16 @@
                         <h5 class="my-0" style="float: right">
                                 <span class=" font-weight-normal">Name:</span>
                         {% if valrun.name_tag %}
-                                <span class="font-weight-normal no_edit_name">{{ valrun.name_tag }}</span>
+                                <span class="font-weight-normal no_edit_name"> {{ valrun.name_tag }} </span>
                         {% endif %}
-                         {% if valrun.is_unpublished %}
+                        {% if valrun.is_unpublished %}
                                 <input class="font-weight-normal d-none edit_name"/>
                                 <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name" onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
                                 <button class="btn btn-sm btn-primary btn-action d-none save_name_btn" title="Save Name" onclick="ajax_save_name(event, '{{ valrun.id}}')"><span class="fas fa-save"></span></button>
                                 <button class="btn btn-sm btn-primary btn-action d-none cancel_editing_btn" title="Cancel" onclick="cancel_editing(event)"><span class="fas fa-ban"></span></button>
-                         {% endif %}
+                        {% else %}
+                                <span class="no_name_change_info fas fa-question-circle help-icon" title="Validation has been published. There is no possibility of changing its name."> </span>
+                        {% endif %}
                         </h5>
 
                     </div>

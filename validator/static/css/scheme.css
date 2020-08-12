@@ -206,6 +206,14 @@ a[aria-expanded=false] .fa-minus-circle {
     margin-right: .3em;
 }
 
+.no_name_change_info{
+    color: #fff;
+    background-color: #00AAE3;
+    border-color: #00AAE3;
+    transform: scale(0.5);
+    width: 1rem;
+}
+
 .btn-primary.edit_name_btn{
     color: #fff;
     background-color: #00AAE3;
