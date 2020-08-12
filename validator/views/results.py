@@ -58,6 +58,9 @@ def result(request, result_uuid):
         patch_params = QueryDict(request.body)
 
         if 'save_name' in patch_params:
+            if (not val_run.is_unpublished):
+                return HttpResponse(status=405)
+
             save_mode = patch_params['save_name']
 
             if save_mode != 'true':
