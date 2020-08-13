@@ -5,213 +5,254 @@
 
 {% if val.end_time == None %}
 
-    <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
-        <h1 class="jumbotron-heading">Validation Running...</h1>
-        <p class="lead text-muted">
-            Your validation is still running. You'll be notified via e-mail once it's finished.</p>
-        <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
-    </div>
+<div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+    <h1 class="jumbotron-heading">Validation Running...</h1>
+    <p class="lead text-muted">
+        Your validation is still running. You'll be notified via e-mail once it's finished.</p>
+    <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
+</div>
 
 {% else %}
-    <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
-        <h1 class="jumbotron-heading">Validation Results</h1>
-    </div>
+<div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+    <h1 class="jumbotron-heading">Validation Results</h1>
+</div>
 
-    <div class="container center-text">
-        <div class="card-deck">
-            <div id="result_summary" class="card mb-4 shadow-sm">
-                <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">
-                        Summary:
-                        {% if is_owner and val.is_unpublished %}
-                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %}</span>
-                        <input class="d-none edit_name"/>
-                        <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name" onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
-                        <button class="btn btn-sm btn-primary btn-action d-none save_name_btn result_page" title="Save Name" onclick="ajax_save_name(event, '{{ val.id }}')"><span class="fas fa-save"></span></button>
-                        <button class="btn btn-sm btn-primary btn-action d-none cancel_editing_btn result_page" title="Cancel" onclick="cancel_editing(event)"><span class="fas fa-ban"></span></button>
-                        {% else %}
-                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %} <span class="no_name_change_info fas fa-question-circle help-icon" title="Validation has been published. There is no possibility of changing its name."> </span> </span>
-                        {% endif %}
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <ul>
-                        <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
-                        <li>Compared {{ val.dataset_configurations.count }} datasets:
-                            <ul>
-                                {% for dc in val.dataset_configurations.all %}
-                                    {% if dc.id != val.reference_configuration.id %}
-                                        <li>
-                                            <em>Dataset {{ forloop.counter }}:</em> {{ dc.dataset.pretty_name }} ({{ dc.version.pretty_name }}, {{ dc.variable.pretty_name }})
-                                            [Filters:
-                                            {% if not dc.filters.all and not dc.parametrisedfilter_set.all %}
-                                                none
-                                            {% else %}
-                                                {% for filter in dc.filters.all %} {{ filter.description }}; {% endfor %}
-                                                {% for pfilter in dc.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
-                                            {% endif %}]
-                                        </li>
-                                    {% endif %}
-                                {% endfor %}
-
-                                <li>
-                                    <em>Reference:</em> {{ val.reference_configuration.dataset.pretty_name }} ({{ val.reference_configuration.version.pretty_name }}, {{ val.reference_configuration.variable.pretty_name }})
-                                    [Filters:
-                                    {% if not val.reference_configuration.filters.all and not val.reference_configuration.parametrisedfilter_set.all %}
-                                        none
-                                    {% else %}
-                                        {% for filter in val.reference_configuration.filters.all %} {{ filter.description }}; {% endfor %}
-                                        {% for pfilter in val.reference_configuration.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
-                                    {% endif %}]
-                                </li>
-                            </ul>
-                        </li>
-
-                        {% if val.min_lat and val.min_lon and val.max_lat and val.max_lon %}
-                            <li>Spatial filter bounding box: [{{ val.min_lat }}, {{ val.min_lon }}, {{ val.max_lat }}, {{ val.max_lon }}].</li>
-                        {% else %}
-                            <li>Validated globally.</li>
-                        {% endif %}
-
-                        {% if val.interval_from and val.interval_to %}
-                            <li>Validation period / temporal filter: {{ val.interval_from }} to {{ val.interval_to }}.</li>
-                        {% else %}
-                            <li>Validated over entire available timespan.</li>
-                        {% endif %}
-
-                        {% if val.anomalies != 'none' %}
-                            <li>Validation metrics calculated from anomalies
-                                {% if val.anomalies == 'climatology' %}
-                                    against climatology computed on years {{ val.anomalies_from|date:"Y" }} through {{ val.anomalies_to|date:"Y" }}.
-                                {% elif val.anomalies == 'moving_avg_35_d' %}
-                                    against 35 day moving average.
-                                {% endif %}
-                            </li>
-                        {% else %}
-                            <li>Validation metrics calculated from absolute values.</li>
-                        {% endif %}
-
-                        <li>Scaling reference: {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
-                                    [Filters:
-                                    {% if not val.scaling_ref.filters.all and not val.scaling_ref.parametrisedfilter_set.all %}
-                                        none
-                                    {% else %}
-                                        {% for filter in val.scaling_ref.filters.all %} {{ filter.description }}; {% endfor %}
-                                        {% for pfilter in val.scaling_ref.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
-                                    {% endif %}]
-                        </li>
-                        <li>Scaling method: {{ val.get_scaling_method_display }}.</li>
-
-                        <li>Processing took {{ run_time }} minutes (wall time).</li>
-
-                        {% if val.progress == -1 %}
-                            <li>The validation was cancelled.</li>
-                        {% else %}
-                            <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>
-                                {% widthratio error_rate 1 100 %}% ({{ val.error_points }} of {{ val.total_points }}) of the processed locations (grid points) produced errors during calculation.
-                            </li>
-                        {% endif %}
-
-                        {% if is_owner %}
-                            <li>
-                                {% if val.expiry_date %}
-                                    {% if val.is_near_expiry %}
-                                        <span class="fas fa-exclamation-triangle"></span>
-                                        This validation will SOON be automatically removed during cleanup on {{ val.expiry_date }}.
-                                    {% else %}
-                                        <span class="fas fa-calendar-alt"></span>
-                                        This validation will be automatically removed during cleanup on {{ val.expiry_date }}.
-                                    {% endif %}
-                                {% else %}
-                                    {% if val.doi %}
-                                        <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank" href="{{doi_prefix}}{{ val.doi }}">{{ val.doi }}</a>.
-                                    {% elif val.is_archived %}
-                                        <span class="fas fa-archive"></span>
-                                        This validation has been archived. It will NOT be automatically removed during cleanup.
-                                    {% endif %}
-                                {% endif %}
-                            </li>
-                        {% endif %}
-                    </ul>
-
+<div class="container center-text">
+    <div class="card-deck">
+        <div id="result_summary" class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">
+                    Summary:
                     {% if is_owner and val.is_unpublished %}
-                        <div style="float: right;" class="patchButtonGroup{% if val.publishing_in_progress %} collapse {% endif %}">
-                            <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove</button>
-                            {% if val.is_archived %}
-                                <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ val.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>
-                            {% else %}
-                                <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ val.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>
-                                <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span> Archive</button>
+                    <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %}</span>
+                    <input class="d-none edit_name"/>
+                    <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name"
+                            onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
+                    <button class="btn btn-sm btn-primary btn-action d-none save_name_btn result_page" title="Save Name"
+                            onclick="ajax_save_name(event, '{{ val.id }}')"><span class="fas fa-save"></span></button>
+                    <button class="btn btn-sm btn-primary btn-action d-none cancel_editing_btn result_page"
+                            title="Cancel" onclick="cancel_editing(event)"><span class="fas fa-ban"></span></button>
+                    {% else %}
+                    <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %} <span
+                            class="no_name_change_info fas fa-question-circle help-icon"
+                            title="Validation has been published. There is no possibility of changing its name."> </span> </span>
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
+                    <li>Compared {{ val.dataset_configurations.count }} datasets:
+                        <ul>
+                            {% for dc in val.dataset_configurations.all %}
+                            {% if dc.id != val.reference_configuration.id %}
+                            <li>
+                                <em>Dataset {{ forloop.counter }}:</em> {{ dc.dataset.pretty_name }} ({{
+                                dc.version.pretty_name }}, {{ dc.variable.pretty_name }})
+                                [Filters:
+                                {% if not dc.filters.all and not dc.parametrisedfilter_set.all %}
+                                none
+                                {% else %}
+                                {% for filter in dc.filters.all %} {{ filter.description }}; {% endfor %}
+                                {% for pfilter in dc.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{
+                                pfilter.parameters }}; {% endfor %}
+                                {% endif %}]
+                            </li>
                             {% endif %}
-                            {% if val.output_file %}
-                                <button type="button" title="Publish on Zenodo" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#publishDialog">
-                                    <span class="fas fa-book" ></span> Publish
-                                </button>
-                            {% endif %}
-                        </div>
-                        {% if val.output_file %}
-                            <div class="publishingNote small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}" style="float: right">
-                                <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing in progress...</span></div>
-                                Publishing in progress...
-                            </div>
+                            {% endfor %}
+
+                            <li>
+                                <em>Reference:</em> {{ val.reference_configuration.dataset.pretty_name }} ({{
+                                val.reference_configuration.version.pretty_name }}, {{
+                                val.reference_configuration.variable.pretty_name }})
+                                [Filters:
+                                {% if not val.reference_configuration.filters.all and not
+                                val.reference_configuration.parametrisedfilter_set.all %}
+                                none
+                                {% else %}
+                                {% for filter in val.reference_configuration.filters.all %} {{ filter.description }}; {%
+                                endfor %}
+                                {% for pfilter in val.reference_configuration.parametrisedfilter_set.all %} {{
+                                pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
+                                {% endif %}]
+                            </li>
+                        </ul>
+                    </li>
+
+                    {% if val.min_lat and val.min_lon and val.max_lat and val.max_lon %}
+                    <li>Spatial filter bounding box: [{{ val.min_lat }}, {{ val.min_lon }}, {{ val.max_lat }}, {{
+                        val.max_lon }}].
+                    </li>
+                    {% else %}
+                    <li>Validated globally.</li>
+                    {% endif %}
+
+                    {% if val.interval_from and val.interval_to %}
+                    <li>Validation period / temporal filter: {{ val.interval_from }} to {{ val.interval_to }}.</li>
+                    {% else %}
+                    <li>Validated over entire available timespan.</li>
+                    {% endif %}
+
+                    {% if val.anomalies != 'none' %}
+                    <li>Validation metrics calculated from anomalies
+                        {% if val.anomalies == 'climatology' %}
+                        against climatology computed on years {{ val.anomalies_from|date:"Y" }} through {{
+                        val.anomalies_to|date:"Y" }}.
+                        {% elif val.anomalies == 'moving_avg_35_d' %}
+                        against 35 day moving average.
                         {% endif %}
+                    </li>
+                    {% else %}
+                    <li>Validation metrics calculated from absolute values.</li>
+                    {% endif %}
+
+                    <li>Scaling reference: {{ val.scaling_ref.dataset.pretty_name }} ({{
+                        val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
+                        [Filters:
+                        {% if not val.scaling_ref.filters.all and not val.scaling_ref.parametrisedfilter_set.all %}
+                        none
+                        {% else %}
+                        {% for filter in val.scaling_ref.filters.all %} {{ filter.description }}; {% endfor %}
+                        {% for pfilter in val.scaling_ref.parametrisedfilter_set.all %} {{ pfilter.filter.description }}
+                        {{ pfilter.parameters }}; {% endfor %}
+                        {% endif %}]
+                    </li>
+                    <li>Scaling method: {{ val.get_scaling_method_display }}.</li>
+
+                    <li>Processing took {{ run_time }} minutes (wall time).</li>
+
+                    {% if val.progress == -1 %}
+                    <li>The validation was cancelled.</li>
+                    {% else %}
+                    <li {% if error_rate> 0 %} class="alert-danger" {% endif %}>
+                        {% widthratio error_rate 1 100 %}% ({{ val.error_points }} of {{ val.total_points }}) of the
+                        processed locations (grid points) produced errors during calculation.
+                    </li>
+                    {% endif %}
+
+                    {% if is_owner %}
+                    <li>
+                        {% if val.expiry_date %}
+                        {% if val.is_near_expiry %}
+                        <span class="fas fa-exclamation-triangle"></span>
+                        This validation will SOON be automatically removed during cleanup on {{ val.expiry_date }}.
+                        {% else %}
+                        <span class="fas fa-calendar-alt"></span>
+                        This validation will be automatically removed during cleanup on {{ val.expiry_date }}.
+                        {% endif %}
+                        {% else %}
+                        {% if val.doi %}
+                        <span class="fas fa-book"></span> This result was published on zenodo with DOI <a
+                            target="_blank" href="{{doi_prefix}}{{ val.doi }}">{{ val.doi }}</a>.
+                        {% elif val.is_archived %}
+                        <span class="fas fa-archive"></span>
+                        This validation has been archived. It will NOT be automatically removed during cleanup.
+                        {% endif %}
+                        {% endif %}
+                    </li>
+                    {% endif %}
+                </ul>
+
+                {% if is_owner and val.is_unpublished %}
+                <div style="float: right;"
+                     class="patchButtonGroup{% if val.publishing_in_progress %} collapse {% endif %}">
+                    <button class="btn btn-sm btn-primary" title="Remove result"
+                            onclick="ajax_delete_result('{{ val.id }}')"><span class="fas fa-times"></span> Remove
+                    </button>
+                    {% if val.is_archived %}
+                    <button class="btn btn-sm btn-primary" title="Un-archive"
+                            onclick="ajax_archive_result('{{ val.id }}', false)"><span
+                            class="fas fa-calendar-alt"></span> Un-archive
+                    </button>
+                    {% else %}
+                    <button class="btn btn-sm btn-primary" title="Extend lifespan"
+                            onclick="ajax_extend_result('{{ val.id }}', true)"><span
+                            class="fas fa-calendar-plus"></span> Renew
+                    </button>
+                    <button class="btn btn-sm btn-primary" title="Archive"
+                            onclick="ajax_archive_result('{{ val.id }}', true)"><span class="fas fa-archive"></span>
+                        Archive
+                    </button>
+                    {% endif %}
+                    {% if val.output_file %}
+                    <button type="button" title="Publish on Zenodo" class="btn btn-sm btn-primary" data-toggle="modal"
+                            data-target="#publishDialog">
+                        <span class="fas fa-book"></span> Publish
+                    </button>
                     {% endif %}
                 </div>
+                {% if val.output_file %}
+                <div class="publishingNote small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}"
+                     style="float: right">
+                    <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing in progress...</span>
+                    </div>
+                    Publishing in progress...
+                </div>
+                {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
 
-    {% if val.output_file %}
-        <div class="container">
-            <div class="card-deck">
-                <div id="result_files" class="card mb-4 box-shadow">
-                    <div class="card-header center-text">
-                        <h4 class="my-0 font-weight-normal">Result files</h4>
-                    </div>
+{% if val.output_file %}
+<div class="container">
+    <div class="card-deck">
+        <div id="result_files" class="card mb-4 box-shadow">
+            <div class="card-header center-text">
+                <h4 class="my-0 font-weight-normal">Result files</h4>
+            </div>
 
-                    <div class="card-body">
-                        <div class="d-flex">
-                            <figure class="figure" style="max-width: 50%;">
-                                <a id="id_boxplot_link" href="#" class="center-text">
-                                    <img id="id_boxplot" src="#" alt="#" title="#" class="figure-thumb img-fluid">
-                                </a>
-                                <figcaption id="id_boxplot_label" class="figure-caption">Description goes here</figcaption>
-                            </figure>
-                            <span style="min-width:1rem;"></span>
-                            <figure class="figure" style="max-width: 50%;">
-                                <a id="id_overview_link" href="#" class="center-text">
-                                    <img id="id_overview" src="#" alt="#" title="#" class="figure-thumb img-fluid">
-                                </a>
-                                <figcaption id="id_overview_label" class="figure-caption">Description goes here</figcaption>
-                            </figure>
-                        </div>
+            <div class="card-body">
+                <div class="d-flex">
+                    <figure class="figure" style="max-width: 50%;">
+                        <a id="id_boxplot_link" href="#" class="center-text">
+                            <img id="id_boxplot" src="#" alt="#" title="#" class="figure-thumb img-fluid">
+                        </a>
+                        <figcaption id="id_boxplot_label" class="figure-caption">Description goes here</figcaption>
+                    </figure>
+                    <span style="min-width:1rem;"></span>
+                    <figure class="figure" style="max-width: 50%;">
+                        <a id="id_overview_link" href="#" class="center-text">
+                            <img id="id_overview" src="#" alt="#" title="#" class="figure-thumb img-fluid">
+                        </a>
+                        <figcaption id="id_overview_label" class="figure-caption">Description goes here</figcaption>
+                    </figure>
+                </div>
 
-                        <div class="d-flex justify-content-between align-items-center">
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';"><span class="fas fa-download"></span> Download all graphs</button>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary"
+                            onclick="location.href='{{ val.output_dir_url }}graphs.zip';"><span
+                            class="fas fa-download"></span> Download all graphs
+                    </button>
 
-                            <select id="id_graph_metric" style="width: 12rem;" name="graph_variable"
-                                title="Metric to show in the graphs"
-                                class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for key, label in metrics.items %}
-                                    <option value="{{ key }}">{{ label }}</option>
-                                {% endfor %}
-                            </select>
+                    <select id="id_graph_metric" style="width: 12rem;" name="graph_variable"
+                            title="Metric to show in the graphs"
+                            class="btn custom-select custom-select-sm d-block btn-select mx-3">
+                        {% for key, label in metrics.items %}
+                        <option value="{{ key }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
 
-                            <select id="id_graph_pair" style="width: 12rem;" name="graph_pair"
-                                title="Dataset pair to show in the graphs"
-                                class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for pair in pairs %}
-                                    <option value="{{ pair }}">{{ pair }}</option>
-                                {% endfor %}
-                            </select>
+                    <select id="id_graph_pair" style="width: 12rem;" name="graph_pair"
+                            title="Dataset pair to show in the graphs"
+                            class="btn custom-select custom-select-sm d-block btn-select mx-3">
+                        {% for pair in pairs %}
+                        <option value="{{ pair }}">{{ pair }}</option>
+                        {% endfor %}
+                    </select>
 
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" title="Download all results in NetCDF format" onclick="location.href='{{ val.output_file.url }}';"><span class="fas fa-file-download"></span> Download NetCDF</button>
-                        </div>
-                    </div>
+                    <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary"
+                            title="Download all results in NetCDF format"
+                            onclick="location.href='{{ val.output_file.url }}';"><span
+                            class="fas fa-file-download"></span> Download NetCDF
+                    </button>
                 </div>
             </div>
         </div>
-    {% endif %}
+    </div>
+</div>
+{% endif %}
 
 {% endif %}
 
@@ -221,7 +262,7 @@
 {% block dialogs %}
 
 {% if is_owner %}
-    {% include "validator/publishing_dialog.html" %}
+{% include "validator/publishing_dialog.html" %}
 {% endif %}
 
 {% endblock %}
@@ -266,16 +307,18 @@
     // update the plots once the page loads
     changeBoxplot()
     changeOverviewMap()
+
 </script>
 
 <script type="text/javascript">
     csrf_token = '{{csrf_token}}';
     result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
     stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+
 </script>
 
 {% if is_owner %}
-    <script src="{% static 'js/results_buttons.js' %}"></script>
+<script src="{% static 'js/results_buttons.js' %}"></script>
 {% endif %}
 
 {% endblock %}
