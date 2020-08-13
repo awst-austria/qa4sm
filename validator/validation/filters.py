@@ -1,11 +1,23 @@
 import logging
 
-from pytesmo.validation_framework.adapters import SelfMaskingAdapter
-from numpy import inner
+import pandas as pd
+from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
 
 __logger = logging.getLogger(__name__)
+
+'''
+Bitmask filter for SMOS, you can only exclude data on set bits (not on unset bits)
+'''
+def smos_exclude_bitmask(data, bitmask):
+    thedata = data
+
+    if type(thedata) is pd.Series:
+        thedata = thedata.values
+
+    mask = (thedata & bitmask) != bitmask
+    return mask
 
 '''
 Get the variables that need to be loaded for filtering the data on them.
@@ -60,6 +72,27 @@ def get_used_variables(filters, dataset, variable):
             variables.append('Quality_Flag')
             continue
 
+        if(fil.name == "FIL_SMOS_UNFROZEN"):
+            variables.append('Scene_Flags')
+            variables.append('Soil_Temperature_Level1')
+            continue
+
+        if(fil.name == "FIL_SMOS_UNPOLLUTED"):
+            variables.append('Scene_Flags')
+            continue
+
+        if(fil.name == "FIL_SMOS_BRIGHTNESS"):
+            variables.append('Processing_Flags')
+            continue
+
+        if(fil.name == "FIL_SMOS_TOPO_NO_MODERATE"):
+            variables.append('Processing_Flags')
+            continue
+
+        if(fil.name == "FIL_SMOS_TOPO_NO_STRONG"):
+            variables.append('Processing_Flags')
+            continue
+
         if(fil.name == "FIL_ERA5_TEMP_UNFROZEN"):
             era_temp_variable = variable.pretty_name.replace("wv", "t")
             variables.append(era_temp_variable)
@@ -107,78 +140,103 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 inner_reader.activate_network(networks)
             continue
 
+    masking_filters = []
+
     for fil in filters:
         __logger.debug("Setting up filter {} for dataset {}.".format(fil.name, dataset))
 
         if(fil.name == "FIL_ALL_VALID_RANGE"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '>=', variable.min_value, variable.pretty_name)
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '<=', variable.max_value, variable.pretty_name)
+            masking_filters.append( (variable.pretty_name, '>=', variable.min_value) )
+            masking_filters.append( (variable.pretty_name, '<=', variable.max_value) )
             continue
 
         if(fil.name == "FIL_ISMN_GOOD"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 'G', 'soil moisture_flag')
+            masking_filters.append( ('soil moisture_flag', '==', 'G') )
             continue
 
         if(fil.name == "FIL_C3S_FLAG_0"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'flag')
+            masking_filters.append( ('flag', '==', 0) )
             continue
 
         if(fil.name == "FIL_C3S_NO_FLAG_1"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '!=', 1, 'flag')
+            masking_filters.append( ('flag', '!=', 1) )
             continue
 
         if(fil.name == "FIL_C3S_NO_FLAG_2"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '!=', 2, 'flag')
+            masking_filters.append( ('flag', '!=', 2) )
             continue
 
         if(fil.name == "FIL_C3S_MODE_ASC"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 1, 'mode')
+            masking_filters.append( ('mode', '==', 1) )
             continue
 
         if(fil.name == "FIL_C3S_MODE_DESC"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 2, 'mode')
+            masking_filters.append( ('mode', '==', 2) )
             continue
 
         if(fil.name == "FIL_GLDAS_UNFROZEN"):
             temp_variable = variable.pretty_name.replace("Moi", "TMP")
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '<', 0.001, 'SWE_inst')
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 0.0, variable.pretty_name)
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 1., temp_variable)
+            masking_filters.append( ('SWE_inst', '<', 0.001) )
+            masking_filters.append( (variable.pretty_name, '>', 0.0) )
+            masking_filters.append( (temp_variable, '>', 1.) )
             continue
 
         if(fil.name == "FIL_ASCAT_METOP_A"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 3, 'sat_id')
+            masking_filters.append( ('sat_id', '==', 3) )
             continue
 
         if(fil.name == "FIL_ASCAT_METOP_B"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 4, 'sat_id')
+            masking_filters.append( ('sat_id', '==', 4) )
             continue
 
         if(fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '<=', 1, 'ssf') ## TODO: really should be == 0 or == 1
+            masking_filters.append( ('ssf', '<=', 1) ) ## TODO: really should be == 0 or == 1
             continue
 
         if(fil.name == "FIL_ASCAT_NO_CONF_FLAGS"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'conf_flag')
+            masking_filters.append( ('conf_flag', '==', 0) )
             continue
 
         if(fil.name == "FIL_ASCAT_NO_PROC_FLAGS"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'proc_flag')
+            masking_filters.append( ('proc_flag', '==', 0) )
             continue
 
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '==', 0, 'Quality_Flag')
+            masking_filters.append( ('Quality_Flag', '==', 0) )
+            continue
+
+        if(fil.name == "FIL_SMOS_TOPO_NO_MODERATE"):
+            masking_filters.append( ('Processing_Flags', smos_exclude_bitmask, 0b00000001) )
+            continue
+
+        if(fil.name == "FIL_SMOS_TOPO_NO_STRONG"):
+            masking_filters.append( ('Processing_Flags', smos_exclude_bitmask, 0b00000010) )
+            continue
+
+        if(fil.name == "FIL_SMOS_UNPOLLUTED"):
+            masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00000100) )
+            continue
+
+        if(fil.name == "FIL_SMOS_UNFROZEN"):
+            masking_filters.append( ('Scene_Flags', smos_exclude_bitmask, 0b00001000) )
+            continue
+
+        if(fil.name == "FIL_SMOS_BRIGHTNESS"):
+            masking_filters.append( ('Processing_Flags', smos_exclude_bitmask, 0b00000001) )
             continue
 
         #snow depth in the nc file yet, this is the preliminary one.
         if(fil.name == "FIL_ERA5_TEMP_UNFROZEN"):
             era_temp_variable = variable.pretty_name.replace("wv", "t")
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 274.15, era_temp_variable)
+            masking_filters.append( (era_temp_variable, '>', 274.15) )
             continue
 
         if(fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN"):
             era_temp_variable = variable.pretty_name.replace("wv", "t")
-            filtered_reader = SelfMaskingAdapter(filtered_reader, '>', 274.15, era_temp_variable)
+            masking_filters.append( (era_temp_variable, '>', 274.15) )
             continue
+
+    if len(masking_filters):
+        filtered_reader = AdvancedMaskingAdapter(filtered_reader, masking_filters)
 
     return filtered_reader

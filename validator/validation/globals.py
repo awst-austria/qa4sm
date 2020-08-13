@@ -1,6 +1,7 @@
-from valentina.settings import MEDIA_ROOT
+from django.conf import settings
 
-OUTPUT_FOLDER = MEDIA_ROOT
+
+OUTPUT_FOLDER = settings.MEDIA_ROOT
 
 METRICS = {'R' : 'Pearson\'s r',
            'p_R' : 'Pearson\'s r p-value',
@@ -10,7 +11,7 @@ METRICS = {'R' : 'Pearson\'s r',
            'BIAS' : 'Bias (difference of means)',
            'n_obs' : '# observations',
            'urmsd' : 'Unbiased root-mean-square deviation',
-#            'RSS' : 'Residual sum of squares',
+           'RSS' : 'Residual sum of squares',
            'mse' : 'Mean square error',
            'mse_corr' : 'Mean square error correlation',
            'mse_bias' : 'Mean square error bias',
@@ -30,13 +31,28 @@ ERA5_LAND = 'ERA5_LAND'
 
 ## dataset versions
 C3S_V201706 = 'C3S_V201706'
+C3S_V201812 = 'C3S_V201812'
+C3S_V201912 = 'C3S_V201912'
 ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
 ISMN_V20191211 = 'ISMN_V20191211'
 SMAP_V5_PM = 'SMAP_V5_PM'
+SMAP_V6_PM = 'SMAP_V6_PM'
 GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
 ASCAT_H113 = 'ASCAT_H113'
 ERA5_20190613 = 'ERA5_20190613'
 ERA5_Land_V20190904 = 'ERA5_LAND_V20190904'
+ESA_CCI_SM_A_V04_4 = 'ESA_CCI_SM_A_V04_4'
+ESA_CCI_SM_P_V04_4 = 'ESA_CCI_SM_P_V04_4'
+ESA_CCI_SM_C_V04_4 = 'ESA_CCI_SM_C_V04_4'
+ESA_CCI_SM_A_V04_5 = 'ESA_CCI_SM_A_V04_5'
+ESA_CCI_SM_P_V04_5 = 'ESA_CCI_SM_P_V04_5'
+ESA_CCI_SM_C_V04_5 = 'ESA_CCI_SM_C_V04_5'
+ESA_CCI_SM_A_V04_7 = 'ESA_CCI_SM_A_V04_7'
+ESA_CCI_SM_P_V04_7 = 'ESA_CCI_SM_P_V04_7'
+ESA_CCI_SM_C_V04_7 = 'ESA_CCI_SM_C_V04_7'
+ESA_CCI_SM_A_V05_2 = 'ESA_CCI_SM_A_V05_2'
+ESA_CCI_SM_P_V05_2 = 'ESA_CCI_SM_P_V05_2'
+ESA_CCI_SM_C_V05_2 = 'ESA_CCI_SM_C_V05_2'
 
 ## dataset data variables
 C3S_sm = 'C3S_sm'
@@ -49,3 +65,6 @@ GLDAS_SoilMoi40_100cm_inst = 'GLDAS_SoilMoi40_100cm_inst'
 GLDAS_SoilMoi100_200cm_inst = 'GLDAS_SoilMoi100_200cm_inst'
 ERA5_sm = 'ERA5_sm'
 ERA5_LAND_sm = 'ERA5_LAND_sm'
+ESA_CCI_SM_P_sm = 'ESA_CCI_SM_P_sm'
+ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
+ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'

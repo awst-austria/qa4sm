@@ -79,7 +79,6 @@ pip install --no-binary :all: shapely
 pip install sqlparse
 pip install pynetcf
 pip install ascat
-# pip install pybufr-ecmwf
 pip install c3s_sm
 pip install esa_cci_sm
 pip install smos
@@ -97,12 +96,10 @@ pip install gldas
 pip install smap-io
 pip install django-countries
 pip install seaborn
-# export CFLAGS="-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H=1"
-# pip install cartopy
 pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
-#pip install git+https://github.com/TUW-GEO/pytesmo.git
 pip install ismn
+pip install requests
 
 cd $TEMP_DIR
 

@@ -15,10 +15,10 @@ import netCDF4
 import numpy as np
 import pandas as pd
 
-from valentina.settings import BASE_DIR
+from django.conf import settings
 
 from cartopy import config as cconfig
-cconfig['data_dir'] = path.join(BASE_DIR, 'cartopy')
+cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
@@ -93,6 +93,8 @@ _metric_units = {
     'ERA5_LAND': r'm^3 m^{-3}'
 }
 
+_watermark = u'made with QA4SM ('+ settings.SITE_URL +')'
+
 def safe_arange(start, stop, step):
     f_step = (1. / float(step))
     vals = np.arange(float(start) * f_step, float(stop) * f_step , float(step) * f_step)
@@ -115,7 +117,7 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
 
     plt.title(plot_title)
     plt.ylabel(label + _metric_description[variable].format(_metric_units[unit_ref]))
-    plt.text(0, -0.14, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=10, color='black',
+    plt.text(0, -0.14, _watermark, fontsize=10, color='black',
              horizontalalignment='left', verticalalignment='bottom', alpha=0.5, transform=ax.transAxes)
     plt.tight_layout()
     plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1,)
@@ -124,7 +126,8 @@ def generate_boxplot(validation_run, outfolder, variable, label, values, unit_re
     return [png_filename, svg_filename]
 
 
-def generate_overview_map(validation_run, outfolder, metric, label, values, dc1, dc2, pair_name, unit_ref, lons, lats):
+def generate_overview_map(validation_run, outfolder, metric, label, values, dc1, dc2,
+                          pair_name, unit_ref, lons, lats, draw_grid=True):
     if metric == pair_name:
         filename = 'overview_{}'.format(metric)
     else:
@@ -155,10 +158,13 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
     else:
         if validation_run.reference_configuration.dataset.short_name == globals.ERA5_LAND:
             dy, dx = -0.1, 0.1
+            lats_map = safe_arange(extent[3], extent[2], dy)
+            lons_map = safe_arange(extent[0], extent[1], dx)
         else:
             dy, dx = -0.25, 0.25
-        lats_map = safe_arange(extent[3], extent[2], dy)
-        lons_map = safe_arange(extent[0], extent[1], dx)
+            lats_map = safe_arange(extent[3], extent[2], dy)
+            lons_map = safe_arange(extent[0], extent[1], dx)
+
 #         lats_map = np.arange(89.875, -60, -0.25)
 #         lons_map = np.arange(-179.875, 180, 0.25)
         values_map = np.empty((len(lats_map), len(lons_map)))
@@ -183,15 +189,18 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
         grid_interval_lat = 30
     if grid_interval_lon > 30:
         grid_interval_lon = 30
-    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0.2, color='gray', alpha=0.5, linestyle='--')
-    gl.xlabels_top = False
-    gl.ylabels_left = False
-    gl.xlocator = mticker.FixedLocator(np.arange(-180, 181, grid_interval_lon))
-    gl.ylocator = mticker.FixedLocator(np.arange(-90, 91, grid_interval_lat))
-    gl.xformatter = LONGITUDE_FORMATTER
-    gl.yformatter = LATITUDE_FORMATTER
-    gl.xlabel_style = {'size': 4, 'color': 'black'}
-    gl.ylabel_style = {'size': 4, 'color': 'black'}
+
+    if draw_grid:
+        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0.2,
+                          color='gray', alpha=0.5, linestyle='--')
+        gl.xlabels_top = False
+        gl.ylabels_left = False
+        gl.xlocator = mticker.FixedLocator(np.arange(-180, 181, grid_interval_lon))
+        gl.ylocator = mticker.FixedLocator(np.arange(-90, 91, grid_interval_lat))
+        gl.xformatter = LONGITUDE_FORMATTER
+        gl.yformatter = LATITUDE_FORMATTER
+        gl.xlabel_style = {'size': 4, 'color': 'black'}
+        gl.ylabel_style = {'size': 4, 'color': 'black'}
 
     # add colorbar
     cbar = plt.colorbar(the_plot, orientation='horizontal', pad=0.05)
@@ -203,7 +212,7 @@ def generate_overview_map(validation_run, outfolder, metric, label, values, dc1,
     plot_title="{} ({}) vs {} ({})".format(
         dc1.dataset.short_name, dc1.version.short_name, dc2.dataset.short_name, dc2.version.short_name)
     plt.title(plot_title,fontsize=8)
-    ax.text(0, -0.6, u'made with QA4SM (qa4sm.eodc.eu)', fontsize=5,
+    ax.text(0, -0.6, _watermark, fontsize=5,
         color='black', horizontalalignment='left', verticalalignment='bottom', alpha=0.5, transform=ax.transAxes)
 
 #     plt.tight_layout()
@@ -236,7 +245,7 @@ def identify_dataset_configs(validation_run, metric_col_name):
 
     return [dc1, dc2, pair_name]
 
-def generate_all_graphs(validation_run, outfolder):
+def generate_all_graphs(validation_run, outfolder, map_grid=True):
     if not validation_run.output_file:
         return None
 
@@ -245,6 +254,7 @@ def generate_all_graphs(validation_run, outfolder):
 
     # get units for plot labels
     unit_ref = validation_run.reference_configuration.dataset.short_name
+
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         with netCDF4.Dataset(validation_run.output_file.path, mode='r') as ds:
@@ -266,7 +276,7 @@ def generate_all_graphs(validation_run, outfolder):
                     ## make overview maps for all columns
                     if metric_col[:] is not None:
                         file1, file2 = generate_overview_map(validation_run, outfolder, metric, globals.METRICS[metric], metric_col[:],
-                                                             dc1, dc2, pair_name, unit_ref, lons, lats)
+                                                             dc1, dc2, pair_name, unit_ref, lons, lats, draw_grid=map_grid)
                         arcname = path.basename(file1)
                         myzip.write(file1, arcname=arcname)
                         arcname = path.basename(file2)

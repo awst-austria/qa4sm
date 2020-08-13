@@ -4,10 +4,15 @@
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 's3cr3t'
 
+SITE_URL = "https://qa4sm.eu"
+
+DOI_ACCESS_TOKEN = 'notset'
+DOI_REGISTRATION_URL = "https://zenodo.org/api/deposit/depositions"
+DOI_URL_PREFIX = "https://doi.org/"
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-DATA_FOLDER = '/var/lib/qa4sm-web-val/valentina/data/'
 
 LOG_FILE = 'valentina.log'
 
@@ -30,13 +35,13 @@ DBSM = 'sqlite'
 DB_PASSWORD = 's3cr3t'
 
 ## Email settings
-EMAIL_HOST = 'bsmtp.a1.net'
+EMAIL_HOST = 'smtp.ionos.de'
 EMAIL_PORT = '587'
-EMAIL_HOST_USER = 'qa4sm@awst.at'
-EMAIL_FROM = 'qa4sm@awst.at'
+EMAIL_HOST_USER = 'support@qa4sm.eu'
+EMAIL_FROM = 'support@qa4sm.eu'
 EMAIL_USE_TLS = 'yes'
 EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'qa4sm@awst.at'
+DEFAULT_FROM_EMAIL = 'support@qa4sm.eu'
 
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 #EMAIL_FILE_PATH = '/tmp/app-messages'

@@ -1,20 +1,12 @@
 from django.shortcuts import render
-# from django.contrib.auth.decorators import login_required
+from validator.models import Settings
 
 
 def home(request):
-    return render(request, 'validator/index.html')
+    return render(request, 'validator/index.html', {'news_text': Settings.load().news})
 
-# @login_required(login_url='/login/')
 def alpha(request):
     return render(request, 'validator/alpha.html')
 
-# @login_required(login_url='/login/')
-def userhelp(request):
-    return render(request, 'validator/help.html')
-
 def terms(request):
     return render(request, 'validator/terms.html')
-
-def datasets(request):
-    return render(request, 'validator/datasets.html')

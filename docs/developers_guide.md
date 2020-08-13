@@ -172,35 +172,13 @@ If the `init_conig.sh` doesn't work for you, copy `settings_example_conf.py` int
 
 Adapt the `valentina/settings_conf.py` to match your local configuration:
 
-- Set `DATA_FOLDER` to the folder where you keep the (geo)data, see the datasets folder section for more info. If you don't have other data, set it to the `testdata` folder.
 - If you didn't set up your own Redis and RabbitMQ, add below the other CELERY settings: `CELERY_TASK_ALWAYS_EAGER = True` and `CELERY_TASK_EAGER_PROPAGATES = True`. This means that Celery jobs will be processed sequentially (not in parallel) - but you don't have to set up the services.
 - Use `DBSM = 'postgresql'` and `DB_PASSWORD = ...` if you've set up a local postgresql database. The rest of the database configuration is in `valentina/settings.py` and ideally should be left unchanged.
 - Set `EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'` to tell Django to log emails to files instead of trying to send them. Use `EMAIL_FILE_PATH = ...` to tell Django where to put the email files.
 - Set the `LOG_FILE` location to where you want the log files to be written to.
+- If you want to publish to the Zenodo sandbox (test environment) with your installation, set the `DOI_ACCESS_TOKEN_ENV` variable to a valid Zenodo sandbox token. To get a token, register an [account with Zenodo sandbox](https://sandbox.zenodo.org/) and [create a token](https://sandbox.zenodo.org/account/settings/applications/tokens/new/).
 
-For the folders specified for the `DATA_FOLDER` and `LOG_FILE` settings, make sure the directories exist in your system, otherwise, the `Init Django` section of this guide will throw an error.
-
-## Datasets folder
-
-Your datasets folder should have the following structure so that the webapp can find the data (note these are not all of the datasets available but you should get an idea of the folder structure):
-
-    ASCAT/ASCAT_H113
-        data/xxxx.nc
-        grid
-        static_layer
-
-    C3S/C3S_V201706/TCDR/063_images_to_ts/combined-daily
-
-    GLDAS/GLDAS_NOAH025_3H_2_1
-    GLDAS/GLDAS_TEST
-
-    ISMN/ISMN_V20180712_MINI
-    ISMN/ISMN_V20180712_TEST
-    ISMN/ISMN_V20180830_GLOBAL
-
-    SMAP/SMAP_V5_PM
-
-The folders are used in `validator.validation.readers.create_reader` to create the necessary data readers. The general folder structure is `<dataset_name>/<version_name>`, using the names in the webapp database. As always, capitalisation makes a difference ;-)
+Make sure the `LOG_FILE` folder defined in your settings exist in your system, otherwise, the `Init Django` section of this guide will throw an error.
 
 ## Init Django
 
@@ -254,6 +232,16 @@ Depending on the `LOG_FILE` setting in your `settings_conf.py` file, the webapp'
 
 If, when you try to log in, you get a verification failed error, try going to `valentina/settings.py` and commenting out the `CSRF_COOKIE_SECURE` setting. Then log in again.
 
+## Specifying location of datasets
+
+If you want to try out or host QA4SM beyond running the integration tests, you can use your own data if you make the data locations known to the app. There's an interactive Django command that will prompt you for the data locations:
+
+    python manage.py setdatasetpaths
+
+With it, you can change all dataset paths or just the datasets that don't have a path set yet. You can optionally give a parent data folder from which the dataset subfolder names will be guessed and suggested. If you don't give a parent data folder, the suggestion will be the currently set path (if one is set) - this is useful if you want to change only a few of the paths and just skip over the others.
+
+The folders are used in `validator.validation.readers.create_reader` to create the necessary data readers. The general folder structure is `<dataset_name>/<version_name>`, using the names in the webapp database. As always, capitalisation makes a difference ;-)
+
 ## Webapp walkthrough
 
 The code for the webapp lives in two submodules of the your qa4sm folder: `valentina` and `validator`. The first contains the Django "project", the second the Django "app" - [see here for the Django tutorial that explains projects and apps.](https://docs.djangoproject.com/en/2.1/intro/tutorial01/)
@@ -292,7 +280,17 @@ Congratulations, your development environment is now set up and you can develop 
 
 ## Tips and Tricks
 
-## Creating new environment file
+### Setting up cronjob for autocleanup
+
+To have the `autocleanupvalidations` command called regularly, it's recommended to have a wrapper script that activates the conda environment and call it with cron. The default installation script installs a script to `/var/lib/qa4sm-web-val/valentina/run_autocleanup.sh`. If the paths in the script don't fit your installation, you'll have to edit them.
+
+You can set up a cronjob for the user that runs the webapp as root like this:
+
+    crontab -e -u www-data
+
+    15 2 * * * /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
+
+### Creating new environment file
 
 If you need to create a new environment file with the latest dependencies, look at `environment/recreate_environment_file.sh`, edit it to include dependencies you want to add/update. Then run it - output should be an updated `environment/qa4sm_env.yml` file.
 
@@ -464,3 +462,22 @@ To assign validation runs to a specific user in bulk:
     for run in ValidationRun.objects.all():
         run.user = myuser
         run.save()
+
+### Secrets / tokens in continuous builds
+
+#### In Jenkins
+
+Use the `Credentials` menu entry to add a new credential and select `Secret text` as type. Put your token into the `Secret` field and name / describe it as you wish. You can then use it in your build job's configuration page by going to `Build Environment` and checking `Use secret text(s) or file(s)`. This allows you to bind your secret text to an environment variable. Jenkins will set that env variable before running the build and you can use it inside your scripts.
+
+For example, to keep the Zenodo access token secret, put it into Jenkins and bind the secret text to variable `DOI_ACCESS_TOKEN_ENV`. The `init_config.sh` script will inject it into the django config.
+
+#### In Travis
+
+Similar to Jenkins - see [Defining Variables in Repository Settings](https://docs.travis-ci.com/user/environment-variables/#defining-variables-in-repository-settings) and [go to the settings page](https://travis-ci.com/github/awst-austria/qa4sm/settings) to set environment variables. Then use in your script as an environment variable.
+
+You could also try [Defining encrypted variables in .travis.yml](https://docs.travis-ci.com/user/environment-variables/#defining-encrypted-variables-in-travisyml) but I never managed to get it to work.
+
+#### Don't leak the secrets!
+
+Travis docs have general [Recommendations on how to avoid leaking secrets to build logs](https://docs.travis-ci.com/user/best-practices-security/#recommendations-on-how-to-avoid-leaking-secrets-to-build-logs).
+If you accidentally leak a secret, repair the leak and generate a new secret, e.g. a new API token for Zenodo.

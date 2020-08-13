@@ -1,13 +1,17 @@
 from json import dumps as json_dumps
 
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import QueryDict
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from validator.doi import get_doi_for_validation
+from validator.forms import PublishingForm
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_pairs
+
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -30,7 +34,6 @@ def user_runs(request):
     return render(request, 'validator/user_runs.html', context)
 
 
-@login_required(login_url='/login/')
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
 
@@ -39,11 +42,66 @@ def result(request, result_uuid):
         if(val_run.user != request.user):
             return HttpResponse(status=403)
 
+        ## check that our validation can be deleted; it can't if it already has a DOI
+        if(not val_run.is_unpublished):
+            return HttpResponse(status=405)
+
         val_run.delete()
         return HttpResponse("Deleted.", status=200)
 
-    # not DELETE
+    elif(request.method == 'PATCH'):
+        ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+        if(val_run.user != request.user):
+            return HttpResponse(status=403)
+
+        patch_params = QueryDict(request.body)
+
+        if 'archive' in patch_params:
+            archive_mode = patch_params['archive']
+
+            if not ((archive_mode == 'true') or (archive_mode == 'false')):
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            val_run.archive(unarchive = (archive_mode == 'false'))
+            return HttpResponse("Changed.", status=200)
+
+        if 'extend' in patch_params:
+            extend = patch_params['extend']
+
+            if extend != 'true':
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            val_run.extend_lifespan()
+            return HttpResponse(val_run.expiry_date, status=200)
+
+        if 'publish' in patch_params:
+            publish = patch_params['publish']
+
+            # check we've got the action set correctly
+            if publish != 'true':
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            # check that the publication parameters are valid
+            pub_form = PublishingForm(data=patch_params, validation=val_run)
+            if not pub_form.is_valid():
+                # if not, send back an updated publication form with errors set and http code 420 (picked up in javascript)
+                return render(request, 'validator/publishing_dialog.html', {'publishing_form': pub_form, 'val': val_run}, status=420)
+
+            try:
+                get_doi_for_validation(val_run, pub_form.pub_metadata)
+            except Exception as e:
+                m = getattr(e, 'message', repr(e))
+                return HttpResponse(m, status=400)
+
+            return HttpResponse("Published.", status=200)
+
+        return HttpResponse("Wrong action parameter.", status=400)
+
+    # by default, show page
     else:
+        ## tell template whether it's the owner of the validation - to show action buttons
+        is_owner = (val_run.user == request.user)
+
         ## TODO: get time in format like '2 minutes', '5 hours'
         run_time = None
         if val_run.end_time is not None:
@@ -56,13 +114,18 @@ def result(request, result_uuid):
 
         pairs = get_dataset_pairs(val_run)
 
+        # the publication form is only needed by the owner; if we're displaying for another user, avoid leaking user data
+        pub_form = PublishingForm(validation=val_run) if is_owner else None
+
         context = {
+            'is_owner': is_owner,
             'val' : val_run,
             'error_rate' : error_rate,
             'run_time': run_time,
             'metrics': METRICS,
             'pairs': pairs,
             'json_metrics': json_dumps(METRICS),
+            'publishing_form': pub_form
             }
 
         return render(request, 'validator/result.html', context)

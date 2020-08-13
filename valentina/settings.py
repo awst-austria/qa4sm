@@ -26,6 +26,8 @@ STATIC_ROOT=os.path.join(BASE_DIR, 'static/')
 
 ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environment/qa4sm_env.yml"
 
+ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
+
 # Application definition
 INSTALLED_APPS = [
     'validator.apps.ValidatorConfig',
@@ -63,6 +65,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media',
+                'validator.context_processors.globals_processor',
             ],
         },
     },
@@ -179,3 +182,6 @@ except NameError:
 # print("Running with CSRF_COOKIE_SECURE = {}".format(CSRF_COOKIE_SECURE))
 
 PASSWORD_RESET_TIMEOUT_DAYS = 1
+
+VALIDATION_EXPIRY_DAYS = 60
+VALIDATION_EXPIRY_WARNING_DAYS = 7

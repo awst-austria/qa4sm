@@ -1,0 +1,72 @@
+{% load widget_tweaks %}
+
+<div class="modal" id="publishDialog" role="dialog" aria-labelledby="publishDialogTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+
+            <form id="publishing_form">
+                {% csrf_token %}
+
+                {% with WIDGET_ERROR_CLASS='is-invalid' %}
+
+                    <div class="modal-header">
+                        <h4 class="my-0 font-weight-normal" id="publishDialogTitle">Publish results</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <p>
+                            Please check the metadata your results will be published with. <br/>
+                            If you want to permanently set your author details, you can do so on your <a href="{% url 'user_profile' %}">profile page</a>.
+                        </p>
+
+                        <div class="custom-invalid-feedback">
+                            {{ publishing_form.non_field_errors }}
+                        </div>
+
+                        {% for field in publishing_form.visible_fields %}
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text addon-w-pub">{{field.label}}</span>
+                                        </div>
+
+                                        {% render_field field class="form-control" title=field.help_text %}
+
+                                        {% if field.help_text %}
+                                            <div class="input-group-append">
+                                                <span class="input-group-text fas fa-question-circle" title="{{ field.help_text }}"></span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% for error in field.errors %}
+                                        <div class="custom-invalid-feedback">
+                                            {{ error }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <p class="mt-3 mb-0">
+                            <b>Please note:</b>
+                            Publishing the result can't be undone and you won't be able to delete the result later.<br/>
+                            Publishing can take a few minutes, please be patient.
+                        </p>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" title="Publish on Zenodo" type="button" onclick="ajax_publish_result('{{ val.id }}')">Publish now!</button>
+                    </div>
+
+                {% endwith %}
+
+            </form>
+
+        </div>
+    </div>
+</div>

@@ -24,7 +24,7 @@ class TimezoneAdapter(object):
         if type(data) is TS or issubclass(type(data), TS):
             data = data.data
 
-        if data.index.tz is not None:
+        if (hasattr(data.index, 'tz') and (data.index.tz is not None)):
 #             warnings.warn('Dropping timezone information for data')
             data.index = data.index.tz_convert(None)
         return data
@@ -35,7 +35,7 @@ class TimezoneAdapter(object):
         if type(data) is TS or issubclass(type(data), TS):
             data = data.data
 
-        if data.index.tz is not None:
+        if (hasattr(data.index, 'tz') and (data.index.tz is not None)):
 #             warnings.warn('Dropping timezone information for data')
             data.index = data.index.tz_convert(None)
         return data

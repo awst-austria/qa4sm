@@ -1,3 +1,4 @@
+from datetime import timedelta
 from os import path
 from re import sub as regex_sub
 from shutil import rmtree
@@ -5,11 +6,13 @@ import uuid
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
+from django.utils import timezone
+
 from validator.models import DatasetConfiguration
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class ValidationRun(models.Model):
@@ -70,11 +73,57 @@ class ValidationRun(models.Model):
     anomalies_from = models.DateTimeField(null=True, blank=True)
     anomalies_to = models.DateTimeField(null=True, blank=True)
 
-    output_file = models.FileField(null=True, max_length=250)
+    output_file = models.FileField(null=True, max_length=250, blank=True)
+
+    is_archived = models.BooleanField(default=False)
+    last_extended = models.DateTimeField(null=True, blank=True)
+    expiry_notified = models.BooleanField(default=False)
+
+    doi = models.CharField(max_length=255, blank=True)
+    publishing_in_progress = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
+
+    @property
+    def expiry_date(self):
+        if (self.is_archived or (self.end_time is None)):
+            return None
+
+        initial_date = self.last_extended if self.last_extended else self.end_time
+        return initial_date + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+
+    @property
+    def is_expired(self):
+        e = self.expiry_date
+        return ((e is not None) and (timezone.now() > e))
+
+    @property
+    def is_near_expiry(self):
+        e = self.expiry_date
+        return ((e is not None) and (timezone.now() > e - timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)))
+
+    @property
+    def is_unpublished(self):
+        return not self.doi
+
+    def archive(self, unarchive=False, commit=True):
+        if unarchive:
+            self.extend_lifespan(commit=False)
+            self.is_archived = False
+        else:
+            self.is_archived = True
+
+        if commit:
+            self.save()
+
+    def extend_lifespan(self, commit=True):
+        self.last_extended = timezone.now()
+        self.expiry_notified = False;
+
+        if commit:
+            self.save()
 
     def clean(self):
         super(ValidationRun, self).clean()

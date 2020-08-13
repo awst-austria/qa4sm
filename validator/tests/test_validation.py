@@ -11,7 +11,6 @@ from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
-from symbol import parameters
 User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -21,15 +20,15 @@ from pytz import UTC
 
 import numpy as np
 import pandas as pd
-import valentina
-from valentina.settings import APP_VERSION, ENV_FILE_URL_TEMPLATE
-from validator.models import DataFilter, dataset_configuration
+from django.conf import settings
+from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
 from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
+from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting
@@ -65,6 +64,8 @@ class TestValidation(TestCase):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+
+        set_dataset_paths()
 
     def generate_default_validation(self):
         run = ValidationRun()
@@ -108,8 +109,10 @@ class TestValidation(TestCase):
         length=-1
         num_vars=-1
         with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
-            assert ds.qa4sm_version == valentina.settings.APP_VERSION
-            assert ds.qa4sm_env_url == ENV_FILE_URL_TEMPLATE.format(APP_VERSION)
+            assert ds.qa4sm_version == settings.APP_VERSION
+            assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
+            assert str(run.id) in ds.url
+            assert settings.SITE_URL in ds.url
 
             ## check the metrics contained in the file
             for metric in self.metrics:
@@ -204,14 +207,15 @@ class TestValidation(TestCase):
         with ZipFile(zipfile, 'r') as myzip:
             assert myzip.testzip() is None
 
+        n_metrics = len(globals.METRICS.keys())
         # check diagrams
         boxplot_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (run.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (run.dataset_configurations.count() - 1)
 
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -443,7 +447,7 @@ class TestValidation(TestCase):
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
         run.anomalies_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59, tzinfo=UTC)
+        run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59)
         run.save()
 
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -544,6 +548,15 @@ class TestValidation(TestCase):
         version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
         variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         reader = val.create_reader(dataset, version)
+
+        no_msk_reader = val.setup_filtering(reader, None, None, dataset, variable)
+        assert no_msk_reader is not None
+        data = no_msk_reader.read_ts(0)
+        assert data is not None
+        assert isinstance(data, pd.DataFrame)
+        assert len(data.index) > 1
+        assert not data[variable.pretty_name].empty
+
         data_filters = [
             DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
             DataFilter.objects.get(name="FIL_ISMN_GOOD"),
@@ -568,6 +581,7 @@ class TestValidation(TestCase):
         start_time = time.time()
 
         for dataset in Dataset.objects.all():
+            self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
             va = dataset.variables.all()
             fils = dataset.filters.all()
@@ -576,7 +590,7 @@ class TestValidation(TestCase):
                 reader = val.create_reader(dataset, version)
                 for variable in va:
                     for data_filter in fils:
-                        print("Testing {} version {} variable {} filter {}".format(dataset, version, variable, data_filter.name))
+                        self.__logger.debug("Testing {} version {} variable {} filter {}".format(dataset, version, variable, data_filter.name))
                         if data_filter.parameterised:
                             pfilter = ParametrisedFilter(filter = data_filter, parameters = data_filter.default_parameter)
                             msk_reader = val.setup_filtering(reader, [], [pfilter], dataset, variable)
@@ -732,7 +746,8 @@ class TestValidation(TestCase):
         assert num == 1
 
     @pytest.mark.long_running
-    def test_generate_graphs(self):
+    @pytest.mark.graphs
+    def test_generate_graphs(self, map_grid=True):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
         infile2 = 'testdata/output_data/c3s_gldas.nc'
         infile3 = 'testdata/output_data/c3s_era5land.nc'
@@ -751,15 +766,16 @@ class TestValidation(TestCase):
         shutil.copy(infile1, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        n_metrics = len(globals.METRICS.keys())
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
         # remove results from first test and recreate dir
         shutil.rmtree(run_dir)
@@ -772,15 +788,15 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
         # remove results from first test and recreate dir
         shutil.rmtree(run_dir)
@@ -793,15 +809,15 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, map_grid)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == 12
+        assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == 12 * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
 
         self.delete_run(v)

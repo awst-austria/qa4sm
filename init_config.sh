@@ -15,15 +15,21 @@ NEWKEY=${NEWKEY//\\/\\\\}
 NEWKEY=${NEWKEY//&/\\&}
 
 # default values (for ops)
+SITE_URL="https://qa4sm.eu"
 LOGFILE="/var/log/valentina/valentina.log"
 DEBUGFLAG="False"
-ALLOWED_HOSTS="['qa4sm.eodc.eu','localhost']"
+ALLOWED_HOSTS="['qa4sm.eu','localhost']"
 STATIC_URL='/static/'
 MEDIA_URL='/media/'
 FORCE_SCRIPT_NAME=''
 SSL_SECURITY=""
-DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/"
+DOI_REGISTRATION_URL="https://zenodo.org/api/deposit/depositions"
 
+# this token needs to be set as an evironment variable when this script is run
+# e.g. in the CI (Jenkins credentials or Travis secrets)
+if [ "x$DOI_ACCESS_TOKEN_ENV" == "x" ]; then
+    export DOI_ACCESS_TOKEN_ENV="notset"
+fi
 
 DB_PASSWORD=""
 EMAIL_PASSWORD=""
@@ -40,37 +46,36 @@ DBSM="postgresql"
 if [ "x$ENV" == "xjenkins" ]; then
     LOGFILE="valentina.log"
     ALLOWED_HOSTS="['127.0.0.1', 'localhost']"
-    STATIC_URL='/static/'
-    MEDIA_URL='/media/'
-    FORCE_SCRIPT_NAME=''
     DEBUGFLAG="True"
     SSL_SECURITY=""
-    DATA_FOLDER="/data/qa4sm/testdata/input_data"
     DBSM="sqlite"
+    DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
 fi
 
 if [ "x$ENV" == "xdev" ]; then
-    STATIC_URL='/static/'
-    MEDIA_URL='/media/'
-    FORCE_SCRIPT_NAME=''
     DEBUGFLAG="True"
     ALLOWED_HOSTS="['127.0.0.1', 'localhost']"
     SSL_SECURITY=""
-    DATA_FOLDER="/data/qa4sm/data/"
     DBSM="sqlite"
+    DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
 fi
 
 if [ "x$ENV" == "xtest" ]; then
-    STATIC_URL='/static/'
-    MEDIA_URL='/media/'
-    FORCE_SCRIPT_NAME=''
     DEBUGFLAG="True"
     ALLOWED_HOSTS="['127.0.0.1', 'localhost']"
     SSL_SECURITY=""
-    DATA_FOLDER="$DIRNAME/testdata/input_data"
     DBSM="sqlite"
     LOGFILE="/tmp/log/valentina/valentina.log"
+    DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
 fi
 
+if [ "x$ENV" == "xtestenv" ]; then
+    SITE_URL="https://test.qa4sm.eu"
+    DEBUGFLAG="False"
+    ALLOWED_HOSTS="['127.0.0.1', 'localhost', '10.48.108.24', 'test.qa4sm.eu', '10.10.10.66']"
+    DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
+fi
 
-sed -e "s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*DATA_FOLDER = .*$|DATA_FOLDER = '$DATA_FOLDER'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
+echo $DOI_ACCESS_TOKEN_ENV
+
+sed -e "s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py

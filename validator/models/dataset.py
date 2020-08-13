@@ -9,8 +9,12 @@ class Dataset(models.Model):
     pretty_name = models.CharField(max_length=30)
     help_text = models.CharField(max_length=150)
 
+    storage_path = models.CharField(max_length=255, blank=True)
+
+    detailed_description = models.TextField()
     source_reference = models.TextField()
     citation = models.TextField()
+    time_range_covered = models.TextField()
 
     is_reference = models.BooleanField(default=False)
 
