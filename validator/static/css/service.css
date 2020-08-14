@@ -131,11 +131,15 @@ html {
 }
 
 .tab-minus {
-    margin-left: 0.3;
-    margin-top: .2rem;
-    margin-bottom: .2rem;
-    padding: 0 .35rem;
-    display:none;
+    position: relative;
+    left: -0.8rem;
+  //  margin-left: 0.3;
+  //  margin-top: .2rem;
+  //  margin-bottom: .02rem;
+      width: 0.1rem;
+      margin-right: 0.000001rem;
+      padding: .0000001rem;
+      display:none;
 }
 
 a.doilink {
