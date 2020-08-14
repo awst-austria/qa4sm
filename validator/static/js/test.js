@@ -5,8 +5,18 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
 // and choosing the ones to be removed (the active ones)
     var tabs = $(tabLinkClass)
     var containers = $(tabContentClass)
-    var tab_to_remove = $(tabLinkClass+'.active')
-    var container_to_remove = $(tabContentClass+'.active.show')
+
+    // removal button is on the right-hand side of the tab to be remove, therefore I'm using prev()
+    var tab_to_remove = $(removeButton.prev())
+    var container_to_remove = $('#'+tab_to_remove.attr('aria-controls'))
+
+    console.log('tab to remove', tab_to_remove)
+    console.log('tab to remove aria-controls', tab_to_remove.attr('aria-controls'))
+    console.log('container to remove', container_to_remove)
+    console.log('container to remove', container_to_remove)
+
+//    var tab_to_remove = $(tabLinkClass+'.active')
+//    var container_to_remove = $(tabContentClass+'.active.show')
 
 // taking totalNoForms so that plus sign can be displayed again
     var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
@@ -21,9 +31,11 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
         var all_next_tabs = tab_to_remove.nextAll(tabLinkClass)
         var all_next_containers = container_to_remove.nextAll(tabContentClass)
 
+        console.log('All next tabs: ',all_next_tabs)
+        console.log('All next containers: ', all_next_containers)
 
     //taking next and previous tabs and containers, to make them active after removal current items
-        var next_tab = tab_to_remove.next()
+        var next_tab = removeButton.next()
         var prev_tab = tab_to_remove.prev()
 
         var next_container = container_to_remove.next()
@@ -32,7 +44,7 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
     //removing current tab and container
         tab_to_remove.remove()
         container_to_remove.remove()
-
+//
     // showing add button again
         totalNoForms--
          $(totalSelector).val(totalNoForms);
@@ -43,22 +55,28 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
          if (totalNoForms == 1) {
                 removeButton.hide();
             }
-
-    // changing attributes of following items
+//
+//    // changing attributes of following items
         for (var i=0; i < all_next_tabs.length; i++){
-
+//
             var current_tab = $(all_next_tabs[i])
             var current_container = $(all_next_containers[i])
+            console.log('current container', current_container)
 
+//
             var old_id = current_container.attr('id')
+            console.log('old id', old_id)
+
             var new_num = parseInt(old_id.slice(-1)) - 1
             var new_id = old_id.slice(0,-1) + new_num
             var new_tab_id = new_id + '-tab'
 
+            console.log(old_id, new_num, new_id, new_tab_id)
+
             // setting new values
             current_tab.attr('id', new_tab_id)
             current_tab.attr('href', '#' + new_id)
-            current_tab.attr('aria-controls', '#' + new_id)
+            current_tab.attr('aria-controls', new_id)
 
             current_container.attr('id', new_id)
             current_container.attr('aria-labelledby', new_tab_id)
@@ -81,16 +99,21 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
 
            $('#' + new_id + '-dataset').change()
         }
-
-
-
+//
+//
+//
 // checking if there is a tab and a container after the ones removed and set them to be active;
 // if the last one is being removed, setting the previous ones as the active
 // tabLinkClass and tabContentClass are sliced to remove the dot at the beginning
+console.log('has class', next_tab.hasClass(tabLinkClass.slice(1, )))
+console.log('Class name', tabLinkClass.slice(1, ))
+console.log('next tab', next_tab)
         if (next_tab.hasClass(tabLinkClass.slice(1, ))){
             next_tab.toggleClass('active')
+            $(next_tab).after(removeButton)
         } else {
             prev_tab.toggleClass('active')
+//            prev_tab.after(removeButton)
         }
 
         if (next_container.hasClass(tabContentClass.slice(1, ))){
@@ -106,15 +129,21 @@ $('#remove_dc_form').click(function() {
 });
 
 
-function shiftTheButton(activeObject, buttonSelector){
+function shiftTheButton(obj, buttonSelector){
     var newButton = buttonSelector.clone(true)
     buttonSelector.remove()
-    activeObject.after(newButton)
+    obj.after(newButton)
     newButton.show()
 
 }
 
-$('#id_datasets-0').click(function(){
-    console.log('clck click')
-//    shiftTheButton($(this), $('#remove_dc_form'))
-})
+function clickClick(obj){
+    var currentObject = obj.currentTarget
+    var removeButton = $('#remove_dc_form')
+    $(currentObject).after(removeButton)
+}
+
+//$('.dc_form_link.nav-item.nav-link.active').focus(function(){
+//    console.log('clck click')
+////    shiftTheButton($(this), $('#remove_dc_form'))
+//})
