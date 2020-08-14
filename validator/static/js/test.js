@@ -104,3 +104,17 @@ function removeTab(tabContentClass, tabLinkClass, formsetPrefix, addButton, remo
 $('#remove_dc_form').click(function() {
     removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
 });
+
+
+function shiftTheButton(activeObject, buttonSelector){
+    var newButton = buttonSelector.clone(true)
+    buttonSelector.remove()
+    activeObject.after(newButton)
+    newButton.show()
+
+}
+
+$('#id_datasets-0').click(function(){
+    console.log('clck click')
+//    shiftTheButton($(this), $('#remove_dc_form'))
+})

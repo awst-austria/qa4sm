@@ -45,7 +45,7 @@
                                     <nav>
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                             {% for dc_form in dc_formset %}
-                                                <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}" role="tab" aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %}>Dataset</a>
+                                                <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %}>Dataset</a>
                                             {% endfor %}
                                                 <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
                                                 <a id="remove_dc_form" class="tab-minus btn btn-primary" href="javascript:void(0)"><span class="fas fa-minus" title="Remove active dataset"></span></a>
@@ -730,12 +730,16 @@
             newLink.attr('href', '#' + newId);
             newLink.attr('aria-controls', '#' + newId);
 
+            var newButton = $(removeButton).clone(true)
+            removeButton.remove()
+
             totalNoForms++;
             $(totalSelector).val(totalNoForms);
 
             // insert new tab and link and select it
             $(selector).after(newElement);
             $(link_selector).after(newLink);
+            $(newLink).after(newButton)
             newLink.tab('show')
 
             // prevent addition of new tabs if max reached
@@ -744,12 +748,12 @@
             }
            // show remove button and change its
             if ( totalNoForms > 1 ) {
-                $(removeButton).css('margin-left', '0.3rem')
-                removeButton.show();
+                $(newButton).css('margin-left', '0.3rem')
+                newButton.show();
             }
-            if (totalNoForms == $(maxSelector).val()) {
-                $(removeButton).css('margin-left', 'auto');
-            }
+<!--            if (totalNoForms == $(maxSelector).val()) {-->
+<!--                $(removeButton).css('margin-left', 'auto');-->
+<!--            }-->
 
 
             // trigger change event on dataset select so that dependent parameters are set correctly
@@ -765,6 +769,7 @@
             cloneTab('.dc_form', '.dc_form_link', 'datasets', $('#remove_dc_form') ,$(this));
             setScalingRef();
         });
+
     </script>
 
 
