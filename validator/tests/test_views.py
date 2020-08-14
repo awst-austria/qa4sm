@@ -187,6 +187,7 @@ class TestViews(TransactionTestCase):
 
         url = reverse('result', kwargs={'result_uuid': self.testrun.id})
 
+
         # use the publishing form to convert the validation metadata to a dict
         metadata = PublishingForm()._formdata_from_validation(self.testrun)
 
