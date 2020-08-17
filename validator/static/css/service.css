@@ -137,6 +137,12 @@ html {
      margin-right: 0.000001rem;
      padding: .0000001rem;
      display:none;
+     color: black;
+}
+.tab-minus:hover {
+    color: black;
+    text-decoration: none;
+    transform: scale(1.2);
 }
 
 a.doilink {

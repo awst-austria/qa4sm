@@ -48,7 +48,7 @@
                                                 <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %} onclick="shiftTheButton(event, '#remove_dc_form')">Dataset</a>
                                             {% endfor %}
                                                 <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
-                                                <a id="remove_dc_form" class="tab-minus btn" href="javascript:void(0)" title="Remove active dataset">&times;</a>
+                                                <a id="remove_dc_form" class="tab-minus" href="javascript:void(0)" title="Remove active dataset">&times;</a>
                                         </div>
                                     </nav>
 
