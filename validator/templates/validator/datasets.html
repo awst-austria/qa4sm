@@ -31,8 +31,8 @@
                 <tr>
                     <th scope="col" style="width: 10%">Dataset</th>
                     <th scope="col" style="width: 20%">Details</th>
-                    <th scope="col" style="width: 15%">Versions supported</th>
-                    <th scope="col" style="width: 5%">Time Range Covered</th>
+                    <th scope="col" style="width: 20%">Versions supported with Time Range Covered</th>
+<!--                    <th scope="col" style="width: 5%">Time Range Covered</th>-->
                     <th scope="col" style="width: 15%">Data availability</th>
                     <th scope="col" style="width: 10%">Citation</th>
                     <th scope="col" style="width: 25%">Filters</th>
@@ -41,15 +41,30 @@
             <tbody>
                 {% for dataset in datasets %}
                     {% if dataset.is_reference == ref_flag %}
+                    <tr>
+
+                    </tr>
+                    <tr>
+
+                    </tr>
                         <tr>
                             <th scope="row">{{ dataset.pretty_name }}</th>
                             <td>{{ dataset.detailed_description |safe }}</td>
                             <td>
-                                <ul>
-                                    {% for version in dataset.versions.all %} <li>{{ version.pretty_name }}: {{ version.help_text }}</li> {% endfor %}
-                                </ul>
+<!--                                <ul>-->
+                                    {% for version in dataset.versions.all %}
+                                    <p>{{ version.pretty_name }}{% if version.help_text != '-' and version.help_text != ''%} ({{ version.help_text }}): {%else%}: {% endif %}
+                                        {{ version.time_range_covered}}</p>
+                                    {% endfor %}
+<!--                                </ul>-->
                             </td>
-                            <td>{{ dataset.time_range_covered |safe}}</td>
+<!--                            <td>-->
+<!--&lt;!&ndash;                                <ul>&ndash;&gt;-->
+<!--                                    {% for version in dataset.versions.all %}-->
+<!--                                    <p>{{ version.time_range_covered}}</p>-->
+<!--                                    {% endfor %}-->
+<!--&lt;!&ndash;                                </ul>&ndash;&gt;-->
+<!--                            </td>-->
                             <td>{{ dataset.source_reference |safe }}</td>
                             <td>{{ dataset.citation |safe }}</td>
                             <td>
