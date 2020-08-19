@@ -11,6 +11,7 @@ from dateutil import parser
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 from validator.forms import PublishingForm
+
 User = get_user_model()
 
 from django.core import mail
@@ -38,8 +39,8 @@ from validator.validation import set_outfile, mkdir_if_not_exists
 
 from django.utils.http import urlencode
 
-class TestViews(TransactionTestCase):
 
+class TestViews(TransactionTestCase):
     # This re-inits the database for every test, see
     # https://docs.djangoproject.com/en/2.0/topics/testing/overview/#test-case-serialized-rollback
     # It's necessary because the validation view closes the db connection
@@ -85,8 +86,8 @@ class TestViews(TransactionTestCase):
             'user': self.testuser,
             'start_time': datetime.utcnow().replace(tzinfo=utc) - timedelta(hours=1),
             'end_time': datetime.utcnow().replace(tzinfo=utc),
-            'total_points' : 30,
-            'error_points' : 5,
+            'total_points': 30,
+            'error_points': 5,
         }
         ## Create a test validation run with a specific id so that it can
         ## be accessed via a URL containing that id
@@ -95,14 +96,17 @@ class TestViews(TransactionTestCase):
         self.testrun.output_file.name = str(self.testrun.id) + '/foobar.nc'
         self.testrun.save()
 
-        self.public_views = ['login', 'logout', 'home', 'published_results', 'signup', 'signup_complete', 'terms', 'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done', 'password_reset_complete', 'user_profile_deactivated']
-        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm','stop_validation']
-        self.private_views = [p.name for p in urlpatterns if hasattr(p, 'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
+        self.public_views = ['login', 'logout', 'home', 'published_results', 'signup', 'signup_complete', 'terms',
+                             'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done',
+                             'password_reset_complete', 'user_profile_deactivated']
+        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm', 'stop_validation']
+        self.private_views = [p.name for p in urlpatterns if hasattr(p,
+                                                                     'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
     ## Ensure that anonymous access is prevented for private pages
     def test_views_deny_anonymous(self):
         login_url = reverse('login')
-        testurls = [ reverse(tv) for tv in self.private_views ]
+        testurls = [reverse(tv) for tv in self.private_views]
 
         for url in testurls:
             self.__logger.info(url)
@@ -113,7 +117,7 @@ class TestViews(TransactionTestCase):
 
     ## Check that with valid credentials (set in setUp), access is possible
     def test_views_login(self):
-        testurls = [ reverse(tv) for tv in self.private_views ]
+        testurls = [reverse(tv) for tv in self.private_views]
 
         for url in testurls:
             self.client.login(**self.credentials)
@@ -140,7 +144,8 @@ class TestViews(TransactionTestCase):
 
         ## only owners should be able to change validations
         self.client.login(**self.credentials2)
-        response = self.client.patch(url, 'extend=true',  content_type='application/x-www-form-urlencoded;')
+        # response = self.client.patch(url, 'extend=true', content_type='application/x-www-form-urlencoded;')
+        response = self.client.patch(url, 'extend=true', content_type='application/x-www-form-urlencoded;')
         self.assertEqual(response.status_code, 403)
 
         ## try out normal expiry extension
@@ -181,7 +186,7 @@ class TestViews(TransactionTestCase):
         self.assertEqual(response.status_code, 400)
         assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is not None
 
-    @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
+    @override_settings(DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions")
     def test_result_publishing(self):
         infile = 'testdata/output_data/c3s_era5land.nc'
 
@@ -222,7 +227,7 @@ class TestViews(TransactionTestCase):
         # remove file path from validation
         self.testrun.output_file = None
         self.testrun.save()
-        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id)  # reload
 
         # shouldn't work because of missing file path in validation
         response = self.client.patch(url, urlencode(metadata))
@@ -236,12 +241,12 @@ class TestViews(TransactionTestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         set_outfile(self.testrun, run_dir)
         self.testrun.save()
-        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id)  # reload
 
         ## simulate that publishing is already in progress
         self.testrun.publishing_in_progress = True
         self.testrun.save()
-        self.testrun = ValidationRun.objects.get(pk=self.testrun.id) # reload
+        self.testrun = ValidationRun.objects.get(pk=self.testrun.id)  # reload
         response = self.client.patch(url, urlencode(metadata))
         self.__logger.debug("{} {}".format(response.status_code, response.content))
         self.assertEqual(response.status_code, 400)
@@ -265,7 +270,7 @@ class TestViews(TransactionTestCase):
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
         run.save()
-        result_id=str(run.id)
+        result_id = str(run.id)
 
         assert result_id, "Error saving the test validation run."
 
@@ -295,6 +300,47 @@ class TestViews(TransactionTestCase):
 
         assert not ValidationRun.objects.filter(pk=result_id).exists(), "Validation run didn't get deleted."
 
+    def test_change_validation_name(self):
+        # create new no-named result
+        run = ValidationRun()
+        run.user = self.testuser
+        run.start_time = datetime.now(tzlocal())
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.save()
+        result_id = str(run.id)
+
+        assert result_id, "Error saving the test validation run."
+
+        #try to change name of other user's validation
+        url = reverse('result', kwargs={'result_uuid': result_id})
+
+        self.client.login(**self.credentials2)
+        response = self.client.patch(url, 'save_name=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 403)
+
+        # log in as owner of result and check invalid saving mode
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'save_name=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        # log in as owner of result and check valid saving mode
+        self.client.login(**self.credentials)
+        response = self.client.patch(url, 'save_name=true&new_name="new_name"', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+
+        run.doi = '10.1000/182'
+        run.save()
+
+        response = self.client.patch(url, 'save_name=true&new_name="new_name"', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 405)
+
+        run.doi = ''
+        run.save()
+        run.name_tag = 'new_name'
+        run.save()
+        assert ValidationRun.objects.filter(name_tag='new_name').exists()
+
     def test_my_results_view(self):
         url = reverse('myruns')
         self.client.login(**self.credentials)
@@ -308,7 +354,9 @@ class TestViews(TransactionTestCase):
     def test_ajax_get_dataset_options_view(self):
         url = reverse('ajax_get_dataset_options')
         self.client.login(**self.credentials)
-        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id, 'filter_widget_id': 'id_datasets-0-filters', 'param_filter_widget_id': 'id_datasets-0-paramfilters'})
+        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
+                                         'filter_widget_id': 'id_datasets-0-filters',
+                                         'param_filter_widget_id': 'id_datasets-0-paramfilters'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
         assert return_data['versions']
@@ -346,7 +394,7 @@ class TestViews(TransactionTestCase):
                          Dataset.objects.get(short_name=globals.ASCAT),
                          Dataset.objects.get(short_name=globals.SMAP),
                          Dataset.objects.get(short_name=globals.C3S),
-                         Dataset.objects.get(short_name=globals.ASCAT),]
+                         Dataset.objects.get(short_name=globals.ASCAT), ]
 
         url = reverse('validation')
         self.client.login(**self.credentials)
@@ -365,17 +413,17 @@ class TestViews(TransactionTestCase):
             'ref_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
             'ref_filters': DataFilter.objects.get(name='FIL_ISMN_GOOD').id,
 
-            'anomalies' : ValidationRun.CLIMATOLOGY,
-            'anomalies_from' : '1978',
-            'anomalies_to' : '1998',
+            'anomalies': ValidationRun.CLIMATOLOGY,
+            'anomalies_from': '1978',
+            'anomalies_to': '1998',
 
-            'min_lat' : '20.07094414427701',
-            'min_lon' : '-134.82421875000003',
-            'max_lat' : '51.47764573196917',
-            'max_lon' : '-57.83203125000001',
+            'min_lat': '20.07094414427701',
+            'min_lon': '-134.82421875000003',
+            'max_lat': '51.47764573196917',
+            'max_lon': '-57.83203125000001',
 
-            'interval_from': datetime(1978,1,1),
-            'interval_to': datetime(1998,1,1),
+            'interval_from': datetime(1978, 1, 1),
+            'interval_to': datetime(1998, 1, 1),
 
             'scaling_method': ValidationRun.MEAN_STD,
             'scaling_ref': ValidationRun.SCALE_TO_REF,
@@ -390,7 +438,7 @@ class TestViews(TransactionTestCase):
                 'datasets-' + str(ds_no) + '-variable': test_ds.variables.first().id,
                 'datasets-' + str(ds_no) + '-filter_dataset': True,
                 'datasets-' + str(ds_no) + '-filters': test_ds.filters.last().id,
-                }
+            }
             validation_params.update(ds_dict)
 
         result = self.client.post(url, validation_params)
@@ -435,10 +483,10 @@ class TestViews(TransactionTestCase):
             'ref-dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
             'ref-version': DatasetVersion.objects.get(short_name=globals.GLDAS_NOAH025_3H_2_1).id,
             'ref-variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
-            'min_lat' : '18.39665',
-            'min_lon' : '-161.08154',
-            'max_lat' : '22.91482',
-            'max_lon' : '-153.91845',
+            'min_lat': '18.39665',
+            'min_lon': '-161.08154',
+            'max_lat': '22.91482',
+            'max_lon': '-153.91845',
             'scaling_method': ValidationRun.MEAN_STD,
             'scaling_ref': ValidationRun.SCALE_TO_DATA,
         }
@@ -487,10 +535,10 @@ class TestViews(TransactionTestCase):
 
     ## Stress test the server!
     @pytest.mark.long_running
-    def no_test_submit_lots_of_validations(self): # deactivate the test until we found out what makes it hang
+    def no_test_submit_lots_of_validations(self):  # deactivate the test until we found out what makes it hang
         N = 10
-        timeout = 300 # seconds
-        wait_time = 5 # seconds
+        timeout = 300  # seconds
+        wait_time = 5  # seconds
 
         url = reverse('validation')
         self.client.login(**self.credentials)
@@ -502,7 +550,7 @@ class TestViews(TransactionTestCase):
             'ref_dataset': Dataset.objects.get(short_name=globals.ISMN).id,
             'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
             'ref_variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
-            #'scaling_ref': ValidationRun.SCALE_REF,
+            # 'scaling_ref': ValidationRun.SCALE_REF,
             'scaling_method': ValidationRun.MEAN_STD,
             'filter_data': True,
             'data_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
@@ -606,7 +654,7 @@ class TestViews(TransactionTestCase):
             'country': 'US',
             'orcid': '0000-0002-1825-0097',
             'terms_consent': True,
-            }
+        }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 302)
         self.assertRedirects(result, reverse('signup_complete'))
@@ -620,7 +668,7 @@ class TestViews(TransactionTestCase):
             'password2': 'Fae6eij7NuoY5Fa1thii',
             'email': 'chuck@norris.com',
             'terms_consent': True,
-            }
+        }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 302)
         self.assertRedirects(result, reverse('signup_complete'))
@@ -634,7 +682,7 @@ class TestViews(TransactionTestCase):
             'password2': 'Fae6eij7NuoY5Fa1thii',
             'email': 'chuck@norris.com',
             'terms_consent': False,
-            }
+        }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 200)
 
@@ -645,12 +693,12 @@ class TestViews(TransactionTestCase):
         user_info = {
             'username': self.credentials['username'],
             'email': 'chuck@norris.com',
-            'country':'AT',
+            'country': 'AT',
             'orcid': '0000-0002-1825-0097',
-            'last_name':'Chuck',
-            'first_name':'Norris',
-            'organisation':'Texas Rangers',
-            }
+            'last_name': 'Chuck',
+            'first_name': 'Norris',
+            'organisation': 'Texas Rangers',
+        }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 302)
         self.assertRedirects(result, reverse('user_profile_updated'))
@@ -660,64 +708,63 @@ class TestViews(TransactionTestCase):
 
         url = reverse('user_profile')
         user_info = {
-            'username': self.credentials['username'], ## this is too little info, should fail
-            }
+            'username': self.credentials['username'],  ## this is too little info, should fail
+        }
         result = self.client.post(url, user_info)
         self.assertEqual(result.status_code, 200)
 
     def test_user_profile_form_validation(self):
-        form_data = {'username':'john_doe',
-                     'password1':'asd12N83poLL',
-                     'password2':'asd12N83poLL',
-                     'country':'AT',
-                     'last_name':'Doe',
-                     'first_name':'John',
-                     'organisation':'????',
-                     'email':'john@nowhere.com',
-                     'orcid':'0000-0002-1825-0097',
+        form_data = {'username': 'john_doe',
+                     'password1': 'asd12N83poLL',
+                     'password2': 'asd12N83poLL',
+                     'country': 'AT',
+                     'last_name': 'Doe',
+                     'first_name': 'John',
+                     'organisation': '????',
+                     'email': 'john@nowhere.com',
+                     'orcid': '0000-0002-1825-0097',
                      }
-        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
-        self.assertTrue(form.is_valid()) # should pass
+        form = UserProfileForm(initial={'username': 'john_doe', }, data=form_data)
+        self.assertTrue(form.is_valid())  # should pass
 
-        form_data = { 'email':'john@nowhere.com' }
-        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
-        self.assertTrue(form.is_valid()) # should pass
+        form_data = {'email': 'john@nowhere.com'}
+        form = UserProfileForm(initial={'username': 'john_doe', }, data=form_data)
+        self.assertTrue(form.is_valid())  # should pass
 
-        form_data = { 'username':'john_doe' }
-        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
-        self.assertFalse(form.is_valid()) # should fail because of the missing e-mail field
+        form_data = {'username': 'john_doe'}
+        form = UserProfileForm(initial={'username': 'john_doe', }, data=form_data)
+        self.assertFalse(form.is_valid())  # should fail because of the missing e-mail field
 
-        form_data = {'username':'john_doe',
-                     'password1':'asd12N83poLL',
-                     'password2':'asd12N83poLL',
-                     'email':'john@nowhere.com'
+        form_data = {'username': 'john_doe',
+                     'password1': 'asd12N83poLL',
+                     'password2': 'asd12N83poLL',
+                     'email': 'john@nowhere.com'
                      }
-        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
-        self.assertTrue(form.is_valid()) # should pass
+        form = UserProfileForm(initial={'username': 'john_doe', }, data=form_data)
+        self.assertTrue(form.is_valid())  # should pass
 
-        form_data = {'username':'john_doe',
-                     'password1':'asd12N83poLL',
-                     'password2':'asd12N8',
-                     'email':'john@nowhere.com'
+        form_data = {'username': 'john_doe',
+                     'password1': 'asd12N83poLL',
+                     'password2': 'asd12N8',
+                     'email': 'john@nowhere.com'
                      }
-        form = UserProfileForm(initial={ 'username': 'john_doe', }, data=form_data)
-        self.assertFalse(form.is_valid()) # should fail because passwords don't match
-
+        form = UserProfileForm(initial={'username': 'john_doe', }, data=form_data)
+        self.assertFalse(form.is_valid())  # should fail because passwords don't match
 
     def test_deactivate_user_profile(self):
         url = reverse('user_profile')
         credentials = {
             'username': 'to_be_deactivated',
             'password': 'secret'}
-        to_be_deactivated=User.objects.create_user(**credentials)
+        to_be_deactivated = User.objects.create_user(**credentials)
         to_be_deactivated.is_active = True
         to_be_deactivated.save()
         self.client.login(**credentials)
         result = self.client.delete(url)
         to_be_deactivated.refresh_from_db()
-        self.assertEqual(to_be_deactivated.is_active,False)
+        self.assertEqual(to_be_deactivated.is_active, False)
         self.assertEqual(result.status_code, 200)
-        login_success=self.client.login(**credentials)
+        login_success = self.client.login(**credentials)
         assert not login_success
 
     ## simulate workflow for password reset
@@ -747,7 +794,8 @@ class TestViews(TransactionTestCase):
         assert self.credentials2['username'] in sent_mail.body
 
         ## check that the email contains a confirmation link with userid and token
-        urls = regex_find(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sent_mail.body)
+        urls = regex_find(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+                          sent_mail.body)
         userid = None
         token = None
         for u in urls:
@@ -771,7 +819,8 @@ class TestViews(TransactionTestCase):
                 ## follow redirect and enter new password - we should be redirected to password_reset_complete
                 url = response.url
                 self.credentials2['password'] = '1superPassword!!'
-                response = self.client.post(url, {'new_password1': self.credentials2['password'], 'new_password2': self.credentials2['password'],})
+                response = self.client.post(url, {'new_password1': self.credentials2['password'],
+                                                  'new_password2': self.credentials2['password'], })
                 self.assertRedirects(response, reverse('password_reset_complete'))
             ## second time
             else:
@@ -784,5 +833,5 @@ class TestViews(TransactionTestCase):
         assert login_success
 
         ## make sure we can't log in with the old password
-        login_success = self.client.login(**{'username': self.credentials2['username'], 'password': orig_password })
+        login_success = self.client.login(**{'username': self.credentials2['username'], 'password': orig_password})
         assert not login_success
