@@ -51,12 +51,14 @@
                             <th scope="row">{{ dataset.pretty_name }}</th>
                             <td>{{ dataset.detailed_description |safe }}</td>
                             <td>
-<!--                                <ul>-->
+                                <ul>
                                     {% for version in dataset.versions.all %}
-                                    <p>{{ version.pretty_name }}{% if version.help_text != '-' and version.help_text != ''%} ({{ version.help_text }}): {%else%}: {% endif %}
-                                        {{ version.time_range_covered}}</p>
+                                    <li>
+                                     <b> {{ version.pretty_name }}</b>{% if version.help_text != '-' and version.help_text != ''%} ({{ version.help_text }}): {%else%}: {% endif %}
+                                      {%if version.time_range_start == "" and version.time_range_end == "" %} Stattion dependent {%else%} From {{ version.time_range_start}} to {{ version.time_range_start}} {% endif %}
+                                    </li>
                                     {% endfor %}
-<!--                                </ul>-->
+                                </ul>
                             </td>
 <!--                            <td>-->
 <!--&lt;!&ndash;                                <ul>&ndash;&gt;-->
