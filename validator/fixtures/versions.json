@@ -6,8 +6,8 @@
             "short_name": "C3S_V201706",
             "pretty_name": "v201706",
             "help_text": "C3S from June 2017",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2017-06-30"
         }
     },
     {
@@ -17,8 +17,8 @@
             "short_name": "SMAP_V5_PM",
             "pretty_name": "v5 PM/ascending",
             "help_text": "",
-            "time_range_start": "2015-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2018-12-04"
         }
     },
     {
@@ -28,7 +28,7 @@
             "short_name": "ASCAT_H113",
             "pretty_name": "H113",
             "help_text": "",
-            "time_range_start": "2007-01-01",
+            "time_range_start": "2007-01-02",
             "time_range_end": "2017-12-31"
         }
     },
@@ -61,7 +61,7 @@
             "short_name": "C3S_V201812",
             "pretty_name": "v201812",
             "help_text": "C3S from December 2018",
-            "time_range_start": "1978-01-01",
+            "time_range_start": "1978-11-01",
             "time_range_end": "2018-12-31"
         }
     },
@@ -72,8 +72,8 @@
             "short_name": "ESA_CCI_SM_C_V04_4",
             "pretty_name": "v04.4",
             "help_text": "",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2018-06-30"
         }
     },
     {
@@ -83,7 +83,7 @@
             "short_name": "SMOS_105_ASC",
             "pretty_name": "V.105 Ascending",
             "help_text": "",
-            "time_range_start": "2010-01-01",
+            "time_range_start": "2010-01-12",
             "time_range_end": "2018-12-31"
         }
     },
@@ -95,7 +95,7 @@
             "pretty_name": "v20190613",
             "help_text": "snapshot of the reanalysis dataset from 2019-06-13",
             "time_range_start": "1979-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_end": "2019-03-31"
         }
     },
     {
@@ -106,7 +106,7 @@
             "pretty_name": "v20190904",
             "help_text": "snapshot of the reanalysis dataset from 2019-09-04",
             "time_range_start": "2001-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_end": "2019-04-30"
         }
     },
     {
@@ -127,7 +127,7 @@
             "short_name": "ESA_CCI_SM_C_V04_5",
             "pretty_name": "v04.5",
             "help_text": "-",
-            "time_range_start": "1978-01-01",
+            "time_range_start": "1978-11-01",
             "time_range_end": "2018-12-31"
         }
     },
@@ -138,7 +138,7 @@
             "short_name": "ESA_CCI_SM_A_V04_5",
             "pretty_name": "v04.5",
             "help_text": "-",
-            "time_range_start": "1978-01-01",
+            "time_range_start": "1991-08-05",
             "time_range_end": "2018-12-31"
         }
     },
@@ -149,29 +149,7 @@
             "short_name": "ESA_CCI_SM_P_V04_5",
             "pretty_name": "v04.5",
             "help_text": "-",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 22,
-        "fields": {
-            "short_name": "ESA_CCI_SM_P_V04_7",
-            "pretty_name": "v04.7",
-            "help_text": "-",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 23,
-        "fields": {
-            "short_name": "ESA_CCI_SM_A_V04_7",
-            "pretty_name": "v04.7",
-            "help_text": "-",
-            "time_range_start": "1978-01-01",
+            "time_range_start": "1978-11-01",
             "time_range_end": "2018-12-31"
         }
     },
@@ -182,8 +160,8 @@
             "short_name": "ESA_CCI_SM_C_V04_7",
             "pretty_name": "v04.7",
             "help_text": "-",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2019-12-31"
         }
     },
     {
@@ -193,8 +171,8 @@
             "short_name": "ESA_CCI_SM_P_V05_2",
             "pretty_name": "v05.2",
             "help_text": "-",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2019-12-31"
         }
     },
     {
@@ -204,7 +182,7 @@
             "short_name": "ESA_CCI_SM_A_V05_2",
             "pretty_name": "v05.2",
             "help_text": "-",
-            "time_range_start": "1978-01-01",
+            "time_range_start": "1991-08-05",
             "time_range_end": "2018-12-31"
         }
     },
@@ -215,8 +193,8 @@
             "short_name": "ESA_CCI_SM_C_V05_2",
             "pretty_name": "v05.2",
             "help_text": "-",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2019-12-31"
         }
     },
     {
@@ -226,8 +204,8 @@
             "short_name": "C3S_V201912",
             "pretty_name": "v201912",
             "help_text": "C3S from December 2019",
-            "time_range_start": "1978-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2019-12-31"
         }
     },
     {
@@ -237,8 +215,8 @@
             "short_name": "SMAP_V6_PM",
             "pretty_name": "v6 PM/ascending",
             "help_text": "-",
-            "time_range_start": "2015-01-01",
-            "time_range_end": "2018-12-31"
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2020-05-23"
         }
     }
 ]

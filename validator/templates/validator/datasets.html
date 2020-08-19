@@ -40,12 +40,6 @@
             <tbody>
                 {% for dataset in datasets %}
                     {% if dataset.is_reference == ref_flag %}
-                    <tr>
-
-                    </tr>
-                    <tr>
-
-                    </tr>
                         <tr>
                             <th scope="row">{{ dataset.pretty_name }}</th>
                             <td>{{ dataset.detailed_description |safe }}</td>
