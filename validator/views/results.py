@@ -36,7 +36,6 @@ def user_runs(request):
 
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
-
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
         if(val_run.user != request.user):
@@ -44,17 +43,34 @@ def result(request, result_uuid):
 
         ## check that our validation can be deleted; it can't if it already has a DOI
         if(not val_run.is_unpublished):
-            return HttpResponse(status=405)
+            return HttpResponse(status=405) #405
 
         val_run.delete()
         return HttpResponse("Deleted.", status=200)
 
     elif(request.method == 'PATCH'):
         ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+
         if(val_run.user != request.user):
             return HttpResponse(status=403)
 
         patch_params = QueryDict(request.body)
+
+        if 'save_name' in patch_params:
+            ## check that our validation's name can be changed'; it can't if it already has a DOI
+            if (not val_run.is_unpublished):
+                return HttpResponse('Validation has been published', status=405)
+
+            save_mode = patch_params['save_name']
+
+            if save_mode != 'true':
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            val_run.name_tag = patch_params['new_name']
+            val_run.save()
+
+            return HttpResponse("Changed.", status=200)
+
 
         if 'archive' in patch_params:
             archive_mode = patch_params['archive']
