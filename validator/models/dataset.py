@@ -14,7 +14,6 @@ class Dataset(models.Model):
     detailed_description = models.TextField()
     source_reference = models.TextField()
     citation = models.TextField()
-    # time_range_covered = models.TextField()
 
     is_reference = models.BooleanField(default=False)
 
