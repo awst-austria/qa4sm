@@ -17,7 +17,7 @@
                 <p>
                     Click on a continent to unfold its list of networks.<br/>
                     Networks are listed here with <b>network name</b>, <b>countries</b>, and <b>number of stations</b>.<br/>
-                    You can find more information about the ISMN networks on the <a href="https://ismn.geo.tuwien.ac.at/en/sites/networks/"
+                    You can find more information about the ISMN networks on the <a href="https://ismn.geo.tuwien.ac.at/en/networks/"
                     target="_blank">ISMN networks list</a>.
                 </p>
 
@@ -774,6 +774,66 @@
     </div>
 </div>
 
+
+<!--Monika-->
+<div class="modal" id="ismn_depth" role="dialog" aria-labelledby="ismn_networks_title" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 30rem;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="my-0 font-weight-normal" id="ismn_depth_title">Select measurements depth range</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="modal-body overflow-auto" style="max-height: 60vh;">
+
+                <style type="text/css">
+                    .ismn_label { display:inline-block; }
+                    .ismn_indent { margin-left: 1rem; }
+                </style>
+
+                <p>
+                    Click on a given range to include measurements done only at chosen depth.<br/>
+                    The filter will be applied to all stations in chosen networks.
+                </p>
+
+                <div>
+                    <div class="custom-control custom-switch">
+                        <input class="custom-control-input continent" id="id_range_0_to_5" value="0.00-0.05" type="checkbox" name="first_range"
+                            onchange="toggleISMNContinent(this)" checked>
+                        <label class="custom-control-label" for="id_range_0_to_5">0.00 - 0.05 m</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="custom-control custom-switch">
+                        <input class="custom-control-input continent" id="id_range_5_to_10" value="0.05-0.10" type="checkbox" name="second_range"
+                            onchange="toggleISMNContinent(this)" checked>
+                        <label class="custom-control-label" for="id_range_5_to_10">0.05 - 0.10 m</label>
+                    </div>
+                </div>
+                <div>
+                    <div class="custom-control custom-switch">
+                        <input class="custom-control-input continent" id="id_range_above_10" value="0.10<" type="checkbox" name="third_range"
+                            onchange="toggleISMNContinent(this)" checked>
+                        <label class="custom-control-label" for="id_range_above_10">above 0.10 m</label>
+                    </div>
+                </div>
+
+            </div>
+
+<!--            <input type="hidden" id="id_target_hidden_input" value="" name="target_hidden_input">-->
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="ismn_depth_button" type="button" onclick="setISMNNetworks(this);$('#ismn_networks').modal('hide');" class="btn btn-primary">Use depth ranges</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!--====================================== Java Script Codes ==================================================== -->
 <script type="text/javascript">
     function toggleISMNContinent(checkbox) {
         var groupId = checkbox.id.replace(/^id_continent_/, 'id_collapse_')
