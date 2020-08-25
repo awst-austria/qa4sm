@@ -125,11 +125,11 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
     for pfil in param_filters:
         __logger.debug("Setting up parametrised filter {} for dataset {} with parameter {}".format(pfil.filter.name, dataset, pfil.parameters))
 
-        if(pfil.filter.name == "FIL_ISMN_NETWORKS" and pfil.parameters):
-            inner_reader = filtered_reader
-            while(hasattr(inner_reader, 'cls')):
-                inner_reader = inner_reader.cls
+        inner_reader = filtered_reader
+        while (hasattr(inner_reader, 'cls')):
+            inner_reader = inner_reader.cls
 
+        if(pfil.filter.name == "FIL_ISMN_NETWORKS" and pfil.parameters):
             if isinstance(inner_reader, ISMN_Interface):
                 param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters) # replace whitespace around commas
                 param = regex_sub(r'(^[ ]+|[ ]+$)', '', param) # replace whitespace at start and end of string
@@ -139,6 +139,19 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 __logger.debug('Selected networks: ' + ';'.join(networks))
                 inner_reader.activate_network(networks)
             continue
+
+        if (pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters):
+            # inner_reader = filtered_reader
+            # while (hasattr(inner_reader, 'cls')):
+            #     inner_reader = inner_reader.cls
+
+            if isinstance(inner_reader, ISMN_Interface):
+                param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)  # replace whitespace around commas
+                param = regex_sub(r'(^[ ]+|[ ]+$)', '', param)  # replace whitespace at start and end of string
+                paramnetlist = param.split(',')
+                depths = [depth.split('-') for depth in paramnetlist]
+                depth_to = depths[-1][1]
+                depth_from = float(depths[0][0])
 
     masking_filters = []
 

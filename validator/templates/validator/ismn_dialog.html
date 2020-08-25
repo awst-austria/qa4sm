@@ -785,7 +785,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
             </div>
 
-            <div class="modal-body overflow-auto" style="max-height: 60vh;">
+            <div class="modal-body overflow-auto depth" style="max-height: 60vh;">
 
                 <style type="text/css">
                     .ismn_label { display:inline-block; }
@@ -799,21 +799,21 @@
 
                 <div>
                     <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_range_0_to_5" value="0.00-0.05" type="checkbox" name="first_range"
+                        <input class="custom-control-input depth_range" id="id_range_0_to_5" value="0.00-0.05" type="checkbox" name="first_range"
                             onchange="toggleISMNContinent(this)" checked>
                         <label class="custom-control-label" for="id_range_0_to_5">0.00 - 0.05 m</label>
                     </div>
                 </div>
                 <div>
                     <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_range_5_to_10" value="0.05-0.10" type="checkbox" name="second_range"
+                        <input class="custom-control-input depth_range" id="id_range_5_to_10" value="0.05-0.10" type="checkbox" name="second_range"
                             onchange="toggleISMNContinent(this)" checked>
                         <label class="custom-control-label" for="id_range_5_to_10">0.05 - 0.10 m</label>
                     </div>
                 </div>
                 <div>
                     <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_range_above_10" value="0.10<" type="checkbox" name="third_range"
+                        <input class="custom-control-input depth_range" id="id_range_above_10" value="0.10<" type="checkbox" name="third_range"
                             onchange="toggleISMNContinent(this)" checked>
                         <label class="custom-control-label" for="id_range_above_10">above 0.10 m</label>
                     </div>
@@ -821,11 +821,11 @@
 
             </div>
 
-<!--            <input type="hidden" id="id_target_hidden_input" value="" name="target_hidden_input">-->
+            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth">
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="ismn_depth_button" type="button" onclick="setISMNNetworks(this);$('#ismn_networks').modal('hide');" class="btn btn-primary">Use depth ranges</button>
+                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide');" class="btn btn-primary">Use depth ranges</button>
             </div>
 
         </div>
@@ -847,14 +847,16 @@
     function setISMNNetworks(source) {
         var ismnDialog = $(source).closest('#ismn_networks');
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
-
+        console.log(hiddenId)
         var networkList = '';
         for (var netCB of ismnDialog.find('input:checked.network')) {
+            console.log(netCB.value)
             networkList += netCB.value + ',';
         }
-        networkList = networkList.replace(/,+$/, '');
+        networkList = networkList.replace(/,+$/, ''); //remove the last coma
 
         $('#'+hiddenId).val(networkList);
+        console.log($('#'+hiddenId).val())
     }
 
     $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
@@ -868,6 +870,7 @@
         preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, ''); // clean string from whitespace
         var netList = preselectedNetworks.split(',');
 
+
         // reset dialog:
         ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
         ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
@@ -875,6 +878,52 @@
         for (var net of netList) { // check the preselected networks
             ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
         }
+    });
+
+    function setISMNDepth(source) {
+        var ismnDialog = $(source).closest('#ismn_depth');
+        var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
+        var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
+        console.log(depthCheckbox)
+
+        var depthList = '';
+        for (var depth of ismnDialog.find('input:checked.depth_range')) {
+            depthList += depth.value + ',';
+        }
+        depthList = depthList.replace(/,+$/, ''); //remove the last coma
+
+        $('#'+hiddenId).val(depthList);
+
+
+        // if none of the range or all ranges are chosen then the main checkbox is unchecked
+        if(depthList.split(',').length<3 && depthList.split(',')[0] != ""){
+            $(depthCheckbox).prop('checked', true)
+        } else {
+            $(depthCheckbox).prop('checked', false)
+        }
+
+
+    }
+
+    $('#ismn_depth').on('show.bs.modal', function(e) { // happens when dialog is activated
+        var callerId = e.relatedTarget.id;
+        var hiddenId = callerId.replace(/_link$/, '_params');
+        var ismnDialog = $(e.currentTarget);
+
+        ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
+
+        var preselectedDepths = $('#' + hiddenId).val();
+        preselectedDepths = preselectedDepths.replace(/[ ]+/g, '').replace(/(^[ ]+|[ ]+$)/m, ''); // clean string from whitespace
+        var depthList = preselectedDepths.split(',');
+        console.log(depthList)
+
+<!--        // reset dialog:-->
+<!--        ismnDialog.find('input:checkbox.depth').prop("checked", true); // enable continents-->
+<!--        ismnDialog.find('input:checkbox.depth_range').prop("checked", true); // disable networks-->
+
+<!--        for (var net of netList) { // check the preselected networks-->
+<!--            ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );-->
+<!--        }-->
     });
 
 </script>
