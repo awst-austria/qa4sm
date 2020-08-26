@@ -814,7 +814,7 @@
                 <div>
                     <div class="custom-control custom-switch">
                         <input class="custom-control-input depth_range" id="id_range_above_10" value="0.10<" type="checkbox" name="third_range"
-                            onchange="toggleISMNContinent(this)" checked>
+                            onchange="toggleISMNContinent(this)">
                         <label class="custom-control-label" for="id_range_above_10">above 0.10 m</label>
                     </div>
                 </div>
@@ -894,15 +894,12 @@
 
         $('#'+hiddenId).val(depthList);
 
-
-        // if none of the range or all ranges are chosen then the main checkbox is unchecked
-        if(depthList.split(',').length<3 && depthList.split(',')[0] != ""){
-            $(depthCheckbox).prop('checked', true)
-        } else {
+        // if two first ranges are chosen then uncheck the depth switch to indicate the default settings
+        if ($('#id_range_0_to_5').prop('checked') && $('#id_range_5_to_10').prop('checked') && !$('#id_range_above_10').prop('checked')){
             $(depthCheckbox).prop('checked', false)
+        } else{
+            $(depthCheckbox).prop('checked', true)
         }
-
-
     }
 
     $('#ismn_depth').on('show.bs.modal', function(e) { // happens when dialog is activated
