@@ -143,23 +143,18 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 inner_reader.activate_network(networks)
             continue
 
-        if pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters:
-            if isinstance(inner_reader, ISMN_Interface):
+        if isinstance(inner_reader, ISMN_Interface):
+            default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
+            default_depth = [float(depth) for depth in default_depth.split('-')]
+            depth_min = default_depth[0]
+            depth_max = default_depth[1]
+
+            if pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters:
                 depth_min = float(pfil.parameters.split(',')[0])
                 depth_max = float(pfil.parameters.split(',')[1])
-                print(f'And here are the depth_to: {depth_max}, and depth_from: {depth_min}')
-                indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[4] > depth_max]
 
-                inner_reader.metadata = np.delete(inner_reader.metadata, indices)
-                print(f'Used data: {inner_reader.metadata}')
-        else:
-            if isinstance(inner_reader, ISMN_Interface):
-                default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
-                default_depth = [float(depth) for depth in default_depth.split('-')]
-                depth_min = default_depth[0]
-                depth_max = default_depth[1]
-                indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[4] > depth_max]
-                inner_reader.metadata = np.delete(inner_reader.metadata, indices)
+            indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[4] > depth_max]
+            inner_reader.metadata = np.delete(inner_reader.metadata, indices)
 
 
     masking_filters = []
