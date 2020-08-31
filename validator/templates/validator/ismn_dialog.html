@@ -817,7 +817,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide');" class="btn btn-primary">Use depth ranges</button>
+                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide');" class="btn btn-primary">Use depth range</button>
             </div>
 
         </div>
@@ -881,17 +881,13 @@
 
         var depth_from = $('#depth_from').val()
         var depth_to = $('#depth_to').val()
-        console.log(depth_from, depth_to)
+<!--        console.log(depth_from, depth_to)-->
         var ranges = [depth_from, depth_to]
-        console.log(ranges)
+<!--        console.log(ranges)-->
         $('#'+hiddenId).val(ranges);
-
-<!--        // if two first ranges are chosen then uncheck the depth switch to indicate the default settings-->
-<!--        if ($('#id_range_0_to_5').prop('checked') && $('#id_range_5_to_10').prop('checked') && !$('#id_range_above_10').prop('checked')){-->
-<!--            $(depthCheckbox).prop('checked', false)-->
-<!--        } else{-->
-<!--            $(depthCheckbox).prop('checked', true)-->
-<!--        }-->
+        if(depth_from != 0.00 || depth_to !=0.10){
+            depthCheckbox.prop('checked', true)
+        }
     }
 
     $('#ismn_depth').on('show.bs.modal', function(e) { // happens when dialog is activated
