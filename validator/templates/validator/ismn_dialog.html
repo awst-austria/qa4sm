@@ -793,31 +793,23 @@
                 </style>
 
                 <p>
-                    Click on a given range to include measurements done only at chosen depth.<br/>
-                    The filter will be applied to all stations in chosen networks.
+                    Choose a range to include measurements done only at a particular depth range.<br/>
+                    The filter will be applied to all stations in all chosen networks.
                 </p>
 
                 <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input depth_range" id="id_range_0_to_5" value="0.00-0.05" type="checkbox" name="first_range"
-                            onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_range_0_to_5">0.00 - 0.05 m</label>
+                    <div></div>
+                        <label for="depth_from">Depth from: </label>
+                        <input class="depth_range form-control" id="depth_from" value="{{ depth_range.0 }}" type="number" name="first_range"
+                            onchange="toggleISMNContinent(this)" step="0.01">
+                        <label for="depth_from">m</label>
                     </div>
-                </div>
-                <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input depth_range" id="id_range_5_to_10" value="0.05-0.10" type="checkbox" name="second_range"
-                            onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_range_5_to_10">0.05 - 0.10 m</label>
+                    <div>
+                        <label for="depth_to">Depth to: </label>
+                        <input class="depth_range form-control" id="depth_to" value="{{ depth_range.1 }}" type="number" name="first_range"
+                            onchange="toggleISMNContinent(this)" step="0.01">
+                        <label for="depth_to">m</label>
                     </div>
-                </div>
-                <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input depth_range" id="id_range_above_10" value="0.10<" type="checkbox" name="third_range"
-                            onchange="toggleISMNContinent(this)">
-                        <label class="custom-control-label" for="id_range_above_10">above 0.10 m</label>
-                    </div>
-                </div>
 
             </div>
 
@@ -880,47 +872,41 @@
         }
     });
 
+<!--Monika-->
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
         var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
         console.log(depthCheckbox)
 
-        var depthList = '';
-        for (var depth of ismnDialog.find('input:checked.depth_range')) {
-            depthList += depth.value + ',';
-        }
-        depthList = depthList.replace(/,+$/, ''); //remove the last coma
+        var depth_from = $('#depth_from').val()
+        var depth_to = $('#depth_to').val()
+        console.log(depth_from, depth_to)
+        var ranges = [depth_from, depth_to]
+        console.log(ranges)
+        $('#'+hiddenId).val(ranges);
 
-        $('#'+hiddenId).val(depthList);
-
-        // if two first ranges are chosen then uncheck the depth switch to indicate the default settings
-        if ($('#id_range_0_to_5').prop('checked') && $('#id_range_5_to_10').prop('checked') && !$('#id_range_above_10').prop('checked')){
-            $(depthCheckbox).prop('checked', false)
-        } else{
-            $(depthCheckbox).prop('checked', true)
-        }
+<!--        // if two first ranges are chosen then uncheck the depth switch to indicate the default settings-->
+<!--        if ($('#id_range_0_to_5').prop('checked') && $('#id_range_5_to_10').prop('checked') && !$('#id_range_above_10').prop('checked')){-->
+<!--            $(depthCheckbox).prop('checked', false)-->
+<!--        } else{-->
+<!--            $(depthCheckbox).prop('checked', true)-->
+<!--        }-->
     }
 
     $('#ismn_depth').on('show.bs.modal', function(e) { // happens when dialog is activated
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
         var ismnDialog = $(e.currentTarget);
-
         ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
 
-        var preselectedDepths = $('#' + hiddenId).val();
-        preselectedDepths = preselectedDepths.replace(/[ ]+/g, '').replace(/(^[ ]+|[ ]+$)/m, ''); // clean string from whitespace
-        var depthList = preselectedDepths.split(',');
+        var depth_from = $('#depth_from').val()
+        var depth_to = $('#depth_to').val()
+        var ranges = [depth_from, depth_to]
+
+        var depthList = ranges//preselectedDepths.split(',');
         console.log(depthList)
-
-<!--        // reset dialog:-->
-<!--        ismnDialog.find('input:checkbox.depth').prop("checked", true); // enable continents-->
-<!--        ismnDialog.find('input:checkbox.depth_range').prop("checked", true); // disable networks-->
-
-<!--        for (var net of netList) { // check the preselected networks-->
-<!--            ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );-->
-<!--        }-->
     });
+<!--Monika-->
 
 </script>
