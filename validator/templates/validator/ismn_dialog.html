@@ -801,13 +801,13 @@
                     <div></div>
                         <label for="depth_from">Depth from: </label>
                         <input class="depth_range form-control" id="depth_from" value="{{ depth_range.0 }}" type="number" name="first_range"
-                            onchange="toggleISMNContinent(this)" step="0.01">
+                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
                         <label for="depth_from">m</label>
                     </div>
                     <div>
                         <label for="depth_to">Depth to: </label>
                         <input class="depth_range form-control" id="depth_to" value="{{ depth_range.1 }}" type="number" name="first_range"
-                            onchange="toggleISMNContinent(this)" step="0.01">
+                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
                         <label for="depth_to">m</label>
                     </div>
 
@@ -881,13 +881,15 @@
 
         var depth_from = $('#depth_from').val()
         var depth_to = $('#depth_to').val()
-<!--        console.log(depth_from, depth_to)-->
         var ranges = [depth_from, depth_to]
-<!--        console.log(ranges)-->
+
         $('#'+hiddenId).val(ranges);
-        if(depth_from != 0.00 || depth_to !=0.10){
-            depthCheckbox.prop('checked', true)
+        if(depth_from > depth_to){
+            $('#depth_from').val({{depth_range.0|safe}})
+            $('#depth_to').val({{depth_range.1|safe}})
+            alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
         }
+        depthCheckbox.prop('checked', true)
     }
 
     $('#ismn_depth').on('show.bs.modal', function(e) { // happens when dialog is activated
