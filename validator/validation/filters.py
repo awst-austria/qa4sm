@@ -4,6 +4,8 @@ import pandas as pd
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
+import numpy as np
+from validator.models import DataFilter
 
 __logger = logging.getLogger(__name__)
 
@@ -130,6 +132,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
             inner_reader = inner_reader.cls
 
         if(pfil.filter.name == "FIL_ISMN_NETWORKS" and pfil.parameters):
+
             if isinstance(inner_reader, ISMN_Interface):
                 param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters) # replace whitespace around commas
                 param = regex_sub(r'(^[ ]+|[ ]+$)', '', param) # replace whitespace at start and end of string
@@ -140,18 +143,24 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 inner_reader.activate_network(networks)
             continue
 
-        if (pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters):
-            # inner_reader = filtered_reader
-            # while (hasattr(inner_reader, 'cls')):
-            #     inner_reader = inner_reader.cls
-
+        if pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters:
             if isinstance(inner_reader, ISMN_Interface):
-                param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)  # replace whitespace around commas
-                param = regex_sub(r'(^[ ]+|[ ]+$)', '', param)  # replace whitespace at start and end of string
-                paramnetlist = param.split(',')
-                depths = [depth.split('-') for depth in paramnetlist]
-                depth_to = depths[-1][1]
-                depth_from = float(depths[0][0])
+                depth_min = float(pfil.parameters.split(',')[0])
+                depth_max = float(pfil.parameters.split(',')[1])
+                print(f'And here are the depth_to: {depth_max}, and depth_from: {depth_min}')
+                indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[4] > depth_max]
+
+                inner_reader.metadata = np.delete(inner_reader.metadata, indices)
+                print(f'Used data: {inner_reader.metadata}')
+        else:
+            if isinstance(inner_reader, ISMN_Interface):
+                default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
+                default_depth = [float(depth) for depth in default_depth.split('-')]
+                depth_min = default_depth[0]
+                depth_max = default_depth[1]
+                indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[4] > depth_max]
+                inner_reader.metadata = np.delete(inner_reader.metadata, indices)
+
 
     masking_filters = []
 
