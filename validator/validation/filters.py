@@ -153,10 +153,10 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
             if pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters:
                 depth_min = float(pfil.parameters.split(',')[0])
                 depth_max = float(pfil.parameters.split(',')[1])
-                if depth_min > depth_max:
-                    raise  ValidationError({'filter': 'The minimal depth can not be higher than the maximal one'})
                 if depth_min < 0 or depth_max < 0:
                     raise ValidationError({'filter': 'Depth range can not be negative'})
+                if depth_min > depth_max:
+                    raise  ValidationError({'filter': 'The minimal depth can not be higher than the maximal one'})
 
             indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[3] > depth_max]
             inner_reader.metadata = np.delete(inner_reader.metadata, indices)
