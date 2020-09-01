@@ -11,6 +11,8 @@ from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+
 User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -253,12 +255,15 @@ class TestValidation(TestCase):
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
                                      dataset_config=run.reference_configuration)
         pfilter.save()
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.05,0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
 
         run_id = run.id
 
         ## run the validation
         val.run_validation(run_id)
-
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9 # 9 ismn stations in hawaii testdata
@@ -267,6 +272,7 @@ class TestValidation(TestCase):
 
         self.check_results(new_run)
         self.delete_run(new_run)
+
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
     @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
@@ -563,6 +569,7 @@ class TestValidation(TestCase):
             ]
         param_filters = [
             ParametrisedFilter(filter = DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters = "  COSMOS , SCAN "),
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
             ]
         msk_reader = val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
 
@@ -575,7 +582,27 @@ class TestValidation(TestCase):
         assert not np.any(data[variable.pretty_name].values < 0)
         assert not np.any(data[variable.pretty_name].values > 100)
 
-    # test all combinations of datasets, versions, variables, and filters
+    #     checking some inappropriate values if errors are raised
+        param_filters = [
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.2,0.1")
+        ]
+        with pytest.raises(ValidationError, match=r".*than.*"):
+            val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
+
+        param_filters = [
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="-0.2,0.1")
+            ]
+        with pytest.raises(ValidationError, match=r".*negative.*"):
+            val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
+
+        param_filters = [
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.2,-0.1")
+            ]
+        with pytest.raises(ValidationError, match=r".*negative.*"):
+                val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
+
+
+            # test all combinations of datasets, versions, variables, and filters
     @pytest.mark.long_running
     def test_setup_filtering_max(self):
         start_time = time.time()
