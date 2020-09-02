@@ -146,7 +146,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
 
         if isinstance(inner_reader, ISMN_Interface):
             default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
-            default_depth = [float(depth) for depth in default_depth.split('-')]
+            default_depth = [float(depth) for depth in default_depth.split(',')]
             depth_min = default_depth[0]
             depth_max = default_depth[1]
 
