@@ -256,7 +256,6 @@
             "is_reference": false,
             "versions": [
                 20,
-                23,
                 26
             ],
             "variables": [
@@ -286,7 +285,6 @@
             "is_reference": false,
             "versions": [
                 21,
-                22,
                 25
             ],
             "variables": [
