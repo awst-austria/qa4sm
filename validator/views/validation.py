@@ -138,7 +138,11 @@ def validation(request):
         dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=data_initial_values)
         ref_dc_form = DatasetConfigurationForm(prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
 
-    return render(request, 'validator/validate.html', {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form, 'maintenance_mode':Settings.load().maintenance_mode})
+    # this default depth is assumed to be in the format of: depth_from-depth_to
+    default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
+    default_depth = [float(depth) for depth in default_depth.split('-')]
+
+    return render(request, 'validator/validate.html', {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form, 'maintenance_mode':Settings.load().maintenance_mode, 'depth_range':default_depth})
 
 
 ## Ajax stuff required for validation view

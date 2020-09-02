@@ -262,5 +262,17 @@
             "dialog_name": null,
             "default_parameter": ""
         }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 24,
+        "fields": {
+            "name": "FIL_ISMN_DEPTH",
+            "description": "Use measurements at given depth:",
+            "help_text": "Select the depth ranges. If not selected, the range 0 to 10 cm is applied.",
+            "parameterised": true,
+            "dialog_name": "ismn_depth",
+            "default_parameter": "0.00-0.10"
+        }
     }
 ]

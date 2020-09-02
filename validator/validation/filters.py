@@ -1,9 +1,12 @@
 import logging
 
 import pandas as pd
+from django.core.exceptions import ValidationError
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
+import numpy as np
+from validator.models import DataFilter
 
 __logger = logging.getLogger(__name__)
 
@@ -125,10 +128,11 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
     for pfil in param_filters:
         __logger.debug("Setting up parametrised filter {} for dataset {} with parameter {}".format(pfil.filter.name, dataset, pfil.parameters))
 
+        inner_reader = filtered_reader
+        while (hasattr(inner_reader, 'cls')):
+            inner_reader = inner_reader.cls
+
         if(pfil.filter.name == "FIL_ISMN_NETWORKS" and pfil.parameters):
-            inner_reader = filtered_reader
-            while(hasattr(inner_reader, 'cls')):
-                inner_reader = inner_reader.cls
 
             if isinstance(inner_reader, ISMN_Interface):
                 param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters) # replace whitespace around commas
@@ -139,6 +143,24 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 __logger.debug('Selected networks: ' + ';'.join(networks))
                 inner_reader.activate_network(networks)
             continue
+
+        if isinstance(inner_reader, ISMN_Interface):
+            default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
+            default_depth = [float(depth) for depth in default_depth.split('-')]
+            depth_min = default_depth[0]
+            depth_max = default_depth[1]
+
+            if pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters:
+                depth_min = float(pfil.parameters.split(',')[0])
+                depth_max = float(pfil.parameters.split(',')[1])
+                if depth_min < 0 or depth_max < 0:
+                    raise ValidationError({'filter': 'Depth range can not be negative'})
+                if depth_min > depth_max:
+                    raise  ValidationError({'filter': 'The minimal depth can not be higher than the maximal one'})
+
+            indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[3] > depth_max]
+            inner_reader.metadata = np.delete(inner_reader.metadata, indices)
+
 
     masking_filters = []
 
