@@ -161,7 +161,16 @@ class TestValidation(TestCase):
             if all(x is not None for x in [run.min_lat, run.min_lon, run.max_lat, run.max_lon]):
                 assert ds.val_spatial_subset == "[{}, {}, {}, {}]".format(run.min_lat, run.min_lon, run.max_lat, run.max_lon)
 
-            for d_index, dataset_config in enumerate(run.dataset_configurations.all()):
+            i = 0
+            for dataset_config in run.dataset_configurations.all():
+
+                if ((run.reference_configuration) and
+                        (dataset_config.id == run.reference_configuration.id)):
+                    d_index = 0
+                else:
+                    i += 1
+                    d_index = i
+
                 ds_name = 'val_dc_dataset' + str(d_index)
                 stored_dataset = ds.getncattr(ds_name)
                 stored_version = ds.getncattr('val_dc_version' + str(d_index))
@@ -747,7 +756,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     @pytest.mark.graphs
-    def test_generate_graphs(self, map_grid=True):
+    def test_generate_graphs(self):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
         infile2 = 'testdata/output_data/c3s_gldas.nc'
         infile3 = 'testdata/output_data/c3s_era5land.nc'
@@ -766,7 +775,7 @@ class TestValidation(TestCase):
         shutil.copy(infile1, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir, map_grid)
+        val.generate_all_graphs(v, run_dir)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
@@ -788,7 +797,7 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir, map_grid)
+        val.generate_all_graphs(v, run_dir)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
@@ -809,7 +818,7 @@ class TestValidation(TestCase):
         # heatmap
         v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
         v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir, map_grid)
+        val.generate_all_graphs(v, run_dir)
 
         boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
