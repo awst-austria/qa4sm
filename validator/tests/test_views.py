@@ -38,7 +38,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation import set_outfile, mkdir_if_not_exists
 
 from django.utils.http import urlencode
-
+import os
 
 class TestViews(TransactionTestCase):
     # This re-inits the database for every test, see
@@ -186,6 +186,7 @@ class TestViews(TransactionTestCase):
         self.assertEqual(response.status_code, 400)
         assert ValidationRun.objects.get(pk=self.testrun.id).expiry_date is not None
 
+    @pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
     @override_settings(DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions")
     def test_result_publishing(self):
         infile = 'testdata/output_data/c3s_era5land.nc'
