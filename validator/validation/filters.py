@@ -144,24 +144,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 inner_reader.activate_network(networks)
             continue
 
-        if isinstance(inner_reader, ISMN_Interface):
-            default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
-            default_depth = [float(depth) for depth in default_depth.split(',')]
-            depth_min = default_depth[0]
-            depth_max = default_depth[1]
-
-            if pfil.filter.name == "FIL_ISMN_DEPTH" and pfil.parameters:
-                depth_min = float(pfil.parameters.split(',')[0])
-                depth_max = float(pfil.parameters.split(',')[1])
-                if depth_min < 0 or depth_max < 0:
-                    raise ValidationError({'filter': 'Depth range can not be negative'})
-                if depth_min > depth_max:
-                    raise  ValidationError({'filter': 'The minimal depth can not be higher than the maximal one'})
-
-            indices = [ind for ind, data in enumerate(inner_reader.metadata) if data[3] < depth_min or data[3] > depth_max]
-            inner_reader.metadata = np.delete(inner_reader.metadata, indices)
-
-
     masking_filters = []
 
     for fil in filters:
