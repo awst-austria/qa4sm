@@ -13,7 +13,7 @@ from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
 from pytesmo.validation_framework.data_manager import DataManager
-from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names
+from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names, TCMetrics
 from pytesmo.validation_framework.results_manager import netcdf_results_manager
 from pytesmo.validation_framework.validation import Validation
 from pytz import UTC
@@ -158,7 +158,15 @@ def create_pytesmo_validation(validation_run):
 
     datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
-    metrics = IntercomparisonMetrics(dataset_names=ds_names, other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+    if len(ds_names) >= 3:
+        # if there are 3 or more dataset, do TC, exclude ref metrics
+        metrics = TCMetrics(
+                    dataset_names=ds_names, tc_metrics_for_ref=False,
+                    other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+    else:
+        metrics = IntercomparisonMetrics(
+                        dataset_names=ds_names,
+                        other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
 
     val = Validation(
         datasets=datamanager,
