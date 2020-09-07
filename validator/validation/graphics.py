@@ -57,12 +57,17 @@ def get_dataset_pairs(validation_run):
 
     ref = None
     datasets = []
-    for ds_num, dataset_config in enumerate(validation_run.dataset_configurations.all()):
-        dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
+
+    ds_num = 1
+    for dataset_config in validation_run.dataset_configurations.all():
         if(dataset_config.id == validation_run.reference_configuration.id):
+            dataset_name = '{}-{}'.format(0, dataset_config.dataset.short_name)
             ref = dataset_name
         else:
+            dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
             datasets.append(dataset_name)
+            ds_num = ds_num + 1
+
 
     for ds in datasets:
         pair = '{}_and_{}'.format(ref, ds)
