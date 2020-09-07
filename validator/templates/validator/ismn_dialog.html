@@ -882,8 +882,6 @@
         var depth_from = $('#depth_from').val()
         var depth_to = $('#depth_to').val()
         var range = [depth_from, depth_to]
-        console.log(range)
-        $('#'+hiddenId).val(range);
         if(depth_from > depth_to){
             console.log(parseFloat(default_values[0]))
             $('#'+hiddenId).val(default_values);
