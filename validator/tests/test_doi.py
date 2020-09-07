@@ -4,6 +4,7 @@ Test DOI generation
 
 from datetime import timedelta
 import logging
+import os
 from os import path
 import shutil
 import netCDF4
