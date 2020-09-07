@@ -876,40 +876,43 @@
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
+        var default_values = $('#'+hiddenId).val().split(',')
         var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
-        console.log(depthCheckbox)
 
         var depth_from = $('#depth_from').val()
         var depth_to = $('#depth_to').val()
-        var ranges = [depth_from, depth_to]
-
-        $('#'+hiddenId).val(ranges);
+        var range = [depth_from, depth_to]
+        console.log(range)
+        $('#'+hiddenId).val(range);
         if(depth_from > depth_to){
-            $('#depth_from').val({{depth_range.0|safe}})
-            $('#depth_to').val({{depth_range.1|safe}})
+            console.log(parseFloat(default_values[0]))
+            $('#'+hiddenId).val(default_values);
             alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
         }
         depthCheckbox.prop('checked', true)
     }
 
-    $('#ismn_depth').on('show.bs.modal', function(e) { // happens when dialog is activated
+    function getDefaultParams(e){
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
-        var ranges = $('#'+hiddenId).val().split(',')
-        console.log(parseFloat(ranges[0]))
+        var default_values = $('#'+hiddenId).val()
         var ismnDialog = $(e.currentTarget);
         ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
-        $('#depth_from').val(parseFloat(ranges[0]))
-        $('#depth_to').val(parseFloat(ranges[1]))
+        return default_values
+    }
 
-
-<!--        var depth_from = $('#depth_from').val()-->
-<!--        var depth_to = $('#depth_to').val()-->
-<!--        var ranges = [depth_from, depth_to]-->
-
-<!--        var depthList = ranges//preselectedDepths.split(',');-->
-<!--        console.log(depthList)-->
+    function getDefaultRanges(e){
+        var default_val = getDefaultParams(e)
+        var range = default_val.split(',')
+        $('#depth_from').val(parseFloat(range[0]))
+        $('#depth_to').val(parseFloat(range[1]))
+        range = [$('#depth_from').val(), $('#depth_to').val()]
+        return range
+    }
+    $('#ismn_depth').on('show.bs.modal', function(e){
+        getDefaultRanges(e)
     });
+
 <!--Monika-->
 
 </script>
