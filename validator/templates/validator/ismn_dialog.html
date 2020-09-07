@@ -800,13 +800,13 @@
                 <div>
                     <div></div>
                         <label for="depth_from">Depth from: </label>
-                        <input class="depth_range form-control" id="depth_from" value="{{ depth_range.0 }}" type="number" name="first_range"
+                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="first_range"
                             onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
                         <label for="depth_from">m</label>
                     </div>
                     <div>
                         <label for="depth_to">Depth to: </label>
-                        <input class="depth_range form-control" id="depth_to" value="{{ depth_range.1 }}" type="number" name="first_range"
+                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="first_range"
                             onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
                         <label for="depth_to">m</label>
                     </div>
@@ -876,35 +876,43 @@
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
+        var default_values = $('#'+hiddenId).val().split(',')
         var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
-        console.log(depthCheckbox)
 
         var depth_from = $('#depth_from').val()
         var depth_to = $('#depth_to').val()
-        var ranges = [depth_from, depth_to]
-
-        $('#'+hiddenId).val(ranges);
+        var range = [depth_from, depth_to]
+        console.log(range)
+        $('#'+hiddenId).val(range);
         if(depth_from > depth_to){
-            $('#depth_from').val({{depth_range.0|safe}})
-            $('#depth_to').val({{depth_range.1|safe}})
+            console.log(parseFloat(default_values[0]))
+            $('#'+hiddenId).val(default_values);
             alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
         }
         depthCheckbox.prop('checked', true)
     }
 
-    $('#ismn_depth').on('show.bs.modal', function(e) { // happens when dialog is activated
+    function getDefaultParams(e){
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
+        var default_values = $('#'+hiddenId).val()
         var ismnDialog = $(e.currentTarget);
         ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
+        return default_values
+    }
 
-        var depth_from = $('#depth_from').val()
-        var depth_to = $('#depth_to').val()
-        var ranges = [depth_from, depth_to]
-
-        var depthList = ranges//preselectedDepths.split(',');
-        console.log(depthList)
+    function getDefaultRanges(e){
+        var default_val = getDefaultParams(e)
+        var range = default_val.split(',')
+        $('#depth_from').val(parseFloat(range[0]))
+        $('#depth_to').val(parseFloat(range[1]))
+        range = [$('#depth_from').val(), $('#depth_to').val()]
+        return range
+    }
+    $('#ismn_depth').on('show.bs.modal', function(e){
+        getDefaultRanges(e)
     });
+
 <!--Monika-->
 
 </script>
