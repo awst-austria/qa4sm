@@ -52,7 +52,7 @@ def generate_all_graphs(validation_run, outfolder):
             remove(svgfile)
 
 
-def get_dataset_pairs(validation_run):
+def get_dataset_pairs(validation_run, ref0_config=True):
     pairs = []
 
     ref = None
@@ -60,11 +60,13 @@ def get_dataset_pairs(validation_run):
 
     ds_num = 1
     for dataset_config in validation_run.dataset_configurations.all():
-        if(dataset_config.id == validation_run.reference_configuration.id):
+        if ref0_config and (dataset_config.id == validation_run.reference_configuration.id):
             dataset_name = '{}-{}'.format(0, dataset_config.dataset.short_name)
             ref = dataset_name
         else:
             dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
+            if (dataset_config.id == validation_run.reference_configuration.id) and ref is None:
+                ref = dataset_name
             datasets.append(dataset_name)
             ds_num = ds_num + 1
 

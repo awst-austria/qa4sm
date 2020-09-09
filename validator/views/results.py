@@ -128,7 +128,12 @@ def result(request, result_uuid):
         if val_run.total_points != 0:
             error_rate = (val_run.total_points - val_run.ok_points) / val_run.total_points
 
-        pairs = get_dataset_pairs(val_run)
+        try:
+            ref0_config = val_run.reference_zero # new validations where ref id is 0
+        except AttributeError:
+            ref0_config = False # old validations
+
+        pairs = get_dataset_pairs(val_run, ref0_config=ref0_config)
 
         # the publication form is only needed by the owner; if we're displaying for another user, avoid leaking user data
         pub_form = PublishingForm(validation=val_run) if is_owner else None
