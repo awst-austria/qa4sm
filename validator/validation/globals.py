@@ -17,6 +17,17 @@ METRICS = {'R' : 'Pearson\'s r',
            'mse_bias' : 'Mean square error bias',
            'mse_var' : 'Mean square error variance',}
 
+METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_",
+                   "{metric}"]
+
+TC_METRICS = {'snr': 'Signal-to-noise ratio',
+              'err_std': 'Error standard deviation',
+              'beta': 'TC scaling coefficient',}
+
+TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
+                      "_{metric}",
+                      "_for_{id_met}-{ds_met}"]
+
 C3S = 'C3S'
 ISMN = 'ISMN'
 GLDAS = 'GLDAS'

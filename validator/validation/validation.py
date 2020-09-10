@@ -157,6 +157,7 @@ def create_pytesmo_validation(validation_run):
 
     datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
+
     if len(ds_names) >= 3:
         # if there are 3 or more dataset, do TC, exclude ref metrics
         metrics = TCMetrics(
@@ -166,6 +167,8 @@ def create_pytesmo_validation(validation_run):
         metrics = IntercomparisonMetrics(
                         dataset_names=ds_names,
                         other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+
+    __logger.debug(f"MetricsCalculator: {metrics.__class__.__name__}")
 
     val = Validation(
         datasets=datamanager,
