@@ -35,6 +35,7 @@ urlpatterns = [
     path('published/', views.published_results, name='published_results'),
 
     path('ajax/get-dataset-options/', views.ajax_get_dataset_options, name='ajax_get_dataset_options'),
+    path('ajax/get-version-options/', views.ajax_get_version_id, name='ajax_get_version_id'),
 
     path('user_profile/',views.user_profile, name='user_profile'),
     path('user_profile_deactivated/',views.user_profile_deactivated, name='user_profile_deactivated'),
