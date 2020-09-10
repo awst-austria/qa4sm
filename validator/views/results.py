@@ -10,7 +10,7 @@ from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS
-from validator.validation.graphics import get_dataset_pairs
+from validator.validation.graphics import get_dataset_combis_from_files
 
 
 @login_required(login_url='/login/')
@@ -128,11 +128,7 @@ def result(request, result_uuid):
         if val_run.total_points != 0:
             error_rate = (val_run.total_points - val_run.ok_points) / val_run.total_points
 
-        if hasattr(val_run, 'ref0_config') and val_run.ref0_config is True:
-            pairs = get_dataset_pairs(val_run, ref0_config=True)
-        else:
-            pairs = get_dataset_pairs(val_run, ref0_config=False)
-        print('pairs datasets' , pairs)
+        pairs, ref0_config = get_dataset_combis_from_files(val_run)
 
         # the publication form is only needed by the owner; if we're displaying for another user, avoid leaking user data
         pub_form = PublishingForm(validation=val_run) if is_owner else None

@@ -187,7 +187,6 @@ def execute_job(self,validation_id, job):
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run)
-        __logger.debug('Ref0Config is {}'.format(validation_run.ref0_config))
 
         result = val.calc(*job)
         end_time = datetime.now(tzlocal())
