@@ -4,7 +4,7 @@
         "pk": 1,
         "fields": {
             "name": "AMMA-CATCH",
-            "continent": "africa",
+            "continent": "Africa",
             "country": "Benin, Niger, Mali",
             "number_of_stations": "7",
             "versions": [
@@ -17,7 +17,7 @@
         "pk": 2,
         "fields": {
             "name": "CARBOAFRICA",
-            "continent": "africa",
+            "continent": "Africa",
             "country": "Sudan",
             "number_of_stations": "1",
             "versions": [
@@ -30,7 +30,7 @@
         "pk": 3,
         "fields": {
             "name": "DAHRA",
-            "continent": "africa",
+            "continent": "Africa",
             "country": "Senegal",
             "number_of_stations": "1",
             "versions": [
@@ -43,7 +43,7 @@
         "pk": 4,
         "fields": {
             "name": "CHINA",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "China",
             "number_of_stations": "40",
             "versions": [
@@ -56,7 +56,7 @@
         "pk": 5,
         "fields": {
             "name": "CTP-SMTMN",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "China",
             "number_of_stations": "57",
             "versions": [
@@ -69,7 +69,7 @@
         "pk": 6,
         "fields": {
             "name": "HiWATER-EHWSN",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "China",
             "number_of_stations": "174",
             "versions": [
@@ -82,7 +82,7 @@
         "pk": 7,
         "fields": {
             "name": "HSC-SELMACHEON",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Korea",
             "number_of_stations": "1",
             "versions": [
@@ -95,7 +95,7 @@
         "pk": 8,
         "fields": {
             "name": "HYU-CHEONGMICHEON",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Korea",
             "number_of_stations": "1",
             "versions": [
@@ -108,7 +108,7 @@
         "pk": 9,
         "fields": {
             "name": "IIT-KANPUR",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "India",
             "number_of_stations": "1",
             "versions": [
@@ -121,7 +121,7 @@
         "pk": 10,
         "fields": {
             "name": "KHOREZM",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Uzbekistan",
             "number_of_stations": "7",
             "versions": [
@@ -134,7 +134,7 @@
         "pk": 11,
         "fields": {
             "name": "MAQU",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "China",
             "number_of_stations": "20",
             "versions": [
@@ -147,7 +147,7 @@
         "pk": 12,
         "fields": {
             "name": "MONGOLIA",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Mongolia",
             "number_of_stations": "44",
             "versions": [
@@ -160,7 +160,7 @@
         "pk": 13,
         "fields": {
             "name": "MySMNet",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Malaysia",
             "number_of_stations": "7",
             "versions": [
@@ -173,7 +173,7 @@
         "pk": 14,
         "fields": {
             "name": "RUSWET-AGRO",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Former Soviet Union",
             "number_of_stations": "212",
             "versions": [
@@ -186,7 +186,7 @@
         "pk": 15,
         "fields": {
             "name": "RUSWET-GRASS",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Former Soviet Union",
             "number_of_stations": "122",
             "versions": [
@@ -199,7 +199,7 @@
         "pk": 16,
         "fields": {
             "name": "RUSWET-VALDAI",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Former Soviet Union",
             "number_of_stations": "3",
             "versions": [
@@ -212,7 +212,7 @@
         "pk": 17,
         "fields": {
             "name": "SKKU",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "Korea",
             "number_of_stations": "5",
             "versions": [
@@ -225,7 +225,7 @@
         "pk": 18,
         "fields": {
             "name": "SW-WHU",
-            "continent": "asia",
+            "continent": "Asia",
             "country": "China",
             "number_of_stations": "7",
             "versions": [
@@ -238,7 +238,7 @@
         "pk": 19,
         "fields": {
             "name": "AACES",
-            "continent": "australia",
+            "continent": "Australia",
             "country": "Australia",
             "number_of_stations": "49",
             "versions": [
@@ -251,7 +251,7 @@
         "pk": 20,
         "fields": {
             "name": "OZNET",
-            "continent": "australia",
+            "continent": "Australia",
             "country": "Australia",
             "number_of_stations": "38",
             "versions": [
@@ -264,7 +264,7 @@
         "pk": 21,
         "fields": {
             "name": "SASMAS",
-            "continent": "australia",
+            "continent": "Australia",
             "country": "SASMAS,Australia",
             "number_of_stations": "14",
             "versions": [
@@ -277,7 +277,7 @@
         "pk": 22,
         "fields": {
             "name": "BIEBRZA-S-1",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Poland",
             "number_of_stations": "30",
             "versions": [
@@ -290,7 +290,7 @@
         "pk": 23,
         "fields": {
             "name": "CALABRIA",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "5",
             "versions": [
@@ -303,7 +303,7 @@
         "pk": 24,
         "fields": {
             "name": "CAMPANIA",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "2",
             "versions": [
@@ -316,7 +316,7 @@
         "pk": 25,
         "fields": {
             "name": "FMI",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Finland",
             "number_of_stations": "27",
             "versions": [
@@ -329,7 +329,7 @@
         "pk": 26,
         "fields": {
             "name": "FR-Aqui",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "France",
             "number_of_stations": "5",
             "versions": [
@@ -342,7 +342,7 @@
         "pk": 27,
         "fields": {
             "name": "GROW",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "UK",
             "number_of_stations": "154",
             "versions": [
@@ -355,7 +355,7 @@
         "pk": 28,
         "fields": {
             "name": "GTK",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Finland",
             "number_of_stations": "7",
             "versions": [
@@ -368,7 +368,7 @@
         "pk": 29,
         "fields": {
             "name": "HOBE",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Denmark",
             "number_of_stations": "32",
             "versions": [
@@ -381,7 +381,7 @@
         "pk": 30,
         "fields": {
             "name": "HYDROL-NET-PERUGIA",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "2",
             "versions": [
@@ -394,7 +394,7 @@
         "pk": 31,
         "fields": {
             "name": "IMA-CAN1",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "12",
             "versions": [
@@ -407,7 +407,7 @@
         "pk": 32,
         "fields": {
             "name": "METEROBS",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "1",
             "versions": [
@@ -420,7 +420,7 @@
         "pk": 33,
         "fields": {
             "name": "MOL-RAO",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Germany",
             "number_of_stations": "2",
             "versions": [
@@ -433,7 +433,7 @@
         "pk": 34,
         "fields": {
             "name": "ORACLE",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "France",
             "number_of_stations": "6",
             "versions": [
@@ -446,7 +446,7 @@
         "pk": 35,
         "fields": {
             "name": "REMEDHUS",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Spain",
             "number_of_stations": "24",
             "versions": [
@@ -459,7 +459,7 @@
         "pk": 36,
         "fields": {
             "name": "RSMN",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Romania",
             "number_of_stations": "20",
             "versions": [
@@ -472,7 +472,7 @@
         "pk": 37,
         "fields": {
             "name": "SMOSMANIA",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "France",
             "number_of_stations": "22",
             "versions": [
@@ -485,7 +485,7 @@
         "pk": 38,
         "fields": {
             "name": "SWEX-POLAND",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Poland",
             "number_of_stations": "6",
             "versions": [
@@ -498,7 +498,7 @@
         "pk": 39,
         "fields": {
             "name": "TERENO",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Germany",
             "number_of_stations": "5",
             "versions": [
@@ -511,7 +511,7 @@
         "pk": 40,
         "fields": {
             "name": "UDC-SMOS",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Germany",
             "number_of_stations": "11",
             "versions": [
@@ -524,7 +524,7 @@
         "pk": 41,
         "fields": {
             "name": "UMBRIA",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "13",
             "versions": [
@@ -537,7 +537,7 @@
         "pk": 42,
         "fields": {
             "name": "UMSUOL",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "1",
             "versions": [
@@ -550,7 +550,7 @@
         "pk": 43,
         "fields": {
             "name": "VAS",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Spain",
             "number_of_stations": "3",
             "versions": [
@@ -563,7 +563,7 @@
         "pk": 44,
         "fields": {
             "name": "WEGENERNET",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "Austria",
             "number_of_stations": "12",
             "versions": [
@@ -576,7 +576,7 @@
         "pk": 45,
         "fields": {
             "name": "WSMN",
-            "continent": "europe",
+            "continent": "Europe",
             "country": "UK",
             "number_of_stations": "8",
             "versions": [
@@ -589,7 +589,7 @@
         "pk": 46,
         "fields": {
             "name": "ARM",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "29",
             "versions": [
@@ -602,7 +602,7 @@
         "pk": 47,
         "fields": {
             "name": "AWDN",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "50",
             "versions": [
@@ -615,7 +615,7 @@
         "pk": 48,
         "fields": {
             "name": "BNZ-LTER",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "Alaska",
             "number_of_stations": "12",
             "versions": [
@@ -628,7 +628,7 @@
         "pk": 49,
         "fields": {
             "name": "COSMOS",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "109",
             "versions": [
@@ -642,7 +642,7 @@
         "pk": 50,
         "fields": {
             "name": "FLUXNET-AMERIFLUX",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "2",
             "versions": [
@@ -655,7 +655,7 @@
         "pk": 51,
         "fields": {
             "name": "ICN",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "19",
             "versions": [
@@ -668,7 +668,7 @@
         "pk": 52,
         "fields": {
             "name": "IOWA",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "6",
             "versions": [
@@ -681,7 +681,7 @@
         "pk": 53,
         "fields": {
             "name": "iRON",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "9",
             "versions": [
@@ -694,7 +694,7 @@
         "pk": 54,
         "fields": {
             "name": "PBO-H2O",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "159",
             "versions": [
@@ -707,7 +707,7 @@
         "pk": 55,
         "fields": {
             "name": "RISMA",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "Canada",
             "number_of_stations": "23",
             "versions": [
@@ -720,7 +720,7 @@
         "pk": 56,
         "fields": {
             "name": "SCAN",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "239",
             "versions": [
@@ -734,7 +734,7 @@
         "pk": 57,
         "fields": {
             "name": "SNOTEL",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "441",
             "versions": [
@@ -747,7 +747,7 @@
         "pk": 58,
         "fields": {
             "name": "SOILSCAPE",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "171",
             "versions": [
@@ -760,7 +760,7 @@
         "pk": 59,
         "fields": {
             "name": "USCRN",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "115",
             "versions": [
@@ -773,7 +773,7 @@
         "pk": 60,
         "fields": {
             "name": "USDA-ARS",
-            "continent": "north_america",
+            "continent": "North America",
             "country": "USA",
             "number_of_stations": "4",
             "versions": [
@@ -786,7 +786,7 @@
         "pk": 61,
         "fields": {
             "name": "LAB-net",
-            "continent": "south_america",
+            "continent": "South America",
             "country": "Chile",
             "number_of_stations": "3",
             "versions": [
