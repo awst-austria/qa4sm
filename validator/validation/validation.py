@@ -132,7 +132,6 @@ def create_pytesmo_validation(validation_run):
             (dataset_config.id == validation_run.reference_configuration.id)):
             # reference is always named "0-..."
             dataset_name = '{}-{}'.format(0, dataset_config.dataset.short_name)
-            print(dataset_name)
         else:
             dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
             ds_num += 1
@@ -188,6 +187,8 @@ def execute_job(self,validation_id, job):
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run)
+        __logger.debug('Ref0Config is {}'.format(validation_run.ref0_config))
+
         result = val.calc(*job)
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
