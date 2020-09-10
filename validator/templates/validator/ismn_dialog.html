@@ -122,10 +122,10 @@
     function setISMNNetworks(source) {
         var ismnDialog = $(source).closest('#ismn_networks');
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
-        console.log(hiddenId)
+
         var networkList = '';
         for (var netCB of ismnDialog.find('input:checked.network')) {
-            console.log(netCB.value)
+
             networkList += netCB.value + ',';
         }
         networkList = networkList.replace(/,+$/, ''); //remove the last coma
@@ -150,73 +150,71 @@
         }
 
         function get_network_info(){
-            var network_info = ajax_take_network_info(); // taking info about network
-            var keys = Object.keys(network_info) // taking keys
+            var networks_info = ajax_take_network_info(); // taking info about network
+            var keys = Object.keys(networks_info) // taking keys
 
             // cleaning html in case this function is called more than once
             verify_html_element('continent_container')
             verify_html_element('collapse_continent')
 
            // taking basic html for continent
-            var basic_continent_container = $(".continent_container") // taking basic container for continents
+            var basic_continent_container = $('.continent_container') // taking basic container for continents
             var basic_continent_collapse = $('.collapse_continent')
-            console.log(basic_continent_collapse)
 
            //iteration over keys - to sort networks according to continents
            $.each(keys, function(ind, key){
                 var continent = key;
-                var network = network_info[key];
-                console.log(network)
-                var key_word = key.replace(/ /g, '') //removing spaces from Americas :)
+                var networks = networks_info[key];
+                var key_word = key.replace(/ /g, '') //removing spaces from Americas :);
+
+                //creating new values
+                var new_onclick = `$('#id_collapse_${key_word}').collapse('toggle')`;
+                var new_id = 'id_continent_' + key_word;
 
                 //getting the basic html pattern
-                var new_onclick = `$('#id_collapse_${key_word}').collapse('toggle')`
-                var new_id = 'id_continent_' + key_word
-
-                //getting the basic html pattern
-                var new_continent_container = basic_continent_container.clone(true, true)
-                var new_continent_collapse = basic_continent_collapse.clone(true, true)
-                console.log($(new_continent_collapse).find('input'))
+                var new_continent_container = basic_continent_container.clone(true, true);
+                var new_continent_collapse = basic_continent_collapse.clone(true, true);
+                var basic_network_container = new_continent_collapse.find('.row');
 
                 // setting approprate attributes
-                new_continent_container.find('input').attr('id', new_id)
-                new_continent_container.find('input').attr('value', key_word)
-                new_continent_container.find('input').attr('name', 'continent_' + key_word)
-                new_continent_container.find('label').attr('for', new_id)
-                new_continent_container.find('label').text(key)
-                new_continent_container.find('div').attr('onclick', new_onclick)
-                new_continent_collapse.attr('id', 'id_collapse_' + key_word)
+                new_continent_container.find('input').attr('id', new_id);
+                new_continent_container.find('input').attr('value', key_word);
+                new_continent_container.find('input').attr('name', 'continent_' + key_word);
+                new_continent_container.find('label').attr('for', new_id);
+                new_continent_container.find('label').text(key);
+                new_continent_container.find('div').attr('onclick', new_onclick);
+                new_continent_collapse.attr('id', 'id_collapse_' + key_word);
 
                 // inserting new elements
-                $(basic_continent_container).before(new_continent_container)
-                $(basic_continent_container).before(new_continent_collapse)
+                $(basic_continent_container).before(new_continent_container);
+                $(basic_continent_container).before(new_continent_collapse);
 
-                var basic_network_container = new_continent_collapse.find('.row')
-                $.each(network, function(ind, val){
-                    console.log(ind, val[0], val[1])
-                    var new_network = basic_network_container.clone(true, true)
-                    new_network.find('input').attr('id', 'id_'+val[0])
-                    new_network.find('input').attr('value', val[0])
-                    new_network.find('input').attr('name', val[0])
-                    new_network.find('label').attr('for', 'id_'+val[0])
-                    new_network.find('label').text(val[0])
-                    new_network.find('div.country').text(val[1])
+                //for each continent networks are listed
+                $.each(networks, function(ind, val){
+                    var new_network = basic_network_container.clone(true, true);
+                    new_network.find('input').attr('id', 'id_'+val[0]);
+                    new_network.find('input').attr('value', val[0]);
+                    new_network.find('input').attr('name', val[0]);
+                    new_network.find('label').attr('for', 'id_'+val[0]);
+                    new_network.find('label').text(val[0]);
+                    new_network.find('div.country').text(val[1]);
+                    new_network.find('.col-1').text(val[2]);
 
-                    $(basic_network_container).before(new_network)
+                    $(basic_network_container).before(new_network);
 
                 })
-                toggle_children_class(basic_network_container, 'd-none')
+                toggle_children_class(basic_network_container, 'd-none');
            })
 
            // switching off the basic html pattern
-           toggle_children_class(basic_continent_container, 'd-none')
-           toggle_children_class(basic_continent_collapse, 'd-none')
+           toggle_children_class(basic_continent_container, 'd-none');
+           toggle_children_class(basic_continent_collapse, 'd-none');
         }
 
 <!--Monika-->
-
     $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
-        get_network_info()
+        get_network_info();
+
 <!--filtering part - take care of it later-->
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
@@ -243,14 +241,13 @@
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
-        var default_values = $('#'+hiddenId).val().split(',')
-        var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
+        var default_values = $('#'+hiddenId).val().split(',');
+        var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox');
 
-        var depth_from = $('#depth_from').val()
-        var depth_to = $('#depth_to').val()
-        var range = [depth_from, depth_to]
+        var depth_from = $('#depth_from').val();
+        var depth_to = $('#depth_to').val();
+        var range = [depth_from, depth_to];
         if(depth_from > depth_to){
-            console.log(parseFloat(default_values[0]))
             $('#'+hiddenId).val(default_values);
             alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
         }
@@ -260,22 +257,22 @@
     function getDefaultParams(e){
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
-        var default_values = $('#'+hiddenId).val()
+        var default_values = $('#'+hiddenId).val();
         var ismnDialog = $(e.currentTarget);
         ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
         return default_values
     }
 
     function getDefaultRanges(e){
-        var default_val = getDefaultParams(e)
-        var range = default_val.split(',')
-        $('#depth_from').val(parseFloat(range[0]))
-        $('#depth_to').val(parseFloat(range[1]))
-        range = [$('#depth_from').val(), $('#depth_to').val()]
+        var default_val = getDefaultParams(e);
+        var range = default_val.split(',');
+        $('#depth_from').val(parseFloat(range[0]));
+        $('#depth_to').val(parseFloat(range[1]));
+        range = [$('#depth_from').val(), $('#depth_to').val()];
         return range
     }
     $('#ismn_depth').on('show.bs.modal', function(e){
-        getDefaultRanges(e)
+        getDefaultRanges(e);
     });
 
 <!--Monika-->
