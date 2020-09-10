@@ -250,7 +250,7 @@
         var metric = $("#id_graph_metric").val()
         var pair = $("#id_graph_pair").val()
         var labels = {{json_metrics|safe}}
-        var overview_label = 'The distribution of ' + labels[metric] + ' for dataset pair ' + pair + ' values plotted on a map.'
+        var overview_label = 'The distribution of ' + labels[metric] + ' for dataset combination ' + pair + ' values plotted on a map.'
         var overview_url = '';
         if(metric == 'n_obs') {
             overview_url = '{{ val.output_dir_url }}' + 'overview_' + metric + '.png';
