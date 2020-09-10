@@ -5,7 +5,9 @@ class DatasetVersion(models.Model):
     short_name = models.CharField(max_length=30)
     pretty_name = models.CharField(max_length=30)
     help_text = models.CharField(max_length=150)
-    
+    time_range_start = models.TextField(blank=True, null=True)
+    time_range_end = models.TextField(blank=True, null=True)
+
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration
 
