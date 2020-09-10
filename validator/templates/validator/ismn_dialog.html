@@ -181,8 +181,8 @@
                 new_continent_container.find('input').attr('value', key_word);
                 new_continent_container.find('input').attr('name', 'continent_' + key_word);
                 new_continent_container.find('label').attr('for', new_id);
-                new_continent_container.find('label').text(key);
-                new_continent_container.find('div').attr('onclick', new_onclick);
+                new_continent_container.find('div.ismn_label').text(key);
+                new_continent_container.find('div.ismn_label').attr('onclick', new_onclick);
                 new_continent_collapse.attr('id', 'id_collapse_' + key_word);
 
                 // inserting new elements
@@ -200,6 +200,7 @@
                     new_network.find('div.country').text(val[1]);
                     new_network.find('.col-1').text(val[2]);
 
+                    // inserting new network
                     $(basic_network_container).before(new_network);
 
                 })

@@ -1,22 +1,22 @@
 console.log("I'm here")
 
 function toggle_children_class(element, class_name){
-    $(element).toggleClass(class_name)
+    $(element).toggleClass(class_name);
     $.each($(element).find("*"), function(id, child){
-        $(child).toggleClass(class_name)
+        $(child).toggleClass(class_name);
     })
 }
 
 
 function verify_html_element(element_class){
-        var selector = '.'+element_class
+        var selector = '.'+element_class;
         if  ($(selector).length>1){
             $.each($(selector), function(ind, element){
                 if (!$(element).hasClass('d-none')){
-                    $(element).empty()
-                    $(element).remove()
+                    $(element).empty();
+                    $(element).remove();
                 } else {
-                    toggle_children_class(element, 'd-none')
+                    toggle_children_class(element, 'd-none');
                 }
             })
         }
