@@ -148,3 +148,6 @@ html {
 a.doilink {
     color: white;
 }
+div.col-1{
+    visibility: hidden;
+}

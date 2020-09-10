@@ -287,3 +287,17 @@ a[aria-expanded=false] .fa-minus-circle {
     box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .3);
     outline: none;
 }
+
+.depth_range.form-control{
+    width: 20%;
+    height: 20%;
+    display: inline;
+    padding: 5px;
+}
+label[for="depth_to"]{
+    margin-right: 1.2rem;
+}
+label[for="depth_from"]{
+    margin-right: .12rem;
+}
+
