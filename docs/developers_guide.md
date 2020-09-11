@@ -481,3 +481,7 @@ You could also try [Defining encrypted variables in .travis.yml](https://docs.tr
 
 Travis docs have general [Recommendations on how to avoid leaking secrets to build logs](https://docs.travis-ci.com/user/best-practices-security/#recommendations-on-how-to-avoid-leaking-secrets-to-build-logs).
 If you accidentally leak a secret, repair the leak and generate a new secret, e.g. a new API token for Zenodo.
+
+### Debugging unit tests
+Coverage report is enabled by default for tests which makes it impossible to debug unit tests. In case you need to debug a unit test update the `pytest.ini` file with the followings:
+`addopts = --tb=short --verbose --junitxml=junit.xml -m "not long_running and not needs_advanced_setup"`
