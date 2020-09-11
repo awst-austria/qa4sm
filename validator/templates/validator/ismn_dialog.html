@@ -149,6 +149,28 @@
             return data
         }
 
+        function toggle_children_class(element, class_name){
+            $(element).toggleClass(class_name);
+            $.each($(element).find("*"), function(id, child){
+                $(child).toggleClass(class_name);
+            })
+        }
+
+
+        function verify_html_element(element_class){
+                var selector = '.'+element_class;
+                if  ($(selector).length>1){
+                    $.each($(selector), function(ind, element){
+                        if (!$(element).hasClass('d-none')){
+                            $(element).empty();
+                            $(element).remove();
+                        } else {
+                            toggle_children_class(element, 'd-none');
+                        }
+                    })
+                }
+        }
+
         function get_network_info(){
             var networks_info = ajax_take_network_info(); // taking info about network
             var keys = Object.keys(networks_info) // taking keys
