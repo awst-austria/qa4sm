@@ -30,7 +30,6 @@ def generate_all_graphs(validation_run, outfolder):
     outfolder : str
         Directoy where graphs are stored.
     """
-
     if not validation_run.output_file:
         return None
 
@@ -54,7 +53,6 @@ def generate_all_graphs(validation_run, outfolder):
             arcname = path.basename(svgfile)
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
-
 
 def get_dataset_combis_and_metrics_from_files(validation_run):
     """
