@@ -1,9 +1,12 @@
 import logging
 
 import pandas as pd
+from django.core.exceptions import ValidationError
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
+import numpy as np
+from validator.models import DataFilter
 
 __logger = logging.getLogger(__name__)
 
@@ -125,10 +128,11 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
     for pfil in param_filters:
         __logger.debug("Setting up parametrised filter {} for dataset {} with parameter {}".format(pfil.filter.name, dataset, pfil.parameters))
 
+        inner_reader = filtered_reader
+        while (hasattr(inner_reader, 'cls')):
+            inner_reader = inner_reader.cls
+
         if(pfil.filter.name == "FIL_ISMN_NETWORKS" and pfil.parameters):
-            inner_reader = filtered_reader
-            while(hasattr(inner_reader, 'cls')):
-                inner_reader = inner_reader.cls
 
             if isinstance(inner_reader, ISMN_Interface):
                 param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters) # replace whitespace around commas

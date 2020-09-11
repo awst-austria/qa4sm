@@ -11,6 +11,8 @@ from zipfile import ZipFile
 
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+
 User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -315,12 +317,15 @@ class TestValidation(TestCase):
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
                                      dataset_config=run.reference_configuration)
         pfilter.save()
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
 
         run_id = run.id
 
         ## run the validation
         val.run_validation(run_id)
-
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9 # 9 ismn stations in hawaii testdata
@@ -336,8 +341,8 @@ class TestValidation(TestCase):
         run = self.generate_default_validation_triple_coll()
         run.user = self.testuser
 
-        #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.CDF_MATCH  # cdf matching causes an error for 1 gpi, use that to test error handling
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -354,7 +359,54 @@ class TestValidation(TestCase):
 
             config.save()
 
-        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 9
+
+        self.check_results(new_run, is_tcol_run=True)
+        self.delete_run(new_run)
+
+    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
+    def test_validation_empty_network(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        #run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config == run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+            config.save()
+
+
+        # add filterring according to depth_range with values which cause that there is no points anymore:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.1,0.2", \
                                      dataset_config=run.reference_configuration)
         pfilter.save()
 
@@ -365,12 +417,11 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 9 # 9 ismn stations in hawaii testdata
+        assert new_run.total_points == 0
         assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+        assert new_run.ok_points == 0
 
-        self.check_results(new_run, is_tcol_run=True)
-        self.delete_run(new_run)
+
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
     @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
@@ -667,6 +718,7 @@ class TestValidation(TestCase):
             ]
         param_filters = [
             ParametrisedFilter(filter = DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters = "  COSMOS , SCAN "),
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
             ]
         msk_reader = val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
 
@@ -678,6 +730,61 @@ class TestValidation(TestCase):
         assert not data[variable.pretty_name].empty
         assert not np.any(data[variable.pretty_name].values < 0)
         assert not np.any(data[variable.pretty_name].values > 100)
+
+    # test potential depth ranges errors
+    def test_depth_range_filtering_errors(self):
+        # perparing Validation run for ISMN
+        run = ValidationRun()
+        run.start_time = datetime.now(tzlocal())
+        run.save()
+
+        dataset = Dataset.objects.get(short_name='ISMN')
+        version = dataset.versions.all()[0]
+
+        ref_c = DatasetConfiguration()
+        ref_c.validation = run
+        ref_c.dataset = dataset
+        ref_c.version = version
+        ref_c.variable = dataset.variables.first()
+        ref_c.save()
+        run.reference_configuration = ref_c
+        run.save()
+
+        # adding filters where depth_to is smaller than depth_from
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.2,0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        with pytest.raises(ValueError, match=r".*than.*"):
+            val.create_jobs(run)
+
+        ParametrisedFilter.objects.all().delete()
+
+        # adding filters with negative values
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="-0.05,0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        with pytest.raises(ValueError, match=r".*negative.*"):
+            val.create_jobs(run)
+
+        ParametrisedFilter.objects.all().delete()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="-0.05,-0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        with pytest.raises(ValueError, match=r".*negative.*"):
+            val.create_jobs(run)
+
+        ParametrisedFilter.objects.all().delete()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.05,-0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        with pytest.raises(ValueError, match=r".*negative.*"):
+            val.create_jobs(run)
 
     # test all combinations of datasets, versions, variables, and filters
     @pytest.mark.long_running
