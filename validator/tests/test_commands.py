@@ -233,3 +233,8 @@ class TestCommands(TestCase):
             self.__logger.debug('checking path second time for ' + dataset.short_name)
             assert new_test_path2 in dataset.storage_path
             assert dataset.short_name in dataset.storage_path
+
+
+        with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
+            # run the command to list the paths
+            call_command('getdatasetpaths', *args, **opts)

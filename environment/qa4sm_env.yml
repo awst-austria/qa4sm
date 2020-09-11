@@ -173,7 +173,7 @@ dependencies:
     - esa-cci-sm==0.1.1
     - gldas==0.6.1
     - h5py==2.10.0
-    - ismn==0.3.2
+    - ismn==0.4
     - kombu==4.6.11
     - llvmlite==0.33.0
     - netcdf4==1.5.3
@@ -203,3 +203,5 @@ dependencies:
     - trollsift==0.2.1
     - vine==1.3.0
     - xarray==0.15.1
+    - colorcet
+    - qa4sm-reader
