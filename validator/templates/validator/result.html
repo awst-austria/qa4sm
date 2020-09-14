@@ -192,9 +192,9 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';"><span class="fas fa-download"></span> Download all graphs</button>
+                            <button type="button" style="width: 10rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';"><span class="fas fa-download"></span> Download graphs</button>
 
-                            <select id="id_graph_metric" style="width: 12rem;" name="graph_variable"
+                            <select id="id_graph_metric" style="width: 18rem;" name="graph_variable"
                                 title="Metric to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
                                 {% for key, label in metrics.items %}
@@ -202,7 +202,7 @@
                                 {% endfor %}
                             </select>
 
-                            <select id="id_graph_pair" style="width: 12rem;" name="graph_pair"
+                            <select id="id_graph_pair" style="width: 18rem;" name="graph_pair"
                                 title="Dataset pair to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
                                 {% for pair in pairs %}
@@ -210,7 +210,7 @@
                                 {% endfor %}
                             </select>
 
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" title="Download all results in NetCDF format" onclick="location.href='{{ val.output_file.url }}';"><span class="fas fa-file-download"></span> Download NetCDF</button>
+                            <button type="button" style="width: 10rem;" class="btn btn-sm btn-primary" title="Download all results in NetCDF format" onclick="location.href='{{ val.output_file.url }}';"><span class="fas fa-file-download"></span> Download NetCDF</button>
                         </div>
                     </div>
                 </div>
