@@ -34,7 +34,8 @@
                         <div class="row">
                             <div class="col-sm network">
                                 <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_network" value="" type="checkbox" checked name="">
+                                    <input class="custom-control-input network" id="id_network" value="" type="checkbox" checked name=""
+                                           onchange="toggleISMNNetwork(this)">
                                     <label class="custom-control-label" for="id_network"></label>
                                 </div>
                             </div>
@@ -114,9 +115,25 @@
         var groupId = checkbox.id.replace(/^id_continent_/, 'id_collapse_')
         var filterboxes = $('#' + groupId).find('input:checkbox');
         var newValue = checkbox.checked;
+        console.log(newValue)
         for (var f of filterboxes) {
             f.checked=newValue;
         }
+    }
+
+    function toggleISMNNetwork(checkbox){
+        var checkboxId = checkbox.id
+        var network_container = $('#'+checkboxId).closest('.collapse_continent')
+        var continent_checkbox = $(network_container).prev().find('input.continent')
+        var networks = $(network_container).find('input:checkbox').not('.d-none')
+        console.log()
+<!--        console.log(continent_checkbox)-->
+<!--        console.log(networks.length)-->
+<!--        for (var i = 0; i < networks.length; i++){-->
+<!--            if ($())-->
+<!--        }-->
+
+
     }
 
     function setISMNNetworks(source) {
@@ -245,8 +262,11 @@
 
         ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
 
+        //the default networks are taken here from the hidden field
         var preselectedNetworks = $('#' + hiddenId).val();
-        preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, ''); // clean string from whitespace
+
+        // some text manipulation: clean string from whitespace and separation based on comas
+        preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
         var netList = preselectedNetworks.split(',');
 
 
@@ -257,6 +277,20 @@
         for (var net of netList) { // check the preselected networks
             ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
         }
+        // if there is a continent without any network chosen by default it should be switched off
+        $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
+            var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
+            var checked_networks = 0;
+            for (var i = 0; i < networks.length; i++){
+                if($(networks[i]).prop('checked')){
+                    checked_networks ++;
+                };
+            };
+            if (checked_networks == 0){
+                $(element).prop('checked', false);
+            };
+
+        });
     });
 
 
