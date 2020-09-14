@@ -17,6 +17,17 @@ METRICS = {'R' : 'Pearson\'s r',
            'mse_bias' : 'Mean square error bias',
            'mse_var' : 'Mean square error variance',}
 
+METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_",
+                   "{metric}"]
+
+TC_METRICS = {'snr': 'Signal-to-noise ratio',
+              'err_std': 'Error standard deviation',
+              'beta': 'TC scaling coefficient',}
+
+TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
+                      "_{metric}",
+                      "_for_{id_met}-{ds_met}"]
+
 C3S = 'C3S'
 ISMN = 'ISMN'
 GLDAS = 'GLDAS'
@@ -37,6 +48,7 @@ ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
 ISMN_V20191211 = 'ISMN_V20191211'
 SMAP_V5_PM = 'SMAP_V5_PM'
 SMAP_V6_PM = 'SMAP_V6_PM'
+SMOS_105_ASC = 'SMOS_105_ASC'
 GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
 ASCAT_H113 = 'ASCAT_H113'
 ERA5_20190613 = 'ERA5_20190613'
@@ -55,6 +67,7 @@ ESA_CCI_SM_C_V05_2 = 'ESA_CCI_SM_C_V05_2'
 ## dataset data variables
 C3S_sm = 'C3S_sm'
 SMAP_soil_moisture = 'SMAP_soil_moisture'
+SMOS_sm = 'SMOS_sm'
 ASCAT_sm = 'ASCAT_sm'
 ISMN_soil_moisture = 'ISMN_soil_moisture'
 GLDAS_SoilMoi0_10cm_inst = 'GLDAS_SoilMoi0_10cm_inst'

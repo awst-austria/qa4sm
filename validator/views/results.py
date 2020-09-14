@@ -9,8 +9,8 @@ from django.shortcuts import get_object_or_404, render
 from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm
 from validator.models import ValidationRun
-from validator.validation.globals import METRICS
-from validator.validation.graphics import get_dataset_combis_from_files
+from validator.validation.globals import METRICS, TC_METRICS
+from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
 
 @login_required(login_url='/login/')
@@ -128,7 +128,8 @@ def result(request, result_uuid):
         if val_run.total_points != 0:
             error_rate = (val_run.total_points - val_run.ok_points) / val_run.total_points
 
-        pairs, ref0_config = get_dataset_combis_from_files(val_run)
+        pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(val_run)
+        combis = pairs + triples
 
         # the publication form is only needed by the owner; if we're displaying for another user, avoid leaking user data
         pub_form = PublishingForm(validation=val_run) if is_owner else None
@@ -138,8 +139,8 @@ def result(request, result_uuid):
             'val' : val_run,
             'error_rate' : error_rate,
             'run_time': run_time,
-            'metrics': METRICS,
-            'pairs': pairs,
+            'metrics': metrics,
+            'pairs': combis,
             'json_metrics': json_dumps(METRICS),
             'publishing_form': pub_form
             }
