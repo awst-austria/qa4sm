@@ -4,6 +4,7 @@ Test DOI generation
 
 from datetime import timedelta
 import logging
+import os
 from os import path
 import shutil
 import netCDF4
@@ -24,6 +25,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 
 
 # use zenodo test sandbox to avoid generating real dois
+@pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
 @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
 @pytest.mark.long_running
 class TestDOI(TestCase):
