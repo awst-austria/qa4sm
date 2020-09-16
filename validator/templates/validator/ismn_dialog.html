@@ -59,7 +59,6 @@
 </div>
 
 
-<!--Monika-->
 <div class="modal" id="ismn_depth" role="dialog" aria-labelledby="ismn_networks_title" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document" style="max-width: 30rem;">
         <div class="modal-content">
@@ -84,13 +83,13 @@
                 <div>
                     <div></div>
                         <label for="depth_from">Depth from: </label>
-                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="first_range"
+                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="depth_from"
                             onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
                         <label for="depth_from">m</label>
                     </div>
                     <div>
                         <label for="depth_to">Depth to: </label>
-                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="first_range"
+                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="depth_to"
                             onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
                         <label for="depth_to">m</label>
                     </div>
@@ -129,7 +128,6 @@
         var network_container = $('#'+checkboxId).closest('.collapse_continent')
         var continent_checkbox = network_container.prev().find('input.continent')
         var networks = network_container.find('input:checkbox').not('.d-none')
-        console.log(networks)
 
         // it checks here if at least one network is checked ...
         var cond = networks.is(function(indx, network){
@@ -141,7 +139,6 @@
         } else {
             continent_checkbox.prop('checked', true);
         }
-
     }
 
     function setISMNNetworks(source) {
@@ -154,11 +151,9 @@
             networkList += netCB.value + ',';
         }
         networkList = networkList.replace(/,+$/, ''); //remove the last coma
-
         $('#'+hiddenId).val(networkList);
     }
 
-<!--Monika-->
         function ajax_take_network_info() {
             <!--using ajax to read the network info according to its version -->
             var url = $("#validation_form").attr("version-options-url");
@@ -200,45 +195,44 @@
 
         function get_network_info(){
             var networks_info = ajax_take_network_info(); // taking info about network
-            var keys = Object.keys(networks_info) // taking keys
+            var continents = Object.keys(networks_info) // taking keys-continents
 
             // cleaning html in case this function is called more than once
             verify_html_element('continent_container')
             verify_html_element('collapse_continent')
 
            // taking basic html for continent
-            var basic_continent_container = $('.continent_container') // taking basic container for continents
+            var basic_continent_container = $('.continent_container')
             var basic_continent_collapse = $('.collapse_continent')
 
-           //iteration over keys - to sort networks according to continents
-           $.each(keys, function(ind, key){
-                var continent = key;
-                var networks = networks_info[key];
-                var key_word = key.replace(/ /g, '') //removing spaces from Americas :);
+           //iteration over continents - to sort networks according to continents
+           $.each(continents, function(ind, continent){
+                var networks = networks_info[continent];
+                var continent_name = continent.replace(/ /g, '') //removing spaces from Americas :);
 
                 //creating new values
-                var new_onclick = `$('#id_collapse_${key_word}').collapse('toggle')`;
-                var new_id = 'id_continent_' + key_word;
+                var new_onclick = `$('#id_collapse_${continent_name}').collapse('toggle')`;
+                var new_id = 'id_continent_' + continent_name;
 
-                //getting the basic html pattern
+                //getting basic html patterns
                 var new_continent_container = basic_continent_container.clone(true, true);
                 var new_continent_collapse = basic_continent_collapse.clone(true, true);
                 var basic_network_container = new_continent_collapse.find('.row');
 
                 // setting approprate attributes
                 new_continent_container.find('input').attr('id', new_id);
-                new_continent_container.find('input').attr('value', key_word);
-                new_continent_container.find('input').attr('name', 'continent_' + key_word);
+                new_continent_container.find('input').attr('value', continent_name);
+                new_continent_container.find('input').attr('name', 'continent_' + continent_name);
                 new_continent_container.find('label').attr('for', new_id);
-                new_continent_container.find('div.ismn_label').text(key);
+                new_continent_container.find('div.ismn_label').text(continent);
                 new_continent_container.find('div.ismn_label').attr('onclick', new_onclick);
-                new_continent_collapse.attr('id', 'id_collapse_' + key_word);
+                new_continent_collapse.attr('id', 'id_collapse_' + continent_name);
 
                 // inserting new elements
                 $(basic_continent_container).before(new_continent_container);
                 $(basic_continent_container).before(new_continent_collapse);
 
-                //for each continent networks are listed
+                //for each continent networks are listed here
                 $.each(networks, function(ind, val){
                     var new_network = basic_network_container.clone(true, true);
                     new_network.find('input').attr('id', 'id_'+val[0]);
@@ -253,21 +247,18 @@
                     $(basic_network_container).before(new_network);
 
                 })
+                // switching off the basic html pattern
                 toggle_children_class(basic_network_container, 'd-none');
-                    $(basic_network_container).detach()
            })
 
-
-           // switching off the basic html pattern
+           // switching off basic html patterns
            toggle_children_class(basic_continent_container, 'd-none');
            toggle_children_class(basic_continent_collapse, 'd-none');
         }
 
-<!--Monika-->
     $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
         get_network_info();
 
-<!--filtering part - take care of it later-->
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
         var ismnDialog = $(e.currentTarget);
@@ -292,7 +283,6 @@
         // if there is a continent without any network chosen by default it should be switched off
         $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
             var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
-            var checked_networks = 0;
 
             // here I'm checking if there is at least one network checked by default:
             var cond = networks.is(function(indx, network){return $(network).prop('checked')})
@@ -306,7 +296,6 @@
     });
 
 
-<!--Monika-->
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
@@ -344,6 +333,5 @@
         getDefaultRanges(e);
     });
 
-<!--Monika-->
 
 </script>
