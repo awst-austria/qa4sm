@@ -119,7 +119,6 @@
         var groupId = checkbox.id.replace(/^id_continent_/, 'id_collapse_')
         var filterboxes = $('#' + groupId).find('input:checkbox');
         var newValue = checkbox.checked;
-        console.log(newValue)
         for (var f of filterboxes) {
             f.checked=newValue;
         }
@@ -128,15 +127,20 @@
     function toggleISMNNetwork(checkbox){
         var checkboxId = checkbox.id
         var network_container = $('#'+checkboxId).closest('.collapse_continent')
-        var continent_checkbox = $(network_container).prev().find('input.continent')
-        var networks = $(network_container).find('input:checkbox').not('.d-none')
-        console.log()
-<!--        console.log(continent_checkbox)-->
-<!--        console.log(networks.length)-->
-<!--        for (var i = 0; i < networks.length; i++){-->
-<!--            if ($())-->
-<!--        }-->
+        var continent_checkbox = network_container.prev().find('input.continent')
+        var networks = network_container.find('input:checkbox').not('.d-none')
+        console.log(networks)
 
+        // it checks here if at least one network is checked ...
+        var cond = networks.is(function(indx, network){
+                    return $(network).prop('checked');
+                   })
+        // .. if not then unchecked also the appropriate continent checkbox
+        if(!cond){
+            continent_checkbox.prop('checked', false);
+        } else {
+            continent_checkbox.prop('checked', true);
+        }
 
     }
 
