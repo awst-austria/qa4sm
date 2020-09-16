@@ -111,6 +111,10 @@
 
 <!--====================================== Java Script Codes ==================================================== -->
 <script type="text/javascript">
+    // Remark: I use below hide-element-approach instead of detach or remove it, so everytime we use somehow:
+    // .continent_container, .collapse_continent, label.custom-control-label elements there is always one element more
+    //  to handle. Thus filtering should be done ommiting the bootstrap 'd-none' class;
+
     function toggleISMNContinent(checkbox) {
         var groupId = checkbox.id.replace(/^id_continent_/, 'id_collapse_')
         var filterboxes = $('#' + groupId).find('input:checkbox');
@@ -152,7 +156,7 @@
 
 <!--Monika-->
         function ajax_take_network_info() {
-            <!--using ajax to read the network info according to the -->
+            <!--using ajax to read the network info according to its version -->
             var url = $("#validation_form").attr("version-options-url");
             var versionId = $('#id_target_hidden_input_version').val();
             $.ajax({
@@ -181,7 +185,9 @@
                         if (!$(element).hasClass('d-none')){
                             $(element).empty();
                             $(element).remove();
-                        } else {
+                        }
+                        else {
+
                             toggle_children_class(element, 'd-none');
                         }
                     })
@@ -244,7 +250,9 @@
 
                 })
                 toggle_children_class(basic_network_container, 'd-none');
+                    $(basic_network_container).detach()
            })
+
 
            // switching off the basic html pattern
            toggle_children_class(basic_continent_container, 'd-none');
@@ -281,14 +289,14 @@
         $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
             var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
             var checked_networks = 0;
-            for (var i = 0; i < networks.length; i++){
-                if($(networks[i]).prop('checked')){
-                    checked_networks ++;
-                };
-            };
-            if (checked_networks == 0){
+
+            // here I'm checking if there is at least one network checked by default:
+            var cond = networks.is(function(indx, network){return $(network).prop('checked')})
+
+            // if not then the continent also should be unchecked
+            if(!cond){
                 $(element).prop('checked', false);
-            };
+            }
 
         });
     });
