@@ -448,7 +448,7 @@ Put json files into `validator/fixtures/` (and pretty-print them with an editor 
 
 Set up database contents with the fixtures:
 
-    python manage.py loaddata versions variables filters datasets
+    python manage.py loaddata versions variables filters datasets networks
 
 ### Database bulk changes
 
