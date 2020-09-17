@@ -1,311 +1,146 @@
 import matplotlib.pyplot as plt
 plt.switch_backend('agg') ## this allows headless graph production
-import matplotlib.ticker as mticker
 
-from fileinput import filename
 import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from re import search as regex_search
-from re import match as regex_match
-from re import IGNORECASE  # @UnresolvedImport
-
-import netCDF4
-import numpy as np
-import pandas as pd
+from qa4sm_reader.plot_all import plot_all
 
 from django.conf import settings
 
 from cartopy import config as cconfig
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 
-import seaborn as sns
-
-from validator.validation import globals
-from validator.models import DatasetConfiguration
-
+from validator.validation.globals import OUTPUT_FOLDER, METRICS, TC_METRICS, METRIC_TEMPLATE, TC_METRIC_TEMPLATE
+import os
+from parse import *
 
 __logger = logging.getLogger(__name__)
 
+def generate_all_graphs(validation_run, outfolder):
+    """
+    Create all default graphs for validation run. This is done
+    using the qa4sm-reader plotting library.
 
-_metric_value_ranges = {
-    'R': [-1, 1],
-    'p_R': [0, 1],
-    'rho': [-1, 1],
-    'p_rho': [0, 1],
-    'RMSD': [0, None],
-    'BIAS': [None, None],
-    'n_obs': [0, None],
-    'urmsd': [0, None],
-    'RSS': [0, None],
-    'mse' : [None, None],
-    'mse_corr' : [None, None],
-    'mse_bias' : [None, None],
-    'mse_var' : [None, None],
-}
-
-# label format for all metrics
-_metric_description = {
-    'R': '',
-    'p_R': '',
-    'rho': '',
-    'p_rho': '',
-    'RMSD': r' in ${}$',
-    'BIAS': r' in ${}$',
-    'n_obs': '',
-    'urmsd': r' in ${}$',
-    'RSS': r' in $({})^2$',
-    'mse' : '',
-    'mse_corr' : '',
-    'mse_bias' : '',
-    'mse_var' : '',
-}
-
-# colormaps used for plotting metrics
-_colormaps = {
-    'R': 'RdYlBu',
-    'p_R': 'RdYlBu_r',
-    'rho': 'RdYlBu',
-    'p_rho': 'RdYlBu_r',
-    'RMSD': 'RdYlBu_r',
-    'BIAS': 'coolwarm',
-    'n_obs': 'RdYlBu',
-    'urmsd': 'RdYlBu_r',
-    'RSS': 'RdYlBu_r',
-    'mse' : 'RdYlBu_r',
-    'mse_corr' : 'RdYlBu_r',
-    'mse_bias' : 'RdYlBu_r',
-    'mse_var' : 'RdYlBu_r',
-}
-
-# units for all datasets
-_metric_units = {
-    'ISMN': r'm^3 m^{-3}',
-    'C3S': r'm^3 m^{-3}',
-    'GLDAS': r'm^3 m^{-3}',
-    'ASCAT': r'percentage of saturation',
-    'SMAP': r'm^3 m^{-3}',
-    'ERA5': r'm^3 m^{-3}',
-    'ERA5_LAND': r'm^3 m^{-3}'
-}
-
-_watermark = u'made with QA4SM ('+ settings.SITE_URL +')'
-
-def safe_arange(start, stop, step):
-    f_step = (1. / float(step))
-    vals = np.arange(float(start) * f_step, float(stop) * f_step , float(step) * f_step)
-    return vals / f_step
-
-def generate_boxplot(validation_run, outfolder, variable, label, values, unit_ref):
-    png_filename = path.join(outfolder, 'boxplot_{}.png'.format(variable))
-    svg_filename = path.join(outfolder, 'boxplot_{}.svg'.format(variable))
-
-    values = values.melt(value_vars=values.columns, var_name='Validation')
-
-    # use seaborn library for boxplot
-    sns.set_style("whitegrid")
-    ax = sns.boxplot(data=values, x='Validation', y='value', width=0.15, showfliers=False, color='white')
-    sns.despine()
-    ax.set_ylim(_metric_value_ranges[variable])
-
-    plot_title = " vs \n".join(
-        ['{} ({})'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in validation_run.dataset_configurations.all()])
-
-    plt.title(plot_title)
-    plt.ylabel(label + _metric_description[variable].format(_metric_units[unit_ref]))
-    plt.text(0, -0.14, _watermark, fontsize=10, color='black',
-             horizontalalignment='left', verticalalignment='bottom', alpha=0.5, transform=ax.transAxes)
-    plt.tight_layout()
-    plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1,)
-    plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0.1,)
-    plt.close()
-    return [png_filename, svg_filename]
-
-
-def generate_overview_map(validation_run, outfolder, metric, label, values, dc1, dc2,
-                          pair_name, unit_ref, lons, lats, draw_grid=True):
-    if metric == pair_name:
-        filename = 'overview_{}'.format(metric)
-    else:
-        filename = 'overview_{}_{}'.format(pair_name, metric)
-
-    png_filename = path.join(outfolder, filename + '.png')
-    svg_filename = path.join(outfolder, filename + '.svg')
-
-    data_crs = ccrs.PlateCarree()
-    ax = plt.axes(projection=data_crs)
-    cm = plt.cm.get_cmap(_colormaps[metric])
-    ax.outline_patch.set_linewidth(0.2)
-
-    v_min = _metric_value_ranges[metric][0]
-    v_max = _metric_value_ranges[metric][1]
-
-    padding = 5
-    extent = [lons.min()-padding, lons.max()+padding, lats.min()-padding, lats.max()+padding]
-    lon_interval = extent[1] - extent[0]
-    lat_interval = extent[3] - extent[2]
-
-    # do scatter plot for ISMN and heatmap for everything else
-    if validation_run.reference_configuration.dataset.short_name == globals.ISMN:
-        # change size of markers dependent on zoom level
-        markersize = 1.5 * (360 / lon_interval)
-        the_plot = plt.scatter(lons, lats, c=values, cmap=cm, s=markersize, vmin=v_min, vmax=v_max,
-                               edgecolors='black', linewidths=0.05, zorder=3)
-    else:
-        if validation_run.reference_configuration.dataset.short_name == globals.ERA5_LAND:
-            dy, dx = -0.1, 0.1
-            lats_map = safe_arange(extent[3], extent[2], dy)
-            lons_map = safe_arange(extent[0], extent[1], dx)
-        else:
-            dy, dx = -0.25, 0.25
-            lats_map = safe_arange(extent[3], extent[2], dy)
-            lons_map = safe_arange(extent[0], extent[1], dx)
-
-#         lats_map = np.arange(89.875, -60, -0.25)
-#         lons_map = np.arange(-179.875, 180, 0.25)
-        values_map = np.empty((len(lats_map), len(lons_map)))
-        values_map[:] = np.nan
-        
-        for i in range(0, len(values)):
-            values_map[np.where(lats_map == lats[i])[0][0]][np.where(lons_map == lons[i])[0][0]] = values[i]
-
-#         extent = [-179.875, 179.875, -59.875, 89.875]
-        the_plot = plt.imshow(values_map, cmap=cm, interpolation='none', extent=extent,
-                              vmin=v_min, vmax=v_max, zorder=1)
-
-    ax.coastlines(linewidth=0.2, zorder=2)
-    ax.add_feature(cfeature.STATES, linewidth=0.05, zorder=2)
-    ax.add_feature(cfeature.BORDERS, linewidth=0.1, zorder=2)
-    ax.add_feature(cfeature.LAND, color='white', zorder=0)
-
-    # add gridlines
-    grid_interval_lon = 5 * round((lon_interval/3) / 5)
-    grid_interval_lat = 5 * round((lat_interval/3) / 5)
-    if grid_interval_lat > 30:
-        grid_interval_lat = 30
-    if grid_interval_lon > 30:
-        grid_interval_lon = 30
-
-    if draw_grid:
-        gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=0.2,
-                          color='gray', alpha=0.5, linestyle='--')
-        gl.xlabels_top = False
-        gl.ylabels_left = False
-        gl.xlocator = mticker.FixedLocator(np.arange(-180, 181, grid_interval_lon))
-        gl.ylocator = mticker.FixedLocator(np.arange(-90, 91, grid_interval_lat))
-        gl.xformatter = LONGITUDE_FORMATTER
-        gl.yformatter = LATITUDE_FORMATTER
-        gl.xlabel_style = {'size': 4, 'color': 'black'}
-        gl.ylabel_style = {'size': 4, 'color': 'black'}
-
-    # add colorbar
-    cbar = plt.colorbar(the_plot, orientation='horizontal', pad=0.05)
-    cbar.set_label(label + _metric_description[metric].format(_metric_units[unit_ref]), size=5)
-    cbar.outline.set_linewidth(0.2)
-    cbar.outline.set_edgecolor('black')
-    cbar.ax.tick_params(width=0.2, labelsize=4)
-
-    plot_title="{} ({}) vs {} ({})".format(
-        dc1.dataset.short_name, dc1.version.short_name, dc2.dataset.short_name, dc2.version.short_name)
-    plt.title(plot_title,fontsize=8)
-    ax.text(0, -0.6, _watermark, fontsize=5,
-        color='black', horizontalalignment='left', verticalalignment='bottom', alpha=0.5, transform=ax.transAxes)
-
-#     plt.tight_layout()
-    plt.savefig(png_filename, bbox_inches='tight', pad_inches=0.1, dpi=200)
-    plt.savefig(svg_filename, bbox_inches='tight', pad_inches=0.1, dpi=200)
-    plt.close()
-
-    return [png_filename, svg_filename]
-
-def identify_dataset_configs(validation_run, metric_col_name):
-    ds_match = regex_match(r'.*_between_(([0-9]+)-(.*)_and_([0-9]+)-(.*))', metric_col_name)
-    if ds_match:
-        pair_name = ds_match.group(1)
-        dc1_num = int(ds_match.group(2))
-        ds1_name = ds_match.group(3)
-        dc2_num = int(ds_match.group(4))
-        ds2_name = ds_match.group(5)
-
-        ds_order = validation_run.get_datasetconfiguration_order()
-        dc1 = DatasetConfiguration.objects.get(pk = ds_order[dc1_num - 1])
-        dc2 = DatasetConfiguration.objects.get(pk = ds_order[dc2_num - 1])
-
-        if ((dc1.dataset.short_name != ds1_name) or (dc2.dataset.short_name != ds2_name)):
-            raise Exception('Can\'t figure out correct dataset configuration')
-
-    else: # this should happen for columns that aren't specific to dataset pairs, e.g. n_obs
-        dc1 = validation_run.dataset_configurations.first()
-        dc2 = validation_run.dataset_configurations.last()
-        pair_name = metric_col_name
-
-    return [dc1, dc2, pair_name]
-
-def generate_all_graphs(validation_run, outfolder, map_grid=True):
+    Parameters
+    ----------
+    validation_run : ValidationRun
+        The validation run to make plots for.
+    outfolder : str
+        Directoy where graphs are stored.
+    """
     if not validation_run.output_file:
         return None
 
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-    # get units for plot labels
-    unit_ref = validation_run.reference_configuration.dataset.short_name
+
+    fnb, fnm = plot_all(validation_run.output_file.path,
+        out_dir=outfolder, out_type='png')
+    fnb_svg, fnm_svg = plot_all(validation_run.output_file.path,
+        out_dir=outfolder, out_type='svg')
 
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        with netCDF4.Dataset(validation_run.output_file.path, mode='r') as ds:
-            lats = ds.variables['lat'][:]
-            lons = ds.variables['lon'][:]
+        for pngfile in fnb + fnm:
+            print(pngfile)
+            arcname = path.basename(pngfile)
+            myzip.write(pngfile, arcname=arcname)
+        for svgfile in fnb_svg + fnm_svg:
+            print(svgfile)
+            arcname = path.basename(svgfile)
+            myzip.write(svgfile, arcname=arcname)
+            remove(svgfile)
 
-            for metric in globals.METRICS:
-                ## get all 'columns' (dataset-pair results) from the netcdf file that start with the current metric name
-                cur_metric_cols = ds.get_variables_by_attributes(name=lambda v: regex_search(r'^{}(_between|$)'.format(metric), v, IGNORECASE) is not None)
+def get_dataset_combis_and_metrics_from_files(validation_run):
+    """
+    Go through plots of validation run and detect the dataset names and ids.
+    Create combinations of id-REF_and_id-SAT to show the plots on the results
+    page.
 
-                metric_table = pd.DataFrame()
-                for metric_col in cur_metric_cols:
-                    ## figure out dataset configurations for current pair
-                    dc1, dc2, pair_name = identify_dataset_configs(validation_run, metric_col.name)
+    Parameters
+    ----------
+    validation_run
+        Validation run object
 
-                    ## build table for current metric, one column per dataset-pair
-                    metric_table[pair_name] = metric_col[:].compressed()
+    Returns
+    -------
+    pairs : list
+        Dataset pairs to show in the dropdown
+    triples : list
+        Dataset triples to show in the dropdown
+    metrics : dict
+        All metrics that are found
+    ref0_config : bool or None
+        True if the ref has id 0 (sorted ids).
+    """
 
-                    ## make overview maps for all columns
-                    if metric_col[:] is not None:
-                        file1, file2 = generate_overview_map(validation_run, outfolder, metric, globals.METRICS[metric], metric_col[:],
-                                                             dc1, dc2, pair_name, unit_ref, lons, lats, draw_grid=map_grid)
-                        arcname = path.basename(file1)
-                        myzip.write(file1, arcname=arcname)
-                        arcname = path.basename(file2)
-                        myzip.write(file2, arcname=arcname)
-                        remove(file2)  # we don't need the vector image anywhere but in the zip
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
+    pairs, triples = [] ,[]
+    ref0_config = None
 
-                ## make boxplot graph with boxplots for all columns
-                if not metric_table.empty:
-                    file1, file2 = generate_boxplot(validation_run, outfolder, metric, globals.METRICS[metric], metric_table, unit_ref)
-                    arcname = path.basename(file1)
-                    myzip.write(file1, arcname=arcname)
-                    arcname = path.basename(file2)
-                    myzip.write(file2, arcname=arcname)
-                    remove(file2)  # we don't need the vector image anywhere but in the zip
+    ds_names = [ds_config.dataset.short_name for ds_config in validation_run.dataset_configurations.all()]
 
-def get_dataset_pairs(validation_run):
-    pairs = []
+    metrics = {}
 
-    ref = None
-    datasets = []
-    for ds_num, dataset_config in enumerate(validation_run.dataset_configurations.all(), start=1):
-        dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
-        if(dataset_config.id == validation_run.reference_configuration.id):
-            ref = dataset_name
-        else:
-            datasets.append(dataset_name)
+    for root, dirs, files in os.walk(run_dir):
+        for f in files:
+            if not f.endswith('.png'): continue
 
-    for ds in datasets:
-        pair = '{}_and_{}'.format(ref, ds)
-        pairs.append(pair)
+            for pair_metric in METRICS.keys():
 
-    return pairs
+                template = ''.join([METRIC_TEMPLATE[0],
+                                    METRIC_TEMPLATE[1].format(metric=pair_metric)]) + '.png'
+
+                parsed = parse(template,f)
+                if parsed is None:
+                    continue
+                else:
+                    if (parsed['ds_ref'] in ds_names) and (parsed['ds_sat'] in ds_names):
+                        ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+                        ds = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+
+                        if ref0_config is None and (int(parsed['id_ref']) == 0):
+                            ref0_config = True
+
+                        if pair_metric not in metrics.keys():
+                            metrics[pair_metric] = METRICS[pair_metric]
+
+                        pair = '{}_and_{}'.format(ref, ds)
+                        if pair not in pairs:
+                            pairs.append(pair)
+
+            for tcol_metric in TC_METRICS.keys():
+
+                template = ''.join([TC_METRIC_TEMPLATE[0],
+                                    TC_METRIC_TEMPLATE[1].format(metric=tcol_metric),
+                                    TC_METRIC_TEMPLATE[2]]) + '.png'
+
+                parsed = parse(template, f)
+                if parsed is None:
+                    continue
+                else:
+                    if all([parsed[d] in ds_names for d in ['ds_ref', 'ds_sat', 'ds_sat2', 'ds_met']]):
+                        ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+                        ds = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+                        ds2 = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
+                        ds_met = f"{parsed['id_met']}-{parsed['ds_met']}"
+
+                        metric = f"{tcol_metric}_for_{ds_met}"
+
+                        if metric not in metrics.keys():
+                            metrics[metric] = f"{TC_METRICS[tcol_metric]} for {ds_met}"
+
+                        triple = '{}_and_{}_and_{}'.format(ref, ds, ds2)
+
+                        if triple not in triples:
+                            triples.append(triple)
+    # import logging
+    # __logger = logging.getLogger(__name__)
+    # __logger.debug(f"Pairs: {pairs}")
+    # __logger.debug(f"Triples: {triples}")
+    # __logger.debug(f"Metrics: {metrics}")
+
+    return pairs, triples, metrics, ref0_config

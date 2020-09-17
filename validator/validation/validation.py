@@ -13,7 +13,7 @@ from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
 from pytesmo.validation_framework.data_manager import DataManager
-from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names
+from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names, TCMetrics
 from pytesmo.validation_framework.results_manager import netcdf_results_manager
 from pytesmo.validation_framework.validation import Validation
 from pytz import UTC
@@ -57,7 +57,8 @@ def save_validation_config(validation_run):
         else:
             ds.val_interval_to=validation_run.interval_to.strftime('%Y-%m-%d %H:%M')
 
-        for i, dataset_config in enumerate(validation_run.dataset_configurations.all()):
+        j = 1
+        for dataset_config in validation_run.dataset_configurations.all():
             filters = None
             if dataset_config.filters.all():
                 filters = '; '.join([x.description for x in dataset_config.filters.all()])
@@ -68,6 +69,13 @@ def save_validation_config(validation_run):
 
             if not filters:
                 filters = 'N/A'
+
+            if ((validation_run.reference_configuration) and
+                    (dataset_config.id == validation_run.reference_configuration.id)):
+                i = 0 # reference is always 0
+            else:
+                i = j
+                j += 1
 
             ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
             ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
@@ -105,18 +113,29 @@ def create_pytesmo_validation(validation_run):
     ds_list = []
     ref_name = None
     scaling_ref_name = None
-    for ds_num, dataset_config in enumerate(validation_run.dataset_configurations.all(), start=1):
+
+    ds_num = 1
+    for dataset_config in validation_run.dataset_configurations.all():
         reader = create_reader(dataset_config.dataset, dataset_config.version)
-        reader = setup_filtering(reader, list(dataset_config.filters.all()), list(dataset_config.parametrisedfilter_set.all()), dataset_config.dataset, dataset_config.variable)
+        reader = setup_filtering(reader, list(dataset_config.filters.all()), list(dataset_config.parametrisedfilter_set.all()),
+                                 dataset_config.dataset, dataset_config.variable)
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name])
         if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
             # make sure our baseline period is in UTC and without timezone information
-            anomalies_baseline=[validation_run.anomalies_from.astimezone(tz=pytz.UTC).replace(tzinfo=None), validation_run.anomalies_to.astimezone(tz=pytz.UTC).replace(tzinfo=None)]
+            anomalies_baseline=[validation_run.anomalies_from.astimezone(tz=pytz.UTC).replace(tzinfo=None),
+                                validation_run.anomalies_to.astimezone(tz=pytz.UTC).replace(tzinfo=None)]
             reader = AnomalyClimAdapter(reader, columns=[dataset_config.variable.pretty_name], timespan=anomalies_baseline)
 
-        dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
+        if ((validation_run.reference_configuration) and
+            (dataset_config.id == validation_run.reference_configuration.id)):
+            # reference is always named "0-..."
+            dataset_name = '{}-{}'.format(0, dataset_config.dataset.short_name)
+        else:
+            dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
+            ds_num += 1
+
         ds_list.append( (dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
 
         if ((validation_run.reference_configuration) and
@@ -126,7 +145,7 @@ def create_pytesmo_validation(validation_run):
             (dataset_config.id == validation_run.scaling_ref.id)):
             scaling_ref_name = dataset_name
 
-    datasets=dict(ds_list)
+    datasets = dict(ds_list)
     ds_num = len(ds_list)
 
     period = None
@@ -136,9 +155,20 @@ def create_pytesmo_validation(validation_run):
         enddate = validation_run.interval_to.astimezone(UTC).replace(tzinfo=None)
         period = [startdate, enddate]
 
-    datamanager = DataManager(datasets, ref_name=ref_name, period=period)
+    datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
-    metrics = IntercomparisonMetrics(dataset_names=ds_names, other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+
+    if len(ds_names) >= 3:
+        # if there are 3 or more dataset, do TC, exclude ref metrics
+        metrics = TCMetrics(
+                    dataset_names=ds_names, tc_metrics_for_ref=False,
+                    other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+    else:
+        metrics = IntercomparisonMetrics(
+                        dataset_names=ds_names,
+                        other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+
+    __logger.debug(f"MetricsCalculator: {metrics.__class__.__name__}")
 
     val = Validation(
         datasets=datamanager,
@@ -168,6 +198,7 @@ def execute_job(self,validation_id, job):
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run)
+
         result = val.calc(*job)
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
