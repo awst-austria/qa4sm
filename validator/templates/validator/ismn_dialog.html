@@ -213,7 +213,6 @@
             var versionId = $('#id_target_hidden_input_version').val();
             $.ajax({
                 url: url,
-                async: false,
                 data: {'version_id': versionId},
                 success: function (return_data) {
                     data = return_data['network']
