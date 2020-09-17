@@ -51,7 +51,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="ismn_networks_button" type="button" onclick="setISMNNetworks(this);$('#ismn_networks').modal('hide');" class="btn btn-primary">Use networks</button>
+                <button id="ismn_networks_button" type="button" onclick="setISMNNetworks(this);" class="btn btn-primary">Use networks</button>
             </div>
 
         </div>
@@ -100,7 +100,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide');" class="btn btn-primary">Use depth range</button>
+                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide')" class="btn btn-primary">Use depth range</button>
             </div>
 
         </div>
@@ -114,6 +114,51 @@
     // .continent_container, .collapse_continent, label.custom-control-label elements there is always one element more
     //  to handle. Thus filtering should be done ommiting the bootstrap 'd-none' class;
 
+// Auxiliary functions:
+
+    function getDefaultParams(e){
+        var callerId = e.relatedTarget.id;
+        var hiddenId = callerId.replace(/_link$/, '_params');
+        var default_values = $('#'+hiddenId).val();
+        var ismnDialog = $(e.currentTarget);
+        ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
+        return default_values
+    }
+
+    function getDefaultRanges(e){
+        var default_val = getDefaultParams(e);
+        var range = default_val.split(',');
+        $('#depth_from').val(parseFloat(range[0]));
+        $('#depth_to').val(parseFloat(range[1]));
+        range = [$('#depth_from').val(), $('#depth_to').val()];
+        return range
+    }
+
+    function toggle_children_class(element, class_name){
+        $(element).toggleClass(class_name);
+        $.each($(element).find("*"), function(id, child){
+            $(child).toggleClass(class_name);
+        })
+    }
+
+
+    function verify_html_element(element_class){
+            var selector = '.'+element_class;
+            if  ($(selector).length>1){
+                $.each($(selector), function(ind, element){
+                    if (!$(element).hasClass('d-none')){
+                        $(element).empty();
+                        $(element).remove();
+                    }
+                    else {
+
+                        toggle_children_class(element, 'd-none');
+                    }
+                })
+            }
+     }
+
+// ------------------- ISMN Networks -----------------------------------------//
     function toggleISMNContinent(checkbox) {
         var groupId = checkbox.id.replace(/^id_continent_/, 'id_collapse_')
         var filterboxes = $('#' + groupId).find('input:checkbox');
@@ -151,7 +196,15 @@
             networkList += netCB.value + ',';
         }
         networkList = networkList.replace(/,+$/, ''); //remove the last coma
-        $('#'+hiddenId).val(networkList);
+
+        if (networkList.length == 0){
+          alert('You did not choose any network. Please choose at least one network.')
+        }else {
+          $('#'+hiddenId).val(networkList);
+          $('#ismn_networks').modal('hide')
+        }
+
+
     }
 
         function ajax_take_network_info() {
@@ -169,29 +222,6 @@
             return data
         }
 
-        function toggle_children_class(element, class_name){
-            $(element).toggleClass(class_name);
-            $.each($(element).find("*"), function(id, child){
-                $(child).toggleClass(class_name);
-            })
-        }
-
-
-        function verify_html_element(element_class){
-                var selector = '.'+element_class;
-                if  ($(selector).length>1){
-                    $.each($(selector), function(ind, element){
-                        if (!$(element).hasClass('d-none')){
-                            $(element).empty();
-                            $(element).remove();
-                        }
-                        else {
-
-                            toggle_children_class(element, 'd-none');
-                        }
-                    })
-                }
-        }
 
         function get_network_info(){
             var networks_info = ajax_take_network_info(); // taking info about network
@@ -277,9 +307,12 @@
         ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
         ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
 
+    // here is the problem
         for (var net of netList) { // check the preselected networks
             ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
         }
+
+
         // if there is a continent without any network chosen by default it should be switched off
         $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
             var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
@@ -295,7 +328,7 @@
         });
     });
 
-
+// ------------------------ ISMN Depths -------------------------------------- //
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
@@ -309,26 +342,9 @@
             $('#'+hiddenId).val(default_values);
             alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
         }
-        depthCheckbox.prop('checked', true)
     }
 
-    function getDefaultParams(e){
-        var callerId = e.relatedTarget.id;
-        var hiddenId = callerId.replace(/_link$/, '_params');
-        var default_values = $('#'+hiddenId).val();
-        var ismnDialog = $(e.currentTarget);
-        ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
-        return default_values
-    }
 
-    function getDefaultRanges(e){
-        var default_val = getDefaultParams(e);
-        var range = default_val.split(',');
-        $('#depth_from').val(parseFloat(range[0]));
-        $('#depth_to').val(parseFloat(range[1]));
-        range = [$('#depth_from').val(), $('#depth_to').val()];
-        return range
-    }
     $('#ismn_depth').on('show.bs.modal', function(e){
         getDefaultRanges(e);
     });
