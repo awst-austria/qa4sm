@@ -676,6 +676,12 @@
             $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
         {% endfor %}
 
+        function get_version_id(){
+            var versionId = $(this).val();
+            $('#id_target_hidden_input_version').val(versionId)
+        }
+
+
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
         $('#id_ref-version').change(get_version_id)
 
