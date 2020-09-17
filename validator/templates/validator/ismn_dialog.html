@@ -307,7 +307,6 @@
         ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
         ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
 
-    // here is the problem
         for (var net of netList) { // check the preselected networks
             ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
         }
