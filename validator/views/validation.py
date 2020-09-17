@@ -18,10 +18,11 @@ from django.template import loader
 
 from validator.forms import DatasetConfigurationForm, FilterCheckboxSelectMultiple,\
     ValidationRunForm, ParamFilterChoiceField, ParamFilterSelectMultiple
-from validator.models import DataFilter
+from validator.models import DataFilter, DatasetVersion
 from validator.models import Dataset
 from validator.models import Settings
 from validator.models import ValidationRun
+from validator.models import ISMNNetworks
 from validator.validation import run_validation
 import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
@@ -194,6 +195,23 @@ def ajax_get_dataset_options(request):
         'variables': __render_options(selected_dataset.variables.all().order_by('id')),
         'filters': __render_filters(selected_dataset.filters.filter(parameterised=False), filter_widget_id, parametrised = False),
         'paramfilters': __render_filters(selected_dataset.filters.filter(parameterised=True), param_filter_widget_id, parametrised = True),
+        }
+
+    return JsonResponse(response_data)
+
+@login_required(login_url='/login/')
+def ajax_get_version_id(request):
+    version_id = request.GET.get('version_id')
+    try:
+        version = DatasetVersion.objects.get(pk=int(version_id))
+        networks = version.network_version.all()
+        continents = networks.distinct('continent').values_list('continent', flat=True)
+        network_dict =  {continent: [(network.name, network.country, network.number_of_stations) for network in networks.filter(continent=continent)] for continent in continents}
+    except:
+        return HttpResponseBadRequest("Not a valid dataset version")
+
+    response_data = {
+        'network': network_dict
         }
 
     return JsonResponse(response_data)
