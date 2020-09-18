@@ -76,6 +76,7 @@ def validation(request):
         ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_repfix, is_reference=[True, False], initial=ref_initial_values)
         # form for the rest of the validation parameters
         val_form = ValidationRunForm(request.POST)
+
         if val_form.is_valid() and dc_formset.is_valid() and ref_dc_form.is_valid():
             newrun = val_form.save(commit=False)
             newrun.user = request.user

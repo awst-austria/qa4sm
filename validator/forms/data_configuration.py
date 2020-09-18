@@ -49,10 +49,13 @@ class DatasetConfigurationForm(forms.ModelForm):
             # change sth in the future
             new_queryset_list = [Dataset.objects.filter(is_reference=cond) for cond in is_reference]
             self.fields["dataset"].queryset = new_queryset_list[0]
+            print(self.fields['dataset'].queryset)
             for ind in range(1, len(new_queryset_list)):
                 self.fields["dataset"].queryset = self.fields["dataset"].queryset.union(new_queryset_list[ind])
+            print(self.fields['dataset'].queryset)
         else:
             self.fields["dataset"].queryset = Dataset.objects.filter(is_reference=is_reference)
+            print(self.fields["dataset"].queryset)
 
     def _save_m2m(self):
         # treat the parametrised filters separately, remove them now, save after calling super
