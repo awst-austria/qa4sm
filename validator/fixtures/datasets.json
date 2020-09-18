@@ -119,7 +119,7 @@
             "detailed_description": "GLDAS is a land surface model (LSM) which provides soil moisture data at different depths. Different versions are available for different time periods. For more information, visit the LDAS website: <a target=\"_blank\" href=\"https://ldas.gsfc.nasa.gov/gldas/\">NASA Land Data Assimilation Systems Website</a>",
             "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H.2.1/\"> here for version 2.1</a>",
             "citation": "<a target=\"_blank\" href=\"https://ldas.gsfc.nasa.gov/gldas/GLDASpublications.php\">Click here</a>",
-            "is_reference": true,
+            "is_reference": false,
             "versions": [
                 7
             ],
@@ -206,7 +206,7 @@
             "detailed_description": "ERA5 is a global reanalysis product provided by ECMWF. It provides global, sub-daily simulations of variables for land, atmosphere and ocean waves. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5 Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.25\u00b0 Lat. * 0.25\u00b0 Lon were converted into a time series format via daily averages. The ERA5 dataset starts in 1979. The version number used in QA4SM indicates the date when the original data was downloaded. For more details about ERA5 please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation\">ECMWF Confluence - ERA5 Documentation</a>",
             "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation#ERA5datadocumentation-HowtodownloadERA5\"> ECMWF Confluence - ERA5 Download</a>",
             "citation": "<a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/What+is+ERA5\">Click here</a>",
-            "is_reference": true,
+            "is_reference": false,
             "versions": [
                 15
             ],
@@ -230,7 +230,7 @@
             "detailed_description": "ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5-Land Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.1\u00b0 Lat. * 0.1\u00b0 Lon were converted into a time series format from daily averages. ERA5-Land is available from January 2001 onward. The Soil Temperature variable (stl1) is used to mask Soil Moisture (swvl1) under frozen conditions if selected. The version number used in QA4SM indicates the date when the original data was downloaded. For more details please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation\">ECMWF Confluence - ERA5-Land Documentation</a>",
             "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form\"> Copernicus Climate Data Store Confluence - ERA5-Land Download</a>",
             "citation": "<a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview\">Click here</a>",
-            "is_reference": true,
+            "is_reference": false,
             "versions": [
                 16
             ],
