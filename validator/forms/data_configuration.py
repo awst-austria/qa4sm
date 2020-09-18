@@ -45,17 +45,10 @@ class DatasetConfigurationForm(forms.ModelForm):
     def __init__(self, *args, is_reference=False, **kwargs):
         super(DatasetConfigurationForm, self).__init__(*args, **kwargs)
         if type(is_reference) is list:
-            # generally here might be only [True, False] list, but anyway I prefer to do here a loop in case we
-            # change sth in the future
-            new_queryset_list = [Dataset.objects.filter(is_reference=cond) for cond in is_reference]
-            self.fields["dataset"].queryset = new_queryset_list[0]
-            print('query set before', self.fields['dataset'].queryset)
-            for ind in range(1, len(new_queryset_list)):
-                self.fields["dataset"].queryset = self.fields["dataset"].queryset.union(new_queryset_list[ind])
-            print('query set after', self.fields['dataset'].queryset)
+            # a list means that it contains both True and False, so generally everything
+            self.fields["dataset"].queryset = Dataset.objects.all()
         else:
             self.fields["dataset"].queryset = Dataset.objects.filter(is_reference=is_reference)
-            print(self.fields["dataset"].queryset)
 
     def _save_m2m(self):
         # treat the parametrised filters separately, remove them now, save after calling super
