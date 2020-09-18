@@ -44,7 +44,15 @@ class DatasetConfigurationForm(forms.ModelForm):
     ## if you want to create a dataset config form for reference datasets, pass in parameter is_reference=True
     def __init__(self, *args, is_reference=False, **kwargs):
         super(DatasetConfigurationForm, self).__init__(*args, **kwargs)
-        self.fields["dataset"].queryset = Dataset.objects.filter(is_reference=is_reference)
+        if type(is_reference) is list:
+            # generally here might be only [True, False] list, but anyway I prefer to do here a loop in case we
+            # change sth in the future
+            new_queryset_list = [Dataset.objects.filter(is_reference=cond) for cond in is_reference]
+            self.fields["dataset"].queryset = new_queryset_list[0]
+            for ind in range(1, len(new_queryset_list)):
+                self.fields["dataset"].queryset = self.fields["dataset"].queryset.union(new_queryset_list[ind])
+        else:
+            self.fields["dataset"].queryset = Dataset.objects.filter(is_reference=is_reference)
 
     def _save_m2m(self):
         # treat the parametrised filters separately, remove them now, save after calling super
