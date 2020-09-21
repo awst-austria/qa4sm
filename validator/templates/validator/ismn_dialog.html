@@ -96,7 +96,7 @@
 
             </div>
 
-            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth">
+            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth" data-default=''>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -189,7 +189,6 @@
     function setISMNNetworks(source) {
         var ismnDialog = $(source).closest('#ismn_networks');
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
-
         var networkList = '';
         for (var netCB of ismnDialog.find('input:checked.network')) {
 
@@ -201,7 +200,7 @@
           alert('You did not choose any network. Please choose at least one network.')
         }else {
           $('#'+hiddenId).val(networkList);
-          $('#ismn_networks').modal('hide')
+          $('#ismn_networks').modal('hide') //hide the window
         }
 
 
@@ -294,14 +293,10 @@
         var ismnDialog = $(e.currentTarget);
 
         ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
-
-        //the default networks are taken here from the hidden field
         var preselectedNetworks = $('#' + hiddenId).val();
-
-        // some text manipulation: clean string from whitespace and separation based on comas
+          // some text manipulation: clean string from whitespace and separation based on comas
         preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
         var netList = preselectedNetworks.split(',');
-
 
         // reset dialog:
         ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents

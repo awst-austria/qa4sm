@@ -679,6 +679,13 @@
         function get_version_id(){
             var versionId = $(this).val();
             $('#id_target_hidden_input_version').val(versionId)
+            // additionally set up default networks 
+            var hiddenField = $('#id_target_hidden_input')
+            if(hiddenId = $('#id_target_hidden_input').val()){
+              var hiddenId = $('#id_target_hidden_input').val()
+              var default_params = $('#' + hiddenId).attr('data-default_val')
+              $('#' + hiddenId).val(default_params)
+            }
         }
 
 
@@ -910,4 +917,3 @@
     </script>
 
 {% endblock %}
-
