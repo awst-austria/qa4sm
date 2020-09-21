@@ -370,7 +370,7 @@ class TestViews(TransactionTestCase):
     def test_ajax_get_version_id_view(self):
         url = reverse('ajax_get_version_id')
         self.client.login(**self.credentials)
-        response = self.client.get(url, {'version_id': DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id})
+        response = self.client.get(url, {'version_id': 18}) #DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
         assert return_data['network']
