@@ -817,7 +817,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide');" class="btn btn-primary">Use depth range</button>
+                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);" class="btn btn-primary">Use depth range</button>
             </div>
 
         </div>
@@ -876,39 +876,59 @@
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
+        console.log(hiddenId)
+        // taking default values from the hidden field
         var default_values = $('#'+hiddenId).val().split(',')
         var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
 
+        //taking chosen values
         var depth_from = $('#depth_from').val()
         var depth_to = $('#depth_to').val()
-        var range = [depth_from, depth_to]
         if(depth_from > depth_to){
-            console.log(parseFloat(default_values[0]))
-            $('#'+hiddenId).val(default_values);
+            $('#depth_from').val(parseFloat(default_values[0]))
+            $('#depth_to').val(parseFloat(default_values[1]))
             alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
+        } else {
+          depthCheckbox.prop('checked', true)
+          $('#ismn_depth').modal('hide'); // closing the window
         }
-        depthCheckbox.prop('checked', true)
+
+
     }
 
-    function getDefaultParams(e){
+    function getDefaultParams(e, field_selector){
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
         var default_values = $('#'+hiddenId).val()
         var ismnDialog = $(e.currentTarget);
-        ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
+        ismnDialog.find(field_selector).val(hiddenId); // remember where the selected depths need to go
         return default_values
     }
 
     function getDefaultRanges(e){
-        var default_val = getDefaultParams(e)
+        var default_val = getDefaultParams(e, '#id_target_hidden_input_depth')
         var range = default_val.split(',')
         $('#depth_from').val(parseFloat(range[0]))
         $('#depth_to').val(parseFloat(range[1]))
         range = [$('#depth_from').val(), $('#depth_to').val()]
         return range
     }
+    function getRangesSetByUser(e){
+        var callerId = e.relatedTarget.id;
+        var hiddenId = callerId.replace(/_link$/, '_params');
+        var range = [parseFloat($('#depth_from').val()), parseFloat($('#depth_to').val())]
+        return range
+
+    }
     $('#ismn_depth').on('show.bs.modal', function(e){
+      // getDefaultRanges(e)
+      var ranges = getRangesSetByUser(e)
+      if(isNaN(ranges[0] && isNaN(ranges[1]))){
         getDefaultRanges(e)
+      } else {
+        $('#depth_from').val(ranges[0])
+        $('#depth_to').val(ranges[1])
+      }
     });
 
 <!--Monika-->
