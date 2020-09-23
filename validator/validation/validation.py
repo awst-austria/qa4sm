@@ -158,7 +158,9 @@ def create_pytesmo_validation(validation_run):
     datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
-    if len(ds_names) >= 3:
+    __logger.debug(f"Validation Run Tcol Field: {validation_run.tcol}")
+
+    if (len(ds_names) >= 3) and (validation_run.tcol is True):
         # if there are 3 or more dataset, do TC, exclude ref metrics
         metrics = TCMetrics(
                     dataset_names=ds_names, tc_metrics_for_ref=False,
