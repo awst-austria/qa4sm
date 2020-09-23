@@ -213,7 +213,7 @@
             $.ajax({
                 url: url,
                 data: {'version_id': versionId},
-                // async: false,
+                async: false,
                 success: function (return_data) {
                     data = return_data['network']
                 }

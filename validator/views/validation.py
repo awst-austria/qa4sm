@@ -205,7 +205,7 @@ def ajax_get_version_id(request):
     try:
         version = DatasetVersion.objects.get(pk=int(version_id))
         networks = version.network_version.all()
-        continents = networks.distinct('continent').values_list('continent', flat=True)
+        continents = networks.values('continent').distinct().values_list('continent', flat=True)
         network_dict =  {continent: [(network.name, network.country, network.number_of_stations) for network in networks.filter(continent=continent)] for continent in continents}
     except:
         return HttpResponseBadRequest("Not a valid dataset version")
