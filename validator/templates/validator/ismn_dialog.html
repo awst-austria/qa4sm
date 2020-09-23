@@ -96,7 +96,7 @@
 
             </div>
 
-            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth">
+            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth" data-default=''>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -189,7 +189,6 @@
     function setISMNNetworks(source) {
         var ismnDialog = $(source).closest('#ismn_networks');
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
-
         var networkList = '';
         for (var netCB of ismnDialog.find('input:checked.network')) {
 
@@ -201,29 +200,12 @@
           alert('You did not choose any network. Please choose at least one network.')
         }else {
           $('#'+hiddenId).val(networkList);
-          $('#ismn_networks').modal('hide')
+          $('#ismn_networks').modal('hide') //hide the window
         }
-
-
     }
 
-        function ajax_take_network_info() {
-            <!--using ajax to read the network info according to its version -->
-            var url = $("#validation_form").attr("version-options-url");
-            var versionId = $('#id_target_hidden_input_version').val();
-            $.ajax({
-                url: url,
-                data: {'version_id': versionId},
-                success: function (return_data) {
-                    data = return_data['network']
-                }
-            });
-            return data
-        }
-
-
-        function get_network_info(){
-            var networks_info = ajax_take_network_info(); // taking info about network
+        function get_network_info(networks_info){
+            // var networks_info = ajax_take_network_info(); // taking info about network
             var continents = Object.keys(networks_info) // taking keys-continents
 
             // cleaning html in case this function is called more than once
@@ -285,45 +267,58 @@
            toggle_children_class(basic_continent_collapse, 'd-none');
         }
 
-    $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
-        get_network_info();
+        function filter_networks(e){
+          var callerId = e.relatedTarget.id;
+          var hiddenId = callerId.replace(/_link$/, '_params');
+          var ismnDialog = $(e.currentTarget);
 
-        var callerId = e.relatedTarget.id;
-        var hiddenId = callerId.replace(/_link$/, '_params');
-        var ismnDialog = $(e.currentTarget);
+          ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
+          var preselectedNetworks = $('#' + hiddenId).val();
+            // some text manipulation: clean string from whitespace and separation based on comas
+          preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
+          var netList = preselectedNetworks.split(',');
 
-        ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
+          // reset dialog:
+          ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
+          ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
 
-        //the default networks are taken here from the hidden field
-        var preselectedNetworks = $('#' + hiddenId).val();
+          for (var net of netList) { // check the preselected networks
+              ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
+          }
 
-        // some text manipulation: clean string from whitespace and separation based on comas
-        preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
-        var netList = preselectedNetworks.split(',');
+          // if there is a continent without any network chosen by default it should be switched off
+          $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
+              var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
 
+              // here I'm checking if there is at least one network checked by default:
+              var cond = networks.is(function(indx, network){return $(network).prop('checked')})
 
-        // reset dialog:
-        ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
-        ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
+              // if not then the continent also should be unchecked
+              if(!cond){
+                  $(element).prop('checked', false);
+              }
+          });
+        }
 
-        for (var net of netList) { // check the preselected networks
-            ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
+        function ajax_take_network_info(e) {
+            //using ajax to read the network info according to its version
+            var url = $("#validation_form").attr("version-options-url");
+            var versionId = $('#id_target_hidden_input_version').val();
+            $.ajax({
+                url: url,
+                data: {'version_id': versionId},
+                success: function (return_data) {
+                    data = return_data['network']
+                    get_network_info(data)
+                    filter_networks(e)
+                }
+            });
+
         }
 
 
-        // if there is a continent without any network chosen by default it should be switched off
-        $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
-            var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
-
-            // here I'm checking if there is at least one network checked by default:
-            var cond = networks.is(function(indx, network){return $(network).prop('checked')})
-
-            // if not then the continent also should be unchecked
-            if(!cond){
-                $(element).prop('checked', false);
-            }
-
-        });
+    $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
+        ajax_take_network_info(e)
     });
 
 // ------------------------ ISMN Depths -------------------------------------- //
