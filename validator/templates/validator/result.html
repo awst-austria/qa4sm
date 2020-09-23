@@ -234,6 +234,19 @@
 
 {% block javascript %}
 <script type="text/javascript">
+
+    function fileExists(urlToFile) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('HEAD', urlToFile, false);
+        xhr.send();
+
+        if (xhr.status == "404") {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     function changeBoxplot(metric) {
         var metric = $("#id_graph_metric").val()
         var labels = {{json_metrics|safe}}
@@ -257,11 +270,20 @@
         } else {
             overview_url = '{{ val.output_dir_url }}' + 'overview_' + pair + '_' + metric + '.png';
         }
+
+        var map_exists = fileExists(overview_url);
+
+        if (map_exists == false) {
+            overview_label = 'Please change metric and/or data set group.';
+            overview_url = "javascript:void(0)";
+            $("#id_overview_link").attr("href", "javascript:void(0)");
+        } else {
+            $("#id_overview").attr("title", overview_label);
+        }
         $("#id_overview").attr("src", overview_url);
-        $("#id_overview").attr("alt", overview_label);
-        $("#id_overview").attr("title", overview_label);
         $("#id_overview_link").attr("href", overview_url);
         $("#id_overview_label").html(overview_label);
+        $("#id_overview").attr("alt", "No map for the selected metric / data set combination found.");
     }
 
     // change the plots when the selection of metric and/or dataset pair is changed

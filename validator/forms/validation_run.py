@@ -52,6 +52,7 @@ class ValidationRunForm(forms.ModelForm):
         self.fields['interval_from'].initial = datetime(1978, 1, 1).strftime('%Y-%m-%d')
         self.fields['interval_to'].initial = datetime.now().strftime('%Y-%m-%d')
 
+
     def clean(self):
         values = super(ValidationRunForm, self).clean()
         if(('anomalies' in values) and (values['anomalies'] != ValidationRun.CLIMATOLOGY)):
