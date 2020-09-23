@@ -306,7 +306,7 @@ class TestModels(TestCase):
         mydataset.short_name = 'SUPERSAT'
         mydataset.pretty_name = 'Super satellite dataset'
         mydataset.help_text = 'Dataset from the super satellite - solves all problems!'
-        mydataset.is_reference = True
+        mydataset.is_only_reference = True
         mydataset.source_reference = "<a href=\"http://tuwien.ac.at\">Click here!</a>"
         mydataset.citation = "<a href=\"http://tuwien.ac.at\">Click here!</a>"
 

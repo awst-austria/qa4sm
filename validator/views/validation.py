@@ -73,7 +73,7 @@ def validation(request):
                 return HttpResponseBadRequest('Not a valid request: ' + e.message)
 
         # form for the reference configuration
-        ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_repfix, is_reference=[True, False], initial=ref_initial_values)
+        ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_repfix, is_reference= True, initial=ref_initial_values)
         # form for the rest of the validation parameters
         val_form = ValidationRunForm(request.POST)
 
@@ -138,7 +138,7 @@ def validation(request):
     else:
         val_form = ValidationRunForm()
         dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=data_initial_values)
-        ref_dc_form = DatasetConfigurationForm(prefix=ref_repfix, is_reference=[True, False], initial=ref_initial_values)
+        ref_dc_form = DatasetConfigurationForm(prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
 
 
     return render(request, 'validator/validate.html', {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form, 'maintenance_mode':Settings.load().maintenance_mode})

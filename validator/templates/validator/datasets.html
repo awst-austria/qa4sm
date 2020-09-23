@@ -39,7 +39,7 @@
             </thead>
             <tbody>
                 {% for dataset in datasets %}
-                    {% if dataset.is_reference == ref_flag %}
+                    {% if dataset.is_only_reference == ref_flag %}
                         <tr>
                             <th scope="row">{{ dataset.pretty_name }}</th>
                             <td>{{ dataset.detailed_description |safe }}</td>
