@@ -26,6 +26,7 @@ class ValidationRunForm(forms.ModelForm):
             'min_lon',
             'max_lat',
             'max_lon',
+            'tcol',
             ]
 
     scaling_ref = forms.fields.ChoiceField(choices=[(ValidationRun.SCALE_TO_REF, 'Reference'), (ValidationRun.SCALE_TO_DATA, 'Data'), ])
@@ -51,6 +52,7 @@ class ValidationRunForm(forms.ModelForm):
         self.fields['max_lon'].initial = 48.30
         self.fields['interval_from'].initial = datetime(1978, 1, 1).strftime('%Y-%m-%d')
         self.fields['interval_to'].initial = datetime.now().strftime('%Y-%m-%d')
+
 
     def clean(self):
         values = super(ValidationRunForm, self).clean()
