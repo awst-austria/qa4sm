@@ -1,11 +1,11 @@
-QA4SM v1.2.1 - Release notes 2020-07-20
+QA4SM v1.3.0 - Release notes 2020-09-24
 =======================================================
 
 # Changes
 
-1. Fix bug that hides DOIs for published validations if user is not the owner
-2. ISMN Test data set is no longer the default reference data set
-3. When deleting a validation result user is now redirected back to overview page
-4. Fix landing page for mobile devices
-5. Add more SMOS-IC filters
-6. Fixes for the auto-cleanup process
+1. Added the depth selection filter for ISMN networks;
+2. Usability features (removing datasets tab, changing validations name, disabling switching parametrized filters);
+3. The default bounding box for spatial subsetting added;
+4. The datasets site updated according to time range covered;
+5. New plotting functions based on qa4sm-reader github package;
+6. Added Triple Collocation Analysis to the service.

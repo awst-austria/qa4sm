@@ -338,7 +338,40 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card-deck">
+                        <div id="metrics_accordion" style="width:100%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="metrics_header">
+                                    <h4 class="my-0 font-weight-normal">Metrics</h4>
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="Specify metrics to calculate. Basic metrics between data set pairs are always calculated."></span>
+                                        <a class="input-group-text" data-toggle="collapse" href="#metrics_collapse" role="button" aria-expanded="true" aria-controls="metrics_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="metrics_collapse" class="collapse show" aria-labelledby="metrics_header" data-parent="#metrics_accordion">
+                                    <div class="card-body">
 
+                                        <div class="container">
+                                            <div class="row">
+                                                 <div class="custom-control custom-switch">
+                                                    <input id="tcol" class="custom-control-input" name="tcol" type="checkbox" disabled="true">
+                                                    <label class="custom-control-label" for="tcol">Include Triple Collocation Metrics &nbsp;</label>
+                                                 </div>
+
+                                                <span class="input-group-text fas fa-question-circle help-icon"
+                                                    title="Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-deck">
                         <div id="anom_accordion" style="width:100%">
                             <div class="card mb-4 shadow-sm">
@@ -764,8 +797,21 @@
         $('#add_dc_form').click(function() {
             cloneTab('.dc_form', '.dc_form_link', 'datasets', $('#remove_dc_form') ,$(this));
             setScalingRef();
+            setTcLock();
         });
 
+        function setTcLock() {
+            var formsetPrefix = 'datasets';
+            var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
+            var totalNoForms = $(totalSelector).val();
+            var n_datasets = parseInt(totalNoForms) + 1
+            if ( n_datasets >= 3) {
+                $('#tcol').prop('disabled', false);
+            } else {
+                $('#tcol').prop('checked', false);
+                $('#tcol').prop('disabled', true);
+            }
+        }
     </script>
 
     <script type="text/javascript">
@@ -873,6 +919,7 @@
                     prev_container.toggleClass('active show')
                 }
             }
+        setTcLock();
         }
 
         $('#remove_dc_form').click(function() {
@@ -883,6 +930,8 @@
             var currentObject = obj.currentTarget
             var removeButton = $(buttonSelector)
             $(currentObject).after(removeButton)
+
+
 }
 
 
