@@ -467,6 +467,220 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
+    # @pytest.mark.long_running
+    def test_validation_ccip_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_P_V05_2)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_P_sm)
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+        print(run_id)
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        print(new_run)
+        assert new_run
+
+        assert new_run.total_points == 24, "Number of gpis is off"
+        assert new_run.error_points == 0, "Too many error gpis"
+        assert new_run.ok_points == 24, "OK points are off"
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    # @pytest.mark.long_running
+    def test_validation_ccia_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V05_2)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_A_sm)
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+        print(run_id)
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        print(new_run)
+        assert new_run
+
+        assert new_run.total_points == 24, "Number of gpis is off"
+        assert new_run.error_points == 0, "Too many error gpis"
+        assert new_run.ok_points == 24, "OK points are off"
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    # @pytest.mark.long_running
+    def test_validation_smap_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ASCAT_H113)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ASCAT_sm)
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        # different window is used here, because for the default one there is too much memory needed to create and save
+        # plots
+        run.min_lat = 20.32
+        run.min_lon = -157.47
+        run.max_lat = 21.33
+        run.max_lon = -155.86
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        print(new_run)
+        assert new_run
+
+        assert new_run.total_points == 15, "Number of gpis is off"
+        assert new_run.error_points == 0, "Too many error gpis"
+        assert new_run.ok_points == 15, "OK points are off"
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    # @pytest.mark.long_running
+    def test_validation_ascat_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ASCAT_H113)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ASCAT_sm)
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        # different window is used here, because for the default one there is too much memory needed to create and save
+        # plots
+        run.min_lat = 20.32
+        run.min_lon = -157.47
+        run.max_lat = 21.33
+        run.max_lon = -155.86
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        print(new_run)
+        assert new_run
+
+        assert new_run.total_points == 15, "Number of gpis is off"
+        assert new_run.error_points == 0, "Too many error gpis"
+        assert new_run.ok_points == 15, "OK points are off"
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    # @pytest.mark.long_running
+    def test_validation_c3s_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3S)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V201912)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.C3S_sm)
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        print(new_run)
+        assert new_run
+
+        assert new_run.total_points == 24, "Number of gpis is off"
+        assert new_run.error_points == 0, "Too many error gpis"
+        assert new_run.ok_points == 24, "OK points are off"
+        self.check_results(new_run)
+        self.delete_run(new_run)
 
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
