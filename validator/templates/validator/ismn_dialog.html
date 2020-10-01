@@ -334,6 +334,9 @@
         if(depth_from > depth_to){
             $('#'+hiddenId).val(default_values);
             alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
+        } else {
+          depthCheckbox.prop('checked', true)
+          $('#ismn_depth').modal('hide'); // closing the window
         }
     }
 
