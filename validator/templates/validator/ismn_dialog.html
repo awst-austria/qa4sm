@@ -101,7 +101,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide')" class="btn btn-primary">Use depth range</button>
-
             </div>
 
         </div>
@@ -334,14 +333,12 @@
         var range = [depth_from, depth_to];
         if(depth_from > depth_to){
             $('#'+hiddenId).val(default_values);
-
             alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
         } else {
           depthCheckbox.prop('checked', true)
           $('#ismn_depth').modal('hide'); // closing the window
         }
     }
-
 
     $('#ismn_depth').on('show.bs.modal', function(e){
         getDefaultRanges(e);
