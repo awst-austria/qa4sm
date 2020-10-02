@@ -467,7 +467,7 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    # @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_validation_ccip_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
@@ -510,7 +510,7 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    # @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_validation_ccia_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
@@ -553,7 +553,7 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    # @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_validation_smap_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
@@ -597,7 +597,7 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    # @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_validation_ascat_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
@@ -640,7 +640,7 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    # @pytest.mark.long_running
+    @pytest.mark.long_running
     def test_validation_c3s_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
