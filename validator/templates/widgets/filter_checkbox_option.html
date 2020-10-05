@@ -4,5 +4,5 @@
     <label class="custom-control-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
     {% if widget.parameterised  %}<a id="{{ widget.attrs.id }}_link" href="#{{ widget.dialog_name }}" data-toggle="modal" data-target="#{{ widget.dialog_name }}">select...</a>{% endif %}
     <span class="input-group-text fas fa-question-circle help-icon" title="{{ widget.help_text }}"></span>
-    {% if widget.parameterised  %}<input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.default_parameter }}" name="{{ widget.name }}_params">{% endif %}
+    {% if widget.parameterised  %}<input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.default_parameter }}" data-default_val="{{ widget.default_parameter }}" name="{{ widget.name }}_params">{% endif %}
 </div>
