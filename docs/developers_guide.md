@@ -198,7 +198,7 @@ Keep note of the username, email, and password you enter here, you'll need it to
 
 Populate the database with information about the datasets:
 
-    python manage.py loaddata versions variables filters datasets
+    python manage.py loaddata versions variables filters datasets networks
 
 This should result in the message "Installed x object(s) from y fixture(s)".
 
@@ -448,7 +448,7 @@ Put json files into `validator/fixtures/` (and pretty-print them with an editor 
 
 Set up database contents with the fixtures:
 
-    python manage.py loaddata versions variables filters datasets
+    python manage.py loaddata versions variables filters datasets networks
 
 ### Database bulk changes
 
