@@ -123,6 +123,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration = ref_c
         run.scaling_ref = ref_c
+        run.tcol = True
         run.save()
 
         return run
