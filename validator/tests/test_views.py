@@ -55,7 +55,7 @@ class TestViews(TransactionTestCase):
 
     __logger = logging.getLogger(__name__)
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters', 'networks']
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     def setUp(self):
         self.__logger = logging.getLogger(__name__)
@@ -99,7 +99,7 @@ class TestViews(TransactionTestCase):
         self.public_views = ['login', 'logout', 'home', 'published_results', 'signup', 'signup_complete', 'terms',
                              'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done',
                              'password_reset_complete', 'user_profile_deactivated']
-        self.parameter_views = ['result', 'ajax_get_dataset_options','ajax_get_version_id', 'password_reset_confirm', 'stop_validation']
+        self.parameter_views = ['result', 'ajax_get_dataset_options', 'password_reset_confirm', 'stop_validation']
         self.private_views = [p.name for p in urlpatterns if hasattr(p,
                                                                      'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
@@ -365,23 +365,6 @@ class TestViews(TransactionTestCase):
         assert return_data['filters']
 
         response = self.client.get(url, {'dataset_id': ''})
-        self.assertEqual(response.status_code, 400)
-
-    def test_ajax_get_version_id_view(self):
-        url = reverse('ajax_get_version_id')
-        self.client.login(**self.credentials)
-        response = self.client.get(url, {'version_id': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id})
-        self.assertEqual(response.status_code, 200)
-        return_data = json.loads(response.content)
-        assert return_data['network']
-
-        # another test for dataset other than ISMN
-        response = self.client.get(url, {'version_id': DatasetVersion.objects.get(short_name=globals.GLDAS_NOAH025_3H_2_1).id})
-        self.assertEqual(response.status_code, 200)
-        return_data = json.loads(response.content)
-        assert not return_data['network']
-
-        response = self.client.get(url, {'version_id': ''})
         self.assertEqual(response.status_code, 400)
 
     ## Submit a validation with minimum parameters set
