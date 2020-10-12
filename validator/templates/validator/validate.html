@@ -775,15 +775,10 @@
             if ( totalNoForms >= $(maxSelector).val() ) {
                 addButton.hide();
             }
-           // show remove button and change its
+           // show remove button
             if ( totalNoForms > 1 ) {
-<!--                $(newButton).css('margin-left', '0.3rem')-->
                 newButton.show();
             }
-<!--            if (totalNoForms == $(maxSelector).val()) {-->
-<!--                $(removeButton).css('margin-left', 'auto');-->
-<!--            }-->
-
 
             // trigger change event on dataset select so that dependent parameters are set correctly
             $('#' + newId + '-dataset').change();
@@ -792,6 +787,10 @@
         function setScalingRef() {
             $("#id_scaling_ref option[value='data']").remove();
             $("#id_scaling_ref").val("ref");
+        }
+
+        function addScalingData() {
+            $("#id_scaling_ref").append(new Option('Data', 'data'))
         }
 
         $('#add_dc_form').click(function() {
@@ -851,7 +850,7 @@
                 tab_to_remove.remove()
                 container_to_remove.remove()
 
-            // showing add button again
+            // showing add button again and the possibility of scaling data
                 totalNoForms--
                  $(totalSelector).val(totalNoForms);
                  if (totalNoForms < $(maxSelector).val()) {
@@ -859,6 +858,7 @@
                     }
                  if (totalNoForms == 1) {
                         removeButton.hide();
+                        addScalingData()
                     }
 
                 // changing attributes of following items
@@ -940,4 +940,3 @@
     </script>
 
 {% endblock %}
-
