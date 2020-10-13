@@ -808,12 +808,10 @@
             if ( totalNoForms >= $(maxSelector).val() ) {
                 addButton.hide();
             }
-           // show remove button and change its
+           // show remove button
             if ( totalNoForms > 1 ) {
                 newButton.show();
             }
-
-
 
             // trigger change event on dataset select so that dependent parameters are set correctly
             $('#' + newId + '-dataset').change();
