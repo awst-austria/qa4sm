@@ -8,3 +8,4 @@ from .dataset import Dataset
 from .dataset_configuration import DatasetConfiguration
 from .validation_run import ValidationRun
 from .celery_task import CeleryTask
+from .networks import ISMNNetworks
