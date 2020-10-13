@@ -12,6 +12,7 @@ from validator.models import ValidationRun
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
+from collections import OrderedDict
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -129,10 +130,11 @@ def result(request, result_uuid):
             error_rate = (val_run.total_points - val_run.ok_points) / val_run.total_points
 
         pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(val_run)
-        combis = pairs + triples
-
+        combis = OrderedDict(sorted({**pairs, **triples}.items()))
         # the publication form is only needed by the owner; if we're displaying for another user, avoid leaking user data
         pub_form = PublishingForm(validation=val_run) if is_owner else None
+
+        metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
 
         context = {
             'is_owner': is_owner,
@@ -140,7 +142,7 @@ def result(request, result_uuid):
             'error_rate' : error_rate,
             'run_time': run_time,
             'metrics': metrics,
-            'pairs': combis,
+            'combis': combis,
             'json_metrics': json_dumps(METRICS),
             'publishing_form': pub_form
             }
