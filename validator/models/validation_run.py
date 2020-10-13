@@ -82,6 +82,8 @@ class ValidationRun(models.Model):
     doi = models.CharField(max_length=255, blank=True)
     publishing_in_progress = models.BooleanField(default=False)
 
+    tcol = models.BooleanField(default=False)
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask

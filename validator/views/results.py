@@ -9,9 +9,10 @@ from django.shortcuts import get_object_or_404, render
 from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm
 from validator.models import ValidationRun
-from validator.validation.globals import METRICS
-from validator.validation.graphics import get_dataset_pairs
+from validator.validation.globals import METRICS, TC_METRICS
+from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
+from collections import OrderedDict
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -36,7 +37,6 @@ def user_runs(request):
 
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
-
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
         if(val_run.user != request.user):
@@ -44,17 +44,34 @@ def result(request, result_uuid):
 
         ## check that our validation can be deleted; it can't if it already has a DOI
         if(not val_run.is_unpublished):
-            return HttpResponse(status=405)
+            return HttpResponse(status=405) #405
 
         val_run.delete()
         return HttpResponse("Deleted.", status=200)
 
     elif(request.method == 'PATCH'):
         ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+
         if(val_run.user != request.user):
             return HttpResponse(status=403)
 
         patch_params = QueryDict(request.body)
+
+        if 'save_name' in patch_params:
+            ## check that our validation's name can be changed'; it can't if it already has a DOI
+            if (not val_run.is_unpublished):
+                return HttpResponse('Validation has been published', status=405)
+
+            save_mode = patch_params['save_name']
+
+            if save_mode != 'true':
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            val_run.name_tag = patch_params['new_name']
+            val_run.save()
+
+            return HttpResponse("Changed.", status=200)
+
 
         if 'archive' in patch_params:
             archive_mode = patch_params['archive']
@@ -112,18 +129,20 @@ def result(request, result_uuid):
         if val_run.total_points != 0:
             error_rate = (val_run.total_points - val_run.ok_points) / val_run.total_points
 
-        pairs = get_dataset_pairs(val_run)
-
+        pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(val_run)
+        combis = OrderedDict(sorted({**pairs, **triples}.items()))
         # the publication form is only needed by the owner; if we're displaying for another user, avoid leaking user data
         pub_form = PublishingForm(validation=val_run) if is_owner else None
+
+        metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
 
         context = {
             'is_owner': is_owner,
             'val' : val_run,
             'error_rate' : error_rate,
             'run_time': run_time,
-            'metrics': METRICS,
-            'pairs': pairs,
+            'metrics': metrics,
+            'combis': combis,
             'json_metrics': json_dumps(METRICS),
             'publishing_form': pub_form
             }

@@ -124,12 +124,30 @@ html {
 
 .tab-plus {
     margin-left: auto;
-    margin-right: 1.3rem;
+    margin-right: 0.3rem;
     margin-top: .2rem;
     margin-bottom: .2rem;
     padding: 0 .35rem;
 }
 
+.tab-minus {
+    position: relative;
+    left: -0.8rem;
+     width: 0.1rem;
+     margin-right: 0.000001rem;
+     padding: .0000001rem;
+     display:none;
+     color: black;
+}
+.tab-minus:hover {
+    color: black;
+    text-decoration: none;
+    transform: scale(1.2);
+}
+
 a.doilink {
     color: white;
+}
+div.col-1{
+    visibility: hidden;
 }

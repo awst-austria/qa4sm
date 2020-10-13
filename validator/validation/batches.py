@@ -3,8 +3,30 @@ import numpy as np
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
+from validator.models import DataFilter
 from validator.validation.readers import create_reader
 from validator.validation.filters import setup_filtering
+
+# function to retrieve depth_from and depth_to from the database
+def get_depths_params(param_filters):
+    default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
+    default_depth = [float(depth) for depth in default_depth.split(',')]
+    depth_from = default_depth[0]
+    depth_to = default_depth[1]
+
+    param_name_list = [pfil.filter.name for pfil in list(param_filters)]
+    if "FIL_ISMN_DEPTH" in param_name_list:
+        ind = param_name_list.index('FIL_ISMN_DEPTH')
+        depth_from = float(param_filters[ind].parameters.split(',')[0])
+        depth_to = float(param_filters[ind].parameters.split(',')[1])
+
+    if depth_to < 0 or depth_from <0:
+        raise ValueError("the depth range can not be negative")
+    if depth_to < depth_from:
+        raise ValueError("depth_to can not be less than depth_from")
+
+    return [depth_from, depth_to]
+
 
 # very basic geographic subsetting with only a bounding box. simple should also be quick :-)
 def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon):
@@ -81,7 +103,10 @@ def create_jobs(validation_run):
 
     # if we've got ISMN data, process one network at a time
     elif isinstance(ref_reader, ISMN_Interface):
-        ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=0, max_depth=0.1)
+
+        depth_from, depth_to = get_depths_params(validation_run.reference_configuration.parametrisedfilter_set.all())
+
+        ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=depth_from, max_depth=depth_to)
         mdata = ref_reader.metadata[ids]
         networks = np.unique(mdata['network'])
 

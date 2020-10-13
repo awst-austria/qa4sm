@@ -1,8 +1,25 @@
+<!--A general idead behind is: if it is a parametrised filter then the checkbox has id with _p (and it's disabled) at the end
+    and a hidden input is created with the appropriate id so that it can pass the filter id into the database - therefore,
+    depending on an IDE id="{{ widget.attrs.id }}" migth be marked as an error, but there is if statement so it's not an error! -->
+
 <div class="custom-control custom-switch">
-    <input class="custom-control-input" id="{{ widget.attrs.id }}" value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}"
-        type="checkbox" {% include "django/forms/widgets/attrs.html" %}>
-    <label class="custom-control-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
-    {% if widget.parameterised  %}<a id="{{ widget.attrs.id }}_link" href="#{{ widget.dialog_name }}" data-toggle="modal" data-target="#{{ widget.dialog_name }}">select...</a>{% endif %}
+    <input class="custom-control-input"
+           {% if widget.parameterised  %} id="{{ widget.attrs.id }}_checkbox" {% else %} id="{{ widget.attrs.id }}"  {% endif %}
+           value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}"
+        type="checkbox" {% include "django/forms/widgets/attrs.html" %} {% if widget.parameterised  %} checked disabled {% endif %}
+    >
+    {% if widget.parameterised  %}
+        <label class="custom-control-label" for="{{ widget.attrs.id }}_checkbox">{{ widget.label }}</label>
+        <input type="hidden" id="{{ widget.attrs.id }}" value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}">
+    {% else %}
+        <label class="custom-control-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
+    {% endif %}
+
+    {% if widget.parameterised  %}
+        <a id="{{ widget.attrs.id }}_link" href="#{{ widget.dialog_name }}" data-toggle="modal" data-target="#{{ widget.dialog_name }}">select...</a>
+    {% endif %}
     <span class="input-group-text fas fa-question-circle help-icon" title="{{ widget.help_text }}"></span>
-    {% if widget.parameterised  %}<input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.default_parameter }}" name="{{ widget.name }}_params">{% endif %}
+    {% if widget.parameterised  %}
+        <input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.default_parameter }}" name="{{ widget.name }}_params">
+    {% endif %}
 </div>

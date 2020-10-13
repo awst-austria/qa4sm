@@ -21,15 +21,22 @@
         <div class="card-deck">
             <div id="result_summary" class="card mb-4 shadow-sm">
                 <div class="card-header">
-                    <h4 class="my-0 font-weight-normal">Summary</h4>
+                    <h4 class="my-0 font-weight-normal">
+                        Summary:
+                        {% if is_owner and val.is_unpublished %}
+                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %}</span>
+                        <input class="d-none edit_name"/>
+                        <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name" onclick="edit_name(event)"><span class="fas fa-pen"></span></button>
+                        <button class="btn btn-sm btn-primary btn-action d-none save_name_btn result_page" title="Save Name" onclick="ajax_save_name(event, '{{ val.id }}')"><span class="fas fa-save"></span></button>
+                        <button class="btn btn-sm btn-primary btn-action d-none cancel_editing_btn result_page" title="Cancel" onclick="cancel_editing(event)"><span class="fas fa-ban"></span></button>
+                        {% else %}
+                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %} <span class="no_name_change_info fas fa-question-circle help-icon" title="Validation has been published. There is no possibility of changing its name."> </span> </span>
+                        {% endif %}
+                    </h4>
                 </div>
                 <div class="card-body">
                     <ul>
                         <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
-                        {% if val.name_tag %}
-                            <li>Validation name: {{ val.name_tag }}</li>
-                        {% endif %}
-
                         <li>Compared {{ val.dataset_configurations.count }} datasets:
                             <ul>
                                 {% for dc in val.dataset_configurations.all %}
@@ -83,6 +90,10 @@
                         {% else %}
                             <li>Validation metrics calculated from absolute values.</li>
                         {% endif %}
+
+                        <li>Triple collocation analysis was
+                            {% if val.tcol %} activated. {% else %} deactivated. {% endif %}
+                        </li>
 
                         <li>Scaling reference: {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
                                     [Filters:
@@ -176,7 +187,7 @@
                                 <figcaption id="id_boxplot_label" class="figure-caption">Description goes here</figcaption>
                             </figure>
                             <span style="min-width:1rem;"></span>
-                            <figure class="figure" style="max-width: 50%;">
+                            <figure class="figure" style="max-width: 50%; margin: auto; display: block;">
                                 <a id="id_overview_link" href="#" class="center-text">
                                     <img id="id_overview" src="#" alt="#" title="#" class="figure-thumb img-fluid">
                                 </a>
@@ -185,25 +196,25 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';"><span class="fas fa-download"></span> Download all graphs</button>
+                            <button type="button" style="width: 10rem;" class="btn btn-sm btn-primary" onclick="location.href='{{ val.output_dir_url }}graphs.zip';"><span class="fas fa-download"></span> Download graphs</button>
 
-                            <select id="id_graph_metric" style="width: 12rem;" name="graph_variable"
+                            <select id="id_graph_metric" style="width: 18rem;" name="graph_variable"
                                 title="Metric to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for key, label in metrics.items %}
+                                {% for label, key in metrics.items %}
                                     <option value="{{ key }}">{{ label }}</option>
                                 {% endfor %}
                             </select>
 
-                            <select id="id_graph_pair" style="width: 12rem;" name="graph_pair"
+                            <select id="id_graph_pair" style="width: 18rem;" name="graph_pair"
                                 title="Dataset pair to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for pair in pairs %}
-                                    <option value="{{ pair }}">{{ pair }}</option>
+                                {% for combi_short, combi_pretty in combis.items %}
+                                    <option value="{{ combi_short }}">{{ combi_pretty }}</option>
                                 {% endfor %}
                             </select>
 
-                            <button type="button" style="width: 12rem;" class="btn btn-sm btn-primary" title="Download all results in NetCDF format" onclick="location.href='{{ val.output_file.url }}';"><span class="fas fa-file-download"></span> Download NetCDF</button>
+                            <button type="button" style="width: 10rem;" class="btn btn-sm btn-primary" title="Download all results in NetCDF format" onclick="location.href='{{ val.output_file.url }}';"><span class="fas fa-file-download"></span> Download NetCDF</button>
                         </div>
                     </div>
                 </div>
@@ -227,6 +238,19 @@
 
 {% block javascript %}
 <script type="text/javascript">
+
+    function fileExists(urlToFile) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('HEAD', urlToFile, false);
+        xhr.send();
+
+        if (xhr.status == "404") {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     function changeBoxplot(metric) {
         var metric = $("#id_graph_metric").val()
         var labels = {{json_metrics|safe}}
@@ -243,18 +267,27 @@
         var metric = $("#id_graph_metric").val()
         var pair = $("#id_graph_pair").val()
         var labels = {{json_metrics|safe}}
-        var overview_label = 'The distribution of ' + labels[metric] + ' for dataset pair ' + pair + ' values plotted on a map.'
+        var overview_label = 'The distribution of ' + labels[metric] + ' for dataset combination ' + pair + ' values plotted on a map.'
         var overview_url = '';
         if(metric == 'n_obs') {
             overview_url = '{{ val.output_dir_url }}' + 'overview_' + metric + '.png';
         } else {
             overview_url = '{{ val.output_dir_url }}' + 'overview_' + pair + '_' + metric + '.png';
         }
+
+        var map_exists = fileExists(overview_url);
+
+        if (map_exists == false) {
+            overview_label = 'Please change metric and/or data set group.';
+            overview_url = "javascript:void(0)";
+            $("#id_overview_link").attr("href", "javascript:void(0)");
+        } else {
+            $("#id_overview").attr("title", overview_label);
+        }
         $("#id_overview").attr("src", overview_url);
-        $("#id_overview").attr("alt", overview_label);
-        $("#id_overview").attr("title", overview_label);
         $("#id_overview_link").attr("href", overview_url);
         $("#id_overview_label").html(overview_label);
+        $("#id_overview").attr("alt", "No map for the selected metric / data set combination found.");
     }
 
     // change the plots when the selection of metric and/or dataset pair is changed

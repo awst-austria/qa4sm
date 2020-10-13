@@ -16,8 +16,8 @@
 
                 <p>
                     Click on a continent to unfold its list of networks.<br/>
-                    Networks are listed here with <b>network name</b>, <b>countries</b>, and <b>number of stations</b>.<br/>
-                    You can find more information about the ISMN networks on the <a href="https://ismn.geo.tuwien.ac.at/en/sites/networks/"
+                    Networks are listed here with <b>network name</b> and <b>countries</b><br/>
+                    You can find more information about the ISMN networks on the <a href="https://ismn.geo.tuwien.ac.at/en/networks/"
                     target="_blank">ISMN networks list</a>.
                 </p>
 
@@ -774,6 +774,58 @@
     </div>
 </div>
 
+
+<!--Monika-->
+<div class="modal" id="ismn_depth" role="dialog" aria-labelledby="ismn_networks_title" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 30rem;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="my-0 font-weight-normal" id="ismn_depth_title">Select measurements depth range</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="modal-body overflow-auto depth" style="max-height: 60vh;">
+
+                <style type="text/css">
+                    .ismn_label { display:inline-block; }
+                    .ismn_indent { margin-left: 1rem; }
+                </style>
+
+                <p>
+                    Choose a range to include measurements done only at a particular depth range.<br/>
+                    The filter will be applied to all stations in all chosen networks.
+                </p>
+
+                <div>
+                    <div></div>
+                        <label for="depth_from">Depth from: </label>
+                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="first_range"
+                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
+                        <label for="depth_from">m</label>
+                    </div>
+                    <div>
+                        <label for="depth_to">Depth to: </label>
+                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="first_range"
+                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
+                        <label for="depth_to">m</label>
+                    </div>
+
+            </div>
+
+            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth">
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);" class="btn btn-primary">Use depth range</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!--====================================== Java Script Codes ==================================================== -->
 <script type="text/javascript">
     function toggleISMNContinent(checkbox) {
         var groupId = checkbox.id.replace(/^id_continent_/, 'id_collapse_')
@@ -787,14 +839,16 @@
     function setISMNNetworks(source) {
         var ismnDialog = $(source).closest('#ismn_networks');
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
-
+        console.log(hiddenId)
         var networkList = '';
         for (var netCB of ismnDialog.find('input:checked.network')) {
+            console.log(netCB.value)
             networkList += netCB.value + ',';
         }
-        networkList = networkList.replace(/,+$/, '');
+        networkList = networkList.replace(/,+$/, ''); //remove the last coma
 
         $('#'+hiddenId).val(networkList);
+        console.log($('#'+hiddenId).val())
     }
 
     $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
@@ -808,6 +862,7 @@
         preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, ''); // clean string from whitespace
         var netList = preselectedNetworks.split(',');
 
+
         // reset dialog:
         ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
         ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
@@ -816,5 +871,53 @@
             ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
         }
     });
+
+<!--Monika-->
+    function setISMNDepth(source) {
+        var ismnDialog = $(source).closest('#ismn_depth');
+        var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
+        // taking default values from the hidden field
+        var default_values = $('#'+hiddenId).val().split(',')
+        var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
+
+        //taking chosen values
+        var depth_from = $('#depth_from').val()
+        var depth_to = $('#depth_to').val()
+        if(depth_from > depth_to){
+            $('#depth_from').val(parseFloat(default_values[0]))
+            $('#depth_to').val(parseFloat(default_values[1]))
+            alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the last valid range used.')
+        } else {
+          depthCheckbox.prop('checked', true)
+          $('#'+hiddenId).val([depth_from, depth_to])
+          $('#ismn_depth').modal('hide'); // closing the window
+        }
+
+
+    }
+
+    function getDefaultParams(e, field_selector){
+        var callerId = e.relatedTarget.id;
+        var hiddenId = callerId.replace(/_link$/, '_params');
+        var default_values = $('#'+hiddenId).val()
+        var ismnDialog = $(e.currentTarget);
+        ismnDialog.find(field_selector).val(hiddenId); // remember where the selected depths need to go
+        return default_values
+    }
+
+    function getDefaultRanges(e){
+        var default_val = getDefaultParams(e, '#id_target_hidden_input_depth')
+        var range = default_val.split(',')
+        $('#depth_from').val(parseFloat(range[0]))
+        $('#depth_to').val(parseFloat(range[1]))
+        range = [$('#depth_from').val(), $('#depth_to').val()]
+        return range
+    }
+
+    $('#ismn_depth').on('show.bs.modal', function(e){
+      getDefaultRanges(e)
+    });
+
+<!--Monika-->
 
 </script>
