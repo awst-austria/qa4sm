@@ -201,7 +201,7 @@
                             <select id="id_graph_metric" style="width: 18rem;" name="graph_variable"
                                 title="Metric to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for key, label in metrics.items %}
+                                {% for label, key in metrics.items %}
                                     <option value="{{ key }}">{{ label }}</option>
                                 {% endfor %}
                             </select>
@@ -209,8 +209,8 @@
                             <select id="id_graph_pair" style="width: 18rem;" name="graph_pair"
                                 title="Dataset pair to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for pair in pairs %}
-                                    <option value="{{ pair }}">{{ pair }}</option>
+                                {% for combi_short, combi_pretty in combis.items %}
+                                    <option value="{{ combi_short }}">{{ combi_pretty }}</option>
                                 {% endfor %}
                             </select>
 
