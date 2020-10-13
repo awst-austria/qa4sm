@@ -668,6 +668,7 @@
         function ajax_change_dataset() {
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
+            var datasetName = $(this).text();
             var widgetId = $(this).attr('id');
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
@@ -684,8 +685,7 @@
                     $(variable_widget).html(return_data['variables']);
                     $(filter_widget).html(return_data['filters']);
                     $(param_filter_widget).html(return_data['paramfilters']);
-
-                    if(datasetId==4){
+                    if(datasetName=='ISMN'){
                         var default_value = $(version_widget).find('option')[0].value
                         $('#id_target_hidden_input_version').val(default_value)
                     } else{
@@ -712,7 +712,7 @@
         function get_version_id(){
             var versionId = $(this).val();
             $('#id_target_hidden_input_version').val(versionId)
-            // additionally set up default networks 
+            // additionally set up default networks
             var hiddenField = $('#id_target_hidden_input')
             if(hiddenId = $('#id_target_hidden_input').val()){
               var hiddenId = $('#id_target_hidden_input').val()
