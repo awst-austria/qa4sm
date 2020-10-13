@@ -668,8 +668,9 @@
         function ajax_change_dataset() {
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
-            var datasetName = $(this).text()
+            // var datasetName = $(this).text();
             var widgetId = $(this).attr('id');
+            var datasetName = $(`#${widgetId} option[value=${datasetId}]`).text()
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
             $.ajax({
@@ -685,6 +686,8 @@
                     $(variable_widget).html(return_data['variables']);
                     $(filter_widget).html(return_data['filters']);
                     $(param_filter_widget).html(return_data['paramfilters']);
+
+                    console.log(datasetId, datasetName)
 
                     if(datasetName=='ISMN'){
                         var default_value = $(version_widget).find('option')[0].value
