@@ -13,14 +13,14 @@
     {% for ref_flag in ref_flags %}
 
         {% if not ref_flag %}
-            <a id="data"></a><h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated</h1>
+            <a id="data"></a><h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated and to be used as a reference</h1>
             <p>
-                The following datasets can be validated within the QA4SM tool. These datasets are available in the "data" section of the validate page.
+                The following datasets can be validated within the QA4SM tool. These datasets are available in both the "data" and the 'reference' sections and of the validate page.
             </p>
         {% else %}
             <a id="ref"></a><h1 class="h3 mb-3 font-weight-normal">Datasets - Reference Data</h1>
             <p>
-                The following datasets can be used as a reference within the QA4SM tool. These datasets are available in the
+                The following datasets can be used only  as a reference within the QA4SM tool. These datasets are available in the
                 "reference" section of the validate page.
             </p>
         {% endif %}
@@ -39,7 +39,7 @@
             </thead>
             <tbody>
                 {% for dataset in datasets %}
-                    {% if dataset.is_reference == ref_flag %}
+                    {% if dataset.is_only_reference == ref_flag %}
                         <tr>
                             <th scope="row">{{ dataset.pretty_name }}</th>
                             <td>{{ dataset.detailed_description |safe }}</td>
