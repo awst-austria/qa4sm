@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}" version-options-url="{% url 'ajax_get_version_id' %}">
+    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}">
         {% csrf_token %}
 
         {% with WIDGET_ERROR_CLASS='is-invalid' %}
@@ -163,7 +163,6 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="ref-addon2">Version</span>
                                                 </div>
-                                                <input type="hidden" id="id_target_hidden_input_version" value="" name="target_hidden_input_version">
                                                 {% render_field ref_dc_form.version class="custom-select" %}
                                             </div>
                                             {% for error in ref_dc_form.version.errors %}
@@ -562,7 +561,6 @@
     <link rel="stylesheet" href="/static/leaflet/leaflet.draw.css" />
     <script src="/static/leaflet/leaflet.draw.js"></script>
 
-
     <script type="text/javascript">
         var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
         var map = L.map('spatialFilterMap', { maxBounds: bounds });
@@ -694,10 +692,7 @@
 
                 }
             });
-
         }
-
-
 
         function change_tab_name() {
             var datasetName = $(this).find('option:selected').text();
@@ -721,10 +716,7 @@
             }
         }
 
-
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id)
-
     </script>
 
     <script type="text/javascript">
@@ -806,9 +798,12 @@
             }
            // show remove button and change its
             if ( totalNoForms > 1 ) {
+<!--                $(newButton).css('margin-left', '0.3rem')-->
                 newButton.show();
             }
-
+<!--            if (totalNoForms == $(maxSelector).val()) {-->
+<!--                $(removeButton).css('margin-left', 'auto');-->
+<!--            }-->
 
 
             // trigger change event on dataset select so that dependent parameters are set correctly
@@ -892,7 +887,7 @@
 
                     var current_tab = $(all_next_tabs[i])
                     var current_container = $(all_next_containers[i])
-
+                    console.log('current container', current_container)
 
                     var old_id = current_container.attr('id')
 
@@ -966,3 +961,4 @@
     </script>
 
 {% endblock %}
+

@@ -40,7 +40,7 @@ install:
 
   - python manage.py migrate
 
-  - python manage.py loaddata versions variables filters datasets networks
+  - python manage.py loaddata versions variables filters datasets
 
   - pip list
   - which pip
