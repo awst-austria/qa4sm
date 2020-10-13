@@ -1,5 +1,5 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 from multiprocessing import Process
 from re import sub as regex_subs
 
@@ -16,17 +16,15 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.template import loader
 
-from validator.forms import DatasetConfigurationForm, FilterCheckboxSelectMultiple,\
+import validator.validation.globals as val_globals
+from validator.forms import DatasetConfigurationForm, FilterCheckboxSelectMultiple, \
     ValidationRunForm, ParamFilterChoiceField, ParamFilterSelectMultiple
 from validator.models import DataFilter, DatasetVersion
 from validator.models import Dataset
 from validator.models import Settings
 from validator.models import ValidationRun
-from validator.models import ISMNNetworks
 from validator.validation import run_validation
-import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
-
 
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)

@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class DataVariable(models.Model):
     short_name = models.CharField(max_length=30)
     pretty_name = models.CharField(max_length=30)
@@ -7,7 +8,7 @@ class DataVariable(models.Model):
 
     min_value = models.FloatField(null=True)
     max_value = models.FloatField(null=True)
-    
+
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration
 
