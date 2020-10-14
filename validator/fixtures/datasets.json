@@ -10,7 +10,7 @@
             "detailed_description": "The C3S long-term data record provides active, passive and  combined (active+passive) soil moisture data on a daily, dekadal and monthly basis. Observations are  provided on a quarter degree grid. For more information, please visit the <a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview\">Climate Data Store</a>.",
             "source_reference": "The data can be downloaded from the <a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview\">Climate Data Store</a>.",
             "citation": "<a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/satellite-soil-moisture?tab=overview\">See Climate Data Store</a>",
-            "is_reference": false,
+            "is_only_reference": false,
             "versions": [
                 1,
                 10,
@@ -40,7 +40,7 @@
             "detailed_description": "The NASA SMAP level 3 data set provides global daily soil moisture observations at a 36 km resolution from the SMAP sensor (<a target=\"_blank\" href=\"https://nsidc.org/data/SPL3SMP\">more information</a>).",
             "source_reference": "The data can be downloaded from the product homepage <a target=\"_blank\" href=\"https://nsidc.org/data/SPL3SMP\"> here</a>.",
             "citation": "<a target=\"_blank\" href=\"https://nsidc.org/data/SPL3SMP\">Click here</a>",
-            "is_reference": false,
+            "is_only_reference": false,
             "versions": [
                 2,
                 29
@@ -64,7 +64,7 @@
             "detailed_description": "The ASCAT dataset from the EUMETSAT H-SAF portal provides global daily soil moisture observations on a discrete global grid (DGG) with a spatial resolution of 25 km. Observations are provided from the ASCAT instrument on-board both Metop-A and Metop-B (<a target=\"_blank\" href=\"http://hsaf.meteoam.it/description-h25-h108-h111.php\">more information</a>).",
             "source_reference": "The data can be downloaded from the <a target=\"_blank\" href=\"http://hsaf.meteoam.it/description-h25-h108-h111.php\">product homepage</a>.",
             "citation": "See section 5.2 of <a target=\"_blank\" href=\"http://hsaf.meteoam.it/documents/PUM/SSM_ASCAT_DR_PUM_v0.6.pdf\">this document</a>",
-            "is_reference": false,
+            "is_only_reference": false,
             "versions": [
                 3
             ],
@@ -92,7 +92,7 @@
             "detailed_description": "The ISMN provides in-situ soil moisture data from over 2600 monitoring stations worldwide. The data is harmonised and quality controlled to ensure the highest quality data is provided through the portal. Data is provided from 1952 to present day (<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/\">more information</a>).",
             "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/data-access/\"> here</a>.",
             "citation": "<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/terms-and-conditions/\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\">readme (v20180830)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\">readme (v20190222)</a>",
-            "is_reference": true,
+            "is_only_reference": true,
             "versions": [
                 5,
                 18
@@ -119,7 +119,7 @@
             "detailed_description": "GLDAS is a land surface model (LSM) which provides soil moisture data at different depths. Different versions are available for different time periods. For more information, visit the LDAS website: <a target=\"_blank\" href=\"https://ldas.gsfc.nasa.gov/gldas/\">NASA Land Data Assimilation Systems Website</a>",
             "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://hydro1.gesdisc.eosdis.nasa.gov/data/GLDAS/GLDAS_NOAH025_3H.2.1/\"> here for version 2.1</a>",
             "citation": "<a target=\"_blank\" href=\"https://ldas.gsfc.nasa.gov/gldas/GLDASpublications.php\">Click here</a>",
-            "is_reference": true,
+            "is_only_reference": false,
             "versions": [
                 7
             ],
@@ -146,7 +146,7 @@
             "detailed_description": "The ESA CCI SM long-term data record provides active, passive and combined (active+passive) on a daily basis. Observations are provided on a quarter degree grid. For more information on the ESA CCI SM product, please see the <a target=\"_blank\" href=\"https://www.esa-soilmoisture-cci.org/\">product homepage</a>.",
             "source_reference": "<a target=\"_blank\" href=\"https://www.esa-soilmoisture-cci.org/node/145\">Register at ESA CCI</a>, then download through FTP.",
             "citation": "<a target=\"_blank\" href=\"https://www.esa-soilmoisture-cci.org/node/137\">See CCI Publications Page</a>",
-            "is_reference": false,
+            "is_only_reference": false,
             "versions": [
                 12,
                 19,
@@ -177,7 +177,7 @@
             "detailed_description": "The <a target=\"_blank\" href=\"https://www.catds.fr/Products/Available-products-from-CEC-SM/SMOS-IC\">SMOS IC product</a> generated by INRA and CESBIO provides global soil moisture and VOD based on the two parameter inversion of the <a target=\"_blank\" href=\"https://www.sciencedirect.com/science/article/pii/S0034425706004238\">L-MEB model</a>.",
             "source_reference": "The data can be downloaded from the <a target=\"_blank\" href=\"https://www.catds.fr/Products/Available-products-from-CEC-SM/SMOS-IC\">product homepage</a>.",
             "citation": "<a target=\"_blank\" href=\"https://www.catds.fr/Products/Available-products-from-CEC-SM/SMOS-IC\">See this page.</a>",
-            "is_reference": false,
+            "is_only_reference": false,
             "versions": [
                 13
             ],
@@ -206,7 +206,7 @@
             "detailed_description": "ERA5 is a global reanalysis product provided by ECMWF. It provides global, sub-daily simulations of variables for land, atmosphere and ocean waves. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5 Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.25\u00b0 Lat. * 0.25\u00b0 Lon were converted into a time series format via daily averages. The ERA5 dataset starts in 1979. The version number used in QA4SM indicates the date when the original data was downloaded. For more details about ERA5 please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation\">ECMWF Confluence - ERA5 Documentation</a>",
             "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation#ERA5datadocumentation-HowtodownloadERA5\"> ECMWF Confluence - ERA5 Download</a>",
             "citation": "<a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/What+is+ERA5\">Click here</a>",
-            "is_reference": true,
+            "is_only_reference": false,
             "versions": [
                 15
             ],
@@ -230,7 +230,7 @@
             "detailed_description": "ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5-Land Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.1\u00b0 Lat. * 0.1\u00b0 Lon were converted into a time series format from daily averages. ERA5-Land is available from January 2001 onward. The Soil Temperature variable (stl1) is used to mask Soil Moisture (swvl1) under frozen conditions if selected. The version number used in QA4SM indicates the date when the original data was downloaded. For more details please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation\">ECMWF Confluence - ERA5-Land Documentation</a>",
             "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form\"> Copernicus Climate Data Store Confluence - ERA5-Land Download</a>",
             "citation": "<a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview\">Click here</a>",
-            "is_reference": true,
+            "is_only_reference": false,
             "versions": [
                 16
             ],
@@ -254,7 +254,7 @@
             "detailed_description": "see ESA CCI SM combined",
             "source_reference": "see ESA CCI SM combined",
             "citation": "see ESA CCI SM combined",
-            "is_reference": false,
+            "is_only_reference": false,
             "versions": [
                 20,
                 26
@@ -283,7 +283,7 @@
             "detailed_description": "see ESA CCI SM combined",
             "source_reference": "see ESA CCI SM combined",
             "citation": "see ESA CCI SM combined",
-            "is_reference": false,
+            "is_only_reference": false,
             "versions": [
                 21,
                 25

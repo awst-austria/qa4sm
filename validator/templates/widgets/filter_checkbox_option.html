@@ -20,6 +20,6 @@
     {% endif %}
     <span class="input-group-text fas fa-question-circle help-icon" title="{{ widget.help_text }}"></span>
     {% if widget.parameterised  %}
-        <input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.default_parameter }}" name="{{ widget.name }}_params">
+        <input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.default_parameter }}" data-default_val="{{ widget.default_parameter }}" name="{{ widget.name }}_params">
     {% endif %}
 </div>
