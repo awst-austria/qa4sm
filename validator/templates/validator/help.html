@@ -103,8 +103,21 @@
         datasets, see the <a href="{% url 'datasets' %}">datasets page</a>.
     </p>
     <img class="scaled_image mb-3" src="../../static/images/help/validation_period.png">
+
     <p>
-        <b>Step 9</b> - Choose how the data (or reference) will be scaled before metrics calculation.
+        <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC). By default, QA4SM calculates validation
+        metrics between dataset pairs (the reference and each candidate data set). If more than 3 datasets
+        are selected (including the reference), the switch to activate TC becomes available. If
+        TC is selected, in addition to the basic metrics between dataset pairs, TC metrics between
+        triples of selected datasets are calculated. The reference is included in all triples and
+        metrics are found for all candidate datasets. Note that each TC metric is specific to a dataset
+        (this is evident from the metric name). TC metrics are affected by all 3 used datasets. Only results from TC with
+        independent datasets should be used.
+    </p>
+    <img class="scaled_image mb-3" src="../../static/images/help/tca.png">
+
+    <p>
+        <b>Step 10</b> - Choose how the data (or reference) will be scaled before metrics calculation.
         The data can be scaled to the reference (default) or vice versa.
         Note that in an intercomparision validation (with multiple datasets), only scaling to reference
         is possible.
@@ -114,13 +127,13 @@
     <img class="scaled_image mb-3" src="../../static/images/help/scaling.png">
 
     <p>
-        <b>Step 10</b> - Optionally name your validation results to make it easier to identify it in
+        <b>Step 11</b> - Optionally name your validation results to make it easier to identify it in
         the list of all your validations.
     </p>
     <img class="scaled_image mb-3" src="../../static/images/help/name_your_validation.png">
 
     <p>
-        <b>Step 11</b> - Run the validation process. You'll be notified via e-mail once it's
+        <b>Step 12</b> - Run the validation process. You'll be notified via e-mail once it's
         finished. You don't need to keep the results window (or even your browser) open for
         the validation to run. The email will contain a link to your results.
     </p>
@@ -276,6 +289,10 @@
             <tr><th scope="row">Mean square error correlation</th><td>Mean square error correlation</td></tr>
             <tr><th scope="row">Mean square error bias</th><td>Mean square error bias</td></tr>
             <tr><th scope="row">Mean square error variance</th><td>Mean square error variance</td></tr>
+            <tr><th scope="row">Residual Sum of Squares</th><td>Residual Sum of Squares</td></tr>
+            <tr><th scope="row">TC: Signal-to-noise ratio</th><td>TC: Signal-to-noise ratio</td></tr>
+            <tr><th scope="row">TC: Error standard deviation</th><td>TC: Error standard deviation'</td></tr>
+            <tr><th scope="row">TC: Scaling coefficient</th><td>TC: Scaling coefficient</td></tr>
         </tbody>
     </table>
 

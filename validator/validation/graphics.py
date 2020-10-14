@@ -67,10 +67,10 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
 
     Returns
     -------
-    pairs : list
-        Dataset pairs to show in the dropdown
-    triples : list
-        Dataset triples to show in the dropdown
+    pairs : dict
+        Dataset pairs and pretty names to show in the dropdown
+    triples : dict
+        Dataset triples and pretty names to show in the dropdown
     metrics : dict
         All metrics that are found
     ref0_config : bool or None
@@ -78,18 +78,24 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     """
 
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
-    pairs, triples = [] ,[]
+    pairs, triples = {}, {}
     ref0_config = None
 
     ds_names = [ds_config.dataset.short_name for ds_config in validation_run.dataset_configurations.all()]
 
     metrics = {}
 
+
     for root, dirs, files in os.walk(run_dir):
         for f in files:
+
             if not f.endswith('.png'): continue
 
             for pair_metric in METRICS.keys():
+
+                if pair_metric == 'n_obs':
+                    metrics['n_obs'] = METRICS['n_obs']
+                    continue
 
                 template = ''.join([METRIC_TEMPLATE[0],
                                     METRIC_TEMPLATE[1].format(metric=pair_metric)]) + '.png'
@@ -98,6 +104,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                 if parsed is None:
                     continue
                 else:
+
                     if (parsed['ds_ref'] in ds_names) and (parsed['ds_sat'] in ds_names):
                         ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
                         ds = f"{parsed['id_sat']}-{parsed['ds_sat']}"
@@ -109,8 +116,9 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                             metrics[pair_metric] = METRICS[pair_metric]
 
                         pair = '{}_and_{}'.format(ref, ds)
-                        if pair not in pairs:
-                            pairs.append(pair)
+                        pretty_pair = '{} and {}'.format(ref, ds)
+                        if pair not in pairs.keys():
+                            pairs[pair] = pretty_pair # pretty name
 
             for tcol_metric in TC_METRICS.keys():
 
@@ -134,9 +142,11 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                             metrics[metric] = f"{TC_METRICS[tcol_metric]} for {ds_met}"
 
                         triple = '{}_and_{}_and_{}'.format(ref, ds, ds2)
+                        pretty_triple = '{} and {} and {}'.format(ref, ds, ds2)
 
-                        if triple not in triples:
-                            triples.append(triple)
+                        if triple not in triples.keys():
+                            triples[triple] = pretty_triple
+
     # import logging
     # __logger = logging.getLogger(__name__)
     # __logger.debug(f"Pairs: {pairs}")
