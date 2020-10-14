@@ -20,9 +20,9 @@ METRICS = {'R' : 'Pearson\'s r',
 METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_",
                    "{metric}"]
 
-TC_METRICS = {'snr': 'Signal-to-noise ratio',
-              'err_std': 'Error standard deviation',
-              'beta': 'TC scaling coefficient',}
+TC_METRICS = {'snr': 'TC: Signal-to-noise ratio',
+              'err_std': 'TC: Error standard deviation',
+              'beta': 'TC: Scaling coefficient',}
 
 TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
                       "_{metric}",

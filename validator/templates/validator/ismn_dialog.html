@@ -301,25 +301,26 @@
     });
 
 // ------------------------ ISMN Depths -------------------------------------- //
-function setISMNDepth(source) {
-    var ismnDialog = $(source).closest('#ismn_depth');
-    var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
-    // taking default values from the hidden field
-    var default_values = $('#'+hiddenId).val().split(',')
-    var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
+    function setISMNDepth(source) {
+        var ismnDialog = $(source).closest('#ismn_depth');
+        var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
+        // taking default values from the hidden field
+        var default_values = $('#'+hiddenId).val().split(',')
+        var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
 
-    //taking chosen values
-    var depth_from = $('#depth_from').val()
-    var depth_to = $('#depth_to').val()
-    if(depth_from > depth_to){
-        $('#depth_from').val(parseFloat(default_values[0]))
-        $('#depth_to').val(parseFloat(default_values[1]))
-        alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the last valid range used.')
-    } else {
-      depthCheckbox.prop('checked', true)
-      $('#'+hiddenId).val([depth_from, depth_to])
-      $('#ismn_depth').modal('hide'); // closing the window
-    }
+        //taking chosen values
+        var depth_from = $('#depth_from').val()
+        var depth_to = $('#depth_to').val()
+        if(depth_from > depth_to){
+            $('#depth_from').val(parseFloat(default_values[0]))
+            $('#depth_to').val(parseFloat(default_values[1]))
+            alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the last valid range used.')
+        } else {
+          depthCheckbox.prop('checked', true)
+          $('#'+hiddenId).val([depth_from, depth_to])
+          $('#ismn_depth').modal('hide'); // closing the window
+        }
+
 
 
 }
@@ -333,18 +334,19 @@ function getDefaultParams(e, field_selector){
     return default_values
 }
 
-function getDefaultRanges(e){
-    var default_val = getDefaultParams(e, '#id_target_hidden_input_depth')
-    var range = default_val.split(',')
-    $('#depth_from').val(parseFloat(range[0]))
-    $('#depth_to').val(parseFloat(range[1]))
-    range = [$('#depth_from').val(), $('#depth_to').val()]
-    return range
-}
+    function getDefaultRanges(e){
+        var default_val = getDefaultParams(e, '#id_target_hidden_input_depth')
+        var range = default_val.split(',')
+        $('#depth_from').val(parseFloat(range[0]))
+        $('#depth_to').val(parseFloat(range[1]))
+        range = [$('#depth_from').val(), $('#depth_to').val()]
+        return range
+    }
 
-$('#ismn_depth').on('show.bs.modal', function(e){
-  getDefaultRanges(e)
-});
+    $('#ismn_depth').on('show.bs.modal', function(e){
+      getDefaultRanges(e)
+    });
+
 
 
 </script>

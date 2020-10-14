@@ -1,3 +1,13 @@
+QA4SM v1.3.1 - Release notes 2020-10-13
+=======================================================
+
+# Changes
+
+1. Fix parameterized filtering from ISMN network and depth selections;
+2. Fix n_obs plot and sort metric list in GUI;
+3. Help text for triple collocation;
+4. Restore data scaling when there is only one dataset.
+
 QA4SM v1.3.0 - Release notes 2020-09-24
 =======================================================
 
