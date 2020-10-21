@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"station_name": "SD-DEM", "depth_from": "[ 0.    0.05  0.15  0.3   0.6   1.    1.5   2.   -2.    0.3   0.6 ]", "depth_to": "[ 0.    0.05  0.15  0.3   0.6   1.    1.5   2.   -2.    0.3   0.6 ]", "network": "CARBOAFRICA"}, "geometry": {"type": "Point", "coordinates": [30.4783, 13.2829]}}]}

@@ -5,7 +5,7 @@ Module description
 """
 # TODO:
 #   (+)
-#---------
+# ---------
 # NOTES:
 #   -
 
@@ -14,6 +14,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import cartopy
+import json
 import cartopy.crs as ccrs
 from matplotlib.patches import Rectangle
 
@@ -66,12 +67,24 @@ class ISMN_Plotter(ISMN_Interface):
             rect.append(Rectangle((0, 0), 1, 1, fc=netcolor))
 
             stationnames = self.list_stations(network)
-
+            geo_json_features = []
             for stationname in stationnames:
                 station_counted = False
                 station = self.get_station(stationname, network)
                 station_vars = station.get_variables()
+                geo_json_feature = {}
+                geo_json_feature['type'] = 'Feature'
+                feature_properties = {}
+                feature_properties['station_name'] = station.station
+                feature_properties['depth_from'] = '{}'.format(station.depth_from)
+                feature_properties['depth_to'] = '{}'.format(station.depth_to)
+                feature_properties['network'] = station.network
 
+                geo_json_feature['properties'] = feature_properties
+
+                geo_json_geometry = {'type': 'Point', 'coordinates': [station.longitude, station.latitude]}
+                geo_json_feature['geometry'] = geo_json_geometry
+                geo_json_features.append(geo_json_feature)
                 if variable not in station_vars:
                     continue
 
@@ -112,6 +125,14 @@ class ISMN_Plotter(ISMN_Interface):
                         values.append(colorsteps[j])
                         sensors_count += 1
 
+            geo_json_feature_collection = {}
+            geo_json_feature_collection['type'] = 'FeatureCollection'
+            geo_json_feature_collection['features'] = geo_json_features
+            print(geo_json_feature_collection)
+            text_file = open('networks/' + station.network + ".json", "w")
+            n = text_file.write(json.dumps(geo_json_feature_collection))
+            text_file.close()
+
         postfix_depth = "when only considering depth_from of the sensor" if check_only_depth_from else ''
 
         feedback = "{} valid sensors in {} stations in {} networks (of {} potential networks) \n" \
@@ -137,7 +158,6 @@ class ISMN_Plotter(ISMN_Interface):
         ax = plt.scatter(lons, lats, s=10,
                          zorder=3, transform=data_crs)
 
-
         nrows = 8. if len(uniq_networks) > 8 else len(uniq_networks)
         ncols = int(uniq_networks.size / nrows)
         if ncols == 0:
@@ -149,7 +169,7 @@ class ISMN_Plotter(ISMN_Interface):
         plt.legend(rect, uniq_networks.tolist(), loc='upper center', ncol=ncols,
                    bbox_to_anchor=(0.5, -0.05), fontsize=4)
         text = imax.text(0.5, 1.2, feedback, transform=imax.transAxes, fontsize='xx-small',
-                       horizontalalignment='center')
+                         horizontalalignment='center')
 
         fig.set_size_inches([6, 3.5 + 0.25 * nrows])
         if filename is not None:
@@ -158,6 +178,7 @@ class ISMN_Plotter(ISMN_Interface):
         else:
             return fig, imax
 
+
 if __name__ == '__main__':
     ds = ISMN_Plotter(r"/mnt/qa4sm/qa4sm_sat_data/ISMN/ISMN_V20191211", networks_to_use=None)
-    ds.plot_station_locations('soil moisture', 0, 0.1,'asd.jpg', check_only_depth_from=True)
+    ds.plot_station_locations('soil moisture', 0, 0.1, 'asd.jpg', check_only_depth_from=True)

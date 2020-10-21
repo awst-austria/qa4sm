@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"station_name": "IITK-Airstrip", "depth_from": "[0.1  0.25 0.5  0.8 ]", "depth_to": "[0.1  0.25 0.5  0.8 ]", "network": "IIT-KANPUR"}, "geometry": {"type": "Point", "coordinates": [80.23303, 26.51881]}}]}
