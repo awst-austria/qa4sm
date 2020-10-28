@@ -1,0 +1,31 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block content %}
+<script src="/static/js/plotly-latest.min.js"></script>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+
+<h1> QA4SM statistics </h1>
+<div>
+    <h3> Currently we have {{ stats.number_of_users }} users </h3>
+    <h3> Up to now {{ stats.number_of_validations }} {% if stats.number_of_validations == 1 %} validation has {% else %}
+        validations have {% endif%} been run</h3>
+    <h3> The user who runs validations most frequently is {{stats.most_frequent_user.name}} and he/she has run
+        {{stats.most_frequent_user.validation_num}} by now</h3>
+
+</div>
+<div id="val_nums_by_users" style="width:600px;height:250px;"></div>
+
+<script>
+	var val_nums_by_users_div = $('#val_nums_by_users')[0];
+  var val_nums_by_users_plot_data = [{
+        x: {{ stats.val_num_by_user_data.users|safe}},
+        y: {{ stats.val_num_by_user_data.validations_num|safe }},
+        type: 'bar'
+    }]
+  // ];
+	Plotly.react( val_nums_by_users_div, val_nums_by_users_plot_data);
+</script>
+
+
+{% endblock %}
