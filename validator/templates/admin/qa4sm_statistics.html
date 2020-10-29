@@ -14,17 +14,151 @@
         {{stats.most_frequent_user.validation_num}} by now</h3>
 
 </div>
-<div id="val_nums_by_users" style="width:600px;height:250px;"></div>
+<div id="val_nums_by_users" class="plot_div"></div>
+<div id="validations_in_time" class="plot_div"></div>
 
 <script>
+  // Common plot parameters:
+  var title_font_size = 20;
+  var title_font_type = 'Arial, monospace';
+  var axis_font_size = 16;
+  var axis_font_type = 'Arial, monospace';
+  var plot_bgcolor = 'none';//'rgb(240, 240, 240)';
+  // Number of validations run by each user plot
 	var val_nums_by_users_div = $('#val_nums_by_users')[0];
+
+
   var val_nums_by_users_plot_data = [{
         x: {{ stats.val_num_by_user_data.users|safe}},
         y: {{ stats.val_num_by_user_data.validations_num|safe }},
         type: 'bar'
     }]
-  // ];
-	Plotly.react( val_nums_by_users_div, val_nums_by_users_plot_data);
+  var val_nums_by_user_layout = {
+    plot_bgcolor: plot_bgcolor,
+    title: {
+      text:'Number of validations run by each user',
+      font: {
+        family: title_font_type,
+        size: title_font_size}
+      },
+    xaxis: {
+      title: {
+          text:'Users',
+          font: {
+            family: axis_font_type,
+            size: axis_font_size}
+          }
+      },
+    yaxis: {
+      title: {
+          text:'NUmber of validations',
+          font: {
+            family: axis_font_type,
+            size: axis_font_size}
+          }
+      }
+  }
+
+	Plotly.react( val_nums_by_users_div, val_nums_by_users_plot_data, val_nums_by_user_layout);
+
+//==========================================================================================
+
+  // Number of validations by time range:
+  var first_epoch = {{stats.validations_for_plot.first_validation|safe}}[0];
+  var last_epoch = {{stats.validations_for_plot.last_validation|safe}}[0];
+  var H1 = 3600000; //xbins are defined in mili seconds, therefore one hour is defined this way
+  var D1 = H1 * 24; // one day
+  var W1 = D1 * 7; // one week
+  var val_nums_by_users_div = $('#validations_in_time')[0];
+
+  var validations_in_time_data = [{
+        x: {{ stats.validations_for_plot.validations_time|safe }},
+        autobinx: false,
+        autobiny: true,
+        marker: {color: 'rgb(68, 68, 68)'},
+        name: 'date',
+        type: 'histogram',
+        xbins: {
+          end: last_epoch,
+          size: H1,
+          start: first_epoch
+        }
+    }];
+
+  var validations_in_time_layout = {
+      plot_bgcolor: plot_bgcolor,
+      title: {
+        text: 'Number of validations in particular time periods',
+        font: {
+          family: title_font_type,
+          size: title_font_size}
+        },
+      xaxis: {
+        type: 'date',
+        autorange: false,
+        range: [first_epoch, last_epoch],
+        title: {
+          text:'Date range',
+          font: {
+            family: axis_font_type,
+            size: axis_font_size}
+          },
+        font: {
+          family: axis_font_type,
+          size: axis_font_size}
+      },
+      yaxis: {
+        autorange: true,
+        title: {
+          text:'Number of validations',
+          font: {
+            family: axis_font_type,
+            size: axis_font_size}},
+        type: 'linear'
+      },
+      updatemenus: [{
+            x: 0.1,
+            y: 1.15,
+            xref: 'paper',
+            yref: 'paper',
+            yanchor: 'top',
+            active: 0,
+            showactive: true,
+            buttons: [{
+                args: ['xbins.size', H1],
+                label: 'Hour',
+                method: 'restyle',
+            },{
+                args: ['xbins.size', D1],
+                label: 'Day',
+                method: 'restyle',
+            }, {
+                args: ['xbins.size', W1],
+                label: 'Week',
+                method: 'restyle',
+            }, {
+                args: ['xbins.size', 'M1'],
+                label: 'Month',
+                method: 'restyle',
+            }, {
+                args: ['xbins.size', 'M3'],
+                label: 'Quater',
+                method: 'restyle',
+            }, {
+                args: ['xbins.size', 'M6'],
+                label: 'Half Year',
+                method: 'restyle',
+            }, {
+                args: ['xbins.size', 'M12'],
+                label: 'Year',
+                method: 'restyle',
+            }]
+      }]
+};
+
+Plotly.newPlot(validations_in_time, validations_in_time_data, validations_in_time_layout);
+
+
 </script>
 
 
