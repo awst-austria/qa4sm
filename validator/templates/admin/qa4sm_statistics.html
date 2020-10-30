@@ -5,50 +5,71 @@
 <script src="/static/js/plotly-latest.min.js"></script>
 <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
 
-<h1> QA4SM statistics </h1>
+<center> <h1> <b>QA4SM statistics</b> </h1> </center>
 <div>
-    <h3> Currently we have {{ stats.number_of_users }} users </h3>
-    <h3> Up to now {{ stats.number_of_validations }} {% if stats.number_of_validations == 1 %} validation has {% else %}
-        validations have {% endif%} been run</h3>
-    <h3> The user who runs validations most frequently is {{stats.most_frequent_user.name}} and he/she has run
-        {{stats.most_frequent_user.validation_num}} by now</h3>
+    <h1> Currently we have <b>{{ stats.number_of_users }}</b> users </h1>
+    <h1> Up to now <b>{{ stats.number_of_validations }}</b> {% if stats.number_of_validations == 1 %} validation has {% else %}
+        validations have {% endif%} been run</h1>
+    <h1> The user who runs validations most frequently is <b>{{stats.most_frequent_user.name}}</b> and he/she has run
+        <b>{{stats.most_frequent_user.validation_num}}</b> by now</h1>
 
 </div>
 <div id="val_nums_by_users" class="plot_div"></div>
 <div id="validations_in_time" class="plot_div"></div>
 
 <script>
-  // Common plot parameters:
+// Common plot parameters:
+  // ============ Font size =================
   var title_font_size = 20;
-  var title_font_type = 'Arial, monospace';
   var axis_font_size = 16;
+  var tick_font_size = 12;
+  // ============ Font type =================
+  var title_font_type = 'Arial, monospace';
   var axis_font_type = 'Arial, monospace';
-  var plot_bgcolor = 'none';//'rgb(240, 240, 240)';
-  // Number of validations run by each user plot
+  var tick_font_type = 'Arial, monospace';
+  // ============ Colors =================
+  var plot_bgcolor = 'rgb(240, 240, 240)';
+  var basic_color = 'rgb(0, 204, 204)'//'rgb(255,20,147)';
+
+  //==========================================================================================
+    // Number of validations run by each user plot
 	var val_nums_by_users_div = $('#val_nums_by_users')[0];
 
 
   var val_nums_by_users_plot_data = [{
         x: {{ stats.val_num_by_user_data.users|safe}},
         y: {{ stats.val_num_by_user_data.validations_num|safe }},
-        type: 'bar'
+        type: 'bar',
+        marker: {
+          color: basic_color
+        }
     }]
+
   var val_nums_by_user_layout = {
     plot_bgcolor: plot_bgcolor,
     title: {
       text:'Number of validations run by each user',
       font: {
         family: title_font_type,
-        size: title_font_size}
+        size: title_font_size
+      },
+    yref: 'container',
+    y: 0.85
       },
     xaxis: {
       title: {
           text:'Users',
           font: {
             family: axis_font_type,
-            size: axis_font_size}
-          }
+            size: axis_font_size},
+            standoff: 10,
+          },
+      tickfont:{
+        size: tick_font_size,
+        family: tick_font_type
       },
+      automargin: true
+    },
     yaxis: {
       title: {
           text:'NUmber of validations',
@@ -62,7 +83,6 @@
 	Plotly.react( val_nums_by_users_div, val_nums_by_users_plot_data, val_nums_by_user_layout);
 
 //==========================================================================================
-
   // Number of validations by time range:
   var first_epoch = {{stats.validations_for_plot.first_validation|safe}}[0];
   var last_epoch = {{stats.validations_for_plot.last_validation|safe}}[0];
@@ -75,7 +95,7 @@
         x: {{ stats.validations_for_plot.validations_time|safe }},
         autobinx: false,
         autobiny: true,
-        marker: {color: 'rgb(68, 68, 68)'},
+        marker: {color: basic_color},
         name: 'date',
         type: 'histogram',
         xbins: {
@@ -91,7 +111,9 @@
         text: 'Number of validations in particular time periods',
         font: {
           family: title_font_type,
-          size: title_font_size}
+          size: title_font_size},
+      yref: 'container',
+      y: 0.85
         },
       xaxis: {
         type: 'date',
