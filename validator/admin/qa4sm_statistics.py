@@ -4,11 +4,12 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 from django.urls import path
 
 from valentina.celery import app
-from validator.models import User, ValidationRun
+from validator.models import User, ValidationRun, DatasetConfiguration, Dataset, DatasetVersion
 from django.contrib import messages
 
 
@@ -24,6 +25,7 @@ class StatisticsAdmin(ModelAdmin):
         urls = super(StatisticsAdmin, self).get_urls()
         new_urls = [
             path('', self.admin_site.admin_view(self.statistics), name='qa4sm-statistics'),
+            # path('user_id/', self.admin_site.admin_view(ajax_user_info), name='ajax_user_info'),
         ]
         return new_urls + urls
 
@@ -39,6 +41,27 @@ class StatisticsAdmin(ModelAdmin):
         users_dict = {'users': users_names,
                       'validations_num': validations_num}
         return users_dict
+
+    @staticmethod
+    def dataset_info_for_plot():
+        datasets = Dataset.objects.all()
+        dataset_names = list(datasets.values_list('short_name', flat=True))
+        dataset_numbers = []
+        dataset_versions = []
+        for dataset in datasets:
+            versions = dataset.versions.all()
+            version_counts = []
+            version_names = []
+            for version in versions:
+                number = dataset.dataset_configurations.filter(version=version).count()
+                version_counts.append(number)
+                version_names.append(version.short_name)
+            dataset_numbers.append(version_counts)
+            dataset_versions.append(version_names)
+        dataset_dict = {'datasets': dataset_names,
+                        'versions': dataset_versions,
+                        'dataset_count':dataset_numbers}
+        return dataset_dict
 
     def most_frequent_user_info(self):
         most_frequent_user_id = self.sorted_users_validation_query().first()['user']
@@ -67,18 +90,50 @@ class StatisticsAdmin(ModelAdmin):
                            'validations_time': time_list,
                            'first_validation': first_time,
                            'last_validation': last_time}
+
         return validation_dict
+
+    # @staticmethod
+    # def ajax_user_info(request):
+    #     user_id = request.GET.get('user_id')
+    #     try:
+    #         selected_user = User.objects.get(pk=user_id)
+    #     except:
+    #         return HttpResponseBadRequest("No such a user")
+    #
+    #     response_data = {
+    #         'user_name': selected_user.username
+    #     }
+    #
+    #     return JsonResponse(response_data)
+
 
     # @csrf_protect_m
     def statistics(self, request):
         if not request.user.is_superuser:
             raise PermissionDenied
 
+        users = User.objects.filter(is_active=True).order_by('pk')
         if request.method == "GET":
-            stats = {'number_of_users':  User.objects.filter(is_active=True).count(),
+            stats = {'users': users,
+                     'number_of_users':  users.count(),
                      'number_of_validations':  ValidationRun.objects.all().count(),
                      'most_frequent_user': self.most_frequent_user_info(),
                      'val_num_by_user_data': self.users_info_for_plot(),
-                     'validations_for_plot': self.validation_info_for_plot()}
+                     'validations_for_plot': self.validation_info_for_plot(),
+                     'datasets_for_plot': self.dataset_info_for_plot()}
 
             return render(request, 'admin/qa4sm_statistics.html', {'stats': stats})
+
+# def ajax_user_info(request):
+#     user_id = request.GET.get('user_id')
+#     try:
+#         selected_user = User.objects.get(pk=user_id)
+#     except:
+#         return HttpResponseBadRequest("No such a user")
+#
+#     response_data = {
+#         'user_name': selected_user.username
+#     }
+#
+#     return JsonResponse(response_data)

@@ -13,9 +13,56 @@
     <h1> The user who runs validations most frequently is <b>{{stats.most_frequent_user.name}}</b> and he/she has run
         <b>{{stats.most_frequent_user.validation_num}}</b> by now</h1>
 
+    <!-- <a href="{% url 'home'%}">Here I should send ajax request</a> -->
+</div>
+<div>
+    <h1>To see statistics on a particular user please choose the user from the list:
+        <select id="username">
+        {%for user in stats.users%}
+            <option id='user_{{user.pk}}' value='{{user.id}}'> {{user.username}} </option>
+        {%endfor%}
+        </select>
+    </h1>
+</div>
+<div id='user_info' hidden>
+    Monika
+    <button id='hide_user_info' value='Hide'> Hide </button>
 </div>
 <div id="val_nums_by_users" class="plot_div"></div>
 <div id="validations_in_time" class="plot_div"></div>
+<div id="datasets_cumulative" class="plot_div"></div>
+<!-- <script type="text/javascript">
+  // hiding ifo on a user
+  $('#hide_user_info').on('click', function(){
+    $('#user_info')[0].hidden = true;
+  })
+ // showing info on a user
+  function show_info(info){
+    $('#user_info')[0].hidden = false;
+    console.log($('#username').val())
+    console.log(info)
+    // $('#user_info').text(info);
+  }
+  var id = $('#username').val()
+  $("#username").change(ajax_show_user_info).change()
+
+  // ajax to take info on a user
+  function ajax_show_user_info(user_id) {
+      var url = 'admin/validator/statistics/user_id';
+      var user_id = $('#user_info').val()
+      $.ajax({
+          url: url,
+          data: {'user_id': user_id},
+          success: function (return_data) {
+              var user_name = return_data['user_name'];
+              console.log(user_name)
+              show_info(user_name)
+          }
+      });
+  }
+
+</script> -->
+
 
 <script>
 // Common plot parameters:
@@ -30,15 +77,74 @@
   // ============ Colors =================
   var plot_bgcolor = 'rgb(240, 240, 240)';
   var basic_color = 'rgb(0, 204, 204)'//'rgb(255,20,147)';
+  var versions_colors = ['rgb(0, 204, 204)', 'rgb(0, 204, 0)', 'rgb(204, 0, 0)', 'rgb(204, 0, 204)']
 
+  //==========================================================================================
+    // Datasets counts
+    var datasets_info = {{ stats.datasets_for_plot|safe }}
+    var datasets = datasets_info.datasets
+    var versions = datasets_info.versions
+    var dataset_counts = datasets_info.dataset_count
+
+    var datasets_plot_data = []
+    for (var dataset_ind=0; dataset_ind<datasets.length; dataset_ind++){
+      for (var vers_ind=0; vers_ind<versions[dataset_ind].length; vers_ind++){
+        var data = {
+          x: [datasets[dataset_ind]],
+          y: [dataset_counts[dataset_ind][vers_ind]],
+          name: versions[dataset_ind][vers_ind],
+          type: 'bar',
+          // marker: {
+          //   color: versions_colors[vers_ind]
+          // }
+        }
+        datasets_plot_data.push(data)
+      }
+    }
+
+    var datasets_plot_layout = {
+      barmode: 'stack',
+      plot_bgcolor: plot_bgcolor,
+      title: {
+        text:'Datasets counts',
+        font: {
+          family: title_font_type,
+          size: title_font_size,
+        },
+      yref: 'container',
+      y: 0.85
+        },
+      xaxis: {
+        title: {
+            text:'Datasets',
+            font: {
+              family: axis_font_type,
+              size: axis_font_size},
+              standoff: 10,
+            },
+        tickfont:{
+          size: tick_font_size,
+          family: tick_font_type
+        },
+        automargin: true
+      },
+      yaxis: {
+        title: {
+            text:'Counts',
+            font: {
+              family: axis_font_type,
+              size: axis_font_size}
+            }
+        }
+    }
+
+  Plotly.react(datasets_cumulative, datasets_plot_data,  datasets_plot_layout);
   //==========================================================================================
     // Number of validations run by each user plot
 	var val_nums_by_users_div = $('#val_nums_by_users')[0];
-
-
   var val_nums_by_users_plot_data = [{
-        x: {{ stats.val_num_by_user_data.users|safe}},
-        y: {{ stats.val_num_by_user_data.validations_num|safe }},
+        x: {{stats.val_num_by_user_data.users|safe}},
+        y: {{stats.val_num_by_user_data.validations_num|safe}},
         type: 'bar',
         marker: {
           color: basic_color
@@ -72,7 +178,7 @@
     },
     yaxis: {
       title: {
-          text:'NUmber of validations',
+          text:'Number of validations',
           font: {
             family: axis_font_type,
             size: axis_font_size}
