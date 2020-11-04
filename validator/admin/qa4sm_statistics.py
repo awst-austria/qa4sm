@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.core.exceptions import PermissionDenied
@@ -8,9 +9,29 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 from django.urls import path
 
-from valentina.celery import app
-from validator.models import User, ValidationRun, DatasetConfiguration, Dataset, DatasetVersion
-from django.contrib import messages
+from validator.models import User, ValidationRun, Dataset
+
+
+def sorted_users_validation_query():
+    return ValidationRun.objects.values('user').annotate(count=Count('user')).order_by('-count')
+
+
+def get_time_as_string(time_in_time_format, year_first=True):
+    try:
+        day = time_in_time_format.day
+        month = time_in_time_format.month
+        year = time_in_time_format.year
+        hour = time_in_time_format.hour
+        minute = time_in_time_format.minute if time_in_time_format.minute > 9 else f'0{time_in_time_format.minute}'
+    except:
+        return 'No date found'
+
+    if year_first:
+        time_as_str = f'{year}-{month}-{day} {hour}:{minute}'
+    else:
+        time_as_str = f'{day}-{month}-{year} {hour}:{minute}'
+
+    return time_as_str
 
 
 class StatisticsAdmin(ModelAdmin):
@@ -25,14 +46,10 @@ class StatisticsAdmin(ModelAdmin):
         urls = super(StatisticsAdmin, self).get_urls()
         new_urls = [
             path('', self.admin_site.admin_view(self.statistics), name='qa4sm-statistics'),
-            # path('user_id/', self.admin_site.admin_view(ajax_user_info), name='ajax_user_info'),
+            path('user_id/', self.admin_site.admin_view(ajax_user_info), name='ajax_user_info'),
         ]
         return new_urls + urls
 
-    @staticmethod
-    def sorted_users_validation_query():
-        return ValidationRun.objects.values('user').annotate(count=Count('user')).order_by('-count')
-    
     @staticmethod
     def users_info_for_plot():
         users = User.objects.filter(is_active=True).order_by('pk')
@@ -63,10 +80,11 @@ class StatisticsAdmin(ModelAdmin):
                         'dataset_count':dataset_numbers}
         return dataset_dict
 
-    def most_frequent_user_info(self):
-        most_frequent_user_id = self.sorted_users_validation_query().first()['user']
+    @staticmethod
+    def most_frequent_user_info():
+        most_frequent_user_id = sorted_users_validation_query().first()['user']
         user_name = User.objects.get(pk=most_frequent_user_id).username
-        validations_num = self.sorted_users_validation_query().first()['count']
+        validations_num = sorted_users_validation_query().first()['count']
         return {'name': user_name, 'validation_num': validations_num}
 
     @staticmethod
@@ -77,8 +95,7 @@ class StatisticsAdmin(ModelAdmin):
         time_list = []
         for time in validations_time:
             # if the minute part is a single digit then 0 has to be added, otherwise it's not converted correctly
-            minute = time.minute if time.minute > 9 else f'0{time.minute}'
-            time_new_format = f'{time.year}-{time.month}-{time.day} {time.hour}:{minute}'
+            time_new_format = get_time_as_string(time)#f'{time.year}-{time.month}-{time.day} {time.hour}:{minute}'
             time_list.append(time_new_format)
 
         first = validations_sorted_by_time.values_list('start_time', flat=True).first()
@@ -93,23 +110,9 @@ class StatisticsAdmin(ModelAdmin):
 
         return validation_dict
 
-    # @staticmethod
-    # def ajax_user_info(request):
-    #     user_id = request.GET.get('user_id')
-    #     try:
-    #         selected_user = User.objects.get(pk=user_id)
-    #     except:
-    #         return HttpResponseBadRequest("No such a user")
-    #
-    #     response_data = {
-    #         'user_name': selected_user.username
-    #     }
-    #
-    #     return JsonResponse(response_data)
-
-
     # @csrf_protect_m
     def statistics(self, request):
+
         if not request.user.is_superuser:
             raise PermissionDenied
 
@@ -125,15 +128,29 @@ class StatisticsAdmin(ModelAdmin):
 
             return render(request, 'admin/qa4sm_statistics.html', {'stats': stats})
 
-# def ajax_user_info(request):
-#     user_id = request.GET.get('user_id')
-#     try:
-#         selected_user = User.objects.get(pk=user_id)
-#     except:
-#         return HttpResponseBadRequest("No such a user")
-#
-#     response_data = {
-#         'user_name': selected_user.username
-#     }
-#
-#     return JsonResponse(response_data)
+
+@staff_member_required
+def ajax_user_info(request):
+    user_id = request.GET.get('user_id')
+    try:
+        selected_user = User.objects.get(pk=user_id)
+    except:
+        return HttpResponseBadRequest("No such a user")
+    try:
+        last_validation = ValidationRun.objects.order_by('start_time').filter(user_id=user_id).last().start_time
+        val_num = sorted_users_validation_query().get(user=user_id)['count']
+    except:
+        last_validation = None
+        val_num = 0
+
+    last_valid_time = get_time_as_string(last_validation, False)
+    last_login_time = get_time_as_string(selected_user.last_login, False)
+
+    response_data = {
+        'user_name': selected_user.username,
+        'val_num': val_num,
+        'last_validation': last_valid_time,
+        'last_login': last_login_time,
+    }
+
+    return JsonResponse(response_data)

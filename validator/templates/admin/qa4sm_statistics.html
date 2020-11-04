@@ -4,6 +4,8 @@
 {% block content %}
 <script src="/static/js/plotly-latest.min.js"></script>
 <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<link href="{% static 'css/service.css' %}" rel="stylesheet">
+
 
 <center> <h1> <b>QA4SM statistics</b> </h1> </center>
 <div>
@@ -13,11 +15,10 @@
     <h1> The user who runs validations most frequently is <b>{{stats.most_frequent_user.name}}</b> and he/she has run
         <b>{{stats.most_frequent_user.validation_num}}</b> by now</h1>
 
-    <!-- <a href="{% url 'home'%}">Here I should send ajax request</a> -->
 </div>
 <div>
     <h1>To see statistics on a particular user please choose the user from the list:
-        <select id="username">
+        <select id="users_list">
         {%for user in stats.users%}
             <option id='user_{{user.pk}}' value='{{user.id}}'> {{user.username}} </option>
         {%endfor%}
@@ -25,13 +26,18 @@
     </h1>
 </div>
 <div id='user_info' hidden>
-    Monika
-    <button id='hide_user_info' value='Hide'> Hide </button>
+  <h1>Information on user <span id='username'></span>:</h1>
+  Last login: <span id='last_login'></span> <br>
+  Number of validations: <span id='validation_number'></span> <br>
+  Last validation: <span id='last_validation'></span> <br>
+  Used datasets: <br>
+
+  <button id='hide_user_info' value='Hide'> Hide </button>
 </div>
 <div id="val_nums_by_users" class="plot_div"></div>
 <div id="validations_in_time" class="plot_div"></div>
 <div id="datasets_cumulative" class="plot_div"></div>
-<!-- <script type="text/javascript">
+<script type="text/javascript">
   // hiding ifo on a user
   $('#hide_user_info').on('click', function(){
     $('#user_info')[0].hidden = true;
@@ -39,29 +45,37 @@
  // showing info on a user
   function show_info(info){
     $('#user_info')[0].hidden = false;
-    console.log($('#username').val())
-    console.log(info)
-    // $('#user_info').text(info);
+    $('#username').text(info.username)
+    $('#validation_number').text(info.validations_num)
+    $('#last_validation').text(info.last_validation)
+    $('#last_login').text(info.last_login)
   }
-  var id = $('#username').val()
-  $("#username").change(ajax_show_user_info).change()
+
 
   // ajax to take info on a user
   function ajax_show_user_info(user_id) {
-      var url = 'admin/validator/statistics/user_id';
-      var user_id = $('#user_info').val()
+      var url = '/admin/validator/statistics/user_id';
+      var user_id = $('#users_list').val()
       $.ajax({
           url: url,
           data: {'user_id': user_id},
           success: function (return_data) {
-              var user_name = return_data['user_name'];
-              console.log(user_name)
-              show_info(user_name)
-          }
+              // var user_name = return_data['user_name'];
+              var info = {
+                'username': return_data['user_name'],
+                'validations_num': return_data['val_num'],
+                'last_validation': return_data['last_validation'],
+                'last_login': return_data['last_login']
+              }
+              show_info(info)
+              console.log(info.username, info.validations_num)
+        }
       });
   }
 
-</script> -->
+$("#users_list").change(ajax_show_user_info).change()
+
+</script>
 
 
 <script>
