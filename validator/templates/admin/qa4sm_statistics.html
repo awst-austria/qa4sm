@@ -6,37 +6,45 @@
 <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
 <link href="{% static 'css/service.css' %}" rel="stylesheet">
 
-
-<center> <h1> <b>QA4SM statistics</b> </h1> </center>
-<div>
+<section>
+    <center><h1><b>QA4SM statistics</b></h1></center>
+</section>
+<section>
     <h1> Currently we have <b>{{ stats.number_of_users }}</b> users </h1>
-    <h1> Up to now <b>{{ stats.number_of_validations }}</b> {% if stats.number_of_validations == 1 %} validation has {% else %}
+    <h1> Up to now <b>{{ stats.number_of_validations }}</b> {% if stats.number_of_validations == 1 %} validation has {%
+        else %}
         validations have {% endif%} been run</h1>
     <h1> The user who runs validations most frequently is <b>{{stats.most_frequent_user.name}}</b> and he/she has run
         <b>{{stats.most_frequent_user.validation_num}}</b> by now</h1>
-
-</div>
-<div>
+</section>
+<section>
     <h1>To see statistics on a particular user please choose the user from the list:
         <select id="users_list">
-        {%for user in stats.users%}
-            <option id='user_{{user.pk}}' value='{{user.id}}'> {{user.username}} </option>
-        {%endfor%}
+            <option disabled="True" selected="selected" value='None'>Please select</option>
+            <optgroup label='Users'>
+                {%for user in stats.users%}
+                <option id='user_{{user.pk}}' value='{{user.id}}'>{{user.username}}</option>
+                {%endfor%}
+            </optgroup>
         </select>
     </h1>
-</div>
-<div id='user_info' hidden>
-  <h1>Information on user <span id='username'></span>:</h1>
-  Last login: <span id='last_login'></span> <br>
-  Number of validations: <span id='validation_number'></span> <br>
-  Last validation: <span id='last_validation'></span> <br>
-  Used datasets: <br>
+</section>
 
-  <button id='hide_user_info' value='Hide'> Hide </button>
-</div>
+<section id='user_info' hidden>
+    <h1>Information on user <span id='username'></span>:</h1>
+    <div>
+        <h2>Last login: <span id='last_login'></span></h2>
+        <h2>Number of validations: <span id='validation_number'></span></h2>
+        <h2>Last validation: <span id='last_validation'></span></h2>
+        <h2>Used datasets: </h2>
+    </div>
+    <a href="#" id='hide_user_info'> Hide information</a>
+</section>
+
 <div id="val_nums_by_users" class="plot_div"></div>
 <div id="validations_in_time" class="plot_div"></div>
 <div id="datasets_cumulative" class="plot_div"></div>
+
 <script type="text/javascript">
   // hiding ifo on a user
   $('#hide_user_info').on('click', function(){
@@ -50,17 +58,15 @@
     $('#last_validation').text(info.last_validation)
     $('#last_login').text(info.last_login)
   }
-
-
   // ajax to take info on a user
   function ajax_show_user_info(user_id) {
+      // url is fixed, as it is admin site so its name is not visible here
       var url = '/admin/validator/statistics/user_id';
       var user_id = $('#users_list').val()
       $.ajax({
           url: url,
           data: {'user_id': user_id},
           success: function (return_data) {
-              // var user_name = return_data['user_name'];
               var info = {
                 'username': return_data['user_name'],
                 'validations_num': return_data['val_num'],
@@ -73,12 +79,37 @@
       });
   }
 
-$("#users_list").change(ajax_show_user_info).change()
+
+$("#users_list").change(ajax_show_user_info)
+$("#users_list").click(ajax_show_user_info)
 
 </script>
 
-
 <script>
+// Auxiliary functions for plotting:
+function datasets_stack_barplot(x_dataset, y_dataset, names){
+  /**
+ * Prepare data for stacked barplot, where stacked names are different for different bars
+ * @param  {[object]} x_dataset: [list with names of x-axis values (e.g. datasets)]
+ * @param  {[object]} y_dataset [list of values or other lists to be shown as bars (e.g. datasets versiosn)]
+ * @param  {[object]} names [list of values or other lists containing names of values shown as stacked bars (e.g. datasets names)]
+ * @return {[object]}[list of dicts ready to be used in plotly plot function]
+ */
+  var plot_data = []
+  for (var dataset_ind=0; dataset_ind<x_dataset.length; dataset_ind++){
+    for (var vers_ind=0; vers_ind<names[dataset_ind].length; vers_ind++){
+      var data = {
+        x: [x_dataset[dataset_ind]],
+        y: [y_dataset[dataset_ind][vers_ind]],
+        name: names[dataset_ind][vers_ind],
+        type: 'bar',
+      }
+      plot_data.push(data)
+    }
+  }
+  return plot_data
+}
+
 // Common plot parameters:
   // ============ Font size =================
   var title_font_size = 20;
@@ -94,27 +125,13 @@ $("#users_list").change(ajax_show_user_info).change()
   var versions_colors = ['rgb(0, 204, 204)', 'rgb(0, 204, 0)', 'rgb(204, 0, 0)', 'rgb(204, 0, 204)']
 
   //==========================================================================================
-    // Datasets counts
+    // Datasets counts - general
     var datasets_info = {{ stats.datasets_for_plot|safe }}
     var datasets = datasets_info.datasets
     var versions = datasets_info.versions
     var dataset_counts = datasets_info.dataset_count
 
-    var datasets_plot_data = []
-    for (var dataset_ind=0; dataset_ind<datasets.length; dataset_ind++){
-      for (var vers_ind=0; vers_ind<versions[dataset_ind].length; vers_ind++){
-        var data = {
-          x: [datasets[dataset_ind]],
-          y: [dataset_counts[dataset_ind][vers_ind]],
-          name: versions[dataset_ind][vers_ind],
-          type: 'bar',
-          // marker: {
-          //   color: versions_colors[vers_ind]
-          // }
-        }
-        datasets_plot_data.push(data)
-      }
-    }
+    var datasets_plot_data = datasets_stack_barplot(datasets, dataset_counts, versions)
 
     var datasets_plot_layout = {
       barmode: 'stack',
@@ -299,6 +316,7 @@ $("#users_list").change(ajax_show_user_info).change()
 };
 
 Plotly.newPlot(validations_in_time, validations_in_time_data, validations_in_time_layout);
+
 
 
 </script>
