@@ -34,6 +34,39 @@ def get_time_as_string(time_in_time_format, year_first=True):
     return time_as_str
 
 
+def get_dataset_info_by_user(user=None):
+    if user is not None:
+        try:
+            user_runs = user.validationrun_set.all()
+        except:
+            return None
+
+        configs = ValidationRun.objects.none()  # just an empty query, doesn't matter which model is used
+        for run in user_runs:
+            configs = run.dataset_configurations.all() | configs
+
+    datasets = Dataset.objects.all()
+    dataset_names = list(datasets.values_list('short_name', flat=True))
+    dataset_counts = []
+    dataset_versions = []
+    for dataset in datasets:
+        versions = dataset.versions.all()
+        version_counts = []
+        version_names = []
+        for version in versions:
+            if user is not None:
+                number = configs.filter(dataset=dataset, version=version).count()
+            else:
+                number = dataset.dataset_configurations.filter(version=version).count()
+            version_counts.append(number)
+            version_names.append(version.short_name)
+        dataset_counts.append(version_counts)
+        dataset_versions.append(version_names)
+    dataset_dict = {'datasets': dataset_names,
+                    'versions': dataset_versions,
+                    'dataset_count': dataset_counts}
+    return dataset_dict
+
 class StatisticsAdmin(ModelAdmin):
     __logger = logging.getLogger(__name__)
 
@@ -124,10 +157,9 @@ class StatisticsAdmin(ModelAdmin):
                      'most_frequent_user': self.most_frequent_user_info(),
                      'val_num_by_user_data': self.users_info_for_plot(),
                      'validations_for_plot': self.validation_info_for_plot(),
-                     'datasets_for_plot': self.dataset_info_for_plot()}
+                     'datasets_for_plot': get_dataset_info_by_user()}#self.dataset_info_for_plot()}
 
             return render(request, 'admin/qa4sm_statistics.html', {'stats': stats})
-
 
 @staff_member_required
 def ajax_user_info(request):
