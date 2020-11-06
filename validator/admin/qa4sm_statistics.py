@@ -92,26 +92,26 @@ class StatisticsAdmin(ModelAdmin):
                       'validations_num': validations_num}
         return users_dict
 
-    @staticmethod
-    def dataset_info_for_plot():
-        datasets = Dataset.objects.all()
-        dataset_names = list(datasets.values_list('short_name', flat=True))
-        dataset_numbers = []
-        dataset_versions = []
-        for dataset in datasets:
-            versions = dataset.versions.all()
-            version_counts = []
-            version_names = []
-            for version in versions:
-                number = dataset.dataset_configurations.filter(version=version).count()
-                version_counts.append(number)
-                version_names.append(version.short_name)
-            dataset_numbers.append(version_counts)
-            dataset_versions.append(version_names)
-        dataset_dict = {'datasets': dataset_names,
-                        'versions': dataset_versions,
-                        'dataset_count':dataset_numbers}
-        return dataset_dict
+    # @staticmethod
+    # def dataset_info_for_plot():
+    #     datasets = Dataset.objects.all()
+    #     dataset_names = list(datasets.values_list('short_name', flat=True))
+    #     dataset_numbers = []
+    #     dataset_versions = []
+    #     for dataset in datasets:
+    #         versions = dataset.versions.all()
+    #         version_counts = []
+    #         version_names = []
+    #         for version in versions:
+    #             number = dataset.dataset_configurations.filter(version=version).count()
+    #             version_counts.append(number)
+    #             version_names.append(version.short_name)
+    #         dataset_numbers.append(version_counts)
+    #         dataset_versions.append(version_names)
+    #     dataset_dict = {'datasets': dataset_names,
+    #                     'versions': dataset_versions,
+    #                     'dataset_count':dataset_numbers}
+    #     return dataset_dict
 
     @staticmethod
     def most_frequent_user_info():
@@ -175,6 +175,8 @@ def ajax_user_info(request):
         last_validation = None
         val_num = 0
 
+    datasets_used = get_dataset_info_by_user(selected_user)
+    print(datasets_used)
     last_valid_time = get_time_as_string(last_validation, False)
     last_login_time = get_time_as_string(selected_user.last_login, False)
 
@@ -183,6 +185,7 @@ def ajax_user_info(request):
         'val_num': val_num,
         'last_validation': last_valid_time,
         'last_login': last_login_time,
+        'datasets_used': datasets_used,
     }
 
     return JsonResponse(response_data)

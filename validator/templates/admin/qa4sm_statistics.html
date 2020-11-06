@@ -38,6 +38,7 @@
         <h2>Last validation: <span id='last_validation'></span></h2>
         <h2>Used datasets: </h2>
     </div>
+    <div id="user_datasets_plot" class="plot_div"></div>
     <a href="#" id='hide_user_info'> Hide information</a>
 </section>
 
@@ -58,6 +59,18 @@
     $('#last_validation').text(info.last_validation)
     $('#last_login').text(info.last_login)
   }
+
+  function user_datasets_plot(used_datasets, div_id){
+    console.log(used_datasets)
+    var datasets = used_datasets.datasets
+    var versions = used_datasets.versions
+    var dataset_counts = used_datasets.dataset_count
+
+    var datasets_plot_data = datasets_stack_barplot(datasets, dataset_counts, versions)
+    var layout = dataset_barplot_layout()
+    Plotly.react(div_id, datasets_plot_data,  layout);
+
+  }
   // ajax to take info on a user
   function ajax_show_user_info(user_id) {
       // url is fixed, as it is admin site so its name is not visible here
@@ -71,10 +84,13 @@
                 'username': return_data['user_name'],
                 'validations_num': return_data['val_num'],
                 'last_validation': return_data['last_validation'],
-                'last_login': return_data['last_login']
+                'last_login': return_data['last_login'],
+                'used_datasets': return_data['datasets_used']
               }
               show_info(info)
-              console.log(info.username, info.validations_num)
+              // console.log(info.used_datasets)
+              user_datasets_plot(info.used_datasets, 'user_datasets_plot')
+              // console.log(info.username, info.validations_num)
         }
       });
   }
@@ -110,6 +126,45 @@ function datasets_stack_barplot(x_dataset, y_dataset, names){
   return plot_data
 }
 
+function dataset_barplot_layout(){
+  var layout = {
+    barmode: 'stack',
+    plot_bgcolor: plot_bgcolor,
+    title: {
+      text:'Datasets counts',
+      font: {
+        family: title_font_type,
+        size: title_font_size,
+      },
+    yref: 'container',
+    y: 0.85
+      },
+    xaxis: {
+      title: {
+          text:'Datasets',
+          font: {
+            family: axis_font_type,
+            size: axis_font_size},
+            standoff: 10,
+          },
+      tickfont:{
+        size: tick_font_size,
+        family: tick_font_type
+      },
+      automargin: true
+    },
+    yaxis: {
+      title: {
+          text:'Counts',
+          font: {
+            family: axis_font_type,
+            size: axis_font_size}
+          }
+      }
+  }
+  return layout
+}
+
 // Common plot parameters:
   // ============ Font size =================
   var title_font_size = 20;
@@ -132,42 +187,7 @@ function datasets_stack_barplot(x_dataset, y_dataset, names){
     var dataset_counts = datasets_info.dataset_count
 
     var datasets_plot_data = datasets_stack_barplot(datasets, dataset_counts, versions)
-
-    var datasets_plot_layout = {
-      barmode: 'stack',
-      plot_bgcolor: plot_bgcolor,
-      title: {
-        text:'Datasets counts',
-        font: {
-          family: title_font_type,
-          size: title_font_size,
-        },
-      yref: 'container',
-      y: 0.85
-        },
-      xaxis: {
-        title: {
-            text:'Datasets',
-            font: {
-              family: axis_font_type,
-              size: axis_font_size},
-              standoff: 10,
-            },
-        tickfont:{
-          size: tick_font_size,
-          family: tick_font_type
-        },
-        automargin: true
-      },
-      yaxis: {
-        title: {
-            text:'Counts',
-            font: {
-              family: axis_font_type,
-              size: axis_font_size}
-            }
-        }
-    }
+    var datasets_plot_layout = dataset_barplot_layout()
 
   Plotly.react(datasets_cumulative, datasets_plot_data,  datasets_plot_layout);
   //==========================================================================================
