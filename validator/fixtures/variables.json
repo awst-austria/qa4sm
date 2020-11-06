@@ -139,7 +139,7 @@
             "pretty_name": "sm",
             "help_text": "-",
             "min_value": 0.0,
-            "max_value": 1.0
+            "max_value": 100.0
         }
     },
     {
