@@ -67,6 +67,7 @@ def get_dataset_info_by_user(user=None):
                     'dataset_count': dataset_counts}
     return dataset_dict
 
+
 class StatisticsAdmin(ModelAdmin):
     __logger = logging.getLogger(__name__)
 
@@ -106,14 +107,13 @@ class StatisticsAdmin(ModelAdmin):
         # here the date is converted to the format 'YYYY-MM-DD HH:MM' needed to plotply histogram
         time_list = []
         for time in validations_time:
-            # if the minute part is a single digit then 0 has to be added, otherwise it's not converted correctly
-            time_new_format = get_time_as_string(time)#f'{time.year}-{time.month}-{time.day} {time.hour}:{minute}'
+            time_new_format = get_time_as_string(time)
             time_list.append(time_new_format)
 
         first = validations_sorted_by_time.values_list('start_time', flat=True).first()
         first_time = [f'{first.year}-{first.month}-{first.day} 0:00:00']
         last = validations_sorted_by_time.values_list('start_time', flat=True).last()
-        last_time = [f'{last.year}-{last.month}-{last.day}']
+        last_time = [f'{last.year}-{last.month}-{last.day} 23:59:59']
 
         validation_dict = {'validations': validations_sorted_by_time,
                            'validations_time': time_list,
