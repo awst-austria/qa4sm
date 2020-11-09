@@ -41,7 +41,7 @@ def get_dataset_info_by_user(user=None):
         except:
             return None
 
-        configs = DatasetConfiguration.objects.none() # just an empty query
+        configs = DatasetConfiguration.objects.none()  # just an empty query
         for run in user_runs:
             configs = run.dataset_configurations.all() | configs
 
@@ -131,14 +131,15 @@ class StatisticsAdmin(ModelAdmin):
         users = User.objects.filter(is_active=True).order_by('pk')
         if request.method == "GET":
             stats = {'users': users,
-                     'number_of_users':  users.count(),
-                     'number_of_validations':  ValidationRun.objects.all().count(),
+                     'number_of_users': users.count(),
+                     'number_of_validations': ValidationRun.objects.all().count(),
                      'most_frequent_user': self.most_frequent_user_info(),
                      'val_num_by_user_data': self.users_info_for_plot(),
                      'validations_for_plot': self.validation_info_for_plot(),
-                     'datasets_for_plot': get_dataset_info_by_user()}#self.dataset_info_for_plot()}
+                     'datasets_for_plot': get_dataset_info_by_user()}  # self.dataset_info_for_plot()}
 
             return render(request, 'admin/qa4sm_statistics.html', {'stats': stats})
+
 
 @staff_member_required
 def ajax_user_info(request):
