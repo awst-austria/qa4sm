@@ -46,7 +46,9 @@ class DatasetConfigurationForm(forms.ModelForm):
         super(DatasetConfigurationForm, self).__init__(*args, **kwargs)
 
         if is_reference:
-            self.fields["dataset"].queryset = Dataset.objects.all()
+            # self.fields["dataset"].queryset = Dataset.objects.all()
+            # temporarily SMOS, SMAP and ASCAT are removed from the reference list
+            self.fields["dataset"].queryset = Dataset.objects.exclude(short_name__in=['SMOS', 'SMAP', 'ASCAT'])
         else:
             self.fields["dataset"].queryset = Dataset.objects.filter(is_only_reference=is_reference)
 
