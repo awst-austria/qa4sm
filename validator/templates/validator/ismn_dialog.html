@@ -83,14 +83,12 @@
                 <div>
                     <div></div>
                         <label for="depth_from">Depth from: </label>
-                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="depth_from"
-                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
+                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="depth_from" step="0.01" min="0.00">
                         <label for="depth_from">m</label>
                     </div>
                     <div>
                         <label for="depth_to">Depth to: </label>
-                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="depth_to"
-                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
+                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="depth_to" step="0.01" min="0.00">
                         <label for="depth_to">m</label>
                     </div>
 
@@ -302,6 +300,7 @@
         ajax_take_network_info(e)
     });
 
+
 // ------------------------ ISMN Depths -------------------------------------- //
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
@@ -322,8 +321,6 @@
           $('#'+hiddenId).val([depth_from, depth_to])
           $('#ismn_depth').modal('hide'); // closing the window
         }
-
-
 
 }
 
