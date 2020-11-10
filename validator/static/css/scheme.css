@@ -78,6 +78,10 @@
     color: #000;
 }
 
+div > label.custom-control-label{
+  width: 95%;
+}
+
 .alert-danger {
     color: rgb(255, 108, 92);
     background-color: rgba(255, 108, 92, .15);
