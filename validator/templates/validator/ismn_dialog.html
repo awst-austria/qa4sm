@@ -322,16 +322,16 @@
           $('#ismn_depth').modal('hide'); // closing the window
         }
 
-}
+    }
 
-function getDefaultParams(e, field_selector){
-    var callerId = e.relatedTarget.id;
-    var hiddenId = callerId.replace(/_link$/, '_params');
-    var default_values = $('#'+hiddenId).val()
-    var ismnDialog = $(e.currentTarget);
-    ismnDialog.find(field_selector).val(hiddenId); // remember where the selected depths need to go
-    return default_values
-}
+    function getDefaultParams(e, field_selector){
+        var callerId = e.relatedTarget.id;
+        var hiddenId = callerId.replace(/_link$/, '_params');
+        var default_values = $('#'+hiddenId).val()
+        var ismnDialog = $(e.currentTarget);
+        ismnDialog.find(field_selector).val(hiddenId); // remember where the selected depths need to go
+        return default_values
+    }
 
     function getDefaultRanges(e){
         var default_val = getDefaultParams(e, '#id_target_hidden_input_depth')

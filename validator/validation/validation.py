@@ -158,7 +158,6 @@ def create_pytesmo_validation(validation_run):
     datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
-    __logger.debug(f"Validation Run Tcol Field: {validation_run.tcol}")
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         # if there are 3 or more dataset, do TC, exclude ref metrics
@@ -170,13 +169,19 @@ def create_pytesmo_validation(validation_run):
                         dataset_names=ds_names,
                         other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
 
-    __logger.debug(f"MetricsCalculator: {metrics.__class__.__name__}")
+    if validation_run.scaling_method == validation_run.NO_SCALING:
+        scaling_method = None
+    else:
+        scaling_method = validation_run.scaling_method
+
+    __logger.debug(f"Scaling method: {scaling_method}")
+    __logger.debug(f"Scaling dataset: {scaling_ref_name}")
 
     val = Validation(
         datasets=datamanager,
         spatial_ref=ref_name,
         temporal_window=0.5,
-        scaling=validation_run.scaling_method,
+        scaling=scaling_method,
         scaling_ref=scaling_ref_name,
         metrics_calculators={(ds_num, ds_num): metrics.calc_metrics},
         period=period)
