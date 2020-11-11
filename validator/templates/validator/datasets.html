@@ -41,7 +41,7 @@
                 {% for dataset in datasets %}
                     {% if dataset.is_only_reference == ref_flag %}
                         <tr>
-                            <th scope="row">{{ dataset.pretty_name }}{% if dataset.short_name == 'SMOS' or dataset.short_name == 'SMAP' or dataset.short_name == 'ASCAT' %}<sup>*</sup>{% endif %}</th>
+                            <th scope="row">{{ dataset.pretty_name }}{% if dataset.short_name in not_as_reference %}<sup>*</sup>{% endif %}</th>
                             <td>{{ dataset.detailed_description |safe }}</td>
                             <td>
                                 <ul>
