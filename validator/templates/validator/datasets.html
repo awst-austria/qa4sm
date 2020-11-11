@@ -42,6 +42,7 @@
                     {% if dataset.is_only_reference == ref_flag %}
                         <tr>
                             <th scope="row">{{ dataset.pretty_name }}{% if dataset.short_name in not_as_reference %}<sup>*</sup>{% endif %}</th>
+
                             <td>{{ dataset.detailed_description |safe }}</td>
                             <td>
                                 <ul>
@@ -74,7 +75,7 @@
             </tbody>
         </table>
         {% if not ref_flag %}
-            <sup>*</sup> data temporarily excluded from the reference list for technical reasons<br>
+            <sup>*</sup> dataset temporarily excluded from the reference list for technical reasons<br>
         {% endif %}
         <br>
     {% endfor %}

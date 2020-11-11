@@ -554,6 +554,7 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
+
     # @pytest.mark.long_running
     # def test_validation_smap_ref(self):
     #     run = self.generate_default_validation()
@@ -597,6 +598,7 @@ class TestValidation(TestCase):
     #     assert new_run.ok_points == 15, "OK points are off"
     #     self.check_results(new_run)
     #     self.delete_run(new_run)
+
 
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
