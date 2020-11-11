@@ -7,6 +7,7 @@ from validator.models import DatasetConfiguration
 from validator.models.filter import DataFilter
 from validator.forms.custom_widgets import ParamFilterChoiceField,\
     ParamFilterSelectMultiple
+from validator.validation.globals import NOT_AS_REFERENCE
 
 # https://docs.djangoproject.com/en/2.2/ref/forms/fields/#django.forms.ModelChoiceField
 # make sure the pretty name is used in the dropdown for the dataset selection
@@ -48,7 +49,7 @@ class DatasetConfigurationForm(forms.ModelForm):
         if is_reference:
             # self.fields["dataset"].queryset = Dataset.objects.all()
             # temporarily SMOS, SMAP and ASCAT are removed from the reference list
-            self.fields["dataset"].queryset = Dataset.objects.exclude(short_name__in=['SMOS', 'SMAP', 'ASCAT'])
+            self.fields["dataset"].queryset = Dataset.objects.exclude(short_name__in=NOT_AS_REFERENCE)
         else:
             self.fields["dataset"].queryset = Dataset.objects.filter(is_only_reference=is_reference)
 
