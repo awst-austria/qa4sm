@@ -467,20 +467,6 @@
                                         <div class="container">
                                             <div class="row">
 
-                                                <div class="col-sm px-0 pr-sm-2 pb-1 py-sm-0">
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
-                                                        </div>
-                                                        {% render_field val_form.scaling_ref class="custom-select" %}
-                                                    </div>
-                                                    {% for error in val_form.scaling_ref.errors %}
-                                                        <div class="custom-invalid-feedback">
-                                                            {{ error }}
-                                                        </div>
-                                                    {% endfor %}
-                                                </div>
-
                                                 <div class="col-sm px-0 pl-sm-2 pt-1 py-sm-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
@@ -489,6 +475,20 @@
                                                         {% render_field val_form.scaling_method class="custom-select" %}
                                                     </div>
                                                     {% for error in val_form.scaling_method.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                 <div class="col-sm scaling-ref px-0 pr-sm-2 pb-1 py-sm-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
+                                                        </div>
+                                                        {% render_field val_form.scaling_ref class="custom-select" %}
+                                                    </div>
+                                                    {% for error in val_form.scaling_ref.errors %}
                                                         <div class="custom-invalid-feedback">
                                                             {{ error }}
                                                         </div>
@@ -702,7 +702,7 @@
         function onChangeAnomalies() {
             var anomMethod = $(this).val();
             var dateBoxes = $('div.anomalies-period');
-            var dateSelectors = dateBoxes.find('select')
+            var dateSelectors = dateBoxes.find('select');
 
             if(anomMethod == 'climatology') {
                 dateSelectors.prop('disabled', false);
@@ -713,6 +713,20 @@
             }
         }
         $('#{{ val_form.anomalies.auto_id }}').change(onChangeAnomalies).change(); // last change() to call change on pageload
+    </script>
+
+    <script type="text/javascript">
+        function onChangeScaleMethod() {
+            var scaleMethod = $(this).val();
+            var scaleRefBox = $('div.scaling-ref');
+
+            if(scaleMethod == 'none') {
+                scaleRefBox.css('visibility', 'hidden');
+            } else {
+                scaleRefBox.css('visibility', 'visible');
+            }
+        }
+        $('#{{ val_form.scaling_method.auto_id }}').change(onChangeScaleMethod).change(); // last change() to call change on pageload
     </script>
 
     <script type="text/javascript">
