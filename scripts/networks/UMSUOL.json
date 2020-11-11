@@ -1,1 +1,0 @@
-{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"station_name": "SanPietroCapofiume", "depth_from": "[0.1  0.25 0.45 0.7  1.   1.35 1.8 ]", "depth_to": "[0.1  0.25 0.45 0.7  1.   1.35 1.8 ]", "network": "UMSUOL"}, "geometry": {"type": "Point", "coordinates": [11.62263, 44.65378]}}]}

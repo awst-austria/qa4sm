@@ -1,1 +1,0 @@
-{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"station_name": "Suresan", "depth_from": "[0.]", "depth_to": "[0.1]", "network": "HYU-CHEONGMICHEON"}, "geometry": {"type": "Point", "coordinates": [127.4699, 37.0382]}}]}

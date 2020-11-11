@@ -1,1 +1,0 @@
-{"type": "FeatureCollection", "features": [{"type": "Feature", "properties": {"station_name": "Selmacheon", "depth_from": "[0.]", "depth_to": "[0.1]", "network": "HSC-SELMACHEON"}, "geometry": {"type": "Point", "coordinates": [126.9569, 37.9353]}}]}
