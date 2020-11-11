@@ -99,7 +99,7 @@ class TestViews(TransactionTestCase):
         self.public_views = ['login', 'logout', 'home', 'published_results', 'signup', 'signup_complete', 'terms',
                              'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done',
                              'password_reset_complete', 'user_profile_deactivated']
-        self.parameter_views = ['result', 'ajax_get_dataset_options', 'ajax_get_version_id', 'password_reset_confirm', 'stop_validation']
+        self.parameter_views = ['result', 'ajax_get_dataset_options', 'ajax_get_version_id', 'password_reset_confirm', 'stop_validation', 'ajax_get_ismn_geodata']
         self.private_views = [p.name for p in urlpatterns if hasattr(p,
                                                                      'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
