@@ -176,12 +176,14 @@
             networkList += netCB.value + ',';
         }
         networkList = networkList.replace(/,+$/, ''); //remove the last coma
+        window.ismn_network_filter.selected_networks = networkList.split(',');
 
         if (networkList.length == 0){
           alert('You did not choose any network. Please choose at least one network.')
         }else {
           $('#'+hiddenId).val(networkList);
           $('#ismn_networks').modal('hide') //hide the window
+            update_ismn_networks_to_display();
         }
     }
 
@@ -258,6 +260,7 @@
             // some text manipulation: clean string from whitespace and separation based on comas
           preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
           var netList = preselectedNetworks.split(',');
+          window.ismn_network_filter.selected_networks = netList;
 
           // reset dialog:
           ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
@@ -279,6 +282,7 @@
                   $(element).prop('checked', false);
               }
           });
+          update_ismn_networks_to_display();
         }
 
         function ajax_take_network_info(e) {
@@ -294,13 +298,17 @@
                     filter_networks(e)
                 }
             });
-
         }
 
 
     $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
         ajax_take_network_info(e)
     });
+
+    function networkUpdate(){
+        let versionId = $('#id_target_hidden_input_version').val();
+        console.log("Network update: "+versionId)
+    }
 
 
 // ------------------------ ISMN Depths -------------------------------------- //
