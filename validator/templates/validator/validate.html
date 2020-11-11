@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}" version-options-url="{% url 'ajax_get_version_id' %}">
+    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}" version-options-url="{% url 'ajax_get_version_id' %}" ismn-geodata-url="{% url 'ajax_get_ismn_geodata' %}">
         {% csrf_token %}
 
         {% with WIDGET_ERROR_CLASS='is-invalid' %}
@@ -564,12 +564,20 @@
 
 
     <script type="text/javascript">
+        //prepare ismn network filter for later use
+        window.ismn_network_filter={
+            'dataset_version_id': '',
+            'selected_networks':[]
+        }
+        window.ismn_stations = []
+
         var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
-        var map = L.map('spatialFilterMap', { maxBounds: bounds });
+        var map = L.map('spatialFilterMap', { maxBounds: bounds, preferCanvas: true });
         var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
         var osm = new L.TileLayer(osmUrl, {minZoom: 1, maxZoom: 20, attribution: osmAttrib});
         var drawnItems = new L.FeatureGroup();
+        var selectedStations = L.featureGroup();
         var drawControl = new L.Control.Draw({
             draw: {
                 polygon: false,
@@ -583,6 +591,7 @@
             }
         });
         map.addLayer(drawnItems);
+        map.addLayer(selectedStations);
         map.addControl(drawControl);
         map.setView(new L.LatLng(48.2, 16.37), 3.4);
         map.addLayer(osm);
@@ -621,6 +630,19 @@
             }
         }
 
+        function displaySelectedStations() {
+            selectedStations.clearLayers();
+            for (var i = 0; i < window.ismn_stations.length; i++) {
+                L.geoJSON(JSON.parse(window.ismn_stations[i]), {onEachFeature: showStationProperties}).addTo(selectedStations);
+            }
+        }
+
+        function showStationProperties(feature, layer) {
+            if (feature.properties) {
+                layer.bindPopup('<table><tbody><tr><td>Network</td><td>'+feature.properties.network+'</td></tr><tr><td>Station</td><td>'+feature.properties.station_name+'</td></tr><tr><td>Depth from</td><td>'+feature.properties.depth_from+'</td></tr><tr><td>Depth to</td><td>'+feature.properties.depth_from+'</td></tr></tbody></table>');
+            }
+        }
+
         map.on('draw:created', function (e) {
             var type = e.layerType, layer = e.layer;
 
@@ -641,6 +663,7 @@
                 map.invalidateSize();
                 drawnItems.clearLayers();
                 drawBoxFromCoordinates()
+                displaySelectedStations();
                 }, 10 /* ms */);
         });
     </script>
@@ -695,6 +718,7 @@
                     } else{
                         $('#id_target_hidden_input_version').val('')
                     }
+                    $(version_widget).change();
 
                 }
             });
@@ -963,13 +987,31 @@
             var currentObject = obj.currentTarget
             var removeButton = $(buttonSelector)
             $(currentObject).after(removeButton)
+        }
 
+    </script>
 
-}
+    <script type="text/javascript">
+     $("#{{ ref_dc_form.version.auto_id }}").change(update_selected_dataset_version_id);
+        function update_selected_dataset_version_id(e){
+            if($(this).val()==""){
+                window.ismn_network_filter.dataset_version_id = $('#{{ ref_dc_form.version.auto_id }} option:eq(0)').val();
+            }else {
+                window.ismn_network_filter.dataset_version_id = $(this).val();
+            }
+            update_ismn_networks_to_display();
+        }
 
-
-
-
+        function update_ismn_networks_to_display(){
+            let url = $("#validation_form").attr("ismn-geodata-url")
+            $.ajax({
+                url: url,
+                data: {'filter':JSON.stringify(window.ismn_network_filter)},
+                success: function (return_data) {
+                    window.ismn_stations = return_data['geodata']
+                }
+            });
+        }
     </script>
 
 {% endblock %}

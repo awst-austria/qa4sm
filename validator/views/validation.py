@@ -1,4 +1,5 @@
 import logging
+import json
 from datetime import datetime
 from multiprocessing import Process
 from re import sub as regex_subs
@@ -204,12 +205,38 @@ def ajax_get_version_id(request):
         version = DatasetVersion.objects.get(pk=int(version_id))
         networks = version.network_version.all()
         continents = networks.values('continent').distinct().values_list('continent', flat=True)
-        network_dict =  {continent: [(network.name, network.country, network.number_of_stations) for network in networks.filter(continent=continent)] for continent in continents}
-    except:
+        network_dict = {continent: [(network.name, network.country, network.number_of_stations) for network in networks.filter(continent=continent)] for continent in continents}
+    except Exception as e:
+        __logger.exception("Could not retrieve ISMN network properties", e)
         return HttpResponseBadRequest("Not a valid dataset version")
 
     response_data = {
         'network': network_dict
         }
 
+    return JsonResponse(response_data)
+
+@login_required(login_url='/login/')
+def ajax_get_ismn_geodata(request):
+    response_data = {}
+    station_filter = json.loads(request.GET.get('filter'))
+    selected_networks = station_filter['selected_networks']
+
+    try:
+        version = DatasetVersion.objects.get(pk=int(station_filter['dataset_version_id']))
+        networks = version.network_version.all()
+        geodata_list = []
+
+        if len(selected_networks) == 0: # No filter set
+            for network in networks:
+                geodata_list.append(network.station_info)
+        else:
+            for network in networks:
+                if network.name in selected_networks:
+                    geodata_list.append(network.station_info)
+
+    except Exception as e:
+        __logger.exception("Could not retrieve ISMN geodata", e)
+
+    response_data['geodata'] = geodata_list
     return JsonResponse(response_data)
