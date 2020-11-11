@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0020_auto_20200902_0756'),
+        ('validator', '0022_auto_20201110_1524'),
     ]
 
     operations = [
