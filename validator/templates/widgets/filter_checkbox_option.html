@@ -1,7 +1,3 @@
-<!--A general idead behind is: if it is a parametrised filter then the checkbox has id with _p (and it's disabled) at the end
-    and a hidden input is created with the appropriate id so that it can pass the filter id into the database - therefore,
-    depending on an IDE id="{{ widget.attrs.id }}" migth be marked as an error, but there is if statement so it's not an error! -->
-
 <div class="custom-control custom-switch">
     <input class="custom-control-input"
            {% if widget.parameterised  %} id="{{ widget.attrs.id }}_checkbox" {% else %} id="{{ widget.attrs.id }}"  {% endif %}
