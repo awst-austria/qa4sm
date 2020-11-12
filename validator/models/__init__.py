@@ -9,3 +9,5 @@ from .dataset_configuration import DatasetConfiguration
 from .validation_run import ValidationRun
 from .celery_task import CeleryTask
 from .statistics import Statistics
+from .networks import ISMNNetworks
+

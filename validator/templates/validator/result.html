@@ -95,7 +95,9 @@
                             {% if val.tcol %} activated. {% else %} deactivated. {% endif %}
                         </li>
 
-                        <li>Scaling reference: {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
+                        {% if val.scaling_method != 'none' %}
+                            <li>Scaling reference:
+                            {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
                                     [Filters:
                                     {% if not val.scaling_ref.filters.all and not val.scaling_ref.parametrisedfilter_set.all %}
                                         none
@@ -103,7 +105,11 @@
                                         {% for filter in val.scaling_ref.filters.all %} {{ filter.description }}; {% endfor %}
                                         {% for pfilter in val.scaling_ref.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
                                     {% endif %}]
-                        </li>
+                            </li>
+                        {% else %}
+                            <li>Scaling reference: {{ val.get_scaling_method_display }}.</li>
+                        {% endif %}
+
                         <li>Scaling method: {{ val.get_scaling_method_display }}.</li>
 
                         <li>Processing took {{ run_time }} minutes (wall time).</li>
