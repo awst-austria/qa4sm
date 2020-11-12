@@ -77,7 +77,7 @@
 .custom-switch .custom-control-input[name='ref-parametrised_filters']:disabled:checked+label{
     color: #000;
 }
-div > label.custom-control-label{
+#dc_form_container div > label.custom-control-label{
   width: 95%;
 }
 
