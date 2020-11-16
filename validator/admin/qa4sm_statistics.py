@@ -156,7 +156,6 @@ def ajax_user_info(request):
         val_num = 0
 
     datasets_used = get_dataset_info_by_user(selected_user)
-    print(datasets_used)
     last_valid_time = get_time_as_string(last_validation, False)
     last_login_time = get_time_as_string(selected_user.last_login, False)
 
