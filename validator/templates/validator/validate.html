@@ -934,9 +934,17 @@
 
 }
 
-
-
-
     </script>
+    
+    <!-- datepicker widget -->
+    <link href ="/static/css/jquery-ui.css" rel = "stylesheet">
+    <script src="/static/js/jquery-ui-1.12.1.js"></script>
+    <script>
+     $(function() {
+        $( "#id_interval_from" ).datepicker();
+        $( "#id_interval_to" ).datepicker();
+     });
+    </script>
+
 
 {% endblock %}
