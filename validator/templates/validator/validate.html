@@ -936,20 +936,47 @@
 
     </script>
 
-
     <!-- datepicker widget -->
     <link href ="/static/css/jquery-ui.css" rel = "stylesheet">
     <script src="/static/js/jquery-ui-1.12.1.js"></script>
     <script>
-    function setTheFirstDayActive(){
-      var day = $(this).val().slice(-2)
-      var year = $('select.ui-datepicker-year').val()
-      var month = parseInt($('select.ui-datepicker-month').val()) + 1
-      if(month<=9){
-        month = '0' + month
-      }
-      $(this).val(year+'-'+month+'-'+day)
+    function setTheDate(){
+      // This is a function which set chosen date in the input field when
+      // a change of a month or a year is done
 
+      // need to know what casuses the change
+      var event_target = event.target;
+      var tagName = event_target.tagName;
+      day = '01' // always set the first day, it's not that important
+      var year = parseInt($('select.ui-datepicker-year').val());
+      if(tagName=='SELECT'){
+        // if it is a select just take a month number and add 1 because they start with 0
+        var month = parseInt($('select.ui-datepicker-month').val()) + 1;
+      } else if (tagName=='SPAN') {
+        // if changes are done with arrows I am taking it from the field and
+        // just add or subtract 1
+        var month = parseInt($(this).val().slice(-5, -3));
+        if(event_target.textContent=='Next'){
+          month += 1
+          // change of the year
+          if(month>12){
+            month = 1;
+            year +=1;
+          };
+        } else if (event_target.textContent=='Prev') {
+          month -= 1
+          // change of the year
+          if (month == 0){
+            month = 12;
+            year -= 1;
+          };
+        };
+      };
+
+      // add zero to look nice
+      if(month<=9){month = '0' + month};
+      // set the appropriate date
+      $(this).val(year+'-'+month+'-'+day);
     }
 
     var dates_settings = {
@@ -957,9 +984,12 @@
       changeMonth: true,
       changeYear: true,
       showButtonPanel: true,
-      onChangeMonthYear: setTheFirstDayActive,
+      onChangeMonthYear: setTheDate,
       closeText: 'Apply',
       showMonthAfterYear: true,
+      navigationAsDateFormat: true,
+      showOn: "button",
+      buttonText: ""
     }
 
      $(function() {
