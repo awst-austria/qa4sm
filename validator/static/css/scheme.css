@@ -315,4 +315,13 @@ label[for="depth_to"]{
 label[for="depth_from"]{
     margin-right: .12rem;
 }
+button.ui-datepicker-current {
+    display: none;
+}
 
+button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all {
+    float: right;
+    font-weight: normal;
+    background: #00AAE3;
+    color: #FFFFFF
+}
