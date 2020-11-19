@@ -949,19 +949,22 @@
         month = '0' + month
       }
       $(this).val(year+'-'+month+'-'+day)
+
+    }
+
+    var dates_settings = {
+      dateFormat:'yy-mm-dd',
+      changeMonth: true,
+      changeYear: true,
+      showButtonPanel: true,
+      onChangeMonthYear: setTheFirstDayActive,
+      closeText: 'Apply',
+      showMonthAfterYear: true,
     }
 
      $(function() {
-        $( "#id_interval_from" ).datepicker({
-          changeMonth: true,
-          changeYear: true,
-          showButtonPanel: true,
-          onChangeMonthYear: setTheFirstDayActive
-        });
-        $( "#id_interval_to" ).datepicker({
-          changeMonth: true,
-          changeYear: true
-        });
+        $( "#id_interval_from" ).datepicker(dates_settings);
+        $( "#id_interval_to" ).datepicker(dates_settings);
      });
     </script>
 
