@@ -936,14 +936,27 @@
 
     </script>
 
+
     <!-- datepicker widget -->
     <link href ="/static/css/jquery-ui.css" rel = "stylesheet">
     <script src="/static/js/jquery-ui-1.12.1.js"></script>
     <script>
+    function setTheFirstDayActive(){
+      var day = $(this).val().slice(-2)
+      var year = $('select.ui-datepicker-year').val()
+      var month = parseInt($('select.ui-datepicker-month').val()) + 1
+      if(month<=9){
+        month = '0' + month
+      }
+      $(this).val(year+'-'+month+'-'+day)
+    }
+
      $(function() {
         $( "#id_interval_from" ).datepicker({
           changeMonth: true,
-          changeYear: true
+          changeYear: true,
+          showButtonPanel: true,
+          onChangeMonthYear: setTheFirstDayActive
         });
         $( "#id_interval_to" ).datepicker({
           changeMonth: true,
