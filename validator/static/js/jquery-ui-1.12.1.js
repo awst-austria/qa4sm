@@ -7224,7 +7224,7 @@ function Datepicker() {
 	this._mainDivId = "ui-datepicker-div"; // The ID of the main datepicker division
 	this._inlineClass = "ui-datepicker-inline"; // The name of the inline marker class
 	this._appendClass = "ui-datepicker-append"; // The name of the append marker class
-	this._triggerClass = "ui-datepicker-trigger"; // The name of the trigger marker class
+	this._triggerClass = "ui-datepicker-trigger btn btn-primary fas fa-calendar-alt"; // The name of the trigger marker class
 	this._dialogClass = "ui-datepicker-dialog"; // The name of the dialog marker class
 	this._disableClass = "ui-datepicker-disabled"; // The name of the disabled covering marker class
 	this._unselectableClass = "ui-datepicker-unselectable"; // The name of the unselectable cell marker class
