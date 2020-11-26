@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}">
+    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}" version-options-url="{% url 'ajax_get_version_id' %}">
         {% csrf_token %}
 
         {% with WIDGET_ERROR_CLASS='is-invalid' %}
@@ -163,6 +163,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="ref-addon2">Version</span>
                                                 </div>
+                                                <input type="hidden" id="id_target_hidden_input_version" value="" name="target_hidden_input_version">
                                                 {% render_field ref_dc_form.version class="custom-select" %}
                                             </div>
                                             {% for error in ref_dc_form.version.errors %}
@@ -467,20 +468,6 @@
                                         <div class="container">
                                             <div class="row">
 
-                                                <div class="col-sm px-0 pr-sm-2 pb-1 py-sm-0">
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
-                                                        </div>
-                                                        {% render_field val_form.scaling_ref class="custom-select" %}
-                                                    </div>
-                                                    {% for error in val_form.scaling_ref.errors %}
-                                                        <div class="custom-invalid-feedback">
-                                                            {{ error }}
-                                                        </div>
-                                                    {% endfor %}
-                                                </div>
-
                                                 <div class="col-sm px-0 pl-sm-2 pt-1 py-sm-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
@@ -489,6 +476,20 @@
                                                         {% render_field val_form.scaling_method class="custom-select" %}
                                                     </div>
                                                     {% for error in val_form.scaling_method.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                 <div class="col-sm scaling-ref px-0 pr-sm-2 pb-1 py-sm-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
+                                                        </div>
+                                                        {% render_field val_form.scaling_ref class="custom-select" %}
+                                                    </div>
+                                                    {% for error in val_form.scaling_ref.errors %}
                                                         <div class="custom-invalid-feedback">
                                                             {{ error }}
                                                         </div>
@@ -560,6 +561,7 @@
 
     <link rel="stylesheet" href="/static/leaflet/leaflet.draw.css" />
     <script src="/static/leaflet/leaflet.draw.js"></script>
+
 
     <script type="text/javascript">
         var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
@@ -666,7 +668,9 @@
         function ajax_change_dataset() {
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
+            // var datasetName = $(this).text();
             var widgetId = $(this).attr('id');
+            var datasetName = $(`#${widgetId} option[value=${datasetId}]`).text()
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
             $.ajax({
@@ -682,9 +686,22 @@
                     $(variable_widget).html(return_data['variables']);
                     $(filter_widget).html(return_data['filters']);
                     $(param_filter_widget).html(return_data['paramfilters']);
+
+                    console.log(datasetId, datasetName)
+
+                    if(datasetName=='ISMN'){
+                        var default_value = $(version_widget).find('option')[0].value
+                        $('#id_target_hidden_input_version').val(default_value)
+                    } else{
+                        $('#id_target_hidden_input_version').val('')
+                    }
+
                 }
             });
+
         }
+
+
 
         function change_tab_name() {
             var datasetName = $(this).find('option:selected').text();
@@ -695,14 +712,30 @@
         {% for dc_form in dc_formset.forms %}
             $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
         {% endfor %}
+
+        function get_version_id(){
+            var versionId = $(this).val();
+            $('#id_target_hidden_input_version').val(versionId)
+            // additionally set up default networks
+            var hiddenField = $('#id_target_hidden_input')
+            if(hiddenId = $('#id_target_hidden_input').val()){
+              var hiddenId = $('#id_target_hidden_input').val()
+              var default_params = $('#' + hiddenId).attr('data-default_val')
+              $('#' + hiddenId).val(default_params)
+            }
+        }
+
+
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
+        $('#id_ref-version').change(get_version_id)
+
     </script>
 
     <script type="text/javascript">
         function onChangeAnomalies() {
             var anomMethod = $(this).val();
             var dateBoxes = $('div.anomalies-period');
-            var dateSelectors = dateBoxes.find('select')
+            var dateSelectors = dateBoxes.find('select');
 
             if(anomMethod == 'climatology') {
                 dateSelectors.prop('disabled', false);
@@ -713,6 +746,20 @@
             }
         }
         $('#{{ val_form.anomalies.auto_id }}').change(onChangeAnomalies).change(); // last change() to call change on pageload
+    </script>
+
+    <script type="text/javascript">
+        function onChangeScaleMethod() {
+            var scaleMethod = $(this).val();
+            var scaleRefBox = $('div.scaling-ref');
+
+            if(scaleMethod == 'none') {
+                scaleRefBox.css('visibility', 'hidden');
+            } else {
+                scaleRefBox.css('visibility', 'visible');
+            }
+        }
+        $('#{{ val_form.scaling_method.auto_id }}').change(onChangeScaleMethod).change(); // last change() to call change on pageload
     </script>
 
     <script type="text/javascript">
@@ -866,7 +913,7 @@
 
                     var current_tab = $(all_next_tabs[i])
                     var current_container = $(all_next_containers[i])
-                    console.log('current container', current_container)
+
 
                     var old_id = current_container.attr('id')
 
