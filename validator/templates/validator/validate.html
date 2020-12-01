@@ -687,12 +687,12 @@
                     $(param_filter_widget).html(return_data['paramfilters']);
 
                     if(datasetName=='ISMN'){
-                        var default_value = $(version_widget).find('option')[0].value
-                        $('#id_target_hidden_input_version').val(default_value)
+                        var default_value = $(version_widget).find('option')[0].value;
+                        $('#id_target_hidden_input_version').val(default_value);
                     } else{
-                        $('#id_target_hidden_input_version').val('')
-                    }
-                    start_ajax_to_set_valiadtion_period()
+                        $('#id_target_hidden_input_version').val('');
+                    };
+                    start_ajax_to_set_valiadtion_period();
                 }
             });
         }
@@ -710,7 +710,6 @@
            will call func1 with argument 'intervals_from', func2 with 'intervals_to' and func3 with both of them.
            Functions passed as a list must accept only one object-like argument.
           */
-
             var url = $("#validation_form").attr("version-info-url");
             $.ajax({
                 url: url,
@@ -722,10 +721,10 @@
                   // calling functions given in the functions list
                   ind = 0
                   for (func in funcs_set){
-                    // taking values of arguments passed in the parameter args_names and creating a list of them
-                    param_list = get_list_of_params(arguments[0], args_names[ind])
-                    funcs_set[func](param_list)
-                    ind++
+                    // taking values of arguments passed in the parameter args_names and creating a list of their values
+                    param_list = get_list_of_params(arguments[0], args_names[ind]);
+                    funcs_set[func](param_list);
+                    ind++;
                   };
                 }
             });
@@ -761,37 +760,47 @@
           function convert_date_to_string(date){
             // Converts date from Date() constructor to date format YYYY-MM-DD
             var year = date.getFullYear();
-            var month = date.getMonth()+1
-            if(month<=9){month = '0'+month}
-            var day = date.getDate()
-            if(day<=9){day = '0' + day}
-            return year + '-' + month + '-' + day
-          }
+            var month = date.getMonth()+1;
+            if(month<=9){month = '0'+month};
+            var day = date.getDate();
+            if(day<=9){day = '0' + day};
+            return year + '-' + month + '-' + day;
+          };
 
           function compare_and_set_time_ranges(params){
+            /**
+             * Compares given time ranges and sets the appropriate ones
+                into From and To fields in Validation Period section
+             * @param  {object} params list consisting of two lists: intervals_from and intervals_to
+            */
+
+            // take appropriate elements from params
             var intervals_from = params[0];
             var intervals_to = params[1];
             dates_from = [];
             dates_to = [];
+            // convert string into date
             for (ind=0; ind<intervals_from.length; ind++){
               dates_from.push(new Date(intervals_from[ind]));
               dates_to.push(new Date(intervals_to[ind]));
-            }
+            };
 
+            // get maximum date from and minimum date to
             var max_date_from = new Date(Math.max.apply(null, dates_from));
             var min_date_to = new Date(Math.min.apply(null, dates_to));
 
-            var max_date_from_str = convert_date_to_string(max_date_from)
-            var min_date_to_str = convert_date_to_string(min_date_to)
-            console.log(max_date_from_str, min_date_to_str)
+            //reconvert date to string
+            var max_date_from_str = convert_date_to_string(max_date_from);
+            var min_date_to_str = convert_date_to_string(min_date_to);
 
-            $('#id_interval_from').val(max_date_from_str)
-            $('#id_interval_to').val(min_date_to_str)
+            //set appropriate values
+            $('#id_interval_from').val(max_date_from_str);
+            $('#id_interval_to').val(min_date_to_str);
           }
 
           function start_ajax_to_set_valiadtion_period(){
-            var versionIds = find_current_ids()
-            ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']])
+            var versionIds = find_current_ids();
+            ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
           }
 //================================================================================
         function change_tab_name() {
