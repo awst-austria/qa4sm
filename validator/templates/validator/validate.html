@@ -779,9 +779,7 @@
             }
 
             var max_date_from = new Date(Math.max.apply(null, dates_from));
-            console.log(max_date_from)
             var min_date_to = new Date(Math.min.apply(null, dates_to));
-            console.log(min_date_to)
 
             var max_date_from_str = convert_date_to_string(max_date_from)
             var min_date_to_str = convert_date_to_string(min_date_to)
@@ -790,8 +788,6 @@
             $('#id_interval_from').val(max_date_from_str)
             $('#id_interval_to').val(min_date_to_str)
           }
-
-
 
           function start_ajax_to_set_valiadtion_period(){
             var versionIds = find_current_ids()
@@ -806,6 +802,7 @@
 
         {% for dc_form in dc_formset.forms %}
             $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
+            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_valiadtion_period)
         {% endfor %}
 
         function get_version_id(){
@@ -822,7 +819,7 @@
 
 
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id)
+        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
 
     </script>
 
@@ -1066,6 +1063,7 @@
 
         $('#remove_dc_form').click(function() {
             removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
+            start_ajax_to_set_valiadtion_period();
         });
 
         function shiftTheButton(obj, buttonSelector){
