@@ -233,8 +233,8 @@ def ajax_get_version_info(request):
         else:
             time_from = version.time_range_start
             time_to = version.time_range_end
-    intervals_from.append(time_from)
-    intervals_to.append(time_to)
+        intervals_from.append(time_from)
+        intervals_to.append(time_to)
 
     response_data = {
         'intervals_from': intervals_from,
