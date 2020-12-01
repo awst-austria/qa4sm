@@ -668,9 +668,8 @@
         function ajax_change_dataset() {
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
-            // var datasetName = $(this).text();
             var widgetId = $(this).attr('id');
-            var datasetName = $(`#${widgetId} option[value=${datasetId}]`).text()
+            var datasetName = $(`#${widgetId} option[value=${datasetId}]`).text();
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
             $.ajax({
@@ -687,20 +686,31 @@
                     $(filter_widget).html(return_data['filters']);
                     $(param_filter_widget).html(return_data['paramfilters']);
 
-                    console.log(datasetId, datasetName)
-
                     if(datasetName=='ISMN'){
                         var default_value = $(version_widget).find('option')[0].value
                         $('#id_target_hidden_input_version').val(default_value)
                     } else{
                         $('#id_target_hidden_input_version').val('')
                     }
+                }
+            });
+        }
 
+        function ajax_take_version_info(versionId) {
+            //using ajax to read the network info according to its version
+            var url = $("#validation_form").attr("version-info-url");
+            // var versionId = $('#id_target_hidden_input_version').val();
+            $.ajax({
+                url: url,
+                traditional: true,
+                data: {'version_id': versionId},
+                success: function (return_data) {
+                  var intervals_from = return_data['time_from'];
+                  var intervals_to = return_data['time_to'];
                 }
             });
 
         }
-
 
 
         function change_tab_name() {
