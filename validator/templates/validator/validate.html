@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}" version-options-url="{% url 'ajax_get_version_id' %}">
+    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}" version-options-url="{% url 'ajax_get_version_id' %}" version-info-url="{% url 'ajax_get_version_info' %}">
         {% csrf_token %}
 
         {% with WIDGET_ERROR_CLASS='is-invalid' %}
