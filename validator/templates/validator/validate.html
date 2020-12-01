@@ -692,12 +692,12 @@
                     } else{
                         $('#id_target_hidden_input_version').val('')
                     }
-                    ajax_take_version_info()
+                    ajax_take_versions_info()
                 }
             });
         }
 
-        function ajax_take_version_info() {
+        function ajax_take_versions_info() {
             //using ajax to read the network info according to its version
             versionIds = find_current_ids()
             var url = $("#validation_form").attr("version-info-url");
