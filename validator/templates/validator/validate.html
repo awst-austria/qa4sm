@@ -698,7 +698,18 @@
         }
 
         function ajax_take_versions_info(versionIds, funcs_set, args_names) {
-            //using ajax to read info according to dataset versions;
+          /**
+           * Use ajax to read info of given dataset versions;
+           * @param  {object} versionIds list of version ids
+           * @param  {object} funcs_set  list of name of functions to be called
+           * @param  {object} args_names  list of name of arguments returned by ajax, which are passed to given functions
+           *
+           *
+           Example:
+           ajax_take_versions_info(versionsIds, [func1, func2, func3], [['intervals_from'], ['intervals_to'], ['intervals_from', 'intervals_to']])
+           will call func1 with argument 'intervals_from', func2 with 'intervals_to' and func3 with both of them.
+           Functions passed as a list must accept only one object-like argument.
+          */
 
             var url = $("#validation_form").attr("version-info-url");
             $.ajax({
@@ -708,32 +719,34 @@
                 success: function (return_data) {
                   var intervals_from = return_data['intervals_from'];
                   var intervals_to = return_data['intervals_to'];
-
-                  // taking all parameters that the ajax function return
-                  all_args = arguments[0]
-                  param_list = get_list_of_params(all_args, args_names)
+                  // calling functions given in the functions list
+                  ind = 0
                   for (func in funcs_set){
+                    // taking values of arguments passed in the parameter args_names and creating a list of them
+                    param_list = get_list_of_params(arguments[0], args_names[ind])
                     funcs_set[func](param_list)
+                    ind++
                   };
                 }
             });
           };
 
           function get_list_of_params(args, args_names){
-            param_list = []
+            /**
+             * Returns a list of values assinged to arguments which names are give in args_names;
+             * @param  {object} args list of arguments returned by ajax function: arguments[0]
+             * @param  {object} args_names list of names of arguments returned by the ajax function which should be passed further
+            */
+            param_list = [];
             for (arg_name in args_names){
-              var name = args_names[arg_name]
-              param_list.push(args[name])
-            }
+              var name = args_names[arg_name];
+              param_list.push(args[name]);
+            };
             return param_list
-          }
-
-          function test(params){
-            console.log(params)
-            console.log('Monika')
-          }
+          };
 
           function find_current_ids(){
+            // Finds all selects which have 'version' in name attribute
             var versions_list = $('select[name*=version]');
             var ids_list = [];
             for(ind=0; ind<versions_list.length; ind++){
@@ -742,15 +755,49 @@
                 ids_list.push(version_id)
               };
             };
-            console.log(ids_list);
             return ids_list;
           };
+//=========================== Time range related functions =====================================================
+          function convert_date_to_string(date){
+            // Converts date from Date() constructor to date format YYYY-MM-DD
+            var year = date.getFullYear();
+            var month = date.getMonth()+1
+            if(month<=9){month = '0'+month}
+            var day = date.getDate()
+            if(day<=9){day = '0' + day}
+            return year + '-' + month + '-' + day
+          }
+
+          function compare_and_set_time_ranges(params){
+            var intervals_from = params[0];
+            var intervals_to = params[1];
+            dates_from = [];
+            dates_to = [];
+            for (ind=0; ind<intervals_from.length; ind++){
+              dates_from.push(new Date(intervals_from[ind]));
+              dates_to.push(new Date(intervals_to[ind]));
+            }
+
+            var max_date_from = new Date(Math.max.apply(null, dates_from));
+            console.log(max_date_from)
+            var min_date_to = new Date(Math.min.apply(null, dates_to));
+            console.log(min_date_to)
+
+            var max_date_from_str = convert_date_to_string(max_date_from)
+            var min_date_to_str = convert_date_to_string(min_date_to)
+            console.log(max_date_from_str, min_date_to_str)
+
+            $('#id_interval_from').val(max_date_from_str)
+            $('#id_interval_to').val(min_date_to_str)
+          }
+
+
 
           function start_ajax_to_set_valiadtion_period(){
             var versionIds = find_current_ids()
-            ajax_take_versions_info(versionIds, [test], ['intervals_from', 'intervals_to'])
+            ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']])
           }
-
+//================================================================================
         function change_tab_name() {
             var datasetName = $(this).find('option:selected').text();
             var tabId = '#' + $(this).attr('id').replace(/dataset$/, 'tab');
