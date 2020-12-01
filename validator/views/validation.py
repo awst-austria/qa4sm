@@ -218,16 +218,26 @@ def ajax_get_version_id(request):
 
 login_required(login_url='/login/')
 def ajax_get_version_info(request):
-    version_id = request.GET.getlist('version_id')
-    # try:
-    #     version = DatasetVersion.objects.get(pk=int(version_id))
-    #     networks = version.network_version.all()
-    #     continents = networks.values('continent').distinct().values_list('continent', flat=True)
-    #     network_dict =  {continent: [(network.name, network.country, network.number_of_stations) for network in networks.filter(continent=continent)] for continent in continents}
-    # except:
-    #     return HttpResponseBadRequest("Not a valid dataset version")
-    #
-    # response_data = {
-    #     'network': network_dict
-    #     }
+    version_ids = request.GET.getlist('version_id')
+    version_ids_int = [int(vid) for vid in version_ids]
+    try:
+        versions = DatasetVersion.objects.filter(pk__in=version_ids_int)
+    except:
+        return HttpResponseBadRequest("Not a valid dataset version")
+    intervals_from = []
+    intervals_to = []
+    for version in versions:
+        if 'ISMN' in version.short_name:
+            time_from = val_globals.START_TIME
+            time_to = val_globals.END_TIME
+        else:
+            time_from = version.time_range_start
+            time_to = version.time_range_end
+    intervals_from.append(time_from)
+    intervals_to.append(time_to)
+
+    response_data = {
+        'intervals_from': intervals_from,
+        'intervals_to' : intervals_to
+        }
     return JsonResponse(response_data)
