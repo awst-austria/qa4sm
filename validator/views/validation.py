@@ -241,3 +241,4 @@ def ajax_get_version_info(request):
         'intervals_to' : intervals_to
         }
     return JsonResponse(response_data)
+

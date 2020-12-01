@@ -38,6 +38,7 @@ urlpatterns = [
     path('ajax/get-version-options/', views.ajax_get_version_id, name='ajax_get_version_id'),
     path('ajax/get-version-info/', views.ajax_get_version_info, name='ajax_get_version_info'),
 
+
     path('user_profile/',views.user_profile, name='user_profile'),
     path('user_profile_deactivated/',views.user_profile_deactivated, name='user_profile_deactivated'),
     path('user_profile_updated/',views.user_profile_updated, name='user_profile_updated'),
