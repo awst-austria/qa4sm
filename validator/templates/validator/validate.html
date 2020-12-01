@@ -692,25 +692,41 @@
                     } else{
                         $('#id_target_hidden_input_version').val('')
                     }
+                    ajax_take_version_info()
                 }
             });
         }
 
-        function ajax_take_version_info(versionId) {
+        function ajax_take_version_info() {
             //using ajax to read the network info according to its version
+            versionIds = find_current_ids()
             var url = $("#validation_form").attr("version-info-url");
             // var versionId = $('#id_target_hidden_input_version').val();
             $.ajax({
                 url: url,
                 traditional: true,
-                data: {'version_id': versionId},
+                data: {'version_id': versionIds},
                 success: function (return_data) {
-                  var intervals_from = return_data['time_from'];
-                  var intervals_to = return_data['time_to'];
+                  var intervals_from = return_data['intervals_from'];
+                  var intervals_to = return_data['intervals_to'];
+                  console.log(intervals_from)
+                  console.log(intervals_to)
                 }
             });
+          };
 
-        }
+          function find_current_ids(){
+            var versions_list = $('select[name*=version]');
+            var ids_list = [];
+            for(ind=0; ind<versions_list.length; ind++){
+              var version_id = parseInt(versions_list[ind].value);
+              if (!isNaN(version_id)){
+                ids_list.push(version_id)
+              };
+            };
+            console.log(ids_list);
+            return ids_list;
+          };
 
 
         function change_tab_name() {
