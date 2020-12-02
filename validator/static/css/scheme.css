@@ -77,6 +77,9 @@
 .custom-switch .custom-control-input[name='ref-parametrised_filters']:disabled:checked+label{
     color: #000;
 }
+#dc_form_container div > label.custom-control-label{
+  width: 95%;
+}
 
 .alert-danger {
     color: rgb(255, 108, 92);
@@ -315,6 +318,7 @@ label[for="depth_to"]{
 label[for="depth_from"]{
     margin-right: .12rem;
 }
+
 button.ui-datepicker-current {
     display: none;
 }
@@ -332,3 +336,4 @@ select.ui-datepicker-year, select.ui-datepicker-month {
 button.ui-datepicker-trigger{
   margin-left: 7px;
 }
+
