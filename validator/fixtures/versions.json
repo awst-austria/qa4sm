@@ -218,5 +218,16 @@
             "time_range_start": "2015-03-31",
             "time_range_end": "2020-05-23"
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 30,
+        "fields": {
+            "short_name": "GSWP_V202012",
+            "pretty_name": "GSWP dummy",
+            "help_text": "-",
+            "time_range_start": "2000-01-01",
+            "time_range_end": "2014-12-31"
+        }
     }
 ]

@@ -152,5 +152,16 @@
             "min_value": 0.0,
             "max_value": 1.0
         }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 15,
+        "fields": {
+            "short_name": "GSWP_mrsos",
+            "pretty_name": "mrsos",
+            "help_text": "kg/m^2",
+            "min_value": 0.0,
+            "max_value": 100.0
+        }
     }
 ]

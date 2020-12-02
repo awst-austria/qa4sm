@@ -39,6 +39,7 @@ CCIP = 'ESA_CCI_SM_passive'
 SMOS = 'SMOS'
 ERA5 = 'ERA5'
 ERA5_LAND = 'ERA5_LAND'
+GSWP = 'GSWP'
 
 ## dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -63,6 +64,7 @@ ESA_CCI_SM_C_V04_7 = 'ESA_CCI_SM_C_V04_7'
 ESA_CCI_SM_A_V05_2 = 'ESA_CCI_SM_A_V05_2'
 ESA_CCI_SM_P_V05_2 = 'ESA_CCI_SM_P_V05_2'
 ESA_CCI_SM_C_V05_2 = 'ESA_CCI_SM_C_V05_2'
+GSWP_V202012 = 'GSWP_V202012'
 
 ## dataset data variables
 C3S_sm = 'C3S_sm'
@@ -79,5 +81,6 @@ ERA5_LAND_sm = 'ERA5_LAND_sm'
 ESA_CCI_SM_P_sm = 'ESA_CCI_SM_P_sm'
 ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
+GSWP_mrsos = 'GSWP_mrsos'
 
 NOT_AS_REFERENCE = [SMAP, SMOS, ASCAT]

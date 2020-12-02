@@ -4,6 +4,7 @@ from ascat import AscatNc
 from c3s_sm.interface import C3STs as c3s_read
 from ecmwf_models.interface import ERATs
 from esa_cci_sm.interface import CCITs
+from gswp.interface import GSWPTs
 from gldas.interface import GLDASTs
 from ismn.interface import ISMN_Interface
 from smap_io.interface import SMAPTs
@@ -53,6 +54,9 @@ def create_reader(dataset, version):
 
     if dataset.short_name == globals.ERA5_LAND:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})
+
+    if dataset.short_name == globals.GSWP:
+        reader = GSWPTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))

@@ -300,5 +300,28 @@
                 7
             ]
         }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 12,
+        "fields": {
+            "short_name": "GSWP",
+            "pretty_name": "GSWP",
+            "help_text": "Model output from Global Soil Wetness Project",
+            "storage_path": "testdata/input_data/GSWP",
+            "detailed_description": "TODO",
+            "source_reference": "TODO",
+            "citation": "TODO",
+            "is_only_reference": false,
+            "versions": [
+		30
+            ],
+            "variables": [
+                15
+            ],
+            "filters": [
+                1
+            ]
+        }
     }
 ]
