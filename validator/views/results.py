@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm
+from validator.forms.custom_widgets import ResultsSortingForm
 from validator.models import ValidationRun
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
@@ -17,9 +18,27 @@ from collections import OrderedDict
 @login_required(login_url='/login/')
 def user_runs(request):
     current_user = request.user
-    page = request.GET.get('page', 1)
 
-    cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
+    sorting_form = ResultsSortingForm(request.GET)
+    sort_key, sort_order = "", ""
+    if sorting_form.is_valid():
+        print("is valid")
+        print(sorting_form.clean())
+        sorting = sorting_form.cleaned_data
+        sort_key = sorting["key"]
+        sort_order = sorting["order"]
+        print(sorting)
+    if sort_key == "":
+        sort_key = sorting_form.initial_sort_key
+    if sort_order == "":
+        sort_order = sorting_form.initial_sort_order
+    print("Sort by: ", sort_order + sort_key)
+
+    page = request.GET.get('page', 1)
+    cur_user_runs = (
+        ValidationRun.objects.filter(user=current_user)
+        .order_by(sort_order + sort_key)
+    )
 
     paginator = Paginator(cur_user_runs, 10)
     try:
@@ -30,7 +49,8 @@ def user_runs(request):
         paginated_runs = paginator.page(paginator.num_pages)
 
     context = {
-        'myruns' : paginated_runs,
+        'myruns': paginated_runs,
+        'sorting_form': sorting_form,
         }
     return render(request, 'validator/user_runs.html', context)
 

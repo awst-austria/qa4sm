@@ -6,6 +6,7 @@ from pytz import UTC
 import django.forms as forms
 from validator.models import ParametrisedFilter
 
+
 class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     """
     Hackaround to render the data filters checkboxes with help texts and correct
@@ -94,3 +95,30 @@ class YearChoiceField(forms.fields.ChoiceField):
             v_date = datetime(year=int(v), month=12, day=31, hour=23, minute=59, second=59, tzinfo=UTC)
 
         return v_date
+
+
+class ResultsSortingForm(forms.Form):
+    """
+    Allows the user to select a key which is used for sorting, and whether it
+    should be sorted ascending or descending.
+    """
+
+    initial_sort_key = "start_time"
+    initial_sort_order = "-"
+
+    key = forms.fields.ChoiceField(
+        choices=[
+            ("start_time", "Start time"),
+            ("end_time", "End time"),
+        ],
+        initial=initial_sort_key,
+        required=False,
+    )
+    order = forms.fields.ChoiceField(
+        choices=[
+            ("-", "descending"),
+            ("", "ascending"),
+        ],
+        initial=initial_sort_order,
+        required=False,
+    )
