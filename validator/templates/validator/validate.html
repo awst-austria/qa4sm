@@ -999,7 +999,7 @@
       if(tagName=='SELECT'){
         // if it is a select just take a month number and add 1 because they start with 0
         var month = parseInt($('select.ui-datepicker-month').val()) + 1;
-      } else if (tagName=='SPAN') {
+      } else if (tagName=='SPAN' || tagName=='A') {
         // if changes are done with arrows I am taking it from the field and
         // just add or subtract 1
         var month = parseInt($(this).val().slice(-5, -3));
