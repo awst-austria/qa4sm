@@ -1025,7 +1025,11 @@
       // set the appropriate date
       $(this).val(year+'-'+month+'-'+day);
     }
-
+    
+    var today = new Date()
+    var todays_year = today.getFullYear()
+    var today_str = todays_year + '-' + (today.getMonth()+1) + '-' + today.getDate()    
+        
     var dates_settings = {
       dateFormat:'yy-mm-dd',
       changeMonth: true,
@@ -1036,7 +1040,10 @@
       showMonthAfterYear: true,
       navigationAsDateFormat: true,
       showOn: "button",
-      buttonText: ""
+      buttonText: "",
+      minDate: '1978-01-01',
+      maxDate: today_str,
+      yearRange: '1978:'+todays_year
     }
 
      $(function() {
