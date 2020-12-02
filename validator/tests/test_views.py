@@ -864,11 +864,11 @@ class TestViews(TransactionTestCase):
 
         response = self.client.get(url, {'version_id': version_ids})
         self.assertEqual(response.status_code, 200)
-        return_data = json.loads(response.content)
 
+        return_data = json.loads(response.content)
         self.assertEqual(len(return_data['intervals_from']), len(version_ids))
         self.assertEqual(len(return_data['intervals_to']), len(version_ids))
-        assert return_data['intervals_from']
+        assert return_data['intervals_from'], return_data['intervals_to']
 
         response = self.client.get(url, {'version_id': ''})
         self.assertEqual(response.status_code, 400)
