@@ -219,8 +219,8 @@ def ajax_get_version_id(request):
 login_required(login_url='/login/')
 def ajax_get_version_info(request):
     version_ids = request.GET.getlist('version_id')
-    version_ids_int = [int(vid) for vid in version_ids]
     try:
+        version_ids_int = [int(vid) for vid in version_ids]
         versions = DatasetVersion.objects.filter(pk__in=version_ids_int)
     except:
         return HttpResponseBadRequest("Not a valid dataset version")
