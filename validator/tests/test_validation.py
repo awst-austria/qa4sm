@@ -1247,3 +1247,47 @@ class TestValidation(TestCase):
 
 
         self.delete_run(v)
+
+
+    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
+    @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
+    @pytest.mark.long_running
+    def test_validation_gswp_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name='GSWP')
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GSWP_V202012')
+        run.reference_configuration.variable = DataVariable.objects.get(short_name='GSWP_mrsos')
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2014, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2014, 12, 31, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run
+
+        assert new_run.total_points == 19
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 19
+        self.check_results(new_run)
+        self.delete_run(new_run)
