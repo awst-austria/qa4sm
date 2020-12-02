@@ -1,21 +1,18 @@
-QA4SM v1.3.1 - Release notes 2020-10-13
+QA4SM v1.4.0 - Release notes 2020-12-02
 =======================================================
 
-# Changes
+# New features
 
-1. Fix parameterized filtering from ISMN network and depth selections;
-2. Fix n_obs plot and sort metric list in GUI;
-3. Help text for triple collocation;
-4. Restore data scaling when there is only one dataset.
+1.  ESA CCI (A, P, C) and C3S datasets from now on can also be used as the reference.
 
-QA4SM v1.3.0 - Release notes 2020-09-24
-=======================================================
+# Improvements
 
-# Changes
+1. ISMN networks selection now depends on the chosen version;
+2. Possibility of switching off scaling added;
+3. Added calendar widget for picking time range of validation.
 
-1. Added the depth selection filter for ISMN networks;
-2. Usability features (removing datasets tab, changing validations name, disabling switching parametrized filters);
-3. The default bounding box for spatial subsetting added;
-4. The datasets site updated according to time range covered;
-5. New plotting functions based on qa4sm-reader github package;
-6. Added Triple Collocation Analysis to the service.
+# Other changes
+
+1. Corrected time range and soil moisture geophysical range for CCI Active dataset;
+2. Displaying filter list for SMOS dataset improved;
+3. Admin panel developed - statistics on the service retrieved.
