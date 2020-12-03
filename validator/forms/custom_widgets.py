@@ -107,6 +107,8 @@ class ResultsSortingForm(forms.Form):
         choices=[
             ("start_time", "Start time"),
             ("end_time", "End time"),
+            ("name_tag", "Name"),
+            ("progress", "Progress"),
         ],
         required=False,
     )

@@ -19,16 +19,19 @@ from collections import OrderedDict
 def user_runs(request):
     current_user = request.user
 
-    sort_key = request.GET.get("sort_key", "start_time")
-    sort_order = request.GET.get("sort_order", "-")
-    sorting_form = ResultsSortingForm(
-        initial={"sort_key": sort_key, "sort_order": sort_order},
-    )
+    sorting_form = ResultsSortingForm(request.GET)
+    if sorting_form.is_valid():
+        order = (
+            sorting_form.cleaned_data["sort_order"]
+            + sorting_form.cleaned_data["sort_key"]
+        )
+    else:
+        order = "-start_time"
 
     page = request.GET.get('page', 1)
     cur_user_runs = (
         ValidationRun.objects.filter(user=current_user)
-        .order_by(sort_order + sort_key)
+        .order_by(order)
     )
 
     paginator = Paginator(cur_user_runs, 10)
