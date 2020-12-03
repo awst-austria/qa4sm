@@ -25,7 +25,7 @@ from validator.models import CeleryTask
 from validator.models import ValidationRun
 from validator.validation.batches import create_jobs
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -94,6 +94,11 @@ def save_validation_config(validation_run):
             if ((validation_run.scaling_ref is not None) and
                 (dataset_config.id == validation_run.scaling_ref.id)):
                 ds.val_scaling_ref = 'val_dc_dataset' + str(i)
+                if dataset_config.dataset.short_name in IRREGULAR_GRIDS.keys():
+                    grid_stepsize = IRREGULAR_GRIDS[dataset_config.dataset.short_name]
+                else:
+                    grid_stepsize = 'nan'
+                ds.setncattr('val_dc_dataset' + str(i) + '_grid_stepsize', grid_stepsize)
 
         ds.val_scaling_method=validation_run.scaling_method
 
