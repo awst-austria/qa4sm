@@ -19,20 +19,11 @@ from collections import OrderedDict
 def user_runs(request):
     current_user = request.user
 
-    sorting_form = ResultsSortingForm(request.GET)
-    sort_key, sort_order = "", ""
-    if sorting_form.is_valid():
-        print("is valid")
-        print(sorting_form.clean())
-        sorting = sorting_form.cleaned_data
-        sort_key = sorting["key"]
-        sort_order = sorting["order"]
-        print(sorting)
-    if sort_key == "":
-        sort_key = sorting_form.initial_sort_key
-    if sort_order == "":
-        sort_order = sorting_form.initial_sort_order
-    print("Sort by: ", sort_order + sort_key)
+    sort_key = request.GET.get("sort_key", "start_time")
+    sort_order = request.GET.get("sort_order", "-")
+    sorting_form = ResultsSortingForm(
+        initial={"sort_key": sort_key, "sort_order": sort_order},
+    )
 
     page = request.GET.get('page', 1)
     cur_user_runs = (

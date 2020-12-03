@@ -103,22 +103,17 @@ class ResultsSortingForm(forms.Form):
     should be sorted ascending or descending.
     """
 
-    initial_sort_key = "start_time"
-    initial_sort_order = "-"
-
-    key = forms.fields.ChoiceField(
+    sort_key = forms.fields.ChoiceField(
         choices=[
             ("start_time", "Start time"),
             ("end_time", "End time"),
         ],
-        initial=initial_sort_key,
         required=False,
     )
-    order = forms.fields.ChoiceField(
+    sort_order = forms.fields.ChoiceField(
         choices=[
-            ("-", "descending"),
             ("", "ascending"),
+            ("-", "descending"),
         ],
-        initial=initial_sort_order,
         required=False,
     )
