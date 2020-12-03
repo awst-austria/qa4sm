@@ -981,9 +981,76 @@
 
 }
 
-
-
-
     </script>
+
+    <!-- datepicker widget -->
+    <link href ="/static/css/jquery-ui.css" rel = "stylesheet">
+    <script src="/static/js/jquery-ui-1.12.1.js"></script>
+    <script>
+    function setTheDate(){
+      // This is a function which set chosen date in the input field when
+      // a change of a month or a year is done
+
+      // need to know what casuses the change
+      var event_target = event.target;
+      var tagName = event_target.tagName;
+      day = '01' // always set the first day, it's not that important
+      var year = parseInt($('select.ui-datepicker-year').val());
+      if(tagName=='SELECT'){
+        // if it is a select just take a month number and add 1 because they start with 0
+        var month = parseInt($('select.ui-datepicker-month').val()) + 1;
+      } else if (tagName=='SPAN' || tagName=='A') {
+        // if changes are done with arrows I am taking it from the field and
+        // just add or subtract 1
+        var month = parseInt($(this).val().slice(-5, -3));
+        if(event_target.textContent=='Next'){
+          month += 1
+          // change of the year
+          if(month>12){
+            month = 1;
+            year +=1;
+          };
+        } else if (event_target.textContent=='Prev') {
+          month -= 1
+          // change of the year
+          if (month == 0){
+            month = 12;
+            year -= 1;
+          };
+        };
+      };
+
+      // add zero to look nice
+      if(month<=9){month = '0' + month};
+      // set the appropriate date
+      $(this).val(year+'-'+month+'-'+day);
+    }
+    
+    var today = new Date()
+    var todays_year = today.getFullYear()
+    var today_str = todays_year + '-' + (today.getMonth()+1) + '-' + today.getDate()    
+        
+    var dates_settings = {
+      dateFormat:'yy-mm-dd',
+      changeMonth: true,
+      changeYear: true,
+      showButtonPanel: true,
+      onChangeMonthYear: setTheDate,
+      closeText: 'Apply',
+      showMonthAfterYear: true,
+      navigationAsDateFormat: true,
+      showOn: "button",
+      buttonText: "",
+      minDate: '1978-01-01',
+      maxDate: today_str,
+      yearRange: '1978:'+todays_year
+    }
+
+     $(function() {
+        $( "#id_interval_from" ).datepicker(dates_settings);
+        $( "#id_interval_to" ).datepicker(dates_settings);
+     });
+    </script>
+
 
 {% endblock %}
