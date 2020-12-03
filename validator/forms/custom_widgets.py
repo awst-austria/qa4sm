@@ -114,8 +114,28 @@ class ResultsSortingForm(forms.Form):
     )
     sort_order = forms.fields.ChoiceField(
         choices=[
-            ("", "ascending"),
-            ("-", "descending"),
+            ("desc", "descending"),
+            ("asc", "ascending"),
         ],
         required=False,
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # set initial values on field level too
+        for field in self.fields:
+            self.fields[field].initial = self.get_initial_for_field(
+                self.fields[field], field
+            )
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+        for field in self.fields:
+            # replace missing/invalid values with initial values
+            if field not in self.data or field not in cleaned_data:
+                cleaned_data[field] = self.get_initial_for_field(
+                    self.fields[field], field
+                )
+            
+
