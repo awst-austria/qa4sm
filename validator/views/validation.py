@@ -32,14 +32,19 @@ from validator.validation.validation import stop_running_validation
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
 
 def _compare_validation_runs(new_run, runs_set):
-    response = False
+    fields = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon']
+    is_the_same = []
+    max_ind = len(fields)-1
     for run in runs_set:
-        if run.interval_from != new_run.interval_from:
-            return response
-        if run.interval_to != new_run.interval_to:
-            return response
+        ind = 0
+        print(fields[ind])
+        while getattr(run, fields[ind]) == getattr(new_run, fields[ind]) and ind<max_ind:
+            ind += 1
+        is_the_same.append(ind == max_ind)
 
-    return True
+    response = any(is_the_same)
+
+    return response
 
 
 __logger = logging.getLogger(__name__)
