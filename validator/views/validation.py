@@ -31,6 +31,17 @@ from validator.validation.validation import stop_running_validation
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
 
+def _compare_validation_runs(new_run, runs_set):
+    response = False
+    for run in runs_set:
+        if run.interval_from != new_run.interval_from:
+            return response
+        if run.interval_to != new_run.interval_to:
+            return response
+
+    return True
+
+
 __logger = logging.getLogger(__name__)
 
 @login_required(login_url='/login/')
@@ -124,6 +135,15 @@ def validation(request):
 
             newrun.save()
 
+            # taking published validations:
+            vals_published = ValidationRun.objects.exclude(doi='')
+            if_run_exists = _compare_validation_runs(newrun, vals_published)
+            print('If validation already exists: ', if_run_exists)
+            if if_run_exists:
+                return render(request, 'validator/validate.html',
+                              {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
+                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists':if_run_exists})
+
             # need to close all db connections before forking, see
             # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
             connections.close_all()
@@ -140,8 +160,9 @@ def validation(request):
         ref_dc_form = DatasetConfigurationForm(prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
         # ref_dc_form.
 
-
-    return render(request, 'validator/validate.html', {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form, 'maintenance_mode':Settings.load().maintenance_mode})
+    return render(request, 'validator/validate.html',
+                  {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
+                   'maintenance_mode':Settings.load().maintenance_mode, 'if_run_exists':False})
 
 
 ## Ajax stuff required for validation view
