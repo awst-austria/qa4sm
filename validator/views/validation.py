@@ -150,7 +150,7 @@ def validation(request):
             newrun.save()
 
             # taking published validations:
-            vals_published = ValidationRun.objects.exclude(doi='').ordr_by('start_time')
+            vals_published = ValidationRun.objects.exclude(doi='').order_by('start_time')
             # comparing validation-to-be-run against existing ones
             if_run_exists = _compare_validation_runs(newrun, vals_published)
             # checking how many times the validation button was clicked
