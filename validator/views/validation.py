@@ -142,21 +142,25 @@ def validation(request):
 
             # taking published validations:
             vals_published = ValidationRun.objects.exclude(doi='')
+            # comparing validation-to-be-run against existing ones
             if_run_exists = _compare_validation_runs(newrun, vals_published)
-            print('If validation already exists: ', if_run_exists)
-            if if_run_exists:
+            # checking how many times the validation button was clicked
+            clicked_times = int(request.POST.get('click-counter'))
+
+            if if_run_exists and clicked_times==1:
+                newrun.delete()
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
                                'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists':if_run_exists})
+            else:
+                # need to close all db connections before forking, see
+                # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
+                connections.close_all()
 
-            # need to close all db connections before forking, see
-            # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
-            connections.close_all()
+                p = Process(target=run_validation, kwargs={"validation_id": run_id})
+                p.start()
 
-            p = Process(target=run_validation, kwargs={"validation_id": run_id})
-            p.start()
-
-            return redirect('result', result_uuid=run_id)
+                return redirect('result', result_uuid=run_id)
         else:
             __logger.error("Errors in validation form {}\n{}\n{}".format(val_form.errors, dc_formset.errors, ref_dc_form.errors))
     else:
