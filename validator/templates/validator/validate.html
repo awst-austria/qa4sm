@@ -519,7 +519,11 @@
                     {% endfor %}
 
 
-                    <input class="btn btn-lg btn-primary mb-3" type="submit" value="&#9658; Validate">
+                    <input id='validate-run' class="btn btn-lg btn-primary mb-3" type="submit" value="&#9658; Validate">
+                    <!-- this is a hidden field so it is possible to count how many times the Validate button was clicked -->
+                    <input id='click-counter' name='click-counter' type='hidden' value=1>
+                    <!-- this is an area triggered as a dialog window for informing user that there is a validation with given settings -->
+                    <div id="validate-confirm" title="Do you want to use an existing validation?"></div>
                 </div>
             {% endif %}
         {% endwith %}
@@ -1053,12 +1057,30 @@
     </script>
 
     <script type="text/javascript">
-      // console.log('{{if_run_exists}}')
+
+      function set_counter(){
+        var counter = parseInt($('#click-counter').val())
+        $('#click-counter').val(counter+1)
+      }
+
       if ('{{if_run_exists}}' == 'True'){
         console.log('Yeah!')
-        if (!confirm('There exists a published validation with all the settings you introduced. You can use existing results or run your validation anyway.')) {
-               console.log('yes, please')
-        }
+        $('#validate-confirm').dialog({
+          resizable: false,
+          height: "auto",
+          width: 400,
+          modal: true,
+          buttons: {
+            "Run your own validation": function() {
+              $('#validate-run').click(set_counter).click();
+              $( this ).dialog( "close" );
+
+            },
+            'Use the existing one': function() {
+              $( this ).dialog( "close" );
+            }
+          }
+        });
       }
 
     </script>
