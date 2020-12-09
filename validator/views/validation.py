@@ -48,7 +48,6 @@ def _compare_validation_runs(new_run, runs_set):
         val_id = runs_set[indx].id
     else:
         val_id = None
-
     response = {
         'is_there_validation': is_there_validation,
         'val_id': val_id
@@ -162,7 +161,7 @@ def validation(request):
                 val_id = comparison['val_id']
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists':if_run_exists, 'val_id':val_id})
+                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists, 'val_id':val_id})
             else:
                 # need to close all db connections before forking, see
                 # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
@@ -182,7 +181,7 @@ def validation(request):
 
     return render(request, 'validator/validate.html',
                   {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                   'maintenance_mode':Settings.load().maintenance_mode, 'if_run_exists':False})
+                   'maintenance_mode':Settings.load().maintenance_mode, 'if_run_exists':False, 'val_id': None})
 
 
 ## Ajax stuff required for validation view
