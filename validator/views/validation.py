@@ -114,6 +114,7 @@ def validation(request):
             ref_dc_form.save_m2m() # save many-to-many related objects, e.g. filters. If you don't do this, filters won't get saved!
 
             newrun.reference_configuration = ref_dc
+            newrun.ref_dataset_name = ref_dc.dataset.pretty_name
 
             ## determine the scaling reference. For intercomparison, only the reference makes sense. Otherwise let the user pick.
             if ((len(dc_formset) == 1) and

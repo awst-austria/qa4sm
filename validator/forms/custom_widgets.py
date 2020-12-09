@@ -105,10 +105,10 @@ class ResultsSortingForm(forms.Form):
 
     sort_key = forms.fields.ChoiceField(
         choices=[
-            ("start_time", "Start time"),
-            ("end_time", "End time"),
+            ("start_time", "Date"),
             ("name_tag", "Name"),
-            ("progress", "Progress"),
+            ("progress", "Status"),
+            ("ref_dataset_name", "Reference dataset"),
         ],
         required=False,
     )

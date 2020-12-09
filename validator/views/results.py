@@ -47,7 +47,7 @@ def user_runs(request):
     context = {
         'myruns': paginated_runs,
         'sorting_form': sorting_form,
-        }
+    }
     return render(request, 'validator/user_runs.html', context)
 
 

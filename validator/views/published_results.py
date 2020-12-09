@@ -1,13 +1,30 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render
 
+from validator.forms.custom_widgets import ResultsSortingForm
 from validator.models import ValidationRun
 
 
 def published_results(request):
     page = request.GET.get('page', 1)
 
-    published = ValidationRun.objects.filter(doi__isnull=False).exclude(doi__exact='').order_by('-start_time')
+    # get sorting key and order
+    key = "start_time"
+    order = "desc"
+    sorting_form = ResultsSortingForm(
+        request.GET,
+        initial={"sort_key": key, "sort_order": order}
+    )
+    if sorting_form.is_valid():
+        key = sorting_form.cleaned_data["sort_key"]
+        order = sorting_form.cleaned_data["sort_order"]
+    order_string = {"asc": "", "desc": "-"}[order] + key
+
+    published = (
+        ValidationRun.objects.filter(doi__isnull=False)
+        .exclude(doi__exact='')
+        .order_by(order_string)
+    )
 
     paginator = Paginator(published, 10)
     try:
@@ -19,5 +36,6 @@ def published_results(request):
 
     context = {
         'validations' : paginated_runs,
-        }
+        'sorting_form': sorting_form,
+    }
     return render(request, 'validator/published_results.html', context)
