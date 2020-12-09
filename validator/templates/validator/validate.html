@@ -523,7 +523,7 @@
                     <!-- this is a hidden field so it is possible to count how many times the Validate button was clicked -->
                     <input id='click-counter' name='click-counter' type='hidden' value=1>
                     <!-- this is an area triggered as a dialog window for informing user that there is a validation with given settings -->
-                    <div id="validate-confirm" title="Do you want to use an existing validation?">
+                    <div id="validate-confirm" title="Do you want to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %} {% endif%}">
                       There exists a published validation with exactly the same settings. <br>
                       You can run your own validation and wait for the results or you can use the existing one. <br>
                       What would you like to do?
@@ -1068,17 +1068,16 @@
       }
 
       if ('{{if_run_exists}}' == 'True'){
+        var url_to_go = $('#validate-confirm').attr('data-url')
         $('#validate-confirm').dialog({
           resizable: false,
           height: "auto",
           width: "auto",
           modal: true,
-          classes: {
-
-          },
           buttons: {
             'Use the existing one': function() {
-              $( this ).dialog( "close" );
+              window.location.href = url_to_go
+              // $( this ).dialog( "close" );
             },
             "Run your own validation": function() {
               $('#validate-run').click(set_counter).click();
