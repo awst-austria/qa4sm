@@ -34,22 +34,25 @@ DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0,
 def _compare_validation_runs(new_run, runs_set):
     vr_fields = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
                  'anomalies', 'anomalies_from', 'anomalies_to']
-    is_the_same = []
-    max_ind = len(vr_fields)-1
-    for run in runs_set:
+    is_the_same = False
+    max_vr_ind = len(vr_fields) - 1
+    max_run_ind = len(runs_set) - 1
+    print('number of validations to be checked: ', len(runs_set))
+    run_ind = 0
+    while not is_the_same and run_ind < max_run_ind:
+        run = runs_set[run_ind]
         ind = 0
-        while getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]) and ind<max_ind:
+        while getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]) and ind < max_vr_ind:
             ind += 1
-        is_the_same.append(ind == max_ind)
+        if ind == max_vr_ind:
+            is_the_same = True
+            val_id = runs_set[run_ind].id
+        run_ind += 1
 
-    is_there_validation = any(is_the_same)
-    if is_there_validation:
-        indx = is_the_same.index(True)
-        val_id = runs_set[indx].id
-    else:
-        val_id = None
+    val_id = val_id if is_the_same else None
+    print('Number of validations checked', run_ind)
     response = {
-        'is_there_validation': is_there_validation,
+        'is_there_validation': is_the_same,
         'val_id': val_id
     }
     return response
