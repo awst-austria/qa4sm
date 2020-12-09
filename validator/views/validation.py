@@ -45,13 +45,13 @@ def _compare_validation_runs(new_run, runs_set):
     is_there_validation = any(is_the_same)
     if is_there_validation:
         indx = is_the_same.index(True)
-        run_id = runs_set[indx].id
+        val_id = runs_set[indx].id
     else:
-        run_id = None
+        val_id = None
 
     response = {
         'is_there_validation': is_there_validation,
-        'run_id': run_id
+        'val_id': val_id
     }
     return response
 
@@ -152,16 +152,17 @@ def validation(request):
             # taking published validations:
             vals_published = ValidationRun.objects.exclude(doi='').order_by('start_time')
             # comparing validation-to-be-run against existing ones
-            if_run_exists = _compare_validation_runs(newrun, vals_published)
+            comparison = _compare_validation_runs(newrun, vals_published)
+            if_run_exists = comparison['is_there_validation']
             # checking how many times the validation button was clicked
             clicked_times = int(request.POST.get('click-counter'))
 
-            if if_run_exists['is_there_validation'] and clicked_times==1:
+            if if_run_exists and clicked_times==1:
                 newrun.delete()
-                run_id = if_run_exists['run_id']
+                val_id = comparison['val_id']
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists':if_run_exists, 'run_id':run_id})
+                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists':if_run_exists, 'val_id':val_id})
             else:
                 # need to close all db connections before forking, see
                 # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
