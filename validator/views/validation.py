@@ -31,6 +31,36 @@ from validator.validation.validation import stop_running_validation
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
 
+def _compare_datasets(new_run_config, old_run_config):
+    new_len = len(new_run_config)
+    old_len = len(old_run_config)
+    # print(old_len, new_len)
+
+    if old_len != new_len:
+        return False
+    else:
+        ds_fields = ['dataset', 'version']
+        max_ds_ind = len(ds_fields) - 1
+        the_same = False
+        conf_ind = 0
+
+        while conf_ind <= new_len and not the_same:
+            ds_ind = 0
+            new_dataset = new_run_config[conf_ind]
+            old_dataset = old_run_config[conf_ind]
+            while getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]) and ds_ind < max_ds_ind:
+                ds_ind += 1
+            print(ds_ind, max_ds_ind)
+            print(ds_ind == max_ds_ind)
+            if ds_ind == max_ds_ind:
+                the_same = True
+                # new_filters = new_dataset.dataset.filters.all().order_by('name')
+                # old_filters = old_dataset.dataset.filters.all().order_by('name')
+                # if len(new_filters) != len(old_filters):
+                #     return False
+            conf_ind +=1
+    return the_same
+
 def _compare_validation_runs(new_run, runs_set):
     vr_fields = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
                  'anomalies', 'anomalies_from', 'anomalies_to', 'scaling_method']
