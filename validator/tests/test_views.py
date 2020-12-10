@@ -357,7 +357,7 @@ class TestViews(TransactionTestCase):
         self.client.login(**self.credentials)
 
         # check some valid sorting keys
-        for key in ["start_time", "end_time"]:
+        for key in ["start_time", "ref_dataset_name"]:
             for order in ["asc", "desc"]:
                 response = self.client.get(url, {"sort_key": key, "sort_order": order})
                 self.assertEqual(response.status_code, 200)
