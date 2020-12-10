@@ -48,7 +48,6 @@ def _compare_param_filters(new_dataset_id, old_dataset_id):
     return is_the_same
 
 
-
 def _compare_filters(new_dataset, old_dataset):
 
     new_run_filters = new_dataset.filters.all().order_by('name')
@@ -97,20 +96,11 @@ def _compare_datasets(new_run_config, old_run_config):
             while getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]) and ds_ind < max_ds_ind:
                 ds_ind += 1
             if ds_ind == max_ds_ind:
-                pass
+                if not _compare_filters(new_dataset, old_dataset):
+                    the_same = False
             else:
                 the_same = False
-                # _compare_filters(new_dataset, old_dataset)
-                # fs_ind = 0
-                # max_fs_id = len(new_dataset.filters.all()) - 1
-                # while _compare_filters(new_dataset, old_dataset) and fs_ind < max_fs_id:
-                #     fs_ind += fs_ind
-                # if fs_ind == max_fs_id:
-                #     the_same = True
-
-                # if len(new_filters) != len(old_filters):
-                #     return False
-            conf_ind +=1
+            conf_ind += 1
     return the_same
 
 def _compare_validation_runs(new_run, runs_set):
