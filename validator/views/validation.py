@@ -31,57 +31,73 @@ from validator.validation.validation import stop_running_validation
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
 
-def _compare_param_filters(new_dataset_id, old_dataset_id):
-    new_param_filters = ParametrisedFilter.objects.filter(dataset_config_id=new_dataset_id).order_by('filter_id')
-    old_param_filters = ParametrisedFilter.objects.filter(dataset_config_id=old_dataset_id).order_by('filter_id')
 
+def _compare_param_filters(new_param_filters, old_param_filters):
+    """
+    Checking if parametrised filters are the same for given configuration, checks till finds the first failure
+    or till the end of the list.
+
+    If lengths of queries do not agree then return False.
+    """
     if len(new_param_filters) != len(old_param_filters):
         return False
     else:
         ind = 0
-        is_the_same = False
-        while not is_the_same and new_param_filters[ind].parameters == old_param_filters[ind].parameters:
+        max_ind = len(new_param_filters) - 1
+        is_the_same = True
+        while new_param_filters[ind].parameters == old_param_filters[ind].parameters and ind < max_ind:
             ind += 1
-        if ind == len(new_param_filters) -1:
-            is_the_same = True
+        if ind != len(new_param_filters) - 1:
+            is_the_same = False
 
     return is_the_same
 
 
 def _compare_filters(new_dataset, old_dataset):
+    """
+    Checking if filters are the same for given configuration, checks till finds the first failure or till the end
+     of the list. If filters are the same, then parameterised filters are checked.
+
+    If lengths of queries do not agree then return False.
+    """
 
     new_run_filters = new_dataset.filters.all().order_by('name')
     old_run_filters = old_dataset.filters.all().order_by('name')
 
-    print(new_run_filters, old_run_filters)
     new_filts_len = len(new_run_filters)
-    old_filts_len = len(old_run_filters)
 
-    if new_filts_len != old_filts_len:
+    if new_filts_len != len(old_run_filters):
         return False
     else:
         is_the_same = True
         filt_ind = 0
-        while new_run_filters[filt_ind] == old_run_filters[filt_ind] and filt_ind < new_filts_len-1:
-            # if new_run_filters[filt_ind].parameterised:
-            #     if _compare_param_filters(new_dataset.id, old_dataset.id):
-            #         filt_ind += 1
-            #     else:
-            #         return False
-            # else:
+        max_filt_ind = new_filts_len - 1
+
+        while new_run_filters[filt_ind] == old_run_filters[filt_ind] and filt_ind < max_filt_ind:
             filt_ind += 1
 
-        if filt_ind != new_filts_len - 1:
+        if filt_ind == max_filt_ind:
+            new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
+            if len(new_param_filters) != 0:
+                old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
+                is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
+        else:
             is_the_same = False
 
     return is_the_same
 
 
 def _compare_datasets(new_run_config, old_run_config):
-    new_len = len(new_run_config)
-    old_len = len(old_run_config)
+    """
+    Takes queries of dataset configurations and compare datasets one by one. If names and versions agree,
+    checks filters.
 
-    if old_len != new_len:
+    Runs till the first failure or til the end of the configuration list.
+    If lengths of queries do not agree then return False.
+    """
+    new_len = len(new_run_config)
+
+    if len(old_run_config) != new_len:
         return False
     else:
         ds_fields = ['dataset', 'version']
@@ -96,17 +112,30 @@ def _compare_datasets(new_run_config, old_run_config):
             while getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]) and ds_ind < max_ds_ind:
                 ds_ind += 1
             if ds_ind == max_ds_ind:
-                if not _compare_filters(new_dataset, old_dataset):
-                    the_same = False
+                the_same = _compare_filters(new_dataset, old_dataset)
             else:
                 the_same = False
             conf_ind += 1
     return the_same
 
+
 def _compare_validation_runs(new_run, runs_set):
+    """
+    Compares two validation runs. It takes a new_run and checks the query given by runs_set according to parameters
+    given in the vr_fileds. If all fields agree it checks datasets configurations.
+
+    It works till the first found validation run or till the end of the list.
+
+    Returns a dict:
+         {
+        'is_there_validation': is_the_same,
+        'val_id': val_id
+        }
+        where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
+    """
     vr_fields = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
                  'anomalies', 'anomalies_from', 'anomalies_to', 'scaling_method']
-    is_the_same = False
+    is_the_same = False # set to False because it looks for the first found validation run
     max_vr_ind = len(vr_fields) - 1
     max_run_ind = len(runs_set) - 1
     print('number of validations to be checked: ', len(runs_set))
