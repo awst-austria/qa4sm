@@ -119,6 +119,10 @@ def _compare_datasets(new_run_config, old_run_config):
     return the_same
 
 def _check_scaling_method(new_run, old_run):
+    """
+    It takes two validation runs and compares scaling method together with the scaling reference dataset.
+
+    """
     new_run_sm = new_run.scaling_method
     if new_run_sm != old_run.scaling_method:
         return False
@@ -129,6 +133,7 @@ def _check_scaling_method(new_run, old_run):
             if new_scal_ref != run_scal_ref:
                 return False
     return True
+
 
 def _compare_validation_runs(new_run, runs_set):
     """
