@@ -118,6 +118,17 @@ def _compare_datasets(new_run_config, old_run_config):
             conf_ind += 1
     return the_same
 
+def _check_scaling_method(new_run, old_run):
+    new_run_sm = new_run.scaling_method
+    if new_run_sm != old_run.scaling_method:
+        return False
+    else:
+        if new_run_sm != 'none':
+            new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
+            run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
+            if new_scal_ref != run_scal_ref:
+                return False
+    return True
 
 def _compare_validation_runs(new_run, runs_set):
     """
@@ -134,7 +145,7 @@ def _compare_validation_runs(new_run, runs_set):
         where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
     """
     vr_fields = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-                 'anomalies', 'anomalies_from', 'anomalies_to', 'scaling_method']
+                 'anomalies', 'anomalies_from', 'anomalies_to']
     is_the_same = False # set to False because it looks for the first found validation run
     max_vr_ind = len(vr_fields) - 1
     max_run_ind = len(runs_set) - 1
@@ -145,7 +156,7 @@ def _compare_validation_runs(new_run, runs_set):
         ind = 0
         while getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]) and ind < max_vr_ind:
             ind += 1
-        if ind == max_vr_ind:
+        if ind == max_vr_ind and _check_scaling_method(new_run, run):
             pub_run = runs_set[run_ind]
             new_run_config = DatasetConfiguration.objects.filter(validation=new_run).order_by('dataset')
             old_run_config = DatasetConfiguration.objects.filter(validation=pub_run).order_by('dataset')
@@ -175,6 +186,7 @@ def stop_validation(request, result_uuid):
         return HttpResponse("Validation stopped.", status=200)
 
     return HttpResponse(status=405) # if we're not DELETEing, send back "Method not Allowed"
+
 
 @login_required(login_url='/login/')
 def validation(request):
@@ -263,12 +275,13 @@ def validation(request):
             # checking how many times the validation button was clicked
             clicked_times = int(request.POST.get('click-counter'))
 
-            if if_run_exists and clicked_times==1:
+            if if_run_exists and clicked_times == 1:
                 newrun.delete()
                 val_id = comparison['val_id']
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists, 'val_id':val_id})
+                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
+                               'val_id': val_id})
             else:
                 # need to close all db connections before forking, see
                 # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
