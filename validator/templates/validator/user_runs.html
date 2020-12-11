@@ -11,21 +11,23 @@
     </div>
 
     <form method="get">
-    <div class="mb-3">
-      <div class="input-group">
-	<div class="input-group-prepend">
-	  <span class="input-group-text addon-w" id="sorting_form">Sort By</span>
+	<div class="mb-3">
+	    <div class="input-group">
+		<div class="input-group-prepend">
+		    <span class="input-group-text addon-w" id="sorting_form">Sort By</span>
+		</div>
+		{% render_field sorting_form.sort_key class="custom-select" %}
+		{% render_field sorting_form.sort_order class="custom-select" %}
+		<div class="px-2 py-2 py-sm-0">
+		    <input class="btn btn-primary" type="submit" value="Apply">
+		</div>
+	    </div>
+	    {% for error in sorting_form.key.errors %}
+	    <div class="custom-invalid-feedback">
+		{{ error }}
+	    </div>
+	    {% endfor %}
 	</div>
-	{% render_field sorting_form.sort_key class="custom-select" %}
-	{% render_field sorting_form.sort_order class="custom-select" %}
-	<input class="btn btn-primary" type="submit" value="Apply">
-      </div>
-      {% for error in sorting_form.key.errors %}
-      <div class="custom-invalid-feedback">
-	{{ error }}
-      </div>
-      {% endfor %}
-    </div>
     </form>
 
     <div class="card-deck mb-3">
