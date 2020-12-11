@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='validationrun',
             name='ref_dataset_name',
-            field=models.CharField(blank=True, max_length=30),
+            field=models.CharField(max_length=30),
         ),
     ]
