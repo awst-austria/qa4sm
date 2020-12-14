@@ -1247,3 +1247,12 @@ class TestValidation(TestCase):
 
 
         self.delete_run(v)
+
+    # @pytest.mark.long_running
+    def test_existing_validations(self):
+        # common settings:
+        user = self.testuser
+        time_intervals_from = [datetime(1978, 1, 1, tzinfo=UTC), datetime(2000, 1, 1, tzinfo=UTC)]
+        time_intervals_from = [datetime(2018, 12, 31, tzinfo=UTC), datetime(2020, 1, 31, tzinfo=UTC)]
+
+        validation_1 = self.generate_default_validation()
