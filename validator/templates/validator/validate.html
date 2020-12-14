@@ -45,10 +45,10 @@
                                     <nav>
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                             {% for dc_form in dc_formset %}
-                                                <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %} onclick="shiftTheButton(event, '#remove_dc_form')">Dataset</a>
+                                                <a class="dc_form_link nav-item nav-link {% if forloop.last %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" {% if forloop.last %}aria-selected="true"{% endif %} onclick="shiftTheButton(event, '#remove_dc_form')">Dataset</a>
                                             {% endfor %}
-                                                <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
-                                                <a id="remove_dc_form" class="tab-minus" href="javascript:void(0)" title="Remove active dataset">&times;</a>
+                                                <a id="add_dc_form" value='{{ dc.formset|length }}' class="tab-plus btn btn-primary {% if dc_formset|length == 5 %}hide_element{% endif %}" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
+                                                <a id="remove_dc_form" class="tab-minus {% if dc_formset|length == 1 %}hide_element{% endif %}"  href="javascript:void(0)" title="Remove active dataset">&times;</a>
                                         </div>
                                     </nav>
 
@@ -57,7 +57,7 @@
                                     <div id="dc_form_container" class="card-body tab-content">
 
                                         {% for dc_form in dc_formset.forms %}
-                                            <div class="dc_form tab-pane fade {% if forloop.first %}show active{% endif %}" id="id_{{ dc_form.prefix }}" role="tabpanel" aria-labelledby="id_{{ dc_form.prefix }}-tab">
+                                            <div class="dc_form tab-pane fade {% if forloop.last %}show active{% endif %}" id="id_{{ dc_form.prefix }}" role="tabpanel" aria-labelledby="id_{{ dc_form.prefix }}-tab">
                                                 <div class="mb-3">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
