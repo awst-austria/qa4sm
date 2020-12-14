@@ -46,8 +46,10 @@ def _get_actual_time_range(val_run, dataset_version_id):
         val_start_time = val_run.interval_from.date()
         val_end_time = val_run.interval_to.date()
 
-        actual_start = val_start_time if val_start_time < vs_start_time else vs_start_time
-        actual_end = val_end_time if val_end_time < vs_end_time else vs_end_time
+        actual_start = val_start_time.strftime('%Y-%m-%d') if val_start_time > vs_start_time \
+            else vs_start_time.strftime('%Y-%m-%d')
+        actual_end = val_end_time.strftime('%Y-%m-%d') if val_end_time < vs_end_time \
+            else vs_end_time.strftime('%Y-%m-%d')
 
     except:
         # exception will arise for ISMN, and for that one we can use entire range
