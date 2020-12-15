@@ -1258,10 +1258,12 @@ class TestValidation(TestCase):
         anomalies_methods = ValidationRun.ANOMALIES_METHODS
         scaling_methods = [ValidationRun.MIN_MAX, ValidationRun.NO_SCALING, ValidationRun.MEAN_STD]
 
-        # preparing 6 validations, so that there is a base to be searched
+        # preparing a few validations, so that there is a base to be searched
         for i in range(3):
             run = self.generate_default_validation()
             run.user = self.testuser
+            run.interval_from = time_intervals_from
+            run.interval_to = time_intervals_to
             run.min_lat = self.hawaii_coordinates[0]
             run.min_lon = self.hawaii_coordinates[1]
             run.max_lat = self.hawaii_coordinates[2]
@@ -1274,27 +1276,29 @@ class TestValidation(TestCase):
             run.scaling_method = scaling_methods[i]
             run.doi = f'doi-1-2-{i}'
             run.save()
-            # ================== tcols ====================================
-            run_tcol = self.generate_default_validation_triple_coll()
-            run_tcol.user = self.testuser
-            run_tcol.min_lat = self.hawaii_coordinates[0]
-            run_tcol.min_lon = self.hawaii_coordinates[1]
-            run_tcol.max_lat = self.hawaii_coordinates[2]
-            run_tcol.max_lon = self.hawaii_coordinates[3]
+        # ================== tcols ====================================
+        run_tcol = self.generate_default_validation_triple_coll()
+        run_tcol.user = self.testuser
+        run_tcol.interval_from = time_intervals_from
+        run_tcol.interval_to = time_intervals_to
+        run_tcol.min_lat = self.hawaii_coordinates[0]
+        run_tcol.min_lon = self.hawaii_coordinates[1]
+        run_tcol.max_lat = self.hawaii_coordinates[2]
+        run_tcol.max_lon = self.hawaii_coordinates[3]
 
-            run_tcol.anomalies = anomalies_methods[i][0]
-            if anomalies_methods[i][0] == 'climatology':
-                run_tcol.anomalies_from = time_intervals_from
-                run_tcol.anomalies_to = time_intervals_to
-            run_tcol.scaling_method = scaling_methods[i]
-            run_tcol.doi = f'tcol_doi-1-2-{i}'
-            run_tcol.save()
+        run_tcol.anomalies = anomalies_methods[0][0]
+        run_tcol.scaling_method = scaling_methods[0]
+        run_tcol.doi = f'tcol_doi-1-2-{i}'
+        run_tcol.save()
 
         published_runs = ValidationRun.objects.exclude(doi='')
+
         # here will be validations for asserting, I start with exactly the same validations and check if it finds them:
         for i in range(3):
             run = self.generate_default_validation()
             run.user = self.testuser
+            run.interval_from = time_intervals_from
+            run.interval_to = time_intervals_to
             run.min_lat = self.hawaii_coordinates[0]
             run.min_lon = self.hawaii_coordinates[1]
             run.max_lat = self.hawaii_coordinates[2]
@@ -1311,3 +1315,120 @@ class TestValidation(TestCase):
             assert is_there_one
 
             run.delete()
+
+
+
+        # run to fail:
+        run = self.generate_default_validation()
+        run.user = self.testuser
+        run.interval_from = time_intervals_from
+        run.interval_to = time_intervals_to
+
+        # here different coordinates
+        run.min_lat = 34
+        run.min_lon = -11
+        run.max_lat = 48
+        run.max_lon = 71
+
+        run.anomalies = anomalies_methods[0][0]
+        run.scaling_method = scaling_methods[0]
+        run.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        # getting back to good coordinates
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # spoiling time span:
+        run.interval_from = datetime(1990, 1, 1, tzinfo=UTC)
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        run.interval_from = time_intervals_from
+        run.interval_to = datetime(2000, 1, 1, tzinfo=UTC)
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        # time span restored
+        run.interval_to = time_intervals_to
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # spoiling anomalies and scaling (there is no validation with anomalies set to 35 days average and min_max
+        # scaling method at the same time):
+        run.anomalies = anomalies_methods[1][0]
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        run.anomalies = anomalies_methods[0][0]
+        # there is no run with scaling method LINREG
+        run.scaling_method = ValidationRun.LINREG
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        # restoring existing validation
+        run.anomalies = anomalies_methods[2][0]
+        run.scaling_method = scaling_methods[2]
+        run.anomalies_from = time_intervals_from
+        run.anomalies_to = time_intervals_to
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # messing up with anomalies time interval:
+        run.anomalies_from = datetime(1990, 1, 1, tzinfo=UTC)
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        run.anomalies_from = time_intervals_from
+        run.anomalies_to = datetime(1990, 1, 1, tzinfo=UTC)
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        #getting back to appropriate settings
+        run.anomalies_to = time_intervals_to
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+
+        # ================== tcols ====================================
+        run_tcol = self.generate_default_validation_triple_coll()
+        run_tcol.user = self.testuser
+        run_tcol.interval_from = time_intervals_from
+        run_tcol.interval_to = time_intervals_to
+        run_tcol.min_lat = self.hawaii_coordinates[0]
+        run_tcol.min_lon = self.hawaii_coordinates[1]
+        run_tcol.max_lat = self.hawaii_coordinates[2]
+        run_tcol.max_lon = self.hawaii_coordinates[3]
+
+        run_tcol.anomalies = anomalies_methods[0][0]
+        run_tcol.scaling_method = scaling_methods[0]
+        run_tcol.save()
+        is_there_one = _compare_validation_runs(run_tcol, published_runs)
+
+        assert is_there_one['is_there_validation']
+
+        # setting tcols to False
+        run_tcol.tcol = False
+        run_tcol.save()
+
+        is_there_one = _compare_validation_runs(run_tcol, published_runs)
+        assert not is_there_one['is_there_validation']
+
+
