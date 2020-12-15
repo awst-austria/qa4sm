@@ -43,9 +43,9 @@ def _compare_param_filters(new_param_filters, old_param_filters):
         return False
     else:
         ind = 0
-        max_ind = len(new_param_filters) - 1
+        max_ind = len(new_param_filters)
         is_the_same = True
-        while new_param_filters[ind].parameters == old_param_filters[ind].parameters and ind < max_ind:
+        while ind < max_ind and new_param_filters[ind].parameters == old_param_filters[ind].parameters:
             ind += 1
         if ind != len(new_param_filters) - 1:
             is_the_same = False
@@ -79,9 +79,9 @@ def _compare_filters(new_dataset, old_dataset):
     else:
         is_the_same = True
         filt_ind = 0
-        max_filt_ind = new_filts_len - 1
+        max_filt_ind = new_filts_len
 
-        while new_run_filters[filt_ind] == old_run_filters[filt_ind] and filt_ind < max_filt_ind:
+        while filt_ind < max_filt_ind and new_run_filters[filt_ind] == old_run_filters[filt_ind]:
             filt_ind += 1
 
         if filt_ind == max_filt_ind:
@@ -109,7 +109,7 @@ def _compare_datasets(new_run_config, old_run_config):
         return False
     else:
         ds_fields = ['dataset', 'version']
-        max_ds_ind = len(ds_fields) - 1
+        max_ds_ind = len(ds_fields)
         the_same = True
         conf_ind = 0
 
@@ -117,7 +117,7 @@ def _compare_datasets(new_run_config, old_run_config):
             ds_ind = 0
             new_dataset = new_run_config[conf_ind]
             old_dataset = old_run_config[conf_ind]
-            while getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]) and ds_ind < max_ds_ind:
+            while  ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
                 ds_ind += 1
             if ds_ind == max_ds_ind:
                 the_same = _compare_filters(new_dataset, old_dataset)
@@ -125,6 +125,7 @@ def _compare_datasets(new_run_config, old_run_config):
                 the_same = False
             conf_ind += 1
     return the_same
+
 
 def _check_scaling_method(new_run, old_run):
     """
@@ -160,14 +161,14 @@ def _compare_validation_runs(new_run, runs_set):
     vr_fields = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
                  'anomalies', 'anomalies_from', 'anomalies_to']
     is_the_same = False # set to False because it looks for the first found validation run
-    max_vr_ind = len(vr_fields) - 1
-    max_run_ind = len(runs_set) - 1
+    max_vr_ind = len(vr_fields)
+    max_run_ind = len(runs_set)
     print('number of validations to be checked: ', len(runs_set))
     run_ind = 0
-    while not is_the_same and run_ind <= max_run_ind:
+    while not is_the_same and run_ind < max_run_ind:
         run = runs_set[run_ind]
         ind = 0
-        while getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]) and ind < max_vr_ind:
+        while ind < max_vr_ind and getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]):
             ind += 1
         if ind == max_vr_ind and _check_scaling_method(new_run, run):
             pub_run = runs_set[run_ind]
