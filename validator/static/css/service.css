@@ -180,6 +180,11 @@ div.plot_div {
 }
 #validate-confirm {
   display: none;
+  color: #00212e;
+}
+div.ui-dialog-titlebar{
+  background-color: #00AAE3;
+  color: white;
 }
 .hide_element {
   display: none;
