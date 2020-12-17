@@ -1257,7 +1257,7 @@ class TestValidation(TestCase):
         time_intervals_to = datetime(2018, 12, 31, tzinfo=UTC)
         anomalies_methods = ValidationRun.ANOMALIES_METHODS
         scaling_methods = [ValidationRun.MIN_MAX, ValidationRun.NO_SCALING, ValidationRun.MEAN_STD]
-
+        run_ids = []
         # preparing a few validations, so that there is a base to be searched
         for i in range(3):
             run = self.generate_default_validation()
@@ -1276,6 +1276,8 @@ class TestValidation(TestCase):
             run.scaling_method = scaling_methods[i]
             run.doi = f'doi-1-2-{i}'
             run.save()
+            run_ids.append(run.id)
+
         # ================== tcols ====================================
         run_tcol = self.generate_default_validation_triple_coll()
         run_tcol.user = self.testuser
@@ -1288,10 +1290,44 @@ class TestValidation(TestCase):
 
         run_tcol.anomalies = anomalies_methods[0][0]
         run_tcol.scaling_method = scaling_methods[0]
-        run_tcol.doi = f'tcol_doi-1-2-{i}'
+        run_tcol.doi = f'tcol_doi-1-2-3'
         run_tcol.save()
+        run_tcol_id = run_tcol.id
 
-        published_runs = ValidationRun.objects.exclude(doi='')
+        # ========= validations with filters
+
+        run_filt = self.generate_default_validation()
+        run_filt.user = self.testuser
+        run_filt.interval_from = time_intervals_from
+        run_filt.interval_to = time_intervals_to
+        run_filt.min_lat = self.hawaii_coordinates[0]
+        run_filt.min_lon = self.hawaii_coordinates[1]
+        run_filt.max_lat = self.hawaii_coordinates[2]
+        run_filt.max_lon = self.hawaii_coordinates[3]
+
+        run_filt.anomalies = anomalies_methods[0][0]
+        run_filt.scaling_method = scaling_methods[0]
+        run_filt.doi = f'doi-1-2-8'
+        run_filt.save()
+        run_filt_id = run_filt.id
+
+        for config in run_filt.dataset_configurations.all():
+            config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            if config.dataset.short_name == globals.ISMN:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            if config.dataset.short_name == globals.C3S:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+            print('old one',config.dataset == globals.ISMN, config, config.filters.all())
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
+                                     dataset_config=run_filt.reference_configuration)
+        pfilter.save()
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run_filt.reference_configuration)
+        pfilter.save()
+
+
+        published_runs = ValidationRun.objects.exclude(doi='').order_by('-start_time')
 
         # here will be validations for asserting, I start with exactly the same validations and check if it finds them:
         for i in range(3):
@@ -1312,13 +1348,11 @@ class TestValidation(TestCase):
             run.save()
             is_there_one = _compare_validation_runs(run, published_runs)
 
-            assert is_there_one
-
+            assert is_there_one['is_there_validation']
+            assert is_there_one['val_id'] == run_ids[i]
             run.delete()
 
-
-
-        # run to fail:
+        # runs to fail:
         run = self.generate_default_validation()
         run.user = self.testuser
         run.interval_from = time_intervals_from
@@ -1346,6 +1380,8 @@ class TestValidation(TestCase):
         run.save()
         is_there_one = _compare_validation_runs(run, published_runs)
         assert is_there_one['is_there_validation']
+        assert is_there_one['val_id'] == run_ids[0]
+
 
         # spoiling time span:
         run.interval_from = datetime(1990, 1, 1, tzinfo=UTC)
@@ -1364,6 +1400,7 @@ class TestValidation(TestCase):
         run.save()
         is_there_one = _compare_validation_runs(run, published_runs)
         assert is_there_one['is_there_validation']
+        assert is_there_one['val_id'] == run_ids[0]
 
         # spoiling anomalies and scaling (there is no validation with anomalies set to 35 days average and min_max
         # scaling method at the same time):
@@ -1387,6 +1424,7 @@ class TestValidation(TestCase):
         run.save()
         is_there_one = _compare_validation_runs(run, published_runs)
         assert is_there_one['is_there_validation']
+        assert is_there_one['val_id'] == run_ids[2]
 
         # messing up with anomalies time interval:
         run.anomalies_from = datetime(1990, 1, 1, tzinfo=UTC)
@@ -1406,6 +1444,141 @@ class TestValidation(TestCase):
         is_there_one = _compare_validation_runs(run, published_runs)
         assert is_there_one['is_there_validation']
 
+        # getting back to settings of the run with filters set adding filters for the run
+        run.anomalies = anomalies_methods[0][0]
+        run.scaling_method = scaling_methods[0]
+        run.anomalies_from = None
+        run.anomalies_to = None
+        run.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # adding filters
+        for new_config in run.dataset_configurations.all():
+            new_config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            if new_config.dataset.short_name == globals.ISMN:
+                new_config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            if new_config.dataset.short_name == globals.C3S:
+                new_config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+
+            new_config.save()
+
+        new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
+                                     dataset_config=run.reference_configuration)
+        new_pfilter.save()
+        # add filterring according to depth_range with the default values:
+        new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.reference_configuration)
+        new_pfilter.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+
+        assert is_there_one['is_there_validation']
+        assert is_there_one['val_id'] == run_filt_id
+
+        #messing up with filters:
+
+        # adding filter for C3S
+        c3s_filter = DataFilter.objects.get(name='FIL_C3S_MODE_ASC')
+        for new_config in run.dataset_configurations.all():
+            if new_config.dataset.short_name == globals.C3S:
+                new_config.filters.add(c3s_filter)
+                new_config.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+
+        assert not is_there_one['is_there_validation']
+
+        # getting back to the right settings
+        for new_config in run.dataset_configurations.all():
+            if new_config.dataset.short_name == globals.C3S:
+                new_config.filters.remove(c3s_filter)
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # removing ismn filter:
+        ismn_filter = DataFilter.objects.get(name='FIL_ISMN_GOOD')
+        for new_config in run.dataset_configurations.all():
+            if new_config.dataset.short_name == globals.ISMN:
+                new_config.filters.remove(ismn_filter)
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        #restoring the filter:
+        for new_config in run.dataset_configurations.all():
+            if new_config.dataset.short_name == globals.ISMN:
+                new_config.filters.add(ismn_filter)
+            new_config.save()
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # messing up with parameterised filters:
+        # ... with networks
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+            if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
+                pf.parameters = 'SCAN,OZNET'
+                pf.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+            if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
+                pf.parameters = 'OZNET'
+                pf.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        # restoring networks
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+            if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
+                pf.parameters = 'SCAN'
+                pf.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # with depths
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+            if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_DEPTH':
+                pf.parameters = '0.10,0.20'
+                pf.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        # restoring depths
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+            if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_DEPTH':
+                pf.parameters = '0.0,0.1'
+                pf.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # adding a new dataset:
+        data_c = DatasetConfiguration()
+        data_c.validation = run
+        data_c.dataset = Dataset.objects.get(short_name='ASCAT')
+        data_c.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
+        data_c.variable = DataVariable.objects.get(short_name='ASCAT_sm')
+        data_c.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
+
+        data_c.delete()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert is_there_one['is_there_validation']
+
+        # checking scaling reference:
+        new_ref = run.dataset_configurations.all()[0]
+        run.scaling_ref = new_ref
+        run.save()
+
+        is_there_one = _compare_validation_runs(run, published_runs)
+        assert not is_there_one['is_there_validation']
 
         # ================== tcols ====================================
         run_tcol = self.generate_default_validation_triple_coll()
@@ -1423,6 +1596,7 @@ class TestValidation(TestCase):
         is_there_one = _compare_validation_runs(run_tcol, published_runs)
 
         assert is_there_one['is_there_validation']
+        assert is_there_one['val_id'] == run_tcol_id
 
         # setting tcols to False
         run_tcol.tcol = False
@@ -1430,5 +1604,9 @@ class TestValidation(TestCase):
 
         is_there_one = _compare_validation_runs(run_tcol, published_runs)
         assert not is_there_one['is_there_validation']
+
+        ValidationRun.objects.all().delete()
+        DatasetConfiguration.objects.all().delete()
+        ParametrisedFilter.objects.all().delete()
 
 
