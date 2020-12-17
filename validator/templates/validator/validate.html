@@ -45,10 +45,10 @@
                                     <nav>
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                             {% for dc_form in dc_formset %}
-                                                <a class="dc_form_link nav-item nav-link {% if forloop.last %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" {% if forloop.last %}aria-selected="true"{% endif %} onclick="shiftTheButton(event, '#remove_dc_form')">Dataset</a>
+                                                <a class="dc_form_link nav-item nav-link {% if forloop.last %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" aria-selected="{% if forloop.last %}true{%else%}false{% endif %}" onclick="shiftTheButton(event, '#remove_dc_form')">Dataset</a>
                                             {% endfor %}
-                                                <a id="add_dc_form" value='{{ dc.formset|length }}' class="tab-plus btn btn-primary {% if dc_formset|length == 5 %}hide_element{% endif %}" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
-                                                <a id="remove_dc_form" class="tab-minus {% if dc_formset|length == 1 %}hide_element{% endif %}"  href="javascript:void(0)" title="Remove active dataset">&times;</a>
+                                                <a id="add_dc_form" value='{{ dc.formset|length }}' class="tab-plus btn btn-primary {%if dc_formset|length == dc_formset.max_num%}hide_element{%endif%}" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
+                                                <a id="remove_dc_form" class="tab-minus {%if dc_formset|length == dc_formset.min_num%}hide_element{%endif%}"  href="javascript:void(0)" title="Remove active dataset">&times;</a>
                                         </div>
                                     </nav>
 
@@ -695,7 +695,6 @@
                     $(filter_widget).html(return_data['filters']);
                     $(param_filter_widget).html(return_data['paramfilters']);
 
-                    console.log(datasetId, datasetName)
 
                     if(datasetName=='ISMN'){
                         var default_value = $(version_widget).find('option')[0].value
@@ -703,12 +702,9 @@
                     } else{
                         $('#id_target_hidden_input_version').val('')
                     }
-
                 }
             });
-
         }
-
 
 
         function change_tab_name() {
@@ -981,13 +977,14 @@
             removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
         });
 
+        function set_after(first_element_selector, second_element_selector){
+          $(first_element_selector).after($(second_element_selector))
+        }
+
         function shiftTheButton(obj, buttonSelector){
             var currentObject = obj.currentTarget
-            var removeButton = $(buttonSelector)
-            $(currentObject).after(removeButton)
-
-
-}
+            set_after(currentObject, buttonSelector)
+          }
 
     </script>
 
@@ -1066,6 +1063,11 @@
         var counter = parseInt($('#click-counter').val())
         $('#click-counter').val(counter+1)
       }
+      // this code is added so the tab closing button renders in an appropriate
+      // place; it wasn't an issue before, because only one tab is rendered by default
+      if($('#id_datasets-TOTAL_FORMS') >= $('#id_datasets-MIN_NUM_FORMS')){
+        set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
+      }
 
       if ('{{if_run_exists}}' == 'True'){
         var url_to_go = $('#validate-confirm').attr('data-url')
@@ -1077,13 +1079,11 @@
           buttons: {
             'Use the existing one': function() {
               window.location.href = url_to_go
-              // $( this ).dialog( "close" );
             },
             "Run your own validation": function() {
               $('#validate-run').click(set_counter).click();
               $( this ).dialog( "close" );
             }
-
           }
         });
       }
