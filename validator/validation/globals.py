@@ -81,3 +81,8 @@ ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 
 NOT_AS_REFERENCE = [SMAP, SMOS, ASCAT]
+
+# ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
+VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
+                 'anomalies', 'anomalies_from', 'anomalies_to']
+DS_FIELDS = ['dataset', 'version']
