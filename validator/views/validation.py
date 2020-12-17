@@ -18,7 +18,7 @@ from django.template import loader
 
 from validator.forms import DatasetConfigurationForm, FilterCheckboxSelectMultiple,\
     ValidationRunForm, ParamFilterChoiceField, ParamFilterSelectMultiple
-from validator.models import DataFilter, DatasetVersion, ParametrisedFilter
+from validator.models import DataFilter, DatasetVersion
 from validator.models import Dataset
 from validator.models import Settings
 from validator.models import ValidationRun, DatasetConfiguration
@@ -107,7 +107,7 @@ def _compare_datasets(new_run_config, old_run_config):
     if len(old_run_config) != new_len:
         return False
     else:
-        ds_fields = ['dataset', 'version']
+        ds_fields = val_globals.DS_FIELDS
         max_ds_ind = len(ds_fields)
         the_same = True
         conf_ind = 0
@@ -157,8 +157,7 @@ def _compare_validation_runs(new_run, runs_set):
         }
         where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
     """
-    vr_fields = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-                 'anomalies', 'anomalies_from', 'anomalies_to']
+    vr_fields = val_globals.VR_FIELDS
     is_the_same = False # set to False because it looks for the first found validation run
     max_vr_ind = len(vr_fields)
     max_run_ind = len(runs_set)
