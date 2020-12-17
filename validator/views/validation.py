@@ -47,7 +47,7 @@ def _compare_param_filters(new_param_filters, old_param_filters):
         is_the_same = True
         while ind < max_ind and new_param_filters[ind].parameters == old_param_filters[ind].parameters:
             ind += 1
-        if ind != len(new_param_filters) - 1:
+        if ind != len(new_param_filters):
             is_the_same = False
 
     return is_the_same
@@ -63,21 +63,20 @@ def _compare_filters(new_dataset, old_dataset):
 
     new_run_filters = new_dataset.filters.all().order_by('name')
     old_run_filters = old_dataset.filters.all().order_by('name')
-
     new_filts_len = len(new_run_filters)
+    old_filts_len = len(old_run_filters)
 
-    if new_filts_len != len(old_run_filters):
+    if new_filts_len != old_filts_len:
         return False
-    elif new_filts_len == len(old_run_filters) and new_filts_len == 0:
+    elif new_filts_len == old_filts_len and new_filts_len == 0:
         is_the_same = True
         new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
+
         if len(new_param_filters) != 0:
             old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
             is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
-
         return is_the_same
     else:
-        is_the_same = True
         filt_ind = 0
         max_filt_ind = new_filts_len
 
@@ -85,13 +84,13 @@ def _compare_filters(new_dataset, old_dataset):
             filt_ind += 1
 
         if filt_ind == max_filt_ind:
+            is_the_same = True
             new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
             if len(new_param_filters) != 0:
                 old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
                 is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
         else:
             is_the_same = False
-
     return is_the_same
 
 
@@ -117,7 +116,7 @@ def _compare_datasets(new_run_config, old_run_config):
             ds_ind = 0
             new_dataset = new_run_config[conf_ind]
             old_dataset = old_run_config[conf_ind]
-            while  ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
+            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
                 ds_ind += 1
             if ds_ind == max_ds_ind:
                 the_same = _compare_filters(new_dataset, old_dataset)
@@ -163,7 +162,6 @@ def _compare_validation_runs(new_run, runs_set):
     is_the_same = False # set to False because it looks for the first found validation run
     max_vr_ind = len(vr_fields)
     max_run_ind = len(runs_set)
-    print('number of validations to be checked: ', len(runs_set))
     run_ind = 0
     while not is_the_same and run_ind < max_run_ind:
         run = runs_set[run_ind]
@@ -171,15 +169,15 @@ def _compare_validation_runs(new_run, runs_set):
         while ind < max_vr_ind and getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]):
             ind += 1
         if ind == max_vr_ind and _check_scaling_method(new_run, run):
-            pub_run = runs_set[run_ind]
+            # is_the_same = True
+            # val_id = run.id
             new_run_config = DatasetConfiguration.objects.filter(validation=new_run).order_by('dataset')
-            old_run_config = DatasetConfiguration.objects.filter(validation=pub_run).order_by('dataset')
+            old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
             is_the_same = _compare_datasets(new_run_config, old_run_config)
-            val_id = pub_run.id
+            val_id = run.id
         run_ind += 1
 
     val_id = val_id if is_the_same else None
-    print('Number of validations checked', run_ind)
     response = {
         'is_there_validation': is_the_same,
         'val_id': val_id
