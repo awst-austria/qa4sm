@@ -158,3 +158,18 @@ function ajax_save_name(obj, result_id){
     });
 
 }
+
+function ajax_copy_validation(result_id){
+  var url =  result_url.replace('00000000-0000-0000-0000-000000000000', result_id);
+  var formdata = { "add_validation" : true};
+  $.ajaxSetup({
+      headers : { "X-CSRFToken" : csrf_token }
+  });
+
+  $.ajax({
+      url: url,
+      type: 'POST',
+      data: formdata,
+      success : function(return_data) { location.reload(); }
+  });
+}
