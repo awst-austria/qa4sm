@@ -20,10 +20,13 @@ def user_runs(request):
     page = request.GET.get('page', 1)
 
     cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
+    copied_runs = current_user.copied_runs.all()
 
     paginator = Paginator(cur_user_runs, 10)
+    paginator_copied = Paginator(copied_runs, 10)
     try:
         paginated_runs = paginator.page(page)
+        paginated_copied_runs = paginator_copied.page(page)
     except PageNotAnInteger:
         paginated_runs = paginator.page(1)
     except EmptyPage:
