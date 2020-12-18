@@ -172,8 +172,27 @@ function ajax_copy_validation(result_id){
       data: formdata,
       success : function(return_data) {
         location.reload();
-        console.log(return_data)
-        !alert(return_data)
+        !alert(return_data);
+      }
+  });
+}
+
+function ajax_remove_copied_validation(result_id){
+  if (!confirm('Do you really want to remove this validation from your list?')) {
+         return;
+  }
+  var url =  result_url.replace('00000000-0000-0000-0000-000000000000', result_id);
+  var formdata = { "remove_validation" : true};
+  $.ajaxSetup({
+      headers : { "X-CSRFToken" : csrf_token }
+  });
+
+  $.ajax({
+      url: url,
+      type: 'POST',
+      data: formdata,
+      success : function(return_data) {
+        location.reload();
       }
   });
 }

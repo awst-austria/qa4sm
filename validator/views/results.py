@@ -59,7 +59,7 @@ def result(request, result_uuid):
     elif request.method == 'POST':
         post_params = QueryDict(request.body)
 
-        if post_params['add_validation']:
+        if 'add_validation' in post_params and post_params['add_validation']:
             user = request.user
             if val_run.user != request.user:
                 if val_run not in user.copied_runs.all():
@@ -71,9 +71,15 @@ def result(request, result_uuid):
             else:
                 response = HttpResponse("This validation was published by you, you have it already on your list",
                                         status=200)
-            return response
+        elif 'remove_validation' in post_params and post_params['remove_validation']:
+            user = request.user
+            user.copied_runs.remove(val_run)
+            response = HttpResponse("Validation has been removed from your list",status=200)
+
         else:
-            return HttpResponse("Wrong action parameter.", status=400)
+            response = HttpResponse("Wrong action parameter.", status=400)
+
+        return response
 
     elif(request.method == 'PATCH'):
         ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
