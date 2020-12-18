@@ -52,7 +52,7 @@
 
                             <div class="col-sm" style="text-align: right; max-width: 6.8rem;">
                                 <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
-                                <a class="btn btn-sm btn-primary btn-action" href="#" title="Add this validation to your list"><span class="fas fa-plus"></span></a>
+                                <a class="btn btn-sm btn-primary btn-action" href="#" onclick="ajax_copy_validation('{{ valrun.id}}')" title="Add this validation to your list"><span class="fas fa-plus"></span></a>
                             </div>
 
                         </div>
@@ -99,4 +99,10 @@
 {% endblock %}
 
 {% block javascript %}
+<script type="text/javascript">
+    csrf_token = '{{csrf_token}}';
+    result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+    stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+</script>
+<script src="{% static 'js/results_buttons.js' %}"></script>
 {% endblock %}
