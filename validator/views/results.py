@@ -37,6 +37,7 @@ def user_runs(request):
 
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
         if(val_run.user != request.user):
@@ -48,6 +49,22 @@ def result(request, result_uuid):
 
         val_run.delete()
         return HttpResponse("Deleted.", status=200)
+
+    elif request.method == 'POST':
+        post_params = QueryDict(request.body)
+
+        if post_params['add_validation']:
+            user = request.user
+            if(val_run.user != request.user):
+                val_run.used_by.add(user)
+                val_run.save()
+                response = HttpResponse("Validation added to your list", status=200)
+            else:
+                response = HttpResponse("This validation was published by you, you have it already on your validations "
+                                        "list", status=200)
+            return response
+        else:
+            return HttpResponse("Wrong action parameter.", status=400)
 
     elif(request.method == 'PATCH'):
         ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
@@ -148,3 +165,4 @@ def result(request, result_uuid):
             }
 
         return render(request, 'validator/result.html', context)
+
