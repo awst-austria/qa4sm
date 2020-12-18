@@ -35,8 +35,8 @@ def user_runs(request):
         paginated_copied_runs = paginator_copied.page(paginator_copied.num_pages)
 
     context = {
-        'myruns' : paginated_runs,
-        'copied_runs' :paginated_copied_runs
+        'myruns': paginated_runs,
+        'copied_runs': paginated_copied_runs
         }
     return render(request, 'validator/user_runs.html', context)
 
@@ -61,13 +61,16 @@ def result(request, result_uuid):
 
         if post_params['add_validation']:
             user = request.user
-            if(val_run.user != request.user):
-                val_run.used_by.add(user)
-                val_run.save()
-                response = HttpResponse("Validation added to your list", status=200)
+            if val_run.user != request.user:
+                if val_run not in user.copied_runs.all():
+                    val_run.used_by.add(user)
+                    val_run.save()
+                    response = HttpResponse("Validation added to your list", status=200)
+                else:
+                    response = HttpResponse("You have already added this validation to your list", status=200)
             else:
-                response = HttpResponse("This validation was published by you, you have it already on your validations "
-                                        "list", status=200)
+                response = HttpResponse("This validation was published by you, you have it already on your list",
+                                        status=200)
             return response
         else:
             return HttpResponse("Wrong action parameter.", status=400)
