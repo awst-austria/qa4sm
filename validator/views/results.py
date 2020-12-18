@@ -29,11 +29,14 @@ def user_runs(request):
         paginated_copied_runs = paginator_copied.page(page)
     except PageNotAnInteger:
         paginated_runs = paginator.page(1)
+        paginated_copied_runs = paginator_copied.page(1)
     except EmptyPage:
         paginated_runs = paginator.page(paginator.num_pages)
+        paginated_copied_runs = paginator_copied.page(paginator_copied.num_pages)
 
     context = {
         'myruns' : paginated_runs,
+        'copied_runs' :paginated_copied_runs
         }
     return render(request, 'validator/user_runs.html', context)
 
