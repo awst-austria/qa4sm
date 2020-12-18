@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='validationrun',
             name='used_by',
-            field=models.ManyToManyField(blank=True, related_name='used_by_users', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(blank=True, related_name='copied_runs', to=settings.AUTH_USER_MODEL),
         ),
     ]
