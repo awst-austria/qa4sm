@@ -170,6 +170,10 @@ function ajax_copy_validation(result_id){
       url: url,
       type: 'POST',
       data: formdata,
-      success : function(return_data) { location.reload(); }
+      success : function(return_data) {
+        location.reload();
+        console.log(return_data)
+        !alert(return_data)
+      }
   });
 }
