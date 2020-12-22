@@ -6,7 +6,7 @@ from validator.models import ValidationRun
 
 def published_results(request):
     current_user = request.user
-    copied_runs = current_user.copied_runs.all()
+    copied_runs = current_user.copied_runs.all() if current_user.username else []
 
     page = request.GET.get('page', 1)
 

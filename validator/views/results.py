@@ -44,7 +44,7 @@ def user_runs(request):
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
     current_user = request.user
-    copied_runs = current_user.copied_runs.all()
+    copied_runs = current_user.copied_runs.all() if current_user.username else []
     is_copied = val_run in copied_runs
 
     if(request.method == 'DELETE'):
