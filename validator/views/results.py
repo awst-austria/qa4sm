@@ -172,6 +172,7 @@ def result(request, result_uuid):
         metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
 
         context = {
+            'current_user': current_user.username,
             'is_owner': is_owner,
             'val' : val_run,
             'is_copied': is_copied,
