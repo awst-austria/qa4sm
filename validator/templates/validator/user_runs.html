@@ -4,32 +4,31 @@
 {% block content %}
 
 <div class="container">
-    {% if copied_runs|length != 0 %}
-    <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
-        <h1 class="jumbotron-heading">Attached validations</h1>
-    </div>
-    <div class="card-deck mb-3">
-            <div class="col">
-              {% for valrun in copied_runs %}
-                  <div class="mx-0" id="attached_result_row_{{ valrun.id }}">
-                      <div class="card-header att_val_container">
-                          <h5 class="my-0"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
-                        <div class="col-sm">
-                            <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
-                            {% if valrun.end_time %}
-                                {% if valrun.output_file %}
-                                  <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
-                                  <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
-                                  <button class="btn btn-sm btn-primary btn-action" title="Deattach this validation from your list" onclick="ajax_remove_copied_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
-                                {% endif %}
-                            {% endif %}
+  {% if copied_runs|length != 0 %}
+      <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+          <h1 class="jumbotron-heading">Attached validations</h1>
+      </div>
+      <div class="card-deck mb-3">
+              <div class="col">
+                {% for valrun in copied_runs %}
+                    <div class="mx-0" id="attached_result_row_{{ valrun.id }}">
+                        <div class="card-header att_val_container">
+                            <h5 class="my-0"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
+                          <div class="col-sm">
+                              <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
+                              {% if valrun.end_time %}
+                                  {% if valrun.output_file %}
+                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
+                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
+                                    <button class="btn btn-sm btn-primary btn-action" title="Deattach this validation from your list" onclick="ajax_remove_copied_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
+                                  {% endif %}
+                              {% endif %}
+                          </div>
                         </div>
-                  </div>
-              {% endfor %}
+                    </div>
+                {% endfor %}
               </div>
-    </div>
-        {% endif %}
-</div>
+      </div>
         {% if copied_runs.has_other_pages %}
             <nav aria-label="pagination">
                 <ul class="pagination justify-content-center">
@@ -63,6 +62,7 @@
                 </ul>
             </nav>
         {% endif %}
+      {%endif%}  
 
 
     <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
