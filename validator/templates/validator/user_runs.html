@@ -13,7 +13,7 @@
               {% for valrun in copied_runs %}
                   <div class="mx-0" id="attached_result_row_{{ valrun.id }}">
                       <div class="card-header att_val_container">
-                          <h5 class="my-0"><span class="font-weight-normal" style="padding: 0px 0px 0px 0px">Validation:</span> {{ valrun.name_tag }}</h5>
+                          <h5 class="my-0"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
                         <div class="col-sm">
                             <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
                             {% if valrun.end_time %}
