@@ -6,6 +6,8 @@ from validator.models import ValidationRun
 
 def published_results(request):
     current_user = request.user
+    copied_runs = current_user.copied_runs.all()
+
     page = request.GET.get('page', 1)
 
     published = ValidationRun.objects.filter(doi__isnull=False).exclude(doi__exact='').order_by('-start_time')
@@ -20,6 +22,7 @@ def published_results(request):
 
     context = {
         'current_user': current_user.username,
-        'validations' : paginated_runs,
+        'copied_runs': copied_runs,
+        'validations': paginated_runs,
         }
     return render(request, 'validator/published_results.html', context)
