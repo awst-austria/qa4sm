@@ -342,6 +342,50 @@ class TestViews(TransactionTestCase):
         run.save()
         assert ValidationRun.objects.filter(name_tag='new_name').exists()
 
+    def test_attach_detach_results(self):
+        # create new no-named result
+        run = ValidationRun()
+        run.user = self.testuser
+        run.start_time = datetime.now(tzlocal())
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.save()
+        result_id = str(run.id)
+
+        assert result_id, "Error saving the test validation run."
+
+            # # try to change name of other user's validation
+            # url = reverse('result', kwargs={'result_uuid': result_id})
+            #
+            # self.client.login(**self.credentials2)
+            # response = self.client.patch(url, 'save_name=false', content_type='application/x-www-form-urlencoded;')
+            # self.assertEqual(response.status_code, 403)
+            #
+            # # log in as owner of result and check invalid saving mode
+            # self.client.login(**self.credentials)
+            # response = self.client.patch(url, 'save_name=false', content_type='application/x-www-form-urlencoded;')
+            # self.assertEqual(response.status_code, 400)
+            #
+            # # log in as owner of result and check valid saving mode
+            # self.client.login(**self.credentials)
+            # response = self.client.patch(url, 'save_name=true&new_name="new_name"',
+            #                              content_type='application/x-www-form-urlencoded;')
+            # self.assertEqual(response.status_code, 200)
+            #
+            # run.doi = '10.1000/182'
+            # run.save()
+            #
+            # response = self.client.patch(url, 'save_name=true&new_name="new_name"',
+            #                              content_type='application/x-www-form-urlencoded;')
+            # self.assertEqual(response.status_code, 405)
+            #
+            # run.doi = ''
+            # run.save()
+            # run.name_tag = 'new_name'
+            # run.save()
+            # assert ValidationRun.objects.filter(name_tag='new_name').exists()
+
+
     def test_my_results_view(self):
         url = reverse('myruns')
         self.client.login(**self.credentials)
