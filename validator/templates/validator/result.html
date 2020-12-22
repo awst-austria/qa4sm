@@ -175,7 +175,11 @@
                         {% endif %}
                     {% else %}
                     <div style="float: right;" class="patchButtonGroup">
-                        <button class="btn btn-sm btn-primary" title="Attach this validation to your list" onclick="ajax_copy_validation('{{ valrun.id}}')"><span class="fas fa-plus"></span> Attach </button>
+                        {% if is_copied %}
+                            <button class="btn btn-sm btn-primary" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span> Detach </button>
+                        {% else %}
+                            <button class="btn btn-sm btn-primary" title="Attach this validation to your list" onclick="ajax_copy_validation('{{ valrun.id}}')"><span class="fas fa-plus"></span> Attach </button>
+                        {% endif %}
                     </div>
                     {% endif %}
                 </div>

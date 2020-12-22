@@ -43,6 +43,9 @@ def user_runs(request):
 
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+    current_user = request.user
+    copied_runs = current_user.copied_runs.all()
+    is_copied = val_run in copied_runs
 
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
@@ -171,6 +174,7 @@ def result(request, result_uuid):
         context = {
             'is_owner': is_owner,
             'val' : val_run,
+            'is_copied': is_copied,
             'error_rate' : error_rate,
             'run_time': run_time,
             'metrics': metrics,
