@@ -176,9 +176,9 @@
                     {% else %}
                     <div style="float: right;" class="patchButtonGroup">
                         {% if is_copied %}
-                            <button class="btn btn-sm btn-primary" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span> Detach </button>
+                            <button class="btn btn-sm btn-primary" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Detach </button>
                         {% else %}
-                            <button class="btn btn-sm btn-primary" title="Attach this validation to your list" onclick="ajax_copy_validation('{{ valrun.id}}')"><span class="fas fa-plus"></span> Attach </button>
+                            <button class="btn btn-sm btn-primary" title="Attach this validation to your list" onclick="ajax_copy_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Attach </button>
                         {% endif %}
                     </div>
                     {% endif %}
@@ -323,8 +323,9 @@
     stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
 </script>
 
-{% if is_owner %}
+{% if is_owner or not val.is_unpublished %}
     <script src="{% static 'js/results_buttons.js' %}"></script>
+    Monika
 {% endif %}
 
 {% endblock %}
