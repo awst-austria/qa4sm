@@ -175,10 +175,12 @@
                         {% endif %}
                     {% else %}
                     <div style="float: right;" class="patchButtonGroup">
-                        {% if is_copied %}
-                            <button class="btn btn-sm btn-primary" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Detach </button>
-                        {% else %}
-                            <button class="btn btn-sm btn-primary" title="Attach this validation to your list" onclick="ajax_copy_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Attach </button>
+                        {% if current_user %}
+                            {% if is_copied %}
+                                <button class="btn btn-sm btn-primary" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Detach </button>
+                            {% else %}
+                                <button class="btn btn-sm btn-primary" title="Attach this validation to your list" onclick="ajax_copy_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Attach </button>
+                            {% endif %}
                         {% endif %}
                     </div>
                     {% endif %}
@@ -325,7 +327,6 @@
 
 {% if is_owner or not val.is_unpublished %}
     <script src="{% static 'js/results_buttons.js' %}"></script>
-    Monika
 {% endif %}
 
 {% endblock %}
