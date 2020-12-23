@@ -342,6 +342,58 @@ class TestViews(TransactionTestCase):
         run.save()
         assert ValidationRun.objects.filter(name_tag='new_name').exists()
 
+    def test_attach_detach_results(self):
+        # create new no-named result
+        run = ValidationRun()
+        run.user = self.testuser
+        run.start_time = datetime.now(tzlocal())
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.doi = '10.1000/182'
+        run.save()
+        result_id = str(run.id)
+
+        assert result_id, "Error saving the test validation run."
+
+        url = reverse('result', kwargs={'result_uuid': result_id})
+
+        # attaching results should be possible even for non owners:
+        self.client.login(**self.credentials2)
+        current_user = self.testuser2
+
+        response = self.client.post(url, 'add_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'add_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(current_user.copied_runs.all()), 1)
+
+        response = self.client.post(url, 'remove_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'remove_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(current_user.copied_runs.all()), 0)
+
+        self.client.login(**self.credentials)
+        current_user = self.testuser
+
+        response = self.client.post(url, 'remove_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'remove_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        # is the user is also the owner of the run it's not possible to attach it to the list
+        self.assertEqual(len(current_user.copied_runs.all()), 0)
+
+        response = self.client.post(url, 'add_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'add_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+
+        run.delete()
+
     def test_my_results_view(self):
         url = reverse('myruns')
         self.client.login(**self.credentials)

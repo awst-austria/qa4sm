@@ -12,7 +12,7 @@ from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
-from validator.models import DatasetConfiguration
+from validator.models import DatasetConfiguration, User
 
 
 class ValidationRun(models.Model):
@@ -85,6 +85,7 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
+    used_by = models.ManyToManyField(User, related_name='copied_runs', blank=True)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration

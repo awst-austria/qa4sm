@@ -20,6 +20,7 @@ def user_runs(request):
     page = request.GET.get('page', 1)
 
     cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
+    copied_runs = current_user.copied_runs.all()
 
     paginator = Paginator(cur_user_runs, 10)
     try:
@@ -28,15 +29,19 @@ def user_runs(request):
         paginated_runs = paginator.page(1)
     except EmptyPage:
         paginated_runs = paginator.page(paginator.num_pages)
-
     context = {
-        'myruns' : paginated_runs,
+        'myruns': paginated_runs,
+        'copied_runs': copied_runs
         }
     return render(request, 'validator/user_runs.html', context)
 
 
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+    current_user = request.user
+    copied_runs = current_user.copied_runs.all() if current_user.username else []
+    is_copied = val_run in copied_runs
+
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
         if(val_run.user != request.user):
@@ -48,6 +53,29 @@ def result(request, result_uuid):
 
         val_run.delete()
         return HttpResponse("Deleted.", status=200)
+
+    elif request.method == 'POST':
+        post_params = QueryDict(request.body)
+        user = request.user
+        if 'add_validation' in post_params and post_params['add_validation'] == 'true':
+            if val_run.user != user:
+                if val_run not in user.copied_runs.all():
+                    val_run.used_by.add(user)
+                    val_run.save()
+                    response = HttpResponse("Validation added to your list", status=200)
+                else:
+                    response = HttpResponse("You have already added this validation to your list", status=200)
+            else:
+                response = HttpResponse("This validation was published by you, you have it already on your list",
+                                        status=200)
+        elif 'remove_validation' in post_params and post_params['remove_validation'] == 'true':
+            user.copied_runs.remove(val_run)
+            response = HttpResponse("Validation has been removed from your list", status=200)
+
+        else:
+            response = HttpResponse("Wrong action parameter.", status=400)
+
+        return response
 
     elif(request.method == 'PATCH'):
         ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
@@ -137,8 +165,10 @@ def result(request, result_uuid):
         metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
 
         context = {
+            'current_user': current_user.username,
             'is_owner': is_owner,
             'val' : val_run,
+            'is_copied': is_copied,
             'error_rate' : error_rate,
             'run_time': run_time,
             'metrics': metrics,
@@ -148,3 +178,4 @@ def result(request, result_uuid):
             }
 
         return render(request, 'validator/result.html', context)
+

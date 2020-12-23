@@ -189,3 +189,16 @@ div.ui-dialog-titlebar{
 .hide_element {
   display: none;
 }
+
+.att_val_container{
+  background-color: white;
+  color: black;
+  padding: 0.3em 0.3em 0.3em 0.3em;
+}
+.att_val_container h5.my-0{
+  float: left;
+  padding-top: 0.3em;
+}
+.att_val_container div.col-sm{
+  text-align: right;
+}
