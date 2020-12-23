@@ -292,11 +292,28 @@ def validation(request):
             if if_run_exists and clicked_times == 1:
                 newrun.delete()
                 val_id = comparison['val_id']
+                is_published = True
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
                                'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
-                               'val_id': val_id})
+                               'val_id': val_id, 'is_published': is_published})
             else:
+                existing_vals = ValidationRun.objects.filter(doi='').order_by('-start_time')
+                # comparing validation-to-be-run against existing ones
+                comparison = _compare_validation_runs(newrun, existing_vals)
+                if_run_exists = comparison['is_there_validation']
+
+                if if_run_exists and clicked_times == 1:
+                    newrun.delete()
+                    val_id = comparison['val_id']
+                    is_published = False
+                    return render(request, 'validator/validate.html',
+                                  {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
+                                   'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
+                                   'val_id': val_id, 'is_published': is_published})
+
+
+                # checking how many times the validation button was clicked - in try so that tests pass
                 # need to close all db connections before forking, see
                 # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
                 connections.close_all()

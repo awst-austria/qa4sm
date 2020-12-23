@@ -1070,7 +1070,7 @@
         set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
       }
 
-      if ('{{if_run_exists}}' == 'True'){
+      if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){
         var url_to_go = $('#validate-confirm').attr('data-url')
         $('#validate-confirm').dialog({
           resizable: false,
