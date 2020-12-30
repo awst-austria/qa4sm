@@ -146,7 +146,7 @@ def _check_scaling_method(new_run, old_run):
     return True
 
 
-def _compare_validation_runs(new_run, runs_set):
+def _compare_validation_runs(new_run, runs_set, user):
     """
     Compares two validation runs. It takes a new_run and checks the query given by runs_set according to parameters
     given in the vr_fileds. If all fields agree it checks datasets configurations.
@@ -182,68 +182,82 @@ def _compare_validation_runs(new_run, runs_set):
     val_id = val_id if is_the_same else None
     response = {
         'is_there_validation': is_the_same,
-        'val_id': val_id
+        'val_id': val_id,
+        'belongs_to_user': run.user == user
         }
     return response
 
 
 def _copy_validationrun(run_to_copy, new_user):
-    # old info which is needed then
-    old_scaling_ref_id = run_to_copy.scaling_ref_id
-    old_val_id = str(run_to_copy.id)
-    dataset_conf = run_to_copy.dataset_configurations.all()
+    # checking if the new validation belongs to the same user:
+    if run_to_copy.user == new_user:
+        run_id = run_to_copy.id
+        # belongs_to_user = True
+    else:
+        # old info which is needed then
+        old_scaling_ref_id = run_to_copy.scaling_ref_id
+        old_val_id = str(run_to_copy.id)
+        dataset_conf = run_to_copy.dataset_configurations.all()
 
-    run_to_copy.user = new_user
-    run_to_copy.id = None
-    run_to_copy.save()
-
-    # new configuration
-    for conf in dataset_conf:
-        old_id = conf.id
-        old_filters = conf.filters.all()
-        old_param_filters = conf.parametrisedfilter_set.all()
-
-        # setting new scaling reference id
-        if old_id == old_scaling_ref_id:
-            run_to_copy.scaling_ref_id = conf.id
-
-        new_conf = conf
-        new_conf.pk = None
-        new_conf.validation = run_to_copy
-        new_conf.save()
-
-        # setting filters
-        new_conf.filters.set(old_filters)
-        if len(old_param_filters) != 0:
-            for param_filter in old_param_filters:
-                param_filter.id = None
-                param_filter.dataset_config = new_conf
-                param_filter.save()
-
-    # the reference configuration is always the last one:
-    try:
-        run_to_copy.reference_configuration_id = conf.id
+        run_to_copy.user = new_user
+        run_to_copy.id = None
         run_to_copy.save()
-    except:
-        pass
 
-    # copying files
-    # new directory -> creating if doesn't exist
-    new_dir = os.path.join(OUTPUT_FOLDER, str(run_to_copy.id))
-    mkdir_if_not_exists(new_dir)
-    # old directory and all files there
-    old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
-    old_files = os.listdir(old_dir)
+        # new configuration
+        for conf in dataset_conf:
+            old_id = conf.id
+            old_filters = conf.filters.all()
+            old_param_filters = conf.parametrisedfilter_set.all()
 
-    if len(old_files) != 0:
-        for old_file_name in old_files:
-            new_file = new_dir + '/' + old_file_name
-            old_file = old_dir + '/' + old_file_name
-            if '.nc' in new_file:
-                run_to_copy.output_file = str(run_to_copy.id) + '/' + old_file_name
-                run_to_copy.save()
-            copy2(old_file, new_file)
+            # setting new scaling reference id
+            if old_id == old_scaling_ref_id:
+                run_to_copy.scaling_ref_id = conf.id
 
+            new_conf = conf
+            new_conf.pk = None
+            new_conf.validation = run_to_copy
+            new_conf.save()
+
+            # setting filters
+            new_conf.filters.set(old_filters)
+            if len(old_param_filters) != 0:
+                for param_filter in old_param_filters:
+                    param_filter.id = None
+                    param_filter.dataset_config = new_conf
+                    param_filter.save()
+
+        # the reference configuration is always the last one:
+        try:
+            run_to_copy.reference_configuration_id = conf.id
+            run_to_copy.save()
+        except:
+            pass
+
+        # copying files
+        # new directory -> creating if doesn't exist
+        new_dir = os.path.join(OUTPUT_FOLDER, str(run_to_copy.id))
+        mkdir_if_not_exists(new_dir)
+        # old directory and all files there
+        old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
+        old_files = os.listdir(old_dir)
+
+        if len(old_files) != 0:
+            for old_file_name in old_files:
+                new_file = new_dir + '/' + old_file_name
+                old_file = old_dir + '/' + old_file_name
+                if '.nc' in new_file:
+                    run_to_copy.output_file = str(run_to_copy.id) + '/' + old_file_name
+                    run_to_copy.save()
+                copy2(old_file, new_file)
+
+        run_id = run_to_copy.id
+        # belongs_to_user = False
+
+    response = {
+        'run_id': run_id,
+        # 'belongs_to_user': belongs_to_user
+    }
+    return response
 
 __logger = logging.getLogger(__name__)
 
@@ -339,12 +353,22 @@ def validation(request):
 
             newrun.save()
 
-            # taking published validations:
+            # checking if there exist validations:
+            # checking published validations:
             vals_published = ValidationRun.objects.exclude(doi='').order_by('-start_time')
-            # comparing validation-to-be-run against existing ones
-            comparison = _compare_validation_runs(newrun, vals_published)
-            if_run_exists = comparison['is_there_validation']
-            # checking how many times the validation button was clicked - in try so that tests pass
+            comparison_pub = _compare_validation_runs(newrun, vals_published, request.user)
+            if_pub_run_exists = comparison_pub['is_there_validation']
+
+            if not if_pub_run_exists:
+                # checking non published ones - excluding the one which is currently verified
+                existing_vals = ValidationRun.objects.filter(doi='').exclude(pk=newrun.id).order_by('-start_time')
+                comparison_non_pub = _compare_validation_runs(newrun, existing_vals, request.user)
+                if_non_pub_run_exists = comparison_non_pub['is_there_validation']
+                if_run_exists = if_non_pub_run_exists
+            else:
+                if_run_exists = False
+
+            # checking how many times the validation button was clicked - in 'try' so that tests pass
             try:
                 clicked_times = int(request.POST.get('click-counter'))
             except:
@@ -352,27 +376,37 @@ def validation(request):
 
             if if_run_exists and clicked_times == 1:
                 newrun.delete()
+                comparison, is_published  = (comparison_pub, True) if if_pub_run_exists else (comparison_non_pub, False)
                 val_id = comparison['val_id']
-                is_published = True
+                belongs_to_user = comparison['belongs_to_user']
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
                                'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
-                               'val_id': val_id, 'is_published': is_published})
+                               'val_id': val_id, 'is_published': is_published, 'belongs_to_user': belongs_to_user})
             else:
-                # existing_vals = ValidationRun.objects.filter(doi='').order_by('-start_time')
+                # # here taking non published ones
+                # existing_vals = ValidationRun.objects.filter(doi='').exclude(pk=newrun.id).order_by('-start_time')
                 # # comparing validation-to-be-run against existing ones
                 # comparison = _compare_validation_runs(newrun, existing_vals)
                 # if_run_exists = comparison['is_there_validation']
                 #
+                # try:
+                #     clicked_times = int(request.POST.get('click-counter'))
+                # except:
+                #     clicked_times = 0
+                #
                 # if if_run_exists and clicked_times == 1:
                 #     newrun.delete()
                 #     val_id = comparison['val_id']
+                #     run_to_copy = ValidationRun.objects.get(pk=val_id)
+                #     response = _copy_validationrun(run_to_copy, request.user)
+                #     print(response['belongs_to_user'])
                 #     is_published = False
                 #     return render(request, 'validator/validate.html',
                 #                   {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
                 #                    'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
-                #                    'val_id': val_id, 'is_published': is_published})
-
+                #                    'val_id': response['run_id'], 'belongs_to_user': response['belongs_to_user'],
+                #                    'is_published': is_published})
 
                 # checking how many times the validation button was clicked - in try so that tests pass
                 # need to close all db connections before forking, see
