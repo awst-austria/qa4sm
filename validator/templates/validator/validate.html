@@ -530,8 +530,8 @@
                       What would you like to do?
                     </div>
                     <div id="non_pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
-                      {% if belongs_to_user == 'True' %}
-                      You have already run a validation with exactly the same settings. <br>
+                      {% if belongs_to_user == True %}
+                      You have already run a validation with exactly the same settings.
                       You can run it again or use the existing one. <br>
                       {% else %}
                       There exists a validation with exactly the same settings. <br>
@@ -1109,7 +1109,9 @@
           modal: true,
           buttons: {
             'Use the existing one': function() {
-              window.location.href = url_to_go
+              var validation_id = '{{ val_id }}';
+              ajax_copy_validation(validation_id)
+
             },
             "Run your own validation": function() {
               $('#validate-run').click(set_counter).click();
@@ -1120,5 +1122,13 @@
       }
 
     </script>
+
+    <script type="text/javascript">
+        csrf_token = '{{csrf_token}}';
+        result_list_url = "{% url 'myruns' %}";
+        result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+        stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+    </script>
+    <script src="{% static 'js/results_buttons.js' %}"></script>
 
 {% endblock %}
