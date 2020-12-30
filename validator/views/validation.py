@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 import logging
 from multiprocessing import Process
@@ -27,9 +26,7 @@ from validator.models import ISMNNetworks
 from validator.validation import run_validation
 import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
-from validator.validation.util import mkdir_if_not_exists
-from validator.validation.globals import OUTPUT_FOLDER
-from shutil import copy2
+
 
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
@@ -188,76 +185,76 @@ def _compare_validation_runs(new_run, runs_set, user):
     return response
 
 
-def _copy_validationrun(run_to_copy, new_user):
-    # checking if the new validation belongs to the same user:
-    if run_to_copy.user == new_user:
-        run_id = run_to_copy.id
-        # belongs_to_user = True
-    else:
-        # old info which is needed then
-        old_scaling_ref_id = run_to_copy.scaling_ref_id
-        old_val_id = str(run_to_copy.id)
-        dataset_conf = run_to_copy.dataset_configurations.all()
-
-        run_to_copy.user = new_user
-        run_to_copy.id = None
-        run_to_copy.save()
-
-        # new configuration
-        for conf in dataset_conf:
-            old_id = conf.id
-            old_filters = conf.filters.all()
-            old_param_filters = conf.parametrisedfilter_set.all()
-
-            # setting new scaling reference id
-            if old_id == old_scaling_ref_id:
-                run_to_copy.scaling_ref_id = conf.id
-
-            new_conf = conf
-            new_conf.pk = None
-            new_conf.validation = run_to_copy
-            new_conf.save()
-
-            # setting filters
-            new_conf.filters.set(old_filters)
-            if len(old_param_filters) != 0:
-                for param_filter in old_param_filters:
-                    param_filter.id = None
-                    param_filter.dataset_config = new_conf
-                    param_filter.save()
-
-        # the reference configuration is always the last one:
-        try:
-            run_to_copy.reference_configuration_id = conf.id
-            run_to_copy.save()
-        except:
-            pass
-
-        # copying files
-        # new directory -> creating if doesn't exist
-        new_dir = os.path.join(OUTPUT_FOLDER, str(run_to_copy.id))
-        mkdir_if_not_exists(new_dir)
-        # old directory and all files there
-        old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
-        old_files = os.listdir(old_dir)
-
-        if len(old_files) != 0:
-            for old_file_name in old_files:
-                new_file = new_dir + '/' + old_file_name
-                old_file = old_dir + '/' + old_file_name
-                if '.nc' in new_file:
-                    run_to_copy.output_file = str(run_to_copy.id) + '/' + old_file_name
-                    run_to_copy.save()
-                copy2(old_file, new_file)
-
-        run_id = run_to_copy.id
-        # belongs_to_user = False
-
-    response = {
-        'run_id': run_id,
-        # 'belongs_to_user': belongs_to_user
-    }
-    return response
+# def _copy_validationrun(run_to_copy, new_user):
+#     # checking if the new validation belongs to the same user:
+#     if run_to_copy.user == new_user:
+#         run_id = run_to_copy.id
+#         # belongs_to_user = True
+#     else:
+#         # old info which is needed then
+#         old_scaling_ref_id = run_to_copy.scaling_ref_id
+#         old_val_id = str(run_to_copy.id)
+#         dataset_conf = run_to_copy.dataset_configurations.all()
+#
+#         run_to_copy.user = new_user
+#         run_to_copy.id = None
+#         run_to_copy.save()
+#
+#         # new configuration
+#         for conf in dataset_conf:
+#             old_id = conf.id
+#             old_filters = conf.filters.all()
+#             old_param_filters = conf.parametrisedfilter_set.all()
+#
+#             # setting new scaling reference id
+#             if old_id == old_scaling_ref_id:
+#                 run_to_copy.scaling_ref_id = conf.id
+#
+#             new_conf = conf
+#             new_conf.pk = None
+#             new_conf.validation = run_to_copy
+#             new_conf.save()
+#
+#             # setting filters
+#             new_conf.filters.set(old_filters)
+#             if len(old_param_filters) != 0:
+#                 for param_filter in old_param_filters:
+#                     param_filter.id = None
+#                     param_filter.dataset_config = new_conf
+#                     param_filter.save()
+#
+#         # the reference configuration is always the last one:
+#         try:
+#             run_to_copy.reference_configuration_id = conf.id
+#             run_to_copy.save()
+#         except:
+#             pass
+#
+#         # copying files
+#         # new directory -> creating if doesn't exist
+#         new_dir = os.path.join(OUTPUT_FOLDER, str(run_to_copy.id))
+#         mkdir_if_not_exists(new_dir)
+#         # old directory and all files there
+#         old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
+#         old_files = os.listdir(old_dir)
+#
+#         if len(old_files) != 0:
+#             for old_file_name in old_files:
+#                 new_file = new_dir + '/' + old_file_name
+#                 old_file = old_dir + '/' + old_file_name
+#                 if '.nc' in new_file:
+#                     run_to_copy.output_file = str(run_to_copy.id) + '/' + old_file_name
+#                     run_to_copy.save()
+#                 copy2(old_file, new_file)
+#
+#         run_id = run_to_copy.id
+#         # belongs_to_user = False
+#
+#     response = {
+#         'run_id': run_id,
+#         # 'belongs_to_user': belongs_to_user
+#     }
+#     return response
 
 __logger = logging.getLogger(__name__)
 

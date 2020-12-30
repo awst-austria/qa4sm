@@ -1,9 +1,10 @@
+import os
 from json import dumps as json_dumps
 
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
@@ -13,6 +14,80 @@ from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
 from collections import OrderedDict
+from validator.validation.util import mkdir_if_not_exists
+from validator.validation.globals import OUTPUT_FOLDER
+from shutil import copy2
+
+def _copy_validationrun(run_to_copy, new_user):
+    # checking if the new validation belongs to the same user:
+    if run_to_copy.user == new_user:
+        run_id = run_to_copy.id
+        # belongs_to_user = True
+    else:
+        # old info which is needed then
+        old_scaling_ref_id = run_to_copy.scaling_ref_id
+        old_val_id = str(run_to_copy.id)
+        dataset_conf = run_to_copy.dataset_configurations.all()
+
+        run_to_copy.user = new_user
+        run_to_copy.id = None
+        run_to_copy.save()
+
+        # new configuration
+        for conf in dataset_conf:
+            old_id = conf.id
+            old_filters = conf.filters.all()
+            old_param_filters = conf.parametrisedfilter_set.all()
+
+            # setting new scaling reference id
+            if old_id == old_scaling_ref_id:
+                run_to_copy.scaling_ref_id = conf.id
+
+            new_conf = conf
+            new_conf.pk = None
+            new_conf.validation = run_to_copy
+            new_conf.save()
+
+            # setting filters
+            new_conf.filters.set(old_filters)
+            if len(old_param_filters) != 0:
+                for param_filter in old_param_filters:
+                    param_filter.id = None
+                    param_filter.dataset_config = new_conf
+                    param_filter.save()
+
+        # the reference configuration is always the last one:
+        try:
+            run_to_copy.reference_configuration_id = conf.id
+            run_to_copy.save()
+        except:
+            pass
+
+        # copying files
+        # new directory -> creating if doesn't exist
+        new_dir = os.path.join(OUTPUT_FOLDER, str(run_to_copy.id))
+        mkdir_if_not_exists(new_dir)
+        # old directory and all files there
+        old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
+        old_files = os.listdir(old_dir)
+
+        if len(old_files) != 0:
+            for old_file_name in old_files:
+                new_file = new_dir + '/' + old_file_name
+                old_file = old_dir + '/' + old_file_name
+                if '.nc' in new_file:
+                    run_to_copy.output_file = str(run_to_copy.id) + '/' + old_file_name
+                    run_to_copy.save()
+                copy2(old_file, new_file)
+
+        run_id = run_to_copy.id
+        # belongs_to_user = False
+
+    response = {
+        'run_id': run_id,
+    }
+    return response
+
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -71,6 +146,10 @@ def result(request, result_uuid):
         elif 'remove_validation' in post_params and post_params['remove_validation'] == 'true':
             user.copied_runs.remove(val_run)
             response = HttpResponse("Validation has been removed from your list", status=200)
+
+        elif 'copy_validation' in post_params and post_params['copy_validation'] == 'true':
+            resp = _copy_validationrun(val_run, request.user)
+            response = JsonResponse(resp)
 
         else:
             response = HttpResponse("Wrong action parameter.", status=400)
