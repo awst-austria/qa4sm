@@ -523,13 +523,13 @@
                     <!-- this is a hidden field so it is possible to count how many times the Validate button was clicked -->
                     <input id='click-counter' name='click-counter' type='hidden' value=1>
                     <!-- this is an area triggered as a dialog window for informing user that there is a validation with given settings -->
-                    <div id="pub_validate-confirm" title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %} {% endif%}">
+                    <div id="pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
                       There exists a published validation with exactly the same settings. <br>
                       You can run your own validation and wait for the results or you can use the existing one.<br>
                       You can also close this window and change some settings.<br>
                       What would you like to do?
                     </div>
-                    <div id="non_pub_validate-confirm" title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %} {% endif%}">
+                    <div id="non_pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
                       {% if belongs_to_user == 'True' %}
                       You have already run a validation with exactly the same settings. <br>
                       You can run it again or use the existing one. <br>
