@@ -162,6 +162,7 @@ def _compare_validation_runs(new_run, runs_set, user):
     max_vr_ind = len(vr_fields)
     max_run_ind = len(runs_set)
     run_ind = 0
+    old_user = None
     while not is_the_same and run_ind < max_run_ind:
         run = runs_set[run_ind]
         ind = 0
@@ -174,13 +175,14 @@ def _compare_validation_runs(new_run, runs_set, user):
             old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
             is_the_same = _compare_datasets(new_run_config, old_run_config)
             val_id = run.id
+            old_user = run.user
         run_ind += 1
 
     val_id = val_id if is_the_same else None
     response = {
         'is_there_validation': is_the_same,
         'val_id': val_id,
-        'belongs_to_user': run.user == user
+        'belongs_to_user': old_user == user
         }
     return response
 
