@@ -136,9 +136,12 @@ def _check_scaling_method(new_run, old_run):
         return False
     else:
         if new_run_sm != 'none':
-            new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
-            run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
-            if new_scal_ref != run_scal_ref:
+            try:
+                new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
+                run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
+                if new_scal_ref != run_scal_ref:
+                    return False
+            except:
                 return False
     return True
 
@@ -169,8 +172,6 @@ def _compare_validation_runs(new_run, runs_set, user):
         while ind < max_vr_ind and getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]):
             ind += 1
         if ind == max_vr_ind and _check_scaling_method(new_run, run):
-            # is_the_same = True
-            # val_id = run.id
             new_run_config = DatasetConfiguration.objects.filter(validation=new_run).order_by('dataset')
             old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
             is_the_same = _compare_datasets(new_run_config, old_run_config)
@@ -178,7 +179,7 @@ def _compare_validation_runs(new_run, runs_set, user):
             old_user = run.user
         run_ind += 1
 
-    val_id = val_id if is_the_same else None
+    val_id = None if not is_the_same else val_id
     response = {
         'is_there_validation': is_the_same,
         'val_id': val_id,
