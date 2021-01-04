@@ -78,6 +78,7 @@
                                         <button class="btn btn-sm btn-primary btn-action" title="Remove this validation from your list" onclick="ajax_detach_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
                                     {% endif %}
                                 {% endif %}
+                                <a class="btn btn-sm btn-primary btn-action" href="{% url 'validation' %}?valrun_uuid={{ valrun.id }}" title="Load validation settings"><span class="fas fa-redo"></span></a>
                             </div>
 
                         </div>

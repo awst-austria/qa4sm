@@ -46,7 +46,7 @@ class ValidationRunForm(forms.ModelForm):
         self.fields['max_lat'].required = False
         self.fields['max_lon'].required = False
 
-        ## give default/initial values to widgets
+        # default/initial values
         self.fields['min_lat'].initial = 34.00
         self.fields['min_lon'].initial = -11.20
         self.fields['max_lat'].initial = 71.60
@@ -54,6 +54,11 @@ class ValidationRunForm(forms.ModelForm):
         self.fields['interval_from'].initial = START_TIME
         self.fields['interval_to'].initial = END_TIME
 
+        # in case the form got passed initial values, use them instead
+        for name in self.fields:
+            self.fields[name].initial = self.get_initial_for_field(
+                self.fields[name], name
+            )
 
     def clean(self):
         values = super(ValidationRunForm, self).clean()
