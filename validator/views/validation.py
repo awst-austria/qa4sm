@@ -48,12 +48,31 @@ def stop_validation(request, result_uuid):
 @login_required(login_url='/login/')
 def validation(request):
     dc_prefix = 'datasets'
-    ref_repfix = 'ref'
-    data_initial_values = [{'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
-                            'dataset': Dataset.objects.get(short_name=val_globals.C3S), }]
+    ref_prefix = 'ref'
 
-    ref_initial_values = {'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
-                          'dataset': Dataset.objects.get(short_name=val_globals.ISMN), }
+    # initial values
+    valrun_uuid = request.GET.get("valrun_uuid", None)
+    if valrun_uuid == None:
+        ref_filter_name = "FIL_ALL_VALID_RANGE"
+        ref_dataset_name = val_globals.ISMN
+        data_filter_name = "FIL_ALL_VALID_RANGE"
+        data_dataset_name = val_globals.C3S
+    else:
+        valrun = get_object_or_404(ValidationRun, pk=valrun_uuid)
+        ref_config = valrun.reference_configuration
+        ref_filter_name = ref_config.filters.all()[0]
+        ref_dataset_name = ref_config.dataset.short_name
+
+        data_configs = [dc for dc in valrun.dataset_configurations.all()
+                        if dc.id != ref_config.id][0]
+        data_filter_name = data_configs.filters.all()[0]
+        data_dataset_name = data_configs.dataset.short_name
+
+    data_initial_values = [{'filters': DataFilter.objects.filter(name=data_filter_name),
+                            'dataset': Dataset.objects.get(short_name=data_dataset_name), }]
+
+    ref_initial_values = {'filters': DataFilter.objects.filter(name=ref_filter_name),
+                          'dataset': Dataset.objects.get(short_name=ref_dataset_name), }
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:
@@ -73,7 +92,7 @@ def validation(request):
                 return HttpResponseBadRequest('Not a valid request: ' + e.message)
 
         # form for the reference configuration
-        ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
+        ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_prefix, is_reference=True, initial=ref_initial_values)
         # form for the rest of the validation parameters
         val_form = ValidationRunForm(request.POST)
         if val_form.is_valid() and dc_formset.is_valid() and ref_dc_form.is_valid():
@@ -137,7 +156,7 @@ def validation(request):
     else:
         val_form = ValidationRunForm()
         dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=data_initial_values)
-        ref_dc_form = DatasetConfigurationForm(prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
+        ref_dc_form = DatasetConfigurationForm(prefix=ref_prefix, is_reference=True, initial=ref_initial_values)
         # ref_dc_form.
 
 
