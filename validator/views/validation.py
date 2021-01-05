@@ -53,32 +53,37 @@ def validation(request):
     # initial values
     valrun_uuid = request.GET.get("valrun_uuid", None)
     if valrun_uuid == None:
-        ref_filters = DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE")
-        ref_dataset = Dataset.objects.get(short_name=val_globals.ISMN)
-        data_filters = [DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE")]
-        data_datasets = [Dataset.objects.get(short_name=val_globals.C3S)]
+        ref_initial_values = {
+            "filters": DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE"),
+            "dataset": Dataset.objects.get(short_name=val_globals.ISMN),
+        }
+        data_initial_values = [{
+            "filters": DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE"),
+            "dataset": Dataset.objects.get(short_name=val_globals.C3S),
+        }]
         valrun_initial_values = None
     else:
         valrun = get_object_or_404(ValidationRun, pk=valrun_uuid)
         # initial settings for datasets
         ref_config = valrun.reference_configuration
-        ref_filters = ref_config.filters.all()
-        ref_dataset = ref_config.dataset
         data_configs = [dc for dc in valrun.dataset_configurations.all()
                         if dc.id != ref_config.id]
-        data_filters = [dc.filters.all()[::-1] for dc in data_configs]
-        data_datasets = [dc.dataset for dc in data_configs]
+        initial_values = [
+            {
+                "filters": dc.filters.all(),
+                "dataset": dc.dataset,
+                "version": dc.version,
+                "variable": dc.variable,
+            }
+            for dc in [ref_config] + data_configs
+        ]
+        ref_initial_values = initial_values[0]
+        data_initial_values = initial_values[1:]
 
         # validation run settings
         valrun_initial_values = {}
         for field in ValidationRunForm.Meta.fields:
             valrun_initial_values[field] = getattr(valrun, field)
-
-    data_initial_values = [{'filters': data_filters[i],
-                            'dataset': data_datasets[i], }
-                           for i in range(len(data_datasets))]
-    ref_initial_values = {'filters': ref_filters,
-                          'dataset': ref_dataset, }
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:
@@ -171,14 +176,22 @@ def validation(request):
 ## Ajax stuff required for validation view
 
 ## render string options as html
-def __render_options(entity_list):
+def __render_options(entity_list, initial):
     widgets = []
     for entity in entity_list:
         widget = {
-            'value' : entity.id,
+            'value': entity.id,
             'label': entity.pretty_name,
             }
         widgets.append(widget)
+    # reorder such that "initial" is at the front
+    if initial != "":
+        init_val = int(initial)
+        try:
+            init_idx = [w["value"] for w in widgets].index(init_val)
+            widgets.insert(0, widgets.pop(init_idx))
+        except ValueError:  # pragma: no cover
+            pass
 
     content = loader.render_to_string('widgets/select_options.html', {'widgets': widgets})
     return content
@@ -211,6 +224,8 @@ def ajax_get_dataset_options(request):
     filter_widget_id = request.GET.get('filter_widget_id')
     param_filter_widget_id = request.GET.get('param_filter_widget_id')
     initial_filters = request.GET.get('initial_filters')
+    initial_version = request.GET.get('initial_version')
+    initial_variable = request.GET.get('initial_variable')
 
     try:
         selected_dataset = Dataset.objects.get(pk=selected_dataset_name)
@@ -218,8 +233,14 @@ def ajax_get_dataset_options(request):
         return HttpResponseBadRequest("Not a valid dataset")
 
     response_data = {
-        'versions': __render_options(selected_dataset.versions.all().order_by('-pretty_name')),
-        'variables': __render_options(selected_dataset.variables.all().order_by('id')),
+        'versions': __render_options(
+            selected_dataset.versions.all().order_by('-pretty_name'),
+            initial_version,
+        ),
+        'variables': __render_options(
+            selected_dataset.variables.all().order_by('id'),
+            initial_variable
+        ),
         'filters': __render_filters(
             selected_dataset.filters.filter(parameterised=False),
             filter_widget_id, initial_filters,
