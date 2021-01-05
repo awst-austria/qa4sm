@@ -57,9 +57,21 @@ class DatasetConfigurationForm(forms.ModelForm):
         # separated by an underscore. This string is passed to the ajax call
         # `ajax_change_dataset` in validate.html, and then further passed to
         # `ajax_get_dataset_options` in validation.py.
-        self.initial_filters = "_".join(map(
-            lambda x: str(getattr(x, "id")), list(self.initial["filters"])
-        ))
+        if "filters" in self.initial:
+            self.initial_filters = "_".join(map(
+                lambda x: str(getattr(x, "id")), list(self.initial["filters"])
+            ))
+        else:
+            self.initial_filters = ""
+        # do the same for version and variable
+        if "version" in self.initial:
+            self.initial_version = str(self.initial["version"].id)
+        else:
+            self.initial_version = ""
+        if "variable" in self.initial:
+            self.initial_variable = str(self.initial["version"].id)
+        else:
+            self.initial_variable = ""
 
     def _save_m2m(self):
         # treat the parametrised filters separately, remove them now, save after calling super

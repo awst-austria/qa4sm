@@ -24,7 +24,7 @@ from pytz import UTC
 from pytz import utc
 
 from validator.forms.user_profile import UserProfileForm
-from validator.models import ValidationRun
+from validator.models import ValidationRun, DatasetConfiguration
 from validator.models.dataset import Dataset
 from validator.models.filter import DataFilter
 from validator.models.settings import Settings
@@ -93,8 +93,52 @@ class TestViews(TransactionTestCase):
         ## Create a test validation run with a specific id so that it can
         ## be accessed via a URL containing that id
         self.testrun = ValidationRun.objects.create(**run_params)
+        # set some values to some of the settings
+        self.testrun.min_lat = -30
+        self.testrun.max_lat = 30
         ## make sure the run's output file name is set:
         self.testrun.output_file.name = str(self.testrun.id) + '/foobar.nc'
+        self.testrun.save()
+
+        # create data and reference configuration, required to rerun a
+        # validation
+        # uses two datasets and some non-default filters
+        data_c = DatasetConfiguration()
+        data_c.validation = self.testrun
+        data_c.dataset = Dataset.objects.get(short_name='C3S')
+        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
+        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.save()
+        filters = list(DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE"))
+        data_c.filters.set([fil.id for fil in filters])
+        data_c.save()
+        other_data_c = DatasetConfiguration()
+        other_data_c.validation = self.testrun
+        other_data_c.dataset = Dataset.objects.get(short_name='SMOS')
+        other_data_c.version = DatasetVersion.objects.get(
+            short_name='SMOS_105_ASC'
+        )
+        other_data_c.variable = DataVariable.objects.get(short_name='SMOS_sm')
+        other_data_c.save()
+        filters = (
+            list(DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE"))
+            + list(DataFilter.objects.filter(name="FIL_SMOS_UNFROZEN"))
+        )
+        other_data_c.filters.set([fil.id for fil in filters])
+        other_data_c.save()
+        ref_c = DatasetConfiguration()
+        ref_c.validation = self.testrun
+        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
+        ref_c.version = DatasetVersion.objects.get(
+            short_name='ISMN_V20180712_MINI'
+        )
+        ref_c.variable = DataVariable.objects.get(
+            short_name='ISMN_soil_moisture'
+        )
+        ref_c.save()
+
+        self.testrun.reference_configuration = ref_c
+        self.testrun.scaling_ref = ref_c
         self.testrun.save()
 
         self.public_views = ['login', 'logout', 'home', 'published_results', 'signup', 'signup_complete', 'terms',
@@ -434,12 +478,23 @@ class TestViews(TransactionTestCase):
         self.client.login(**self.credentials)
         response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
                                          'filter_widget_id': 'id_datasets-0-filters',
-                                         'param_filter_widget_id': 'id_datasets-0-paramfilters'})
+                                         'param_filter_widget_id': 'id_datasets-0-paramfilters',
+                                         'initial_filters': '1_9',
+                                         'initial_version': '7',
+                                         'initial_variable': '7'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
         assert return_data['versions']
         assert return_data['variables']
         assert return_data['filters']
+
+        checked_filter_ids = [
+            "id_datasets-0-filters_0", "id_datasets-0-filters_1"
+        ]
+        for id in checked_filter_ids:
+            assert f'id="{id}" checked' in return_data["filters"]
+        assert return_data["versions"].startswith('<option value="7">')
+        assert return_data["variables"].startswith('<option value="7">')
 
         response = self.client.get(url, {'dataset_id': ''})
         self.assertEqual(response.status_code, 400)
@@ -755,6 +810,44 @@ class TestViews(TransactionTestCase):
             # check netcdf file
             netcdf_stream = io.BytesIO(b"".join(netcdf_result.streaming_content))
             assert netcdf_stream, 'netcdf file corrupt'
+
+    def test_redo_validation(self):
+        url = reverse("validation")
+        self.client.login(**self.credentials)
+        response = self.client.get(url, {"valrun_uuid": self.testrun.id})
+        self.assertEqual(response.status_code, 200)
+
+        val_form = response.context["val_form"]
+        ref_dc_form = response.context["ref_dc_form"]
+        dc_formset = response.context["dc_formset"]
+
+        # assert datasets are same as in setUp function
+        assert len(dc_formset) == 2
+        dc_form = dc_formset[0]
+        assert dc_form.initial["dataset"].short_name == "C3S"
+        assert len(dc_form.initial["filters"]) == 1
+        assert dc_form.initial["filters"][0].name == "FIL_ALL_VALID_RANGE"
+        assert dc_form.initial["version"].short_name == "C3S_V201812"
+        assert dc_form.initial["variable"].short_name == "C3S_sm"
+        dc_form = dc_formset[1]
+        assert dc_form.initial["dataset"].short_name == "SMOS"
+        assert len(dc_form.initial["filters"]) == 2
+        assert dc_form.initial["filters"][0].name == "FIL_ALL_VALID_RANGE"
+        assert dc_form.initial["filters"][1].name == "FIL_SMOS_UNFROZEN"
+        assert dc_form.initial["version"].short_name == "SMOS_105_ASC"
+        assert dc_form.initial["variable"].short_name == "SMOS_sm"
+        assert ref_dc_form.initial["dataset"].short_name == "ISMN"
+        assert (
+            ref_dc_form.initial["version"].short_name == "ISMN_V20180712_MINI"
+        )
+        assert (
+            ref_dc_form.initial["variable"].short_name == "ISMN_soil_moisture"
+        )
+
+        # assert some settings
+        assert val_form.initial["min_lat"] == -30
+        assert val_form.initial["max_lat"] == 30
+
 
     def test_access_to_results(self):
         self.client.login(**self.credentials2)
