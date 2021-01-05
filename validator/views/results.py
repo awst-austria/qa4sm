@@ -17,6 +17,8 @@ from collections import OrderedDict
 from validator.validation.util import mkdir_if_not_exists
 from validator.validation.globals import OUTPUT_FOLDER
 from shutil import copy2
+from dateutil.tz import tzlocal
+from datetime import datetime
 
 def _copy_validationrun(run_to_copy, new_user):
     # checking if the new validation belongs to the same user:
@@ -31,6 +33,8 @@ def _copy_validationrun(run_to_copy, new_user):
 
         run_to_copy.user = new_user
         run_to_copy.id = None
+        run_to_copy.start_time = datetime.now(tzlocal())
+        run_to_copy.end_time = datetime.now(tzlocal())
         run_to_copy.save()
 
         # new configuration
