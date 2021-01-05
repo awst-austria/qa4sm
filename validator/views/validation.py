@@ -371,21 +371,23 @@ def __render_options(entity_list):
     return content
 
 # render filters as html checkboxes with descriptions
-def __render_filters(filters, filter_widget_id, parametrised = False):
+def __render_filters(filters, filter_widget_id, initial_filters, parametrised=False):
     widget_name = regex_subs(r'^id_', '', filter_widget_id)
     if parametrised:
         filter_field = ParamFilterChoiceField(widget=ParamFilterSelectMultiple, queryset=filters, required=False)
     else:
         filter_field = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=filters, required=False)
 
-    preselected = None
+    # extracts the initial filters to be selected from the initial_filters
+    # string, see DatasetConfigurationForm.__init__
     if filters:
-        # pre-select the first filter
-        preselected = filters[0].id
+        initial_filter_ids = list(map(int, initial_filters.split('_')))
+    else:
+        initial_filter_ids = None
 
     filter_html = filter_field.widget.render(
         name=widget_name,
-        value=preselected,
+        value=initial_filter_ids,
         attrs={'id': filter_widget_id})
     return filter_html
 
@@ -395,6 +397,7 @@ def ajax_get_dataset_options(request):
     selected_dataset_name = request.GET.get('dataset_id')
     filter_widget_id = request.GET.get('filter_widget_id')
     param_filter_widget_id = request.GET.get('param_filter_widget_id')
+    initial_filters = request.GET.get('initial_filters')
 
     try:
         selected_dataset = Dataset.objects.get(pk=selected_dataset_name)
@@ -404,8 +407,17 @@ def ajax_get_dataset_options(request):
     response_data = {
         'versions': __render_options(selected_dataset.versions.all().order_by('-pretty_name')),
         'variables': __render_options(selected_dataset.variables.all().order_by('id')),
-        'filters': __render_filters(selected_dataset.filters.filter(parameterised=False), filter_widget_id, parametrised = False),
-        'paramfilters': __render_filters(selected_dataset.filters.filter(parameterised=True), param_filter_widget_id, parametrised = True),
+        'filters': __render_filters(
+            selected_dataset.filters.filter(parameterised=False),
+            filter_widget_id, initial_filters,
+            parametrised=False
+        ),
+        'paramfilters': __render_filters(
+            selected_dataset.filters.filter(parameterised=True),
+            param_filter_widget_id,
+            initial_filters,
+            parametrised=True
+        ),
         }
 
     return JsonResponse(response_data)

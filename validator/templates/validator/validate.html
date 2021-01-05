@@ -685,7 +685,7 @@
     </script>
 
     <script type="text/javascript">
-        function ajax_change_dataset() {
+        function ajax_change_dataset(event) {
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
             // var datasetName = $(this).text();
@@ -693,9 +693,13 @@
             var datasetName = $(`#${widgetId} option[value=${datasetId}]`).text();
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
+	    var initialFilters = event.data.initialFilters;
             $.ajax({
                 url: url,
-                data: { 'dataset_id': datasetId, 'filter_widget_id': filterWidgetId, 'param_filter_widget_id': paramFilterWidgetId },
+                data: { 'dataset_id': datasetId,
+			'filter_widget_id': filterWidgetId,
+			'param_filter_widget_id': paramFilterWidgetId,
+		        'initial_filters': initialFilters },
                 success: function (return_data) {
                     var dataset_widget = "#" + widgetId;
                     var version_widget = dataset_widget.replace(/dataset$/, "version");
@@ -832,7 +836,9 @@
         }
 
         {% for dc_form in dc_formset.forms %}
-            $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
+            $("#{{ dc_form.dataset.auto_id }}").change(
+                {initialFilters: "{{ dc_form.initial_filters }}"}, ajax_change_dataset
+            ).change(change_tab_name).change(); // last change() to call change on pageload
             $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_valiadtion_period)
         {% endfor %}
 
@@ -849,9 +855,16 @@
         }
 
 
+<<<<<<< HEAD
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
         $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
 
+=======
+        $("#{{ ref_dc_form.dataset.auto_id }}").change(
+            {initialFilters: "{{ ref_dc_form.initial_filters }}" }, ajax_change_dataset
+        ).change(); // last change() to call change on pageload
+        $('#id_ref-version').change(get_version_id)
+>>>>>>> 295ae2d (selecting correct filters)
 
     </script>
 
