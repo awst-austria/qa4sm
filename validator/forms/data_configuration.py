@@ -53,6 +53,14 @@ class DatasetConfigurationForm(forms.ModelForm):
         else:
             self.fields["dataset"].queryset = Dataset.objects.filter(is_only_reference=is_reference)
 
+        # This translates the initial filter list to a string of filter ids
+        # separated by an underscore. This string is passed to the ajax call
+        # `ajax_change_dataset` in validate.html, and then further passed to
+        # `ajax_get_dataset_options` in validation.py.
+        self.initial_filters = "_".join(map(
+            lambda x: str(getattr(x, "id")), list(self.initial["filters"])
+        ))
+
     def _save_m2m(self):
         # treat the parametrised filters separately, remove them now, save after calling super
         param_filters = None
