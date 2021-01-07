@@ -177,9 +177,9 @@
                     <div style="float: right;" class="patchButtonGroup">
                         {% if current_user %}
                             {% if is_copied %}
-                                <button class="btn btn-sm btn-primary" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Detach </button>
+                                <button class="btn btn-sm btn-primary" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Untrack </button>
                             {% else %}
-                                <button class="btn btn-sm btn-primary" title="Attach this validation to your list" onclick="ajax_copy_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Attach </button>
+                                <button class="btn btn-sm btn-primary" title="ch this validation to your list" onclick="ajax_copy_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Track </button>
                             {% endif %}
                         {% endif %}
                     </div>
