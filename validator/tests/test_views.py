@@ -99,7 +99,7 @@ class TestViews(TransactionTestCase):
         self.public_views = ['login', 'logout', 'home', 'published_results', 'signup', 'signup_complete', 'terms',
                              'datasets', 'alpha', 'help', 'about', 'password_reset', 'password_reset_done',
                              'password_reset_complete', 'user_profile_deactivated']
-        self.parameter_views = ['result', 'ajax_get_dataset_options', 'ajax_get_version_id', 'password_reset_confirm', 'stop_validation']
+        self.parameter_views = ['result', 'ajax_get_dataset_options', 'ajax_get_version_id', 'password_reset_confirm', 'stop_validation', 'ajax_get_version_info']
         self.private_views = [p.name for p in urlpatterns if hasattr(p,
                                                                      'name') and p.name is not None and p.name not in self.public_views and p.name not in self.parameter_views]
 
@@ -853,3 +853,22 @@ class TestViews(TransactionTestCase):
         ## make sure we can't log in with the old password
         login_success = self.client.login(**{'username': self.credentials2['username'], 'password': orig_password})
         assert not login_success
+
+    def test_ajax_get_version_info_view(self):
+        url = reverse('ajax_get_version_info')
+        self.client.login(**self.credentials)
+        version_ids = [DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id,
+                       DatasetVersion.objects.get(short_name=globals.GLDAS_NOAH025_3H_2_1).id,
+                       DatasetVersion.objects.get(short_name=globals.C3S_V201912).id,
+                       DatasetVersion.objects.get(short_name=globals.SMOS_105_ASC).id]
+
+        response = self.client.get(url, {'version_id': version_ids})
+        self.assertEqual(response.status_code, 200)
+
+        return_data = json.loads(response.content)
+        self.assertEqual(len(return_data['intervals_from']), len(version_ids))
+        self.assertEqual(len(return_data['intervals_to']), len(version_ids))
+        assert return_data['intervals_from'], return_data['intervals_to']
+
+        response = self.client.get(url, {'version_id': ''})
+        self.assertEqual(response.status_code, 400)

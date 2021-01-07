@@ -22,16 +22,41 @@ import pytz
 from valentina.celery import app
 from validator.mailer import send_val_done_notification
 from validator.models import CeleryTask
-from validator.models import ValidationRun
+from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
+from validator.validation.globals import START_TIME, END_TIME
 
 
 __logger = logging.getLogger(__name__)
+
+
+def _get_actual_time_range(val_run, dataset_version_id):
+    try:
+        vs_start = DatasetVersion.objects.get(pk=dataset_version_id).time_range_start
+        vs_start_time = datetime.strptime(vs_start, '%Y-%m-%d').date()
+
+        vs_end = DatasetVersion.objects.get(pk=dataset_version_id).time_range_end
+        vs_end_time = datetime.strptime(vs_end, '%Y-%m-%d').date()
+
+        val_start_time = val_run.interval_from.date()
+        val_end_time = val_run.interval_to.date()
+
+        actual_start = val_start_time.strftime('%Y-%m-%d') if val_start_time > vs_start_time \
+            else vs_start_time.strftime('%Y-%m-%d')
+        actual_end = val_end_time.strftime('%Y-%m-%d') if val_end_time < vs_end_time \
+            else vs_end_time.strftime('%Y-%m-%d')
+
+    except:
+        # exception will arise for ISMN, and for that one we can use entire range
+        actual_start = START_TIME
+        actual_end = END_TIME
+
+    return [actual_start, actual_end]
 
 
 def set_outfile(validation_run, run_dir):
@@ -86,6 +111,10 @@ def save_validation_config(validation_run):
             ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.pretty_name)
 
             ds.setncattr('val_dc_filters' + str(i), filters)
+
+            actual_interval_from, actual_interval_to = _get_actual_time_range(validation_run, dataset_config.version.id)
+            ds.setncattr('val_dc_actual_interval_from' + str(i), actual_interval_from)
+            ds.setncattr('val_dc_actual_interval_to' + str(i), actual_interval_to)
 
             if ((validation_run.reference_configuration is not None) and
                 (dataset_config.id == validation_run.reference_configuration.id)):
