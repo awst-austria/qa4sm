@@ -6,7 +6,7 @@
 <div class="container">
     {% if copied_runs|length != 0 %}
       <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
-          <h1 class="jumbotron-heading">Attached validations</h1>
+          <h1 class="jumbotron-heading">Tracked validations</h1>
       </div>
       <div class="card-deck mb-3">
               <div class="col">
@@ -20,7 +20,7 @@
                                   {% if valrun.output_file %}
                                     <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
                                     <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
-                                    <button class="btn btn-sm btn-primary btn-action" title="Detach this validation from your list" onclick="ajax_remove_copied_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
+                                    <button class="btn btn-sm btn-primary btn-action" title="Remove this validation from your list" onclick="ajax_remove_copied_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
                                   {% endif %}
                               {% endif %}
                           </div>
