@@ -137,7 +137,7 @@
             <nav aria-label="pagination">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if myruns.number == 1 %}disabled{%endif%}">
-                        <a class="page-link" href="?page=1" aria-label="First">
+                        <a class="page-link" href="?sort_key={{ sorting_form.key }}&sort_order={{ sorting_form.order }}&page=1" aria-label="First">
                         <span aria-hidden="true" class="fas fa-angle-double-left"></span>
                         <span class="sr-only">First</span></a>
                     </li>
@@ -149,7 +149,7 @@
                     {% for i in myruns.paginator.page_range %}
                         {% if i <= myruns.number|add:8 and i >= myruns.number|add:-8 %}
                             <li class="page-item {% if myruns.number == i %}active{% endif %}">
-                                <a class="page-link" href="?page={{ i }}">{{ i }} {% if myruns.number == i %}<span class="sr-only">(current)</span>{% endif %}</a>
+                                <a class="page-link" href="?sort_key={{ sorting_form.key }}&sort_order={{ sorting_form.order }}&page={{ i }}">{{ i }} {% if myruns.number == i %}<span class="sr-only">(current)</span>{% endif %}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -159,7 +159,7 @@
                         <span class="sr-only">Next</span></a>
                     </li>
                     <li class="page-item {% if myruns.number == myruns.paginator.num_pages %}disabled{% endif %}">
-                        <a class="page-link" href="?page={{ myruns.paginator.num_pages }}" aria-label="Next">
+                        <a class="page-link" href="?sort_key={{ sorting_form.key }}&sort_order={{ sorting_form.order }}&page={{ myruns.paginator.num_pages }}" aria-label="Next">
                         <span aria-hidden="true" class="fas fa-angle-double-right"></span>
                         <span class="sr-only">Next</span></a>
                     </li>

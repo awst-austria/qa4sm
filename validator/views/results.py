@@ -7,13 +7,13 @@ from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
-from validator.forms import PublishingForm
-from validator.forms.custom_widgets import ResultsSortingForm
+from validator.forms import PublishingForm, ResultsSortingForm
 from validator.models import ValidationRun
-from validator.validation.globals import METRICS, TC_METRICS
+from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
 from collections import OrderedDict
+
 
 @login_required(login_url='/login/')
 def user_runs(request):
