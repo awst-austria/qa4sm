@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm
-from validator.models import ValidationRun, ValidationRun_User
+from validator.models import ValidationRun, CopiedValidations
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
@@ -20,17 +20,20 @@ from shutil import copy2
 from dateutil.tz import tzlocal
 from datetime import datetime
 
+
 def _copy_validationrun(run_to_copy, new_user):
     # checking if the new validation belongs to the same user:
     if run_to_copy.user == new_user:
         run_id = run_to_copy.id
         # belongs_to_user = True
     else:
+        # copying validation
+        valrun_user = CopiedValidations(user=new_user, original_run=run_to_copy)
+        valrun_user.save()
+
         # old info which is needed then
         old_scaling_ref_id = run_to_copy.scaling_ref_id
         old_val_id = str(run_to_copy.id)
-        original_start = run_to_copy.start_time
-        original_end = run_to_copy.end_time
 
         dataset_conf = run_to_copy.dataset_configurations.all()
 
@@ -40,7 +43,9 @@ def _copy_validationrun(run_to_copy, new_user):
         run_to_copy.end_time = datetime.now(tzlocal())
         run_to_copy.save()
 
-        # validationrun_user = ValidationRun_User(user=new_user, valid)
+        # adding the copied validation to the copied validation list
+        valrun_user.copied_run = run_to_copy
+        valrun_user.save()
 
         # new configuration
         for conf in dataset_conf:
@@ -122,9 +127,11 @@ def user_runs(request):
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
     current_user = request.user
-    copied_runs = current_user.copied_runs.all() if current_user.username else []
+    copied_runs = current_user.validationrun_user_set.all() if current_user.username else []
     is_copied = val_run in copied_runs
-
+    if is_copied and val_run.doi == '':
+        # original_start =
+        pass
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
         if(val_run.user != request.user):
@@ -142,10 +149,8 @@ def result(request, result_uuid):
         user = request.user
         if 'add_validation' in post_params and post_params['add_validation'] == 'true':
             if val_run.user != user:
-                start = val_run.start_time
-                end = val_run.end_time
                 if val_run not in user.copied_runs.all():
-                    valrun_user = ValidationRun_User(user=user, original_run=val_run, copied_run=val_run)
+                    valrun_user = CopiedValidations(user=user, original_run=val_run, copied_run=val_run)
                     valrun_user.save()
                     response = HttpResponse("Validation added to your list", status=200)
                 else:
