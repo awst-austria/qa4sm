@@ -85,7 +85,8 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
-    used_by = models.ManyToManyField(User, through="ValidationRun_User", related_name='copied_runs', blank=True)
+    used_by = models.ManyToManyField(User, through="ValidationRun_User", through_fields=('original_run', 'user'),
+                                     related_name='copied_runs')
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration

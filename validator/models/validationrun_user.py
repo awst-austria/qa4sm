@@ -4,8 +4,6 @@ from validator.models.validation_run import ValidationRun
 
 class ValidationRun_User(models.Model):
 
-    validationrun = models.ForeignKey(ValidationRun, on_delete=models.CASCADE)
+    copied_run = models.ForeignKey(ValidationRun, on_delete=models.CASCADE, related_name='copied_run')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_published = models.BooleanField(default=False)
-    original_start = models.DateTimeField('started')
-    original_end = models.DateTimeField('finished')
+    original_run = models.ForeignKey(ValidationRun, on_delete=models.SET_NULL, null=True, related_name='original_run')
