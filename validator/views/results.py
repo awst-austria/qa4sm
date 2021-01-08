@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm
-from validator.models import ValidationRun
+from validator.models import ValidationRun, ValidationRun_User
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
@@ -138,9 +138,12 @@ def result(request, result_uuid):
         user = request.user
         if 'add_validation' in post_params and post_params['add_validation'] == 'true':
             if val_run.user != user:
+                start = val_run.start_time
+                end = val_run.end_time
                 if val_run not in user.copied_runs.all():
-                    val_run.used_by.add(user)
-                    val_run.save()
+                    valrun_user = ValidationRun_User(user=user, validationrun=val_run, original_start=start,
+                                                     original_end=end, is_published=True)
+                    valrun_user.save()
                     response = HttpResponse("Validation added to your list", status=200)
                 else:
                     response = HttpResponse("You have already added this validation to your list", status=200)
