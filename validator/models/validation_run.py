@@ -85,7 +85,7 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
-    used_by = models.ManyToManyField(User, related_name='copied_runs', blank=True)
+    used_by = models.ManyToManyField(User, through="ValidationRun_User", related_name='copied_runs', blank=True)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -176,3 +176,4 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         rundir = path.dirname(instance.output_file.path)
         if path.isdir(rundir):
             rmtree(rundir)
+
