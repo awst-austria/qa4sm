@@ -145,8 +145,7 @@ def result(request, result_uuid):
                 start = val_run.start_time
                 end = val_run.end_time
                 if val_run not in user.copied_runs.all():
-                    valrun_user = ValidationRun_User(user=user, validationrun=val_run, original_start=start,
-                                                     original_end=end, is_published=True)
+                    valrun_user = ValidationRun_User(user=user, original_run=val_run, copied_run=val_run)
                     valrun_user.save()
                     response = HttpResponse("Validation added to your list", status=200)
                 else:
