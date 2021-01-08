@@ -169,12 +169,13 @@
         var ismnDialog = $(source).closest('#ismn_networks');
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
         var networkList = '';
-        for (var netCB of ismnDialog.find('input:checked.network')) {
 
+        for (var netCB of ismnDialog.find('input:checked.network')) {
+            if (netCB.value != ''){
             networkList += netCB.value + ',';
+          }
         }
         networkList = networkList.replace(/,+$/, ''); //remove the last coma
-
         if (networkList.length == 0){
           alert('You did not choose any network. Please choose at least one network.')
         }else {
@@ -255,12 +256,13 @@
           var preselectedNetworks = $('#' + hiddenId).val();
             // some text manipulation: clean string from whitespace and separation based on comas
           preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
+          console.log(preselectedNetworks)
           var netList = preselectedNetworks.split(',');
 
           // reset dialog:
           ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
           ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
-
+          console.log(netList)
           for (var net of netList) { // check the preselected networks
               ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
           }
