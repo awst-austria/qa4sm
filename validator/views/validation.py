@@ -308,11 +308,13 @@ def validation(request):
                 newrun.delete()
                 comparison, is_published = (comparison_pub, True) if if_pub_run_exists else (comparison_non_pub, False)
                 val_id = comparison['val_id']
+                val_date = ValidationRun.objects.get(id=val_id).start_time
                 belongs_to_user = comparison['belongs_to_user']
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
                                'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
-                               'val_id': val_id, 'is_published': is_published, 'belongs_to_user': belongs_to_user})
+                               'val_id': val_id, 'is_published': is_published, 'belongs_to_user': belongs_to_user,
+                               'val_date': val_date})
 
             # checking how many times the validation button was clicked - in try so that tests pass
             # need to close all db connections before forking, see
