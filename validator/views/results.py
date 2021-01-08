@@ -29,6 +29,9 @@ def _copy_validationrun(run_to_copy, new_user):
         # old info which is needed then
         old_scaling_ref_id = run_to_copy.scaling_ref_id
         old_val_id = str(run_to_copy.id)
+        original_start = run_to_copy.start_time
+        original_end = run_to_copy.end_time
+
         dataset_conf = run_to_copy.dataset_configurations.all()
 
         run_to_copy.user = new_user
@@ -36,6 +39,8 @@ def _copy_validationrun(run_to_copy, new_user):
         run_to_copy.start_time = datetime.now(tzlocal())
         run_to_copy.end_time = datetime.now(tzlocal())
         run_to_copy.save()
+
+        # validationrun_user = ValidationRun_User(user=new_user, valid)
 
         # new configuration
         for conf in dataset_conf:
@@ -85,7 +90,6 @@ def _copy_validationrun(run_to_copy, new_user):
                 copy2(old_file, new_file)
 
         run_id = run_to_copy.id
-        # belongs_to_user = False
 
     response = {
         'run_id': run_id,
@@ -99,7 +103,7 @@ def user_runs(request):
     page = request.GET.get('page', 1)
 
     cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
-    copied_runs = current_user.copied_runs.all()
+    tracked_runs = current_user.copied_runs.exclude(doi='')
 
     paginator = Paginator(cur_user_runs, 10)
     try:
@@ -110,7 +114,7 @@ def user_runs(request):
         paginated_runs = paginator.page(paginator.num_pages)
     context = {
         'myruns': paginated_runs,
-        'copied_runs': copied_runs
+        'tracked_runs': tracked_runs
         }
     return render(request, 'validator/user_runs.html', context)
 
