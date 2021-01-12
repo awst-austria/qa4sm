@@ -163,6 +163,7 @@ def _compare_validation_runs(new_run, runs_set, user):
     """
     vr_fields = val_globals.VR_FIELDS
     is_the_same = False # set to False because it looks for the first found validation run
+    is_published = False
     max_vr_ind = len(vr_fields)
     max_run_ind = len(runs_set)
     run_ind = 0
@@ -177,6 +178,8 @@ def _compare_validation_runs(new_run, runs_set, user):
             old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
             is_the_same = _compare_datasets(new_run_config, old_run_config)
             val_id = run.id
+            print('I found a validation: ', run.id, 'with doi: ', run.doi)
+            is_published = run.doi != ''
             old_user = run.user
         run_ind += 1
 
@@ -184,7 +187,8 @@ def _compare_validation_runs(new_run, runs_set, user):
     response = {
         'is_there_validation': is_the_same,
         'val_id': val_id,
-        'belongs_to_user': old_user == user
+        'belongs_to_user': old_user == user,
+        'is_published': is_published
         }
     return response
 
@@ -283,21 +287,9 @@ def validation(request):
             newrun.save()
 
             # checking if there exist validations:
-            # checking published validations:
-            vals_published = ValidationRun.objects.exclude(doi='').order_by('-start_time')
-            comparison_pub = _compare_validation_runs(newrun, vals_published, request.user)
-            if_pub_run_exists = comparison_pub['is_there_validation']
-
-            if not if_pub_run_exists:
-                # checking non published ones - excluding the one which is being currently verified
-                existing_vals = ValidationRun.objects.filter(doi='').filter(progress=100).exclude(output_file='')\
-                    .order_by('-start_time')
-                comparison_non_pub = _compare_validation_runs(newrun, existing_vals, request.user)
-                if_non_pub_run_exists = comparison_non_pub['is_there_validation']
-                if_run_exists = if_non_pub_run_exists
-            else:
-                if_run_exists = False
-
+            existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file='').order_by('-start_time')
+            comparison_pub = _compare_validation_runs(newrun, existing_runs, request.user)
+            if_run_exists = comparison_pub['is_there_validation']
             # checking how many times the validation button was clicked - in 'try' so that tests pass
             try:
                 clicked_times = int(request.POST.get('click-counter'))
@@ -306,7 +298,8 @@ def validation(request):
 
             if if_run_exists and clicked_times == 1:
                 newrun.delete()
-                comparison, is_published = (comparison_pub, True) if if_pub_run_exists else (comparison_non_pub, False)
+                print('Monika', comparison_pub['is_published'])
+                comparison, is_published = (comparison_pub, comparison_pub['is_published'])
                 val_id = comparison['val_id']
                 val_date = ValidationRun.objects.get(id=val_id).start_time
                 belongs_to_user = comparison['belongs_to_user']
