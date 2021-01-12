@@ -84,6 +84,12 @@ def validation(request):
         valrun_initial_values = {}
         for field in ValidationRunForm.Meta.fields:
             valrun_initial_values[field] = getattr(valrun, field)
+            # the dates should be without time
+            if isinstance(valrun_initial_values[field], datetime):
+                valrun_initial_values[field] = (
+                    valrun_initial_values[field].strftime("%Y-%m-%d")
+                )
+        
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:
