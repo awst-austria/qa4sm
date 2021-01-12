@@ -178,7 +178,6 @@ def _compare_validation_runs(new_run, runs_set, user):
             old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
             is_the_same = _compare_datasets(new_run_config, old_run_config)
             val_id = run.id
-            print('I found a validation: ', run.id, 'with doi: ', run.doi)
             is_published = run.doi != ''
             old_user = run.user
         run_ind += 1
