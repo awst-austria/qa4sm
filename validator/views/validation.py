@@ -69,10 +69,9 @@ def _compare_filters(new_dataset, old_dataset):
 
     if new_filts_len != old_filts_len:
         return False
-    elif new_filts_len == old_filts_len and new_filts_len == 0:
+    elif new_filts_len == old_filts_len == 0:
         is_the_same = True
         new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
-
         if len(new_param_filters) != 0:
             old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
             is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
