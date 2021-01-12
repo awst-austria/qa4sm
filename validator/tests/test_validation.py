@@ -37,12 +37,13 @@ from validator.validation.batches import _geographic_subsetting
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.views.validation import _compare_validation_runs
+from validator.views.results import _copy_validationrun
+from django.shortcuts import get_object_or_404
 
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidation(TestCase):
-
     fixtures = ['variables', 'versions', 'datasets', 'filters']
     hawaii_coordinates = [18.16464, -158.79638, 22.21588, -155.06103]
 
@@ -56,12 +57,19 @@ class TestValidation(TestCase):
             'username': 'testuser',
             'password': 'secret',
             'email': 'noreply@awst.at'
-            }
+        }
+        self.user2_data = {
+            'username': 'bojack',
+            'password': 'horseman',
+            'email': 'bojack@awst.at'
+        }
 
         try:
             self.testuser = User.objects.get(username=self.user_data['username'])
+            self.testuser2 = User.objects.get(username=self.user2_data['username'])
         except User.DoesNotExist:
             self.testuser = User.objects.create_user(**self.user_data)
+            self.testuser2 = User.objects.create_user(**self.user2_data)
 
         try:
             os.makedirs(val.OUTPUT_FOLDER)
@@ -144,13 +152,13 @@ class TestValidation(TestCase):
 
         n_datasets = run.dataset_configurations.count()
 
-        tcol_metrics =  self.tcol_metrics if is_tcol_run else []
-        pair_metrics =  [m for m in list(METRICS.keys()) if m.lower() != 'n_obs']
+        tcol_metrics = self.tcol_metrics if is_tcol_run else []
+        pair_metrics = [m for m in list(METRICS.keys()) if m.lower() != 'n_obs']
         comm_metrics = [m for m in self.metrics if m not in pair_metrics]
 
         ## check netcdf output
-        length=-1
-        num_vars=-1
+        length = -1
+        num_vars = -1
         with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
             assert ds.qa4sm_version == settings.APP_VERSION
             assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
@@ -158,7 +166,7 @@ class TestValidation(TestCase):
             assert settings.SITE_URL in ds.url
 
             ## check the metrics contained in the file
-            for metric in  self.metrics + tcol_metrics: # we dont test lon, lat, time etc.
+            for metric in self.metrics + tcol_metrics:  # we dont test lon, lat, time etc.
                 ## This gets all variables in the netcdf file that start with the name of the current metric
                 if metric in tcol_metrics:
                     metric_vars = ds.get_variables_by_attributes(
@@ -180,7 +188,9 @@ class TestValidation(TestCase):
                     raise ValueError(f"Unknown metric {metric}")
 
                 assert len(metric_vars) > 0, 'No variables containing metric {}'.format(metric)
-                assert len(metric_vars) == num_vars, 'Number of variables for metric {} doesn\'t match number for other metrics'.format(metric)
+                assert len(
+                    metric_vars) == num_vars, 'Number of variables for metric {} doesn\'t match number for other metrics'.format(
+                    metric)
 
                 ## check the values of the variables for formal criteria (not empty, matches lenght of other variables, doesn't have too many NaNs)
                 for m_var in metric_vars:
@@ -191,32 +201,38 @@ class TestValidation(TestCase):
                         length = len(values)
                         assert length > 0, 'Variable {} has no entries'.format(m_var.name)
                     else:
-                        assert len(values) == length, 'Variable {} doesn\'t match other variables in length'.format(m_var.name)
+                        assert len(values) == length, 'Variable {} doesn\'t match other variables in length'.format(
+                            m_var.name)
                     self.__logger.debug(f'Length {m_var.name} are {length}')
 
                     nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
                     assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
 
-            if(run.interval_from is None):
+            if (run.interval_from is None):
                 assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
             else:
-                assert ds.val_interval_from == run.interval_from.strftime('%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_from]'
+                assert ds.val_interval_from == run.interval_from.strftime(
+                    '%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_from]'
 
-            if(run.interval_to is None):
+            if (run.interval_to is None):
                 assert ds.val_interval_to == "N/A", 'Wrong validation config attribute. [interval_to]'
             else:
-                assert ds.val_interval_to == run.interval_to.strftime('%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_to]'
+                assert ds.val_interval_to == run.interval_to.strftime(
+                    '%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_to]'
 
             assert run.anomalies == ds.val_anomalies, 'Wrong validation config attribute. [anomalies]'
-            if(run.anomalies == ValidationRun.CLIMATOLOGY):
-                assert ds.val_anomalies_from == run.anomalies_from.strftime('%Y-%m-%d %H:%M'), 'Anomalies baseline start wrong'
-                assert ds.val_anomalies_to == run.anomalies_to.strftime('%Y-%m-%d %H:%M'), 'Anomalies baseline end wrong'
+            if (run.anomalies == ValidationRun.CLIMATOLOGY):
+                assert ds.val_anomalies_from == run.anomalies_from.strftime(
+                    '%Y-%m-%d %H:%M'), 'Anomalies baseline start wrong'
+                assert ds.val_anomalies_to == run.anomalies_to.strftime(
+                    '%Y-%m-%d %H:%M'), 'Anomalies baseline end wrong'
             else:
                 assert 'val_anomalies_from' not in ds.ncattrs(), 'Anomalies baseline period start should not be set'
                 assert 'val_anomalies_to' not in ds.ncattrs(), 'Anomalies baseline period end should not be set'
 
             if all(x is not None for x in [run.min_lat, run.min_lon, run.max_lat, run.max_lon]):
-                assert ds.val_spatial_subset == "[{}, {}, {}, {}]".format(run.min_lat, run.min_lon, run.max_lat, run.max_lon)
+                assert ds.val_spatial_subset == "[{}, {}, {}, {}]".format(run.min_lat, run.min_lon, run.max_lat,
+                                                                          run.max_lon)
 
             i = 0
             for dataset_config in run.dataset_configurations.all():
@@ -265,7 +281,7 @@ class TestValidation(TestCase):
                 if dataset_config.id == run.scaling_ref.id:
                     assert ds.val_scaling_ref == ds_name, 'Wrong validation config attribute. [scaling_ref]'
 
-            assert ds.val_scaling_method == run.scaling_method,' Wrong validation config attribute. [scaling_method]'
+            assert ds.val_scaling_method == run.scaling_method, ' Wrong validation config attribute. [scaling_method]'
 
         # check zipfile of graphics
         zipfile = os.path.join(outdir, 'graphs.zip')
@@ -274,14 +290,14 @@ class TestValidation(TestCase):
             assert myzip.testzip() is None
 
         # check diagrams
-        boxplot_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        boxplot_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
         assert len(boxplot_pngs) == len(globals.METRICS.keys()) + (len(tcol_metrics) * (n_datasets - 1))
 
-        overview_pngs = [ x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
+        overview_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         # n_obs + one for each data set for all other metrics
-        assert len(overview_pngs) == 1 + ((len(pair_metrics)  + len(tcol_metrics)) * (n_datasets - 1))
+        assert len(overview_pngs) == 1 + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
 
     ## delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -293,14 +309,16 @@ class TestValidation(TestCase):
         run.delete()
         assert not os.path.exists(outdir)
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_validation(self):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.CDF_MATCH  # cdf matching causes an error for 1 gpi, use that to test error handling
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -316,7 +334,7 @@ class TestValidation(TestCase):
 
             config.save()
 
-        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
                                      dataset_config=run.reference_configuration)
         pfilter.save()
         # add filterring according to depth_range with the default values:
@@ -330,15 +348,17 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 9 # 9 ismn stations in hawaii testdata
+        assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_validation_tcol(self):
         run = self.generate_default_validation_triple_coll()
         run.user = self.testuser
@@ -383,14 +403,16 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=True)
         self.delete_run(new_run)
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_validation_empty_network(self):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.CDF_MATCH  # cdf matching causes an error for 1 gpi, use that to test error handling
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -405,7 +427,6 @@ class TestValidation(TestCase):
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
-
 
         # add filterring according to depth_range with values which cause that there is no points anymore:
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.1,0.2", \
@@ -422,8 +443,6 @@ class TestValidation(TestCase):
         assert new_run.total_points == 0
         assert new_run.error_points == 0
         assert new_run.ok_points == 0
-
-
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
     @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
@@ -555,49 +574,49 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-#     @pytest.mark.long_running
-#     def test_validation_smap_ref(self):
-#         run = self.generate_default_validation()
-#         run.user = self.testuser
+    #     @pytest.mark.long_running
+    #     def test_validation_smap_ref(self):
+    #         run = self.generate_default_validation()
+    #         run.user = self.testuser
 
-#         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP)
-#         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
-#         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMAP_soil_moisture)
-#         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+    #         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP)
+    #         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
+    #         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMAP_soil_moisture)
+    #         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-#         run.reference_configuration.save()
+    #         run.reference_configuration.save()
 
-#         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
-#         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
-#         # different window is used here, because for the default one there is too much memory needed to create and save
-#         # plots
-#         run.min_lat = 20.32
-#         run.min_lon = -157.47
-#         run.max_lat = 21.33
-#         run.max_lon = -155.86
+    #         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+    #         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+    #         # different window is used here, because for the default one there is too much memory needed to create and save
+    #         # plots
+    #         run.min_lat = 20.32
+    #         run.min_lon = -157.47
+    #         run.max_lat = 21.33
+    #         run.max_lon = -155.86
 
-#         run.save()
+    #         run.save()
 
-#         for config in run.dataset_configurations.all():
-#             if config != run.reference_configuration:
-#                 #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-#                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-#             config.save()
+    #         for config in run.dataset_configurations.all():
+    #             if config != run.reference_configuration:
+    #                 #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+    #                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+    #             config.save()
 
-#         run_id = run.id
+    #         run_id = run.id
 
-#         ## run the validation
-#         val.run_validation(run_id)
+    #         ## run the validation
+    #         val.run_validation(run_id)
 
-#         new_run = ValidationRun.objects.get(pk=run_id)
-#         print(new_run)
-#         assert new_run
+    #         new_run = ValidationRun.objects.get(pk=run_id)
+    #         print(new_run)
+    #         assert new_run
 
-#         assert new_run.total_points == 15, "Number of gpis is off"
-#         assert new_run.error_points == 0, "Too many error gpis"
-#         assert new_run.ok_points == 15, "OK points are off"
-#         self.check_results(new_run)
-#         self.delete_run(new_run)
+    #         assert new_run.total_points == 15, "Number of gpis is off"
+    #         assert new_run.error_points == 0, "Too many error gpis"
+    #         assert new_run.ok_points == 15, "OK points are off"
+    #         self.check_results(new_run)
+    #         self.delete_run(new_run)
 
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
@@ -693,7 +712,7 @@ class TestValidation(TestCase):
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-#        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+        #        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
 
         run.reference_configuration.save()
 
@@ -708,7 +727,7 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-#                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -727,7 +746,8 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
     @pytest.mark.long_running
     def test_validation_ascat(self):
         run = self.generate_default_validation()
@@ -741,8 +761,8 @@ class TestValidation(TestCase):
                 config.filters.clear()
                 config.save()
 
-        #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.CDF_MATCH  # cdf matching causes an error for 1 gpi, use that to test error handling
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -848,7 +868,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         # hawaii bounding box
-        run.min_lat = 18.625 # ll
+        run.min_lat = 18.625  # ll
         run.min_lon = -156.375  # ll
         run.max_lat = 20.375  # ur
         run.max_lon = -154.625  # ur
@@ -887,7 +907,6 @@ class TestValidation(TestCase):
             no_reader = val.create_reader(dataset, version)
             print(no_reader)
 
-
         ## save config
         validation_run = ValidationRun()
         val.save_validation_config(validation_run)
@@ -907,7 +926,7 @@ class TestValidation(TestCase):
                 if dataset.short_name == val.globals.ISMN:
                     data = reader.read_ts(0)
                 else:
-                    data = reader.read_ts(-155.42, 19.78) ## hawaii
+                    data = reader.read_ts(-155.42, 19.78)  ## hawaii
                 assert data is not None
                 assert isinstance(data, pd.DataFrame)
 
@@ -931,11 +950,11 @@ class TestValidation(TestCase):
         data_filters = [
             DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
             DataFilter.objects.get(name="FIL_ISMN_GOOD"),
-            ]
+        ]
         param_filters = [
-            ParametrisedFilter(filter = DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters = "  COSMOS , SCAN "),
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters="  COSMOS , SCAN "),
             ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
-            ]
+        ]
         msk_reader = val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
 
         assert msk_reader is not None
@@ -1017,9 +1036,11 @@ class TestValidation(TestCase):
                 reader = val.create_reader(dataset, version)
                 for variable in va:
                     for data_filter in fils:
-                        self.__logger.debug("Testing {} version {} variable {} filter {}".format(dataset, version, variable, data_filter.name))
+                        self.__logger.debug(
+                            "Testing {} version {} variable {} filter {}".format(dataset, version, variable,
+                                                                                 data_filter.name))
                         if data_filter.parameterised:
-                            pfilter = ParametrisedFilter(filter = data_filter, parameters = data_filter.default_parameter)
+                            pfilter = ParametrisedFilter(filter=data_filter, parameters=data_filter.default_parameter)
                             msk_reader = val.setup_filtering(reader, [], [pfilter], dataset, variable)
                         else:
                             msk_reader = val.setup_filtering(reader, [data_filter], [], dataset, variable)
@@ -1028,7 +1049,7 @@ class TestValidation(TestCase):
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
                         else:
-                            data = msk_reader.read_ts(-155.42, 19.78) ## hawaii
+                            data = msk_reader.read_ts(-155.42, 19.78)  ## hawaii
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
@@ -1084,16 +1105,18 @@ class TestValidation(TestCase):
 
     def test_geographic_subsetting(self):
         # hawaii bounding box
-        min_lat = 18.625 # ll
+        min_lat = 18.625  # ll
         min_lon = -156.375  # ll
         max_lat = 20.375  # ur
         max_lon = -154.625  # ur
 
         # we need the reader just to get the grid
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
+        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
+                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
         gpis, lons, lats, cells = c3s_reader.cls.grid.get_grid_points()
 
-        subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
+        subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat,
+                                                                     max_lon)
 
         assert len(subgpis) == 16
         assert len(sublats) == len(subgpis)
@@ -1106,7 +1129,8 @@ class TestValidation(TestCase):
 
     def test_no_geographic_subsetting(self):
         # we need the reader just to get the grid
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
+        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
+                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, None, None, None, None)
@@ -1116,18 +1140,20 @@ class TestValidation(TestCase):
         assert np.array_equal(lons, sublons)
 
     def test_geographic_subsetting_across_dateline(self):
-        test_coords = [(-34.30, -221.13, 80.17, -111.44), # dateline left
-                       (-58.81, 127.61, 77.15, 256.99) # dateline right
+        test_coords = [(-34.30, -221.13, 80.17, -111.44),  # dateline left
+                       (-58.81, 127.61, 77.15, 256.99)  # dateline right
                        ]
 
         russia_gpi = 898557
         russia_gpi2 = 898567
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
-            c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
+            c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
+                                           DatasetVersion.objects.get(short_name='C3S_V201812'))
             gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
-            subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+            subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat,
+                                                                         max_lon)
 
             assert len(subgpis) > 100
             assert len(sublats) == len(subgpis)
@@ -1137,20 +1163,22 @@ class TestValidation(TestCase):
 
     def test_geographic_subsetting_shifted(self):
         ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
+        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
+                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
-        test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1), # americas
-                       (9.79, -710.50, 70.14, -545.27, 2), #asia
-                       (-55.37, 1303.24, 68.39, 1415.03, 1), # americas
-                       (7.01, 1473.39, 68.39, 1609.80, 2), # asia
+        test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1),  # americas
+                       (9.79, -710.50, 70.14, -545.27, 2),  # asia
+                       (-55.37, 1303.24, 68.39, 1415.03, 1),  # americas
+                       (7.01, 1473.39, 68.39, 1609.80, 2),  # asia
                        ]
 
         panama_gpi = 566315
         india_gpi = 683588
 
         for min_lat, min_lon, max_lat, max_lon, area in test_coords:
-            subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
+            subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat,
+                                                                         max_lon)
 
             assert len(subgpis) > 100
             assert len(sublats) == len(subgpis)
@@ -1195,12 +1223,12 @@ class TestValidation(TestCase):
         v.save()
         val.generate_all_graphs(v, run_dir)
 
-        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
         n_metrics = len(globals.METRICS.keys())
         assert len(boxplot_pngs) == n_metrics
 
-        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
@@ -1217,11 +1245,11 @@ class TestValidation(TestCase):
         v.reference_configuration.save()
         val.generate_all_graphs(v, run_dir)
 
-        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
         assert len(boxplot_pngs) == n_metrics
 
-        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
@@ -1238,14 +1266,13 @@ class TestValidation(TestCase):
         v.reference_configuration.save()
         val.generate_all_graphs(v, run_dir)
 
-        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
         assert len(boxplot_pngs) == n_metrics
 
-        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
-
 
         self.delete_run(v)
 
@@ -1317,15 +1344,14 @@ class TestValidation(TestCase):
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             if config.dataset.short_name == globals.C3S:
                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-            print('old one',config.dataset == globals.ISMN, config, config.filters.all())
+            print('old one', config.dataset == globals.ISMN, config, config.filters.all())
 
-        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
                                      dataset_config=run_filt.reference_configuration)
         pfilter.save()
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
                                      dataset_config=run_filt.reference_configuration)
         pfilter.save()
-
 
         published_runs = ValidationRun.objects.exclude(doi='').order_by('-start_time')
 
@@ -1382,7 +1408,6 @@ class TestValidation(TestCase):
         assert is_there_one['is_there_validation']
         assert is_there_one['val_id'] == run_ids[0]
 
-
         # spoiling time span:
         run.interval_from = datetime(1990, 1, 1, tzinfo=UTC)
         run.save()
@@ -1438,7 +1463,7 @@ class TestValidation(TestCase):
         is_there_one = _compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
-        #getting back to appropriate settings
+        # getting back to appropriate settings
         run.anomalies_to = time_intervals_to
         run.save()
         is_there_one = _compare_validation_runs(run, published_runs, user)
@@ -1464,18 +1489,18 @@ class TestValidation(TestCase):
             new_config.save()
 
         new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
+                                         dataset_config=run.reference_configuration)
         new_pfilter.save()
         # add filterring according to depth_range with the default values:
         new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                         dataset_config=run.reference_configuration)
         new_pfilter.save()
         is_there_one = _compare_validation_runs(run, published_runs, user)
 
         assert is_there_one['is_there_validation']
         assert is_there_one['val_id'] == run_filt_id
 
-        #messing up with filters:
+        # messing up with filters:
 
         # adding filter for C3S
         c3s_filter = DataFilter.objects.get(name='FIL_C3S_MODE_ASC')
@@ -1503,7 +1528,7 @@ class TestValidation(TestCase):
         is_there_one = _compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
-        #restoring the filter:
+        # restoring the filter:
         for new_config in run.dataset_configurations.all():
             if new_config.dataset.short_name == globals.ISMN:
                 new_config.filters.add(ismn_filter)
@@ -1609,4 +1634,59 @@ class TestValidation(TestCase):
         DatasetConfiguration.objects.all().delete()
         ParametrisedFilter.objects.all().delete()
 
+    def test_copy_validation(self):
+        # create a validation to copy:
+        run = self.generate_default_validation()
+        run.user = self.testuser
 
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config == run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+        run_id = run.id
+        val.run_validation(run_id)
+        new_run = get_object_or_404(ValidationRun, pk=run_id)
+        # new_run = ValidationRun.objects.get(pk=run_id)
+
+        copied_validation = _copy_validationrun(new_run, self.testuser)
+        assert copied_validation['run_id'] == run_id
+
+        validations = ValidationRun.objects.exclude(pk=copied_validation['run_id'])
+        val_to_find = ValidationRun.objects.get(pk=copied_validation['run_id'])
+        comparison = _compare_validation_runs(val_to_find, validations, val_to_find.user)
+
+        # the query validations will be empty so 'is_there_validation' == False, 'val_id' == None, '
+        # 'belongs_to_user'==False, 'is_published' == False
+        assert not comparison['is_there_validation']
+        assert comparison['val_id'] is None
+        assert not comparison['belongs_to_user']
+        assert not comparison['is_published']
+
+        copied_validation_2 = _copy_validationrun(new_run, self.testuser2)
+        assert copied_validation_2['run_id'] != run.id
+
+        validations = ValidationRun.objects.exclude(pk=copied_validation_2['run_id'])
+        val_to_find = ValidationRun.objects.get(pk=copied_validation_2['run_id'])
+        comparison = _compare_validation_runs(val_to_find, validations, val_to_find.user)
+
+        assert comparison['is_there_validation']
+        assert comparison['val_id'] == run.id
+        assert not comparison['belongs_to_user']
+        assert not comparison['is_published']
+        print(comparison)
+        # assert False
