@@ -25,9 +25,11 @@ def _copy_validationrun(run_to_copy, new_user):
     # checking if the new validation belongs to the same user:
     if run_to_copy.user == new_user:
         run_id = run_to_copy.id
+        print('the user is the same')
         # belongs_to_user = True
     else:
         # copying validation
+        print('There is a different user')
         valrun_user = CopiedValidations(user=new_user, original_run=run_to_copy)
         valrun_user.save()
 
@@ -42,6 +44,7 @@ def _copy_validationrun(run_to_copy, new_user):
         run_to_copy.start_time = datetime.now(tzlocal())
         run_to_copy.end_time = datetime.now(tzlocal())
         run_to_copy.save()
+        run_id = run_to_copy.id
 
         # adding the copied validation to the copied validation list
         valrun_user.copied_run = run_to_copy
@@ -79,7 +82,7 @@ def _copy_validationrun(run_to_copy, new_user):
 
         # copying files
         # new directory -> creating if doesn't exist
-        new_dir = os.path.join(OUTPUT_FOLDER, str(run_to_copy.id))
+        new_dir = os.path.join(OUTPUT_FOLDER, str(run_id))
         mkdir_if_not_exists(new_dir)
         # old directory and all files there
         old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
@@ -90,11 +93,11 @@ def _copy_validationrun(run_to_copy, new_user):
                 new_file = new_dir + '/' + old_file_name
                 old_file = old_dir + '/' + old_file_name
                 if '.nc' in new_file:
-                    run_to_copy.output_file = str(run_to_copy.id) + '/' + old_file_name
+                    run_to_copy.output_file = str(run_id) + '/' + old_file_name
                     run_to_copy.save()
                 copy2(old_file, new_file)
 
-        run_id = run_to_copy.id
+
 
     response = {
         'run_id': run_id,

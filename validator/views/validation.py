@@ -163,10 +163,10 @@ def _compare_validation_runs(new_run, runs_set, user):
     vr_fields = val_globals.VR_FIELDS
     is_the_same = False # set to False because it looks for the first found validation run
     is_published = False
+    old_user = None
     max_vr_ind = len(vr_fields)
     max_run_ind = len(runs_set)
     run_ind = 0
-    old_user = None
     while not is_the_same and run_ind < max_run_ind:
         run = runs_set[run_ind]
         ind = 0
