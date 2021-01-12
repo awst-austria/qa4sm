@@ -298,7 +298,6 @@ def validation(request):
 
             if if_run_exists and clicked_times == 1:
                 newrun.delete()
-                print('Monika', comparison_pub['is_published'])
                 comparison, is_published = (comparison_pub, comparison_pub['is_published'])
                 val_id = comparison['val_id']
                 val_date = ValidationRun.objects.get(id=val_id).start_time
