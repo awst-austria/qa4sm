@@ -861,18 +861,13 @@
         }
 
 
-<<<<<<< HEAD
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
-
-=======
         $("#{{ ref_dc_form.dataset.auto_id }}").change(
             {initialFilters: "{{ ref_dc_form.initial_filters }}",
              initialVersion: "{{ ref_dc_form.initial_version }}",
              initialVariable: "{{ ref_dc_form.initial_variable }}" }, ajax_change_dataset
         ).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id)
->>>>>>> 295ae2d (selecting correct filters)
+        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
 
     </script>
 
