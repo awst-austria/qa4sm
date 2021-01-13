@@ -89,11 +89,11 @@ def _copy_validationrun(run_to_copy, new_user):
         old_files = os.listdir(old_dir)
 
         if len(old_files) != 0:
-            for old_file_name in old_files:
-                new_file = new_dir + '/' + old_file_name
-                old_file = old_dir + '/' + old_file_name
+            for file_name in old_files:
+                new_file = new_dir + '/' + file_name
+                old_file = old_dir + '/' + file_name
                 if '.nc' in new_file:
-                    run_to_copy.output_file = str(run_id) + '/' + old_file_name
+                    run_to_copy.output_file = str(run_id) + '/' + file_name
                     run_to_copy.save()
                 copy2(old_file, new_file)
 
