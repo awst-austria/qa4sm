@@ -1,6 +1,7 @@
 import os
 from json import dumps as json_dumps
 
+import netCDF4
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
@@ -19,6 +20,9 @@ from validator.validation.globals import OUTPUT_FOLDER
 from shutil import copy2
 from dateutil.tz import tzlocal
 from datetime import datetime
+from django.conf import settings
+from django.urls.base import reverse
+from pytz import UTC
 
 
 def _copy_validationrun(run_to_copy, new_user):
@@ -92,12 +96,17 @@ def _copy_validationrun(run_to_copy, new_user):
             for file_name in old_files:
                 new_file = new_dir + '/' + file_name
                 old_file = old_dir + '/' + file_name
+                copy2(old_file, new_file)
                 if '.nc' in new_file:
                     run_to_copy.output_file = str(run_id) + '/' + file_name
                     run_to_copy.save()
-                copy2(old_file, new_file)
+                    file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
 
-
+                    # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
+                    new_url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': run_to_copy.id})
+                    file.setncattr('url', new_url)
+                    file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
+                    file.close()
 
     response = {
         'run_id': run_id,
