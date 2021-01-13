@@ -151,3 +151,32 @@ a.doilink {
 div.col-1{
     visibility: hidden;
 }
+div.plot_div {
+    width: 100%;
+    height: 10%;
+}
+
+#user_info {
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+}
+#user_info h2{
+  font-size: 1.2em;
+  font-weight: normal;
+}
+#hide_user_info{
+  font-size: 1.2em;
+}
+#user_info > #hide_user_info{
+    position: relative;
+    left: 92%;
+}
+#users_list {
+    background-color: white;
+    font-size: 0.9em;
+    height: 2em;
+}
+#users_list optgroup {
+    font-size: 1em;
+}
+
