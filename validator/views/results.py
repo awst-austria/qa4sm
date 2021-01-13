@@ -165,16 +165,12 @@ def result(request, result_uuid):
         post_params = QueryDict(request.body)
         user = request.user
         if 'add_validation' in post_params and post_params['add_validation'] == 'true':
-            if val_run.user != user:
-                if val_run not in user.copied_runs.all():
-                    valrun_user = CopiedValidations(user=user, original_run=val_run, copied_run=val_run)
-                    valrun_user.save()
-                    response = HttpResponse("Validation added to your list", status=200)
-                else:
-                    response = HttpResponse("You have already added this validation to your list", status=200)
+            if val_run not in user.copied_runs.all():
+                valrun_user = CopiedValidations(user=user, original_run=val_run, copied_run=val_run)
+                valrun_user.save()
+                response = HttpResponse("Validation added to your list", status=200)
             else:
-                response = HttpResponse("This validation was published by you, you have it already on your list",
-                                        status=200)
+                response = HttpResponse("You have already added this validation to your list", status=200)
         elif 'remove_validation' in post_params and post_params['remove_validation'] == 'true':
             user.copied_runs.remove(val_run)
             response = HttpResponse("Validation has been removed from your list", status=200)
