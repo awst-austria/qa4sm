@@ -39,6 +39,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 from validator.views.validation import _compare_validation_runs
 from validator.views.results import _copy_validationrun
 from django.shortcuts import get_object_or_404
+from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
 
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
@@ -78,64 +79,6 @@ class TestValidation(TestCase):
                 raise
 
         set_dataset_paths()
-
-    def generate_default_validation(self):
-        run = ValidationRun()
-        run.start_time = datetime.now(tzlocal())
-        run.save()
-
-        data_c = DatasetConfiguration()
-        data_c.validation = run
-        data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
-        data_c.save()
-
-        ref_c = DatasetConfiguration()
-        ref_c.validation = run
-        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
-        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
-        ref_c.save()
-
-        run.reference_configuration = ref_c
-        run.scaling_ref = ref_c
-        run.save()
-
-        return run
-
-    def generate_default_validation_triple_coll(self):
-        run = ValidationRun()
-        run.start_time = datetime.now(tzlocal())
-        run.save()
-
-        data_c = DatasetConfiguration()
-        data_c.validation = run
-        data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201912')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
-        data_c.save()
-
-        other_data_c = DatasetConfiguration()
-        other_data_c.validation = run
-        other_data_c.dataset = Dataset.objects.get(short_name='SMOS')
-        other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
-        other_data_c.variable = DataVariable.objects.get(short_name='SMOS_sm')
-        other_data_c.save()
-
-        ref_c = DatasetConfiguration()
-        ref_c.validation = run
-        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
-        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
-        ref_c.save()
-
-        run.reference_configuration = ref_c
-        run.scaling_ref = ref_c
-        run.tcol = True
-        run.save()
-
-        return run
 
     ## check output of validation
     def check_results(self, run, is_tcol_run=False):
@@ -314,7 +257,7 @@ class TestValidation(TestCase):
     @pytest.mark.filterwarnings(
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_validation(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
@@ -360,7 +303,7 @@ class TestValidation(TestCase):
     @pytest.mark.filterwarnings(
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_validation_tcol(self):
-        run = self.generate_default_validation_triple_coll()
+        run = generate_default_validation_triple_coll()
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
@@ -408,7 +351,7 @@ class TestValidation(TestCase):
     @pytest.mark.filterwarnings(
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_validation_empty_network(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
@@ -448,7 +391,7 @@ class TestValidation(TestCase):
     @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
     @pytest.mark.long_running
     def test_validation_gldas_ref(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
@@ -490,7 +433,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_ccip_ref(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
@@ -533,7 +476,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_ccia_ref(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
@@ -576,7 +519,7 @@ class TestValidation(TestCase):
 
     #     @pytest.mark.long_running
     #     def test_validation_smap_ref(self):
-    #         run = self.generate_default_validation()
+    #         run = generate_default_validation()
     #         run.user = self.testuser
 
     #         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP)
@@ -620,7 +563,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
@@ -663,7 +606,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_c3s_ref(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3S)
@@ -705,7 +648,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
@@ -750,7 +693,7 @@ class TestValidation(TestCase):
         "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
     @pytest.mark.long_running
     def test_validation_ascat(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         for config in run.dataset_configurations.all():
@@ -785,7 +728,7 @@ class TestValidation(TestCase):
     # test the validation with no changes to the default validation parameters
     def test_validation_default(self):
         ## create default validation object
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.save()
@@ -805,7 +748,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_anomalies_moving_avg(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
         run.anomalies = ValidationRun.MOVING_AVG_35_D
         run.save()
@@ -833,7 +776,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_anomalies_climatology(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
@@ -864,7 +807,7 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         # hawaii bounding box
@@ -1208,7 +1151,7 @@ class TestValidation(TestCase):
         infile3 = 'testdata/output_data/c3s_era5land.nc'
 
         # create validation object and data folder for it
-        v = self.generate_default_validation()
+        v = generate_default_validation()
         # scatterplot
         v.reference_configuration.dataset = Dataset.objects.get(short_name='ISMN')
         v.reference_configuration.save()
@@ -1287,7 +1230,7 @@ class TestValidation(TestCase):
         run_ids = []
         # preparing a few validations, so that there is a base to be searched
         for i in range(3):
-            run = self.generate_default_validation()
+            run = generate_default_validation()
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -1306,7 +1249,7 @@ class TestValidation(TestCase):
             run_ids.append(run.id)
 
         # ================== tcols ====================================
-        run_tcol = self.generate_default_validation_triple_coll()
+        run_tcol = generate_default_validation_triple_coll()
         run_tcol.user = self.testuser
         run_tcol.interval_from = time_intervals_from
         run_tcol.interval_to = time_intervals_to
@@ -1323,7 +1266,7 @@ class TestValidation(TestCase):
 
         # ========= validations with filters
 
-        run_filt = self.generate_default_validation()
+        run_filt = generate_default_validation()
         run_filt.user = self.testuser
         run_filt.interval_from = time_intervals_from
         run_filt.interval_to = time_intervals_to
@@ -1357,7 +1300,7 @@ class TestValidation(TestCase):
 
         # here will be validations for asserting, I start with exactly the same validations and check if it finds them:
         for i in range(3):
-            run = self.generate_default_validation()
+            run = generate_default_validation()
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -1379,7 +1322,7 @@ class TestValidation(TestCase):
             run.delete()
 
         # runs to fail:
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
         run.interval_from = time_intervals_from
         run.interval_to = time_intervals_to
@@ -1606,7 +1549,7 @@ class TestValidation(TestCase):
         assert not is_there_one['is_there_validation']
 
         # ================== tcols ====================================
-        run_tcol = self.generate_default_validation_triple_coll()
+        run_tcol = generate_default_validation_triple_coll()
         run_tcol.user = self.testuser
         run_tcol.interval_from = time_intervals_from
         run_tcol.interval_to = time_intervals_to
@@ -1636,7 +1579,7 @@ class TestValidation(TestCase):
 
     def test_copy_validation(self):
         # create a validation to copy:
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.scaling_method = ValidationRun.MEAN_STD
@@ -1688,5 +1631,4 @@ class TestValidation(TestCase):
         assert comparison['val_id'] == run.id
         assert not comparison['belongs_to_user']
         assert not comparison['is_published']
-        print(comparison)
         # assert False

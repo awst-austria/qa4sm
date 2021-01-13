@@ -36,7 +36,7 @@ from os import path
 import shutil
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation import set_outfile, mkdir_if_not_exists
-from validator.tests.test_validation import TestValidation
+from validator.tests.auxiliary_functions import generate_default_validation
 
 from django.utils.http import urlencode
 import os
@@ -606,7 +606,7 @@ class TestViews(TransactionTestCase):
 
     def test_submit_existing_validation(self):
         # create a default validation with progress code 100 and non empty output_file filed
-        def_val = TestValidation().generate_default_validation()
+        def_val = generate_default_validation()
         def_val.scaling_method = 'mean_std'
         def_val.scaling_ref = def_val.dataset_configurations.all()[0]
         def_val.progress = 100
