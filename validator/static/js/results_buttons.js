@@ -159,6 +159,7 @@ function ajax_save_name(obj, result_id){
 
 }
 
+
 function ajax_attach_validation(result_id){
   var url =  result_url.replace('00000000-0000-0000-0000-000000000000', result_id);
   var formdata = { "add_validation" : true};
@@ -176,6 +177,7 @@ function ajax_attach_validation(result_id){
       }
   });
 }
+
 
 function ajax_detach_validation(result_id){
   if (!confirm('Do you really want to remove this validation from your list?')) {
@@ -214,3 +216,4 @@ function ajax_copy_validation(result_id){
       }
   });
 }
+

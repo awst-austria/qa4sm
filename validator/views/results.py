@@ -139,15 +139,17 @@ def user_runs(request):
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
     current_user = request.user
+
     copied_runs = current_user.copiedvalidations_set.all() if current_user.username else []
     is_copied = val_run.id in copied_runs.values_list('copied_run', flat=True)
-    print(is_copied)
+
     if is_copied and val_run.doi == '':
         original_start = copied_runs.get(copied_run=val_run).original_run.start_time
         original_end = copied_runs.get(copied_run=val_run).original_run.end_time
     else:
         original_start = None
         original_end = None
+
 
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
