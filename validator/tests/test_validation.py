@@ -1605,14 +1605,14 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
         new_run = get_object_or_404(ValidationRun, pk=run_id)
         # new_run = ValidationRun.objects.get(pk=run_id)
+        print('end_time =', new_run.end_time)
+        copied_run_info = _copy_validationrun(new_run, self.testuser)
+        assert copied_run_info['run_id'] == run_id
 
-        copied_validation = _copy_validationrun(new_run, self.testuser)
-        assert copied_validation['run_id'] == run_id
-
-        validations = ValidationRun.objects.exclude(pk=copied_validation['run_id'])
-        val_to_find = ValidationRun.objects.get(pk=copied_validation['run_id'])
-        comparison = _compare_validation_runs(val_to_find, validations, val_to_find.user)
-
+        validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
+        copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
+        comparison = _compare_validation_runs(copied_run, validations, copied_run.user)
+        print('end_time =', copied_run.end_time)
         # the query validations will be empty so 'is_there_validation' == False, 'val_id' == None, '
         # 'belongs_to_user'==False, 'is_published' == False
         assert not comparison['is_there_validation']
@@ -1620,15 +1620,22 @@ class TestValidation(TestCase):
         assert not comparison['belongs_to_user']
         assert not comparison['is_published']
 
-        copied_validation_2 = _copy_validationrun(new_run, self.testuser2)
-        assert copied_validation_2['run_id'] != run.id
+        copied_run_info = _copy_validationrun(new_run, self.testuser2)
+        assert copied_run_info['run_id'] != run.id
 
-        validations = ValidationRun.objects.exclude(pk=copied_validation_2['run_id'])
-        val_to_find = ValidationRun.objects.get(pk=copied_validation_2['run_id'])
-        comparison = _compare_validation_runs(val_to_find, validations, val_to_find.user)
+        validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
+        copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
+        comparison = _compare_validation_runs(copied_run, validations, copied_run.user)
 
         assert comparison['is_there_validation']
         assert comparison['val_id'] == run.id
         assert not comparison['belongs_to_user']
         assert not comparison['is_published']
-        # assert False
+
+        print('Monika', copied_run, run)
+
+        assert copied_run.total_points == 9
+        assert copied_run.error_points == 0
+        assert copied_run.ok_points == 9
+        self.check_results(copied_run)
+        self.delete_run(copied_run)
