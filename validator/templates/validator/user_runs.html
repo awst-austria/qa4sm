@@ -1,4 +1,5 @@
 {% extends 'common/base.html' %}
+{% load widget_tweaks %}
 {% load static %}
 
 {% block content %}
@@ -37,15 +38,35 @@
         <h1 class="jumbotron-heading">My validations</h1>
     </div>
 
+    <form method="get">
+	<div class="mb-3">
+	    <div class="input-group">
+		<div class="input-group-prepend">
+		    <span class="input-group-text addon-w" id="sorting_form">Sort By</span>
+		</div>
+		{% render_field sorting_form.sort_key class="custom-select" %}
+		{% render_field sorting_form.sort_order class="custom-select" %}
+		<div class="px-2 py-2 py-sm-0">
+		    <input class="btn btn-primary" type="submit" value="Apply">
+		</div>
+	    </div>
+	    {% for error in sorting_form.key.errors %}
+	    <div class="custom-invalid-feedback">
+		{{ error }}
+	    </div>
+	    {% endfor %}
+	</div>
+    </form>
+
     <div class="card-deck mb-3">
-        <div class="col">
-            {% for valrun in myruns %}
-                <div class="card mb-4 mx-0 box-shadow" id="result_row_{{ valrun.id }}">
-                    <div class="card-header">
-                        <h5 class="my-0" style="float: left">
-                            {% if valrun.expiry_date %}
-                                {% if valrun.is_near_expiry %}
-                                    <span class="fas fa-exclamation-triangle" title="This validation will SOON be automatically removed during cleanup on {{ valrun.expiry_date }}."></span>
+	<div class="col">
+	    {% for valrun in myruns %}
+		<div class="card mb-4 mx-0 box-shadow" id="result_row_{{ valrun.id }}">
+		    <div class="card-header">
+			<h5 class="my-0" style="float: left">
+			    {% if valrun.expiry_date %}
+				{% if valrun.is_near_expiry %}
+				    <span class="fas fa-exclamation-triangle" title="This validation will SOON be automatically removed during cleanup on {{ valrun.expiry_date }}."></span>
                                 {% else %}
                                     <span class="fas fa-calendar-alt" title="This validation will be automatically removed during cleanup on {{ valrun.expiry_date }}."></span>
                                 {% endif %}
@@ -144,7 +165,7 @@
             <nav aria-label="pagination">
                 <ul class="pagination justify-content-center">
                     <li class="page-item {% if myruns.number == 1 %}disabled{%endif%}">
-                        <a class="page-link" href="?page=1" aria-label="First">
+                        <a class="page-link" href="?sort_key={{ sorting_form.key }}&sort_order={{ sorting_form.order }}&page=1" aria-label="First">
                         <span aria-hidden="true" class="fas fa-angle-double-left"></span>
                         <span class="sr-only">First</span></a>
                     </li>
@@ -156,7 +177,7 @@
                     {% for i in myruns.paginator.page_range %}
                         {% if i <= myruns.number|add:8 and i >= myruns.number|add:-8 %}
                             <li class="page-item {% if myruns.number == i %}active{% endif %}">
-                                <a class="page-link" href="?page={{ i }}">{{ i }} {% if myruns.number == i %}<span class="sr-only">(current)</span>{% endif %}</a>
+                                <a class="page-link" href="?sort_key={{ sorting_form.key }}&sort_order={{ sorting_form.order }}&page={{ i }}">{{ i }} {% if myruns.number == i %}<span class="sr-only">(current)</span>{% endif %}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -166,7 +187,7 @@
                         <span class="sr-only">Next</span></a>
                     </li>
                     <li class="page-item {% if myruns.number == myruns.paginator.num_pages %}disabled{% endif %}">
-                        <a class="page-link" href="?page={{ myruns.paginator.num_pages }}" aria-label="Next">
+                        <a class="page-link" href="?sort_key={{ sorting_form.key }}&sort_order={{ sorting_form.order }}&page={{ myruns.paginator.num_pages }}" aria-label="Next">
                         <span aria-hidden="true" class="fas fa-angle-double-right"></span>
                         <span class="sr-only">Next</span></a>
                     </li>
