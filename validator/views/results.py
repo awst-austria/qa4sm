@@ -29,12 +29,10 @@ def _copy_validationrun(run_to_copy, new_user):
     # checking if the new validation belongs to the same user:
     if run_to_copy.user == new_user:
         run_id = run_to_copy.id
-        print('the user is the same')
         # belongs_to_user = True
     else:
         # copying validation
-        print('There is a different user')
-        valrun_user = CopiedValidations(user=new_user, original_run=run_to_copy)
+        valrun_user = CopiedValidations(used_by_user=new_user, original_run=run_to_copy)
         valrun_user.save()
 
         # old info which is needed then
@@ -168,7 +166,7 @@ def result(request, result_uuid):
         user = request.user
         if 'add_validation' in post_params and post_params['add_validation'] == 'true':
             if val_run not in user.copied_runs.all():
-                valrun_user = CopiedValidations(user=user, original_run=val_run, copied_run=val_run)
+                valrun_user = CopiedValidations(used_by_user=user, original_run=val_run, copied_run=val_run)
                 valrun_user.save()
                 response = HttpResponse("Validation added to your list", status=200)
             else:
