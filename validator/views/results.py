@@ -139,7 +139,7 @@ def user_runs(request):
         paginated_runs = paginator.page(paginator.num_pages)
     context = {
         'myruns': paginated_runs,
-        'tracked_runs': tracked_runs
+        'tracked_runs': tracked_runs,
         'sorting_form': sorting_form,
         }
     
