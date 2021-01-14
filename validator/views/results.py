@@ -9,7 +9,6 @@ from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
-
 from validator.forms import PublishingForm, ResultsSortingForm
 from validator.models import ValidationRun, CopiedValidations
 from validator.validation.globals import METRICS
@@ -23,7 +22,6 @@ from dateutil.tz import tzlocal
 from datetime import datetime
 from django.conf import settings
 from django.urls.base import reverse
-
 
 def _copy_validationrun(run_to_copy, new_user):
     # checking if the new validation belongs to the same user:
@@ -112,8 +110,7 @@ def _copy_validationrun(run_to_copy, new_user):
         'run_id': run_id,
     }
     return response
-
-
+  
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -122,7 +119,6 @@ def user_runs(request):
 
     cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
     tracked_runs = current_user.copied_runs.exclude(doi='')
-
     sorting_form, order = ResultsSortingForm.get_sorting(request)
     page = request.GET.get('page', 1)
     cur_user_runs = (

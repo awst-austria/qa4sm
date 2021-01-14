@@ -22,7 +22,7 @@
                                   {% if valrun.output_file %}
                                     <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
                                     <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
-                                    <button class="btn btn-sm btn-primary btn-action" title="Remove this validation from your list" onclick="ajax_remove_copied_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
+                                    <button class="btn btn-sm btn-primary btn-action" title="Remove this validation from your list" onclick="ajax_detach_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
                                   {% endif %}
                               {% endif %}
                           </div>
