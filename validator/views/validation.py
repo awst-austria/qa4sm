@@ -399,3 +399,30 @@ def ajax_get_version_id(request):
         }
 
     return JsonResponse(response_data)
+
+login_required(login_url='/login/')
+def ajax_get_version_info(request):
+    version_ids = request.GET.getlist('version_id')
+    try:
+        version_ids_int = [int(vid) for vid in version_ids]
+        versions = DatasetVersion.objects.filter(pk__in=version_ids_int)
+    except:
+        return HttpResponseBadRequest("Not a valid dataset version")
+    intervals_from = []
+    intervals_to = []
+    for version in versions:
+        if 'ISMN' in version.short_name:
+            time_from = val_globals.START_TIME
+            time_to = val_globals.END_TIME
+        else:
+            time_from = version.time_range_start
+            time_to = version.time_range_end
+        intervals_from.append(time_from)
+        intervals_to.append(time_to)
+
+    response_data = {
+        'intervals_from': intervals_from,
+        'intervals_to' : intervals_to
+        }
+    return JsonResponse(response_data)
+

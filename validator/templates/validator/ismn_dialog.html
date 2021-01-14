@@ -170,8 +170,9 @@
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
         var networkList = '';
         for (var netCB of ismnDialog.find('input:checked.network')) {
-
-            networkList += netCB.value + ',';
+            if (netCB.value != ''){
+                networkList += netCB.value + ',';
+            }
         }
         networkList = networkList.replace(/,+$/, ''); //remove the last coma
 

@@ -9,9 +9,10 @@ from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
-from validator.forms import PublishingForm
+
+from validator.forms import PublishingForm, ResultsSortingForm
 from validator.models import ValidationRun, CopiedValidations
-from validator.validation.globals import METRICS, TC_METRICS
+from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
 from collections import OrderedDict
@@ -22,7 +23,6 @@ from dateutil.tz import tzlocal
 from datetime import datetime
 from django.conf import settings
 from django.urls.base import reverse
-from pytz import UTC
 
 
 def _copy_validationrun(run_to_copy, new_user):
@@ -114,13 +114,21 @@ def _copy_validationrun(run_to_copy, new_user):
     return response
 
 
+
 @login_required(login_url='/login/')
 def user_runs(request):
     current_user = request.user
-    page = request.GET.get('page', 1)
+
 
     cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
     tracked_runs = current_user.copied_runs.exclude(doi='')
+
+    sorting_form, order = ResultsSortingForm.get_sorting(request)
+    page = request.GET.get('page', 1)
+    cur_user_runs = (
+        ValidationRun.objects.filter(user=current_user)
+        .order_by(order)
+    )
 
     paginator = Paginator(cur_user_runs, 10)
     try:
@@ -132,7 +140,9 @@ def user_runs(request):
     context = {
         'myruns': paginated_runs,
         'tracked_runs': tracked_runs
+        'sorting_form': sorting_form,
         }
+    
     return render(request, 'validator/user_runs.html', context)
 
 
