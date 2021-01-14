@@ -30,6 +30,7 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
+from validator.models import CopiedValidations
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
 import validator.validation as val
@@ -1604,15 +1605,13 @@ class TestValidation(TestCase):
         run_id = run.id
         val.run_validation(run_id)
         new_run = get_object_or_404(ValidationRun, pk=run_id)
-        # new_run = ValidationRun.objects.get(pk=run_id)
-        print('end_time =', new_run.end_time)
         copied_run_info = _copy_validationrun(new_run, self.testuser)
         assert copied_run_info['run_id'] == run_id
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
         copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
         comparison = _compare_validation_runs(copied_run, validations, copied_run.user)
-        print('end_time =', copied_run.end_time)
+
         # the query validations will be empty so 'is_there_validation' == False, 'val_id' == None, '
         # 'belongs_to_user'==False, 'is_published' == False
         assert not comparison['is_there_validation']
@@ -1632,10 +1631,39 @@ class TestValidation(TestCase):
         assert not comparison['belongs_to_user']
         assert not comparison['is_published']
 
-        print('Monika', copied_run, run)
-
         assert copied_run.total_points == 9
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
         self.check_results(copied_run)
+
+        # copying again, so to check CopiedValidations model
+        new_run = get_object_or_404(ValidationRun, pk=run_id)
+        _copy_validationrun(new_run, self.testuser2)
+
+        # checking if saving to CopiedValidations model is correct (should be 2, because the first validation was
+        # returned the same, and only the second and the third one were copied:
+        copied_runs = CopiedValidations.objects.all()
+        assert len(copied_runs) == 2
+        assert copied_runs[0].used_by_user == self.testuser2
+
+        # removing the original run should not cause removal of the record
+        original_run = copied_runs[0].original_run
+        self.delete_run(original_run)
+
+        copied_runs = CopiedValidations.objects.all()
+        assert len(copied_runs) == 2
+        assert copied_runs[0].original_run is None
+
+        # now I remove one of the validations
         self.delete_run(copied_run)
+        # now should be 1, because copied validaitons has been removed
+        copied_runs = CopiedValidations.objects.all()
+        assert len(copied_runs) == 1
+
+        # and now I'm removing the user who copied validations
+        user_to_remove = self.testuser2
+        user_to_remove.delete()
+        copied_runs = CopiedValidations.objects.all()
+        assert len(copied_runs) == 0
+
+
