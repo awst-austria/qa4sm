@@ -531,7 +531,7 @@
                     </div>
                     <div id="non_pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
                       {% if belongs_to_user == True %}
-                      You have already run a validation with exactly the same settings.
+                      You have already run a validation with exactly the same settings on {{val_date}}. <br>
                       You can run it again or use the existing one. <br>
                       {% else %}
                       There exists a validation with exactly the same settings, run on {{val_date}}. <br>
