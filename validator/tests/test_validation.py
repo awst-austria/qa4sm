@@ -1632,8 +1632,6 @@ class TestValidation(TestCase):
         assert not comparison['belongs_to_user']
         assert not comparison['is_published']
 
-        print('Monika', copied_run, run)
-
         assert copied_run.total_points == 9
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
