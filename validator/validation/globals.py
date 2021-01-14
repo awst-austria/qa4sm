@@ -1,4 +1,5 @@
 from django.conf import settings
+from datetime import datetime
 
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
@@ -81,3 +82,11 @@ ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 
 NOT_AS_REFERENCE = [SMAP, SMOS, ASCAT]
+
+IRREGULAR_GRIDS = {'SMAP' : 0.35,
+                   'SMOS' : 0.25,
+                   'ASCAT' : 0.1}
+
+START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
+END_TIME = datetime.now().strftime('%Y-%m-%d')
+

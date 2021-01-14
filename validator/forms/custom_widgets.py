@@ -6,6 +6,7 @@ from pytz import UTC
 import django.forms as forms
 from validator.models import ParametrisedFilter
 
+
 class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     """
     Hackaround to render the data filters checkboxes with help texts and correct
