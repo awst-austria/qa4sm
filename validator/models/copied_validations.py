@@ -11,3 +11,4 @@ class CopiedValidations(models.Model):
 
     def __str__(self):
         return "copied run: {}, user: {}, original run: {} )".format(self.copied_run, self.used_by_user, self.original_run)
+
