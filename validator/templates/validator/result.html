@@ -30,13 +30,21 @@
                         <button class="btn btn-sm btn-primary btn-action d-none save_name_btn result_page" title="Save Name" onclick="ajax_save_name(event, '{{ val.id }}')"><span class="fas fa-save"></span></button>
                         <button class="btn btn-sm btn-primary btn-action d-none cancel_editing_btn result_page" title="Cancel" onclick="cancel_editing(event)"><span class="fas fa-ban"></span></button>
                         {% else %}
-                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %} <span class="no_name_change_info fas fa-question-circle help-icon" title="Validation has been published. There is no possibility of changing its name."> </span> </span>
+                        <span class="my-0 font-weight-normal no_edit_name">{% if val.name_tag %}{{val.name_tag}}{% endif %}
+                            <span class="no_name_change_info fas fa-question-circle help-icon" title="Validation has been published. There is no possibility of changing its name."></span>
+                        </span>
+
                         {% endif %}
                     </h4>
                 </div>
                 <div class="card-body">
                     <ul>
+                        {% if is_copied and val.doi == '' %}
+                        <li>Validation has been copied on {{ val.start_time }}.</li>
+                        <li>Started validation on {{ original_start }}, finished on {{ original_end }}.</li>
+                        {% else %}
                         <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
+                        {%endif%}
                         <li>Compared {{ val.dataset_configurations.count }} datasets:
                             <ul>
                                 {% for dc in val.dataset_configurations.all %}
@@ -170,6 +178,16 @@
                                 Publishing in progress...
                             </div>
                         {% endif %}
+                    {% else %}
+                    <div style="float: right;" class="patchButtonGroup">
+                        {% if current_user %}
+                            {% if is_copied %}
+                                <button class="btn btn-sm btn-primary" title="Remove this validation from your list" onclick="ajax_detach_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Untrack </button>
+                            {% else %}
+                                <button class="btn btn-sm btn-primary" title="Track this validation" onclick="ajax_attach_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Track </button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -312,7 +330,7 @@
     stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
 </script>
 
-{% if is_owner %}
+{% if is_owner or not val.is_unpublished %}
     <script src="{% static 'js/results_buttons.js' %}"></script>
 {% endif %}
 
