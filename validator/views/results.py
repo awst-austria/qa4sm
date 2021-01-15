@@ -1,19 +1,114 @@
+import os
 from json import dumps as json_dumps
 
+import netCDF4
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import QueryDict
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm, ResultsSortingForm
-from validator.models import ValidationRun
+from validator.models import ValidationRun, CopiedValidations
 from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
 
 from collections import OrderedDict
+from validator.validation.util import mkdir_if_not_exists
+from validator.validation.globals import OUTPUT_FOLDER
+from shutil import copy2
+from dateutil.tz import tzlocal
+from datetime import datetime
+from django.conf import settings
+from django.urls.base import reverse
 
+def _copy_validationrun(run_to_copy, new_user):
+    # checking if the new validation belongs to the same user:
+    if run_to_copy.user == new_user:
+        run_id = run_to_copy.id
+        # belongs_to_user = True
+    else:
+        # copying validation
+        valrun_user = CopiedValidations(used_by_user=new_user, original_run=run_to_copy)
+        valrun_user.save()
+
+        # old info which is needed then
+        old_scaling_ref_id = run_to_copy.scaling_ref_id
+        old_val_id = str(run_to_copy.id)
+
+        dataset_conf = run_to_copy.dataset_configurations.all()
+
+        run_to_copy.user = new_user
+        run_to_copy.id = None
+        run_to_copy.start_time = datetime.now(tzlocal())
+        run_to_copy.end_time = datetime.now(tzlocal())
+        run_to_copy.save()
+        run_id = run_to_copy.id
+
+        # adding the copied validation to the copied validation list
+        valrun_user.copied_run = run_to_copy
+        valrun_user.save()
+
+        # new configuration
+        for conf in dataset_conf:
+            old_id = conf.id
+            old_filters = conf.filters.all()
+            old_param_filters = conf.parametrisedfilter_set.all()
+
+            # setting new scaling reference id
+            if old_id == old_scaling_ref_id:
+                run_to_copy.scaling_ref_id = conf.id
+
+            new_conf = conf
+            new_conf.pk = None
+            new_conf.validation = run_to_copy
+            new_conf.save()
+
+            # setting filters
+            new_conf.filters.set(old_filters)
+            if len(old_param_filters) != 0:
+                for param_filter in old_param_filters:
+                    param_filter.id = None
+                    param_filter.dataset_config = new_conf
+                    param_filter.save()
+
+        # the reference configuration is always the last one:
+        try:
+            run_to_copy.reference_configuration_id = conf.id
+            run_to_copy.save()
+        except:
+            pass
+
+        # copying files
+        # new directory -> creating if doesn't exist
+        new_dir = os.path.join(OUTPUT_FOLDER, str(run_id))
+        mkdir_if_not_exists(new_dir)
+        # old directory and all files there
+        old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
+        old_files = os.listdir(old_dir)
+
+        if len(old_files) != 0:
+            for file_name in old_files:
+                new_file = new_dir + '/' + file_name
+                old_file = old_dir + '/' + file_name
+                copy2(old_file, new_file)
+                if '.nc' in new_file:
+                    run_to_copy.output_file = str(run_id) + '/' + file_name
+                    run_to_copy.save()
+                    file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
+
+                    # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
+                    new_url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': run_to_copy.id})
+                    file.setncattr('url', new_url)
+                    file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
+                    file.close()
+
+    response = {
+        'run_id': run_id,
+    }
+    return response
+  
 
 @login_required(login_url='/login/')
 def user_runs(request):
@@ -21,8 +116,7 @@ def user_runs(request):
 
 
     cur_user_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
-    copied_runs = current_user.copied_runs.all()
-
+    tracked_runs = current_user.copied_runs.exclude(doi='')
     sorting_form, order = ResultsSortingForm.get_sorting(request)
     page = request.GET.get('page', 1)
     cur_user_runs = (
@@ -40,18 +134,26 @@ def user_runs(request):
         paginated_runs = paginator.page(paginator.num_pages)
     context = {
         'myruns': paginated_runs,
-        'copied_runs': copied_runs,
+        'tracked_runs': tracked_runs,
         'sorting_form': sorting_form,
-    }
-
+        }
+    
     return render(request, 'validator/user_runs.html', context)
 
 
 def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
     current_user = request.user
-    copied_runs = current_user.copied_runs.all() if current_user.username else []
-    is_copied = val_run in copied_runs
+    copied_runs = current_user.copiedvalidations_set.all() if current_user.username else []
+    is_copied = val_run.id in copied_runs.values_list('copied_run', flat=True)
+
+    if is_copied and val_run.doi == '':
+        original_start = copied_runs.get(copied_run=val_run).original_run.start_time
+        original_end = copied_runs.get(copied_run=val_run).original_run.end_time
+    else:
+        original_start = None
+        original_end = None
+
 
     if(request.method == 'DELETE'):
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
@@ -69,19 +171,20 @@ def result(request, result_uuid):
         post_params = QueryDict(request.body)
         user = request.user
         if 'add_validation' in post_params and post_params['add_validation'] == 'true':
-            if val_run.user != user:
-                if val_run not in user.copied_runs.all():
-                    val_run.used_by.add(user)
-                    val_run.save()
-                    response = HttpResponse("Validation added to your list", status=200)
-                else:
-                    response = HttpResponse("You have already added this validation to your list", status=200)
+            if val_run not in user.copied_runs.all():
+                valrun_user = CopiedValidations(used_by_user=user, original_run=val_run, copied_run=val_run)
+                valrun_user.save()
+                response = HttpResponse("Validation added to your list", status=200)
             else:
-                response = HttpResponse("This validation was published by you, you have it already on your list",
-                                        status=200)
+                response = HttpResponse("You have already added this validation to your list", status=200)
+
         elif 'remove_validation' in post_params and post_params['remove_validation'] == 'true':
             user.copied_runs.remove(val_run)
             response = HttpResponse("Validation has been removed from your list", status=200)
+
+        elif 'copy_validation' in post_params and post_params['copy_validation'] == 'true':
+            resp = _copy_validationrun(val_run, request.user)
+            response = JsonResponse(resp)
 
         else:
             response = HttpResponse("Wrong action parameter.", status=400)
@@ -180,6 +283,8 @@ def result(request, result_uuid):
             'is_owner': is_owner,
             'val' : val_run,
             'is_copied': is_copied,
+            'original_start': original_start,
+            'original_end': original_end,
             'error_rate' : error_rate,
             'run_time': run_time,
             'metrics': metrics,

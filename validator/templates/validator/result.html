@@ -39,7 +39,12 @@
                 </div>
                 <div class="card-body">
                     <ul>
+                        {% if is_copied and val.doi == '' %}
+                        <li>Validation has been copied on {{ val.start_time }}.</li>
+                        <li>Started validation on {{ original_start }}, finished on {{ original_end }}.</li>
+                        {% else %}
                         <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
+                        {%endif%}
                         <li>Compared {{ val.dataset_configurations.count }} datasets:
                             <ul>
                                 {% for dc in val.dataset_configurations.all %}
@@ -177,9 +182,9 @@
                     <div style="float: right;" class="patchButtonGroup">
                         {% if current_user %}
                             {% if is_copied %}
-                                <button class="btn btn-sm btn-primary" title="Remove this validation from your list" onclick="ajax_remove_copied_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Untrack </button>
+                                <button class="btn btn-sm btn-primary" title="Remove this validation from your list" onclick="ajax_detach_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Untrack </button>
                             {% else %}
-                                <button class="btn btn-sm btn-primary" title="Track this validation" onclick="ajax_copy_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Track </button>
+                                <button class="btn btn-sm btn-primary" title="Track this validation" onclick="ajax_attach_validation('{{ val.id}}')"><span class="fas fa-plus"></span> Track </button>
                             {% endif %}
                         {% endif %}
                     </div>

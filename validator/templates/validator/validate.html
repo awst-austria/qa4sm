@@ -523,12 +523,24 @@
                     <!-- this is a hidden field so it is possible to count how many times the Validate button was clicked -->
                     <input id='click-counter' name='click-counter' type='hidden' value=1>
                     <!-- this is an area triggered as a dialog window for informing user that there is a validation with given settings -->
-                    <div id="validate-confirm" title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %} {% endif%}">
-                      There exists a published validation with exactly the same settings. <br>
+                    <div id="pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
+                      There exists a published validation with exactly the same settings, run on {{val_date}}. <br>
                       You can run your own validation and wait for the results or you can use the existing one.<br>
                       You can also close this window and change some settings.<br>
                       What would you like to do?
                     </div>
+                    <div id="non_pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
+                      {% if belongs_to_user == True %}
+                      You have already run a validation with exactly the same settings on {{val_date}}. <br>
+                      You can run it again or use the existing one. <br>
+                      {% else %}
+                      There exists a validation with exactly the same settings, run on {{val_date}}. <br>
+                      You can run your own validation and wait for the results or you can use the existing one.<br>
+                      {% endif %}
+                      You can also close this window and change some settings.<br>
+                      What would you like to do?
+                    </div>
+
                 </div>
             {% endif %}
         {% endwith %}
@@ -740,7 +752,7 @@
             });
           };
 
-          function get_list_of_params(args, args_names){
+         function get_list_of_params(args, args_names){
             /**
              * Returns a list of values assinged to arguments which names are give in args_names;
              * @param  {object} args list of arguments returned by ajax function: arguments[0]
@@ -813,7 +825,7 @@
             ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
           }
 //================================================================================
-
+      
         function change_tab_name() {
             var datasetName = $(this).find('option:selected').text();
             var tabId = '#' + $(this).attr('id').replace(/dataset$/, 'tab');
@@ -1179,9 +1191,9 @@
         set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
       }
 
-      if ('{{if_run_exists}}' == 'True'){
-        var url_to_go = $('#validate-confirm').attr('data-url')
-        $('#validate-confirm').dialog({
+      if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){
+        var url_to_go = $('#pub_validate-confirm').attr('data-url')
+        $('#pub_validate-confirm').dialog({
           resizable: false,
           height: "auto",
           width: "auto",
@@ -1198,6 +1210,36 @@
         });
       }
 
+      if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'False'){
+        var url_to_go = $('#non_pub_validate-confirm').attr('data-url')
+        $('#non_pub_validate-confirm').dialog({
+          resizable: false,
+          height: "auto",
+          width: "auto",
+          modal: true,
+          buttons: {
+            'Use the existing one': function() {
+              var validation_id = '{{ val_id }}';
+              ajax_copy_validation(validation_id)
+
+            },
+            "Run your own validation": function() {
+              $('#validate-run').click(set_counter).click();
+              $( this ).dialog( "close" );
+            }
+          }
+        });
+      }
+
     </script>
+
+    <script type="text/javascript">
+        csrf_token = '{{csrf_token}}';
+        result_list_url = "{% url 'myruns' %}";
+        result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+        stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+    </script>
+    <script src="{% static 'js/results_buttons.js' %}"></script>
+
 
 {% endblock %}

@@ -178,7 +178,8 @@ div.plot_div {
 #users_list optgroup {
     font-size: 1em;
 }
-#validate-confirm {
+
+.validate-confirm {
   display: none;
   color: #00212e;
 }

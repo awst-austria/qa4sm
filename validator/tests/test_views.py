@@ -36,6 +36,7 @@ from os import path
 import shutil
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation import set_outfile, mkdir_if_not_exists
+from validator.tests.auxiliary_functions import generate_default_validation
 
 from django.utils.http import urlencode
 import os
@@ -626,6 +627,37 @@ class TestViews(TransactionTestCase):
         cancelled_val = result.context['val']
         self.__logger.info("Progress {}, end time: {}".format(cancelled_val.progress, cancelled_val.end_time))
         assert cancelled_val.progress <= 0
+
+    def test_submit_existing_validation(self):
+        # create a default validation with progress code 100 and non empty output_file filed
+        def_val = generate_default_validation()
+        def_val.scaling_method = 'mean_std'
+        def_val.scaling_ref = def_val.dataset_configurations.all()[0]
+        def_val.progress = 100
+        def_val.output_file = str(def_val.id) + '.nc'
+        def_val.save()
+
+        # submitting a validation with the same settings should give status code 200
+        url = reverse('validation')
+        self.client.login(**self.credentials)
+        validation_params = {
+            'datasets-TOTAL_FORMS': 1,
+            'datasets-INITIAL_FORMS': 1,
+            'datasets-MIN_NUM_FORMS': 1,
+            'datasets-MAX_NUM_FORMS': 5,
+            'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3S).id,
+            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
+            'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
+            'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
+            'scaling_method': ValidationRun.MEAN_STD,
+            'scaling_ref': ValidationRun.SCALE_TO_DATA,
+            'click-counter': 1,
+        }
+
+        result = self.client.post(url, validation_params)
+        self.assertEqual(result.status_code, 200)
 
     ## Stress test the server!
     @pytest.mark.long_running

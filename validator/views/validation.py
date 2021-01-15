@@ -27,6 +27,7 @@ from validator.validation import run_validation
 import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
 
+from timeit import default_timer as timer
 
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
@@ -68,10 +69,9 @@ def _compare_filters(new_dataset, old_dataset):
 
     if new_filts_len != old_filts_len:
         return False
-    elif new_filts_len == old_filts_len and new_filts_len == 0:
+    elif new_filts_len == old_filts_len == 0:
         is_the_same = True
         new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
-
         if len(new_param_filters) != 0:
             old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
             is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
@@ -136,14 +136,18 @@ def _check_scaling_method(new_run, old_run):
         return False
     else:
         if new_run_sm != 'none':
-            new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
-            run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
-            if new_scal_ref != run_scal_ref:
+            try:
+                new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
+                run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
+                if new_scal_ref != run_scal_ref:
+                    return False
+            except:
                 return False
     return True
 
+  
+def _compare_validation_runs(new_run, runs_set, user):
 
-def _compare_validation_runs(new_run, runs_set):
     """
     Compares two validation runs. It takes a new_run and checks the query given by runs_set according to parameters
     given in the vr_fileds. If all fields agree it checks datasets configurations.
@@ -159,6 +163,8 @@ def _compare_validation_runs(new_run, runs_set):
     """
     vr_fields = val_globals.VR_FIELDS
     is_the_same = False # set to False because it looks for the first found validation run
+    is_published = False
+    old_user = None
     max_vr_ind = len(vr_fields)
     max_run_ind = len(runs_set)
     run_ind = 0
@@ -168,21 +174,22 @@ def _compare_validation_runs(new_run, runs_set):
         while ind < max_vr_ind and getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]):
             ind += 1
         if ind == max_vr_ind and _check_scaling_method(new_run, run):
-            # is_the_same = True
-            # val_id = run.id
             new_run_config = DatasetConfiguration.objects.filter(validation=new_run).order_by('dataset')
             old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
             is_the_same = _compare_datasets(new_run_config, old_run_config)
             val_id = run.id
+            is_published = run.doi != ''
+            old_user = run.user
         run_ind += 1
 
-    val_id = val_id if is_the_same else None
+    val_id = None if not is_the_same else val_id
     response = {
         'is_there_validation': is_the_same,
-        'val_id': val_id
+        'val_id': val_id,
+        'belongs_to_user': old_user == user,
+        'is_published': is_published
         }
     return response
-
 
 __logger = logging.getLogger(__name__)
 
@@ -278,12 +285,11 @@ def validation(request):
 
             newrun.save()
 
-            # taking published validations:
-            vals_published = ValidationRun.objects.exclude(doi='').order_by('-start_time')
-            # comparing validation-to-be-run against existing ones
-            comparison = _compare_validation_runs(newrun, vals_published)
-            if_run_exists = comparison['is_there_validation']
-            # checking how many times the validation button was clicked - in try so that tests pass
+            # checking if there exist validations:
+            existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file='').order_by('-start_time')
+            comparison_pub = _compare_validation_runs(newrun, existing_runs, request.user)
+            if_run_exists = comparison_pub['is_there_validation']
+            # checking how many times the validation button was clicked - in 'try' so that tests pass
             try:
                 clicked_times = int(request.POST.get('click-counter'))
             except:
@@ -291,20 +297,27 @@ def validation(request):
 
             if if_run_exists and clicked_times == 1:
                 newrun.delete()
+                comparison, is_published = (comparison_pub, comparison_pub['is_published'])
                 val_id = comparison['val_id']
+                val_date = ValidationRun.objects.get(id=val_id).start_time
+                belongs_to_user = comparison['belongs_to_user']
+                
                 return render(request, 'validator/validate.html',
                               {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
                                'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
-                               'val_id': val_id})
-            else:
-                # need to close all db connections before forking, see
-                # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
-                connections.close_all()
+                               'val_id': val_id, 'is_published': is_published, 'belongs_to_user': belongs_to_user,
+                               'val_date': val_date})
 
-                p = Process(target=run_validation, kwargs={"validation_id": run_id})
-                p.start()
+            # checking how many times the validation button was clicked - in try so that tests pass
+            # need to close all db connections before forking, see
+            # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
+            connections.close_all()
 
-                return redirect('result', result_uuid=run_id)
+            p = Process(target=run_validation, kwargs={"validation_id": run_id})
+            p.start()
+
+            return redirect('result', result_uuid=run_id)
+          
         else:
             __logger.error("Errors in validation form {}\n{}\n{}".format(val_form.errors, dc_formset.errors, ref_dc_form.errors))
     else:

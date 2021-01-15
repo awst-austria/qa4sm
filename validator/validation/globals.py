@@ -95,4 +95,3 @@ IRREGULAR_GRIDS = {'SMAP' : 0.35,
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
-
