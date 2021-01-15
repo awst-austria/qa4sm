@@ -10,4 +10,4 @@ class CopiedValidations(models.Model):
     original_run = models.ForeignKey(ValidationRun, on_delete=models.SET_NULL, null=True, related_name='original_run')
 
     def __str__(self):
-        return "copied run: {}, user: {}, original run: {} )".format(self.copied_run, self.user, self.original_run)
+        return "copied run: {}, user: {}, original run: {} )".format(self.copied_run, self.used_by_user, self.original_run)
