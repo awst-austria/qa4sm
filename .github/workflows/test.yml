@@ -16,7 +16,6 @@ jobs:
   build:
     env:
       DOI_ACCESS_TOKEN_ENV: ${{ secrets.DOI_ACCESS_TOKEN_ENV }}
-      TEST_VAR: = Mona
     name: Build py${{ matrix.python-version }} @ ${{ matrix.os }} 🐍
     runs-on: ${{ matrix.os }}
     defaults:
@@ -24,7 +23,7 @@ jobs:
         shell: bash -l {0}
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8']
+        python-version: ['3.6']
         os: ["ubuntu-latest"]
     steps:
       - uses: actions/checkout@v2
