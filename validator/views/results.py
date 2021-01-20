@@ -144,7 +144,7 @@ def result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
     current_user = request.user
 
-    copied_runs = current_user.copiedvalidations_set.all() if current_user.username else []
+    copied_runs = current_user.copiedvalidations_set.all() if current_user.username else CopiedValidations.objects.none()
     is_copied = val_run.id in copied_runs.values_list('copied_run', flat=True)
 
     if is_copied and val_run.doi == '':
