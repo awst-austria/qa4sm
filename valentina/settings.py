@@ -22,7 +22,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'output/')
 
 LOGIN_REDIRECT_URL = 'validation'
 
-STATIC_ROOT=os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environment/qa4sm_env.yml"
 
@@ -31,6 +31,7 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 # Application definition
 INSTALLED_APPS = [
     'validator.apps.ValidatorConfig',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,19 +74,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'valentina.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 if DBSM == "postgresql":
     DATABASES = {
         'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'valentina',
-        'USER': 'django',
-        'PASSWORD': DB_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': '',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'valentina',
+            'USER': 'django',
+            'PASSWORD': DB_PASSWORD,
+            'HOST': 'localhost',
+            'PORT': '',
         }
     }
 else:
@@ -116,7 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -143,8 +142,8 @@ LOGGING = {
         'verbose': {
             'format': '{asctime} {levelname} {module}:{funcName}: {message}',
             'style': '{',
-            },
         },
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
@@ -162,11 +161,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-#         'py.warnings': {
-#             'handlers': ['file', 'console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
+        #         'py.warnings': {
+        #             'handlers': ['file', 'console'],
+        #             'level': 'DEBUG',
+        #             'propagate': True,
+        #         },
     },
 }
 
