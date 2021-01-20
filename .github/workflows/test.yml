@@ -55,6 +55,6 @@ jobs:
         run: |
           pytest
       - name: Test with pytest with no token
-        if: not ${{ env.DOI_ACCESS_TOKEN_ENV }}
+        if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |
           pytest -k "not test_result_publishing"
