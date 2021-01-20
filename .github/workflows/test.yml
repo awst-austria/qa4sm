@@ -1,0 +1,60 @@
+# This workflow will install Python dependencies and run tests on
+# windows and linux systems with a variety of Python versions
+
+# For more information see:
+# https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: tests
+
+on:
+  push:
+  pull_request:
+  schedule: # only upstream, won't trigger on forks!
+    - cron: '0 0 * * *' # daily
+
+jobs:
+  build:
+    env:
+      DOI_ACCESS_TOKEN_ENV: ${{ secrets.DOI_ACCESS_TOKEN_ENV }}
+    name: Build py${{ matrix.python-version }} @ ${{ matrix.os }} 🐍
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      matrix:
+        python-version: ['3.6']
+        os: ["ubuntu-latest"]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          environment-file: environment/qa4sm_env.yml
+          activate-environment: qa4sm # todo: must match with name in environment.yml
+      - name: Activate Environment
+        run: conda activate qa4sm
+      - name: Apply needed settings
+        run: |
+          bash ./init_config.sh test
+      - name: Create log directory
+        run: mkdir -p /tmp/log/valentina
+      - name: Migrate database
+        run: python manage.py migrate
+      - name: Fill database
+        run: python manage.py loaddata versions variables filters datasets networks
+      - name: Test with pytest and token
+        if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
+        run: |
+          pytest
+      - name: Test with pytest with no token
+        if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
+        run: |
+          pytest -k "not test_result_publishing"
