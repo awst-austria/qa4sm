@@ -40,7 +40,7 @@
                 <div class="card-body">
                     <ul>
                         {% if is_copied and val.doi == '' %}
-                        <li>Validation has been copied on {{ val.start_time }}.</li>
+                        <li>Validation was copied on {{ val.start_time }}.</li>
                         <li>Started validation on {{ original_start }}, finished on {{ original_end }}.</li>
                         {% else %}
                         <li>Started validation on {{ val.start_time }}, finished on {{ val.end_time }}.</li>
