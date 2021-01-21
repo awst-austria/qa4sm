@@ -26,8 +26,7 @@ from validator.models import ISMNNetworks
 from validator.validation import run_validation
 import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
-
-from timeit import default_timer as timer
+from django.db.models import Case, When
 
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
@@ -285,7 +284,10 @@ def validation(request):
             newrun.save()
 
             # checking if there exist validations:
-            existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file='').order_by('-start_time')
+            # using here Case and Where so that the current user always go first (its value is 0
+            # and for other users is 1)
+            existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file='').\
+                            order_by(Case(When(user=request.user, then=0), default=1), '-start_time')
             comparison_pub = _compare_validation_runs(newrun, existing_runs, request.user)
             if_run_exists = comparison_pub['is_there_validation']
             # checking how many times the validation button was clicked - in 'try' so that tests pass
