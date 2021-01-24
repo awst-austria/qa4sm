@@ -32,6 +32,7 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'validator.apps.ValidatorConfig',
+    'drf_yasg',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,6 +42,28 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'api.jwt_auth.JWTAuthentication',
+    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',  # make all endpoints private
+    # )
+
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+}
+
+JWT_ALGORYTHM = 'HS256'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
