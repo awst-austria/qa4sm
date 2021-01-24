@@ -30,6 +30,7 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 
 # Application definition
 INSTALLED_APPS = [
+    'api.apps.ApiConfig',
     'validator.apps.ValidatorConfig',
     'rest_framework',
     'django.contrib.admin',
