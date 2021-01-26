@@ -4,9 +4,9 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-
 from api.endpoints.LoginEndpoint import login_post
-from api.endpoints.test import test
+from api.endpoints.PathVarTestEndpoint import path_var_get
+from api.endpoints.UsersEndpoint import users_get
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
-
-    path('test/', test),
+    url(r'^test/$', users_get),
+    url(r'^path_test/(?P<username>.+)/$', path_var_get),
     path('auth/', login_post, name='login'),
 ]

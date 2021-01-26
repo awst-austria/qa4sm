@@ -16,6 +16,11 @@ from api.serializers.serializers import UserSerializer
 @permission_classes([AllowAny])
 @ensure_csrf_cookie
 def login_post(request):
+    """
+    Authentication endpoint
+    Request body: {"username":"username","password":"password"}
+    Response: JWT token
+    """
     username = request.data.get('username', '')
     password = request.data.get('password', '')
     user = auth.authenticate(username=username, password=password)
