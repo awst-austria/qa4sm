@@ -13,6 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         parent_data_folder = options['path']
+        not_interactive = False
 
         if parent_data_folder:
             mode = 'a'
