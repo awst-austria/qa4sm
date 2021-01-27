@@ -5,7 +5,7 @@ import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from qa4sm_reader.plot_all import plot_all
+from qa4sm_reader.plot_all import plot_all, get_img_stats
 
 from django.conf import settings
 
@@ -154,3 +154,22 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     # __logger.debug(f"Metrics: {metrics}")
 
     return pairs, triples, metrics, ref0_config
+
+def get_inspection_table(validation_run):
+    """
+    Generate the quick inspection table with the summary statistics of the results
+
+    Parameters
+    ----------
+    validation_run : ValidationRun
+        The validation run to make plots for.
+        
+    Returns
+    -------
+    table : pd.DataFrame
+        Quick inspection table of the results.
+    """
+    table = get_img_stats(validation_run.output_file.path)
+    table = table.drop(columns = 'Group')
+    
+    return table
