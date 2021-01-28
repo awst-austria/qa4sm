@@ -184,7 +184,7 @@
                         <div class="card-header" id="stats_header">
                             <h4 class="my-0 font-weight-normal">Summary statistics</h4>
                             <div class="card-menu">
-                                <span class="input-group-text fas fa-question-circle help-icon" title="Expand this section to inspect a table of statistics of the validation results for each metric."></span>
+                                <span class="input-group-text fas fa-question-circle help-icon" title="Expand this section to inspect a table of statistics of the validation results."></span>
                                 <a class="input-group-text" data-toggle="collapse" href="#stats_collapse" role="button" aria-expanded="false" aria-controls="stats_collapse">
                                     <span class="fa fa-plus-circle" title="Expand"></span>
                                     <span class="fa fa-minus-circle" title="Collapse"></span>
@@ -193,7 +193,7 @@
                         </div>
                         <div id="stats_collapse" class="collapse" aria-labelledby="stats_header" data-parent="#stats_accordion">
                             <div class="card-body">
-                                <p>The following table aggregates the validation results by mean, median and standard deviation. </p>
+                                <p>The mean, median and standard deviation are calculated on the validation results aggregated by metric and dataset. The reference dataset used is {{ val.reference_configuration.dataset.pretty_name }} ({{ val.reference_configuration.version.pretty_name }}, {{ val.reference_configuration.variable.pretty_name }}).</p>
                                 <div class="card-body">
                                     <div style="width: 100%; margin: auto; max-width: 85rem;">
                                             <table id="inspection_table" class="table table-bordered table-striped">
