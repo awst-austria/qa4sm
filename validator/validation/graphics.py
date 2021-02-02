@@ -169,7 +169,11 @@ def get_inspection_table(validation_run):
     table : pd.DataFrame
         Quick inspection table of the results.
     """
-    table = get_img_stats(validation_run.output_file.path)
-    table = table.drop(columns = 'Group')
+    try:
+        table = get_img_stats(validation_run.output_file.path)
+        table = table.drop(columns = 'Group')
+    except ValueError:
+        # file doesn't exist
+        table = ''
     
     return table
