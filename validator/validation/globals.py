@@ -81,7 +81,9 @@ ESA_CCI_SM_P_sm = 'ESA_CCI_SM_P_sm'
 ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 
-NOT_AS_REFERENCE = [SMAP, SMOS, ASCAT]
+# left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
+# insert it's shortname to the list
+NOT_AS_REFERENCE = []
 
 IRREGULAR_GRIDS = {'SMAP' : 0.35,
                    'SMOS' : 0.25,
