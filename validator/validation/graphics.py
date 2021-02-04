@@ -169,11 +169,18 @@ def get_inspection_table(validation_run):
     table : pd.DataFrame
         Quick inspection table of the results.
     """
-    try:
-        table = get_img_stats(validation_run.output_file.path)
-        table = table.drop(columns = 'Group')
-    except ValueError:
-        # file doesn't exist
-        table = ''
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
     
-    return table
+    for root, dirs, files in os.walk(run_dir):
+        for f in files:
+            
+            if not f.endswith('.nc'): continue
+    
+            else:
+                table = get_img_stats(validation_run.output_file.path)
+                table = table.drop(columns = 'Group')
+                
+                return table
+            
+    return None
+
