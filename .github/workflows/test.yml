@@ -54,9 +54,12 @@ jobs:
         if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |
           pytest
-      - name: Long running test
+      - name: Long running tests
         run: |
           pytest -m "not needs_advanced_setup and long_running and not graphs"
+      - name: Graphs tests
+        run: |
+          pytest -m "graphs"
       - name: Test with pytest with no token
         if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |
