@@ -74,7 +74,7 @@
             </tbody>
         </table>
         {% if not ref_flag %}
-            <sup>*</sup> dataset temporarily excluded from the reference list for technical reasons<br>
+        {% if not_as_reference %}    <sup>*</sup> dataset temporarily excluded from the reference list for technical reasons<br> {% endif %}
         {% endif %}
         <br>
 
