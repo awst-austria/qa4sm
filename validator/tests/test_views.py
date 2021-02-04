@@ -352,6 +352,30 @@ class TestViews(TransactionTestCase):
         response = self.client.get(url, {'page': 'first'})
         self.assertEqual(response.status_code, 200)
 
+    def test_my_results_view_sorting(self):
+        url = reverse('myruns')
+        self.client.login(**self.credentials)
+
+        # check some valid sorting keys
+        for key in ["start_time",
+                    "reference_configuration_id__dataset__pretty_name"]:
+            for order in ["asc", "desc"]:
+                response = self.client.get(
+                    url, {"sort_key": key, "sort_order": order}
+                )
+                self.assertEqual(response.status_code, 200)
+
+                form = response.context["sorting_form"]
+                assert form.cleaned_data["sort_key"] == key
+                assert form.cleaned_data["sort_order"] == order
+
+        # check invalid key and missing order
+        response = self.client.get(url, {"sort_key": "invalid"})
+        self.assertEqual(response.status_code, 200)
+        form = response.context["sorting_form"]
+        assert form.cleaned_data["sort_key"] == "start_time"
+        assert form.cleaned_data["sort_order"] == "desc"
+
     def test_ajax_get_dataset_options_view(self):
         url = reverse('ajax_get_dataset_options')
         self.client.login(**self.credentials)
