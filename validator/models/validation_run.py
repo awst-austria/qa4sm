@@ -24,12 +24,14 @@ class ValidationRun(models.Model):
     LIN_CDF_MATCH = 'lin_cdf_match'
     CDF_MATCH = 'cdf_match'
     NO_SCALING = 'none'
+    BETA_SCALING = 'cdf_beta_match'
 
     SCALING_METHODS = (
         (NO_SCALING, 'No scaling'),
         (MIN_MAX, 'Min/Max'),
         (LINREG, 'Linear regression'),
         (MEAN_STD, 'Mean/standard deviation'),
+        (BETA_SCALING, 'CDF matching with beta distribution fitting') 
 #         (LIN_CDF_MATCH, 'CDF matching with linear interpolation'),
 #         (CDF_MATCH, 'CDF matching with 5-th order spline fitting'),
         )
