@@ -50,17 +50,22 @@ jobs:
         run: python manage.py migrate
       - name: Fill database
         run: python manage.py loaddata versions variables filters datasets networks
-      - name: Test with pytest and token
+      - name: Tests with token
         if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |
           pytest
-      - name: Long running tests
+      - name: Long running tests with token
+        if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |
           pytest -m "not needs_advanced_setup and long_running and not graphs"
       - name: Graphs tests
         run: |
           pytest -m "graphs"
-      - name: Test with pytest with no token
+      - name: Test with no token
         if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |
           pytest -k "not test_result_publishing"
+      - name: Long running tests with no token
+        if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
+        run: |
+          pytest -m "not needs_advanced_setup and long_running and not graphs" -k "not test_doi"
