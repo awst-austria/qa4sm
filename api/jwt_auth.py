@@ -15,15 +15,19 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
         prefix, token = auth_data.decode('utf-8').split(' ')
 
+        if not prefix or not token:
+            raise exceptions.AuthenticationFailed('Authentication failed')
+
+        if prefix != 'JWT':
+            raise exceptions.AuthenticationFailed('Authentication method not supported')
+
         try:
-            # decode JWT token
             payload = jwt.decode(token, settings.API_SECRET_KEY, algorithms=[settings.JWT_ALGORYTHM])
 
             self.enforce_csrf(request)
             user = User.objects.get(username=payload['username'])
             return user, token
         except jwt.DecodeError as e:
-            print(e)
             raise exceptions.AuthenticationFailed('Invalid JWT token')
         except jwt.ExpiredSignatureError:
             raise exceptions.AuthenticationFailed('JWT token expired')
@@ -36,7 +40,6 @@ class JWTAuthentication(authentication.BaseAuthentication):
         check = CSRFCheck()
         # populates request.META['CSRF_COOKIE'], which is used in process_view()
         check.process_request(request)
-        print(request.META['CSRF_COOKIE'])
         reason = check.process_view(request, None, (), {})
         print(reason)
         if reason:

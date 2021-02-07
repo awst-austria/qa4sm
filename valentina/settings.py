@@ -47,10 +47,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'api.jwt_auth.JWTAuthentication',
     ),
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticated',  # make all endpoints private
-    # )
-
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',  # make all endpoints private
+    )
 }
 
 SWAGGER_SETTINGS = {
@@ -64,7 +63,8 @@ SWAGGER_SETTINGS = {
 }
 
 JWT_ALGORYTHM = 'HS256'
-
+JWT_ACCESS_TOKEN_LIFETIME = 60  # in minutes
+JWT_REFRESH_TOKEN_LIFETIME = 96  # in hours
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

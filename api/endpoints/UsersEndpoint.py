@@ -10,19 +10,16 @@ from validator.models import User
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def users_get(request):
-    print('asdf')
     if request.user.is_superuser:
         print('super')
-    print(request.user)
-    print('asdf')
+
     user = User.objects.all()[:1].get()
     serializer = UserSerializer(user)
-    print(request.GET)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def signup_post(request):
     print(request)
