@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start-with-path": "ng serve --deploy-url /ui/ --base-href /ui/",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
