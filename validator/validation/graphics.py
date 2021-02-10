@@ -13,8 +13,11 @@ from cartopy import config as cconfig
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS, TC_METRICS, METRIC_TEMPLATE, TC_METRIC_TEMPLATE
+from validator.validation.util import first_file_in
 import os
 from parse import *
+
+import glob
 
 __logger = logging.getLogger(__name__)
 
@@ -171,16 +174,12 @@ def get_inspection_table(validation_run):
     """
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
     
-    for root, dirs, files in os.walk(run_dir):
-        for f in files:
-            
-            if not f.endswith('.nc'): continue
-    
-            else:
-                table = get_img_stats(validation_run.output_file.path)
-                table = table.drop(columns = 'Group')
+    if glob.glob(run_dir):
+        outfile = first_file_in(run_dir, '.nc')
+        
+        if outfile is not None:
+            table = get_img_stats(outfile)
+            table = table.drop(columns = 'Group')
                 
-                return table
-            
-    return None
+            return table
 
