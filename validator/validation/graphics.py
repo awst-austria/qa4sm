@@ -172,14 +172,13 @@ def get_inspection_table(validation_run):
     table : pd.DataFrame
         Quick inspection table of the results.
     """
-    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
-    # check that output directory has been created
-    if os.path.exists(run_dir):
-        filename = os.path.split(validation_run.output_file.name)[1]
-        # check that output file has been created
-        if filename in os.listdir(run_dir):
-            filepath = path.join(run_dir, filename)
-            table = get_img_stats(filepath)
-            table = table.drop(columns = 'Group')
-                    
-            return table
+    outfile = validation_run.output_file
+    # the first condition checks whether the outfile field has been properly
+    # set, the second then whether the file really exists
+    if bool(outfile) and path.exists(outfile.path):
+        return get_img_stats(outfile.path).drop(columns="Group")
+    else:
+        # This happens when the output file has not been generated yet, because
+        # the validation is still running. In this case the table won't be
+        # rendered anyways.
+        return None
