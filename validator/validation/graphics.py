@@ -173,13 +173,13 @@ def get_inspection_table(validation_run):
         Quick inspection table of the results.
     """
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
-    
-    if glob.glob(run_dir):
-        outfile = first_file_in(run_dir, '.nc')
-        
-        if outfile is not None:
-            table = get_img_stats(outfile)
+    # check that output directory has been created
+    if os.path.exists(run_dir):
+        filename = os.path.split(validation_run.output_file.name)[1]
+        # check that output file has been created
+        if filename in os.listdir(run_dir):
+            filepath = path.join(run_dir, filename)
+            table = get_img_stats(filepath)
             table = table.drop(columns = 'Group')
-                
+                    
             return table
-
