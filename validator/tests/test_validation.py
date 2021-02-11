@@ -299,7 +299,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+        run.scaling_method = ValidationRun.BETA_SCALING # cdf matching
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -343,7 +343,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH  # cdf matching causes an error for 1 gpi, use that to test error handling
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -389,7 +389,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+        run.scaling_method = ValidationRun.BETA_SCALING # cdf matching 
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -741,7 +741,7 @@ class TestValidation(TestCase):
                 config.save()
 
         #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
+        run.scaling_method = ValidationRun.BETA_SCALING # cdf matching 
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
