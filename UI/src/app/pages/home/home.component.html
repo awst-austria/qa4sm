@@ -1,1 +1,5 @@
-<p>home works!</p>
+<p-carousel [value]="landingPageImages" [numVisible]="1" [numScroll]="1" [autoplayInterval]="3000" [circular]="true">
+  <ng-template let-image pTemplate="item">
+    <img src="{{image}}" class="product-image"/>
+  </ng-template>
+</p-carousel>
