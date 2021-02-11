@@ -13,11 +13,9 @@ from cartopy import config as cconfig
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS, TC_METRICS, METRIC_TEMPLATE, TC_METRIC_TEMPLATE
-from validator.validation.util import first_file_in
 import os
 from parse import *
 
-import glob
 
 __logger = logging.getLogger(__name__)
 
