@@ -33,7 +33,7 @@ export class NavigationBarComponent implements OnInit {
         label: 'Profile', icon: 'pi pi-fw pi-user', items: [
           {label: 'My account', icon: 'pi pi-fw pi-user'},
           {label: 'Logout', icon: 'pi pi-fw pi-sign-out'},
-          {label: 'Login', icon: 'pi pi-fw pi-sign-in'},
+          {label: 'Login', icon: 'pi pi-fw pi-sign-in',routerLink:['login']},
         ]
       }
     ];
