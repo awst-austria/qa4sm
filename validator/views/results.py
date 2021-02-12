@@ -152,7 +152,6 @@ def result(request, result_uuid):
             'combis': combis,
             'json_metrics': json_dumps(METRICS),
             'publishing_form': pub_form
-            
             }
 
         return render(request, 'validator/result.html', context)
