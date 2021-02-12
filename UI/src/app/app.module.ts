@@ -14,6 +14,8 @@ import {GalleriaModule} from 'primeng/galleria';
 import {ButtonModule} from 'primeng/button';
 import { ErrorComponent } from './pages/error/error.component';
 import {CardModule} from 'primeng/card';
+import { ValidationsComponent } from './pages/validations/validations.component';
+import { ValidationComponent } from './pages/validation/validation.component';
 
 
 @NgModule({
@@ -21,7 +23,9 @@ import {CardModule} from 'primeng/card';
     AppComponent,
     HomeComponent,
     ValidateComponent,
-    ErrorComponent
+    ErrorComponent,
+    ValidationsComponent,
+    ValidationComponent
   ],
   imports: [
     NavigationBarModule,
