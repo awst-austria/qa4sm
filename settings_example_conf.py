@@ -3,6 +3,7 @@
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 's3cr3t'
+API_SECRET_KEY = '@P1 s3cr3t'
 
 SITE_URL = "https://qa4sm.eu"
 
