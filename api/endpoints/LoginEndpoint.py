@@ -15,7 +15,6 @@ JWT_REFRESH_TOKEN_NAME = 'jwt_refresh_token'
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-@ensure_csrf_cookie
 def login_post(request):
     """
     Authentication endpoint
