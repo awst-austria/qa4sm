@@ -8,22 +8,32 @@ import {HomeComponent} from './pages/home/home.component';
 import {ValidateComponent} from './pages/validate/validate.component';
 import {FormsModule} from '@angular/forms';
 import {NavigationBarModule} from './modules/navigation-bar/navigation-bar.module';
-import {Carousel, CarouselModule} from 'primeng/carousel';
+import {CarouselModule} from 'primeng/carousel';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {GalleriaModule} from 'primeng/galleria';
+import {ButtonModule} from 'primeng/button';
+import { ErrorComponent } from './pages/error/error.component';
+import {CardModule} from 'primeng/card';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    ValidateComponent
+    ValidateComponent,
+    ErrorComponent
   ],
   imports: [
     NavigationBarModule,
     FormsModule,
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     MenubarModule,
-    CarouselModule
+    CarouselModule,
+    GalleriaModule,
+    ButtonModule,
+    CardModule
 
   ],
   providers: [
