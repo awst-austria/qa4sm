@@ -1,19 +1,11 @@
-import datetime
-import json
-
-from django.http import HttpResponse
+from django.contrib import auth
+from django.contrib.auth import login
+from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import GenericAPIView
-from django.contrib.auth import authenticate
-from django.contrib import auth
-from django.conf import settings
-import jwt
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
-from api.serializers.serializers import UserSerializer
 
 # class Login(GenericAPIView):
 from validator.admin import User
@@ -35,20 +27,9 @@ def login_post(request):
     user = auth.authenticate(username=username, password=password)
 
     if user:
-        jwt_token = 'JWT ' + jwt.encode({'username': user.username, 'iat': datetime.datetime.now()},
-                                        settings.API_SECRET_KEY,
-                                        algorithm=settings.JWT_ALGORYTHM)
-        refresh_token = 'JWT ' + jwt.encode({'username': user.username, 'iat': datetime.datetime.now()},
-                                            settings.API_SECRET_KEY,
-                                            algorithm=settings.JWT_ALGORYTHM)
-        user_serializer = UserSerializer(user)
-        data = {'user': user_serializer.data, 'token': jwt_token}
-        response = HttpResponse(json.dumps(data), status=status.HTTP_200_OK)
-        response.set_cookie(JWT_REFRESH_TOKEN_NAME, refresh_token,
-                            expires=datetime.datetime.now() + datetime.timedelta(
-                                hours=settings.JWT_REFRESH_TOKEN_LIFETIME),
-                            httponly=True)
-        return response
+        if user is not None:
+            login(request, user)
+            return JsonResponse({"detail": "Success"})
 
     return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
