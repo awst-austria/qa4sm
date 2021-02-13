@@ -50,10 +50,10 @@ def validation(request):
     dc_prefix = 'datasets'
     ref_repfix = 'ref'
     data_initial_values = [{'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
-                            'dataset': Dataset.objects.get(short_name=val_globals.C3S), }]
+                            'dataset': Dataset.objects.get(short_name=val_globals.DEFAULT_DATASET),}]
 
     ref_initial_values = {'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
-                          'dataset': Dataset.objects.get(short_name=val_globals.ISMN), }
+                          'dataset': Dataset.objects.get(short_name=val_globals.DEFAULT_REFERENCE), }
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:

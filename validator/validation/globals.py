@@ -28,56 +28,23 @@ TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_
                       "_{metric}",
                       "_for_{id_met}-{ds_met}"]
 
-C3S = 'C3S'
+## datasets
 ISMN = 'ISMN'
-GLDAS = 'GLDAS'
-SMAP = 'SMAP'
-ASCAT = 'ASCAT'
-CCI = 'ESA_CCI_SM_combined'
-CCIA = 'ESA_CCI_SM_active'
-CCIP = 'ESA_CCI_SM_passive'
 SMOS = 'SMOS'
-ERA5 = 'ERA5'
-ERA5_LAND = 'ERA5_LAND'
+CGLS_CSAR_SSM1km = 'CGLS_CSAR_SSM1km'
 
 ## dataset versions
-C3S_V201706 = 'C3S_V201706'
-C3S_V201812 = 'C3S_V201812'
-C3S_V201912 = 'C3S_V201912'
-ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
 ISMN_V20191211 = 'ISMN_V20191211'
-SMAP_V5_PM = 'SMAP_V5_PM'
-SMAP_V6_PM = 'SMAP_V6_PM'
 SMOS_105_ASC = 'SMOS_105_ASC'
-GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
-ASCAT_H113 = 'ASCAT_H113'
-ERA5_20190613 = 'ERA5_20190613'
-ERA5_Land_V20190904 = 'ERA5_LAND_V20190904'
-ESA_CCI_SM_A_V04_4 = 'ESA_CCI_SM_A_V04_4'
-ESA_CCI_SM_P_V04_4 = 'ESA_CCI_SM_P_V04_4'
-ESA_CCI_SM_C_V04_4 = 'ESA_CCI_SM_C_V04_4'
-ESA_CCI_SM_A_V04_5 = 'ESA_CCI_SM_A_V04_5'
-ESA_CCI_SM_P_V04_5 = 'ESA_CCI_SM_P_V04_5'
-ESA_CCI_SM_C_V04_5 = 'ESA_CCI_SM_C_V04_5'
-ESA_CCI_SM_C_V04_7 = 'ESA_CCI_SM_C_V04_7'
-ESA_CCI_SM_A_V05_2 = 'ESA_CCI_SM_A_V05_2'
-ESA_CCI_SM_P_V05_2 = 'ESA_CCI_SM_P_V05_2'
-ESA_CCI_SM_C_V05_2 = 'ESA_CCI_SM_C_V05_2'
+CGLS_CSAR_SSM1km_V1_1 = 'CGLS_CSAR_SSM1km_V1_1'
 
 ## dataset data variables
-C3S_sm = 'C3S_sm'
-SMAP_soil_moisture = 'SMAP_soil_moisture'
-SMOS_sm = 'SMOS_sm'
-ASCAT_sm = 'ASCAT_sm'
 ISMN_soil_moisture = 'ISMN_soil_moisture'
-GLDAS_SoilMoi0_10cm_inst = 'GLDAS_SoilMoi0_10cm_inst'
-GLDAS_SoilMoi10_40cm_inst = 'GLDAS_SoilMoi10_40cm_inst'
-GLDAS_SoilMoi40_100cm_inst = 'GLDAS_SoilMoi40_100cm_inst'
-GLDAS_SoilMoi100_200cm_inst = 'GLDAS_SoilMoi100_200cm_inst'
-ERA5_sm = 'ERA5_sm'
-ERA5_LAND_sm = 'ERA5_LAND_sm'
-ESA_CCI_SM_P_sm = 'ESA_CCI_SM_P_sm'
-ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
-ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
+SMOS_sm = 'SMOS_sm'
+CGLS_CSAR_SSM1km_ssm = 'S1_SSM'
 
-NOT_AS_REFERENCE = [SMAP, SMOS, ASCAT]
+
+DEFAULT_DATASET = CGLS_CSAR_SSM1km
+DEFAULT_REFERENCE = ISMN
+
+NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, SMOS]

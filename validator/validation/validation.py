@@ -116,6 +116,8 @@ def create_pytesmo_validation(validation_run):
 
     ds_num = 1
     for dataset_config in validation_run.dataset_configurations.all():
+        __logger.debug(f"Dataset, Version: {dataset_config.dataset}, {dataset_config.version}") # todo: remove
+
         reader = create_reader(dataset_config.dataset, dataset_config.version)
         reader = setup_filtering(reader, list(dataset_config.filters.all()), list(dataset_config.parametrisedfilter_set.all()),
                                  dataset_config.dataset, dataset_config.variable)
@@ -135,6 +137,8 @@ def create_pytesmo_validation(validation_run):
         else:
             dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
             ds_num += 1
+
+        __logger.debug(f"Dataset Name: {dataset_name}")  # todo: remove
 
         ds_list.append( (dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}) )
 

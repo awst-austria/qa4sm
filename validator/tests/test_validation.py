@@ -43,7 +43,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 class TestValidation(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
-    hawaii_coordinates = [18.16464, -158.79638, 22.21588, -155.06103]
+    austria_coordinates = [46.8, 14.94, 48.4, 16.12]
 
     __logger = logging.getLogger(__name__)
 
@@ -77,53 +77,20 @@ class TestValidation(TestCase):
 
         data_c = DatasetConfiguration()
         data_c.validation = run
-        data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
+        data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
+        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
         data_c.save()
 
         ref_c = DatasetConfiguration()
         ref_c.validation = run
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
-        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V201912')
         ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         ref_c.save()
 
         run.reference_configuration = ref_c
         run.scaling_ref = ref_c
-        run.save()
-
-        return run
-
-    def generate_default_validation_triple_coll(self):
-        run = ValidationRun()
-        run.start_time = datetime.now(tzlocal())
-        run.save()
-
-        data_c = DatasetConfiguration()
-        data_c.validation = run
-        data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201912')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
-        data_c.save()
-
-        other_data_c = DatasetConfiguration()
-        other_data_c.validation = run
-        other_data_c.dataset = Dataset.objects.get(short_name='SMOS')
-        other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
-        other_data_c.variable = DataVariable.objects.get(short_name='SMOS_sm')
-        other_data_c.save()
-
-        ref_c = DatasetConfiguration()
-        ref_c.validation = run
-        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
-        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
-        ref_c.save()
-
-        run.reference_configuration = ref_c
-        run.scaling_ref = ref_c
-        run.tcol = True
         run.save()
 
         return run
@@ -301,7 +268,7 @@ class TestValidation(TestCase):
         #run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.CDF_MATCH # cdf matching causes an error for 1 gpi, use that to test error handling
 
-        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_from = datetime(2014, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
         run.save()
@@ -336,51 +303,6 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
-    def test_validation_tcol(self):
-        run = self.generate_default_validation_triple_coll()
-        run.user = self.testuser
-
-        # run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.CDF_MATCH  # cdf matching causes an error for 1 gpi, use that to test error handling
-
-        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
-
-        run.save()
-
-        for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
-                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            else:
-                if config.dataset.short_name == 'C3S':
-                    config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-
-            config.save()
-
-        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
-        pfilter.save()
-
-        # add filterring according to depth_range with the default values:
-        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
-        pfilter.save()
-
-        run_id = run.id
-
-        ## run the validation
-        val.run_validation(run_id)
-        new_run = ValidationRun.objects.get(pk=run_id)
-
-        assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
-
-        self.check_results(new_run, is_tcol_run=True)
-        self.delete_run(new_run)
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
     @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
@@ -467,136 +389,6 @@ class TestValidation(TestCase):
         assert new_run.ok_points == 19
         self.check_results(new_run)
         self.delete_run(new_run)
-
-    @pytest.mark.long_running
-    def test_validation_ccip_ref(self):
-        run = self.generate_default_validation()
-        run.user = self.testuser
-
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_P_V05_2)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_P_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-
-        run.reference_configuration.save()
-
-        run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
-        run.min_lat = self.hawaii_coordinates[0]
-        run.min_lon = self.hawaii_coordinates[1]
-        run.max_lat = self.hawaii_coordinates[2]
-        run.max_lon = self.hawaii_coordinates[3]
-
-        run.save()
-
-        for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
-                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
-
-        run_id = run.id
-        print(run_id)
-
-        ## run the validation
-        val.run_validation(run_id)
-
-        new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
-        assert new_run
-
-        assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
-        self.check_results(new_run)
-        self.delete_run(new_run)
-
-    @pytest.mark.long_running
-    def test_validation_ccia_ref(self):
-        run = self.generate_default_validation()
-        run.user = self.testuser
-
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V05_2)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_A_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-
-        run.reference_configuration.save()
-
-        run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
-        run.min_lat = self.hawaii_coordinates[0]
-        run.min_lon = self.hawaii_coordinates[1]
-        run.max_lat = self.hawaii_coordinates[2]
-        run.max_lon = self.hawaii_coordinates[3]
-
-        run.save()
-
-        for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
-                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
-
-        run_id = run.id
-        print(run_id)
-
-        ## run the validation
-        val.run_validation(run_id)
-
-        new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
-        assert new_run
-
-        assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
-        self.check_results(new_run)
-        self.delete_run(new_run)
-
-#     @pytest.mark.long_running
-#     def test_validation_smap_ref(self):
-#         run = self.generate_default_validation()
-#         run.user = self.testuser
-
-#         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP)
-#         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
-#         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMAP_soil_moisture)
-#         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-
-#         run.reference_configuration.save()
-
-#         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
-#         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
-#         # different window is used here, because for the default one there is too much memory needed to create and save
-#         # plots
-#         run.min_lat = 20.32
-#         run.min_lon = -157.47
-#         run.max_lat = 21.33
-#         run.max_lon = -155.86
-
-#         run.save()
-
-#         for config in run.dataset_configurations.all():
-#             if config != run.reference_configuration:
-#                 #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-#                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-#             config.save()
-
-#         run_id = run.id
-
-#         ## run the validation
-#         val.run_validation(run_id)
-
-#         new_run = ValidationRun.objects.get(pk=run_id)
-#         print(new_run)
-#         assert new_run
-
-#         assert new_run.total_points == 15, "Number of gpis is off"
-#         assert new_run.error_points == 0, "Too many error gpis"
-#         assert new_run.ok_points == 15, "OK points are off"
-#         self.check_results(new_run)
-#         self.delete_run(new_run)
 
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):

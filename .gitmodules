@@ -1,4 +1,4 @@
-[submodule "testdata"]
+[submodule "testdata-hr"]
 	path = testdata
-	url = https://github.com/awst-austria/qa4sm-testdata
+	url = https://github.com/wpreimes/qa4sm-testdata-hr
 	branch = master

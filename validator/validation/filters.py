@@ -37,40 +37,6 @@ def get_used_variables(filters, dataset, variable):
             variables.append('soil moisture_flag')
             continue
 
-        if((fil.name == "FIL_C3S_FLAG_0") or
-           (fil.name == "FIL_C3S_NO_FLAG_1") or
-           (fil.name == "FIL_C3S_NO_FLAG_2")):
-            variables.append('flag')
-            continue
-
-        if((fil.name == "FIL_C3S_MODE_ASC") or
-           (fil.name == "FIL_C3S_MODE_DESC")):
-            variables.append('mode')
-            continue
-
-        if(fil.name == "FIL_GLDAS_UNFROZEN"):
-            temp_variable = variable.pretty_name.replace("Moi", "TMP")
-            variables.append(temp_variable)
-            variables.append('SWE_inst')
-            continue
-
-        if((fil.name == "FIL_ASCAT_METOP_A") or
-           (fil.name == "FIL_ASCAT_METOP_B")):
-            variables.append('sat_id')
-            continue
-
-        if(fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN"):
-            variables.append('ssf')
-            continue
-
-        if(fil.name == "FIL_ASCAT_NO_CONF_FLAGS"):
-            variables.append('conf_flag')
-            continue
-
-        if(fil.name == "FIL_ASCAT_NO_PROC_FLAGS"):
-            variables.append('proc_flag')
-            continue
-
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
             variables.append('Quality_Flag')
             continue
@@ -94,16 +60,6 @@ def get_used_variables(filters, dataset, variable):
 
         if(fil.name == "FIL_SMOS_TOPO_NO_STRONG"):
             variables.append('Processing_Flags')
-            continue
-
-        if(fil.name == "FIL_ERA5_TEMP_UNFROZEN"):
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            variables.append(era_temp_variable)
-            continue
-
-        if(fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN"):
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            variables.append(era_temp_variable)
             continue
 
     return variables
@@ -158,53 +114,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
             masking_filters.append( ('soil moisture_flag', '==', 'G') )
             continue
 
-        if(fil.name == "FIL_C3S_FLAG_0"):
-            masking_filters.append( ('flag', '==', 0) )
-            continue
-
-        if(fil.name == "FIL_C3S_NO_FLAG_1"):
-            masking_filters.append( ('flag', '!=', 1) )
-            continue
-
-        if(fil.name == "FIL_C3S_NO_FLAG_2"):
-            masking_filters.append( ('flag', '!=', 2) )
-            continue
-
-        if(fil.name == "FIL_C3S_MODE_ASC"):
-            masking_filters.append( ('mode', '==', 1) )
-            continue
-
-        if(fil.name == "FIL_C3S_MODE_DESC"):
-            masking_filters.append( ('mode', '==', 2) )
-            continue
-
-        if(fil.name == "FIL_GLDAS_UNFROZEN"):
-            temp_variable = variable.pretty_name.replace("Moi", "TMP")
-            masking_filters.append( ('SWE_inst', '<', 0.001) )
-            masking_filters.append( (variable.pretty_name, '>', 0.0) )
-            masking_filters.append( (temp_variable, '>', 1.) )
-            continue
-
-        if(fil.name == "FIL_ASCAT_METOP_A"):
-            masking_filters.append( ('sat_id', '==', 3) )
-            continue
-
-        if(fil.name == "FIL_ASCAT_METOP_B"):
-            masking_filters.append( ('sat_id', '==', 4) )
-            continue
-
-        if(fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN"):
-            masking_filters.append( ('ssf', '<=', 1) ) ## TODO: really should be == 0 or == 1
-            continue
-
-        if(fil.name == "FIL_ASCAT_NO_CONF_FLAGS"):
-            masking_filters.append( ('conf_flag', '==', 0) )
-            continue
-
-        if(fil.name == "FIL_ASCAT_NO_PROC_FLAGS"):
-            masking_filters.append( ('proc_flag', '==', 0) )
-            continue
-
         if(fil.name == "FIL_SMOS_QUAL_RECOMMENDED"):
             masking_filters.append( ('Quality_Flag', '==', 0) )
             continue
@@ -227,17 +136,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
 
         if(fil.name == "FIL_SMOS_BRIGHTNESS"):
             masking_filters.append( ('Processing_Flags', smos_exclude_bitmask, 0b00000001) )
-            continue
-
-        #snow depth in the nc file yet, this is the preliminary one.
-        if(fil.name == "FIL_ERA5_TEMP_UNFROZEN"):
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            masking_filters.append( (era_temp_variable, '>', 274.15) )
-            continue
-
-        if(fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN"):
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            masking_filters.append( (era_temp_variable, '>', 274.15) )
             continue
 
     if len(masking_filters):

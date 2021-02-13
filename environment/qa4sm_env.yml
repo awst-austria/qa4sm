@@ -127,6 +127,7 @@ dependencies:
   - zipp=3.4.0
   - zlib=1.2.11
   - zstd=1.4.5
+  - geopandas
   - pip:
     - amqp==2.6.1
     - ascat==1.1.2
@@ -177,3 +178,6 @@ dependencies:
     - tqdm==4.52.0
     - trollsift==0.2.1
     - vine==1.3.0
+    - Equi7Grid
+    - geopathfinder
+    - git+https://github.com/TUW-GEO/veranda.git

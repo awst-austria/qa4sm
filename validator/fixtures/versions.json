@@ -1,83 +1,6 @@
 [
     {
         "model": "validator.datasetversion",
-        "pk": 1,
-        "fields": {
-            "short_name": "C3S_V201706",
-            "pretty_name": "v201706",
-            "help_text": "C3S from June 2017",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2017-06-30"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 2,
-        "fields": {
-            "short_name": "SMAP_V5_PM",
-            "pretty_name": "v5 PM/ascending",
-            "help_text": "",
-            "time_range_start": "2015-03-31",
-            "time_range_end": "2018-12-04"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 3,
-        "fields": {
-            "short_name": "ASCAT_H113",
-            "pretty_name": "H113",
-            "help_text": "",
-            "time_range_start": "2007-01-02",
-            "time_range_end": "2017-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 5,
-        "fields": {
-            "short_name": "ISMN_V20180712_MINI",
-            "pretty_name": "20180712 mini testset",
-            "help_text": "Test dataset with only 4 stations",
-            "time_range_start": "",
-            "time_range_end": ""
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 7,
-        "fields": {
-            "short_name": "GLDAS_NOAH025_3H_2_1",
-            "pretty_name": "NOAH025 3H.2.1",
-            "help_text": "Version 2.1",
-            "time_range_start": "2000-01-01",
-            "time_range_end": "2017-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 10,
-        "fields": {
-            "short_name": "C3S_V201812",
-            "pretty_name": "v201812",
-            "help_text": "C3S from December 2018",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2018-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 12,
-        "fields": {
-            "short_name": "ESA_CCI_SM_C_V04_4",
-            "pretty_name": "v04.4",
-            "help_text": "",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2018-06-30"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
         "pk": 13,
         "fields": {
             "short_name": "SMOS_105_ASC",
@@ -85,28 +8,6 @@
             "help_text": "",
             "time_range_start": "2010-01-12",
             "time_range_end": "2018-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 15,
-        "fields": {
-            "short_name": "ERA5_20190613",
-            "pretty_name": "v20190613",
-            "help_text": "snapshot of the reanalysis dataset from 2019-06-13",
-            "time_range_start": "1979-01-01",
-            "time_range_end": "2019-03-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 16,
-        "fields": {
-            "short_name": "ERA5_LAND_V20190904",
-            "pretty_name": "v20190904",
-            "help_text": "snapshot of the reanalysis dataset from 2019-09-04",
-            "time_range_start": "2001-01-01",
-            "time_range_end": "2019-04-30"
         }
     },
     {
@@ -120,103 +21,16 @@
             "time_range_end": ""
         }
     },
-    {
+        {
         "model": "validator.datasetversion",
-        "pk": 19,
+        "pk": 30,
         "fields": {
-            "short_name": "ESA_CCI_SM_C_V04_5",
-            "pretty_name": "v04.5",
-            "help_text": "-",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2018-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 20,
-        "fields": {
-            "short_name": "ESA_CCI_SM_A_V04_5",
-            "pretty_name": "v04.5",
-            "help_text": "-",
-            "time_range_start": "1991-08-05",
-            "time_range_end": "2018-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 21,
-        "fields": {
-            "short_name": "ESA_CCI_SM_P_V04_5",
-            "pretty_name": "v04.5",
-            "help_text": "-",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2018-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 24,
-        "fields": {
-            "short_name": "ESA_CCI_SM_C_V04_7",
-            "pretty_name": "v04.7",
-            "help_text": "-",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 25,
-        "fields": {
-            "short_name": "ESA_CCI_SM_P_V05_2",
-            "pretty_name": "v05.2",
-            "help_text": "-",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 26,
-        "fields": {
-            "short_name": "ESA_CCI_SM_A_V05_2",
-            "pretty_name": "v05.2",
-            "help_text": "-",
-            "time_range_start": "1991-08-05",
-            "time_range_end": "2019-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 27,
-        "fields": {
-            "short_name": "ESA_CCI_SM_C_V05_2",
-            "pretty_name": "v05.2",
-            "help_text": "-",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 28,
-        "fields": {
-            "short_name": "C3S_V201912",
-            "pretty_name": "v201912",
-            "help_text": "C3S from December 2019",
-            "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 29,
-        "fields": {
-            "short_name": "SMAP_V6_PM",
-            "pretty_name": "v6 PM/ascending",
-            "help_text": "-",
-            "time_range_start": "2015-03-31",
-            "time_range_end": "2020-05-23"
+            "short_name": "CGLS_CSAR_SSM1km_V1_1",
+            "pretty_name": "V1.1",
+            "help_text": "CGLS Sentinel1 SSM 1km (TIF) product",
+            "time_range_start": "",
+            "time_range_end": ""
         }
     }
+
 ]

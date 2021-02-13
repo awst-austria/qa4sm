@@ -593,8 +593,7 @@
             "country": "USA",
             "number_of_stations": "29",
             "versions": [
-                18,
-                5
+                18
             ]
         }
     },
@@ -724,8 +723,7 @@
             "country": "USA",
             "number_of_stations": "239",
             "versions": [
-                18,
-                5
+                18
             ]
         }
     },
@@ -738,8 +736,7 @@
             "country": "USA",
             "number_of_stations": "441",
             "versions": [
-                18,
-                5
+                18
             ]
         }
     },
@@ -752,8 +749,7 @@
             "country": "USA",
             "number_of_stations": "171",
             "versions": [
-                18,
-                5
+                18
             ]
         }
     },
