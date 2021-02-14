@@ -6,26 +6,28 @@ import {
   HttpInterceptor, HttpHeaders
 } from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {NGXLogger} from 'ngx-logger';
 
 @Injectable()
 export class HttpTokenInterceptor implements HttpInterceptor {
-  constructor() {
+  constructor(private logger:NGXLogger) {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
     let csrfToken = this.getCookie('csrftoken');
     if (csrfToken) {
-      console.log()
-      const authReq = request.clone({setHeaders: {'X-CSRFToken': csrfToken}});
-      console.info(authReq);
+      const authReq = request.clone({
+        headers: request.headers
+          .set('Content-Type', 'application/json')
+          .set('X-CSRFToken', csrfToken)
+      });
 
-      next.handle(authReq);
+      this.logger.debug('csrf token added', authReq)
+      return next.handle(authReq);
     }
 
-
     return next.handle(request);
-
   }
 
   private getCookie(name: string) {
@@ -34,7 +36,6 @@ export class HttpTokenInterceptor implements HttpInterceptor {
     let cookieName = `${name}=`;
     let c: string;
 
-    console.log(ca);
     for (let i: number = 0; i < caLen; i += 1) {
       c = ca[i].replace(/^\s+/g, '');
       if (c.indexOf(cookieName) == 0) {

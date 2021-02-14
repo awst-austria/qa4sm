@@ -1,3 +1,29 @@
-<p>logssin works!</p>
-<p-button (onClick)="loginClick()" label="Nyaloka" ></p-button>
+<p-toast></p-toast>
+<div class="p-grid">
+  <div class="p-col-12">
+    <div class="p-d-flex p-jc-center">
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="p-d-flex p-jc-center p-my-4">
+          <h2>Please sign in</h2>
+        </div>
+        <span class="p-float-label p-my-4">
+              <input id="username-input" type="text" formControlName="username" pInputText>
+              <label for="username-input">Username</label>
+            </span>
+
+        <span class="p-float-label p-my-4">
+              <input id="password-input" type="password" [feedback]="false" formControlName="password" pPassword/>
+              <label for="password-input">Password</label>
+            </span>
+
+        <div class="p-d-flex p-jc-center p-my-4">
+          <p-button label="Sign in" type="submit" [disabled]="!loginForm.valid" class="p-jc-center"></p-button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
 
