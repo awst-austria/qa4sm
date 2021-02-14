@@ -1,4 +1,5 @@
 from django.conf import settings
+from datetime import datetime
 
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
@@ -47,4 +48,12 @@ CGLS_CSAR_SSM1km_ssm = 'S1_SSM'
 DEFAULT_DATASET = CGLS_CSAR_SSM1km
 DEFAULT_REFERENCE = ISMN
 
+
 NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, SMOS]
+
+IRREGULAR_GRIDS = {'SMAP' : 0.35,
+                   'SMOS' : 0.25,
+                   'ASCAT' : 0.1}
+
+START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
+END_TIME = datetime.now().strftime('%Y-%m-%d')
