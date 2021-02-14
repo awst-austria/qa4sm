@@ -50,7 +50,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',  # make all endpoints private
-    )
+    ),
+    'EXCEPTION_HANDLER': 'api.api_exception_handler.custom_exception_handler'
 }
 
 SWAGGER_SETTINGS = {
