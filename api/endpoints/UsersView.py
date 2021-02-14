@@ -1,7 +1,10 @@
+from django_countries.serializer_fields import CountryField
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from rest_framework.serializers import ModelSerializer
 
 from api.Dto import Dto
 from validator.models import User
@@ -25,10 +28,11 @@ def signup_post(request):
     print(request)
 
 
-class UserSerializer(serializers.ModelSerializer):
-    last_login = serializers.DateTimeField(read_only=True)
-    date_joined = serializers.DateTimeField(read_only=True)
-    password = serializers.CharField(write_only=True)
+class UserSerializer(ModelSerializer):
+    last_login = DateTimeField(read_only=True)
+    date_joined = DateTimeField(read_only=True)
+    password = CharField(write_only=True)
+    country = CountryField()
 
     class Meta:
         model = User
