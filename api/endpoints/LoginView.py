@@ -56,6 +56,9 @@ def api_login(request):
 
 
 class LoginDto(object):
+    """
+    DTO for login requests
+    """
     def __init__(self, username='', password=''):
         self.username = username
         self.password = password
