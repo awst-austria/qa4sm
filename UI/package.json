@@ -20,6 +20,7 @@
     "@angular/platform-browser": "~11.1.2",
     "@angular/platform-browser-dynamic": "~11.1.2",
     "@angular/router": "~11.1.2",
+    "ngx-logger": "^4.1.9",
     "primeflex": "^2.0.0",
     "primeicons": "^4.1.0",
     "primeng": "^11.2.0",
