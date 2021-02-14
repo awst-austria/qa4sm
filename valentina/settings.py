@@ -32,6 +32,7 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'validator.apps.ValidatorConfig',
+    'corsheaders',
     'drf_yasg',
     'rest_framework',
     'django.contrib.admin',
@@ -62,11 +63,10 @@ SWAGGER_SETTINGS = {
     },
 }
 
-JWT_ALGORYTHM = 'HS256'
-JWT_ACCESS_TOKEN_LIFETIME = 60  # in minutes
-JWT_REFRESH_TOKEN_LIFETIME = 96  # in hours
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

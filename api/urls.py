@@ -4,9 +4,9 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
-from api.endpoints.LoginEndpoint import LoginView
+from api.endpoints.LoginView import api_login
 from api.endpoints.PathVarTestEndpoint import path_var_get
-from api.endpoints.UsersEndpoint import users_get
+from api.endpoints.UsersView import users_get
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -35,5 +35,8 @@ urlpatterns = [
 
     url(r'^test/$', users_get),
     url(r'^path_test/(?P<username>.+)/$', path_var_get),
-    path('auth/', LoginView.as_view(), name='login'),
+    path('auth', api_login, name='login'),
+
+
+    # path('auth/', LoginView.as_view(), name='login'),
 ]
