@@ -21,742 +21,26 @@
                     target="_blank">ISMN networks list</a>.
                 </p>
 
-                <div>
+                <div class="continent_container">
                     <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_continent_africa" value="Africa" type="checkbox" name="continent_africa"
+                        <input class="custom-control-input continent" id="" value="basic name" type="checkbox" name=""
                             onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_continent_africa"></label>
-                        <div onclick="$('#id_collapse_africa').collapse('toggle')" class="ismn_label link-primary">Africa</div>
+                        <label class="custom-control-label" for=""></label>
+                        <div onclick="$('#id_collapse_').collapse('toggle')" class="ismn_label link-primary"></div>
                     </div>
                 </div>
-                <div class="collapse ismn_indent" id="id_collapse_africa">
+                <div class="collapse collapse_continent ismn_indent" id="id_collapse_">
                     <div class="container">
                         <div class="row">
-                            <div class="col-sm">
+                            <div class="col-sm network">
                                 <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_AMMA-CATCH" value="AMMA-CATCH" type="checkbox" checked name="AMMA-CATCH">
-                                    <label class="custom-control-label" for="id_AMMA-CATCH">AMMA-CATCH</label>
+                                    <input class="custom-control-input network" id="id_network" value="" type="checkbox" checked name=""
+                                           onchange="toggleISMNNetwork(this)">
+                                    <label class="custom-control-label" for="id_network"></label>
                                 </div>
                             </div>
-                            <div class="col-sm">Benin, Niger, Mali</div>
-                            <div class="col-1">7</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_CARBOAFRICA" value="CARBOAFRICA" type="checkbox" checked name="CARBOAFRICA">
-                                    <label class="custom-control-label" for="id_CARBOAFRICA">CARBOAFRICA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Sudan</div>
-                            <div class="col-1">1</div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_DAHRA" value="DAHRA" type="checkbox" checked name="DAHRA">
-                                    <label class="custom-control-label" for="id_DAHRA">DAHRA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Senegal</div>
-                            <div class="col-1">1</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_continent_asia" value="asia" type="checkbox" name="continent_asia"
-                            onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_continent_asia"></label>
-                        <div onclick="$('#id_collapse_asia').collapse('toggle')" class="ismn_label link-primary">Asia</div>
-                    </div>
-                </div>
-                <div class="collapse ismn_indent" id="id_collapse_asia">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_CHINA" value="CHINA" type="checkbox" checked name="CHINA">
-                                    <label class="custom-control-label" for="id_CHINA">CHINA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">China</div>
-                            <div class="col-1">40</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_CTP-SMTMN" value="CTP-SMTMN" type="checkbox" checked name="CTP-SMTMN">
-                                    <label class="custom-control-label" for="id_CTP-SMTMN">CTP-SMTMN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">China</div>
-                            <div class="col-1">57</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_HiWATER-EHWSN" value="HiWATER-EHWSN" type="checkbox" checked name="HiWATER-EHWSN">
-                                    <label class="custom-control-label" for="id_HiWATER-EHWSN">HiWATER-EHWSN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">China</div>
-                            <div class="col-1">174</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_HSC-SELMACHEON" value="HSC-SELMACHEON" type="checkbox" checked name="HSC-SELMACHEON">
-                                    <label class="custom-control-label" for="id_HSC-SELMACHEON">HSC-SELMACHEON</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Korea</div>
-                            <div class="col-1">1</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_HYU-CHEONGMICHEON" value="HYU-CHEONGMICHEON" type="checkbox" checked name="HYU-CHEONGMICHEON">
-                                    <label class="custom-control-label" for="id_HYU-CHEONGMICHEON">HYU-CHEONGMICHEON</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Korea</div>
-                            <div class="col-1">1</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_IIT-KANPUR" value="IIT-KANPUR" type="checkbox" checked name="IIT-KANPUR">
-                                    <label class="custom-control-label" for="id_IIT-KANPUR">IIT-KANPUR</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">India</div>
-                            <div class="col-1">1</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_KHOREZM" value="KHOREZM" type="checkbox" checked name="KHOREZM">
-                                    <label class="custom-control-label" for="id_KHOREZM">KHOREZM</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Uzbekistan</div>
-                            <div class="col-1">7</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_MAQU" value="MAQU" type="checkbox" checked name="MAQU">
-                                            <label class="custom-control-label" for="id_MAQU">MAQU</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">China</div>
-                            <div class="col-1">20</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_MONGOLIA" value="MONGOLIA" type="checkbox" checked name="MONGOLIA">
-                                    <label class="custom-control-label" for="id_MONGOLIA">MONGOLIA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Mongolia</div>
-                            <div class="col-1">44</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_MySMNet" value="MySMNet" type="checkbox" checked name="MySMNet">
-                                    <label class="custom-control-label" for="id_MySMNet">MySMNet</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Malaysia</div>
-                            <div class="col-1">7</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_RUSWET-AGRO" value="RUSWET-AGRO" type="checkbox" checked name="RUSWET-AGRO">
-                                    <label class="custom-control-label" for="id_RUSWET-AGRO">RUSWET-AGRO</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Former Soviet Union</div>
-                            <div class="col-1">212</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_RUSWET-GRASS" value="RUSWET-GRASS" type="checkbox" checked name="RUSWET-GRASS">
-                                    <label class="custom-control-label" for="id_RUSWET-GRASS">RUSWET-GRASS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Former Soviet Union</div>
-                            <div class="col-1">122</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_RUSWET-VALDAI" value="RUSWET-VALDAI" type="checkbox" checked name="RUSWET-VALDAI">
-                                    <label class="custom-control-label" for="id_RUSWET-VALDAI">RUSWET-VALDAI</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Former Soviet Union</div>
-                            <div class="col-1">3</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SKKU" value="SKKU" type="checkbox" checked name="SKKU">
-                                    <label class="custom-control-label" for="id_SKKU">SKKU</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Korea</div>
-                            <div class="col-1">5</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SW-WHU" value="SW-WHU" type="checkbox" checked name="SW-WHU">
-                                    <label class="custom-control-label" for="id_SW-WHU">SW-WHU</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">China</div>
-                            <div class="col-1">7</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_continent_australia" value="australia" type="checkbox" name="continent_australia"
-                            onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_continent_australia"></label>
-                        <div onclick="$('#id_collapse_australia').collapse('toggle')" class="ismn_label link-primary">Australia</div>
-                    </div>
-                </div>
-                <div class="collapse ismn_indent" id="id_collapse_australia">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_AACES" value="AACES" type="checkbox" checked name="AACES">
-                                    <label class="custom-control-label" for="id_AACES">AACES</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Australia</div>
-                            <div class="col-1">49</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_OZNET" value="OZNET" type="checkbox" checked name="OZNET">
-                                    <label class="custom-control-label" for="id_OZNET">OZNET</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Australia</div>
-                            <div class="col-1">38</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SASMAS" value="SASMAS" type="checkbox" checked name="SASMAS">
-                                    <label class="custom-control-label" for="id_SASMAS">SASMAS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">SASMAS,Australia</div>
-                            <div class="col-1">14</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_continent_europe" value="europe" type="checkbox" name="continent_europe"
-                            onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_continent_europe"></label>
-                        <div onclick="$('#id_collapse_europe').collapse('toggle')" class="ismn_label link-primary">Europe</div>
-                    </div>
-                </div>
-                <div class="collapse ismn_indent" id="id_collapse_europe">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_BIEBRZA-S-1" value="BIEBRZA-S-1" type="checkbox" checked name="BIEBRZA-S-1">
-                                    <label class="custom-control-label" for="id_BIEBRZA-S-1">BIEBRZA-S-1</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Poland</div>
-                            <div class="col-1">30</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_CALABRIA" value="CALABRIA" type="checkbox" checked name="CALABRIA">
-                                    <label class="custom-control-label" for="id_CALABRIA">CALABRIA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Italy</div>
-                            <div class="col-1">5</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_CAMPANIA" value="CAMPANIA" type="checkbox" checked name="CAMPANIA">
-                                    <label class="custom-control-label" for="id_CAMPANIA">CAMPANIA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Italy</div>
-                            <div class="col-1">2</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_FMI" value="FMI" type="checkbox" checked name="FMI">
-                                    <label class="custom-control-label" for="id_FMI">FMI</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Finland</div>
-                            <div class="col-1">27</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_FR-Aqui" value="FR-Aqui" type="checkbox" checked name="FR-Aqui">
-                                    <label class="custom-control-label" for="id_FR-Aqui">FR-Aqui</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">France</div>
-                            <div class="col-1">5</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_GROW" value="GROW" type="checkbox" checked name="GROW">
-                                    <label class="custom-control-label" for="id_GROW">GROW</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">UK</div>
-                            <div class="col-1">154</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_GTK" value="GTK" type="checkbox" checked name="GTK">
-                                    <label class="custom-control-label" for="id_GTK">GTK</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Finland</div>
-                            <div class="col-1">7</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_HOBE" value="HOBE" type="checkbox" checked name="HOBE">
-                                    <label class="custom-control-label" for="id_HOBE">HOBE</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Denmark</div>
-                            <div class="col-1">32</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_HYDROL-NET-PERUGIA" value="HYDROL-NET-PERUGIA" type="checkbox" checked name="HYDROL-NET-PERUGIA">
-                                    <label class="custom-control-label" for="id_HYDROL-NET-PERUGIA">HYDROL-NET-PERUGIA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Italy</div>
-                            <div class="col-1">2</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_IMA-CAN1" value="IMA-CAN1" type="checkbox" checked name="IMA-CAN1">
-                                    <label class="custom-control-label" for="id_IMA-CAN1">IMA-CAN1</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Italy</div>
-                            <div class="col-1">12</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_METEROBS" value="METEROBS" type="checkbox" checked name="METEROBS">
-                                    <label class="custom-control-label" for="id_METEROBS">METEROBS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Italy</div>
-                            <div class="col-1">1</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_MOL-RAO" value="MOL-RAO" type="checkbox" checked name="MOL-RAO">
-                                    <label class="custom-control-label" for="id_MOL-RAO">MOL-RAO</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Germany</div>
-                            <div class="col-1">2</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_ORACLE" value="ORACLE" type="checkbox" checked name="ORACLE">
-                                    <label class="custom-control-label" for="id_ORACLE">ORACLE</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">France</div>
-                            <div class="col-1">6</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_REMEDHUS" value="REMEDHUS" type="checkbox" checked name="REMEDHUS">
-                                    <label class="custom-control-label" for="id_REMEDHUS">REMEDHUS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Spain</div>
-                            <div class="col-1">24</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_RSMN" value="RSMN" type="checkbox" checked name="RSMN">
-                                    <label class="custom-control-label" for="id_RSMN">RSMN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Romania</div>
-                            <div class="col-1">20</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SMOSMANIA" value="SMOSMANIA" type="checkbox" checked name="SMOSMANIA">
-                                    <label class="custom-control-label" for="id_SMOSMANIA">SMOSMANIA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">France</div>
-                            <div class="col-1">22</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SWEX-POLAND" value="SWEX-POLAND" type="checkbox" checked name="SWEX-POLAND">
-                                    <label class="custom-control-label" for="id_SWEX-POLAND">SWEX-POLAND</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Poland</div>
-                            <div class="col-1">6</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_TERENO" value="TERENO" type="checkbox" checked name="TERENO">
-                                    <label class="custom-control-label" for="id_TERENO">TERENO</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Germany</div>
-                            <div class="col-1">5</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_UDC-SMOS" value="UDC-SMOS" type="checkbox" checked name="UDC-SMOS">
-                                    <label class="custom-control-label" for="id_UDC-SMOS">UDC-SMOS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Germany</div>
-                            <div class="col-1">11</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_UMBRIA" value="UMBRIA" type="checkbox" checked name="UMBRIA">
-                                    <label class="custom-control-label" for="id_UMBRIA">UMBRIA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Italy</div>
-                            <div class="col-1">13</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_UMSUOL" value="UMSUOL" type="checkbox" checked name="UMSUOL">
-                                    <label class="custom-control-label" for="id_UMSUOL">UMSUOL</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Italy</div>
-                            <div class="col-1">1</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_VAS" value="VAS" type="checkbox" checked name="VAS">
-                                    <label class="custom-control-label" for="id_VAS">VAS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Spain</div>
-                            <div class="col-1">3</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_WEGENERNET" value="WEGENERNET" type="checkbox" checked name="WEGENERNET">
-                                    <label class="custom-control-label" for="id_WEGENERNET">WEGENERNET</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Austria</div>
-                            <div class="col-1">12</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_WSMN" value="WSMN" type="checkbox" checked name="WSMN">
-                                    <label class="custom-control-label" for="id_WSMN">WSMN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">UK</div>
-                            <div class="col-1">8</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_continent_north_america" value="north_america" type="checkbox" name="continent_north_america"
-                            onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_continent_north_america"></label>
-                        <div onclick="$('#id_collapse_north_america').collapse('toggle')" class="ismn_label link-primary">North America</div>
-                    </div>
-                </div>
-                <div class="collapse ismn_indent container" id="id_collapse_north_america">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_ARM" value="ARM" type="checkbox" checked name="ARM">
-                                    <label class="custom-control-label" for="id_ARM">ARM</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">29</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_AWDN" value="AWDN" type="checkbox" checked name="AWDN">
-                                    <label class="custom-control-label" for="id_AWDN">AWDN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">50</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_BNZ-LTER" value="BNZ-LTER" type="checkbox" checked name="BNZ-LTER">
-                                    <label class="custom-control-label" for="id_BNZ-LTER">BNZ-LTER</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Alaska</div>
-                            <div class="col-1">12</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_COSMOS" value="COSMOS" type="checkbox" checked name="COSMOS">
-                                    <label class="custom-control-label" for="id_COSMOS">COSMOS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">109</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_FLUXNET-AMERIFLUX" value="FLUXNET-AMERIFLUX" type="checkbox" checked name="FLUXNET-AMERIFLUX">
-                                    <label class="custom-control-label" for="id_FLUXNET-AMERIFLUX">FLUXNET-AMERIFLUX</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">2</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_ICN" value="ICN" type="checkbox" checked name="ICN">
-                                    <label class="custom-control-label" for="id_ICN">ICN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">19</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_IOWA" value="IOWA" type="checkbox" checked name="IOWA">
-                                    <label class="custom-control-label" for="id_IOWA">IOWA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">6</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_iRON" value="iRON" type="checkbox" checked name="iRON">
-                                    <label class="custom-control-label" for="id_iRON">iRON</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">9</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_PBO-H2O" value="PBO-H2O" type="checkbox" checked name="PBO-H2O">
-                                    <label class="custom-control-label" for="id_PBO-H2O">PBO-H2O</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">159</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_RISMA" value="RISMA" type="checkbox" checked name="RISMA">
-                                    <label class="custom-control-label" for="id_RISMA">RISMA</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Canada</div>
-                            <div class="col-1">23</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SCAN" value="SCAN" type="checkbox" checked name="SCAN">
-                                    <label class="custom-control-label" for="id_SCAN">SCAN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">239</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SNOTEL" value="SNOTEL" type="checkbox" checked name="SNOTEL">
-                                    <label class="custom-control-label" for="id_SNOTEL">SNOTEL</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">441</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_SOILSCAPE" value="SOILSCAPE" type="checkbox" checked name="SOILSCAPE">
-                                    <label class="custom-control-label" for="id_SOILSCAPE">SOILSCAPE</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">171</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_USCRN" value="USCRN" type="checkbox" checked name="USCRN">
-                                    <label class="custom-control-label" for="id_USCRN">USCRN</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">115</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_USDA-ARS" value="USDA-ARS" type="checkbox" checked name="USDA-ARS">
-                                    <label class="custom-control-label" for="id_USDA-ARS">USDA-ARS</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">USA</div>
-                            <div class="col-1">4</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="custom-control custom-switch">
-                        <input class="custom-control-input continent" id="id_continent_south_america" value="south_america" type="checkbox" name="continent_south_america" onchange="toggleISMNContinent(this)" checked>
-                        <label class="custom-control-label" for="id_continent_south_america"></label>
-                        <div onclick="$('#id_collapse_south_america').collapse('toggle')" class="ismn_label link-primary">South America</div>
-                    </div>
-                </div>
-                <div class="collapse ismn_indent" id="id_collapse_south_america">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm">
-                                <div class="custom-control custom-switch">
-                                    <input class="custom-control-input network" id="id_LAB-net" value="LAB-net" type="checkbox" checked name="LAB-net">
-                                    <label class="custom-control-label" for="id_LAB-net">LAB-net</label>
-                                </div>
-                            </div>
-                            <div class="col-sm">Chile</div>
-                            <div class="col-1">3</div>
+                            <div class="col-sm country"></div>
+                            <div class="col-1"></div>
                         </div>
                     </div>
                 </div>
@@ -767,7 +51,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="ismn_networks_button" type="button" onclick="setISMNNetworks(this);$('#ismn_networks').modal('hide');" class="btn btn-primary">Use networks</button>
+                <button id="ismn_networks_button" type="button" onclick="setISMNNetworks(this);" class="btn btn-primary">Use networks</button>
             </div>
 
         </div>
@@ -775,7 +59,6 @@
 </div>
 
 
-<!--Monika-->
 <div class="modal" id="ismn_depth" role="dialog" aria-labelledby="ismn_networks_title" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document" style="max-width: 30rem;">
         <div class="modal-content">
@@ -800,24 +83,22 @@
                 <div>
                     <div></div>
                         <label for="depth_from">Depth from: </label>
-                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="first_range"
-                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
+                        <input class="depth_range form-control" id="depth_from" value="" type="number" name="depth_from" step="0.01" min="0.00">
                         <label for="depth_from">m</label>
                     </div>
                     <div>
                         <label for="depth_to">Depth to: </label>
-                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="first_range"
-                            onchange="toggleISMNContinent(this)" step="0.01" min="0.00">
+                        <input class="depth_range form-control" id="depth_to" value="" type="number" name="depth_to" step="0.01" min="0.00">
                         <label for="depth_to">m</label>
                     </div>
 
             </div>
 
-            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth">
+            <input type="hidden" id="id_target_hidden_input_depth" value="" name="target_hidden_input_depth" data-default=''>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide');" class="btn btn-primary">Use depth range</button>
+                <button id="ismn_depth_button" type="button" onclick="setISMNDepth(this);$('#ismn_depth').modal('hide')" class="btn btn-primary">Use depth range</button>
             </div>
 
         </div>
@@ -827,6 +108,36 @@
 
 <!--====================================== Java Script Codes ==================================================== -->
 <script type="text/javascript">
+    // Remark: I use below hide-element-approach instead of detach or remove it, so everytime we use somehow:
+    // .continent_container, .collapse_continent, label.custom-control-label elements there is always one element more
+    //  to handle. Thus filtering should be done ommiting the bootstrap 'd-none' class;
+
+// Auxiliary functions:
+    function toggle_children_class(element, class_name){
+        $(element).toggleClass(class_name);
+        $.each($(element).find("*"), function(id, child){
+            $(child).toggleClass(class_name);
+        })
+    }
+
+
+    function verify_html_element(element_class){
+            var selector = '.'+element_class;
+            if  ($(selector).length>1){
+                $.each($(selector), function(ind, element){
+                    if (!$(element).hasClass('d-none')){
+                        $(element).empty();
+                        $(element).remove();
+                    }
+                    else {
+
+                        toggle_children_class(element, 'd-none');
+                    }
+                })
+            }
+     }
+
+// ------------------- ISMN Networks -----------------------------------------//
     function toggleISMNContinent(checkbox) {
         var groupId = checkbox.id.replace(/^id_continent_/, 'id_collapse_')
         var filterboxes = $('#' + groupId).find('input:checkbox');
@@ -836,81 +147,206 @@
         }
     }
 
+    function toggleISMNNetwork(checkbox){
+        var checkboxId = checkbox.id
+        var network_container = $('#'+checkboxId).closest('.collapse_continent')
+        var continent_checkbox = network_container.prev().find('input.continent')
+        var networks = network_container.find('input:checkbox').not('.d-none')
+
+        // it checks here if at least one network is checked ...
+        var cond = networks.is(function(indx, network){
+                    return $(network).prop('checked');
+                   })
+        // .. if not then unchecked also the appropriate continent checkbox
+        if(!cond){
+            continent_checkbox.prop('checked', false);
+        } else {
+            continent_checkbox.prop('checked', true);
+        }
+    }
+
     function setISMNNetworks(source) {
         var ismnDialog = $(source).closest('#ismn_networks');
         var hiddenId = ismnDialog.find('#id_target_hidden_input').val();
-        console.log(hiddenId)
         var networkList = '';
         for (var netCB of ismnDialog.find('input:checked.network')) {
-            console.log(netCB.value)
-            networkList += netCB.value + ',';
+            if (netCB.value != ''){
+                networkList += netCB.value + ',';
+            }
         }
         networkList = networkList.replace(/,+$/, ''); //remove the last coma
 
-        $('#'+hiddenId).val(networkList);
-        console.log($('#'+hiddenId).val())
+        if (networkList.length == 0){
+          alert('You did not choose any network. Please choose at least one network.')
+        }else {
+          $('#'+hiddenId).val(networkList);
+          $('#ismn_networks').modal('hide') //hide the window
+        }
     }
 
-    $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
-        var callerId = e.relatedTarget.id;
-        var hiddenId = callerId.replace(/_link$/, '_params');
-        var ismnDialog = $(e.currentTarget);
+        function get_network_info(networks_info){
+            // var networks_info = ajax_take_network_info(); // taking info about network
+            var continents = Object.keys(networks_info) // taking keys-continents
 
-        ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
+            // cleaning html in case this function is called more than once
+            verify_html_element('continent_container')
+            verify_html_element('collapse_continent')
 
-        var preselectedNetworks = $('#' + hiddenId).val();
-        preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, ''); // clean string from whitespace
-        var netList = preselectedNetworks.split(',');
+           // taking basic html for continent
+            var basic_continent_container = $('.continent_container')
+            var basic_continent_collapse = $('.collapse_continent')
 
+           //iteration over continents - to sort networks according to continents
+           $.each(continents, function(ind, continent){
+                var networks = networks_info[continent];
+                var continent_name = continent.replace(/ /g, '') //removing spaces from Americas :);
 
-        // reset dialog:
-        ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
-        ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
+                //creating new values
+                var new_onclick = `$('#id_collapse_${continent_name}').collapse('toggle')`;
+                var new_id = 'id_continent_' + continent_name;
 
-        for (var net of netList) { // check the preselected networks
-            ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
+                //getting basic html patterns
+                var new_continent_container = basic_continent_container.clone(true, true);
+                var new_continent_collapse = basic_continent_collapse.clone(true, true);
+                var basic_network_container = new_continent_collapse.find('.row');
+
+                // setting approprate attributes
+                new_continent_container.find('input').attr('id', new_id);
+                new_continent_container.find('input').attr('value', continent_name);
+                new_continent_container.find('input').attr('name', 'continent_' + continent_name);
+                new_continent_container.find('label').attr('for', new_id);
+                new_continent_container.find('div.ismn_label').text(continent);
+                new_continent_container.find('div.ismn_label').attr('onclick', new_onclick);
+                new_continent_collapse.attr('id', 'id_collapse_' + continent_name);
+
+                // inserting new elements
+                $(basic_continent_container).before(new_continent_container);
+                $(basic_continent_container).before(new_continent_collapse);
+
+                //for each continent networks are listed here
+                $.each(networks, function(ind, val){
+                    var new_network = basic_network_container.clone(true, true);
+                    new_network.find('input').attr('id', 'id_'+val[0]);
+                    new_network.find('input').attr('value', val[0]);
+                    new_network.find('input').attr('name', val[0]);
+                    new_network.find('label').attr('for', 'id_'+val[0]);
+                    new_network.find('label').text(val[0]);
+                    new_network.find('div.country').text(val[1]);
+                    new_network.find('.col-1').text(val[2]);
+
+                    // inserting new network
+                    $(basic_network_container).before(new_network);
+
+                })
+                // switching off the basic html pattern
+                toggle_children_class(basic_network_container, 'd-none');
+           })
+
+           // switching off basic html patterns
+           toggle_children_class(basic_continent_container, 'd-none');
+           toggle_children_class(basic_continent_collapse, 'd-none');
         }
+
+        function filter_networks(e){
+          var callerId = e.relatedTarget.id;
+          var hiddenId = callerId.replace(/_link$/, '_params');
+          var ismnDialog = $(e.currentTarget);
+
+          ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
+          var preselectedNetworks = $('#' + hiddenId).val();
+            // some text manipulation: clean string from whitespace and separation based on comas
+          preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
+          var netList = preselectedNetworks.split(',');
+
+          // reset dialog:
+          ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
+          ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
+
+          for (var net of netList) { // check the preselected networks
+              ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
+          }
+
+          // if there is a continent without any network chosen by default it should be switched off
+          $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
+              var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
+
+              // here I'm checking if there is at least one network checked by default:
+              var cond = networks.is(function(indx, network){return $(network).prop('checked')})
+
+              // if not then the continent also should be unchecked
+              if(!cond){
+                  $(element).prop('checked', false);
+              }
+          });
+        }
+
+        function ajax_take_network_info(e) {
+            //using ajax to read the network info according to its version
+            var url = $("#validation_form").attr("version-options-url");
+            var versionId = $('#id_target_hidden_input_version').val();
+            $.ajax({
+                url: url,
+                data: {'version_id': versionId},
+                success: function (return_data) {
+                    data = return_data['network']
+                    get_network_info(data)
+                    filter_networks(e)
+                }
+            });
+
+        }
+
+
+    $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
+        ajax_take_network_info(e)
     });
 
-<!--Monika-->
+
+// ------------------------ ISMN Depths -------------------------------------- //
     function setISMNDepth(source) {
         var ismnDialog = $(source).closest('#ismn_depth');
         var hiddenId = ismnDialog.find('#id_target_hidden_input_depth').val();
+        // taking default values from the hidden field
         var default_values = $('#'+hiddenId).val().split(',')
         var depthCheckbox = $('#'+hiddenId).siblings('input:checkbox')
 
+        //taking chosen values
         var depth_from = $('#depth_from').val()
         var depth_to = $('#depth_to').val()
-        var range = [depth_from, depth_to]
         if(depth_from > depth_to){
-            console.log(parseFloat(default_values[0]))
-            $('#'+hiddenId).val(default_values);
-            alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the default ones (0.00-0.10 m).')
+            $('#depth_from').val(parseFloat(default_values[0]))
+            $('#depth_to').val(parseFloat(default_values[1]))
+            alert('"Depth from" value is higher than "Depth to". Choose another range or values will be set to the last valid range used.')
+        } else {
+          depthCheckbox.prop('checked', true)
+          $('#'+hiddenId).val([depth_from, depth_to])
+          $('#ismn_depth').modal('hide'); // closing the window
         }
-        depthCheckbox.prop('checked', true)
+
     }
 
-    function getDefaultParams(e){
+    function getDefaultParams(e, field_selector){
         var callerId = e.relatedTarget.id;
         var hiddenId = callerId.replace(/_link$/, '_params');
         var default_values = $('#'+hiddenId).val()
         var ismnDialog = $(e.currentTarget);
-        ismnDialog.find('#id_target_hidden_input_depth').val(hiddenId); // remember where the selected depths need to go
+        ismnDialog.find(field_selector).val(hiddenId); // remember where the selected depths need to go
         return default_values
     }
 
     function getDefaultRanges(e){
-        var default_val = getDefaultParams(e)
+        var default_val = getDefaultParams(e, '#id_target_hidden_input_depth')
         var range = default_val.split(',')
         $('#depth_from').val(parseFloat(range[0]))
         $('#depth_to').val(parseFloat(range[1]))
         range = [$('#depth_from').val(), $('#depth_to').val()]
         return range
     }
+
     $('#ismn_depth').on('show.bs.modal', function(e){
-        getDefaultRanges(e)
+      getDefaultRanges(e)
     });
 
-<!--Monika-->
+
 
 </script>

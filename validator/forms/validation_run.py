@@ -1,4 +1,5 @@
 from datetime import datetime
+from validator.validation.globals import START_TIME, END_TIME
 
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -26,6 +27,7 @@ class ValidationRunForm(forms.ModelForm):
             'min_lon',
             'max_lat',
             'max_lon',
+            'tcol',
             ]
 
     scaling_ref = forms.fields.ChoiceField(choices=[(ValidationRun.SCALE_TO_REF, 'Reference'), (ValidationRun.SCALE_TO_DATA, 'Data'), ])
@@ -49,8 +51,9 @@ class ValidationRunForm(forms.ModelForm):
         self.fields['min_lon'].initial = -11.20
         self.fields['max_lat'].initial = 71.60
         self.fields['max_lon'].initial = 48.30
-        self.fields['interval_from'].initial = datetime(1978, 1, 1).strftime('%Y-%m-%d')
-        self.fields['interval_to'].initial = datetime.now().strftime('%Y-%m-%d')
+        self.fields['interval_from'].initial = START_TIME
+        self.fields['interval_to'].initial = END_TIME
+
 
     def clean(self):
         values = super(ValidationRunForm, self).clean()

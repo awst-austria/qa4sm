@@ -1,11 +1,18 @@
-QA4SM v1.2.1 - Release notes 2020-07-20
+QA4SM v1.4.0 - Release notes 2020-12-02
 =======================================================
 
-# Changes
+# New features
 
-1. Fix bug that hides DOIs for published validations if user is not the owner
-2. ISMN Test data set is no longer the default reference data set
-3. When deleting a validation result user is now redirected back to overview page
-4. Fix landing page for mobile devices
-5. Add more SMOS-IC filters
-6. Fixes for the auto-cleanup process
+1.  ESA CCI (A, P, C) and C3S datasets from now on can also be used as the reference.
+
+# Improvements
+
+1. ISMN networks selection now depends on the chosen version;
+2. Possibility of switching off scaling added;
+3. Added calendar widget for picking time range of validation.
+
+# Other changes
+
+1. Corrected time range and soil moisture geophysical range for CCI Active dataset;
+2. Displaying filter list for SMOS dataset improved;
+3. Admin panel developed - statistics on the service retrieved.

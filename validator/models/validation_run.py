@@ -23,8 +23,10 @@ class ValidationRun(models.Model):
     MEAN_STD = 'mean_std'
     LIN_CDF_MATCH = 'lin_cdf_match'
     CDF_MATCH = 'cdf_match'
+    NO_SCALING = 'none'
 
     SCALING_METHODS = (
+        (NO_SCALING, 'No scaling'),
         (MIN_MAX, 'Min/Max'),
         (LINREG, 'Linear regression'),
         (MEAN_STD, 'Mean/standard deviation'),
@@ -81,6 +83,8 @@ class ValidationRun(models.Model):
 
     doi = models.CharField(max_length=255, blank=True)
     publishing_in_progress = models.BooleanField(default=False)
+
+    tcol = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration

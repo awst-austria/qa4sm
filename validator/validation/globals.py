@@ -1,4 +1,5 @@
 from django.conf import settings
+from datetime import datetime
 
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
@@ -20,9 +21,9 @@ METRICS = {'R' : 'Pearson\'s r',
 METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_",
                    "{metric}"]
 
-TC_METRICS = {'snr': 'Signal-to-noise ratio',
-              'err_std': 'Error standard deviation',
-              'beta': 'TC scaling coefficient',}
+TC_METRICS = {'snr': 'TC: Signal-to-noise ratio',
+              'err_std': 'TC: Error standard deviation',
+              'beta': 'TC: Scaling coefficient',}
 
 TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
                       "_{metric}",
@@ -79,3 +80,13 @@ ERA5_LAND_sm = 'ERA5_LAND_sm'
 ESA_CCI_SM_P_sm = 'ESA_CCI_SM_P_sm'
 ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
+
+NOT_AS_REFERENCE = [SMAP, SMOS, ASCAT]
+
+IRREGULAR_GRIDS = {'SMAP' : 0.35,
+                   'SMOS' : 0.25,
+                   'ASCAT' : 0.1}
+
+START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
+END_TIME = datetime.now().strftime('%Y-%m-%d')
+

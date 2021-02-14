@@ -91,7 +91,13 @@
                             <li>Validation metrics calculated from absolute values.</li>
                         {% endif %}
 
-                        <li>Scaling reference: {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
+                        <li>Triple collocation analysis was
+                            {% if val.tcol %} activated. {% else %} deactivated. {% endif %}
+                        </li>
+
+                        {% if val.scaling_method != 'none' %}
+                            <li>Scaling reference:
+                            {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
                                     [Filters:
                                     {% if not val.scaling_ref.filters.all and not val.scaling_ref.parametrisedfilter_set.all %}
                                         none
@@ -99,7 +105,11 @@
                                         {% for filter in val.scaling_ref.filters.all %} {{ filter.description }}; {% endfor %}
                                         {% for pfilter in val.scaling_ref.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}
                                     {% endif %}]
-                        </li>
+                            </li>
+                        {% else %}
+                            <li>Scaling reference: {{ val.get_scaling_method_display }}.</li>
+                        {% endif %}
+
                         <li>Scaling method: {{ val.get_scaling_method_display }}.</li>
 
                         <li>Processing took {{ run_time }} minutes (wall time).</li>
@@ -197,7 +207,7 @@
                             <select id="id_graph_metric" style="width: 18rem;" name="graph_variable"
                                 title="Metric to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for key, label in metrics.items %}
+                                {% for label, key in metrics.items %}
                                     <option value="{{ key }}">{{ label }}</option>
                                 {% endfor %}
                             </select>
@@ -205,8 +215,8 @@
                             <select id="id_graph_pair" style="width: 18rem;" name="graph_pair"
                                 title="Dataset pair to show in the graphs"
                                 class="btn custom-select custom-select-sm d-block btn-select mx-3">
-                                {% for pair in pairs %}
-                                    <option value="{{ pair }}">{{ pair }}</option>
+                                {% for combi_short, combi_pretty in combis.items %}
+                                    <option value="{{ combi_short }}">{{ combi_pretty }}</option>
                                 {% endfor %}
                             </select>
 
@@ -234,6 +244,19 @@
 
 {% block javascript %}
 <script type="text/javascript">
+
+    function fileExists(urlToFile) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('HEAD', urlToFile, false);
+        xhr.send();
+
+        if (xhr.status == "404") {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     function changeBoxplot(metric) {
         var metric = $("#id_graph_metric").val()
         var labels = {{json_metrics|safe}}
@@ -257,11 +280,20 @@
         } else {
             overview_url = '{{ val.output_dir_url }}' + 'overview_' + pair + '_' + metric + '.png';
         }
+
+        var map_exists = fileExists(overview_url);
+
+        if (map_exists == false) {
+            overview_label = 'Please change metric and/or data set group.';
+            overview_url = "javascript:void(0)";
+            $("#id_overview_link").attr("href", "javascript:void(0)");
+        } else {
+            $("#id_overview").attr("title", overview_label);
+        }
         $("#id_overview").attr("src", overview_url);
-        $("#id_overview").attr("alt", overview_label);
-        $("#id_overview").attr("title", overview_label);
         $("#id_overview_link").attr("href", overview_url);
         $("#id_overview_label").html(overview_label);
+        $("#id_overview").attr("alt", "No map for the selected metric / data set combination found.");
     }
 
     // change the plots when the selection of metric and/or dataset pair is changed

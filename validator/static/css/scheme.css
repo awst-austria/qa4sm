@@ -63,6 +63,24 @@
     background-color: rgba(71, 96, 229,.5);
 }
 
+.custom-switch .custom-control-input[name='ref-parametrised_filters']:disabled:checked ~ .custom-control-label::after {
+    visibility: hidden;
+}
+
+.custom-switch .custom-control-input[name='ref-parametrised_filters']:disabled:checked ~ .custom-control-label::before {
+    background-color: rgba(71, 96, 229, 1);
+    width: 1rem;
+    margin-left: 0.35rem;
+}
+
+
+.custom-switch .custom-control-input[name='ref-parametrised_filters']:disabled:checked+label{
+    color: #000;
+}
+#dc_form_container div > label.custom-control-label{
+  width: 95%;
+}
+
 .alert-danger {
     color: rgb(255, 108, 92);
     background-color: rgba(255, 108, 92, .15);
@@ -301,3 +319,20 @@ label[for="depth_from"]{
     margin-right: .12rem;
 }
 
+button.ui-datepicker-current {
+    display: none;
+}
+
+button.ui-datepicker-close.ui-state-default.ui-priority-primary.ui-corner-all {
+    float: right;
+    font-weight: normal;
+    background: #00AAE3;
+    color: #FFFFFF
+}
+select.ui-datepicker-year, select.ui-datepicker-month {
+  border-radius: 5px;
+  background: #fff;
+}
+button.ui-datepicker-trigger{
+  margin-left: 7px;
+}

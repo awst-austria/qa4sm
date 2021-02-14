@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}">
+    <form action="{% url 'validation' %}" method="post" id="validation_form" data-options-url="{% url 'ajax_get_dataset_options' %}" version-options-url="{% url 'ajax_get_version_id' %}" version-info-url="{% url 'ajax_get_version_info' %}">
         {% csrf_token %}
 
         {% with WIDGET_ERROR_CLASS='is-invalid' %}
@@ -163,6 +163,7 @@
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text addon-w" id="ref-addon2">Version</span>
                                                 </div>
+                                                <input type="hidden" id="id_target_hidden_input_version" value="" name="target_hidden_input_version">
                                                 {% render_field ref_dc_form.version class="custom-select" %}
                                             </div>
                                             {% for error in ref_dc_form.version.errors %}
@@ -338,7 +339,40 @@
                             </div>
                         </div>
                     </div>
+                    <div class="card-deck">
+                        <div id="metrics_accordion" style="width:100%">
+                            <div class="card mb-4 shadow-sm">
+                                <div class="card-header" id="metrics_header">
+                                    <h4 class="my-0 font-weight-normal">Metrics</h4>
+                                    <div class="card-menu">
+                                        <span class="input-group-text fas fa-question-circle help-icon"
+                                            title="Specify metrics to calculate. Basic metrics between data set pairs are always calculated."></span>
+                                        <a class="input-group-text" data-toggle="collapse" href="#metrics_collapse" role="button" aria-expanded="true" aria-controls="metrics_collapse">
+                                            <span class="fa fa-plus-circle" title="Expand"></span>
+                                            <span class="fa fa-minus-circle" title="Collapse"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div id="metrics_collapse" class="collapse show" aria-labelledby="metrics_header" data-parent="#metrics_accordion">
+                                    <div class="card-body">
 
+                                        <div class="container">
+                                            <div class="row">
+                                                 <div class="custom-control custom-switch">
+                                                    <input id="tcol" class="custom-control-input" name="tcol" type="checkbox" disabled="true">
+                                                    <label class="custom-control-label" for="tcol">Include Triple Collocation Metrics &nbsp;</label>
+                                                 </div>
+
+                                                <span class="input-group-text fas fa-question-circle help-icon"
+                                                    title="Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.">
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-deck">
                         <div id="anom_accordion" style="width:100%">
                             <div class="card mb-4 shadow-sm">
@@ -434,20 +468,6 @@
                                         <div class="container">
                                             <div class="row">
 
-                                                <div class="col-sm px-0 pr-sm-2 pb-1 py-sm-0">
-                                                    <div class="input-group">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
-                                                        </div>
-                                                        {% render_field val_form.scaling_ref class="custom-select" %}
-                                                    </div>
-                                                    {% for error in val_form.scaling_ref.errors %}
-                                                        <div class="custom-invalid-feedback">
-                                                            {{ error }}
-                                                        </div>
-                                                    {% endfor %}
-                                                </div>
-
                                                 <div class="col-sm px-0 pl-sm-2 pt-1 py-sm-0">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
@@ -456,6 +476,20 @@
                                                         {% render_field val_form.scaling_method class="custom-select" %}
                                                     </div>
                                                     {% for error in val_form.scaling_method.errors %}
+                                                        <div class="custom-invalid-feedback">
+                                                            {{ error }}
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+
+                                                 <div class="col-sm scaling-ref px-0 pr-sm-2 pb-1 py-sm-0">
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-text addon-w" id="scaling_addon1">Scale To</span>
+                                                        </div>
+                                                        {% render_field val_form.scaling_ref class="custom-select" %}
+                                                    </div>
+                                                    {% for error in val_form.scaling_ref.errors %}
                                                         <div class="custom-invalid-feedback">
                                                             {{ error }}
                                                         </div>
@@ -527,6 +561,7 @@
 
     <link rel="stylesheet" href="/static/leaflet/leaflet.draw.css" />
     <script src="/static/leaflet/leaflet.draw.js"></script>
+
 
     <script type="text/javascript">
         var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
@@ -633,7 +668,9 @@
         function ajax_change_dataset() {
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
+            // var datasetName = $(this).text();
             var widgetId = $(this).attr('id');
+            var datasetName = $(`#${widgetId} option[value=${datasetId}]`).text();
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
             $.ajax({
@@ -649,9 +686,125 @@
                     $(variable_widget).html(return_data['variables']);
                     $(filter_widget).html(return_data['filters']);
                     $(param_filter_widget).html(return_data['paramfilters']);
+
+                    if(datasetName=='ISMN'){
+                        var default_value = $(version_widget).find('option')[0].value;
+                        $('#id_target_hidden_input_version').val(default_value);
+                    } else{
+                        $('#id_target_hidden_input_version').val('');
+                    };
+                    start_ajax_to_set_valiadtion_period();
                 }
             });
+
         }
+
+        function ajax_take_versions_info(versionIds, funcs_set, args_names) {
+          /**
+           * Use ajax to read info of given dataset versions;
+           * @param  {object} versionIds list of version ids
+           * @param  {object} funcs_set  list of name of functions to be called
+           * @param  {object} args_names  list of name of arguments returned by ajax, which are passed to given functions
+           *
+           *
+           Example:
+           ajax_take_versions_info(versionsIds, [func1, func2, func3], [['intervals_from'], ['intervals_to'], ['intervals_from', 'intervals_to']])
+           will call func1 with argument 'intervals_from', func2 with 'intervals_to' and func3 with both of them.
+           Functions passed as a list must accept only one object-like argument.
+          */
+            var url = $("#validation_form").attr("version-info-url");
+            $.ajax({
+                url: url,
+                traditional: true,
+                data: {'version_id': versionIds},
+                success: function (return_data) {
+                  var intervals_from = return_data['intervals_from'];
+                  var intervals_to = return_data['intervals_to'];
+                  // calling functions given in the functions list
+                  ind = 0
+                  for (func in funcs_set){
+                    // taking values of arguments passed in the parameter args_names and creating a list of their values
+                    param_list = get_list_of_params(arguments[0], args_names[ind]);
+                    funcs_set[func](param_list);
+                    ind++;
+                  };
+                }
+            });
+          };
+
+          function get_list_of_params(args, args_names){
+            /**
+             * Returns a list of values assinged to arguments which names are give in args_names;
+             * @param  {object} args list of arguments returned by ajax function: arguments[0]
+             * @param  {object} args_names list of names of arguments returned by the ajax function which should be passed further
+            */
+            param_list = [];
+            for (arg_name in args_names){
+              var name = args_names[arg_name];
+              param_list.push(args[name]);
+            };
+            return param_list
+          };
+
+          function find_current_ids(){
+            // Finds all selects which have 'version' in name attribute
+            var versions_list = $('select[name*=version]');
+            var ids_list = [];
+            for(ind=0; ind<versions_list.length; ind++){
+              var version_id = parseInt(versions_list[ind].value);
+              if (!isNaN(version_id)){
+                ids_list.push(version_id)
+              };
+            };
+            return ids_list;
+          };
+//=========================== Time range related functions =====================================================
+          function convert_date_to_string(date){
+            // Converts date from Date() constructor to date format YYYY-MM-DD
+            var year = date.getFullYear();
+            var month = date.getMonth()+1;
+            if(month<=9){month = '0'+month};
+            var day = date.getDate();
+            if(day<=9){day = '0' + day};
+            return year + '-' + month + '-' + day;
+          };
+
+          function compare_and_set_time_ranges(params){
+            /**
+             * Compares given time ranges and sets the appropriate ones
+                into From and To fields in Validation Period section
+             * @param  {object} params list consisting of two lists: intervals_from and intervals_to
+            */
+
+            // take appropriate elements from params
+            var intervals_from = params[0];
+            var intervals_to = params[1];
+            dates_from = [];
+            dates_to = [];
+            // convert string into date
+            for (ind=0; ind<intervals_from.length; ind++){
+              dates_from.push(new Date(intervals_from[ind]));
+              dates_to.push(new Date(intervals_to[ind]));
+            };
+
+            // get maximum date from and minimum date to
+            var max_date_from = new Date(Math.max.apply(null, dates_from));
+            var min_date_to = new Date(Math.min.apply(null, dates_to));
+
+            //reconvert date to string
+            var max_date_from_str = convert_date_to_string(max_date_from);
+            var min_date_to_str = convert_date_to_string(min_date_to);
+
+            //set appropriate values
+            $('#id_interval_from').val(max_date_from_str);
+            $('#id_interval_to').val(min_date_to_str);
+          }
+
+          function start_ajax_to_set_valiadtion_period(){
+            var versionIds = find_current_ids();
+            ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
+          }
+//================================================================================
 
         function change_tab_name() {
             var datasetName = $(this).find('option:selected').text();
@@ -661,15 +814,33 @@
 
         {% for dc_form in dc_formset.forms %}
             $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
+            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_valiadtion_period)
         {% endfor %}
+
+        function get_version_id(){
+            var versionId = $(this).val();
+            $('#id_target_hidden_input_version').val(versionId)
+            // additionally set up default networks
+            var hiddenField = $('#id_target_hidden_input')
+            if(hiddenId = $('#id_target_hidden_input').val()){
+              var hiddenId = $('#id_target_hidden_input').val()
+              var default_params = $('#' + hiddenId).attr('data-default_val')
+              $('#' + hiddenId).val(default_params)
+            }
+        }
+
+
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
+        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
+
+
     </script>
 
     <script type="text/javascript">
         function onChangeAnomalies() {
             var anomMethod = $(this).val();
             var dateBoxes = $('div.anomalies-period');
-            var dateSelectors = dateBoxes.find('select')
+            var dateSelectors = dateBoxes.find('select');
 
             if(anomMethod == 'climatology') {
                 dateSelectors.prop('disabled', false);
@@ -680,6 +851,20 @@
             }
         }
         $('#{{ val_form.anomalies.auto_id }}').change(onChangeAnomalies).change(); // last change() to call change on pageload
+    </script>
+
+    <script type="text/javascript">
+        function onChangeScaleMethod() {
+            var scaleMethod = $(this).val();
+            var scaleRefBox = $('div.scaling-ref');
+
+            if(scaleMethod == 'none') {
+                scaleRefBox.css('visibility', 'hidden');
+            } else {
+                scaleRefBox.css('visibility', 'visible');
+            }
+        }
+        $('#{{ val_form.scaling_method.auto_id }}').change(onChangeScaleMethod).change(); // last change() to call change on pageload
     </script>
 
     <script type="text/javascript">
@@ -742,15 +927,10 @@
             if ( totalNoForms >= $(maxSelector).val() ) {
                 addButton.hide();
             }
-           // show remove button and change its
+           // show remove button
             if ( totalNoForms > 1 ) {
-<!--                $(newButton).css('margin-left', '0.3rem')-->
                 newButton.show();
             }
-<!--            if (totalNoForms == $(maxSelector).val()) {-->
-<!--                $(removeButton).css('margin-left', 'auto');-->
-<!--            }-->
-
 
             // trigger change event on dataset select so that dependent parameters are set correctly
             $('#' + newId + '-dataset').change();
@@ -761,11 +941,28 @@
             $("#id_scaling_ref").val("ref");
         }
 
+        function addScalingData() {
+            $("#id_scaling_ref").append(new Option('Data', 'data'))
+        }
+
         $('#add_dc_form').click(function() {
             cloneTab('.dc_form', '.dc_form_link', 'datasets', $('#remove_dc_form') ,$(this));
             setScalingRef();
+            setTcLock();
         });
 
+        function setTcLock() {
+            var formsetPrefix = 'datasets';
+            var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
+            var totalNoForms = $(totalSelector).val();
+            var n_datasets = parseInt(totalNoForms) + 1
+            if ( n_datasets >= 3) {
+                $('#tcol').prop('disabled', false);
+            } else {
+                $('#tcol').prop('checked', false);
+                $('#tcol').prop('disabled', true);
+            }
+        }
     </script>
 
     <script type="text/javascript">
@@ -805,7 +1002,7 @@
                 tab_to_remove.remove()
                 container_to_remove.remove()
 
-            // showing add button again
+            // showing add button again and the possibility of scaling data
                 totalNoForms--
                  $(totalSelector).val(totalNoForms);
                  if (totalNoForms < $(maxSelector).val()) {
@@ -813,6 +1010,7 @@
                     }
                  if (totalNoForms == 1) {
                         removeButton.hide();
+                        addScalingData()
                     }
 
                 // changing attributes of following items
@@ -820,7 +1018,7 @@
 
                     var current_tab = $(all_next_tabs[i])
                     var current_container = $(all_next_containers[i])
-                    console.log('current container', current_container)
+
 
                     var old_id = current_container.attr('id')
 
@@ -873,22 +1071,92 @@
                     prev_container.toggleClass('active show')
                 }
             }
+        setTcLock();
         }
 
         $('#remove_dc_form').click(function() {
             removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
+            start_ajax_to_set_valiadtion_period();
         });
 
         function shiftTheButton(obj, buttonSelector){
             var currentObject = obj.currentTarget
             var removeButton = $(buttonSelector)
             $(currentObject).after(removeButton)
+
+
 }
-
-
-
 
     </script>
 
-{% endblock %}
+    <!-- datepicker widget -->
+    <link href ="/static/css/jquery-ui.css" rel = "stylesheet">
+    <script src="/static/js/jquery-ui-1.12.1.js"></script>
+    <script>
+    function setTheDate(){
+      // This is a function which set chosen date in the input field when
+      // a change of a month or a year is done
 
+      // need to know what casuses the change
+      var event_target = event.target;
+      var tagName = event_target.tagName;
+      day = '01' // always set the first day, it's not that important
+      var year = parseInt($('select.ui-datepicker-year').val());
+      if(tagName=='SELECT'){
+        // if it is a select just take a month number and add 1 because they start with 0
+        var month = parseInt($('select.ui-datepicker-month').val()) + 1;
+      } else if (tagName=='SPAN' || tagName=='A') {
+        // if changes are done with arrows I am taking it from the field and
+        // just add or subtract 1
+        var month = parseInt($(this).val().slice(-5, -3));
+        if(event_target.textContent=='Next'){
+          month += 1
+          // change of the year
+          if(month>12){
+            month = 1;
+            year +=1;
+          };
+        } else if (event_target.textContent=='Prev') {
+          month -= 1
+          // change of the year
+          if (month == 0){
+            month = 12;
+            year -= 1;
+          };
+        };
+      };
+
+      // add zero to look nice
+      if(month<=9){month = '0' + month};
+      // set the appropriate date
+      $(this).val(year+'-'+month+'-'+day);
+    }
+    
+    var today = new Date()
+    var todays_year = today.getFullYear()
+    var today_str = todays_year + '-' + (today.getMonth()+1) + '-' + today.getDate()    
+        
+    var dates_settings = {
+      dateFormat:'yy-mm-dd',
+      changeMonth: true,
+      changeYear: true,
+      showButtonPanel: true,
+      onChangeMonthYear: setTheDate,
+      closeText: 'Apply',
+      showMonthAfterYear: true,
+      navigationAsDateFormat: true,
+      showOn: "button",
+      buttonText: "",
+      minDate: '1978-01-01',
+      maxDate: today_str,
+      yearRange: '1978:'+todays_year
+    }
+
+     $(function() {
+        $( "#id_interval_from" ).datepicker(dates_settings);
+        $( "#id_interval_to" ).datepicker(dates_settings);
+     });
+    </script>
+
+
+{% endblock %}
