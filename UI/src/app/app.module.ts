@@ -12,11 +12,14 @@ import {CarouselModule} from 'primeng/carousel';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {GalleriaModule} from 'primeng/galleria';
 import {ButtonModule} from 'primeng/button';
-import { ErrorComponent } from './pages/error/error.component';
+import {ErrorComponent} from './pages/error/error.component';
 import {CardModule} from 'primeng/card';
-import { ValidationsComponent } from './pages/validations/validations.component';
-import { ValidationComponent } from './pages/validation/validation.component';
-import { LoginComponent } from './pages/login/login.component';
+import {ValidationsComponent} from './pages/validations/validations.component';
+import {ValidationComponent} from './pages/validation/validation.component';
+import {LoginComponent} from './pages/login/login.component';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
+import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
 
 
 @NgModule({
@@ -30,9 +33,11 @@ import { LoginComponent } from './pages/login/login.component';
     LoginComponent
   ],
   imports: [
+    LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
     NavigationBarModule,
     FormsModule,
     BrowserModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     AppRoutingModule,
     MenubarModule,
@@ -43,7 +48,11 @@ import { LoginComponent } from './pages/login/login.component';
 
   ],
   providers: [
-
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpTokenInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

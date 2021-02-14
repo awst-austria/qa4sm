@@ -22,4 +22,8 @@ export class LoginComponent implements OnInit {
 
   }
 
+  loginClick() {
+    this.loginService.login();
+  }
+
 }
