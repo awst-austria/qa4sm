@@ -2,10 +2,15 @@ from django.contrib import auth
 from django.contrib.auth import login
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from rest_framework import status, serializers, authentication
+from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
+
+from api.endpoints.UsersView import UserSerializer
+
+# Predefined response bodies
+resp_invalid_credentials = JsonResponse({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+resp_unauthorized = JsonResponse({'message': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST', 'GET'])
@@ -13,7 +18,11 @@ from rest_framework.response import Response
 @ensure_csrf_cookie
 def api_login(request):
     """
-    Authentication endpoint POST: Request body: {"username":"username","password":"password"}
+    Authentication endpoint that handles login requests.
+
+    POST:
+        Login request
+        Request body: LoginDto
 
     GET:
         Response body: User object if logged in. Otherwise HTTP-401(Unauthorized)
@@ -24,7 +33,7 @@ def api_login(request):
 
         login_serializer = LoginDtoSerializer(data=request.data)
         if not login_serializer.is_valid():
-            return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return resp_invalid_credentials
 
         login_data = login_serializer.create()
 
@@ -33,15 +42,17 @@ def api_login(request):
         if user:
             if user is not None:
                 login(request, user)
-                return JsonResponse({"detail": "Success"})
+                user_serializer = UserSerializer(request.user)
+                return JsonResponse(user_serializer.data)
 
-        return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return resp_invalid_credentials
 
     elif request.method == 'GET':
         if request.user.is_authenticated:
-            return JsonResponse({"message": "Authenticated"})
+            user_serializer = UserSerializer(request.user)
+            return JsonResponse(user_serializer.data)
         else:
-            return Response({'message': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            return resp_unauthorized
 
 
 class LoginDto(object):
