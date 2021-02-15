@@ -104,7 +104,7 @@ pip install Equi7Grid
 pip install pytileproj
 pip install git+https://github.com/TUW-GEO/veranda.git ## no public release yet...
 pip install geopathfinder
-pip install qa4sm-reader>=0.3.3
+pip install qa4sm-reader
 
 cd $TEMP_DIR
 
