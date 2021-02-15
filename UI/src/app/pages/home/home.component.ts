@@ -1,4 +1,5 @@
 import {Component, OnInit} from '@angular/core';
+import {AuthService} from '../../modules/core/services/auth/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -12,10 +13,13 @@ export class HomeComponent implements OnInit {
     'assets/landing_page_images/root-zone_soil_moisture_may_2016.jpg',
   ];
 
-  constructor() {
+  loginButtonDisabled: boolean = false;
+
+  constructor(private authService: AuthService) {
   }
 
   ngOnInit(): void {
+    this.authService.authenticated.subscribe(authenticated => this.loginButtonDisabled = authenticated);
   }
 
 }
