@@ -8,5 +8,5 @@
 
     # Rewrite everything else to index.html
     # to allow html5 state links
-    RewriteRule ^ /ui/index.html [L]
+    RewriteRule ^ index.html [L]
 </IfModule>
