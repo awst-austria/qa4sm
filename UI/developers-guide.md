@@ -1,0 +1,102 @@
+QA4SM Angular UI
+================
+
+Table of content
+
+## Development environment - build tools
+Necessary software packages to run and build the UI
+- Node.js (v14)
+- npm (6.14.8)
+- angular-cli (11.0.7)
+
+
+
+### Node.js installation
+```
+curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+### npm
+npm comes with Node.js, no extra step is needed.
+
+### Angular CLI installation
+Install angular cli
+```
+npm install -g @angular/cli
+```
+[General dev. env. setup guide from angular](https://angular.io/guide/setup-local)
+
+## Building the project
+The project root directory is `qa4sm/UI`
+Enter the root directory and execute:
+```
+npm install
+```
+In this step npm will install all necessary dependencies for the project. These dependencies are 
+defined in
+`package.json` and `package-lock.json`.
+
+## Starting the project
+After installing the project dependencies the angular application can be started by 
+executing `npm run start-with-path`. This is custom command defined in `package.json`.  
+
+This is basically an alias for `ng serve --deploy-url /ui/ --base-href /ui/`.  
+Since django runs in the root context, the UI application needs another one. (We don't want to 
+mix django, django rest and angular urls). The angular application has the /ui/ context path, 
+all relative urls defined in the application are relative to this path.
+
+During the startup the server also compiles project. Once it's done the application is reachable 
+at http://localhost:4200/ui
+
+### Development reverse proxy
+The system (django+UI) uses http cookies for authentication, session management and CSRF 
+protection.  
+Browsers are very strict when it comes to cookies and cross origin resource sharing which would 
+mean a lot of trouble if the django api and the UI would be available on different urls. 
+(like `http://localhost:8000/api` and `http://localhost:4200/ui`)  
+
+Luckily the angular dev. server has built-in reverse proxy functionality that can be used to resolve
+such issues in the development environment. `src/proxy.conf.json` contains the necessary 
+configuration.  
+Using this reverse proxy the django api will also be available at `http://localhost:4200/api` 
+which will make the browsers happy. 
+
+The reverse proxy starts automatically with `npm run start-with-path`, no extra command is needed.  
+However, it expects the django api at `http://localhost:8000/api`. If you have the django application
+running somewhere else (different ip or different port) you need to adjust `src/proxy.conf.json`
+
+# Project structure
+For those who are new to Angular I can highly recommend watching [this introductory course](https://www.youtube.com/watch?v=9RG3MiEBEIw&list=PLqq-6Pq4lTTb7JGBTogaJ8bm7f8VCvFkj)
+or at least the [2nd video of the series](https://www.youtube.com/watch?v=u8QF9QIiGHI&list=PLqq-6Pq4lTTb7JGBTogaJ8bm7f8VCvFkj&index=2) in 
+order to get a basic understanding of the framework and how it is different from
+traditional web development.  
+You can of course visit the official   [Angular website](https://angular.io/guide/architecture) too for details.
+
+
+The project make use of all angular building blocks (module, component, service)
+These blocks are structured into the following tree:
+```bash
+-app
+ |-modules
+ | |-module-x
+ | | |-component-x-1
+ | | |-component-x-2
+ | | |-service-x-1
+ | | |-service-x-2
+ | |-module-y
+ | | |-component-y-1
+ | | |-component-y-2
+ | | |-service-y-1
+ | | |-service-y-2
+ |-pages
+ | |-page-x
+ | |-page-y
+```
+
+## Pages
+Pages are angular components that implement the [main section](#page-layout) 
+of each *page*
+
+## Page layout
+
