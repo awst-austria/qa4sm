@@ -79,13 +79,13 @@ class TestValidation(TestCase):
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
         data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
-        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
+        data_c.variable = DataVariable.objects.get(short_name='ssm')
         data_c.save()
 
         ref_c = DatasetConfiguration()
         ref_c.validation = run
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
-        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V201912')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20191211')
         ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         ref_c.save()
 
@@ -276,13 +276,10 @@ class TestValidation(TestCase):
         for config in run.dataset_configurations.all():
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            else:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
 
-        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',\
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='WEGENERNET',\
                                      dataset_config=run.reference_configuration)
         pfilter.save()
         # add filterring according to depth_range with the default values:
@@ -322,7 +319,6 @@ class TestValidation(TestCase):
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
@@ -349,11 +345,11 @@ class TestValidation(TestCase):
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
     @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
     @pytest.mark.long_running
-    def test_validation_gldas_ref(self):
+    def test_validation_smos_ref(self):
         run = self.generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
+        run.reference_configuration.dataset = Dataset.objects.get(short_name='SMOS')
         run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
         run.reference_configuration.variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -880,8 +876,9 @@ class TestValidation(TestCase):
         max_lat = 20.375  # ur
         max_lon = -154.625  # ur
 
+        return # todo: not dataset yet available
         # we need the reader just to get the grid
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'), DatasetVersion.objects.get(short_name='C3S_V201812'))
+        cgls_reader = val.create_reader(Dataset.objects.get(short_name='CGLS_CSAR_SSM1km'), DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1'))
         gpis, lons, lats, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
@@ -967,8 +964,6 @@ class TestValidation(TestCase):
     @pytest.mark.graphs
     def test_generate_graphs(self):
         infile1 = 'testdata/output_data/c3s_ismn.nc'
-        infile2 = 'testdata/output_data/c3s_gldas.nc'
-        infile3 = 'testdata/output_data/c3s_era5land.nc'
 
         # create validation object and data folder for it
         v = self.generate_default_validation()
@@ -998,44 +993,5 @@ class TestValidation(TestCase):
         # remove results from first test and recreate dir
         shutil.rmtree(run_dir)
         val.mkdir_if_not_exists(run_dir)
-
-        # do the same for the other netcdf file
-
-        shutil.copy(infile2, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        # heatmap
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
-
-        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
-        self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == n_metrics
-
-        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
-
-        # remove results from first test and recreate dir
-        shutil.rmtree(run_dir)
-        val.mkdir_if_not_exists(run_dir)
-
-        # do the same for the other netcdf file
-
-        shutil.copy(infile3, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        # heatmap
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
-        v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
-
-        boxplot_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
-        self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == n_metrics
-
-        overview_pngs = [ x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
-
 
         self.delete_run(v)

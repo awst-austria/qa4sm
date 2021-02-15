@@ -25,8 +25,8 @@
         "model": "validator.datavariable",
         "pk": 15,
         "fields": {
-            "short_name": "CGLS_CSAR_SSM1km",
-            "pretty_name": "ssm",
+            "short_name": "S1_SSM",
+            "pretty_name": "Surface_Soil_Moisture",
             "help_text": "-",
             "min_value": 0.0,
             "max_value": 100.0

@@ -28,8 +28,8 @@
             "short_name": "CGLS_CSAR_SSM1km_V1_1",
             "pretty_name": "V1.1",
             "help_text": "CGLS Sentinel1 SSM 1km (TIF) product",
-            "time_range_start": "",
-            "time_range_end": ""
+            "time_range_start": "2014-10-03",
+            "time_range_end": "2020-08-31"
         }
     }
 

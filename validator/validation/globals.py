@@ -49,11 +49,9 @@ DEFAULT_DATASET = CGLS_CSAR_SSM1km
 DEFAULT_REFERENCE = ISMN
 
 
-NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, SMOS]
+NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km]
 
-IRREGULAR_GRIDS = {'SMAP' : 0.35,
-                   'SMOS' : 0.25,
-                   'ASCAT' : 0.1}
+IRREGULAR_GRIDS = {'SMOS' : 0.25}
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
