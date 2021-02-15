@@ -520,7 +520,7 @@ class TestValidation(TestCase):
 
     # @pytest.mark.long_running
     def test_validation_smap_ref(self):
-        run = self.generate_default_validation()
+        run = generate_default_validation()
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP)
