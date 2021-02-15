@@ -14,8 +14,7 @@ output
 testdata/
 junit.xml
 emails
-/static/*
-!/static/files/
+/static/
 run_celery/
 .coverage*
 */python_metadata/*
