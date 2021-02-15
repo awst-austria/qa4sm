@@ -39,21 +39,21 @@ defined in
 
 ## Starting the project
 After installing the project dependencies the angular application can be started by 
-executing `npm run start-with-path`. This is custom command defined in `package.json`.  
+executing `npm run start-with-path`. This custom command is defined in `package.json`.  
 
 This is basically an alias for `ng serve --deploy-url /ui/ --base-href /ui/`.  
 Since django runs in the root context, the UI application needs another one. (We don't want to 
 mix django, django rest and angular urls). The angular application has the /ui/ context path, 
 all relative urls defined in the application are relative to this path.
 
-During the startup the server also compiles project. Once it's done the application is reachable 
+During the startup the server also compiles the project. Once it's done the application is reachable 
 at http://localhost:4200/ui
 
 ### Development reverse proxy
 The system (django+UI) uses http cookies for authentication, session management and CSRF 
 protection.  
 Browsers are very strict when it comes to cookies and cross origin resource sharing which would 
-mean a lot of trouble if the django api and the UI would be available on different urls. 
+mean a lot of trouble if the django api and the UI would be available on different hosts. 
 (like `http://localhost:8000/api` and `http://localhost:4200/ui`)  
 
 Luckily the angular dev. server has built-in reverse proxy functionality that can be used to resolve
@@ -74,7 +74,7 @@ traditional web development.
 You can of course visit the official   [Angular website](https://angular.io/guide/architecture) too for details.
 
 
-The project make use of all angular building blocks (module, component, service)
+The project makes use of all angular building blocks (module, component, service)
 These blocks are structured into the following tree:
 ```bash
 -app
@@ -96,7 +96,30 @@ These blocks are structured into the following tree:
 
 ## Pages
 Pages are angular components that implement the [main section](#page-layout) 
-of each *page*
+of each *page* that is reachable via a URL. Pages are the top level components that integrate other, 
+smaller components in order to offer a specific, complex feature.
+
+Example: Home page, Validate page, User profile page, etc
+
+## Modules
+A module is a high level building block that has one or more components.
+
+Example module: a password change dialog, dataset and version selector panel, a specific dataset filter
+
+## Components
+Components build up modules. Number of components in a module depends on the complexity of the module.
+Components responsible for **presenting and collecting data** to and from the user. 
+Further processing this data or sending it to the backend is a job for the services.
+
+## Services
+Services implement the "business logic" of the UI.
+Tasks that belong to the services are:
+- handling http communication with the backend
+- managing application state (e.g.: user login status)
+
 
 ## Page layout
+The application has two sections at the moment:
+- header: navigation bar on top of the page
+- main section: the rest of the page under the header
 
