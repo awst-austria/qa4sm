@@ -3,7 +3,7 @@ from django.urls import path
 
 from api.endpoints.LoginView import api_login
 from api.endpoints.PathVarTestEndpoint import path_var_get
-from api.endpoints.UsersView import users
+from api.endpoints.UserCRUDView import users
 
 # schema_view = get_schema_view(
 #     openapi.Info(

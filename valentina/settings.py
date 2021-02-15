@@ -32,7 +32,6 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'validator.apps.ValidatorConfig',
-    'corsheaders',
     'drf_yasg',
     'rest_framework',
     'django.contrib.admin',
@@ -67,7 +66,6 @@ SWAGGER_SETTINGS = {
 MIDDLEWARE = [
 
     'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

@@ -6,11 +6,11 @@ from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
-from api.endpoints.UsersView import UserSerializer
+from api.endpoints.UserCRUDView import UserSerializer
 
 # Predefined response bodies
 resp_invalid_credentials = JsonResponse({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-resp_unauthorized = JsonResponse({'message': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+resp_unauthorized = JsonResponse({'message': 'Unauthorized :-('}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['POST', 'GET'])
@@ -30,6 +30,11 @@ def api_login(request):
     if request.method == 'POST':
 
         # serializer.data #to object
+        cookies = request.COOKIES
+        headers = request.headers
+
+        print('cookies: ', cookies)
+        print('headers: ', headers)
 
         login_serializer = LoginDtoSerializer(data=request.data)
         if not login_serializer.is_valid():
@@ -48,6 +53,8 @@ def api_login(request):
         return resp_invalid_credentials
 
     elif request.method == 'GET':
+        cookies = request.COOKIES
+        headers = request.headers
         if request.user.is_authenticated:
             user_serializer = UserSerializer(request.user)
             return JsonResponse(user_serializer.data)
@@ -59,6 +66,7 @@ class LoginDto(object):
     """
     DTO for login requests
     """
+
     def __init__(self, username='', password=''):
         self.username = username
         self.password = password
