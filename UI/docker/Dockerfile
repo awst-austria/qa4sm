@@ -21,7 +21,7 @@ RUN sed -i '/<Directory "\/usr\/local\/apache2\/htdocs">/a### Rewrite rule was w
     RewriteCond %{REQUEST_FILENAME} -s [OR]\n\
     RewriteCond %{REQUEST_FILENAME} -d\n\
     RewriteRule ^.*$ - [NC,L]\n\
-    RewriteRule ^(.*) index.html [NC,L]\n' \
+    RewriteRule ^(.*) /ui/index.html [NC,L]\n' \
   /usr/local/apache2/conf/httpd.conf
 
 # Comment out the default config that handles requests to /.htaccess and /.ht* with a special error message,
