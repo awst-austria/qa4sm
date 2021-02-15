@@ -1,8 +1,6 @@
 QA4SM Angular UI
 ================
 
-Table of content
-
 ## Development environment - build tools
 Necessary software packages to run and build the UI
 - Node.js (v14)
