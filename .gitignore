@@ -11,6 +11,7 @@ db.sqlite3
 *.log
 valentina/settings_conf.py
 output
+testdata/
 junit.xml
 emails
 /static/*
