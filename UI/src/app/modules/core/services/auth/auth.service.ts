@@ -3,6 +3,8 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
 import {BehaviorSubject, from} from 'rxjs';
 import {LoginDto} from './login.dto';
+import {NGXLogger} from 'ngx-logger';
+import {UserDto} from './user.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -14,34 +16,39 @@ export class AuthService {
   private testUrl = this.API_URL + 'api/path_test/nyaloka/';
 
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public currentUser: UserDto = {username: '', firstName: ''};
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, private logger: NGXLogger) {
     this.init();
+    this.authenticated.subscribe(data => logger.debug('Authenticated: ', data));
   }
 
   private init() {
     this.httpClient
-      .get(this.authUrl)
+      .get<UserDto>(this.authUrl)
       .subscribe(
-        data => console.log('success', data),
+        data => {
+          this.currentUser = data;
+          this.authenticated.next(true);
+        },
         error => {
-
           console.log('srv msg:', error.error);
         }
       );
   }
 
-  login(credentials:LoginDto){
+  login(credentials: LoginDto) {
     this.httpClient
-      .post(this.authUrl,credentials)
+      .post<UserDto>(this.authUrl, credentials)
       .subscribe(
         data => {
-          this.authenticated.next(true)
+          this.currentUser = data;
+          this.authenticated.next(true);
           console.log('Login success', data);
           return;
         },
         error => {
-          this.authenticated.next(false)
+          this.authenticated.next(false);
           console.log('srv msg:', error.error);
         }
       );

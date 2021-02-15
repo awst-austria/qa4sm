@@ -24,6 +24,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {PasswordModule} from 'primeng/password';
 import {MessagesModule} from 'primeng/messages';
 import {ToastModule} from 'primeng/toast';
+import {UserProfileComponent} from './pages/user-profile/user-profile.component';
 
 
 @NgModule({
@@ -34,7 +35,8 @@ import {ToastModule} from 'primeng/toast';
     ErrorComponent,
     ValidationsComponent,
     ValidationComponent,
-    LoginComponent
+    LoginComponent,
+    UserProfileComponent
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),

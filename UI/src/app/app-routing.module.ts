@@ -6,6 +6,7 @@ import {ErrorComponent} from './pages/error/error.component';
 import {AuthGuard} from './auth.guard';
 import {ValidationComponent} from './pages/validation/validation.component';
 import {LoginComponent} from './pages/login/login.component';
+import {UserProfileComponent} from './pages/user-profile/user-profile.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -14,6 +15,7 @@ const routes: Routes = [
   {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard]},
   {path: 'validation/:validationId', component: ValidationComponent, canActivate: [AuthGuard]},
   {path: 'validations', component: ValidateComponent, canActivate: [AuthGuard]},
+  {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: '**', component: ErrorComponent}
 ];
 

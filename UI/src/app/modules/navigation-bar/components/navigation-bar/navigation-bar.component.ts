@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MenuItem} from 'primeng/api';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'navigation-bar',
@@ -9,13 +10,14 @@ import {MenuItem} from 'primeng/api';
 export class NavigationBarComponent implements OnInit {
 
   items: MenuItem[];
+  loginMenuItem: MenuItem;
+  logoutMenuItem: MenuItem;
+  userProfileMenuItem: MenuItem;
 
-  constructor() {
-    this.items = [];
-
-  }
-
-  ngOnInit(): void {
+  constructor(private authService: AuthService) {
+    this.loginMenuItem = {label: 'Login', icon: 'pi pi-fw pi-sign-in', routerLink: ['login']};
+    this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user',routerLink:['user-profile']};
+    this.logoutMenuItem = {label: 'Logout', icon: 'pi pi-fw pi-sign-out'};
     this.items = [
       {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['']},
       {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate']},
@@ -31,12 +33,22 @@ export class NavigationBarComponent implements OnInit {
       },
       {
         label: 'Profile', icon: 'pi pi-fw pi-user', items: [
-          {label: 'My account', icon: 'pi pi-fw pi-user'},
-          {label: 'Logout', icon: 'pi pi-fw pi-sign-out'},
-          {label: 'Login', icon: 'pi pi-fw pi-sign-in',routerLink:['login']},
+          this.userProfileMenuItem,
+          this.logoutMenuItem,
+          this.loginMenuItem,
         ]
       }
     ];
+  }
+
+  ngOnInit(): void {
+    this.authService.authenticated.subscribe(authenticated => this.authStatusChanged(authenticated));
+  }
+
+  private authStatusChanged(authenticated: boolean) {
+    this.logoutMenuItem.disabled = !authenticated;
+    this.loginMenuItem.disabled = authenticated;
+    this.userProfileMenuItem.disabled = !authenticated;
   }
 
 }

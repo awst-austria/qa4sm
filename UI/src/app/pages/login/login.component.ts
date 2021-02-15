@@ -3,6 +3,7 @@ import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {LoginDto} from '../../modules/core/services/auth/login.dto';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {MessageService} from 'primeng/api';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -23,7 +24,7 @@ export class LoginComponent implements OnInit {
 
   formMessages = [];
 
-  constructor(private loginService: AuthService, private messageService: MessageService) {
+  constructor(private loginService: AuthService, private messageService: MessageService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -35,8 +36,12 @@ export class LoginComponent implements OnInit {
     console.log(this.loginDto);
     this.loginDto.username = this.loginForm.value.username;
     this.loginDto.password = this.loginForm.value.password;
-    this.loginService.authenticated.subscribe(data => {
-      console.log('Auth observed ', data);
+    this.loginService.authenticated.subscribe(authenticated => {
+      if(authenticated){
+        this.router.navigate(['user-profile']);
+        // this.router.navigateByUrl('/user-profile').then(r => console.log('done'));
+      }
+      console.log('Auth observed ', authenticated);
     });
     this.loginService.login(this.loginDto);
   }
