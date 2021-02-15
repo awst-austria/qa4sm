@@ -179,6 +179,60 @@
     {% if val.output_file %}
         <div class="container">
             <div class="card-deck">
+                <div id="stats_accordion" style="width:100%">
+                    <div class="card mb-4 center-text">
+                        <div class="card-header" id="stats_header">
+                            <h4 class="my-0 font-weight-normal">Summary statistics</h4>
+                            <div class="card-menu">
+                                <span class="input-group-text fas fa-question-circle help-icon" title="Expand this section to inspect a table of statistics of the validation results."></span>
+                                <a class="input-group-text" data-toggle="collapse" href="#stats_collapse" role="button" aria-expanded="false" aria-controls="stats_collapse">
+                                    <span class="fa fa-plus-circle" title="Expand"></span>
+                                    <span class="fa fa-minus-circle" title="Collapse"></span>
+                                </a>
+                            </div>
+                        </div>
+                        <div id="stats_collapse" class="collapse" aria-labelledby="stats_header" data-parent="#stats_accordion">
+                            <div class="card-body">
+                                <p>The mean, median and standard deviation are calculated on the validation results aggregated by metric and dataset. The reference dataset used is {{ val.reference_configuration.dataset.pretty_name }} ({{ val.reference_configuration.version.pretty_name }}, {{ val.reference_configuration.variable.pretty_name }}).</p>
+                                <div class="card-body">
+                                    <div style="width: 100%; margin: auto; max-width: 85rem;">
+                                            <table id="inspection_table" class="table table-bordered table-striped">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th scope="col">Metric</th>
+                                                        {% for column_name in inspection_table.columns %}
+                                                                <th scope="col">{{ column_name }}</th>
+                                                        {% endfor %}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for row_hd, row_values in inspection_table.iterrows %}
+                                                            <tr>
+                                                                <th scope="row">{{row_hd}}</th>
+                                                                    {% for metric in row_values %}
+                                                                        <td>{{metric}}</td>
+                                                                    {% endfor %}
+                                                                </th>
+                                                            </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <button type="button" style="width: 10rem;" class="btn btn-sm btn-primary" title="Download the table to a .csv file" onclick= exportTableToCSV('Stats_summary.csv')><span class="fas fa-file-download"></span> Download .csv table</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container">
+            <div class="card-deck">
                 <div id="result_files" class="card mb-4 box-shadow">
                     <div class="card-header center-text">
                         <h4 class="my-0 font-weight-normal">Result files</h4>
@@ -303,6 +357,35 @@
     // update the plots once the page loads
     changeBoxplot()
     changeOverviewMap()
+    
+    function downloadCSV(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    csvFile = new Blob([csv], {type: "text/csv"});
+    downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    }
+    
+    function exportTableToCSV(filename) {
+    var csv = [];
+    var rows = document.querySelectorAll("table tr");
+    
+    for (var i = 0; i < rows.length; i++) {
+        var row = [], cols = rows[i].querySelectorAll("td, th");
+        
+        for (var j = 0; j < cols.length; j++){
+            row.push(cols[j].innerText);
+        }
+        csv.push(row.join(","));        
+    }
+    downloadCSV(csv.join("\n"), filename);
+    }
+    
 </script>
 
 <script type="text/javascript">
