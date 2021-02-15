@@ -28,7 +28,6 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.messageService.add({severity: 'success', summary: 'Service Message', detail: 'Via MessageService'});
   }
 
   onSubmit() {
@@ -36,14 +35,20 @@ export class LoginComponent implements OnInit {
     console.log(this.loginDto);
     this.loginDto.username = this.loginForm.value.username;
     this.loginDto.password = this.loginForm.value.password;
-    this.loginService.authenticated.subscribe(authenticated => {
-      if(authenticated){
+
+
+    this.loginService.login(this.loginDto).subscribe(authenticated => {
+      if (authenticated) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'You are logged in',
+          detail: 'Welcome ' + this.loginService.currentUser.username
+        });
         this.router.navigate(['user-profile']);
-        // this.router.navigateByUrl('/user-profile').then(r => console.log('done'));
+      } else {
+        this.messageService.add({severity: 'error', summary: 'Authentication error', detail: 'Wrong username or password'});
       }
-      console.log('Auth observed ', authenticated);
     });
-    this.loginService.login(this.loginDto);
   }
 
   get diagnostic() {

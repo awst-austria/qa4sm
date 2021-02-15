@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
-import {BehaviorSubject, from} from 'rxjs';
+import {BehaviorSubject, from, Observable, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
 import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
@@ -37,30 +37,29 @@ export class AuthService {
       );
   }
 
-  login(credentials: LoginDto) {
+  login(credentials: LoginDto): Subject<boolean> {
+    let authResult = new Subject<boolean>();
     this.httpClient
       .post<UserDto>(this.authUrl, credentials)
       .subscribe(
         data => {
           this.currentUser = data;
           this.authenticated.next(true);
+          authResult.next(true);
           console.log('Login success', data);
-          return;
         },
         error => {
           this.authenticated.next(false);
+          authResult.next(false);
           console.log('srv msg:', error.error);
         }
       );
+
+    return authResult;
   }
 
   logout() {
-
+    //TODO: to be implemented
   }
 
-  test() {
-
-    // this.httpClient.get(this.testUrl).subscribe(cucc => console.log(cucc));
-    this.httpClient.post(this.testUrl, '').subscribe(cucc => console.log(cucc));
-  }
 }
