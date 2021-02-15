@@ -13,7 +13,8 @@ valentina/settings_conf.py
 output
 junit.xml
 emails
-/static/
+/static/*
+!/static/files/
 run_celery/
 .coverage*
 */python_metadata/*
