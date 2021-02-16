@@ -202,6 +202,9 @@ dependencies:
     - pygeogrids==0.3.2
     - pynetcf==0.2.2
     - pytesmo==0.10.0
+    - pytest-cov==2.10.1
+    - pytest-django==4.1.0
+    - pytest-mpl==0.12
     - pytileproj==0.0.12
     - qa4sm-reader==0.4
     - redis==3.5.3

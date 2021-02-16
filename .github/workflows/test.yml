@@ -40,10 +40,8 @@ jobs:
           environment-file: environment/qa4sm_env.yml
           activate-environment: qa4sm # todo: must match with name in environment.yml
       - name: Activate Environment
-        run: conda activate qa4sm
-      - name: Install packages that cant be installed from yml file
-        shell: bash -l {0}
         run: |
+          conda activate qa4sm
           pip install yeoda==0.2.0 --no-deps # todo: fix in yml!!
           pip install veranda==0.1.0 --no-deps # todo: fix in yml!!
       - name: Apply needed settings
