@@ -85,19 +85,6 @@
     },
     {
         "model": "validator.ismnnetworks",
-        "pk": 6,
-        "fields": {
-            "name": "HOAL",
-            "continent": "Europe",
-            "country": "Austria",
-            "number_of_stations": "33",
-            "versions": [
-                30
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
         "pk": 7,
         "fields": {
             "name": "HSC-SEOLMACHEON",
@@ -119,8 +106,7 @@
             "country": "Korea",
             "number_of_stations": "1",
             "versions": [
-                18,
-                30
+                18
             ]
         }
     },
@@ -134,45 +120,6 @@
             "number_of_stations": "1",
             "versions": [
                 18,
-                30
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
-        "pk": 9,
-        "fields": {
-            "name": "IPE",
-            "continent": "Europe",
-            "country": "Spain",
-            "number_of_stations": "2",
-            "versions": [
-                30
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
-        "pk": 10,
-        "fields": {
-            "name": "KIHS-CMC",
-            "continent": "Asia",
-            "country": "Korea",
-            "number_of_stations": "18",
-            "versions": [
-                30
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
-        "pk": 10,
-        "fields": {
-            "name": "KHIS-SMC",
-            "continent": "Asia",
-            "country": "Korea",
-            "number_of_stations": "19",
-            "versions": [
                 30
             ]
         }
@@ -655,19 +602,6 @@
     },
     {
         "model": "validator.ismnnetworks",
-        "pk": 43,
-        "fields": {
-            "name": "VDS",
-            "continent": "Asia",
-            "country": "Myanmar",
-            "number_of_stations": "4",
-            "versions": [
-                30,
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
         "pk": 44,
         "fields": {
             "name": "WEGENERNET",
@@ -823,19 +757,6 @@
     },
     {
         "model": "validator.ismnnetworks",
-        "pk": 54,
-        "fields": {
-            "name": "PTSMN",
-            "continent": "Oceania",
-            "country": "New Zealand",
-            "number_of_stations": "20",
-            "versions": [
-                30,
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
         "pk": 55,
         "fields": {
             "name": "RISMA",
@@ -895,19 +816,6 @@
     },
     {
         "model": "validator.ismnnetworks",
-        "pk": 58,
-        "fields": {
-            "name": "TAHMO",
-            "continent": "Africa",
-            "country": "Côte d'Ivoire, Nigeria, Ghana, Uganda, Rwanda, Kenya",
-            "number_of_stations": "171",
-            "versions": [
-                30
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
         "pk": 59,
         "fields": {
             "name": "USCRN",
@@ -922,7 +830,7 @@
     },
     {
         "model": "validator.ismnnetworks",
-        "pk": 60,
+        " ": 60,
         "fields": {
             "name": "USDA-ARS",
             "continent": "North America",
@@ -945,6 +853,97 @@
             "versions": [
                 30,
                 18
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 62,
+        "fields": {
+            "name": "HOAL",
+            "continent": "Europe",
+            "country": "Austria",
+            "number_of_stations": "33",
+            "versions": [
+                30
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 63,
+        "fields": {
+            "name": "IPE",
+            "continent": "Europe",
+            "country": "Spain",
+            "number_of_stations": "2",
+            "versions": [
+                30
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 64,
+        "fields": {
+            "name": "KIHS-CMC",
+            "continent": "Asia",
+            "country": "Korea",
+            "number_of_stations": "18",
+            "versions": [
+                30
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 65,
+        "fields": {
+            "name": "KHIS-SMC",
+            "continent": "Asia",
+            "country": "Korea",
+            "number_of_stations": "19",
+            "versions": [
+                30
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 66,
+        "fields": {
+            "name": "VDS",
+            "continent": "Asia",
+            "country": "Myanmar",
+            "number_of_stations": "4",
+            "versions": [
+                30
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 67,
+        "fields": {
+            "name": "PTSMN",
+            "continent": "Oceania",
+            "country": "New Zealand",
+            "number_of_stations": "20",
+            "versions": [
+                30
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 68,
+        "fields": {
+            "name": "TAHMO",
+            "continent": "Africa",
+            "country": "Côte d'Ivoire, Nigeria, Ghana, Uganda, Rwanda, Kenya",
+            "number_of_stations": "171",
+            "versions": [
+                30
             ]
         }
     }
