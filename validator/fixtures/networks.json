@@ -8,7 +8,8 @@
             "country": "Benin, Niger, Mali",
             "number_of_stations": "7",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -21,7 +22,8 @@
             "country": "Sudan",
             "number_of_stations": "1",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -34,7 +36,8 @@
             "country": "Senegal",
             "number_of_stations": "1",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -47,7 +50,8 @@
             "country": "China",
             "number_of_stations": "40",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -60,7 +64,8 @@
             "country": "China",
             "number_of_stations": "57",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -73,7 +78,8 @@
             "country": "China",
             "number_of_stations": "174",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -86,7 +92,7 @@
             "country": "Austria",
             "number_of_stations": "33",
             "versions": [
-                18
+                30
             ]
         }
     },
@@ -99,7 +105,8 @@
             "country": "Korea",
             "number_of_stations": "1",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -112,7 +119,8 @@
             "country": "Korea",
             "number_of_stations": "1",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -125,7 +133,8 @@
             "country": "India",
             "number_of_stations": "1",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -138,7 +147,7 @@
             "country": "Spain",
             "number_of_stations": "2",
             "versions": [
-                18
+                30
             ]
         }
     },
@@ -151,7 +160,7 @@
             "country": "Korea",
             "number_of_stations": "18",
             "versions": [
-                18
+                30
             ]
         }
     },
@@ -164,7 +173,7 @@
             "country": "Korea",
             "number_of_stations": "19",
             "versions": [
-                18
+                30
             ]
         }
     },
@@ -177,7 +186,8 @@
             "country": "Uzbekistan",
             "number_of_stations": "7",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -190,7 +200,8 @@
             "country": "China",
             "number_of_stations": "20",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -203,7 +214,8 @@
             "country": "Mongolia",
             "number_of_stations": "44",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -216,7 +228,8 @@
             "country": "Malaysia",
             "number_of_stations": "7",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -229,7 +242,8 @@
             "country": "Former Soviet Union",
             "number_of_stations": "212",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -242,7 +256,8 @@
             "country": "Former Soviet Union",
             "number_of_stations": "122",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -255,7 +270,8 @@
             "country": "Former Soviet Union",
             "number_of_stations": "3",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -268,7 +284,8 @@
             "country": "Korea",
             "number_of_stations": "5",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -281,7 +298,8 @@
             "country": "China",
             "number_of_stations": "7",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -294,7 +312,8 @@
             "country": "Australia",
             "number_of_stations": "49",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -307,7 +326,8 @@
             "country": "Australia",
             "number_of_stations": "38",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -320,7 +340,8 @@
             "country": "SASMAS,Australia",
             "number_of_stations": "14",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -333,7 +354,8 @@
             "country": "Poland",
             "number_of_stations": "30",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -346,7 +368,8 @@
             "country": "Italy",
             "number_of_stations": "5",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -359,7 +382,8 @@
             "country": "Italy",
             "number_of_stations": "2",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -372,7 +396,8 @@
             "country": "Finland",
             "number_of_stations": "27",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -385,7 +410,8 @@
             "country": "France",
             "number_of_stations": "5",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -398,7 +424,8 @@
             "country": "UK",
             "number_of_stations": "154",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -411,7 +438,8 @@
             "country": "Finland",
             "number_of_stations": "7",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -424,7 +452,8 @@
             "country": "Denmark",
             "number_of_stations": "32",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -437,7 +466,8 @@
             "country": "Italy",
             "number_of_stations": "2",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -450,7 +480,8 @@
             "country": "Italy",
             "number_of_stations": "12",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -463,7 +494,8 @@
             "country": "Italy",
             "number_of_stations": "1",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -476,7 +508,8 @@
             "country": "Germany",
             "number_of_stations": "2",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -489,7 +522,8 @@
             "country": "France",
             "number_of_stations": "6",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -502,7 +536,8 @@
             "country": "Spain",
             "number_of_stations": "24",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -515,7 +550,8 @@
             "country": "Romania",
             "number_of_stations": "20",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -528,7 +564,8 @@
             "country": "France",
             "number_of_stations": "22",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -541,7 +578,8 @@
             "country": "Poland",
             "number_of_stations": "6",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -554,7 +592,8 @@
             "country": "Germany",
             "number_of_stations": "5",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -567,7 +606,8 @@
             "country": "Germany",
             "number_of_stations": "11",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -580,7 +620,8 @@
             "country": "Italy",
             "number_of_stations": "13",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -593,7 +634,8 @@
             "country": "Italy",
             "number_of_stations": "1",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -606,7 +648,8 @@
             "country": "Spain",
             "number_of_stations": "3",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -619,7 +662,7 @@
             "country": "Myanmar",
             "number_of_stations": "4",
             "versions": [
-                18
+                30,
             ]
         }
     },
@@ -632,7 +675,8 @@
             "country": "Austria",
             "number_of_stations": "12",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -645,7 +689,8 @@
             "country": "UK",
             "number_of_stations": "8",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -658,6 +703,7 @@
             "country": "USA",
             "number_of_stations": "29",
             "versions": [
+                30,
                 18,
                 5
             ]
@@ -672,7 +718,8 @@
             "country": "USA",
             "number_of_stations": "50",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -685,7 +732,8 @@
             "country": "Alaska",
             "number_of_stations": "12",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -698,7 +746,8 @@
             "country": "USA",
             "number_of_stations": "109",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -711,7 +760,8 @@
             "country": "USA",
             "number_of_stations": "2",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -724,7 +774,8 @@
             "country": "USA",
             "number_of_stations": "19",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -737,7 +788,8 @@
             "country": "USA",
             "number_of_stations": "6",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -750,7 +802,8 @@
             "country": "USA",
             "number_of_stations": "9",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -763,7 +816,8 @@
             "country": "USA",
             "number_of_stations": "159",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -776,7 +830,7 @@
             "country": "New Zealand",
             "number_of_stations": "20",
             "versions": [
-                18
+                30,
             ]
         }
     },
@@ -789,7 +843,8 @@
             "country": "Canada",
             "number_of_stations": "23",
             "versions": [
-                18
+                18,
+                30
             ]
         }
     },
@@ -802,6 +857,7 @@
             "country": "USA",
             "number_of_stations": "239",
             "versions": [
+                30,
                 18,
                 5
             ]
@@ -816,6 +872,7 @@
             "country": "USA",
             "number_of_stations": "441",
             "versions": [
+                30,
                 18,
                 5
             ]
@@ -830,6 +887,7 @@
             "country": "USA",
             "number_of_stations": "171",
             "versions": [
+                30,
                 18,
                 5
             ]
@@ -844,8 +902,7 @@
             "country": "Côte d'Ivoire, Nigeria, Ghana, Uganda, Rwanda, Kenya",
             "number_of_stations": "171",
             "versions": [
-                18,
-                5
+                30
             ]
         }
     },
@@ -858,6 +915,7 @@
             "country": "USA",
             "number_of_stations": "115",
             "versions": [
+                30,
                 18
             ]
         }
@@ -871,6 +929,7 @@
             "country": "USA",
             "number_of_stations": "4",
             "versions": [
+                30,
                 18
             ]
         }
@@ -884,6 +943,7 @@
             "country": "Chile",
             "number_of_stations": "3",
             "versions": [
+                30,
                 18
             ]
         }
