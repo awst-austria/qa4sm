@@ -12,7 +12,7 @@ from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
-from validator.models import DatasetConfiguration
+from validator.models import DatasetConfiguration, User
 
 
 class ValidationRun(models.Model):
@@ -21,17 +21,15 @@ class ValidationRun(models.Model):
     MIN_MAX = 'min_max'
     LINREG = 'linreg'
     MEAN_STD = 'mean_std'
-    LIN_CDF_MATCH = 'lin_cdf_match'
-    CDF_MATCH = 'cdf_match'
     NO_SCALING = 'none'
+    BETA_SCALING = 'cdf_beta_match'
 
     SCALING_METHODS = (
         (NO_SCALING, 'No scaling'),
         (MIN_MAX, 'Min/Max'),
         (LINREG, 'Linear regression'),
         (MEAN_STD, 'Mean/standard deviation'),
-#         (LIN_CDF_MATCH, 'CDF matching with linear interpolation'),
-#         (CDF_MATCH, 'CDF matching with 5-th order spline fitting'),
+        (BETA_SCALING, 'CDF matching with beta distribution fitting'),
         )
 
     ## scale to
@@ -85,6 +83,8 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
+    used_by = models.ManyToManyField(User, through="CopiedValidations", through_fields=('original_run', 'used_by_user'),
+                                     related_name='copied_runs')
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -175,3 +175,4 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         rundir = path.dirname(instance.output_file.path)
         if path.isdir(rundir):
             rmtree(rundir)
+

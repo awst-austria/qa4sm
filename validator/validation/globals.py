@@ -50,7 +50,15 @@ DEFAULT_REFERENCE = ISMN
 
 NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km]
 
-IRREGULAR_GRIDS = {'SMOS' : 0.25}
+IRREGULAR_GRIDS = {'SMOS': 0.25}
+
+# ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
+VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
+                 'anomalies', 'anomalies_from', 'anomalies_to']
+DS_FIELDS = ['dataset', 'version']
+
+IRREGULAR_GRIDS = {'SMOS': 0.25,
+                   }
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')

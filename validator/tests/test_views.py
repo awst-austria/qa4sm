@@ -36,6 +36,7 @@ from os import path
 import shutil
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation import set_outfile, mkdir_if_not_exists
+from validator.tests.auxiliary_functions import generate_default_validation
 
 from django.utils.http import urlencode
 import os
@@ -342,6 +343,58 @@ class TestViews(TransactionTestCase):
         run.save()
         assert ValidationRun.objects.filter(name_tag='new_name').exists()
 
+    def test_attach_detach_results(self):
+        # create new no-named result
+        run = ValidationRun()
+        run.user = self.testuser
+        run.start_time = datetime.now(tzlocal())
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.doi = '10.1000/182'
+        run.save()
+        result_id = str(run.id)
+
+        assert result_id, "Error saving the test validation run."
+
+        url = reverse('result', kwargs={'result_uuid': result_id})
+
+        # attaching results should be possible even for non owners:
+        self.client.login(**self.credentials2)
+        current_user = self.testuser2
+
+        response = self.client.post(url, 'add_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'add_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(current_user.copied_runs.all()), 1)
+
+        response = self.client.post(url, 'remove_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'remove_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(current_user.copied_runs.all()), 0)
+
+        self.client.login(**self.credentials)
+        current_user = self.testuser
+
+        response = self.client.post(url, 'remove_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'remove_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+        # is the user is also the owner of the run it's not possible to attach it to the list
+        self.assertEqual(len(current_user.copied_runs.all()), 0)
+
+        response = self.client.post(url, 'add_validation=false', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url, 'add_validation=true', content_type='application/x-www-form-urlencoded;')
+        self.assertEqual(response.status_code, 200)
+
+        run.delete()
+
     def test_my_results_view(self):
         url = reverse('myruns')
         self.client.login(**self.credentials)
@@ -571,6 +624,37 @@ class TestViews(TransactionTestCase):
         cancelled_val = result.context['val']
         self.__logger.info("Progress {}, end time: {}".format(cancelled_val.progress, cancelled_val.end_time))
         assert cancelled_val.progress <= 0
+
+    def test_submit_existing_validation(self):
+        # create a default validation with progress code 100 and non empty output_file filed
+        def_val = generate_default_validation()
+        def_val.scaling_method = 'mean_std'
+        def_val.scaling_ref = def_val.dataset_configurations.all()[0]
+        def_val.progress = 100
+        def_val.output_file = str(def_val.id) + '.nc'
+        def_val.save()
+
+        # submitting a validation with the same settings should give status code 200
+        url = reverse('validation')
+        self.client.login(**self.credentials)
+        validation_params = {
+            'datasets-TOTAL_FORMS': 1,
+            'datasets-INITIAL_FORMS': 1,
+            'datasets-MIN_NUM_FORMS': 1,
+            'datasets-MAX_NUM_FORMS': 5,
+            'datasets-0-dataset': Dataset.objects.get(short_name=globals.CGLS_CSAR_SSM1km).id,
+            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.CGLS_CSAR_SSM1km_V1_1).id,
+            'datasets-0-variable': DataVariable.objects.get(short_name=globals.CGLS_CSAR_SSM1km_ssm).id,
+            'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id,
+            'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
+            'scaling_method': ValidationRun.MEAN_STD,
+            'scaling_ref': ValidationRun.SCALE_TO_DATA,
+            'click-counter': 1,
+        }
+
+        result = self.client.post(url, validation_params)
+        self.assertEqual(result.status_code, 200)
 
     ## Stress test the server!
     @pytest.mark.long_running

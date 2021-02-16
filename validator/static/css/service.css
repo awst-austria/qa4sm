@@ -136,7 +136,6 @@ html {
      width: 0.1rem;
      margin-right: 0.000001rem;
      padding: .0000001rem;
-     display:none;
      color: black;
 }
 .tab-minus:hover {
@@ -179,4 +178,27 @@ div.plot_div {
 #users_list optgroup {
     font-size: 1em;
 }
+.validate-confirm {
+  display: none;
+  color: #00212e;
+}
+div.ui-dialog-titlebar{
+  background-color: #00AAE3;
+  color: white;
+}
+.hide_element {
+  display: none;
+}
 
+.att_val_container{
+  background-color: white;
+  color: black;
+  padding: 0.3em 0.3em 0.3em 0.3em;
+}
+.att_val_container h5.my-0{
+  float: left;
+  padding-top: 0.3em;
+}
+.att_val_container div.col-sm{
+  text-align: right;
+}
