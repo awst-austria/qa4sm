@@ -60,9 +60,9 @@ class TestModels(TestCase):
 
         dc = DatasetConfiguration()
         dc.validation = run
-        dc.dataset = Dataset.objects.get(pk=1)
-        dc.version = DatasetVersion.objects.get(pk=1)
-        dc.variable = DataVariable.objects.get(pk=1)
+        dc.dataset = Dataset.objects.get(pk=4)  # 4 is a dataset pk in fixtures
+        dc.version = DatasetVersion.objects.get(pk=18)  # 18 is a version ok in fixtures
+        dc.variable = DataVariable.objects.get(pk=4)  # 4 is a veriable pk in fixtures
 
         dc.save()
 
@@ -82,7 +82,7 @@ class TestModels(TestCase):
         assert dc_str is not None
 
     def test_ds_config_order(self):
-        dataset_range = range(1, 6)
+        dataset_range = [4,7,12]  # todo: add id of dataset from fixture when adding a new dataset
         run = ValidationRun()
         run.start_time = now()
         run.save()
@@ -107,7 +107,7 @@ class TestModels(TestCase):
 
         # check that they have the same order when using all()
         for i, dsc in enumerate(run.dataset_configurations.all(), 1):
-            assert dsc.dataset.id == i
+            assert dsc.dataset.id == dataset_range[i-1]
             assert dsc.id == orderorder[i-1]
 
         # randomly change the order

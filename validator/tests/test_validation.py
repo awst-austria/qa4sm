@@ -616,7 +616,7 @@ class TestValidation(TestCase):
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
                         else:
-                            data = msk_reader.read_ts(15.8, 47.9) ### austriia
+                            data = msk_reader.read_ts(15.8, 48.3) ### austriia
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
@@ -646,6 +646,8 @@ class TestValidation(TestCase):
 
     def test_create_jobs(self):
         for dataset in Dataset.objects.all():
+            if dataset.short_name in globals.NOT_AS_REFERENCE:
+                continue
             self.__logger.info(dataset.short_name)
             vs = dataset.versions.all()
 
@@ -664,18 +666,25 @@ class TestValidation(TestCase):
                 run.reference_configuration = ref_c
                 run.save()
 
+                pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"),
+                                             parameters="0.0, 0.2", \
+                                             dataset_config=run.reference_configuration)
+                pfilter.save()
+
+
                 total_points, jobs = val.create_jobs(run)
                 print(version)
                 print(len(jobs))
                 print(total_points)
                 self._check_jobs(total_points, jobs)
-    """
+
     def test_geographic_subsetting(self):
-        # hawaii bounding box
-        min_lat = 18.625 # ll
-        min_lon = -156.375  # ll
-        max_lat = 20.375  # ur
-        max_lon = -154.625  # ur
+
+        # austria bounding box
+        min_lat = 46. # ll
+        min_lon = 15.  # ll
+        max_lat = 47.  # ur
+        max_lon = 16.  # ur
 
         # we need the reader just to get the grid
         smosreader = val.create_reader(Dataset.objects.get(short_name='SMOS'),
@@ -684,7 +693,7 @@ class TestValidation(TestCase):
 
         subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
 
-        assert len(subgpis) == 16
+        assert len(subgpis) == 12
         assert len(sublats) == len(subgpis)
         assert len(sublons) == len(subgpis)
 
@@ -693,7 +702,6 @@ class TestValidation(TestCase):
         assert not np.any(sublons > max_lon), "subsetting error: max_lon"
         assert not np.any(sublons < min_lon), "subsetting error: min_lon"
     
-    """
     def test_no_geographic_subsetting(self):
         # we need the reader just to get the grid
         smosreader = val.create_reader(Dataset.objects.get(short_name='SMOS'), DatasetVersion.objects.get(short_name='SMOS_105_ASC'))
@@ -710,12 +718,12 @@ class TestValidation(TestCase):
                        (-58.81, 127.61, 77.15, 256.99) # dateline right
                        ]
 
-        russia_gpi = 898557
-        russia_gpi2 = 898567
+        russia_gpi = 777277  # qdeg: 898557
+        russia_gpi2 = 777287  # qdeg: 898567
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
-            c3s_reader = val.create_reader(Dataset.objects.get(short_name='SMOS'), DatasetVersion.objects.get(short_name='SMOS_105_ASC'))
-            gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
+            smos_reader = val.create_reader(Dataset.objects.get(short_name='SMOS'), DatasetVersion.objects.get(short_name='SMOS_105_ASC'))
+            gpis, lats, lons, cells = smos_reader.cls.grid.get_grid_points()
 
             subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat, max_lon)
 
@@ -762,11 +770,11 @@ class TestValidation(TestCase):
         num = val.num_gpis_from_job(None)
         assert num == 1
 
-    """
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs(self):
-        infile1 = 'testdata/output_data/c3s_ismn.nc'
+        infile1 = 'testdata/output_data/cglss1_ismn.nc'
+        # todo: add a second file like in the origina test
 
         # create validation object and data folder for it
         v = self.generate_default_validation()
@@ -793,9 +801,4 @@ class TestValidation(TestCase):
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
-        # remove results from first test and recreate dir
-        shutil.rmtree(run_dir)
-        val.mkdir_if_not_exists(run_dir)
-
         self.delete_run(v)
-    """

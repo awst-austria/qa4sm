@@ -102,7 +102,7 @@ if __name__ == '__main__':
     path = "/home/wolfgang/code/qa4sm/testdata/input_data/CGLS_CSAR_SSM1km/CGLS_CSAR_SSM1km_V1_1/tiff"
     str(datetime.now())
     reader = CSarSsmTiffReader(path)
-    lon, lat = 15.8, 47.9 # 15.78112, 46.91691
+    lon, lat = 15.8, 48.3 # 15.78112, 46.91691
     str(datetime.now())
     ts = reader.read(lon, lat)
 
