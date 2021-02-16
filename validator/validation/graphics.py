@@ -5,7 +5,7 @@ import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
-from qa4sm_reader.plot_all import plot_all
+from qa4sm_reader.plot_all import plot_all, get_img_stats
 
 from django.conf import settings
 
@@ -15,6 +15,7 @@ cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 from validator.validation.globals import OUTPUT_FOLDER, METRICS, TC_METRICS, METRIC_TEMPLATE, TC_METRIC_TEMPLATE
 import os
 from parse import *
+
 
 __logger = logging.getLogger(__name__)
 
@@ -154,3 +155,28 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     # __logger.debug(f"Metrics: {metrics}")
 
     return pairs, triples, metrics, ref0_config
+
+def get_inspection_table(validation_run):
+    """
+    Generate the quick inspection table with the summary statistics of the results
+
+    Parameters
+    ----------
+    validation_run : ValidationRun
+        The validation run to make plots for.
+        
+    Returns
+    -------
+    table : pd.DataFrame
+        Quick inspection table of the results.
+    """
+    outfile = validation_run.output_file
+    # the first condition checks whether the outfile field has been properly
+    # set, the second then whether the file really exists
+    if bool(outfile) and path.exists(outfile.path):
+        return get_img_stats(outfile.path).drop(columns="Group")
+    else:
+        # This happens when the output file has not been generated yet, because
+        # the validation is still running. In this case the table won't be
+        # rendered anyways.
+        return None

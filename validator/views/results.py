@@ -12,7 +12,7 @@ from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm, ResultsSortingForm
 from validator.models import ValidationRun, CopiedValidations
 from validator.validation.globals import METRICS
-from validator.validation.graphics import get_dataset_combis_and_metrics_from_files
+from validator.validation.graphics import get_dataset_combis_and_metrics_from_files, get_inspection_table
 
 from collections import OrderedDict
 from validator.validation.util import mkdir_if_not_exists
@@ -276,6 +276,8 @@ def result(request, result_uuid):
         pub_form = PublishingForm(validation=val_run) if is_owner else None
 
         metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
+        
+        inspection_table = get_inspection_table(val_run)
 
         context = {
             'current_user': current_user.username,
@@ -289,7 +291,8 @@ def result(request, result_uuid):
             'metrics': metrics,
             'combis': combis,
             'json_metrics': json_dumps(METRICS),
-            'publishing_form': pub_form
+            'publishing_form': pub_form,
+            'inspection_table': inspection_table,
             }
 
         return render(request, 'validator/result.html', context)
