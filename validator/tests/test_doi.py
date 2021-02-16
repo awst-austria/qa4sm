@@ -47,7 +47,7 @@ class TestDOI(TestCase):
         self.testuser = User.objects.create_user(**self.user_data)
 
     def test_doi(self):
-        infile = 'testdata/output_data/c3s_era5land.nc'
+        infile = 'testdata/output_data/cglss1_ismn.nc'
 
         ## generate test validation
         val = ValidationRun()
@@ -58,9 +58,9 @@ class TestDOI(TestCase):
 
         data_c = DatasetConfiguration()
         data_c.validation = val
-        data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
+        data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
+        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
         data_c.save()
 
         ref_c = DatasetConfiguration()

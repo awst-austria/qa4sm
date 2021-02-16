@@ -44,7 +44,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 class TestValidation(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
-    austria_coordinates = [46.8, 14.94, 48.4, 16.12]
+    austria_coordinates = [48.1, 15., 48.4, 16.]
 
     __logger = logging.getLogger(__name__)
 
@@ -94,6 +94,47 @@ class TestValidation(TestCase):
         run.scaling_ref = ref_c
 
         run.save()
+
+        return run
+
+    def generate_default_validation_triple_coll(self):
+        run = ValidationRun()
+        run.start_time = datetime.now(tzlocal())
+        run.save()
+
+        data_c = DatasetConfiguration()
+        data_c.validation = run
+        data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
+        data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
+        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
+        data_c.save()
+
+        other_data_c = DatasetConfiguration()
+        other_data_c.validation = run
+        other_data_c.dataset = Dataset.objects.get(short_name='SMOS')
+        other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
+        other_data_c.variable = DataVariable.objects.get(short_name='SMOS_sm')
+        other_data_c.save()
+
+        ref_c = DatasetConfiguration()
+        ref_c.validation = run
+        ref_c.dataset = Dataset.objects.get(short_name='ISMN')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20191211')
+        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.save()
+        
+        run.reference_configuration = ref_c
+        run.scaling_ref = ref_c
+        run.tcol = True
+        run.save()
+        
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='WEGENERNET',\
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+        # add filterring according to depth_range so that data in wegnernet is found:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0, 0.2", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
 
         return run
 
@@ -305,6 +346,52 @@ class TestValidation(TestCase):
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
     @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
+    def test_validation_tcol(self):
+        run = self.generate_default_validation_triple_coll()
+        run.user = self.testuser
+
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.CDF_MATCH  # cdf matching causes an error for 1 gpi, use that to test error handling
+
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config == run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                if config.dataset.short_name == 'C3S':
+                    config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+            config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='WEGENERNET',\
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+        # add filterring according to depth_range so that data in wegnernet is found:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0, 0.2", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run.total_points == 4 # 4 stations in wegenernet
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 4
+
+        self.check_results(new_run, is_tcol_run=True)
+        self.delete_run(new_run)
+
+    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings("ignore:read_ts is deprecated, please use read instead:DeprecationWarning") # ignore pytesmo warnings about read_ts
     def test_validation_empty_network(self):
         run = self.generate_default_validation()
         run.user = self.testuser
@@ -379,6 +466,55 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
+
+    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
+    @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
+    @pytest.mark.long_running
+    @pytest.mark.skip(reason="Currently no model in HR instance")
+    def test_validation_model_ref(self):
+        # todo: when there is a model refernece dataset available add this test
+        return
+
+    @pytest.mark.long_running
+    def test_validation_smos_ref(self):
+        run = self.generate_default_validation()
+        run.user = self.testuser
+
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMOS)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMOS_105_ASC)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMOS_sm)
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2016, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2017, 1, 1, tzinfo=UTC)
+        run.min_lat = self.austria_coordinates[0]
+        run.min_lon = self.austria_coordinates[1]
+        run.max_lat = self.austria_coordinates[2]
+        run.max_lon = self.austria_coordinates[3]
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config != run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            config.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        print(new_run)
+        assert new_run
+
+        assert new_run.total_points == 4, "Number of gpis is off"
+        assert new_run.error_points == 0, "Too many error gpis"
+        assert new_run.ok_points == 4, "OK points are off"
+        self.check_results(new_run)
+        self.delete_run(new_run)
 
     @pytest.mark.long_running
     def test_validation_anomalies_climatology(self):
