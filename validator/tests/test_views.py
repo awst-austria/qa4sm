@@ -189,7 +189,7 @@ class TestViews(TransactionTestCase):
     @pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
     @override_settings(DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions")
     def test_result_publishing(self):
-        infile = 'testdata/output_data/c3s_era5land.nc'
+        infile = 'testdata/output_data/cglss1_ismn.nc'
 
         url = reverse('result', kwargs={'result_uuid': self.testrun.id})
 
@@ -379,7 +379,7 @@ class TestViews(TransactionTestCase):
     def test_ajax_get_dataset_options_view(self):
         url = reverse('ajax_get_dataset_options')
         self.client.login(**self.credentials)
-        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
+        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.CGLS_CSAR_SSM1km).id,
                                          'filter_widget_id': 'id_datasets-0-filters',
                                          'param_filter_widget_id': 'id_datasets-0-paramfilters'})
         self.assertEqual(response.status_code, 200)
@@ -400,7 +400,7 @@ class TestViews(TransactionTestCase):
         assert return_data['network']
 
         # another test for dataset other than ISMN
-        response = self.client.get(url, {'version_id': DatasetVersion.objects.get(short_name=globals.GLDAS_NOAH025_3H_2_1).id})
+        response = self.client.get(url, {'version_id': DatasetVersion.objects.get(short_name=globals.CGLS_CSAR_SSM1km_V1_1).id})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
         assert not return_data['network']
@@ -417,11 +417,11 @@ class TestViews(TransactionTestCase):
             'datasets-INITIAL_FORMS': 1,
             'datasets-MIN_NUM_FORMS': 1,
             'datasets-MAX_NUM_FORMS': 5,
-            'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3S).id,
-            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
-            'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'datasets-0-dataset': Dataset.objects.get(short_name=globals.CGLS_CSAR_SSM1km).id,
+            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.CGLS_CSAR_SSM1km_V1_1).id,
+            'datasets-0-variable': DataVariable.objects.get(short_name=globals.CGLS_CSAR_SSM1km_ssm).id,
             'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,
-            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id,
             'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
             'scaling_method': ValidationRun.MEAN_STD,
             'scaling_ref': ValidationRun.SCALE_TO_DATA,
@@ -432,11 +432,8 @@ class TestViews(TransactionTestCase):
 
     ## Submit a validation with all possible parameters set
     def test_submit_validation_max(self):
-        test_datasets = [Dataset.objects.get(short_name=globals.C3S),
-                         Dataset.objects.get(short_name=globals.ASCAT),
-                         Dataset.objects.get(short_name=globals.SMAP),
-                         Dataset.objects.get(short_name=globals.C3S),
-                         Dataset.objects.get(short_name=globals.ASCAT), ]
+        test_datasets = [Dataset.objects.get(short_name=globals.CGLS_CSAR_SSM1km),
+                         Dataset.objects.get(short_name=globals.SMOS), ]
 
         url = reverse('validation')
         self.client.login(**self.credentials)
@@ -449,7 +446,7 @@ class TestViews(TransactionTestCase):
             'datasets-MAX_NUM_FORMS': 5,
 
             'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,
-            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id,
             'ref-variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
             'ref-filter_dataset': True,
             'ref_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
@@ -459,13 +456,13 @@ class TestViews(TransactionTestCase):
             'anomalies_from': '1978',
             'anomalies_to': '1998',
 
-            'min_lat': '20.07094414427701',
-            'min_lon': '-134.82421875000003',
-            'max_lat': '51.47764573196917',
-            'max_lon': '-57.83203125000001',
+            'min_lat': '46.4318173285',
+            'min_lon': '9.47996951665',
+            'max_lat': '16.9796667823',
+            'max_lon': '49.0390742051',
 
             'interval_from': datetime(1978, 1, 1),
-            'interval_to': datetime(1998, 1, 1),
+            'interval_to': datetime(2020, 1, 1),
 
             'scaling_method': ValidationRun.MEAN_STD,
             'scaling_ref': ValidationRun.SCALE_TO_REF,
@@ -519,16 +516,16 @@ class TestViews(TransactionTestCase):
             'datasets-INITIAL_FORMS': 1,
             'datasets-MIN_NUM_FORMS': 1,
             'datasets-MAX_NUM_FORMS': 5,
-            'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3S).id,
-            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
-            'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
-            'ref-dataset': Dataset.objects.get(short_name=globals.GLDAS).id,
-            'ref-version': DatasetVersion.objects.get(short_name=globals.GLDAS_NOAH025_3H_2_1).id,
-            'ref-variable': DataVariable.objects.get(short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
-            'min_lat': '18.39665',
-            'min_lon': '-161.08154',
-            'max_lat': '22.91482',
-            'max_lon': '-153.91845',
+            'datasets-0-dataset': Dataset.objects.get(short_name=globals.CGLS_CSAR_SSM1km).id,
+            'datasets-0-version': DatasetVersion.objects.get(short_name=globals.CGLS_CSAR_SSM1km_V1_1).id,
+            'datasets-0-variable': DataVariable.objects.get(short_name=globals.CGLS_CSAR_SSM1km_ssm).id,
+            'ref-dataset': Dataset.objects.get(short_name=globals.SMOS).id,
+            'ref-version': DatasetVersion.objects.get(short_name=globals.SMOS_105_ASC).id,
+            'ref-variable': DataVariable.objects.get(short_name=globals.SMOS_sm).id,
+            'min_lat': '46.4318173285',
+            'min_lon': '9.47996951665',
+            'max_lat': '16.9796667823',
+            'max_lon': '49.0390742051',
             'scaling_method': ValidationRun.MEAN_STD,
             'scaling_ref': ValidationRun.SCALE_TO_DATA,
         }
@@ -586,17 +583,16 @@ class TestViews(TransactionTestCase):
         self.client.login(**self.credentials)
 
         validation_params = {
-            'data_dataset': Dataset.objects.get(short_name=globals.C3S).id,
-            'data_version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
-            'data_variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+            'data_dataset': Dataset.objects.get(short_name=globals.CGLS_CSAR_SSM1km).id,
+            'data_version': DatasetVersion.objects.get(short_name=globals.CGLS_CSAR_SSM1km_V1_1).id,
+            'data_variable': DataVariable.objects.get(short_name=globals.CGLS_CSAR_SSM1km_ssm).id,
             'ref_dataset': Dataset.objects.get(short_name=globals.ISMN).id,
-            'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id,
+            'ref_version': DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id,
             'ref_variable': DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id,
             # 'scaling_ref': ValidationRun.SCALE_REF,
             'scaling_method': ValidationRun.MEAN_STD,
             'filter_data': True,
             'data_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
-            'data_filters': DataFilter.objects.get(name='FIL_C3S_FLAG_0').id,
             'filter_ref': True,
             'ref_filters': DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id,
             'ref_filters': DataFilter.objects.get(name='FIL_ISMN_GOOD').id,
@@ -882,8 +878,7 @@ class TestViews(TransactionTestCase):
         url = reverse('ajax_get_version_info')
         self.client.login(**self.credentials)
         version_ids = [DatasetVersion.objects.get(short_name=globals.ISMN_V20191211).id,
-                       DatasetVersion.objects.get(short_name=globals.GLDAS_NOAH025_3H_2_1).id,
-                       DatasetVersion.objects.get(short_name=globals.C3S_V201912).id,
+                       DatasetVersion.objects.get(short_name=globals.CGLS_CSAR_SSM1km_V1_1).id,
                        DatasetVersion.objects.get(short_name=globals.SMOS_105_ASC).id]
 
         response = self.client.get(url, {'version_id': version_ids})

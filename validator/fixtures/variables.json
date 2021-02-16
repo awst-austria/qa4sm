@@ -26,7 +26,7 @@
         "pk": 15,
         "fields": {
             "short_name": "S1_SSM",
-            "pretty_name": "Surface_Soil_Moisture",
+            "pretty_name": "S1_SSM",
             "help_text": "-",
             "min_value": 0.0,
             "max_value": 100.0

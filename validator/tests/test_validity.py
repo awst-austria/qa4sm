@@ -25,6 +25,7 @@ from validator.models import DataFilter
 from validator.models import DataVariable
 import validator.validation as val
 from validator.validation import globals
+from validator.models import ParametrisedFilter
 
 
 '''
@@ -122,7 +123,7 @@ class TestValidity(TestCase):
 
     @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
     @pytest.mark.long_running
-    def test_validation_c3s_ismn(self):
+    def test_validation_s1_ismn(self):
         run = ValidationRun()
         run.start_time = datetime.now(tzlocal())
         run.user = self.testuser
@@ -133,19 +134,15 @@ class TestValidity(TestCase):
 
         data_c = DatasetConfiguration()
         data_c.validation = run
-        data_c.dataset = Dataset.objects.get(short_name='C3S')
-        data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
-        data_c.save() # object needs to be saved before m2m relationship can be used
-
-        data_c.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
-        data_c.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
+        data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
+        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
         data_c.save()
 
         ref_c = DatasetConfiguration()
         ref_c.validation = run
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
-        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20191211')
         ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         ref_c.save()
 
@@ -155,6 +152,10 @@ class TestValidity(TestCase):
         run.reference_configuration = ref_c
         run.scaling_ref = ref_c
         run.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0, 0.2", \
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
 
         run_id = run.id
 

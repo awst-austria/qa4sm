@@ -20,14 +20,10 @@ pytest-cov
 pytest-mpl
 celery==4.1.1
 celery[redis]
-gldas>=0.5
-smap-io>=0.3
 django-countries
-c3s-sm>=0.1.1
-ascat>=1.0
 cartopy
 ismn>=0.3
-esa_cci_sm>=0.1.1
 smos>=0.2
-ecmwf-models>=0.5
 seaborn
+yeoda
+veranda

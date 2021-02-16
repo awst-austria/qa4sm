@@ -4,7 +4,7 @@ Because even (or especially?) hacks should be tested
 
 from os import path
 
-from c3s_sm.interface import C3STs as c3s_read
+from validator.validation.input_readers.cgls_csar_ssm_readers import CSarSsmTiffReader
 from django.test import TestCase
 from ismn.interface import ISMN_Interface
 
@@ -22,18 +22,18 @@ class TestHacks(TestCase):
         set_dataset_paths()
 
     def test_timezone_adapter(self):
-        c3s_data_folder = path.join(Dataset.objects.get(short_name='C3S').storage_path, 'C3S_V201706/TCDR/063_images_to_ts/combined-daily')
-        c3s_reader = c3s_read(c3s_data_folder)
+        cgls_data_folder = path.join(Dataset.objects.get(short_name='CGLS_CSAR_SSM1km').storage_path, 'CGLS_CSAR_SSM1km_V1_1/tiff')
+        cgls_reader = CSarSsmTiffReader(cgls_data_folder)
 
-        timezone_reader = TimezoneAdapter(c3s_reader)
+        timezone_reader = TimezoneAdapter(cgls_reader)
 
-        orig_data = c3s_reader.read_ts(-155.42, 19.78)
-        data = timezone_reader.read_ts(-155.42, 19.78)
+        orig_data = cgls_reader.read_ts(15.8, 47.9) 
+        data = timezone_reader.read_ts(15.8, 47.9)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
         self.assertTrue(not hasattr(data.index, 'tz') or data.index.tz is None)
 
-        orig_data = c3s_reader.read(-155.42, 19.78)
-        data = timezone_reader.read(-155.42, 19.78)
+        orig_data = cgls_reader.read(15.8, 47.9)
+        data = timezone_reader.read(15.8, 47.9)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
         self.assertTrue((not hasattr(data.index, 'tz')) or (data.index.tz is None))
 

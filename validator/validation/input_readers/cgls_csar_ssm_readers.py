@@ -78,6 +78,9 @@ class CSarSsmTiffReader(object):
                                 smart_filename_class=CglsS1Filename,
                                 dimensions=dim)
 
+    def read_ts(self, *args, **kwargs):
+        return self.read(*args, **kwargs)
+
     def read(self, *args, **kwargs):
         """ Read data for a single point from data cube """
 
@@ -93,13 +96,13 @@ class CSarSsmTiffReader(object):
         df = df.set_index(df.index.get_level_values('time'))
         df = df[~df.index.duplicated(keep='last')]
 
-        return decode(df).rename(columns={'1': 'ssm'})
+        return decode(df).rename(columns={'1': 'S1_SSM'})
 
 if __name__ == '__main__':
-    path = "/data-read/USERS/wpreimes/QA4SM/data/qa4sm-testdata-hr/input_data/CGLS_CSAR_SSM1km/V1_1/tiff"
+    path = "/home/wolfgang/code/qa4sm/testdata/input_data/CGLS_CSAR_SSM1km/CGLS_CSAR_SSM1km_V1_1/tiff"
     str(datetime.now())
     reader = CSarSsmTiffReader(path)
-    lon, lat = 15.7,47
+    lon, lat = 15.8, 47.9 # 15.78112, 46.91691
     str(datetime.now())
     ts = reader.read(lon, lat)
 

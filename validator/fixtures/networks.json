@@ -339,19 +339,6 @@
     },
     {
         "model": "validator.ismnnetworks",
-        "pk": 27,
-        "fields": {
-            "name": "GROW",
-            "continent": "Europe",
-            "country": "UK",
-            "number_of_stations": "154",
-            "versions": [
-                18
-            ]
-        }
-    },
-    {
-        "model": "validator.ismnnetworks",
         "pk": 28,
         "fields": {
             "name": "GTK",

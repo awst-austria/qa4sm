@@ -53,9 +53,8 @@ class TestMailer(TestCase):
         self.__logger.debug(mail.outbox[0].body)
 
     def test_val_finished(self):
-        test_datasets = [Dataset.objects.get(short_name=globals.C3S),
-                         Dataset.objects.get(short_name=globals.ASCAT),
-                         Dataset.objects.get(short_name=globals.SMAP),]
+        test_datasets = [Dataset.objects.get(short_name=globals.CGLS_CSAR_SSM1km),
+                         Dataset.objects.get(short_name=globals.SMOS),]
 
         run = ValidationRun()
         run.start_time = datetime.now(tzlocal())
@@ -74,7 +73,7 @@ class TestMailer(TestCase):
         ref_c = DatasetConfiguration()
         ref_c.validation = run
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
-        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20191211')
         ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         ref_c.save()
 

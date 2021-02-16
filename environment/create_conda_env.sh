@@ -71,29 +71,20 @@ fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
 
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 geopandas numpy scipy cython matplotlib django pyresample pygrib cartopy xarray pip pytest==5.4.3
+conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 pandas shapely fiona numpy pyproj rtree scipy cython django pyresample xarray geopandas matplotlib cartopy pip
 source activate $PYTHON_ENV_DIR
 
 pip uninstall --yes shapely
 pip install --no-binary :all: shapely
 pip install sqlparse
 pip install pynetcf
-pip install ascat
-pip install c3s_sm
-pip install esa_cci_sm
 pip install smos
-pip install ecmwf_models
 pip install coverage
 pip install pygeogrids
-pip install pytest-django
 pip install django-widget-tweaks
 pip install psycopg2-binary
-pip install pytest-cov
-pip install pytest-mpl
 pip install celery==4.1.1
 pip install celery[redis]
-pip install gldas
-pip install smap-io
 pip install django-countries
 pip install seaborn
 pip install --upgrade --force-reinstall netcdf4
@@ -102,9 +93,13 @@ pip install ismn
 pip install requests
 pip install Equi7Grid
 pip install pytileproj
-pip install git+https://github.com/TUW-GEO/veranda.git ## no public release yet...
 pip install geopathfinder
 pip install qa4sm-reader
+pip install pytest-django
+pip install pytest-cov
+pip install pytest-mpl
+pip install pytest==5.4.3
+pip install veranda==0.1.0 --no-deps
 
 cd $TEMP_DIR
 
