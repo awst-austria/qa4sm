@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-name: null
-=======
 name: qa4sm
->>>>>>> e89aae42db5ea3863e27b0666f5438737b52d7f1
 channels:
   - conda-forge
   - defaults
