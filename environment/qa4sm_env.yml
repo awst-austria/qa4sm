@@ -1,6 +1,5 @@
 # need to install yeoda==0.2.0 --no-deps and veranda==0.1.0 --no-deps afterwards
-
-name: qa4sm_hr
+name: qa4sm
 channels:
   - conda-forge
   - defaults
