@@ -162,11 +162,11 @@ dependencies:
     - pygeobase==0.4.0
     - pygeogrids==0.3.0
     - pynetcf==0.2.2
-    - pytesmo==0.9.1
+    - pytesmo==0.10.0
     - pytest-cov==2.10.1
     - pytest-django==4.1.0
     - pytest-mpl==0.12
-    - git+https://github.com/TUW-GEO/qa4sm-reader.git
+    - qa4sm-reader==0.4
     - redis==3.5.3
     - repurpose==0.8
     - seaborn==0.11.0
