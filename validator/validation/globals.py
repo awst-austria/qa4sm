@@ -86,10 +86,15 @@ ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
 
+
+# ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
+VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
+                 'anomalies', 'anomalies_from', 'anomalies_to']
+DS_FIELDS = ['dataset', 'version']
+
 IRREGULAR_GRIDS = {'SMAP' : 0.35,
                    'SMOS' : 0.25,
                    'ASCAT' : 0.1}
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
-
