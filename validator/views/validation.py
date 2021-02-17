@@ -399,7 +399,7 @@ def __render_filters(filters, filter_widget_id, initial_filters, parametrised=Fa
 
     # extracts the initial filters to be selected from the initial_filters
     # string, see DatasetConfigurationForm.__init__
-    if filters:
+    if filters and initial_filters:
         initial_filter_ids = list(map(int, initial_filters.split('_')))
     else:
         initial_filter_ids = None
