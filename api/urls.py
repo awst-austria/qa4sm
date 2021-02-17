@@ -1,10 +1,10 @@
 from django.conf.urls import url
 from django.urls import path
 
-from api.endpoints.DatasetView import dataset
-from api.endpoints.LoginView import api_login
-from api.endpoints.PathVarTestEndpoint import path_var_get
-from api.endpoints.UserCRUDView import users
+from api.views.DatasetView import dataset
+from api.views.LoginView import api_login
+from api.views.PathVarTestEndpoint import path_var_get
+from api.views.UserCRUDView import users
 
 # schema_view = get_schema_view(
 #     openapi.Info(

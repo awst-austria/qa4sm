@@ -7,7 +7,7 @@ from django.test import TestCase
 from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APIClient
 
-from api.endpoints.UserCRUDView import UserSignupDto, UserSignupSerializer, UserSerializer
+from api.views.UserCRUDView import UserSignupDto, UserSignupSerializer, UserSerializer
 from api.tests.test_helper import create_test_user
 
 User = get_user_model()

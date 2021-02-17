@@ -6,7 +6,7 @@ from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
-from api.endpoints.UserCRUDView import UserSerializer
+from api.views.UserCRUDView import UserSerializer
 
 # Predefined response bodies
 resp_invalid_credentials = JsonResponse({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)

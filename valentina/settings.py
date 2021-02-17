@@ -48,7 +48,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',  # make all endpoints private
+        'rest_framework.permissions.IsAuthenticated',  # make all views private
     ),
     'EXCEPTION_HANDLER': 'api.api_exception_handler.custom_exception_handler'
 }
