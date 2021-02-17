@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NavigationBarComponent} from './components/navigation-bar/navigation-bar.component';
-import {MenubarModule} from 'primeng/menubar';
+
 
 
 @NgModule({
@@ -10,8 +10,7 @@ import {MenubarModule} from 'primeng/menubar';
     NavigationBarComponent
   ],
   imports: [
-    CommonModule,
-    MenubarModule
+    CommonModule
   ]
 })
 export class NavigationBarModule {

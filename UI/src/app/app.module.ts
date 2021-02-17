@@ -3,30 +3,26 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
-import {MenubarModule} from 'primeng/menubar';
 import {HomeComponent} from './pages/home/home.component';
 import {ValidateComponent} from './pages/validate/validate.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NavigationBarModule} from './modules/navigation-bar/navigation-bar.module';
-import {CarouselModule} from 'primeng/carousel';
+
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {GalleriaModule} from 'primeng/galleria';
-import {ButtonModule} from 'primeng/button';
+
 import {ErrorComponent} from './pages/error/error.component';
-import {CardModule} from 'primeng/card';
+
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationComponent} from './pages/validation/validation.component';
 import {LoginComponent} from './pages/login/login.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
 import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
-import {InputTextModule} from 'primeng/inputtext';
-import {PasswordModule} from 'primeng/password';
-import {MessagesModule} from 'primeng/messages';
-import {ToastModule} from 'primeng/toast';
+
 import {UserProfileComponent} from './pages/user-profile/user-profile.component';
-import {PanelModule} from 'primeng/panel';
+
 import {DatasetModule} from './modules/dataset/dataset.module';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -49,17 +45,8 @@ import {DatasetModule} from './modules/dataset/dataset.module';
     HttpClientModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    MenubarModule,
-    CarouselModule,
-    GalleriaModule,
-    InputTextModule,
-    PasswordModule,
-    ButtonModule,
-    CardModule,
-    PanelModule,
-    MessagesModule,
-    ToastModule,
-    DatasetModule
+    DatasetModule,
+    NgbModule
 
   ],
   providers: [

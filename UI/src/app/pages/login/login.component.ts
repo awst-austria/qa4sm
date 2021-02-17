@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {LoginDto} from '../../modules/core/services/auth/login.dto';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
 
 
@@ -10,7 +9,7 @@ import {Router} from '@angular/router';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  providers: [MessageService]
+  providers: []
 })
 export class LoginComponent implements OnInit {
 
@@ -24,7 +23,7 @@ export class LoginComponent implements OnInit {
 
   formMessages = [];
 
-  constructor(private loginService: AuthService, private messageService: MessageService, private router: Router) {
+  constructor(private loginService: AuthService, private router: Router) {
   }
 
   ngOnInit(): void {
@@ -39,14 +38,9 @@ export class LoginComponent implements OnInit {
 
     this.loginService.login(this.loginDto).subscribe(authenticated => {
       if (authenticated) {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'You are logged in',
-          detail: 'Welcome ' + this.loginService.currentUser.username
-        });
         this.router.navigate(['user-profile']);
       } else {
-        this.messageService.add({severity: 'error', summary: 'Authentication error', detail: 'Wrong username or password'});
+
       }
     });
   }
