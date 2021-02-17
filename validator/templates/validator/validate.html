@@ -45,10 +45,10 @@
                                     <nav>
                                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
                                             {% for dc_form in dc_formset %}
-                                                <a class="dc_form_link nav-item nav-link {% if forloop.first %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" {% if forloop.first %}aria-selected="true"{% endif %} onclick="shiftTheButton(event, '#remove_dc_form')">Dataset</a>
+                                                <a class="dc_form_link nav-item nav-link {% if forloop.last %}active{% endif %}" id="id_{{ dc_form.prefix }}-tab" data-toggle="tab" href="#id_{{ dc_form.prefix }}"  aria-controls="id_{{ dc_form.prefix }}" aria-selected="{% if forloop.last %}true{%else%}false{% endif %}" onclick="shiftTheButton(event, '#remove_dc_form')">Dataset</a>
                                             {% endfor %}
-                                                <a id="add_dc_form" class="tab-plus btn btn-primary" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
-                                                <a id="remove_dc_form" class="tab-minus" href="javascript:void(0)" title="Remove active dataset">&times;</a>
+                                                <a id="add_dc_form" value='{{ dc.formset|length }}' class="tab-plus btn btn-primary {%if dc_formset|length == dc_formset.max_num%}hide_element{%endif%}" href="javascript:void(0)"><span class="fas fa-plus" title="Add another dataset"></span></a>
+                                                <a id="remove_dc_form" class="tab-minus {%if dc_formset|length == dc_formset.min_num%}hide_element{%endif%}"  href="javascript:void(0)" title="Remove active dataset">&times;</a>
                                         </div>
                                     </nav>
 
@@ -57,7 +57,7 @@
                                     <div id="dc_form_container" class="card-body tab-content">
 
                                         {% for dc_form in dc_formset.forms %}
-                                            <div class="dc_form tab-pane fade {% if forloop.first %}show active{% endif %}" id="id_{{ dc_form.prefix }}" role="tabpanel" aria-labelledby="id_{{ dc_form.prefix }}-tab">
+                                            <div class="dc_form tab-pane fade {% if forloop.last %}show active{% endif %}" id="id_{{ dc_form.prefix }}" role="tabpanel" aria-labelledby="id_{{ dc_form.prefix }}-tab">
                                                 <div class="mb-3">
                                                     <div class="input-group">
                                                         <div class="input-group-prepend">
@@ -519,7 +519,27 @@
                     {% endfor %}
 
 
-                    <input class="btn btn-lg btn-primary mb-3" type="submit" value="&#9658; Validate">
+                    <input id='validate-run' class="btn btn-lg btn-primary mb-3" type="submit" value="&#9658; Validate">
+                    <!-- this is a hidden field so it is possible to count how many times the Validate button was clicked -->
+                    <input id='click-counter' name='click-counter' type='hidden' value=1>
+                    <!-- this is an area triggered as a dialog window for informing user that there is a validation with given settings -->
+                    <div id="pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
+                      There exists a published validation with exactly the same settings, run on {{val_date}}. <br>
+                      You can run your own validation and wait for the results or you can use the existing one.<br>
+                      You can also close this window and change some settings.<br>
+                      What would you like to do?
+                    </div>
+                    <div id="non_pub_validate-confirm" class='validate-confirm' title="Would you like to use an existing validation?" data-url="{% if val_id %}{% url 'result' val_id %}{% endif%}">
+                      {% if belongs_to_user == True %}
+                      You have already run a validation with exactly the same settings on {{val_date}}. <br>
+                      You can run it again or use the existing one. <br>
+                      {% else %}
+                      There exists a validation with exactly the same settings, run on {{val_date}}. <br>
+                      You can run your own validation and wait for the results or you can use the existing one.<br>
+                      {% endif %}
+                      You can also close this window and change some settings.<br>
+                      What would you like to do?
+                    </div>
                 </div>
             {% endif %}
         {% endwith %}
@@ -704,7 +724,6 @@
                     start_ajax_to_set_valiadtion_period();
                 }
             });
-
         }
 
         function ajax_take_versions_info(versionIds, funcs_set, args_names) {
@@ -740,7 +759,7 @@
             });
           };
 
-          function get_list_of_params(args, args_names){
+         function get_list_of_params(args, args_names){
             /**
              * Returns a list of values assinged to arguments which names are give in args_names;
              * @param  {object} args list of arguments returned by ajax function: arguments[0]
@@ -813,7 +832,7 @@
             ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
           }
 //================================================================================
-
+      
         function change_tab_name() {
             var datasetName = $(this).find('option:selected').text();
             var tabId = '#' + $(this).attr('id').replace(/dataset$/, 'tab');
@@ -1094,13 +1113,14 @@
             start_ajax_to_set_valiadtion_period();
         });
 
+        function set_after(first_element_selector, second_element_selector){
+          $(first_element_selector).after($(second_element_selector))
+        }
+
         function shiftTheButton(obj, buttonSelector){
             var currentObject = obj.currentTarget
-            var removeButton = $(buttonSelector)
-            $(currentObject).after(removeButton)
-
-
-}
+            set_after(currentObject, buttonSelector)
+          }
 
     </script>
 
@@ -1146,11 +1166,11 @@
       // set the appropriate date
       $(this).val(year+'-'+month+'-'+day);
     }
-    
+
     var today = new Date()
     var todays_year = today.getFullYear()
-    var today_str = todays_year + '-' + (today.getMonth()+1) + '-' + today.getDate()    
-        
+    var today_str = todays_year + '-' + (today.getMonth()+1) + '-' + today.getDate()
+
     var dates_settings = {
       dateFormat:'yy-mm-dd',
       changeMonth: true,
@@ -1173,5 +1193,66 @@
      });
     </script>
 
+    <script type="text/javascript">
+
+      function set_counter(){
+        var counter = parseInt($('#click-counter').val())
+        $('#click-counter').val(counter+1)
+      }
+      // this code is added so the tab closing button renders in an appropriate
+      // place; it wasn't an issue before, because only one tab is rendered by default
+      if($('#id_datasets-TOTAL_FORMS') >= $('#id_datasets-MIN_NUM_FORMS')){
+        set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
+      }
+
+      if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){
+        var url_to_go = $('#pub_validate-confirm').attr('data-url')
+        $('#pub_validate-confirm').dialog({
+          resizable: false,
+          height: "auto",
+          width: "auto",
+          modal: true,
+          buttons: {
+            'Use the existing one': function() {
+              window.location.href = url_to_go
+            },
+            "Run your own validation": function() {
+              $('#validate-run').click(set_counter).click();
+              $( this ).dialog( "close" );
+            }
+          }
+        });
+      }
+
+      if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'False'){
+        var url_to_go = $('#non_pub_validate-confirm').attr('data-url')
+        $('#non_pub_validate-confirm').dialog({
+          resizable: false,
+          height: "auto",
+          width: "auto",
+          modal: true,
+          buttons: {
+            'Use the existing one': function() {
+              var validation_id = '{{ val_id }}';
+              ajax_copy_validation(validation_id)
+
+            },
+            "Run your own validation": function() {
+              $('#validate-run').click(set_counter).click();
+              $( this ).dialog( "close" );
+            }
+          }
+        });
+      }
+
+    </script>
+
+    <script type="text/javascript">
+        csrf_token = '{{csrf_token}}';
+        result_list_url = "{% url 'myruns' %}";
+        result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
+        stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
+    </script>
+    <script src="{% static 'js/results_buttons.js' %}"></script>
 
 {% endblock %}
