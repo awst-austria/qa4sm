@@ -25,6 +25,8 @@ import {PasswordModule} from 'primeng/password';
 import {MessagesModule} from 'primeng/messages';
 import {ToastModule} from 'primeng/toast';
 import {UserProfileComponent} from './pages/user-profile/user-profile.component';
+import {PanelModule} from 'primeng/panel';
+import {DatasetModule} from './modules/dataset/dataset.module';
 
 
 @NgModule({
@@ -54,8 +56,10 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
     PasswordModule,
     ButtonModule,
     CardModule,
+    PanelModule,
     MessagesModule,
-    ToastModule
+    ToastModule,
+    DatasetModule
 
   ],
   providers: [

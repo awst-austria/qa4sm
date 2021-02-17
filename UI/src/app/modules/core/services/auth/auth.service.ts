@@ -13,7 +13,6 @@ export class AuthService {
   private API_URL = environment.API_URL;
 
   private authUrl = this.API_URL + 'api/auth';
-  private testUrl = this.API_URL + 'api/path_test/nyaloka/';
 
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = {username: '', firstName: ''};
