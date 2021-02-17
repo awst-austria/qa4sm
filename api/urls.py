@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.urls import path
 
+from api.endpoints.DatasetView import dataset
 from api.endpoints.LoginView import api_login
 from api.endpoints.PathVarTestEndpoint import path_var_get
 from api.endpoints.UserCRUDView import users
@@ -32,7 +33,7 @@ urlpatterns = [
     url(r'^test$', users),
     url(r'^path_test/(?P<username>.+)$', path_var_get),
     path('auth', api_login, name='login'),
-
+    path('dataset', dataset, name='Datasets'),
 
     # path('auth/', LoginView.as_view(), name='login'),
 ]
