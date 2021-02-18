@@ -181,6 +181,7 @@
                         {% endif %}
                     {% else %}
                     <div style="float: right;" class="patchButtonGroup">
+                        <a class="btn btn-sm btn-primary" title="Load settings" href="{% url 'validation' %}?valrun_uuid={{ val.id }}"><span class="fas fa-redo"></span> Load settings</a>
                         {% if current_user %}
                             {% if is_copied %}
                                 <button class="btn btn-sm btn-primary" title="Remove this validation from your list" onclick="ajax_detach_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Untrack </button>

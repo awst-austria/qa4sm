@@ -210,6 +210,21 @@ def validation(request):
     ref_prefix = 'ref'
 
     # Get initial values for dataset forms
+    def _default_initials():
+        ref_initial_values = {
+            "filters": DataFilter.objects.filter(
+                name="FIL_ALL_VALID_RANGE"
+            ),
+            "dataset": Dataset.objects.get(short_name=val_globals.ISMN),
+        }
+        data_initial_values = [{
+            "filters": DataFilter.objects.filter(
+                name="FIL_ALL_VALID_RANGE"
+            ),
+            "dataset": Dataset.objects.get(short_name=val_globals.C3S),
+        }]
+        return ref_initial_values, data_initial_values
+
     if request.method == "POST":
         def object_list_from_key(typ, key):
             return list(map(
@@ -220,38 +235,30 @@ def validation(request):
         def object_from_key(typ, key):
             return typ.objects.get(pk=int(request.POST.get(key)[0]))
 
-        prefixes = ["ref"]
-        num_forms = int(request.POST.get("datasets-TOTAL_FORMS")[0])
-        for i in range(num_forms):
-            prefixes.append(f"datasets-{i}")
+        try:
+            prefixes = ["ref"]
+            num_forms = int(request.POST.get("datasets-TOTAL_FORMS")[0])
+            for i in range(num_forms):
+                prefixes.append(f"datasets-{i}")
 
-        initial_values = []
-        for pfx in prefixes:
-            initial_values.append({
-                "filters": object_list_from_key(DataFilter, pfx + "-filters"),
-                "dataset": object_from_key(Dataset, pfx + "-dataset"),
-                "version": object_from_key(DatasetVersion, pfx + "-version"),
-                "variable": object_from_key(DataVariable, pfx + "-variable"),
-            })
-        ref_initial_values = initial_values[0]
-        data_initial_values = initial_values[1:]
+            initial_values = []
+            for pfx in prefixes:
+                initial_values.append({
+                    "filters": object_list_from_key(DataFilter, pfx + "-filters"),
+                    "dataset": object_from_key(Dataset, pfx + "-dataset"),
+                    "version": object_from_key(DatasetVersion, pfx + "-version"),
+                    "variable": object_from_key(DataVariable, pfx + "-variable"),
+                })
+            ref_initial_values = initial_values[0]
+            data_initial_values = initial_values[1:]
+        except TypeError:
+            # happens with invalid requests
+            ref_initial_values, data_initial_values = _default_initials()
 
     else:
         valrun_uuid = request.GET.get("valrun_uuid", None)
         if valrun_uuid is None:
-            ref_initial_values = {
-                "filters": DataFilter.objects.filter(
-                    name="FIL_ALL_VALID_RANGE"
-                ),
-                "dataset": Dataset.objects.get(short_name=val_globals.ISMN),
-            }
-            data_initial_values = [{
-                "filters": DataFilter.objects.filter(
-                    name="FIL_ALL_VALID_RANGE"
-                ),
-                "dataset": Dataset.objects.get(short_name=val_globals.C3S),
-            }]
-            valrun_initial_values = None
+            ref_initial_values, data_initial_values = _default_initials()
         else:
             valrun = get_object_or_404(ValidationRun, pk=valrun_uuid)
             # initial settings for datasets
@@ -273,15 +280,18 @@ def validation(request):
     # get initial values for the validation run settings
     valrun_initial_values = {}
     for field in ValidationRunForm.Meta.fields:
-        if request.method == "POST":
-            valrun_initial_values[field] = request.POST.get(field)
+        if request.method != "POST" and valrun_uuid is None:
+            valrun_initial_values = None
         else:
-            valrun_initial_values[field] = getattr(valrun, field)
-        # the dates should be without time
-        if isinstance(valrun_initial_values[field], datetime):
-            valrun_initial_values[field] = (
-                valrun_initial_values[field].strftime("%Y-%m-%d")
-            )
+            if request.method == "POST":
+                valrun_initial_values[field] = request.POST.get(field)
+            else:
+                valrun_initial_values[field] = getattr(valrun, field)
+            # the dates should be without time
+            if isinstance(valrun_initial_values[field], datetime):
+                valrun_initial_values[field] = (
+                    valrun_initial_values[field].strftime("%Y-%m-%d")
+                )
 
 
     if request.method == "POST":
