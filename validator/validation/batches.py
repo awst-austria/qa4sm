@@ -103,20 +103,20 @@ def create_jobs(validation_run):
 
     # if we've got ISMN data, process one network at a time
     elif isinstance(ref_reader, ISMN_Interface):
-
+        
         depth_from, depth_to = get_depths_params(validation_run.reference_configuration.parametrisedfilter_set.all())
 
-        ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=depth_from, max_depth=depth_to)
-        mdata = ref_reader.metadata[ids]
-        networks = np.unique(mdata['network'])
+        ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=depth_from, max_depth=depth_to, groupby='network')
 
         jobs = []
-        for network in networks:
-            net_ids = mdata['network'] == network
-            net_data = mdata[net_ids]
-            lons = net_data['longitude']
-            lats = net_data['latitude']
-            gpis = ids[net_ids]
+        for network, net_ids in ids.items():
+            lons, lats = [], []
+            for idx in net_ids:
+                meta = ref_reader.read_ts(idx, return_meta=True)[1]
+                lons.append(meta['longitude'][0][0])
+                lats.append(meta['latitude'][0][0])
+            gpis = net_ids
+            gpis, lons, lats = np.array(gpis), np.array(lons), np.array(lats)
 
             gpis, lons, lats, index = _geographic_subsetting(gpis, lons, lats, validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
 

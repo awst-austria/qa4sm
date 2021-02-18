@@ -293,9 +293,9 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
+        assert new_run.total_points == 9, 'The number of validation points is off'  # 9 ismn stations in hawaii testdata
         assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+        assert new_run.ok_points == 9, 'Some validation points yield errors'
 
         self.check_results(new_run)
         self.delete_run(new_run)
