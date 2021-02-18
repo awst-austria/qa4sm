@@ -1,3 +1,28 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col">
+      <ngb-carousel *ngIf="landingPageImages" [showNavigationArrows]="false" [showNavigationIndicators]="true">
+        <ng-template ngbSlide *ngFor="let image of landingPageImages">
+          <div class="picsum-img-wrapper">
+            <img [src]="image" alt="Random slide">
+          </div>
+          <div class="carousel-caption">
+            <!--      <h3>No mouse navigation</h3>-->
+            <!--      <p>This carousel hides navigation arrows and indicators.</p>-->
+          </div>
+        </ng-template>
+      </ngb-carousel>
+    </div>
+
+  </div>
+  <div class="row">
+    <div class="col text-center">
+      <button type="button" class="btn btn-primary btn-lg m-1">Sign up</button>
+      <button (click)="navigateToLogin()" type="button" class="btn btn-primary btn-lg m-1">Sign in</button>
+    </div>
+  </div>
+</div>
+
 <!--<div class="p-grid">-->
 <!--  <div class="p-col-12">-->
 <!--    <p-carousel [value]="landingPageImages" [circular]="true" [autoplayInterval]="3000">-->

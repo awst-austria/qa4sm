@@ -1,5 +1,7 @@
+
+@import "~src/style.variables";
 .navbar {
-  background-color: #00AAE3;
+  background-color: $base-color;
   color: #ffffff;
 }
 

@@ -24,6 +24,7 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 import {DatasetModule} from './modules/dataset/dataset.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {ToastModule} from './modules/toast/toast.module';
 
 
 @NgModule({
@@ -37,20 +38,21 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
     LoginComponent,
     UserProfileComponent
   ],
-  imports: [
-    LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
-    NavigationBarModule,
-    FormsModule,
-    ReactiveFormsModule,
-    BrowserModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    DatasetModule,
-    NgbModule,
-    FontAwesomeModule
+    imports: [
+        LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
+        NavigationBarModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserModule,
+        HttpClientModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        DatasetModule,
+        NgbModule,
+        FontAwesomeModule,
+        ToastModule
 
-  ],
+    ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

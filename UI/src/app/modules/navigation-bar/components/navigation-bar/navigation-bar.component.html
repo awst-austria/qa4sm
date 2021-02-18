@@ -1,33 +1,59 @@
-<nav class="navbar navbar-expand-lg">
+<nav class="navbar navbar-expand-md mb-3 shadow-sm py-md-3">
   <a class="navbar-brand" routerLink="home">QA4SM Validation Service</a>
-  <button class="navbar-toggler " type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
           aria-expanded="false" aria-label="Toggle navigation" (click)="isCollapsed = !isCollapsed"
-          [attr.aria-expanded]="!isCollapsed" aria-controls="navbarTogglerDemo02">
+          [attr.aria-expanded]="!isCollapsed" >
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <div ngbDropdown class="d-inline-block">
-        <button class="btn btn-outline-primary" ngbDropdownToggle>Menu</button>
+        <button class="navbar-btn btn btn-outline-primary m-1" ngbDropdownToggle>Menu</button>
         <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-          <button ngbDropdownItem><fa-icon [icon]="aboutIcon"></fa-icon> About</button>
-          <button ngbDropdownItem><fa-icon [icon]="helpIcon"></fa-icon> Help</button>
-          <button ngbDropdownItem><fa-icon [icon]="datasetsIcon"></fa-icon> Datasets</button>
-          <button ngbDropdownItem><fa-icon [icon]="termsIcon"></fa-icon> Terms</button>
-          <button ngbDropdownItem><fa-icon [icon]="profileIcon"></fa-icon> Profile</button>
-          <button ngbDropdownItem><fa-icon [icon]="logoutIcon"></fa-icon> Logout</button>
+          <button ngbDropdownItem>
+            <fa-icon [icon]="aboutIcon"></fa-icon>
+            About
+          </button>
+          <button ngbDropdownItem>
+            <fa-icon [icon]="helpIcon"></fa-icon>
+            Help
+          </button>
+          <button ngbDropdownItem>
+            <fa-icon [icon]="datasetsIcon"></fa-icon>
+            Datasets
+          </button>
+          <button ngbDropdownItem>
+            <fa-icon [icon]="termsIcon"></fa-icon>
+            Terms
+          </button>
+          <button ngbDropdownItem [disabled]="userProfileButtonDisabled">
+            <fa-icon [icon]="profileIcon"></fa-icon>
+            Profile
+          </button>
+          <button ngbDropdownItem [disabled]="logoutButtonDisabled" (click)="logout()">
+            <fa-icon [icon]="logoutIcon"></fa-icon>
+            Logout
+          </button>
         </div>
       </div>
 
-      <li class="nav-item">
-        <a class="nav-link navbar-btn btn btn-outline-primary" routerLink="home" routerLinkActive="navbar-btn-active">Home<span class="sr-only">(current)</span></a>
+      <li class="nav-item  m-1">
+        <a class="nav-link navbar-btn btn btn-outline-primary " routerLink="validate" routerLinkActive="navbar-btn-active">
+          <fa-icon [icon]="validateIcon"></fa-icon>
+          Validate<span
+          class="sr-only">(current)</span></a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="login">Link</a>
+      <li class="nav-item  m-1">
+        <a class="nav-link navbar-btn btn btn-outline-primary" routerLink="validations">
+          <fa-icon [icon]="myValidationsIcon"></fa-icon>
+          My Validations
+        </a>
       </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
+      <li class="nav-item  m-1">
+        <a class="nav-link navbar-btn btn btn-outline-primary" href="#">
+          <fa-icon [icon]="publishedValidationsIcon"></fa-icon>
+          Published Validations</a>
       </li>
     </ul>
   </div>

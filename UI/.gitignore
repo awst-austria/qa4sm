@@ -46,5 +46,5 @@ testem.log
 Thumbs.db
 
 # Since we use scss, css file should be excluded
-src/app/**/*.css
-src/app/**/*.css.map
+src/**/*.css
+src/**/*.css.map
