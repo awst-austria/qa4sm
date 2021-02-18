@@ -3,6 +3,7 @@ from django.urls import path
 
 from api.views.DatasetView import dataset
 from api.views.LoginView import api_login
+from api.views.LogoutView import api_logout
 from api.views.PathVarTestEndpoint import path_var_get
 from api.views.UserView import users
 
@@ -32,7 +33,8 @@ urlpatterns = [
     #
     url(r'^test$', users),
     url(r'^path_test/(?P<username>.+)$', path_var_get),
-    path('auth', api_login, name='login'),
+    path('auth/login', api_login, name='login'),
+    path('auth/logout', api_logout, name='logout'),
     path('dataset', dataset, name='Datasets'),
 
     # path('auth/', LoginView.as_view(), name='login'),
