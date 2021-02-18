@@ -18,7 +18,7 @@ from django.template import loader
 
 from validator.forms import DatasetConfigurationForm, FilterCheckboxSelectMultiple,\
     ValidationRunForm, ParamFilterChoiceField, ParamFilterSelectMultiple
-from validator.models import DataFilter, DatasetVersion
+from validator.models import DataFilter, DatasetVersion, DataVariable
 from validator.models import Dataset
 from validator.models import Settings
 from validator.models import ValidationRun, DatasetConfiguration
@@ -209,46 +209,80 @@ def validation(request):
     dc_prefix = 'datasets'
     ref_prefix = 'ref'
 
-    # initial values
-    valrun_uuid = request.GET.get("valrun_uuid", None)
-    if valrun_uuid == None:
-        ref_initial_values = {
-            "filters": DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE"),
-            "dataset": Dataset.objects.get(short_name=val_globals.ISMN),
-        }
-        data_initial_values = [{
-            "filters": DataFilter.objects.filter(name="FIL_ALL_VALID_RANGE"),
-            "dataset": Dataset.objects.get(short_name=val_globals.C3S),
-        }]
-        valrun_initial_values = None
-    else:
-        valrun = get_object_or_404(ValidationRun, pk=valrun_uuid)
-        # initial settings for datasets
-        ref_config = valrun.reference_configuration
-        data_configs = [dc for dc in valrun.dataset_configurations.all()
-                        if dc.id != ref_config.id]
-        initial_values = [
-            {
-                "filters": dc.filters.all(),
-                "dataset": dc.dataset,
-                "version": dc.version,
-                "variable": dc.variable,
-            }
-            for dc in [ref_config] + data_configs
-        ]
+    # Get initial values for dataset forms
+    if request.method == "POST":
+        def object_list_from_key(typ, key):
+            return list(map(
+                lambda x: typ.objects.get(pk=int(x)),
+                request.POST.getlist(key)
+            ))
+
+        def object_from_key(typ, key):
+            return typ.objects.get(pk=int(request.POST.get(key)[0]))
+
+        prefixes = ["ref"]
+        num_forms = int(request.POST.get("datasets-TOTAL_FORMS")[0])
+        for i in range(num_forms):
+            prefixes.append(f"datasets-{i}")
+
+        initial_values = []
+        for pfx in prefixes:
+            initial_values.append({
+                "filters": object_list_from_key(DataFilter, pfx + "-filters"),
+                "dataset": object_from_key(Dataset, pfx + "-dataset"),
+                "version": object_from_key(DatasetVersion, pfx + "-version"),
+                "variable": object_from_key(DataVariable, pfx + "-variable"),
+            })
         ref_initial_values = initial_values[0]
         data_initial_values = initial_values[1:]
 
-        # validation run settings
-        valrun_initial_values = {}
-        for field in ValidationRunForm.Meta.fields:
+    else:
+        valrun_uuid = request.GET.get("valrun_uuid", None)
+        if valrun_uuid is None:
+            ref_initial_values = {
+                "filters": DataFilter.objects.filter(
+                    name="FIL_ALL_VALID_RANGE"
+                ),
+                "dataset": Dataset.objects.get(short_name=val_globals.ISMN),
+            }
+            data_initial_values = [{
+                "filters": DataFilter.objects.filter(
+                    name="FIL_ALL_VALID_RANGE"
+                ),
+                "dataset": Dataset.objects.get(short_name=val_globals.C3S),
+            }]
+            valrun_initial_values = None
+        else:
+            valrun = get_object_or_404(ValidationRun, pk=valrun_uuid)
+            # initial settings for datasets
+            ref_config = valrun.reference_configuration
+            data_configs = [dc for dc in valrun.dataset_configurations.all()
+                            if dc.id != ref_config.id]
+            initial_values = [
+                {
+                    "filters": dc.filters.all(),
+                    "dataset": dc.dataset,
+                    "version": dc.version,
+                    "variable": dc.variable,
+                }
+                for dc in [ref_config] + data_configs
+            ]
+            ref_initial_values = initial_values[0]
+            data_initial_values = initial_values[1:]
+
+    # get initial values for the validation run settings
+    valrun_initial_values = {}
+    for field in ValidationRunForm.Meta.fields:
+        if request.method == "POST":
+            valrun_initial_values[field] = request.POST.get(field)
+        else:
             valrun_initial_values[field] = getattr(valrun, field)
-            # the dates should be without time
-            if isinstance(valrun_initial_values[field], datetime):
-                valrun_initial_values[field] = (
-                    valrun_initial_values[field].strftime("%Y-%m-%d")
-                )
-        
+        # the dates should be without time
+        if isinstance(valrun_initial_values[field], datetime):
+            valrun_initial_values[field] = (
+                valrun_initial_values[field].strftime("%Y-%m-%d")
+            )
+
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:
@@ -491,4 +525,3 @@ def ajax_get_version_info(request):
         'intervals_to' : intervals_to
         }
     return JsonResponse(response_data)
-
