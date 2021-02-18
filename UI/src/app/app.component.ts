@@ -1,5 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
+import {faCoffee} from '@fortawesome/free-solid-svg-icons/faCoffee';
+
+
 
 @Component({
   selector: 'app-root',
@@ -8,7 +11,7 @@ import {NGXLogger} from 'ngx-logger';
 })
 export class AppComponent implements OnInit {
   title = 'qa4sm-ui';
-  isCollapsed = true;
+
 
   constructor(private logger: NGXLogger) {
   }

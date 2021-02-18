@@ -23,6 +23,7 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 
 import {DatasetModule} from './modules/dataset/dataset.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 
 @NgModule({
@@ -46,7 +47,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     BrowserAnimationsModule,
     AppRoutingModule,
     DatasetModule,
-    NgbModule
+    NgbModule,
+    FontAwesomeModule
 
   ],
   providers: [

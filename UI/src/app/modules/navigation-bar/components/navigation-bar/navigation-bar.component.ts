@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {faCoffee} from '@fortawesome/free-solid-svg-icons/faCoffee';
 
 @Component({
   selector: 'navigation-bar',
@@ -7,6 +8,9 @@ import {AuthService} from '../../../core/services/auth/auth.service';
   styleUrls: ['./navigation-bar.component.scss']
 })
 export class NavigationBarComponent implements OnInit {
+
+  isCollapsed = true;
+  mIcon=faCoffee;
 
   // items: MenuItem[];
   // loginMenuItem: MenuItem;
