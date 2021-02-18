@@ -2,15 +2,15 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {LoginDto} from '../../modules/core/services/auth/login.dto';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {MessageService} from 'primeng/api';
 import {Router} from '@angular/router';
+import {ToastService} from '../../modules/toast/services/toast.service';
 
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  providers: [MessageService]
+  providers: []
 })
 export class LoginComponent implements OnInit {
 
@@ -24,13 +24,14 @@ export class LoginComponent implements OnInit {
 
   formMessages = [];
 
-  constructor(private loginService: AuthService, private messageService: MessageService, private router: Router) {
+  constructor(private loginService: AuthService, private router: Router, private toastService: ToastService) {
   }
 
   ngOnInit(): void {
   }
 
   onSubmit() {
+
     this.submitted = true;
     console.log(this.loginDto);
     this.loginDto.username = this.loginForm.value.username;
@@ -39,24 +40,15 @@ export class LoginComponent implements OnInit {
 
     this.loginService.login(this.loginDto).subscribe(authenticated => {
       if (authenticated) {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'You are logged in',
-          detail: 'Welcome ' + this.loginService.currentUser.username
-        });
-        this.router.navigate(['user-profile']);
+        this.router.navigate(['user-profile']).then(
+          value => this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.loginService.currentUser.username));
       } else {
-        this.messageService.add({severity: 'error', summary: 'Authentication error', detail: 'Wrong username or password'});
+        this.toastService.showErrorWithHeader('Login failed', 'Wrong username or password');
       }
     });
   }
 
   get diagnostic() {
     return JSON.stringify(this.loginDto);
-  }
-
-  loginClick() {
-    console.info('clicked');
-
   }
 }

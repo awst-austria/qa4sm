@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DatasetComponent } from './components/dataset/dataset.component';
-import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 
 
@@ -13,7 +12,6 @@ import {FormsModule} from '@angular/forms';
   ],
   imports: [
     CommonModule,
-    DropdownModule,
     FormsModule
   ]
 })

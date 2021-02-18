@@ -12,7 +12,8 @@ import {UserDto} from './user.dto';
 export class AuthService {
   private API_URL = environment.API_URL;
 
-  private authUrl = this.API_URL + 'api/auth';
+  private loginUrl = this.API_URL + 'api/auth/login';
+  private logoutUrl = this.API_URL + 'api/auth/logout';
 
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = {username: '', firstName: ''};
@@ -24,7 +25,7 @@ export class AuthService {
 
   private init() {
     this.httpClient
-      .get<UserDto>(this.authUrl)
+      .get<UserDto>(this.loginUrl)
       .subscribe(
         data => {
           this.currentUser = data;
@@ -39,10 +40,10 @@ export class AuthService {
   login(credentials: LoginDto): Subject<boolean> {
     let authResult = new Subject<boolean>();
     this.httpClient
-      .post<UserDto>(this.authUrl, credentials)
+      .post<UserDto>(this.loginUrl, credentials)
       .subscribe(
         data => {
-          this.currentUser = data;
+          this.currentUser = {username: '', firstName: ''};
           this.authenticated.next(true);
           authResult.next(true);
           console.log('Login success', data);
@@ -57,8 +58,23 @@ export class AuthService {
     return authResult;
   }
 
-  logout() {
-    //TODO: to be implemented
+  logout(): Subject<boolean> {
+    let logoutResult = new Subject<boolean>();
+    this.httpClient
+      .post(this.logoutUrl, null)
+      .subscribe(
+        data => {
+          this.currentUser = {username: '', firstName: ''};
+          this.authenticated.next(false);
+          logoutResult.next(true);
+          console.log('Logout success');
+        },
+        error => {
+          logoutResult.next(false);
+          console.log('srv msg:', error.error);
+        }
+      );
+    return logoutResult;
   }
 
 }

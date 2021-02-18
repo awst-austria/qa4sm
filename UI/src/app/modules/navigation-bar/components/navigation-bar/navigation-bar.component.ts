@@ -1,6 +1,18 @@
 import {Component, OnInit} from '@angular/core';
-import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {faCoffee} from '@fortawesome/free-solid-svg-icons/faCoffee';
+import {
+  faBalanceScale, faBook,
+  faCog,
+  faDatabase,
+  faDoorOpen,
+  faInfoCircle,
+  faQuestionCircle,
+  faUserCircle,
+  faUserCog
+} from '@fortawesome/free-solid-svg-icons';
+import {ToastService} from '../../../toast/services/toast.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'navigation-bar',
@@ -9,36 +21,22 @@ import {AuthService} from '../../../core/services/auth/auth.service';
 })
 export class NavigationBarComponent implements OnInit {
 
-  items: MenuItem[];
-  loginMenuItem: MenuItem;
-  logoutMenuItem: MenuItem;
-  userProfileMenuItem: MenuItem;
+  logoutButtonDisabled = true;
+  userProfileButtonDisabled = true;
+  isCollapsed = true;
+  aboutIcon = faInfoCircle;
+  helpIcon = faQuestionCircle;
+  datasetsIcon = faDatabase;
+  termsIcon = faBalanceScale;
+  profileIcon = faUserCog;
+  logoutIcon = faDoorOpen;
+  validateIcon = faCog;
+  myValidationsIcon = faUserCircle;
+  publishedValidationsIcon = faBook;
 
-  constructor(private authService: AuthService) {
-    this.loginMenuItem = {label: 'Login', icon: 'pi pi-fw pi-sign-in', routerLink: ['login']};
-    this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user',routerLink:['user-profile']};
-    this.logoutMenuItem = {label: 'Logout', icon: 'pi pi-fw pi-sign-out'};
-    this.items = [
-      {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['']},
-      {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate']},
-      {label: 'My validations', icon: 'pi pi-fw pi-folder'},
-      {label: 'Published validations', icon: 'pi pi-fw pi-globe'},
-      {
-        label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
-          {label: 'About', icon: 'pi pi-fw pi-info'},
-          {label: 'Help', icon: 'pi pi-fw pi-question'},
-          {label: 'Datasets', icon: 'pi pi-fw pi-save'},
-          {label: 'Terms', icon: 'pi pi-fw pi-briefcase'},
-        ]
-      },
-      {
-        label: 'Profile', icon: 'pi pi-fw pi-user', items: [
-          this.userProfileMenuItem,
-          this.logoutMenuItem,
-          this.loginMenuItem,
-        ]
-      }
-    ];
+
+  constructor(private authService: AuthService, private toastService: ToastService, private router: Router) {
+
   }
 
   ngOnInit(): void {
@@ -46,9 +44,17 @@ export class NavigationBarComponent implements OnInit {
   }
 
   private authStatusChanged(authenticated: boolean) {
-    this.logoutMenuItem.disabled = !authenticated;
-    this.loginMenuItem.disabled = authenticated;
-    this.userProfileMenuItem.disabled = !authenticated;
+    this.logoutButtonDisabled = !authenticated;
+    this.userProfileButtonDisabled = !authenticated;
+  }
+
+  logout() {
+    this.authService.logout().subscribe(result => {
+        if (result) {//Successful logout
+          this.router.navigate(['home']).then(value => this.toastService.showSuccessWithHeader('Logout','Successful logout'))
+        }
+      }
+    );
   }
 
 }
