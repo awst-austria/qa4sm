@@ -11,14 +11,17 @@
       <div ngbDropdown class="d-inline-block">
         <button class="btn btn-outline-primary" ngbDropdownToggle>Menu</button>
         <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-          <button ngbDropdownItem><fa-icon [icon]="mIcon"></fa-icon> Action - 1</button>
-          <button ngbDropdownItem>Another Action</button>
-          <button ngbDropdownItem>Something else is here</button>
+          <button ngbDropdownItem><fa-icon [icon]="aboutIcon"></fa-icon> About</button>
+          <button ngbDropdownItem><fa-icon [icon]="helpIcon"></fa-icon> Help</button>
+          <button ngbDropdownItem><fa-icon [icon]="datasetsIcon"></fa-icon> Datasets</button>
+          <button ngbDropdownItem><fa-icon [icon]="termsIcon"></fa-icon> Terms</button>
+          <button ngbDropdownItem><fa-icon [icon]="profileIcon"></fa-icon> Profile</button>
+          <button ngbDropdownItem><fa-icon [icon]="logoutIcon"></fa-icon> Logout</button>
         </div>
       </div>
 
-      <li class="nav-item active">
-        <a class="nav-link" routerLink="home">Home<span class="sr-only">(current)</span></a>
+      <li class="nav-item">
+        <a class="nav-link navbar-btn btn btn-outline-primary" routerLink="home" routerLinkActive="navbar-btn-active">Home<span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
         <a class="nav-link" routerLink="login">Link</a>
@@ -27,10 +30,6 @@
         <a class="nav-link disabled" href="#">Disabled</a>
       </li>
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
   </div>
 </nav>
 <!--<nav class="navbar navbar-expand-lg ">-->

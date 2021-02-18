@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {faCoffee} from '@fortawesome/free-solid-svg-icons/faCoffee';
+import {faBalanceScale, faDatabase, faDoorOpen, faInfoCircle, faQuestionCircle, faUserCog} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'navigation-bar',
@@ -10,7 +11,12 @@ import {faCoffee} from '@fortawesome/free-solid-svg-icons/faCoffee';
 export class NavigationBarComponent implements OnInit {
 
   isCollapsed = true;
-  mIcon=faCoffee;
+  aboutIcon=faInfoCircle;
+  helpIcon=faQuestionCircle;
+  datasetsIcon=faDatabase;
+  termsIcon=faBalanceScale;
+  profileIcon=faUserCog;
+  logoutIcon=faDoorOpen;
 
   // items: MenuItem[];
   // loginMenuItem: MenuItem;
