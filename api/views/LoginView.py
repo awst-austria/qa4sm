@@ -48,7 +48,7 @@ def api_login(request):
             if user is not None:
                 login(request, user)
                 user_serializer = UserSerializer(request.user)
-                return JsonResponse(user_serializer.data)
+                return JsonResponse(user_serializer.data, status=status.HTTP_200_OK)
 
         return resp_invalid_credentials
 
@@ -57,7 +57,7 @@ def api_login(request):
         headers = request.headers
         if request.user.is_authenticated:
             user_serializer = UserSerializer(request.user)
-            return JsonResponse(user_serializer.data)
+            return JsonResponse(user_serializer.data, status=status.HTTP_200_OK)
         else:
             return resp_unauthorized
 
