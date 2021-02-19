@@ -60,6 +60,14 @@ class ValidationRunForm(forms.ModelForm):
                 self.fields[name], name
             )
 
+        # accessors for initial values of time interval
+        self.initial_interval_from = self.fields["interval_from"].initial
+        if self.initial_interval_from == START_TIME:
+            self.initial_interval_from = ""
+        self.initial_interval_to = self.fields["interval_to"].initial
+        if self.initial_interval_to == END_TIME:
+            self.initial_interval_to = ""
+
     def clean(self):
         values = super(ValidationRunForm, self).clean()
         if(('anomalies' in values) and (values['anomalies'] != ValidationRun.CLIMATOLOGY)):

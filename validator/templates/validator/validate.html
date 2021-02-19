@@ -827,9 +827,13 @@
             $('#id_interval_to').val(min_date_to_str);
           }
 
-          function start_ajax_to_set_valiadtion_period(){
-            var versionIds = find_current_ids();
-            ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
+          function start_ajax_to_set_valiadtion_period(event){
+              var versionIds = find_current_ids();
+              var initialIntervalsFrom = event.data.initialIntervalsFrom;
+              var initialIntervalsTo = event.data.initialIntervalsTo;
+              if (!initialIntervalsFrom && !initialIntervalsTo) {
+                  ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
+              }
           }
 //================================================================================
       
