@@ -830,7 +830,7 @@
     },
     {
         "model": "validator.ismnnetworks",
-        " ": 60,
+        "pk": 60,
         "fields": {
             "name": "USDA-ARS",
             "continent": "North America",
