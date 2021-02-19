@@ -2,3 +2,6 @@
 	path = testdata
 	url = https://github.com/awst-austria/qa4sm-testdata
 	branch = master
+[submodule "qa4sm-testdata"]
+	path = qa4sm-testdata
+	url = git://github.com/awst-austria/qa4sm-testdata.git
