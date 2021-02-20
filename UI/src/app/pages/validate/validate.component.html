@@ -19,11 +19,16 @@
 
             <p-accordionTab [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"
                             [selected]="i == 0">
-              <qa-dataset  (removeDataset)="removeDataset($event)" [datasetSelection]="selectedDatasets[i]"
+              <qa-dataset (removeDataset)="removeDataset($event)" [datasetSelection]="selectedDatasets[i]"
                           [removable]="true"></qa-dataset>
             </p-accordionTab>
 
           </p-accordion>
+          <div class="p-fluid">
+            <button pButton type="button" label="Add dataset" icon="pi pi-trash" (click)="addDataset()"
+                    class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
+                    [disabled]="addDatasetButtonDisabled()"></button>
+          </div>
         </p-panel>
       </div>
 

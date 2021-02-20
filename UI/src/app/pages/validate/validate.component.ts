@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {DatasetService} from '../../modules/dataset/services/dataset.service';
 import {DatasetSelection} from '../../modules/dataset/components/dataset/dataset-selection';
-import {RndGenService} from '../../modules/core/services/rnd-gen.service';
 
+const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should com from either config file or the database
 
 @Component({
   selector: 'app-validate',
@@ -23,6 +23,15 @@ export class ValidateComponent implements OnInit {
     }
   }
 
+  addDataset() {
+    this.datasetService.getAllDatasets().subscribe(datasets => {
+      if (datasets.length > 0) {
+        this.selectedDatasets.push(new DatasetSelection(
+          datasets[0].pretty_name, datasets[0].id, 0, 0));
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.datasetService.getAllDatasets().subscribe(datasets => {
       if (datasets.length > 0) {
@@ -30,6 +39,10 @@ export class ValidateComponent implements OnInit {
           datasets[0].pretty_name, datasets[0].id, 0, 0));
       }
     });
+  }
+
+  addDatasetButtonDisabled(): boolean {
+    return this.selectedDatasets.length >= MAX_DATASETS_FOR_VALIDATION;
   }
 
 }

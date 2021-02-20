@@ -27,7 +27,12 @@ export class DatasetComponent implements OnInit {
 
   ngOnInit(): void {
     this.datasetService.getAllDatasets().subscribe(
-      datasets => this.datasets = datasets
+      datasets => {
+        this.datasets = datasets;
+        if (this.datasetSelection != undefined) {
+          this.selectedDataset=this.datasets.find(ds=>ds.id==this.datasetSelection.datasetId);
+        }
+      }
     );
   }
 
