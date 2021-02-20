@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {DatasetService} from '../../modules/dataset/services/dataset.service';
 import {DatasetSelection} from '../../modules/dataset/components/dataset/dataset-selection';
+import {RndGenService} from '../../modules/core/services/rnd-gen.service';
 
 
 @Component({
@@ -12,21 +13,22 @@ export class ValidateComponent implements OnInit {
   selectedDatasets: DatasetSelection[] = [];
 
   constructor(private datasetService: DatasetService) {
-
-
   }
 
-  updateDatasetSelection(selection: DatasetSelection) {
-    console.log('update', selection);
 
-    this.selectedDatasets[selection.idx].datasetName = selection.datasetName;
-    console.log(this.selectedDatasets);
+  removeDataset(selection: DatasetSelection) {
+    let toBeRemoved = this.selectedDatasets.indexOf(selection);
+    if (toBeRemoved > -1) {
+      this.selectedDatasets.splice(toBeRemoved, 1);
+    }
   }
 
   ngOnInit(): void {
     this.datasetService.getAllDatasets().subscribe(datasets => {
-      datasets.forEach(dataset => this.selectedDatasets.push(new DatasetSelection(this.selectedDatasets.length,
-        dataset.pretty_name, dataset.id, 0, 0)));
+      if (datasets.length > 0) {
+        this.selectedDatasets.push(new DatasetSelection(
+          datasets[0].pretty_name, datasets[0].id, 0, 0));
+      }
     });
   }
 

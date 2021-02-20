@@ -29,6 +29,8 @@ import {DropdownModule} from 'primeng/dropdown';
 import {PanelModule} from 'primeng/panel';
 import {TabViewModule} from 'primeng/tabview';
 import {AccordionModule} from 'primeng/accordion';
+import {TooltipModule} from 'primeng/tooltip';
+import {ButtonModule} from 'primeng/button';
 
 
 @NgModule({
@@ -58,7 +60,10 @@ import {AccordionModule} from 'primeng/accordion';
     PanelModule,
     TabViewModule,
     DropdownModule,
-    AccordionModule
+    AccordionModule,
+    PanelModule,
+    TooltipModule,
+    ButtonModule
 
 
   ],

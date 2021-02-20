@@ -3,7 +3,9 @@
     <label for="datasetSelector">Dataset</label>
   </div>
   <div class="p-col">
-    <p-dropdown id="datasetSelector" (onChange)="onDatasetChange()" [options]="datasets" [(ngModel)]="selectedDataset" optionLabel="pretty_name" [style]="{'width': '100%'}"></p-dropdown>
+    <p-dropdown id="datasetSelector" (onChange)="onDatasetChange()" [options]="datasets"
+                [(ngModel)]="selectedDataset"
+                optionLabel="pretty_name" [style]="{'width': '100%'}"></p-dropdown>
   </div>
 </div>
 
@@ -13,7 +15,7 @@
 
   </div>
   <div class="p-col">
-    <p-dropdown id="versionSelector"   [style]="{'width': '100%'}"></p-dropdown>
+    <p-dropdown id="versionSelector" [style]="{'width': '100%'}"></p-dropdown>
   </div>
 </div>
 
@@ -26,3 +28,13 @@
   </div>
 </div>
 
+
+<!--Remove dataset panel button-->
+<div class="p-grid" *ngIf="removable">
+  <div class="p-col">
+    <div class="p-fluid">
+      <button pButton type="button" (click)="onRemoveDataset()" label="Remove" icon="pi pi-trash"
+              class="p-button-danger" style="padding: 0.2rem;"></button>
+    </div>
+  </div>
+</div>

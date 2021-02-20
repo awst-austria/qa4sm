@@ -1,8 +1,8 @@
 export class DatasetSelection{
-  constructor(public idx:number,
-              public datasetName:string,
+  constructor(public datasetName:string,
               public datasetId:number,
               public versionId:number,
-              public variableId:number) {
+              public variableId:number,
+              public filters?:any[]) {  //TODO: set filter type
   }
 }

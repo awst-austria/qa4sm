@@ -1,45 +1,45 @@
 <div class="p-grid">
-  <div class="p-xl-6 p-xl-offset-3
-              p-lg-7 p-lg-offset-3
+  <div class="p-xl-7 p-xl-offset-2
+              p-lg-8 p-lg-offset-2
               p-md-8 p-md-offset-2
               p-sm-12 p-sm-offset-0">
     <div class="p-grid">
 
-      <!--  data-->
+      <!--  data column-->
       <div class="p-sm-12 p-md-6 ">
-        <p-accordion cl>
+        <p-panel header="Data" [toggleable]="true">
+          <ng-template pTemplate="icons">
+            <label class="p-panel-header-icon"
+                   pTooltip="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+            </label>
+          </ng-template>
+          <p-accordion>
 
-          <p-accordionTab [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"
-                          [selected]="i == 0">
-            <qa-dataset [datasetSelectorId]="i" (datasetSelectionChange)="updateDatasetSelection($event)"></qa-dataset>
-          </p-accordionTab>
-        </p-accordion>
-<!--        <p-tabView>-->
-<!--          <p-tabPanel [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"-->
-<!--                      [selected]="i == 0">-->
-<!--            <qa-dataset [datasetSelectorId]="i" (datasetSelectionChange)="updateDatasetSelection($event)"></qa-dataset>-->
-<!--          </p-tabPanel>-->
-<!--        </p-tabView>-->
+            <p-accordionTab [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"
+                            [selected]="i == 0">
+              <qa-dataset  (removeDataset)="removeDataset($event)" [datasetSelection]="selectedDatasets[i]"
+                          [removable]="true"></qa-dataset>
+            </p-accordionTab>
 
-
-        <!--      <div class="p-d-flex p-jc-center">-->
-        <!--        <p-panel header="Data" [toggleable]="true" [style]="{'min-width': '20em'}">-->
-        <!--          -->
-        <!--        </p-panel>-->
-        <!--      </div>-->
+          </p-accordion>
+        </p-panel>
       </div>
 
-      <!--  reference-->
+      <!--  reference column-->
       <div class="p-sm-12 p-md-6 ">
-        <qa-dataset></qa-dataset>
-        <!--      <div class="p-d-flex p-jc-center">-->
-        <!--        <p-panel header="Reference" [toggleable]="true" [style]="{'min-width': '20em'}">-->
-        <!--          -->
-        <!--        </p-panel>-->
-        <!--      </div>-->
+        <p-panel header="Reference" [toggleable]="true">
+          <ng-template pTemplate="icons">
+            <label class="p-panel-header-icon"
+                   pTooltip="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+            </label>
+          </ng-template>
+          <qa-dataset [removable]="false"></qa-dataset>
+        </p-panel>
       </div>
     </div>
   </div>
 </div>
-
-
