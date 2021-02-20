@@ -1,21 +1,45 @@
-<!--<div class="p-grid">-->
+<div class="p-grid">
+  <div class="p-xl-6 p-xl-offset-3
+              p-lg-7 p-lg-offset-3
+              p-md-8 p-md-offset-2
+              p-sm-12 p-sm-offset-0">
+    <div class="p-grid">
 
-<!--  &lt;!&ndash;  data&ndash;&gt;-->
-<!--  <div class="p-md-6 p-sm-12">-->
-<!--    <div class="p-d-flex p-jc-center">-->
-<!--      <p-panel header="Data" [toggleable]="true" [style]="{'min-width': '20em'}">-->
-<!--        <qa-dataset></qa-dataset>-->
-<!--      </p-panel>-->
-<!--    </div>-->
-<!--  </div>-->
+      <!--  data-->
+      <div class="p-sm-12 p-md-6 ">
+        <p-accordion cl>
 
-<!--  &lt;!&ndash;  reference&ndash;&gt;-->
-<!--  <div class="p-md-6 p-sm-12">-->
-<!--    <div class="p-d-flex p-jc-center">-->
-<!--      <p-panel header="Reference" [toggleable]="true" [style]="{'min-width': '20em'}">-->
-<!--        <qa-dataset></qa-dataset>-->
-<!--      </p-panel>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
+          <p-accordionTab [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"
+                          [selected]="i == 0">
+            <qa-dataset [datasetSelectorId]="i" (datasetSelectionChange)="updateDatasetSelection($event)"></qa-dataset>
+          </p-accordionTab>
+        </p-accordion>
+<!--        <p-tabView>-->
+<!--          <p-tabPanel [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"-->
+<!--                      [selected]="i == 0">-->
+<!--            <qa-dataset [datasetSelectorId]="i" (datasetSelectionChange)="updateDatasetSelection($event)"></qa-dataset>-->
+<!--          </p-tabPanel>-->
+<!--        </p-tabView>-->
+
+
+        <!--      <div class="p-d-flex p-jc-center">-->
+        <!--        <p-panel header="Data" [toggleable]="true" [style]="{'min-width': '20em'}">-->
+        <!--          -->
+        <!--        </p-panel>-->
+        <!--      </div>-->
+      </div>
+
+      <!--  reference-->
+      <div class="p-sm-12 p-md-6 ">
+        <qa-dataset></qa-dataset>
+        <!--      <div class="p-d-flex p-jc-center">-->
+        <!--        <p-panel header="Reference" [toggleable]="true" [style]="{'min-width': '20em'}">-->
+        <!--          -->
+        <!--        </p-panel>-->
+        <!--      </div>-->
+      </div>
+    </div>
+  </div>
+</div>
+
 

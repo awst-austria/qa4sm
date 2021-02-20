@@ -25,6 +25,10 @@ import {DatasetModule} from './modules/dataset/dataset.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ToastModule} from './modules/toast/toast.module';
+import {DropdownModule} from 'primeng/dropdown';
+import {PanelModule} from 'primeng/panel';
+import {TabViewModule} from 'primeng/tabview';
+import {AccordionModule} from 'primeng/accordion';
 
 
 @NgModule({
@@ -38,21 +42,26 @@ import {ToastModule} from './modules/toast/toast.module';
     LoginComponent,
     UserProfileComponent
   ],
-    imports: [
-        LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
-        NavigationBarModule,
-        FormsModule,
-        ReactiveFormsModule,
-        BrowserModule,
-        HttpClientModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        DatasetModule,
-        NgbModule,
-        FontAwesomeModule,
-        ToastModule
+  imports: [
+    LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
+    NavigationBarModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserModule,
+    HttpClientModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    DatasetModule,
+    NgbModule,
+    FontAwesomeModule,
+    ToastModule,
+    PanelModule,
+    TabViewModule,
+    DropdownModule,
+    AccordionModule
 
-    ],
+
+  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

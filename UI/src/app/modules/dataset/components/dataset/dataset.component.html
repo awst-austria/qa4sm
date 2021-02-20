@@ -1,28 +1,28 @@
-<!--<div class="p-grid  p-align-center">-->
-<!--  <div class="p-col-fixed dataset-label-column">-->
-<!--    <label for="datasetSelector">Dataset</label>-->
-<!--  </div>-->
-<!--  <div class="p-col">-->
-<!--    <p-dropdown id="datasetSelector" [options]="datasets" [(ngModel)]="selectedDataset" optionLabel="pretty_name" [style]="{'width': '100%'}"></p-dropdown>-->
-<!--  </div>-->
-<!--</div>-->
+<div class="p-grid  p-align-center">
+  <div class="p-col-fixed dataset-label-column">
+    <label for="datasetSelector">Dataset</label>
+  </div>
+  <div class="p-col">
+    <p-dropdown id="datasetSelector" (onChange)="onDatasetChange()" [options]="datasets" [(ngModel)]="selectedDataset" optionLabel="pretty_name" [style]="{'width': '100%'}"></p-dropdown>
+  </div>
+</div>
 
-<!--<div class="p-grid  p-align-center">-->
-<!--  <div class="p-col-fixed dataset-label-column">-->
-<!--    <label for="versionSelector">Version</label>-->
+<div class="p-grid  p-align-center">
+  <div class="p-col-fixed dataset-label-column">
+    <label for="versionSelector">Version</label>
 
-<!--  </div>-->
-<!--  <div class="p-col">-->
-<!--    <p-dropdown id="versionSelector" (onChange)="onDatasetChange()"  [style]="{'width': '100%'}"></p-dropdown>-->
-<!--  </div>-->
-<!--</div>-->
+  </div>
+  <div class="p-col">
+    <p-dropdown id="versionSelector"   [style]="{'width': '100%'}"></p-dropdown>
+  </div>
+</div>
 
-<!--<div class="p-grid  p-align-center">-->
-<!--  <div class="p-col-fixed dataset-label-column">-->
-<!--    <label for="variableSelector">Variable</label>-->
-<!--  </div>-->
-<!--  <div class="p-col">-->
-<!--    <p-dropdown id="variableSelector" optionLabel="name" [style]="{'width': '100%'}"></p-dropdown>-->
-<!--  </div>-->
-<!--</div>-->
+<div class="p-grid  p-align-center">
+  <div class="p-col-fixed dataset-label-column">
+    <label for="variableSelector">Variable</label>
+  </div>
+  <div class="p-col">
+    <p-dropdown id="variableSelector" optionLabel="name" [style]="{'width': '100%'}"></p-dropdown>
+  </div>
+</div>
 
