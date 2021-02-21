@@ -6,6 +6,8 @@ import {Observable} from 'rxjs';
 import {DatasetVersionDto} from '../../services/dataset-version.dto';
 import {DatasetVersionService} from '../../services/dataset-version.service';
 import {DatasetComponentSelectionModel} from './dataset-component-selection-model';
+import {DatasetVariableDto} from '../../services/dataset-variable.dto';
+import {DatasetVariableService} from '../../services/dataset-variable.service';
 
 
 @Component({
@@ -15,24 +17,24 @@ import {DatasetComponentSelectionModel} from './dataset-component-selection-mode
 })
 export class DatasetComponent implements OnInit {
 
-  datasets: DatasetDto[] = [];
   datasets$: Observable<DatasetDto[]>;
-  datasetVersions: DatasetVersionDto[] = [];  //All dataset versions
-  selectableDatasetVersions: DatasetVersionDto[]; //Dataset versions that belong to the selected dataset
+
   selectableDatasetVersions$: Observable<DatasetVersionDto[]>;
+  selectableDatasetVariables$: Observable<DatasetVariableDto[]>;
 
   @Input() selectionModel: DatasetComponentSelectionModel;
   @Input() removable: boolean = false;
   @Output() removeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
 
-  constructor(private datasetService: DatasetService, private datasetVersionService: DatasetVersionService) {
+  constructor(private datasetService: DatasetService, private datasetVersionService: DatasetVersionService, private datasetVariableService: DatasetVariableService) {
   }
 
   ngOnInit(): void {
-    //load datasets
-    this.datasets$ = this.datasetService.getAllDatasets();
 
+    this.datasets$ = this.datasetService.getAllDatasets();
+    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
   }
 
   private updateSelectableVersionsAndVariable() {
@@ -43,6 +45,11 @@ export class DatasetComponent implements OnInit {
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
     this.selectableDatasetVersions$.subscribe(versions => {
       this.selectionModel.selectedVersion = versions[0];
+    });
+
+    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVariables$.subscribe(variables => {
+      this.selectionModel.selectedVariable = variables[0];
     });
   }
 
