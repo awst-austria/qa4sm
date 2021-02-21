@@ -20,7 +20,6 @@ export class AuthService {
 
   constructor(private httpClient: HttpClient, private logger: NGXLogger) {
     this.init();
-    this.authenticated.subscribe(data => logger.debug('Authenticated: ', data));
   }
 
   private init() {

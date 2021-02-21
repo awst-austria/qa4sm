@@ -22,8 +22,6 @@ export class HttpTokenInterceptor implements HttpInterceptor {
           .set('Content-Type', 'application/json')
           .set('X-CSRFToken', csrfToken)
       });
-
-      this.logger.debug('csrf token added', authReq)
       return next.handle(authReq);
     }
 
