@@ -22,7 +22,7 @@ export class DatasetComponent implements OnInit {
   selectableDatasetVersions$: Observable<DatasetVersionDto[]>;
 
   @Input() datasetSelection: DatasetSelection;
-  @Input() removable?: boolean = false;
+  @Input() removable: boolean = false;
   @Output() removeDataset = new EventEmitter<DatasetSelection>();
 
   selectedDataset: DatasetDto;
@@ -41,7 +41,7 @@ export class DatasetComponent implements OnInit {
           this.selectedDataset = datasets[0];
           this.updateSelectableVersionsAndVariable();
         } else {
-          console.log('dataset selection is undef');
+          console.error('dataset selection is undefined');
         }
       }
     );
