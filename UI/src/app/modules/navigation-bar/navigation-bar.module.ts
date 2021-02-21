@@ -1,7 +1,10 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NavigationBarComponent} from './components/navigation-bar/navigation-bar.component';
-import {MenubarModule} from 'primeng/menubar';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {RouterModule} from '@angular/router';
+
 
 
 @NgModule({
@@ -11,7 +14,9 @@ import {MenubarModule} from 'primeng/menubar';
   ],
   imports: [
     CommonModule,
-    MenubarModule
+    FontAwesomeModule,
+    NgbModule,
+    RouterModule
   ]
 })
 export class NavigationBarModule {

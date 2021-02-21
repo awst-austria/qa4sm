@@ -44,3 +44,7 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Since we use scss, css file should be excluded
+src/**/*.css
+src/**/*.css.map
