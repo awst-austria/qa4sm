@@ -1,6 +1,8 @@
 from django.conf.urls import url
 from django.urls import path
 
+from api.views.DatasetVariableView import dataset_variable
+from api.views.DatasetVersionView import dataset_version
 from api.views.DatasetView import dataset
 from api.views.LoginView import api_login
 from api.views.LogoutView import api_logout
@@ -27,7 +29,7 @@ urlpatterns = [
     # url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
     # IMPORTANT
-    # URLs should not end with a slash. Ig you add a new endpoint, do not add a trailing slash:
+    # URLs should not end with a slash. If you add a new endpoint, do not add a trailing slash:
     #   GOOD:  path('my-new-endpoint', my_new_view, name='fancy stuff'),
     #   WRONG: path('my-new-endpoint/', my_new_view, name='fancy stuff'),
     #
@@ -36,6 +38,6 @@ urlpatterns = [
     path('auth/login', api_login, name='login'),
     path('auth/logout', api_logout, name='logout'),
     path('dataset', dataset, name='Datasets'),
-
-    # path('auth/', LoginView.as_view(), name='login'),
+    path('dataset-version', dataset_version, name='Dataset versions'),
+    path('dataset-variable', dataset_variable, name='Dataset variables'),
 ]

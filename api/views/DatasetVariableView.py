@@ -4,32 +4,33 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.serializers import ModelSerializer
 
-from validator.models import DatasetVersion, Dataset
+from validator.models import DatasetVersion, Dataset, DataVariable
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def dataset_version(request):
+@permission_classes([AllowAny])
+def dataset_variable(request):
     dataset_id = request.query_params.get('dataset', None)
+
     # # get single dataset
     if dataset_id:
-        versions = Dataset.objects.get(id=dataset_id).versions
+        variables = Dataset.objects.get(id=dataset_id).variables
     # get all datasets
     else:
-        versions = DatasetVersion.objects.all()
+        variables = DataVariable.objects.all()
 
-    serializer = DatasetVersionSerializer(versions, many=True)
+    serializer = DatasetVariableSerializer(variables, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
-class DatasetVersionSerializer(ModelSerializer):
+class DatasetVariableSerializer(ModelSerializer):
     class Meta:
-        model = DatasetVersion
+        model = DataVariable
         fields = ['id',
                   'short_name',
                   'pretty_name',
                   'help_text',
-                  'time_range_start',
-                  'time_range_end',
+                  'min_value',
+                  'max_value',
                   ]

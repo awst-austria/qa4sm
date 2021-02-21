@@ -24,7 +24,8 @@ def dataset(request):
 
     datasets = Dataset.objects.all()
     serializer = DatasetSerializer(datasets, many=True)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    print(serializer.data)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK,safe=False)
 
 
 class DatasetSerializer(ModelSerializer):
