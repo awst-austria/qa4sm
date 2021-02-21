@@ -4,14 +4,24 @@
 
     </div>
     <div class="col-12 col-sm-8 col-md-4 col-lg3 col-xl-2">
-      <form [formGroup]="loginForm" class="user-form text-center" (ngSubmit) = "onSubmit()">
+      <form [formGroup]="loginForm" class="user-form text-center" (ngSubmit)="onSubmit()">
         <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
 
+        <div class="p-fluid">
+          <span class="p-float-label p-mb-5 p-mt-6">
+            <input pInputText id="usernameInput" type="text" formControlName="username">
+            <label for="usernameInput">Username</label>
+          </span>
+        </div>
 
-        <input type="text" class="form-control m-1" placeholder="Username" aria-label="Recipient's username"
-               aria-describedby="basic-addon2" formControlName="username">
-        <input type="password" class="form-control  m-1" placeholder="Password" aria-label="Recipient's username"
-               aria-describedby="basic-addon2" formControlName="password">
+
+        <div class="p-fluid">
+          <span class="p-float-label p-mb-5">
+          <input pPassword type="password"
+                 formControlName="password" [feedback]="false" id="passwordInput">
+          <label for="passwordInput">Password</label>
+        </span>
+        </div>
 
         <button class="btn btn-lg btn-primary btn-block  m-1" type="submit">Sign in</button>
 

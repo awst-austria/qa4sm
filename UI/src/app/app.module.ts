@@ -31,6 +31,8 @@ import {TabViewModule} from 'primeng/tabview';
 import {AccordionModule} from 'primeng/accordion';
 import {TooltipModule} from 'primeng/tooltip';
 import {ButtonModule} from 'primeng/button';
+import {PasswordModule} from 'primeng/password';
+import {InputTextModule} from 'primeng/inputtext';
 
 
 @NgModule({
@@ -63,7 +65,9 @@ import {ButtonModule} from 'primeng/button';
     AccordionModule,
     PanelModule,
     TooltipModule,
-    ButtonModule
+    ButtonModule,
+    PasswordModule,
+    InputTextModule
 
 
   ],
