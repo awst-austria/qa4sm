@@ -1,14 +1,15 @@
-export interface DatasetDto {
-  id: number;
-  short_name: string;
-  pretty_name: string;
-  help_text: string;
-  storage_path: string;
-  detailed_description: string;
-  source_reference: string;
-  citation: string;
-  is_only_reference: boolean;
-  versions: number[];
-  variables: number[];
-  filters: number[];
+export class DatasetDto {
+  constructor(public id: number,
+              public short_name: string,
+              public pretty_name: string,
+              public help_text: string,
+              public storage_path: string,
+              public detailed_description: string,
+              public source_reference: string,
+              public citation: string,
+              public is_only_reference: boolean,
+              public versions: number[],
+              public variables: number[],
+              public filters: number[]) {
+  }
 }

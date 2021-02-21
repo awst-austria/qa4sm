@@ -1,21 +1,50 @@
-<!--<div class="p-grid">-->
+<div class="p-grid">
+  <div class="p-xl-7 p-xl-offset-2
+              p-lg-8 p-lg-offset-2
+              p-md-8 p-md-offset-2
+              p-sm-12 p-sm-offset-0">
+    <div class="p-grid">
 
-<!--  &lt;!&ndash;  data&ndash;&gt;-->
-<!--  <div class="p-md-6 p-sm-12">-->
-<!--    <div class="p-d-flex p-jc-center">-->
-<!--      <p-panel header="Data" [toggleable]="true" [style]="{'min-width': '20em'}">-->
-<!--        <qa-dataset></qa-dataset>-->
-<!--      </p-panel>-->
-<!--    </div>-->
-<!--  </div>-->
+      <!--  data column-->
+      <div class="p-sm-12 p-md-6 ">
+        <p-panel header="Data" [toggleable]="true">
+          <ng-template pTemplate="icons">
+            <label class="p-panel-header-icon"
+                   pTooltip="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+            </label>
+          </ng-template>
+          <p-accordion>
 
-<!--  &lt;!&ndash;  reference&ndash;&gt;-->
-<!--  <div class="p-md-6 p-sm-12">-->
-<!--    <div class="p-d-flex p-jc-center">-->
-<!--      <p-panel header="Reference" [toggleable]="true" [style]="{'min-width': '20em'}">-->
-<!--        <qa-dataset></qa-dataset>-->
-<!--      </p-panel>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
+            <p-accordionTab [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"
+                            [selected]="i == 0">
+              <qa-dataset (removeDataset)="removeDataset($event)" [datasetSelection]="selectedDatasets[i]"
+                          [removable]="true"></qa-dataset>
+            </p-accordionTab>
 
+          </p-accordion>
+          <div class="p-fluid">
+            <button pButton type="button" label="Add dataset" icon="pi pi-trash" (click)="addDataset()"
+                    class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
+                    [disabled]="addDatasetButtonDisabled()"></button>
+          </div>
+        </p-panel>
+      </div>
+
+      <!--  reference column-->
+      <div class="p-sm-12 p-md-6 ">
+        <p-panel header="Reference" [toggleable]="true">
+          <ng-template pTemplate="icons">
+            <label class="p-panel-header-icon"
+                   pTooltip="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+            </label>
+          </ng-template>
+          <qa-dataset [removable]="false"></qa-dataset>
+        </p-panel>
+      </div>
+    </div>
+  </div>
+</div>
