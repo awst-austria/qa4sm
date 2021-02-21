@@ -8,7 +8,7 @@
     <div class="p-grid">
 
       <!--  data column-->
-      <div class="p-md-6 p-col-12" >
+      <div class="p-md-6 p-col-12">
         <p-panel header="Data" [toggleable]="true">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
@@ -19,14 +19,15 @@
           </ng-template>
           <p-accordion multiple="true">
 
-            <p-accordionTab [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"
+            <p-accordionTab [header]="(item.selectedDataset.pretty_name)"
+                            *ngFor="let item of selectedDatasets; let i = index"
                             [selected]="i == 0">
-              <qa-dataset (removeDataset)="removeDataset($event)" [datasetSelection]="selectedDatasets[i]"
+              <qa-dataset (removeDataset)="removeDataset($event)" [selectionModel]="selectedDatasets[i]"
                           [removable]="true"></qa-dataset>
             </p-accordionTab>
 
           </p-accordion>
-          <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDataset()"
+          <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDatasetToValidate()"
                   class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
                   [disabled]="addDatasetButtonDisabled()"></button>
         </p-panel>
@@ -42,7 +43,9 @@
               <span class="pi pi-question-circle"></span>
             </label>
           </ng-template>
-          <qa-dataset [removable]="false" [datasetSelection]="selectedReference[0]" ></qa-dataset>
+
+          <qa-dataset *ngIf="selectedReference.length>0" [removable]="false"
+                      [selectionModel]="selectedReference[0]"></qa-dataset>
 
         </p-panel>
       </div>
