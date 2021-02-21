@@ -6,7 +6,7 @@ import {environment} from '../../../../environments/environment';
 import {shareReplay} from 'rxjs/operators';
 
 const datasetUrl: string = environment.API_URL + 'api/dataset';
-const CACHE_LIFETIME: number = 1 * 10 * 1000; // 5 minutes
+const CACHE_LIFETIME: number = 5 * 60 * 1000; // 5 minutes
 
 @Injectable({
   providedIn: 'root'

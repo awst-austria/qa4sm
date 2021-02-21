@@ -1,30 +1,33 @@
 <div class="p-grid  p-align-center">
-  <div class="p-col-fixed dataset-label-column">
-    <label for="datasetSelector">Dataset</label>
-  </div>
   <div class="p-col">
-    <p-dropdown id="datasetSelector" (onChange)="onDatasetChange()" [options]="datasets"
+    <span class="p-float-label p-mb-4 p-mt-3">
+    <p-dropdown id="datasetSelector" (onChange)="onDatasetChange()" [options]="(datasets$|async)"
                 [(ngModel)]="selectedDataset"
                 optionLabel="pretty_name" [style]="{'width': '100%'}"></p-dropdown>
+      <label for="datasetSelector">Dataset</label>
+    </span>
+
   </div>
 </div>
 
 <div class="p-grid  p-align-center">
-  <div class="p-col-fixed dataset-label-column">
-    <label for="versionSelector">Version</label>
-
-  </div>
   <div class="p-col">
-    <p-dropdown id="versionSelector" [style]="{'width': '100%'}"></p-dropdown>
+    <span class="p-float-label p-mb-4">
+      <p-dropdown id="versionSelector" [style]="{'width': '100%'}" [options]="(selectableDatasetVersions$|async)"
+                  optionLabel="pretty_name"></p-dropdown>
+            <label for="versionSelector">Version</label>
+        </span>
+
   </div>
 </div>
 
 <div class="p-grid  p-align-center">
-  <div class="p-col-fixed dataset-label-column">
-    <label for="variableSelector">Variable</label>
-  </div>
   <div class="p-col">
-    <p-dropdown id="variableSelector" optionLabel="name" [style]="{'width': '100%'}"></p-dropdown>
+    <span class="p-float-label">
+      <p-dropdown id="variableSelector" optionLabel="name" [style]="{'width': '100%'}"></p-dropdown>
+            <label for="variableSelector">Variable</label>
+    </span>
+
   </div>
 </div>
 
@@ -32,9 +35,7 @@
 <!--Remove dataset panel button-->
 <div class="p-grid" *ngIf="removable">
   <div class="p-col">
-    <div class="p-fluid">
-      <button pButton type="button" (click)="onRemoveDataset()" label="Remove dataset" icon="pi pi-trash"
-              class="p-button-danger" style="padding: 0.2rem;"></button>
-    </div>
+    <button pButton type="button" (click)="onRemoveDataset()" label="Remove dataset" icon="pi pi-trash"
+            class="p-button-danger" style="padding: 0.2rem;"></button>
   </div>
 </div>

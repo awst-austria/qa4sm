@@ -1,12 +1,14 @@
 <div class="p-grid">
-  <div class="p-xl-7 p-xl-offset-2
-              p-lg-8 p-lg-offset-2
-              p-md-8 p-md-offset-2
-              p-sm-12 p-sm-offset-0">
+  <div class="
+    p-col-12
+    p-md-10 p-md-offset-1
+    p-lg-10 p-lg-offset-1
+    p-xl-8 p-xl-offset-2">
+
     <div class="p-grid">
 
       <!--  data column-->
-      <div class="p-sm-12 p-md-6 ">
+      <div class="p-md-6 p-col-12" >
         <p-panel header="Data" [toggleable]="true">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
@@ -15,7 +17,7 @@
               <span class="pi pi-question-circle"></span>
             </label>
           </ng-template>
-          <p-accordion>
+          <p-accordion multiple="true">
 
             <p-accordionTab [header]="item.datasetName" *ngFor="let item of selectedDatasets; let i = index"
                             [selected]="i == 0">
@@ -24,16 +26,14 @@
             </p-accordionTab>
 
           </p-accordion>
-          <div class="p-fluid">
-            <button pButton type="button" label="Add dataset" icon="pi pi-trash" (click)="addDataset()"
-                    class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
-                    [disabled]="addDatasetButtonDisabled()"></button>
-          </div>
+          <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDataset()"
+                  class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
+                  [disabled]="addDatasetButtonDisabled()"></button>
         </p-panel>
       </div>
 
       <!--  reference column-->
-      <div class="p-sm-12 p-md-6 ">
+      <div class="p-md-6 p-col-12">
         <p-panel header="Reference" [toggleable]="true">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
@@ -42,7 +42,8 @@
               <span class="pi pi-question-circle"></span>
             </label>
           </ng-template>
-          <qa-dataset [removable]="false"></qa-dataset>
+          <qa-dataset [removable]="false" [datasetSelection]="selectedReference[0]" ></qa-dataset>
+
         </p-panel>
       </div>
     </div>

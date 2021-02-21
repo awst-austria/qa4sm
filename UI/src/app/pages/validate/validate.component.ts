@@ -11,8 +11,13 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should com from either conf
 })
 export class ValidateComponent implements OnInit {
   selectedDatasets: DatasetSelection[] = [];
+  selectedReference: DatasetSelection[] = [];
 
   constructor(private datasetService: DatasetService) {
+    this.selectedDatasets.push(new DatasetSelection(
+      '[Select a dataset]', -1, -1, -1));
+    this.selectedReference.push(new DatasetSelection(
+      '[Select a dataset]', -1, -1, -1));
   }
 
 
@@ -24,21 +29,18 @@ export class ValidateComponent implements OnInit {
   }
 
   addDataset() {
-    this.datasetService.getAllDatasets().subscribe(datasets => {
-      if (datasets.length > 0) {
-        this.selectedDatasets.push(new DatasetSelection(
-          datasets[0].pretty_name, datasets[0].id, 0, 0));
-      }
-    });
+
   }
 
   ngOnInit(): void {
+
     this.datasetService.getAllDatasets().subscribe(datasets => {
       if (datasets.length > 0) {
-        this.selectedDatasets.push(new DatasetSelection(
-          datasets[0].pretty_name, datasets[0].id, 0, 0));
+        this.selectedReference.push(new DatasetSelection(
+          datasets[1].pretty_name, datasets[1].id, 0, 0));
       }
     });
+    this.addDataset();
   }
 
   addDatasetButtonDisabled(): boolean {
