@@ -31,7 +31,7 @@ export class AuthService {
           this.authenticated.next(true);
         },
         error => {
-          console.log('srv msg:', error.error);
+
         }
       );
   }
@@ -45,12 +45,10 @@ export class AuthService {
           this.currentUser = {username: '', firstName: ''};
           this.authenticated.next(true);
           authResult.next(true);
-          console.log('Login success', data);
         },
         error => {
           this.authenticated.next(false);
           authResult.next(false);
-          console.log('srv msg:', error.error);
         }
       );
 
@@ -66,7 +64,6 @@ export class AuthService {
           this.currentUser = {username: '', firstName: ''};
           this.authenticated.next(false);
           logoutResult.next(true);
-          console.log('Logout success');
         },
         error => {
           logoutResult.next(false);
