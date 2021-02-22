@@ -696,6 +696,7 @@
 	    var initialFilters = event.data.initialFilters;
             var initialVersion = event.data.initialVersion;
             var initialVariable = event.data.initialVariable;
+            var disableAjaxValidationPeriod = event.data.disableAjaxValidationPeriod;
             $.ajax({
                 url: url,
                 data: { 'dataset_id': datasetId,
@@ -721,7 +722,9 @@
                     } else{
                         $('#id_target_hidden_input_version').val('');
                     };
-                    start_ajax_to_set_valiadtion_period();
+                    if(disableAjaxValidationPeriod == "False") {
+                        start_ajax_to_set_validation_period();
+                    }
                 }
             });
         }
@@ -827,13 +830,9 @@
             $('#id_interval_to').val(min_date_to_str);
           }
 
-          function start_ajax_to_set_valiadtion_period(event){
+          function start_ajax_to_set_validation_period(){
               var versionIds = find_current_ids();
-              var initialIntervalsFrom = event.data.initialIntervalsFrom;
-              var initialIntervalsTo = event.data.initialIntervalsTo;
-              if (!initialIntervalsFrom && !initialIntervalsTo) {
-                  ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
-              }
+              ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
           }
 //================================================================================
       
@@ -847,9 +846,11 @@
             $("#{{ dc_form.dataset.auto_id }}").change(
                 {initialFilters: "{{ dc_form.initial_filters }}",
                  initialVersion: "{{ dc_form.initial_version }}",
-                 initialVariable: "{{ dc_form.initial_variable}}"}, ajax_change_dataset
+                 initialVariable: "{{ dc_form.initial_variable}}",
+                 disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},
+                ajax_change_dataset
             ).change(change_tab_name).change(); // last change() to call change on pageload
-            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_valiadtion_period)
+            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_validation_period)
         {% endfor %}
 
         function get_version_id(){
@@ -868,9 +869,11 @@
         $("#{{ ref_dc_form.dataset.auto_id }}").change(
             {initialFilters: "{{ ref_dc_form.initial_filters }}",
              initialVersion: "{{ ref_dc_form.initial_version }}",
-             initialVariable: "{{ ref_dc_form.initial_variable }}" }, ajax_change_dataset
+             initialVariable: "{{ ref_dc_form.initial_variable }}",
+             disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},
+            ajax_change_dataset
         ).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
+        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_validation_period)
 
     </script>
 
@@ -1114,7 +1117,7 @@
 
         $('#remove_dc_form').click(function() {
             removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
-            start_ajax_to_set_valiadtion_period();
+            start_ajax_to_set_validation_period();
         });
 
         function set_after(first_element_selector, second_element_selector){

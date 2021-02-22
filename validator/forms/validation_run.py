@@ -60,13 +60,13 @@ class ValidationRunForm(forms.ModelForm):
                 self.fields[name], name
             )
 
-        # accessors for initial values of time interval
-        self.initial_interval_from = self.fields["interval_from"].initial
-        if self.initial_interval_from == START_TIME:
-            self.initial_interval_from = ""
-        self.initial_interval_to = self.fields["interval_to"].initial
-        if self.initial_interval_to == END_TIME:
-            self.initial_interval_to = ""
+        # if the initial interval_from or interval_to value is not
+        # START_TIME/END_TIME, we need to disable the ajax call in
+        # validate.html
+        self.disable_ajax_validation_period = (
+            self.fields["interval_from"].initial != START_TIME
+            or self.fields["interval_to"].initial != END_TIME
+        )
 
     def clean(self):
         values = super(ValidationRunForm, self).clean()
