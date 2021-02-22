@@ -1,4 +1,5 @@
-import numpy as np
+import numpy as  np
+import pandas as pd
 
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
@@ -103,25 +104,39 @@ def create_jobs(validation_run):
 
     # if we've got ISMN data, process one network at a time
     elif isinstance(ref_reader, ISMN_Interface):
-        
+
         depth_from, depth_to = get_depths_params(validation_run.reference_configuration.parametrisedfilter_set.all())
 
         ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=depth_from, max_depth=depth_to, groupby='network')
 
+        def reshape_meta(meta):
+            reshaped = {}
+            for key, value in meta.items():
+                meta_value = value[0][0]
+                if isinstance(meta_value, pd.Timestamp):
+                    new = meta_value.value
+                    reshaped[key] = new
+                else:
+                    reshaped[key] = meta_value
+
+            return reshaped
+
         jobs = []
         for network, net_ids in ids.items():
-            lons, lats = [], []
+            lons, lats, meta_list = [], [], []
             for idx in net_ids:
                 meta = ref_reader.read_ts(idx, return_meta=True)[1]
-                lons.append(meta['longitude'][0][0])
-                lats.append(meta['latitude'][0][0])
+                meta = reshape_meta(meta)
+                lons.append(meta['longitude'])
+                lats.append(meta['latitude'])
+                meta_list.append(meta)
             gpis = net_ids
             gpis, lons, lats = np.array(gpis), np.array(lons), np.array(lats)
 
             gpis, lons, lats, index = _geographic_subsetting(gpis, lons, lats, validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
 
             if len(gpis) > 0:
-                jobs.append((gpis, lons, lats))
+                jobs.append((gpis, lons, lats, meta_list))
                 total_points += len(gpis)
 
     else:

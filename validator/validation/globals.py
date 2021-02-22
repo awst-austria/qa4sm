@@ -1,5 +1,7 @@
 from django.conf import settings
 from datetime import datetime
+import pandas as pd
+import numpy as np
 
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
@@ -98,3 +100,24 @@ IRREGULAR_GRIDS = {'SMAP' : 0.35,
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
+
+METADATA_TEMPLATE = {'clay_fraction': np.float32([np.nan]),
+                     'climate_KG': np.array([' ' * 256]),
+                     'climate_insitu': np.array([' ' * 256]),
+                     'elevation': np.float32([np.nan]),
+                     'instrument': np.array([' ' * 256]),
+                     'latitude': np.float32([np.nan]),
+                     'lc_2000': np.float32([np.nan]),
+                     'lc_2005': np.float32([np.nan]),
+                     'lc_2010': np.float32([np.nan]),
+                     'lc_insitu': np.array([' ' * 256]),
+                     'longitude': np.float32([np.nan]),
+                     'network': np.array([' ' * 256]),
+                     'organic_carbon': np.float32([np.nan]),
+                     'sand_fraction': np.float32([np.nan]),
+                     'saturation': np.float32([np.nan]),
+                     'silt_fraction': np.float32([np.nan]),
+                     'station': np.array([' ' * 256]),
+                     'timerange_from': np.float32([np.nan]),
+                     'timerange_to': np.float32([np.nan]),
+                     'variable': np.array([' ' * 256])}

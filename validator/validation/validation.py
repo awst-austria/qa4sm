@@ -29,7 +29,7 @@ from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
-from validator.validation.globals import START_TIME, END_TIME
+from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 
 
 __logger = logging.getLogger(__name__)
@@ -192,16 +192,17 @@ def create_pytesmo_validation(validation_run):
     datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
-
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         # if there are 3 or more dataset, do TC, exclude ref metrics
         metrics = TCMetrics(
                     dataset_names=ds_names, tc_metrics_for_ref=False,
-                    other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+                    other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
+                    metadata_template = METADATA_TEMPLATE)
     else:
         metrics = IntercomparisonMetrics(
                         dataset_names=ds_names,
-                        other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+                        other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
+                        metadata_template = METADATA_TEMPLATE)
 
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
@@ -289,7 +290,7 @@ def run_validation(validation_id):
         validation_run.total_points = total_points
         validation_run.save() # save the number of gpis before we start
 
-        __logger.debug("Jobs to run: {}".format(jobs))
+        __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
 
         save_path = run_dir
 
