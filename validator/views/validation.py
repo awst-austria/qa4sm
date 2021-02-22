@@ -244,13 +244,30 @@ def validation(request):
             initial_values = []
             for pfx in prefixes:
                 initial_values.append({
-                    "filters": object_list_from_key(DataFilter, pfx + "-filters"),
-                    "dataset": object_from_key(Dataset, pfx + "-dataset"),
-                    "version": object_from_key(DatasetVersion, pfx + "-version"),
-                    "variable": object_from_key(DataVariable, pfx + "-variable"),
+                    "filters": object_list_from_key(
+                        DataFilter, pfx + "-filters"
+                    ),
+                    "dataset": object_from_key(
+                        Dataset, pfx + "-dataset"
+                    ),
+                    "version": object_from_key(
+                        DatasetVersion, pfx + "-version"
+                    ),
+                    "variable": object_from_key(
+                        DataVariable, pfx + "-variable"
+                    ),
                 })
             ref_initial_values = initial_values[0]
             data_initial_values = initial_values[1:]
+            # add parametrised_filters for ref
+            ref_initial_values.update({
+                "parametrised_filters": object_list_from_key(
+                    DataFilter, "ref-parametrised_filters"
+                )
+            })
+            ref_parametrised_filters_params = request.POST.get(
+                'ref-parametrized_filters_params'
+            )
         except TypeError:
             # happens with invalid requests
             ref_initial_values, data_initial_values = _default_initials()
@@ -276,6 +293,10 @@ def validation(request):
             ]
             ref_initial_values = initial_values[0]
             data_initial_values = initial_values[1:]
+            # add parametrised_filters for ref
+            ref_initial_values.update({
+                "parametrised_filters": ref_config.parametrised_filters.all(),
+            })
 
     # get initial values for the validation run settings
     valrun_initial_values = {}
@@ -292,7 +313,6 @@ def validation(request):
                 valrun_initial_values[field] = (
                     valrun_initial_values[field].strftime("%Y-%m-%d")
                 )
-
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:
