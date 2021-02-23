@@ -33,6 +33,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {ButtonModule} from 'primeng/button';
 import {PasswordModule} from 'primeng/password';
 import {InputTextModule} from 'primeng/inputtext';
+import {FilterModule} from './modules/filter/filter.module';
 
 
 @NgModule({
@@ -67,7 +68,8 @@ import {InputTextModule} from 'primeng/inputtext';
     TooltipModule,
     ButtonModule,
     PasswordModule,
-    InputTextModule
+    InputTextModule,
+    FilterModule
 
 
   ],
