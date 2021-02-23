@@ -712,7 +712,7 @@ class TestViews(TransactionTestCase):
         }
 
         result = self.client.post(url, validation_params)
-        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.status_code, 302)
 
     ## Stress test the server!
     @pytest.mark.long_running
