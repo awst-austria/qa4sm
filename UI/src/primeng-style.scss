@@ -557,7 +557,8 @@ p-checkbox.ng-dirty.ng-invalid > .p-checkbox > .p-checkbox-box {
 }
 
 .p-checkbox-label {
-  margin-left: 0.5rem;
+  margin: 0 0 0 0.5rem;
+  display: inline;
 }
 
 .p-highlight .p-checkbox .p-checkbox-box {
