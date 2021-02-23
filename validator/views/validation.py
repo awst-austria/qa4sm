@@ -27,6 +27,7 @@ from validator.validation import run_validation
 import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
 from django.db.models import Case, When
+from django.urls import reverse
 
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
@@ -209,6 +210,13 @@ def validation(request):
     dc_prefix = 'datasets'
     ref_prefix = 'ref'
 
+    # some parameters to pass to template
+    valrun_found = request.GET.get('valrun_found', None)
+    valrun_uuid = request.GET.get("valrun_uuid", None)
+    is_published = request.GET.get('is_published', None)
+    belongs_to_user = request.GET.get('belongs', None)
+    val_date = None
+
     # Get initial values for dataset forms
     def _default_initials():
         ref_initial_values = {
@@ -380,13 +388,13 @@ def validation(request):
                 newrun.delete()
                 comparison, is_published = (comparison_pub, comparison_pub['is_published'])
                 val_id = comparison['val_id']
-                val_date = ValidationRun.objects.get(id=val_id).start_time
                 belongs_to_user = comparison['belongs_to_user']
-                return render(request, 'validator/validate.html',
-                              {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
-                               'val_id': val_id, 'is_published': is_published, 'belongs_to_user': belongs_to_user,
-                               'val_date': val_date})
+                validation_settings = reverse('validation') + \
+                                      '?valrun_uuid=' + str(val_id) + \
+                                      '&valrun_found=' + str(int(if_run_exists)) + \
+                                      '&is_published=' + str(int(is_published)) + \
+                                      '&belongs=' + str(int(belongs_to_user))
+                return redirect(validation_settings)
 
             # checking how many times the validation button was clicked - in try so that tests pass
             # need to close all db connections before forking, see
@@ -405,9 +413,18 @@ def validation(request):
         ref_dc_form = DatasetConfigurationForm(prefix=ref_prefix, is_reference=True, initial=ref_initial_values)
         # ref_dc_form.
 
+        # if validation exists:
+        if valrun_found is not None:
+            val_date = ValidationRun.objects.get(id=valrun_uuid).start_time
+            valrun_found = bool(int(valrun_found))
+            is_published = bool(int(is_published))
+            belongs_to_user = bool(int(belongs_to_user))
+
     return render(request, 'validator/validate.html',
                   {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                   'maintenance_mode':Settings.load().maintenance_mode, 'if_run_exists':False, 'val_id': None})
+                   'maintenance_mode':Settings.load().maintenance_mode, 'if_run_exists': valrun_found,
+                   'val_id': valrun_uuid, 'is_published': is_published, 'belongs_to_user': belongs_to_user,
+                   'val_date': val_date})
 
 
 ## Ajax stuff required for validation view
