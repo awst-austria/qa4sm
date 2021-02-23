@@ -1211,6 +1211,9 @@
       if($('#id_datasets-TOTAL_FORMS') >= $('#id_datasets-MIN_NUM_FORMS')){
         set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
       }
+      // and here the same just for tcol
+      setTcLock()
+
 
       if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){
         var url_to_go = $('#pub_validate-confirm').attr('data-url')
