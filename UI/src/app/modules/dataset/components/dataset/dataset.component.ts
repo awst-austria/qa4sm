@@ -24,7 +24,6 @@ export class DatasetComponent implements OnInit {
 
   @Input() selectionModel: DatasetComponentSelectionModel;
   @Input() removable: boolean = false;
-  @Output() removeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
 
   constructor(private datasetService: DatasetService, private datasetVersionService: DatasetVersionService, private datasetVariableService: DatasetVariableService) {
@@ -56,10 +55,4 @@ export class DatasetComponent implements OnInit {
   onDatasetChange() {
     this.updateSelectableVersionsAndVariable();
   }
-
-  onRemoveDataset() {
-    this.removeDataset.emit(this.selectionModel);
-  }
-
-
 }
