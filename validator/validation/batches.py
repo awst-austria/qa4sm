@@ -114,10 +114,8 @@ def create_jobs(validation_run):
             for key, value in meta.items():
                 meta_value = value[0][0]
                 if isinstance(meta_value, pd.Timestamp):
-                    new = meta_value.value
-                    reshaped[key] = new
-                else:
-                    reshaped[key] = meta_value
+                    meta_value = meta_value.to_numpy()
+                reshaped[key] = meta_value
 
             return reshaped
 
