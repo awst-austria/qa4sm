@@ -1,4 +1,4 @@
-<div class="p-grid">
+<div class="p-grid no-gutters">
   <div class="
     p-col-12
     p-md-10 p-md-offset-1
@@ -19,7 +19,7 @@
           </ng-template>
           <p-accordion multiple="true">
 
-            <p-accordionTab [header]="(item.selectedDataset.pretty_name)"
+            <p-accordionTab [header]="(item.selectedDataset.pretty_name)+' / '+(item.selectedVersion.pretty_name)+' / '+(item.selectedVariable.pretty_name)"
                             *ngFor="let item of selectedDatasets; let i = index"
                             [selected]="i == 0">
               <qa-dataset (removeDataset)="removeDataset($event)" [selectionModel]="selectedDatasets[i]"

@@ -41,11 +41,11 @@ export class ValidateComponent implements OnInit {
   private addDataset(targetArray: DatasetComponentSelectionModel[]) {
     this.datasetService.getAllDatasets().subscribe(datasets => {
       let model = new DatasetComponentSelectionModel(datasets[0], null, null);
-      targetArray.push(model);
       this.versionService.getVersionsByDataset(model.selectedDataset.id).subscribe(versions => {
         model.selectedVersion = versions[0];
         this.variableService.getVariablesByDataset(model.selectedDataset.id).subscribe(variables => {
           model.selectedVariable = variables[0];
+          targetArray.push(model);
         });
       });
     });
