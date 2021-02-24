@@ -1,6 +1,7 @@
 from django.conf.urls import url
 from django.urls import path
 
+from api.views.DataFilterView import data_filter
 from api.views.DatasetVariableView import dataset_variable
 from api.views.DatasetVersionView import dataset_version
 from api.views.DatasetView import dataset
@@ -40,4 +41,5 @@ urlpatterns = [
     path('dataset', dataset, name='Datasets'),
     path('dataset-version', dataset_version, name='Dataset versions'),
     path('dataset-variable', dataset_variable, name='Dataset variables'),
+    path('data-filter', data_filter, name='Dataset filters'),
 ]
