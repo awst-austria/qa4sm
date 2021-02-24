@@ -68,6 +68,9 @@ class ValidationRunForm(forms.ModelForm):
             or self.fields["interval_to"].initial != END_TIME
         )
 
+        # remember initial tcol value to set it correctly in setTcLock
+        self.initial_tcol = self.fields["tcol"].initial
+
     def clean(self):
         values = super(ValidationRunForm, self).clean()
         if(('anomalies' in values) and (values['anomalies'] != ValidationRun.CLIMATOLOGY)):

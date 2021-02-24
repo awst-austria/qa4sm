@@ -999,12 +999,13 @@
             setTcLock();
         });
 
-        function setTcLock() {
+        function setTcLock(checked = false) {
             var formsetPrefix = 'datasets';
             var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
             var totalNoForms = $(totalSelector).val();
             var n_datasets = parseInt(totalNoForms) + 1
             if ( n_datasets >= 3) {
+                $('#tcol').prop('checked', checked);
                 $('#tcol').prop('disabled', false);
             } else {
                 $('#tcol').prop('checked', false);
@@ -1218,8 +1219,9 @@
       if($('#id_datasets-TOTAL_FORMS') >= $('#id_datasets-MIN_NUM_FORMS')){
         set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
       }
-      // and here the same just for tcol
-      setTcLock()
+      // and here the same just for tcol, but make sure to remember the
+      // original state
+      setTcLock("{{ val_form.initial_tcol|yesno:"true,false" }}");
 
 
       if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){
