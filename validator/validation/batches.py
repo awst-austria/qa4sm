@@ -70,18 +70,9 @@ def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
 
     return gpis, lons, lats, index
 
-def create_jobs(validation_run):
+def create_jobs(validation_run, ref_reader):
     jobs = []
     total_points = 0
-
-    ref_reader = create_reader(validation_run.reference_configuration.dataset, validation_run.reference_configuration.version)
-
-    # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
-    ref_reader = setup_filtering(ref_reader, list(validation_run.reference_configuration.filters.all()),\
-                                 list(validation_run.reference_configuration.parametrisedfilter_set.all()),\
-                                 validation_run.reference_configuration.dataset, validation_run.reference_configuration.variable)
-    while(hasattr(ref_reader, 'cls')):
-        ref_reader = ref_reader.cls
 
     # if we've got data on a grid, process one cell at a time
     if isinstance(ref_reader, GriddedBase):
@@ -104,7 +95,6 @@ def create_jobs(validation_run):
 
     # if we've got ISMN data, process one network at a time
     elif isinstance(ref_reader, ISMN_Interface):
-
         depth_from, depth_to = get_depths_params(validation_run.reference_configuration.parametrisedfilter_set.all())
 
         ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=depth_from, max_depth=depth_to, groupby='network')

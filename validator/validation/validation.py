@@ -9,6 +9,7 @@ from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
 from django.urls.base import reverse
+from ismn.interface import ISMN_Interface
 from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
@@ -58,6 +59,21 @@ def _get_actual_time_range(val_run, dataset_version_id):
 
     return [actual_start, actual_end]
 
+def _get_reference_reader(val_run):
+    ref_reader = create_reader(val_run.reference_configuration.dataset, val_run.reference_configuration.version)
+
+    # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
+    ref_reader = setup_filtering(ref_reader, list(val_run.reference_configuration.filters.all()),\
+                                 list(val_run.reference_configuration.parametrisedfilter_set.all()),\
+                                 val_run.reference_configuration.dataset, val_run.reference_configuration.variable)
+    while(hasattr(ref_reader, 'cls')):
+        ref_reader = ref_reader.cls
+
+    if not isinstance(ref_reader, ISMN_Interface):
+        global METADATA_TEMPLATE
+        METADATA_TEMPLATE = None
+
+    return ref_reader
 
 def set_outfile(validation_run, run_dir):
     outfile = first_file_in(run_dir, '.nc')
@@ -274,6 +290,8 @@ def untrack_celery_task(task_id):
     except CeleryTask.DoesNotExist:
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
+
+
 def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
@@ -286,11 +304,13 @@ def run_validation(validation_id):
         run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
         mkdir_if_not_exists(run_dir)
 
-        total_points, jobs = create_jobs(validation_run)
+        ref_reader = _get_reference_reader(validation_run)
+
+        total_points, jobs = create_jobs(validation_run, ref_reader)
         validation_run.total_points = total_points
         validation_run.save() # save the number of gpis before we start
 
-        __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
+        __logger.debug("Jobs to run: {}".format(jobs))
 
         save_path = run_dir
 
