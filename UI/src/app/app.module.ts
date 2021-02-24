@@ -24,7 +24,6 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 import {DatasetModule} from './modules/dataset/dataset.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {ToastModule} from './modules/toast/toast.module';
 import {DropdownModule} from 'primeng/dropdown';
 import {PanelModule} from 'primeng/panel';
 import {TabViewModule} from 'primeng/tabview';
@@ -34,6 +33,8 @@ import {ButtonModule} from 'primeng/button';
 import {PasswordModule} from 'primeng/password';
 import {InputTextModule} from 'primeng/inputtext';
 import {FilterModule} from './modules/filter/filter.module';
+import {ToastModule} from 'primeng/toast';
+import {MessageService} from 'primeng/api';
 
 
 @NgModule({
@@ -69,7 +70,8 @@ import {FilterModule} from './modules/filter/filter.module';
     ButtonModule,
     PasswordModule,
     InputTextModule,
-    FilterModule
+    FilterModule,
+    ToastModule,
 
 
   ],
@@ -78,7 +80,8 @@ import {FilterModule} from './modules/filter/filter.module';
       provide: HTTP_INTERCEPTORS,
       useClass: HttpTokenInterceptor,
       multi: true
-    }
+    },
+    MessageService
   ],
   bootstrap: [AppComponent]
 })
