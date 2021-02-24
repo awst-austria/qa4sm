@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import io
 import json
 import logging
+from lxml.html import document_fromstring
 from re import findall as regex_find
 from time import sleep
 import time
@@ -474,27 +475,43 @@ class TestViews(TransactionTestCase):
         assert form.cleaned_data["sort_order"] == "desc"
 
     def test_ajax_get_dataset_options_view(self):
+        ismn_networks = (
+            "BNZ-LTER,COSMOS,FLUXNET-AMERIFLUX,iRON,PBO-H2O,RISMA,SCAN,USCRN"
+            )
+        ismn_depths = "0,0.5"
         url = reverse('ajax_get_dataset_options')
         self.client.login(**self.credentials)
-        response = self.client.get(url, {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
-                                         'filter_widget_id': 'id_datasets-0-filters',
-                                         'param_filter_widget_id': 'id_datasets-0-paramfilters',
-                                         'initial_filters': '1_9',
-                                         'initial_version': '7',
-                                         'initial_variable': '7'})
+        response = self.client.get(
+            url,
+            {'dataset_id': Dataset.objects.get(short_name=globals.ISMN).id,
+             'filter_widget_id': 'id_datasets-0-filters',
+             'param_filter_widget_id': 'id_datasets-0-paramfilters',
+             'initial_filters': '1,2',
+             'initial_paramfilters': '18,24',
+             'initial_paramfilter_params': ismn_networks + ";" + ismn_depths,
+             'initial_version': '5',
+             'initial_variable': '4'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
         assert return_data['versions']
         assert return_data['variables']
         assert return_data['filters']
+        assert return_data['paramfilters']
 
         checked_filter_ids = [
             "id_datasets-0-filters_0", "id_datasets-0-filters_1"
         ]
         for id in checked_filter_ids:
             assert f'id="{id}" checked' in return_data["filters"]
-        assert return_data["versions"].startswith('<option value="7">')
-        assert return_data["variables"].startswith('<option value="7">')
+        assert return_data["versions"].startswith('<option value="5">')
+        assert return_data["variables"].startswith('<option value="4">')
+
+        # check parametrised filters
+        root = document_fromstring(return_data["paramfilters"])
+        for i, (id, val) in enumerate(
+                zip(["18", "24"], [ismn_networks, ismn_depths])):
+            assert val == root[0][i][5].value
+            assert id == root[0][i][2].value
 
         response = self.client.get(url, {'dataset_id': ''})
         self.assertEqual(response.status_code, 400)

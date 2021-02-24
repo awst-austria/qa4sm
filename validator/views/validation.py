@@ -474,13 +474,13 @@ def __render_options(entity_list, initial):
     content = loader.render_to_string('widgets/select_options.html', {'widgets': widgets})
     return content
 
+
 # render filters as html checkboxes with descriptions
-def __render_filters(filters, filter_widget_id, initial_filters, parametrised=False):
+def __render_filters(filters, filter_widget_id, initial_filters):
     widget_name = regex_subs(r'^id_', '', filter_widget_id)
-    if parametrised:
-        filter_field = ParamFilterChoiceField(widget=ParamFilterSelectMultiple, queryset=filters, required=False)
-    else:
-        filter_field = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=filters, required=False)
+    filter_field = ModelMultipleChoiceField(
+        widget=FilterCheckboxSelectMultiple, queryset=filters, required=False
+    )
 
     # extracts the initial filters to be selected from the initial_filters
     # string, see DatasetConfigurationForm.__init__
@@ -493,11 +493,37 @@ def __render_filters(filters, filter_widget_id, initial_filters, parametrised=Fa
         name=widget_name,
         value=initial_filter_ids,
         attrs={'id': filter_widget_id})
-    if parametrised:
-        import pdb; pdb.set_trace()
     return filter_html
 
-## returns the options for the variable and version select dropdowns and the filter checkboxes based on the selected dataset
+
+# render filters as html checkboxes with descriptions
+def __render_parametrised_filters(
+        filters, filter_widget_id, initial_filters, initial_params
+):
+    widget_name = regex_subs(r'^id_', '', filter_widget_id)
+    filter_field = ParamFilterChoiceField(
+        widget=ParamFilterSelectMultiple, queryset=filters, required=False
+    )
+
+    # extracts the initial filters and params to be selected from the
+    # initial_filters string, see DatasetConfigurationForm.__init__
+    if filters and initial_filters:
+        initial_filter_ids = list(map(int, initial_filters.split(",")))
+        initial_parameters = initial_params.split(";")
+    else:
+        initial_filter_ids = None
+        initial_parameters = None
+
+    filter_html = filter_field.widget.render(
+        name=widget_name,
+        value=initial_filter_ids,
+        attrs={'id': filter_widget_id,
+               'initial_params': initial_parameters})
+    return filter_html
+
+
+## returns the options for the variable and version select dropdowns and the
+## filter checkboxes based on the selected dataset
 @login_required(login_url='/login/')
 def ajax_get_dataset_options(request):
     selected_dataset_name = request.GET.get('dataset_id')
@@ -514,8 +540,6 @@ def ajax_get_dataset_options(request):
     except:
         return HttpResponseBadRequest("Not a valid dataset")
 
-    print(initial_paramfilters, initial_paramfilter_params)
-    import pdb; pdb.set_trace();
     response_data = {
         'versions': __render_options(
             selected_dataset.versions.all().order_by('-pretty_name'),
@@ -527,14 +551,14 @@ def ajax_get_dataset_options(request):
         ),
         'filters': __render_filters(
             selected_dataset.filters.filter(parameterised=False),
-            filter_widget_id, initial_filters,
-            parametrised=False
+            filter_widget_id,
+            initial_filters,
         ),
-        'paramfilters': __render_filters(
+        'paramfilters': __render_parametrised_filters(
             selected_dataset.filters.filter(parameterised=True),
             param_filter_widget_id,
             initial_paramfilters,
-            parametrised=True
+            initial_paramfilter_params,
         ),
         }
 
