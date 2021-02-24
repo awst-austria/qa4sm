@@ -694,6 +694,8 @@
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
 	    var initialFilters = event.data.initialFilters;
+	    var initialParamfilters = event.data.initialParamfilters;
+	    var initialParamfilterParams = event.data.initialParamfilterParams;
             var initialVersion = event.data.initialVersion;
             var initialVariable = event.data.initialVariable;
             var disableAjaxValidationPeriod = event.data.disableAjaxValidationPeriod;
@@ -703,6 +705,8 @@
 			'filter_widget_id': filterWidgetId,
 			'param_filter_widget_id': paramFilterWidgetId,
 		        'initial_filters': initialFilters,
+                        'initial_paramfilters': initialParamfilters,
+                        'initial_paramfilter_params': initialParamfilterParams,
 		        'initial_version': initialVersion,
 		        'initial_variable': initialVariable },
                 success: function (return_data) {
@@ -845,6 +849,8 @@
         {% for dc_form in dc_formset.forms %}
             $("#{{ dc_form.dataset.auto_id }}").change(
                 {initialFilters: "{{ dc_form.initial_filters }}",
+                 initialParamfilters: "{{ dc_form.initial_paramfilters }}",
+                 initialParamfilterParams: "{{ dc_form.initial_paramfilter_params }}",
                  initialVersion: "{{ dc_form.initial_version }}",
                  initialVariable: "{{ dc_form.initial_variable}}",
                  disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},
@@ -865,9 +871,10 @@
             }
         }
 
-
         $("#{{ ref_dc_form.dataset.auto_id }}").change(
             {initialFilters: "{{ ref_dc_form.initial_filters }}",
+             initialParamfilters: "{{ ref_dc_form.initial_paramfilters }}",
+             initialParamfilterParams: "{{ ref_dc_form.initial_paramfilter_params }}",
              initialVersion: "{{ ref_dc_form.initial_version }}",
              initialVariable: "{{ ref_dc_form.initial_variable }}",
              disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},

@@ -233,6 +233,7 @@ def validation(request):
         }]
         return ref_initial_values, data_initial_values
 
+    # infer initial configuration values from POST request
     if request.method == "POST":
         def object_list_from_key(typ, key):
             return list(map(
@@ -255,6 +256,12 @@ def validation(request):
                     "filters": object_list_from_key(
                         DataFilter, pfx + "-filters"
                     ),
+                    "parametrised_filters": object_list_from_key(
+                        DataFilter, pfx + "-parametrised_filters"
+                    ),
+                    "paramfilter_params": request.POST.getlist(
+                        pfx + "-parametrised_filters_params"
+                    ),
                     "dataset": object_from_key(
                         Dataset, pfx + "-dataset"
                     ),
@@ -267,19 +274,12 @@ def validation(request):
                 })
             ref_initial_values = initial_values[0]
             data_initial_values = initial_values[1:]
-            # add parametrised_filters for ref
-            ref_initial_values.update({
-                "parametrised_filters": object_list_from_key(
-                    DataFilter, "ref-parametrised_filters"
-                )
-            })
-            ref_parametrised_filters_params = request.POST.get(
-                'ref-parametrized_filters_params'
-            )
+
         except TypeError:
             # happens with invalid requests
             ref_initial_values, data_initial_values = _default_initials()
 
+    # infer initial configuration values from GET request
     else:
         valrun_uuid = request.GET.get("valrun_uuid", None)
         if valrun_uuid is None:
@@ -290,21 +290,25 @@ def validation(request):
             ref_config = valrun.reference_configuration
             data_configs = [dc for dc in valrun.dataset_configurations.all()
                             if dc.id != ref_config.id]
-            initial_values = [
-                {
+            initial_values = []
+            for dc in [ref_config] + data_configs:
+                initial_values.append({
                     "filters": dc.filters.all(),
+                    "parametrised_filters": dc.parametrised_filters.all(),
                     "dataset": dc.dataset,
                     "version": dc.version,
                     "variable": dc.variable,
-                }
-                for dc in [ref_config] + data_configs
-            ]
+                })
+                if initial_values[-1]["parametrised_filters"]:
+                    initial_values[-1].update({
+                        "paramfilter_params": [
+                            fs.parameters
+                            for fs in dc.parametrisedfilter_set.all()
+                        ]
+                    })
+
             ref_initial_values = initial_values[0]
             data_initial_values = initial_values[1:]
-            # add parametrised_filters for ref
-            ref_initial_values.update({
-                "parametrised_filters": ref_config.parametrised_filters.all(),
-            })
 
     # get initial values for the validation run settings
     valrun_initial_values = {}
@@ -481,7 +485,7 @@ def __render_filters(filters, filter_widget_id, initial_filters, parametrised=Fa
     # extracts the initial filters to be selected from the initial_filters
     # string, see DatasetConfigurationForm.__init__
     if filters and initial_filters:
-        initial_filter_ids = list(map(int, initial_filters.split('_')))
+        initial_filter_ids = list(map(int, initial_filters.split(',')))
     else:
         initial_filter_ids = None
 
@@ -489,6 +493,8 @@ def __render_filters(filters, filter_widget_id, initial_filters, parametrised=Fa
         name=widget_name,
         value=initial_filter_ids,
         attrs={'id': filter_widget_id})
+    if parametrised:
+        import pdb; pdb.set_trace()
     return filter_html
 
 ## returns the options for the variable and version select dropdowns and the filter checkboxes based on the selected dataset
@@ -498,6 +504,8 @@ def ajax_get_dataset_options(request):
     filter_widget_id = request.GET.get('filter_widget_id')
     param_filter_widget_id = request.GET.get('param_filter_widget_id')
     initial_filters = request.GET.get('initial_filters')
+    initial_paramfilters = request.GET.get('initial_paramfilters')
+    initial_paramfilter_params = request.GET.get('initial_paramfilter_params')
     initial_version = request.GET.get('initial_version')
     initial_variable = request.GET.get('initial_variable')
 
@@ -506,6 +514,8 @@ def ajax_get_dataset_options(request):
     except:
         return HttpResponseBadRequest("Not a valid dataset")
 
+    print(initial_paramfilters, initial_paramfilter_params)
+    import pdb; pdb.set_trace();
     response_data = {
         'versions': __render_options(
             selected_dataset.versions.all().order_by('-pretty_name'),
@@ -523,7 +533,7 @@ def ajax_get_dataset_options(request):
         'paramfilters': __render_filters(
             selected_dataset.filters.filter(parameterised=True),
             param_filter_widget_id,
-            initial_filters,
+            initial_paramfilters,
             parametrised=True
         ),
         }
