@@ -19,17 +19,26 @@
           </ng-template>
           <p-accordion multiple="true">
 
-            <p-accordionTab [header]="(item.selectedDataset.pretty_name)+' / '+(item.selectedVersion.pretty_name)+' / '+(item.selectedVariable.pretty_name)"
-                            *ngFor="let item of selectedDatasets; let i = index"
-                            [selected]="i == 0">
-              <qa-dataset (removeDataset)="removeDataset($event)" [selectionModel]="selectedDatasets[i]"
+            <p-accordionTab
+              [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / '+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.pretty_name)"
+              *ngFor="let item of datasetConfigurations; let i = index"
+              [selected]="i == 0">
+
+              <qa-dataset *ngIf="datasetConfigurations[i].datasetModel.selectedDataset"
+                          [selectionModel]="datasetConfigurations[i].datasetModel"
                           [removable]="true"></qa-dataset>
+
+              <qa-basic-filter></qa-basic-filter>
+              <button pButton type="button" (click)="removeDataset(datasetConfigurations[i])" label="Remove dataset"
+                      icon="pi pi-trash"
+                      class="p-button-danger" style="padding: 0.2rem;"></button>
             </p-accordionTab>
 
           </p-accordion>
           <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDatasetToValidate()"
                   class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
                   [disabled]="addDatasetButtonDisabled()"></button>
+
         </p-panel>
       </div>
 
@@ -44,8 +53,8 @@
             </label>
           </ng-template>
 
-          <qa-dataset *ngIf="selectedReference.length>0" [removable]="false"
-                      [selectionModel]="selectedReference[0]"></qa-dataset>
+          <qa-dataset *ngIf="referenceConfiguration.length>0 && referenceConfiguration[0].datasetModel.selectedDataset" [removable]="false"
+                      [selectionModel]="referenceConfiguration[0].datasetModel"></qa-dataset>
 
         </p-panel>
       </div>

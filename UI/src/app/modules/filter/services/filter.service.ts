@@ -30,10 +30,10 @@ export class FilterService {
   }
 
   getAllFilters(): Observable<FilterDto[]> {
-    return this.getFilterById(CACHE_KEY_ALL_FILTERS);
+    return this.getFilterByDatasetId(CACHE_KEY_ALL_FILTERS);
   }
 
-  getFilterById(datasetId: number): Observable<FilterDto[]> {
+  getFilterByDatasetId(datasetId: number): Observable<FilterDto[]> {
     if (this.isCached(datasetId)) {
       return this.requestCache.get(datasetId).dataFilters$;
     }
@@ -42,7 +42,7 @@ export class FilterService {
     if (datasetId == CACHE_KEY_ALL_FILTERS) {
       request = this.httpClient.get<FilterDto[]>(dataFilterUrl).pipe(shareReplay());
     } else {
-      let params = new HttpParams().set('id', String(datasetId));
+      let params = new HttpParams().set('dataset', String(datasetId));
       request = this.httpClient.get<FilterDto[]>(dataFilterUrl, {params: params}).pipe(shareReplay());
     }
 

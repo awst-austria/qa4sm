@@ -3,6 +3,11 @@ import {DatasetService} from '../../modules/dataset/services/dataset.service';
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/dataset/services/dataset-version.service';
 import {DatasetVariableService} from '../../modules/dataset/services/dataset-variable.service';
+import {DatasetConfigModel} from './dataset-config-model';
+import {switchMap} from 'rxjs/operators';
+import {concat, Observable} from 'rxjs';
+import {DatasetDto} from '../../modules/dataset/services/dataset.dto';
+import {FilterService} from '../../modules/filter/services/filter.service';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -13,42 +18,58 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either con
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ValidateComponent implements OnInit {
-  selectedDatasets: DatasetComponentSelectionModel[] = [];
-  selectedReference: DatasetComponentSelectionModel[] = [];
+  datasetConfigurations: DatasetConfigModel[] = [];
+  referenceConfiguration: DatasetConfigModel[] = []; // this array will always contain exactly 1 element
+
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
-              private variableService: DatasetVariableService) {
+              private variableService: DatasetVariableService,
+              private filterService: FilterService) {
 
   }
 
-
-  removeDataset(selection: DatasetComponentSelectionModel) {
-    let toBeRemoved = this.selectedDatasets.indexOf(selection);
-    if (toBeRemoved > -1) {
-      this.selectedDatasets.splice(toBeRemoved, 1);
-    }
-  }
 
   addDatasetToValidate() {
-    this.addDataset(this.selectedDatasets);
+    this.addDataset(this.datasetConfigurations);
   }
 
   addReferenceDataset() {
-    this.addDataset(this.selectedReference);
+    this.addDataset(this.referenceConfiguration);
   }
 
-  private addDataset(targetArray: DatasetComponentSelectionModel[]) {
+  private addDataset(targetArray: DatasetConfigModel[]) {
+
+    let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null);
+    targetArray.push(model);
+    //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
-      let model = new DatasetComponentSelectionModel(datasets[0], null, null);
-      this.versionService.getVersionsByDataset(model.selectedDataset.id).subscribe(versions => {
-        model.selectedVersion = versions[0];
-        this.variableService.getVariablesByDataset(model.selectedDataset.id).subscribe(variables => {
-          model.selectedVariable = variables[0];
-          targetArray.push(model);
-        });
+      model.datasetModel.selectedDataset = datasets[0];
+
+      //then get all versions for the first dataset in the result list
+      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
+        model.datasetModel.selectedVersion = versions[0];
       });
+
+      // in the same time get the variables too
+      this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
+        model.datasetModel.selectedVariable = variables[0];
+      });
+
+      //and the filters
+      this.filterService.getFilterByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
+        model.basicFilters = filters;
+        console.log(filters);
+      });
+
     });
+  }
+
+  removeDataset(configModel: DatasetConfigModel) {
+    let toBeRemoved = this.datasetConfigurations.indexOf(configModel);
+    if (toBeRemoved > -1) {
+      this.datasetConfigurations.splice(toBeRemoved, 1);
+    }
   }
 
   ngOnInit(): void {
@@ -57,7 +78,16 @@ export class ValidateComponent implements OnInit {
   }
 
   addDatasetButtonDisabled(): boolean {
-    return this.selectedDatasets.length >= MAX_DATASETS_FOR_VALIDATION;
+    return this.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
   }
 
+  remove2(a: DatasetComponentSelectionModel) {
+
+
+  }
+}
+
+export class Collector {
+  constructor(dataset: Observable<DatasetDto[]>) {
+  }
 }
