@@ -56,6 +56,7 @@
 
           <div *ngIf="referenceConfiguration.length>0 && referenceConfiguration[0].datasetModel.selectedDataset">
             <qa-dataset
+              [reference]="true"
               [removable]="false"
               [selectionModel]="referenceConfiguration[0].datasetModel"
               (changeDataset)="onReferenceChange()"></qa-dataset>
