@@ -28,7 +28,8 @@
                           [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
 
-              <qa-basic-filter *ngFor="let filter of item.basicFilters; let i = index" [filterModel]="filter" ></qa-basic-filter>
+              <qa-basic-filter *ngFor="let filter of item.basicFilters; let i = index"
+                               [filterModel]="filter"></qa-basic-filter>
               <button pButton type="button" (click)="removeDataset(datasetConfigurations[i])" label="Remove dataset"
                       icon="pi pi-trash"
                       class="p-button-danger" style="padding: 0.2rem;"></button>
@@ -55,11 +56,27 @@
 
           <div *ngIf="referenceConfiguration.length>0 && referenceConfiguration[0].datasetModel.selectedDataset">
             <qa-dataset
-                        [removable]="false"
-                        [selectionModel]="referenceConfiguration[0].datasetModel" (changeDataset)="onReferenceChange()"></qa-dataset>
+              [removable]="false"
+              [selectionModel]="referenceConfiguration[0].datasetModel"
+              (changeDataset)="onReferenceChange()"></qa-dataset>
 
-            <qa-basic-filter *ngFor="let filter of referenceConfiguration[0].basicFilters; let i = index" [filterModel]="filter" ></qa-basic-filter>
+            <qa-basic-filter *ngFor="let filter of referenceConfiguration[0].basicFilters; let i = index"
+                             [filterModel]="filter"></qa-basic-filter>
           </div>
+
+        </p-panel>
+      </div>
+
+      <!--      Spatial subsetting-->
+      <div class="p-col-12">
+        <p-panel header="Spatial Subsetting" [toggleable]="true">
+          <ng-template pTemplate="icons">
+            <label class="p-panel-header-icon"
+                   pTooltip="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+            </label>
+          </ng-template>
 
         </p-panel>
       </div>
