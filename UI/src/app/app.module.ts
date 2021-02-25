@@ -26,7 +26,6 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {DropdownModule} from 'primeng/dropdown';
 import {PanelModule} from 'primeng/panel';
-import {TabViewModule} from 'primeng/tabview';
 import {AccordionModule} from 'primeng/accordion';
 import {TooltipModule} from 'primeng/tooltip';
 import {ButtonModule} from 'primeng/button';
@@ -35,6 +34,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {FilterModule} from './modules/filter/filter.module';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
+import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.module';
 
 
 @NgModule({
@@ -61,8 +61,6 @@ import {MessageService} from 'primeng/api';
     NgbModule,
     FontAwesomeModule,
     ToastModule,
-    PanelModule,
-    TabViewModule,
     DropdownModule,
     AccordionModule,
     PanelModule,
@@ -72,6 +70,7 @@ import {MessageService} from 'primeng/api';
     InputTextModule,
     FilterModule,
     ToastModule,
+    SpatialSubsetModule,
 
 
   ],

@@ -70,16 +70,7 @@
 
       <!--      Spatial subsetting-->
       <div class="p-col-12">
-        <p-panel header="Spatial Subsetting" [toggleable]="true">
-          <ng-template pTemplate="icons">
-            <label class="p-panel-header-icon"
-                   pTooltip="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."
-                   tooltipPosition="bottom">
-              <span class="pi pi-question-circle"></span>
-            </label>
-          </ng-template>
-
-        </p-panel>
+        <qa-spatial-subset></qa-spatial-subset>
       </div>
     </div>
   </div>
