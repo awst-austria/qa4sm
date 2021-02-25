@@ -19,16 +19,16 @@
           </ng-template>
           <p-accordion multiple="true">
 
-            <p-accordionTab
-              [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / '+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.pretty_name)"
-              *ngFor="let item of datasetConfigurations; let i = index"
-              [selected]="i == 0">
+            <p-accordionTab *ngFor="let item of datasetConfigurations; let i = index"
+                            [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / '+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.pretty_name)"
+                            [selected]="i == 0">
 
               <qa-dataset *ngIf="datasetConfigurations[i].datasetModel.selectedDataset"
                           [selectionModel]="datasetConfigurations[i].datasetModel"
-                          [removable]="true"></qa-dataset>
+                          [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
-              <qa-basic-filter></qa-basic-filter>
+
+              <qa-basic-filter *ngFor="let filter of item.basicFilters; let i = index" [filterModel]="filter" ></qa-basic-filter>
               <button pButton type="button" (click)="removeDataset(datasetConfigurations[i])" label="Remove dataset"
                       icon="pi pi-trash"
                       class="p-button-danger" style="padding: 0.2rem;"></button>
@@ -53,8 +53,13 @@
             </label>
           </ng-template>
 
-          <qa-dataset *ngIf="referenceConfiguration.length>0 && referenceConfiguration[0].datasetModel.selectedDataset" [removable]="false"
-                      [selectionModel]="referenceConfiguration[0].datasetModel"></qa-dataset>
+          <div *ngIf="referenceConfiguration.length>0 && referenceConfiguration[0].datasetModel.selectedDataset">
+            <qa-dataset
+                        [removable]="false"
+                        [selectionModel]="referenceConfiguration[0].datasetModel" (changeDataset)="onReferenceChange()"></qa-dataset>
+
+            <qa-basic-filter *ngFor="let filter of referenceConfiguration[0].basicFilters; let i = index" [filterModel]="filter" ></qa-basic-filter>
+          </div>
 
         </p-panel>
       </div>

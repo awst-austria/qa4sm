@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {FilterModel} from './filter-model';
 
 @Component({
   selector: 'qa-basic-filter',
@@ -7,7 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BasicFilterComponent implements OnInit {
 
-  constructor() { }
+  @Input() filterModel: FilterModel;
+
+  constructor() {
+  }
 
   ngOnInit(): void {
   }

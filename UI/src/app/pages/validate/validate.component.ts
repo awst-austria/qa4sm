@@ -4,10 +4,8 @@ import {DatasetComponentSelectionModel} from '../../modules/dataset/components/d
 import {DatasetVersionService} from '../../modules/dataset/services/dataset-version.service';
 import {DatasetVariableService} from '../../modules/dataset/services/dataset-variable.service';
 import {DatasetConfigModel} from './dataset-config-model';
-import {switchMap} from 'rxjs/operators';
-import {concat, Observable} from 'rxjs';
-import {DatasetDto} from '../../modules/dataset/services/dataset.dto';
 import {FilterService} from '../../modules/filter/services/filter.service';
+import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -40,7 +38,7 @@ export class ValidateComponent implements OnInit {
 
   private addDataset(targetArray: DatasetConfigModel[]) {
 
-    let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null);
+    let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
@@ -57,11 +55,21 @@ export class ValidateComponent implements OnInit {
       });
 
       //and the filters
-      this.filterService.getFilterByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
-        model.basicFilters = filters;
-        console.log(filters);
-      });
+      this.updateDatasetConfigFilters(model);
+    });
+  }
 
+  private updateDatasetConfigFilters(model: DatasetConfigModel) {
+    this.filterService.getFilterByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
+      model.basicFilters = [];
+      model.parameterisedFilters = [];
+      filters.forEach(filter => {
+        if (filter.parameterised) {
+          model.parameterisedFilters.push(new FilterModel(filter, false, filter.default_parameter));
+        } else {
+          model.basicFilters.push(new FilterModel(filter, false, null));
+        }
+      });
     });
   }
 
@@ -72,6 +80,18 @@ export class ValidateComponent implements OnInit {
     }
   }
 
+  onDatasetChange(datasetConfig: DatasetComponentSelectionModel) {
+    this.datasetConfigurations.forEach(config => {
+      if (config.datasetModel == datasetConfig) {
+        this.updateDatasetConfigFilters(config);
+      }
+    });
+  }
+
+  onReferenceChange() {
+    this.updateDatasetConfigFilters(this.referenceConfiguration[0]);
+  }
+
   ngOnInit(): void {
     this.addDatasetToValidate();
     this.addReferenceDataset();
@@ -79,15 +99,5 @@ export class ValidateComponent implements OnInit {
 
   addDatasetButtonDisabled(): boolean {
     return this.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
-  }
-
-  remove2(a: DatasetComponentSelectionModel) {
-
-
-  }
-}
-
-export class Collector {
-  constructor(dataset: Observable<DatasetDto[]>) {
   }
 }

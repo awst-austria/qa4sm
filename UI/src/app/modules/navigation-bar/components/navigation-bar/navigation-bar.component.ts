@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {Router} from '@angular/router';
-import {ToastService} from '../../../core/services/toast.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'navigation-bar',
