@@ -119,6 +119,6 @@ METADATA_TEMPLATE = {'clay_fraction': np.float32([np.nan]),
                      'saturation': np.float32([np.nan]),
                      'silt_fraction': np.float32([np.nan]),
                      'station': np.array([' ' * 256]),
-                     'timerange_from': np.float32([np.nan]),
-                     'timerange_to': np.float32([np.nan]),
+                     'timerange_from': np.array([' ' * 256]),
+                     'timerange_to': np.array([' ' * 256]),
                      'variable': np.array([' ' * 256])}
