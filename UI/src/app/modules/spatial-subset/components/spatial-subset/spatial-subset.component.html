@@ -6,59 +6,36 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid no-gutters">
-    <div class="p-col-12 p-sm-5">
-      <div class="p-grid">
+ <div class="p-grid" >
+   <div class="p-col-12 p-sm-5">
+     <div class="p-grid no-gutters">
         <div class="p-col-12">
           <div class="p-d-flex p-jc-center">
-            <label>Lower left</label>
+            header
           </div>
-        </div>
-        <div class="p-col-12">
-          <div class="p-d-flex p-jc-center">
-                    <span class="p-float-label p-mr-2">
-                      <input type="text" id="inputtext" pInputText style="width: 4rem">
-                      <label for="inputtext">Lat</label>
-                    </span>
-            <span class="p-float-label">
-                      <input type="text" id="inputtext2" pInputText style="width: 4rem">
-                      <label for="inputtext2">Lon</label>
-                    </span>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="p-col-12 p-sm-2">
-<!--      <div class="p-d-flex p-jc-center">-->
-<!--        <button pButton type="button" icon="pi pi-trash" pTooltip="Clear coordinates"-->
-<!--                class="p-button-info p-mr-2" style="padding: 0.2rem;"-->
-<!--                [disabled]="false"></button>-->
-<!--        <button pButton type="button" icon="pi pi-trash" pTooltip="Clear coordinates"-->
-<!--                class="p-button-info " style="padding: 0.2rem;"-->
-<!--                [disabled]="false"></button>-->
-<!--      </div>-->
-    </div>
-    <div class="p-col-12 p-sm-5">
-      <div class="p-grid no-gutters">
-        <div class="p-col-12">
-          <div class="p-d-flex p-jc-center">
-            <label>Lower left</label>
-          </div>
         </div>
-        <div class="p-col-12">
-          <div class="p-d-flex p-jc-center">
-                    <span class="p-float-label p-mr-2">
-                      <input type="text" id="inputtext3" pInputText style="width: 4rem">
-                      <label for="inputtext3">Lat</label>
-                    </span>
-            <span class="p-float-label">
-                      <input type="text" id="inputtext4" pInputText style="width: 4rem">
-                      <label for="inputtext4">Lon</label>
-                    </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+       <div class="p-col-6">
+         <div class="p-d-flex p-jc-end">
+                               <span class="p-float-label p-mr-2">
+                                 <input type="text" id="inputtext3" pInputText style="width: 4rem">
+                                 <label for="inputtext3">Lat</label>
+                               </span>
+         </div>
+
+       </div>
+       <div class="p-col-6">
+         <span class="p-float-label p-mr-2">
+                                 <input type="text" id="minLonInput" pInputText style="width: 4rem">
+                                 <label for="minLonInput">Lon</label>
+                               </span>
+       </div>
+     </div>
+   </div>
+   <div class="p-col-12 p-sm-2">
+
+   </div>
+   <div class="p-col-12 p-sm-5">
+   </div>
+ </div>
 </p-panel>

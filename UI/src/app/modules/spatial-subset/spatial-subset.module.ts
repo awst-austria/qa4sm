@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { SpatialSubsetComponent } from './components/spatial-subset/spatial-subset.component';
 import {PanelModule} from 'primeng/panel';
 import {ButtonModule} from 'primeng/button';
+import {TooltipModule} from 'primeng/tooltip';
+import {InputTextModule} from 'primeng/inputtext';
 
 
 
@@ -14,7 +16,9 @@ import {ButtonModule} from 'primeng/button';
   imports: [
     CommonModule,
     PanelModule,
-    ButtonModule
+    ButtonModule,
+    TooltipModule,
+    InputTextModule
   ]
 })
 export class SpatialSubsetModule { }
