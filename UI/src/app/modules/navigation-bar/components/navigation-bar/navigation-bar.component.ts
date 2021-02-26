@@ -23,8 +23,8 @@ export class NavigationBarComponent implements OnInit {
     this.items = [
       {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['']},
       {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate']},
-      {label: 'My validations', icon: 'pi pi-fw pi-folder'},
-      {label: 'Published validations', icon: 'pi pi-fw pi-globe'},
+      {label: 'My validations', icon: 'pi pi-fw pi-folder', routerLink: ['my-validations']},
+      {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
       {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
           {label: 'About', icon: 'pi pi-fw pi-info'},
