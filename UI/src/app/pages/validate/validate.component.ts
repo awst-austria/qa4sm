@@ -50,20 +50,16 @@ export class ValidateComponent implements OnInit {
       //then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
         model.datasetModel.selectedVersion = versions[0];
-        console.log('Get versions done')
       });
 
       // in the same time get the variables too
       this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
         model.datasetModel.selectedVariable = variables[0];
-        console.log('Get variables done')
       });
 
       //and the filters
       this.updateDatasetConfigFilters(model);
     });
-
-    console.log('Add dataset function done')
   }
 
   private updateDatasetConfigFilters(model: DatasetConfigModel) {
