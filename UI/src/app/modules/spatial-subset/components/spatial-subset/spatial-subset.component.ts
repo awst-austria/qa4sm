@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {SpatialSubsetModel} from './spatial-subset-model';
 
 @Component({
   selector: 'qa-spatial-subset',
@@ -7,7 +8,10 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SpatialSubsetComponent implements OnInit {
 
-  constructor() { }
+  @Input() subsetModel:SpatialSubsetModel=new SpatialSubsetModel();
+  constructor() {
+
+  }
 
   ngOnInit(): void {
   }

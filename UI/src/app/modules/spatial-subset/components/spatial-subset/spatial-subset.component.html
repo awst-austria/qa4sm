@@ -6,36 +6,84 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
- <div class="p-grid" >
-   <div class="p-col-12 p-sm-5">
-     <div class="p-grid no-gutters">
+  <div class="p-grid">
+
+    <div class="p-col-12 p-sm-5">
+
+      <div class="p-grid no-gutters">
         <div class="p-col-12">
           <div class="p-d-flex p-jc-center">
-            header
+            Lower left
           </div>
+        </div>
+        <div class="p-col-6">
+          <div class="p-fluid" >
+          <span class="p-float-label ">
+
+                                 <p-inputNumber id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+                                                [(ngModel)]="subsetModel.minLat"></p-inputNumber>
+
+                                 <label for="minLatInput">Lat</label>
+                               </span>
+        </div>
 
         </div>
-       <div class="p-col-6">
-         <div class="p-d-flex p-jc-end">
-                               <span class="p-float-label p-mr-2">
-                                 <input type="text" id="inputtext3" pInputText style="width: 4rem">
-                                 <label for="inputtext3">Lat</label>
-                               </span>
-         </div>
+        <div class="p-col-6">
+          <div class="p-fluid" >
+          <span class="p-float-label ">
+                                 <p-inputNumber id="minLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+                                                [(ngModel)]="subsetModel.minLon"></p-inputNumber>
 
-       </div>
-       <div class="p-col-6">
-         <span class="p-float-label p-mr-2">
-                                 <input type="text" id="minLonInput" pInputText style="width: 4rem">
                                  <label for="minLonInput">Lon</label>
                                </span>
-       </div>
-     </div>
-   </div>
-   <div class="p-col-12 p-sm-2">
+          </div>
+        </div>
+      </div>
+    </div>
 
-   </div>
-   <div class="p-col-12 p-sm-5">
-   </div>
- </div>
+    <!--    Clear and map buttons-->
+    <div class="p-col-12 p-sm-2">
+      <div class="p-d-flex p-jc-center">
+        <button pButton type="button" icon="pi pi-trash" pTooltip="Clear coordinates"
+                class="p-button-info p-mr-2" style="padding: 0.2rem;"
+                [disabled]="false"></button>
+        <button pButton type="button" icon="pi pi-map" pTooltip="Open map"
+                class="p-button-info " style="padding: 0.2rem;"
+                [disabled]="false"></button>
+
+      </div>
+    </div>
+
+    <!--    Upper right coordinates-->
+    <div class="p-col-12 p-sm-5">
+      <div class="p-grid no-gutters">
+        <div class="p-col-12">
+          <div class="p-d-flex p-jc-center">
+            Upper right
+          </div>
+        </div>
+        <div class="p-col-6">
+          <div class="p-fluid" >
+          <span class="p-float-label ">
+
+                                 <p-inputNumber id="maxLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+                                                [(ngModel)]="subsetModel.maxLat"></p-inputNumber>
+
+                                 <label for="maxLatInput">Lat</label>
+                               </span>
+          </div>
+        </div>
+        <div class="p-col-6">
+          <div class="p-fluid" >
+          <span class="p-float-label ">
+                                 <p-inputNumber id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+                                                [(ngModel)]="subsetModel.maxLon"></p-inputNumber>
+
+                                 <label for="maxLonInput">Lon</label>
+                               </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </p-panel>
