@@ -67,7 +67,6 @@ export class AuthService {
         },
         error => {
           logoutResult.next(false);
-          console.log('srv msg:', error.error);
         }
       );
     return logoutResult;

@@ -73,7 +73,6 @@ export class ValidateComponent implements OnInit {
           model.basicFilters.push(new FilterModel(filter, false, null));
         }
       });
-      console.log('Update filter done')
     });
   }
 
