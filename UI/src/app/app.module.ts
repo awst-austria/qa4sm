@@ -36,6 +36,7 @@ import {FilterModule} from './modules/filter/filter.module';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import { PublishedValidationsComponent } from './pages/published-validations/published-validations.component';
+import {ValidationResultModule} from './modules/validation-result/validation-result.module';
 
 
 @NgModule({
@@ -74,7 +75,7 @@ import { PublishedValidationsComponent } from './pages/published-validations/pub
     InputTextModule,
     FilterModule,
     ToastModule,
-
+    ValidationResultModule,
 
   ],
   providers: [
