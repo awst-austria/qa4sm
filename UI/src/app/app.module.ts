@@ -35,6 +35,7 @@ import {FilterModule} from './modules/filter/filter.module';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.module';
+import {CarouselModule} from 'primeng/carousel';
 
 
 @NgModule({
@@ -71,6 +72,7 @@ import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.modul
     FilterModule,
     ToastModule,
     SpatialSubsetModule,
+    CarouselModule,
 
 
   ],
