@@ -35,6 +35,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {FilterModule} from './modules/filter/filter.module';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
+import { PublishedValidationsComponent } from './pages/published-validations/published-validations.component';
 
 
 @NgModule({
@@ -46,7 +47,8 @@ import {MessageService} from 'primeng/api';
     ValidationsComponent,
     ValidationComponent,
     LoginComponent,
-    UserProfileComponent
+    UserProfileComponent,
+    PublishedValidationsComponent
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
