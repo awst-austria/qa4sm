@@ -8,6 +8,7 @@ import {FilterService} from '../../modules/filter/services/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
+import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -21,7 +22,11 @@ export class ValidateComponent implements OnInit {
   // datasetConfigurations: DatasetConfigModel[] = [];
   // referenceConfiguration: DatasetConfigModel[] = []; // this array will always contain exactly 1 element
 
-  validationModel:ValidationModel=new ValidationModel([],[],new SpatialSubsetModel());
+  validationModel: ValidationModel = new ValidationModel(
+    [],
+    [],
+    new SpatialSubsetModel(),
+    new ValidationPeriodModel());
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,

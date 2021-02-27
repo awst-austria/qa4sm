@@ -8,9 +8,8 @@ import {SpatialSubsetModel} from './spatial-subset-model';
 })
 export class SpatialSubsetComponent implements OnInit {
 
-  @Input() subsetModel:SpatialSubsetModel=new SpatialSubsetModel();
+  @Input() subsetModel:SpatialSubsetModel;
   constructor() {
-
   }
 
   ngOnInit(): void {

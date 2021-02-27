@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {ValidationPeriodModel} from './validation-period-model';
 
 @Component({
   selector: 'qa-validation-period',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./validation-period.component.scss']
 })
 export class ValidationPeriodComponent implements OnInit {
+
+  @Input() validationPeriodModel:ValidationPeriodModel;
 
   constructor() { }
 
