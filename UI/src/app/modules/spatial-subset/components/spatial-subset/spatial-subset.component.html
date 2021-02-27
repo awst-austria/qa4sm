@@ -46,10 +46,10 @@
       <div class="p-d-flex p-jc-center">
         <button pButton type="button" icon="pi pi-trash" pTooltip="Clear coordinates"
                 class="p-button-info p-mr-2" style="padding: 0.2rem;"
-                [disabled]="false"></button>
+                 (click)="clearCoordinates()"></button>
         <button pButton type="button" icon="pi pi-map" pTooltip="Open map"
                 class="p-button-info " style="padding: 0.2rem;"
-                [disabled]="false"></button>
+                [disabled]="true"></button>
 
       </div>
     </div>

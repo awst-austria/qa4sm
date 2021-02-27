@@ -16,4 +16,11 @@ export class SpatialSubsetComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  clearCoordinates(){
+    this.subsetModel.maxLat=null;
+    this.subsetModel.maxLon=null;
+    this.subsetModel.minLat=null;
+    this.subsetModel.minLon=null;
+  }
+
 }
