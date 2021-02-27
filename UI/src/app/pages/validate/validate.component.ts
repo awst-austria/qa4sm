@@ -11,6 +11,7 @@ import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatia
 import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
+import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -30,7 +31,8 @@ export class ValidateComponent implements OnInit {
     new SpatialSubsetModel(),
     new ValidationPeriodModel(),
     [],
-    new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC));
+    new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC),
+    SCALING_METHOD_DEFAULT);
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,

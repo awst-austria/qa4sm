@@ -39,6 +39,7 @@ import {CarouselModule} from 'primeng/carousel';
 import {ValidationPeriodModule} from './modules/validation-period/validation-period.module';
 import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
+import {ScalingModule} from './modules/scaling/scaling.module';
 
 
 @NgModule({
@@ -79,6 +80,7 @@ import {AnomaliesModule} from './modules/anomalies/anomalies.module';
     ValidationPeriodModule,
     MetricsModule,
     AnomaliesModule,
+    ScalingModule,
 
 
   ],
