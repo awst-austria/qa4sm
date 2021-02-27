@@ -37,6 +37,7 @@ import {MessageService} from 'primeng/api';
 import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.module';
 import {CarouselModule} from 'primeng/carousel';
 import {ValidationPeriodModule} from './modules/validation-period/validation-period.module';
+import {MetricsModule} from './modules/metrics/metrics.module';
 
 
 @NgModule({
@@ -50,34 +51,35 @@ import {ValidationPeriodModule} from './modules/validation-period/validation-per
     LoginComponent,
     UserProfileComponent
   ],
-    imports: [
-        LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
-        NavigationBarModule,
-        FormsModule,
-        ReactiveFormsModule,
-        BrowserModule,
-        HttpClientModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        DatasetModule,
-        NgbModule,
-        FontAwesomeModule,
-        ToastModule,
-        DropdownModule,
-        AccordionModule,
-        PanelModule,
-        TooltipModule,
-        ButtonModule,
-        PasswordModule,
-        InputTextModule,
-        FilterModule,
-        ToastModule,
-        SpatialSubsetModule,
-        CarouselModule,
-        ValidationPeriodModule,
+  imports: [
+    LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
+    NavigationBarModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserModule,
+    HttpClientModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    DatasetModule,
+    NgbModule,
+    FontAwesomeModule,
+    ToastModule,
+    DropdownModule,
+    AccordionModule,
+    PanelModule,
+    TooltipModule,
+    ButtonModule,
+    PasswordModule,
+    InputTextModule,
+    FilterModule,
+    ToastModule,
+    SpatialSubsetModule,
+    CarouselModule,
+    ValidationPeriodModule,
+    MetricsModule,
 
 
-    ],
+  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

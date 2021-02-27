@@ -9,6 +9,7 @@ import {FilterModel} from '../../modules/filter/components/basic-filter/filter-m
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
 import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
+import {MetricModel} from '../../modules/metrics/components/metric/metric-model';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -26,7 +27,8 @@ export class ValidateComponent implements OnInit {
     [],
     [],
     new SpatialSubsetModel(),
-    new ValidationPeriodModel());
+    new ValidationPeriodModel(),
+    []);
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -35,6 +37,10 @@ export class ValidateComponent implements OnInit {
 
   }
 
+  ngOnInit(): void {
+    this.addDatasetToValidate();
+    this.addReferenceDataset();
+  }
 
   addDatasetToValidate() {
     this.addDataset(this.validationModel.datasetConfigurations);
@@ -100,10 +106,6 @@ export class ValidateComponent implements OnInit {
     this.updateDatasetConfigFilters(this.validationModel.referenceConfigurations[0]);
   }
 
-  ngOnInit(): void {
-    this.addDatasetToValidate();
-    this.addReferenceDataset();
-  }
 
   addDatasetButtonDisabled(): boolean {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
