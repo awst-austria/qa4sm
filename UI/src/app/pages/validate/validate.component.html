@@ -80,8 +80,15 @@
       <div class="p-col-12">
         <qa-validation-period [validationPeriodModel]="validationModel.validationPeriodModel"></qa-validation-period>
       </div>
+
+      <!--      Metrics-->
       <div class="p-col-12">
         <qa-metrics [validationModel]="validationModel"></qa-metrics>
+      </div>
+
+      <!--      Anomalies-->
+      <div class="p-col-12">
+        <qa-anomalies [methodForValidation]="validationModel.anomalies"></qa-anomalies>
       </div>
     </div>
   </div>

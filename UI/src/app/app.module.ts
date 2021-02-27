@@ -38,6 +38,7 @@ import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.modul
 import {CarouselModule} from 'primeng/carousel';
 import {ValidationPeriodModule} from './modules/validation-period/validation-period.module';
 import {MetricsModule} from './modules/metrics/metrics.module';
+import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 
 
 @NgModule({
@@ -77,6 +78,7 @@ import {MetricsModule} from './modules/metrics/metrics.module';
     CarouselModule,
     ValidationPeriodModule,
     MetricsModule,
+    AnomaliesModule,
 
 
   ],

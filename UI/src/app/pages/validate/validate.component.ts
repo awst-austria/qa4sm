@@ -9,7 +9,8 @@ import {FilterModel} from '../../modules/filter/components/basic-filter/filter-m
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
 import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
-import {MetricModel} from '../../modules/metrics/components/metric/metric-model';
+import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
+import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -28,7 +29,8 @@ export class ValidateComponent implements OnInit {
     [],
     new SpatialSubsetModel(),
     new ValidationPeriodModel(),
-    []);
+    [],
+    new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC));
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
