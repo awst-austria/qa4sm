@@ -1,4 +1,4 @@
-export class ConfigurationDto {
+export class DatasetConfigurationDto {
   constructor(
     public validation: number,
     public dataset: number,
