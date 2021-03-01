@@ -12,8 +12,11 @@ from validator.models import DatasetConfiguration
 @permission_classes([IsAuthenticated])
 def dataset_configuration(request):
     validation_id = request.query_params.get('validationrun', None)
+    config_id = request.query_params.get('config_id', None)
     if validation_id:
         configs = DatasetConfiguration.objects.filter(validation_id=validation_id)
+    elif config_id:
+        configs = DatasetConfiguration.objects.filter(id = config_id)
     else:
         configs = DatasetConfiguration.objects.all()
 
@@ -27,7 +30,8 @@ def dataset_configuration(request):
 class ConfigurationSerializer(ModelSerializer):
     class Meta:
         model = DatasetConfiguration
-        fields = ['validation',
+        fields = ['id',
+                  'validation',
                   'dataset',
                   'version',
                   'variable',
