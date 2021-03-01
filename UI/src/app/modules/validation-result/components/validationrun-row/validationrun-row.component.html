@@ -1,11 +1,11 @@
 <p-panel *ngIf="published">
     <ng-template pTemplate="header">
-                  <h5 class="my-0" style="float: left"><span class=" font-weight-normal">Name:</span> {{ valrun.name_tag }}</h5>
-                  <h5 class="my-0" style="float: right">
-                    <span class=" font-weight-normal">DOI: </span>
-                    <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ valrun.doi }}">{{ valrun.doi }}</a>
-                  </h5>
+      <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ valrun.name_tag }}</h5>
     </ng-template>
+    <ng-template pTemplate="icons" class="doilink">
+      <h5 class="my-0"> DOI: <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ valrun.doi }}">{{ valrun.doi }}</a></h5>
+    </ng-template>
+
     <div class="col-sm-4">
       <strong>Data:</strong><br/>
 
