@@ -1,6 +1,7 @@
 export class DatasetConfigurationDto {
   constructor(
-    public validation: number,
+    public id: number,
+    public validation: string,
     public dataset: number,
     public version: number,
     public variable: number,
