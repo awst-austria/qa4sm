@@ -1,0 +1,15 @@
+<p-panel header="Metrics" [toggleable]="true">
+  <ng-template pTemplate="icons">
+    <label class="p-panel-header-icon"
+           pTooltip="Specify metrics to calculate. Basic metrics between data set pairs are always calculated."
+           tooltipPosition="bottom">
+      <span class="pi pi-question-circle"></span>
+    </label>
+  </ng-template>
+  <div class="p-grid">
+    <div class="p-col-12">
+      <qa-metric [metricModel]="tripleCollocationMetrics"
+                 [disabled]="validationModel.datasetConfigurations.length<2"></qa-metric>
+    </div>
+  </div>
+</p-panel>
