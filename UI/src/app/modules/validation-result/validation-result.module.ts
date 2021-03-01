@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ValidationrunRowComponent } from './components/validationrun-row/validationrun-row.component';
+import {PanelModule} from 'primeng/panel';
 
 
 
@@ -9,8 +10,9 @@ import { ValidationrunRowComponent } from './components/validationrun-row/valida
     exports: [
         ValidationrunRowComponent
     ],
-    imports: [
-        CommonModule
-    ]
+  imports: [
+    CommonModule,
+    PanelModule
+  ]
 })
 export class ValidationResultModule { }

@@ -14,6 +14,7 @@ import {GlobalParamsService} from '../../../core/services/gloabal-params/global-
 export class ValidationrunRowComponent implements OnInit {
 
   @Input() published: boolean = false;
+  @Input() valrun: ValidationrunDto;
 
   constructor(private validationrunService: ValidationrunService, private configurationService: DatasetConfigurationService,
               private globalContextService: GlobalParamsService) { }
