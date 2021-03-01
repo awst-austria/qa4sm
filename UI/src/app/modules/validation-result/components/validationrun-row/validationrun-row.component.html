@@ -1,14 +1,17 @@
 <p-panel *ngIf="published">
     <ng-template pTemplate="header">
-<!--      <qa-header [published]="published" [valrun]="valrun" [doiPrefix]="getDoiPrefix()"> </qa-header>-->
-<!--      &lt;!&ndash;            <h5 class="my-0" style="float: left"><span class=" font-weight-normal">Name:</span> {{ valrun.name_tag }}</h5>&ndash;&gt;-->
-<!--      &lt;!&ndash;            <h5 class="my-0" style="float: right">&ndash;&gt;-->
-<!--      &lt;!&ndash;              <span class=" font-weight-normal">DOI: </span>&ndash;&gt;-->
-<!--      &lt;!&ndash;              <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ valrun.doi }}">{{ valrun.doi }}</a>&ndash;&gt;-->
-<!--      &lt;!&ndash;            </h5>&ndash;&gt;-->
+                  <h5 class="my-0" style="float: left"><span class=" font-weight-normal">Name:</span> {{ valrun.name_tag }}</h5>
+                  <h5 class="my-0" style="float: right">
+                    <span class=" font-weight-normal">DOI: </span>
+                    <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ valrun.doi }}">{{ valrun.doi }}</a>
+                  </h5>
     </ng-template>
     <div class="col-sm-4">
       <strong>Data:</strong><br/>
 
     </div>
+</p-panel>
+
+<p-panel *ngIf="!published">
+  There is still a lot of stuff to do!
 </p-panel>
