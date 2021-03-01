@@ -12,15 +12,18 @@ import {GlobalParamsService} from '../../../core/services/gloabal-params/global-
   styleUrls: ['./validationrun-row.component.scss']
 })
 export class ValidationrunRowComponent implements OnInit {
-  // with this one I can do *ngFor ... of ...
-  publishedValidationruns?: ValidationrunDto[];
-  // this one I can use e.g. as [options] in p-dropdown element
-  publishedValidation$: Observable<ValidationrunDto[]>;
-  // configs$: Observable<ConfigurationDto>;
 
-  constructor() { }
+  @Input() published: boolean = false;
+
+  constructor(private validationrunService: ValidationrunService, private configurationService: DatasetConfigurationService,
+              private globalContextService: GlobalParamsService) { }
 
   ngOnInit(): void {
+
+  }
+
+  getDoiPrefix(): string {
+    return this.globalContextService.globalContext.doi_prefix;
   }
 
 }

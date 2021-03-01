@@ -1,1 +1,5 @@
-<qa-validationrun-row></qa-validationrun-row>
+<div *ngFor="let valrun of publishedValidation$|async">
+  <qa-validationrun-row [published]="true"></qa-validationrun-row>
+
+</div>
+
