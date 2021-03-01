@@ -1,0 +1,32 @@
+export class ValidationrunDto{
+  constructor(public id: any,
+              public name_tag: string,
+              public user: number,
+              public start_time: new (Date) => string,
+              public end_time: new (Date) => string,
+              public ok_points: number,
+              public total_points: number,
+              public error_points: number,
+              public progress: number,
+              public reference_configuration: number,
+              public scaling_ref: number,
+              public scaling_method: string,
+              public interval_from: new (Date) => string,
+              public interval_to: new (Date) => string,
+              public anomalies: string,
+              public min_lat: number,
+              public min_lon: number,
+              public max_lat: number,
+              public max_lon: number,
+              public anomalies_from: new (Date) => string,
+              public anomalies_to: new (Date) => string,
+              public output_file: string,
+              public is_archived: boolean,
+              public last_extended: string,
+              public expiry_notified: boolean,
+              public doi: string,
+              public publishing_in_progress: boolean,
+              public tcol: boolean) {
+  }
+}
+

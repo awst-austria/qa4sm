@@ -9,6 +9,9 @@ from api.views.LoginView import api_login
 from api.views.LogoutView import api_logout
 from api.views.PathVarTestEndpoint import path_var_get
 from api.views.UserView import users
+from api.views.ValidationRunView import published_results, my_results
+from api.views.DatasetConfigurationView import dataset_configuration
+from api.views.GlobalParamsView import global_params
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -41,5 +44,10 @@ urlpatterns = [
     path('dataset', dataset, name='Datasets'),
     path('dataset-version', dataset_version, name='Dataset versions'),
     path('dataset-variable', dataset_variable, name='Dataset variables'),
+    path('published-results', published_results, name='Published results'),
+    path('dataset-configuration', dataset_configuration, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
+    path('globals', global_params, name='Global context'),
+    path('my-results', my_results, name= 'My results')
+
 ]
