@@ -22,7 +22,7 @@
         <p-dropdown id="scalingReferenceSelector" (onChange)="updateScalingModel()"
                     [options]="scaleToModels"
                     [(ngModel)]="selectedScalingModel.scaleTo"
-                    [disabled]="selectedScalingModel.scaleToSelectorDisabled"
+                    [disabled]="isScalingSelectorDisabled()"
                     optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
         <label for="scalingReferenceSelector">Scale To</label>
       </div>
