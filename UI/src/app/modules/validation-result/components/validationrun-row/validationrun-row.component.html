@@ -5,10 +5,22 @@
     <ng-template pTemplate="icons" class="doilink">
       <h5 class="my-0"> DOI: <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ valrun.doi }}">{{ valrun.doi }}</a></h5>
     </ng-template>
+    <div class="p-grid">
+      <div class="p-col-4">
+        <strong>Data:</strong><br/>
+      </div>
 
-    <div class="col-sm-4">
-      <strong>Data:</strong><br/>
+      <div class="p-col-4">
+        <strong>Reference:</strong><br/>
+  <!--      {{ valrun.reference_configuration.dataset.pretty_name }},-->
+  <!--      {{ valrun.reference_configuration.version.pretty_name }},-->
+  <!--      {{ valrun.reference_configuration.variable.pretty_name }}-->
+      </div>
 
+      <div class="p-col" style="max-width: 7rem;">
+        <strong>Created:</strong><br/>
+        {{ valrun.start_time|date:"YYYY-MM-dd" }}
+      </div>
     </div>
 </p-panel>
 

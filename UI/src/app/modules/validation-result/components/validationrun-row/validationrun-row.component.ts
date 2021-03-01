@@ -27,4 +27,6 @@ export class ValidationrunRowComponent implements OnInit {
     return this.globalContextService.globalContext.doi_prefix;
   }
 
+  // getConfigurationOfValidation()
+
 }
