@@ -4,4 +4,7 @@ export class ValidationConfigurationModel {
   constructor(public datasetConfig: DatasetConfigModel[],
               public isReference: boolean[],
   ){}
+  // constructor(public datasetConfig: DatasetConfigModel,
+  //             public isReference: boolean,
+  // ){}
 }

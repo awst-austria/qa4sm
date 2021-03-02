@@ -17,6 +17,7 @@ import {DatasetVersionService} from '../../../dataset/services/dataset-version.s
 })
 export class ValidationrunRowComponent implements OnInit {
 
+  // validationDatasetsConfigurations: ValidationConfigurationModel[] = [];
   validationDatasetsConfigurations: ValidationConfigurationModel = {datasetConfig: [], isReference: []};
   validationReferenceConfiguration: ValidationConfigurationModel[] = []; // this array will always contain exactly 1 element
 
@@ -34,7 +35,7 @@ export class ValidationrunRowComponent implements OnInit {
 
   ngOnInit(): void {
     this.addDatasetToList();
-    // console.log(this.validationDatasetsConfigurations);
+    console.log(this.validationDatasetsConfigurations);
   }
 
   getDoiPrefix(): string {
@@ -44,6 +45,28 @@ export class ValidationrunRowComponent implements OnInit {
   addDatasetToList() {
     this.getValidationConfiguration(this.validationDatasetsConfigurations);
   }
+
+  // private getValidationConfiguration(targetArray: ValidationConfigurationModel[]) {
+  //   this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
+  //     configs.forEach(config => {
+  //       let datasetModel = new DatasetComponentSelectionModel(null, null, null );
+  //       let model = new ValidationConfigurationModel(new DatasetConfigModel(datasetModel, [], []), false);
+  //       targetArray.push(model);
+  //       model.isReference = config.id === this.valrun.reference_configuration;
+  //       let datasetId = config.dataset;
+  //       let versionId = config.version;
+  //       let variableId = config.variable;
+  //       // console.log(config);
+  //       this.datasetService.getDatasetById(datasetId).subscribe(dataset => {
+  //         // console.log(dataset);
+  //         model.datasetConfig.datasetModel.selectedDataset = dataset;
+  //       });
+  //       this.datasetVersionService.getVersionById(versionId).subscribe(version => {
+  //               model.datasetConfig.datasetModel.selectedVersion = version;
+  //             });
+  //     });
+  //   });
+  // }
 
   private getValidationConfiguration(model: ValidationConfigurationModel){
     this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
@@ -65,69 +88,5 @@ export class ValidationrunRowComponent implements OnInit {
         model.datasetConfig.push(itemDatasetConfig);
       });
     });
-
-
-    // this.updateValidationConfiguration(model);
   }
-
-
-  //
-  // addDatasetToList() {
-  //   this.getValidationConfiguration(this.validationDatasetsConfigurations);
-  // }
-  //
-  // private getValidationConfiguration(targetArray: ValidationConfigurationModel[]){
-  //   let model = new ValidationConfigurationModel(
-  //     new DatasetConfigModel(
-  //       new DatasetComponentSelectionModel(null, null, null),
-  //       null, null), false);
-  //   console.log(targetArray);
-  //   // model.datasetConfig.datasetModel.selectedDataset
-  //   this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
-  //     configs.forEach(config => {
-  //       model.isReference = config.id === this.valrun.reference_configuration;
-  //       console.log(config.dataset, config.version, config.variable, config.id === this.valrun.reference_configuration);
-  //     });
-  //   });
-  //   targetArray.push(model);
-
-
-  // private getConfigurationOfPublishedValidation(model: ValidationConfigurationModel[]){
-  //   // let model = new ValidationConfigurationModel(this.valrun.id, [], [], null, null, null, null);
-  // // //
-  // //   this.validationrunService.getPublishedValidationruns().subscribe(publishedVal => {
-  // //     model.validationrunId = publishedVal[0].id;
-  // //     let validationRefId = publishedVal[0].reference_configuration;
-  // //
-  // //     this.configurationService.getConfigById(validationRefId).subscribe(refConfig => {
-  // //       model.refDataset = refConfig.dataset;
-  // //       model.refDatasetVariable = refConfig.variable;
-  // //       model.refDatasetVersion = refConfig.version;
-  // //     });
-  // //
-  //   this.updateValidationConfiguration(model);
-  // //
-  // //   });
-  // //
-  // }
-
-  // private updateValidationConfiguration(model: ValidationConfigurationModel){
-  //   console.log('Monika');
-  // }
-//   private updateValidationConfiguration(model: ValidationConfigurationModel){
-//     this.configurationService.getConfigByValidationrun(model.validationrunId).subscribe(configs => {
-//       model.datasets = [];
-//       model.datasetVersion = [];
-//       model.datasetsVariables = [];
-//       configs.forEach(config => {
-//         model.datasets.push(config.dataset);
-//         model.datasetsVersions.push(config.version);
-//         model.datasetsVariables.push(config.variable);
-//       });
-//     });
-//   }
-//
-
-
-
 }

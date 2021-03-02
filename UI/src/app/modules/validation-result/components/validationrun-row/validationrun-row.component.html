@@ -8,12 +8,20 @@
     <div class="p-grid">
       <div class="p-col-4">
         <strong>Data:</strong><br/>
+<!--        <span *ngFor="let config of validationDatasetsConfigurations; let ind = index">-->
+<!--          <span *ngIf="!config.isReference">-->
+<!--            <span *ngIf="!config.isReference">-->
+<!--              {{config.datasetConfig.datasetModel.selectedDataset?.pretty_name}},-->
+<!--              {{config.datasetConfig.datasetModel.selectedVersion?.pretty_name}}-->
+<!--            </span>-->
+<!--&lt;!&ndash;            {{config.datasetModel.selectedDataset?.pretty_name}}, {{config.datasetModel.selectedVersion?.pretty_name}}&ndash;&gt;-->
+<!--          </span> <br>-->
+<!--        </span>-->
         <span *ngFor="let config of validationDatasetsConfigurations.datasetConfig; let ind = index">
           <span *ngIf="!validationDatasetsConfigurations.isReference[ind]">
             {{config.datasetModel.selectedDataset?.pretty_name}}, {{config.datasetModel.selectedVersion?.pretty_name}}
-          </span> <br>
+          </span><br/>
         </span>
-<!--        <span>{{ addDatasetToList() }} </span>-->
       </div>
 
       <div class="p-col-4">
