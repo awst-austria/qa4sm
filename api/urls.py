@@ -8,6 +8,7 @@ from api.views.dataset_view import dataset
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
+from api.views.start_validation_view import start_validation
 from api.views.user_view import users
 from api.views.validation_run_view import published_results, my_results
 from api.views.dataset_configuration_view import dataset_configuration
@@ -48,6 +49,7 @@ urlpatterns = [
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
     path('globals', global_params, name='Global context'),
-    path('my-results', my_results, name= 'My results')
+    path('my-results', my_results, name='My results'),
+    path('run-validation', start_validation, name='Run new validation')
 
 ]
