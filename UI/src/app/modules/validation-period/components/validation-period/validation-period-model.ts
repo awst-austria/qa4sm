@@ -1,4 +1,4 @@
-import {NewValidationRunValidationPeriodDto} from '../../../core/services/new-validation-run/new-validation-run-validation-period-dto';
+import {NewValidationRunValidationPeriodDto} from '../../../../pages/validate/service/new-validation-run-validation-period-dto';
 
 export class ValidationPeriodModel {
   constructor(public intervalFrom?: Date,

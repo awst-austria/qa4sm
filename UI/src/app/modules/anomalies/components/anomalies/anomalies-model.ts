@@ -1,4 +1,4 @@
-import {NewValidationRunAnomaliesDto} from '../../../core/services/new-validation-run/new-validation-run-anomalies-dto';
+import {NewValidationRunAnomaliesDto} from '../../../../pages/validate/service/new-validation-run-anomalies-dto';
 
 export class AnomaliesModel {
   constructor(public method: string,

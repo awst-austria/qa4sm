@@ -1,4 +1,4 @@
-import {NewValidationRunMetricDto} from '../../../core/services/new-validation-run/new-validation-run-metric-dto';
+import {NewValidationRunMetricDto} from '../../../../pages/validate/service/new-validation-run-metric-dto';
 
 export class MetricModel {
   constructor(public description: string,

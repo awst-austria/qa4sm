@@ -12,10 +12,10 @@ import {ValidationPeriodModel} from '../../modules/validation-period/components/
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
-import {NewValidationRunDto} from '../../modules/core/services/new-validation-run/new-validation-run-dto';
-import {NewValRunDatasetConfigDto} from '../../modules/core/services/new-validation-run/new-val-run-dataset-config-dto';
-import {NewValidationRunService} from '../../modules/core/services/new-validation-run/new-validation-run.service';
-import {NewValidationRunMetricDto} from '../../modules/core/services/new-validation-run/new-validation-run-metric-dto';
+import {NewValidationRunDto} from './service/new-validation-run-dto';
+import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dto';
+import {NewValidationRunService} from './service/new-validation-run.service';
+import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 

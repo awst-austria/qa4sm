@@ -1,6 +1,6 @@
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
-import {NewValRunDatasetConfigDto} from '../../modules/core/services/new-validation-run/new-val-run-dataset-config-dto';
+import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dto';
 
 
 export class DatasetConfigModel {

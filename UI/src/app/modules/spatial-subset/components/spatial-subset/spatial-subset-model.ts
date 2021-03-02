@@ -1,4 +1,4 @@
-import {NewValidationRunSpatialSubsettingDto} from '../../../core/services/new-validation-run/new-validation-run-spatial-subsetting-dto';
+import {NewValidationRunSpatialSubsettingDto} from '../../../../pages/validate/service/new-validation-run-spatial-subsetting-dto';
 
 export class SpatialSubsetModel {
   constructor(public maxLat?: number,
