@@ -4,9 +4,6 @@ import {DatasetDto} from './dataset.dto';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../environments/environment';
 import {shareReplay} from 'rxjs/operators';
-import {Data} from '@angular/router';
-import {DatasetConfigurationDto} from '../../validation-result/services/dataset-configuration.dto';
-import {DatasetVersionCacheItem} from './dataset-version.service';
 
 const datasetUrl: string = environment.API_URL + 'api/dataset';
 const CACHE_LIFETIME: number = 5 * 60 * 1000; // 5 minutes
@@ -42,10 +39,16 @@ export class DatasetService {
     return this.datasets$;
   }
 
-  getDatasetById(dasetId: number): Observable<DatasetDto>{
+  getDatasetById(datasetId: number): Observable<DatasetDto> {
     let request;
-    let params = new HttpParams().set('dataset_id', String(dasetId));
-    request = this.httpClient.get<DatasetDto>(datasetUrl, {params: params});
+    if (datasetId === CACHE_KEY_ALL_DATASETS) {
+      request = this.httpClient.get<DatasetDto>(datasetUrl).pipe(shareReplay());
+    } else {
+      let params = new HttpParams().set('dataset_id', String(datasetId));
+      request = this.httpClient.get<DatasetDto>(datasetUrl, {params: params}).pipe(shareReplay());
+    }
+    let cacheItem = new DatasetCacheItem(new Date(), request);
+    this.requestCache.set(datasetId, cacheItem);
 
     return request;
   }
