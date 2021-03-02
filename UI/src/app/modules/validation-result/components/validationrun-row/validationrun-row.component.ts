@@ -51,7 +51,6 @@ export class ValidationrunRowComponent implements OnInit {
     this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
       configs.forEach(config => {
         model.isReference.push(config.id === this.valrun.reference_configuration);
-
         let itemDatasetConfig = new DatasetConfigModel(
                                 new DatasetComponentSelectionModel(
                                   null, null, null),
@@ -59,7 +58,6 @@ export class ValidationrunRowComponent implements OnInit {
         let versionId = config.version;
         let variableId = config.variable;
         this.datasetService.getDatasetById(config.dataset).subscribe(dataset => {
-          console.log(dataset);
           itemDatasetConfig.datasetModel.selectedDataset = dataset;
         });
         // this.datasetService.getAllDatasets().subscribe(datasets => {
