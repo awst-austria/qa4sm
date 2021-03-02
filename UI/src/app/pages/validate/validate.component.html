@@ -19,17 +19,19 @@
           </ng-template>
           <p-accordion multiple="true">
 
-            <p-accordionTab *ngFor="let item of datasetConfigurations; let i = index"
+            <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; let i = index"
                             [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / '+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.pretty_name)"
                             [selected]="i == 0">
 
-              <qa-dataset *ngIf="datasetConfigurations[i].datasetModel.selectedDataset"
-                          [selectionModel]="datasetConfigurations[i].datasetModel"
+              <qa-dataset *ngIf="validationModel.datasetConfigurations[i].datasetModel.selectedDataset"
+                          [selectionModel]="validationModel.datasetConfigurations[i].datasetModel"
                           [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
 
-              <qa-basic-filter *ngFor="let filter of item.basicFilters; let i = index" [filterModel]="filter" ></qa-basic-filter>
-              <button pButton type="button" (click)="removeDataset(datasetConfigurations[i])" label="Remove dataset"
+              <qa-basic-filter *ngFor="let filter of item.basicFilters; let i = index"
+                               [filterModel]="filter"></qa-basic-filter>
+              <button pButton type="button" (click)="removeDataset(validationModel.datasetConfigurations[i])"
+                      label="Remove dataset"
                       icon="pi pi-trash"
                       class="p-button-danger" style="padding: 0.2rem;"></button>
             </p-accordionTab>
@@ -53,15 +55,45 @@
             </label>
           </ng-template>
 
-          <div *ngIf="referenceConfiguration.length>0 && referenceConfiguration[0].datasetModel.selectedDataset">
+          <div
+            *ngIf="validationModel.referenceConfigurations.length>0 && validationModel.referenceConfigurations[0].datasetModel.selectedDataset">
             <qa-dataset
-                        [removable]="false"
-                        [selectionModel]="referenceConfiguration[0].datasetModel" (changeDataset)="onReferenceChange()"></qa-dataset>
+              [reference]="true"
+              [removable]="false"
+              [selectionModel]="validationModel.referenceConfigurations[0].datasetModel"
+              (changeDataset)="onReferenceChange()"></qa-dataset>
 
-            <qa-basic-filter *ngFor="let filter of referenceConfiguration[0].basicFilters; let i = index" [filterModel]="filter" ></qa-basic-filter>
+            <qa-basic-filter
+              *ngFor="let filter of validationModel.referenceConfigurations[0].basicFilters; let i = index"
+              [filterModel]="filter"></qa-basic-filter>
           </div>
 
         </p-panel>
+      </div>
+
+      <!--      Spatial subsetting-->
+      <div class="p-col-12">
+        <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
+      </div>
+
+      <!--      Validation period-->
+      <div class="p-col-12">
+        <qa-validation-period [validationPeriodModel]="validationModel.validationPeriodModel"></qa-validation-period>
+      </div>
+
+      <!--      Metrics-->
+      <div class="p-col-12">
+        <qa-metrics [validationModel]="validationModel"></qa-metrics>
+      </div>
+
+      <!--      Anomalies-->
+      <div class="p-col-12">
+        <qa-anomalies [methodForValidation]="validationModel.anomalies"></qa-anomalies>
+      </div>
+
+      <!--      Scaling-->
+      <div class="p-col-12">
+        <qa-scaling [validationModel]="validationModel"></qa-scaling>
       </div>
     </div>
   </div>

@@ -8,6 +8,7 @@ import {DatasetVersionService} from '../../services/dataset-version.service';
 import {DatasetComponentSelectionModel} from './dataset-component-selection-model';
 import {DatasetVariableDto} from '../../services/dataset-variable.dto';
 import {DatasetVariableService} from '../../services/dataset-variable.service';
+import {map} from 'rxjs/operators';
 
 
 @Component({
@@ -24,6 +25,7 @@ export class DatasetComponent implements OnInit {
 
   @Input() selectionModel: DatasetComponentSelectionModel;
   @Input() removable: boolean = false;
+  @Input() reference: boolean = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
 
@@ -32,7 +34,23 @@ export class DatasetComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.datasets$ = this.datasetService.getAllDatasets();
+    //Create dataset observable
+    if (this.reference) {
+      this.datasets$ = this.datasetService.getAllDatasets();
+    } else {
+      //filter out datasets than can be used only as reference
+      this.datasets$ = this.datasetService.getAllDatasets().pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+        let nonReferenceDatasets: DatasetDto[] = [];
+        datasets.forEach(dataset => {
+          if (dataset.is_only_reference == false) {
+            nonReferenceDatasets.push(dataset);
+          }
+        });
+        return nonReferenceDatasets;
+      }));
+    }
+
+
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
     this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
   }

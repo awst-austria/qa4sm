@@ -26,7 +26,6 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {DropdownModule} from 'primeng/dropdown';
 import {PanelModule} from 'primeng/panel';
-import {TabViewModule} from 'primeng/tabview';
 import {AccordionModule} from 'primeng/accordion';
 import {TooltipModule} from 'primeng/tooltip';
 import {ButtonModule} from 'primeng/button';
@@ -37,6 +36,13 @@ import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationResultModule} from './modules/validation-result/validation-result.module';
+import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.module';
+import {CarouselModule} from 'primeng/carousel';
+import {ValidationPeriodModule} from './modules/validation-period/validation-period.module';
+import {MetricsModule} from './modules/metrics/metrics.module';
+import {AnomaliesModule} from './modules/anomalies/anomalies.module';
+import {ScalingModule} from './modules/scaling/scaling.module';
+
 
 
 @NgModule({
@@ -64,8 +70,6 @@ import {ValidationResultModule} from './modules/validation-result/validation-res
     NgbModule,
     FontAwesomeModule,
     ToastModule,
-    PanelModule,
-    TabViewModule,
     DropdownModule,
     AccordionModule,
     TooltipModule,
@@ -75,6 +79,13 @@ import {ValidationResultModule} from './modules/validation-result/validation-res
     FilterModule,
     ToastModule,
     ValidationResultModule,
+    SpatialSubsetModule,
+    CarouselModule,
+    ValidationPeriodModule,
+    MetricsModule,
+    AnomaliesModule,
+    ScalingModule,
+
 
   ],
   providers: [

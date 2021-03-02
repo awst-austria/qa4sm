@@ -6,6 +6,12 @@ import {DatasetVariableService} from '../../modules/dataset/services/dataset-var
 import {DatasetConfigModel} from './dataset-config-model';
 import {FilterService} from '../../modules/filter/services/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
+import {ValidationModel} from './validation-model';
+import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
+import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
+import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
+import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
+import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -16,9 +22,17 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either con
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ValidateComponent implements OnInit {
-  datasetConfigurations: DatasetConfigModel[] = [];
-  referenceConfiguration: DatasetConfigModel[] = []; // this array will always contain exactly 1 element
+  // datasetConfigurations: DatasetConfigModel[] = [];
+  // referenceConfiguration: DatasetConfigModel[] = []; // this array will always contain exactly 1 element
 
+  validationModel: ValidationModel = new ValidationModel(
+    [],
+    [],
+    new SpatialSubsetModel(),
+    new ValidationPeriodModel(),
+    [],
+    new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC),
+    SCALING_METHOD_DEFAULT);
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -27,13 +41,17 @@ export class ValidateComponent implements OnInit {
 
   }
 
+  ngOnInit(): void {
+    this.addDatasetToValidate();
+    this.addReferenceDataset();
+  }
 
   addDatasetToValidate() {
-    this.addDataset(this.datasetConfigurations);
+    this.addDataset(this.validationModel.datasetConfigurations);
   }
 
   addReferenceDataset() {
-    this.addDataset(this.referenceConfiguration);
+    this.addDataset(this.validationModel.referenceConfigurations);
   }
 
   private addDataset(targetArray: DatasetConfigModel[]) {
@@ -74,14 +92,14 @@ export class ValidateComponent implements OnInit {
   }
 
   removeDataset(configModel: DatasetConfigModel) {
-    let toBeRemoved = this.datasetConfigurations.indexOf(configModel);
+    let toBeRemoved = this.validationModel.datasetConfigurations.indexOf(configModel);
     if (toBeRemoved > -1) {
-      this.datasetConfigurations.splice(toBeRemoved, 1);
+      this.validationModel.datasetConfigurations.splice(toBeRemoved, 1);
     }
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel) {
-    this.datasetConfigurations.forEach(config => {
+    this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel == datasetConfig) {
         this.updateDatasetConfigFilters(config);
       }
@@ -89,15 +107,11 @@ export class ValidateComponent implements OnInit {
   }
 
   onReferenceChange() {
-    this.updateDatasetConfigFilters(this.referenceConfiguration[0]);
+    this.updateDatasetConfigFilters(this.validationModel.referenceConfigurations[0]);
   }
 
-  ngOnInit(): void {
-    this.addDatasetToValidate();
-    this.addReferenceDataset();
-  }
 
   addDatasetButtonDisabled(): boolean {
-    return this.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
+    return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
   }
 }

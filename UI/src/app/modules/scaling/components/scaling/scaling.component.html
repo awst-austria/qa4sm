@@ -1,0 +1,31 @@
+<p-panel header="Scaling" [toggleable]="true">
+  <ng-template pTemplate="icons">
+    <label class="p-panel-header-icon"
+           pTooltip="Optionally calculates metrics from anomalies instead of absolute values. First, a climatology is computed using the chosen method and time period (only whole years are used), then the anomalies are calculated based on this. &quot;35 day moving average&quot; means that the climatology is calculated as a moving average of the data; &quot;climatology&quot; means that the average for each day of the year is calculated."
+           tooltipPosition="bottom">
+      <span class="pi pi-question-circle"></span>
+    </label>
+  </ng-template>
+  <div class="p-grid">
+    <div class="p-col-12">
+      <div class="p-float-label p-m-2">
+        <p-dropdown id="scalingMethodSelector" (onChange)="updateScalingModel()"
+                    [options]="scalingModels"
+                    [(ngModel)]="selectedScalingModel"
+                    optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
+        <label for="scalingMethodSelector">Method</label>
+      </div>
+    </div>
+
+    <div class="p-col-12 p-sm-6">
+      <div class="p-float-label p-m-2" *ngIf="selectedScalingModel.id!=noScalingId">
+        <p-dropdown id="scalingReferenceSelector" (onChange)="updateScalingModel()"
+                    [options]="scaleToModels"
+                    [(ngModel)]="selectedScalingModel.scaleTo"
+                    [disabled]="isScalingSelectorDisabled()"
+                    optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
+        <label for="scalingReferenceSelector">Scale To</label>
+      </div>
+    </div>
+  </div>
+</p-panel>
