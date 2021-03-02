@@ -8,10 +8,15 @@
     <div class="p-grid">
       <div class="p-col-4">
         <strong>Data:</strong><br/>
+        <span *ngFor="let config of validationDatasetsConfigurations.datasetConfig; let ind = index">
+          {{config.datasetModel.selectedDataset?.pretty_name}} {{validationDatasetsConfigurations.isReference[ind]}}<br>
+        </span>
+<!--        <span>{{ addDatasetToList() }} </span>-->
       </div>
 
       <div class="p-col-4">
         <strong>Reference:</strong><br/>
+
   <!--      {{ valrun.reference_configuration.dataset.pretty_name }},-->
   <!--      {{ valrun.reference_configuration.version.pretty_name }},-->
   <!--      {{ valrun.reference_configuration.variable.pretty_name }}-->

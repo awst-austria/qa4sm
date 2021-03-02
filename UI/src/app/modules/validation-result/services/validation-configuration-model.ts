@@ -1,12 +1,7 @@
-import {ValidationrunDto} from './validationrun.dto';
+import {DatasetConfigModel} from '../../../pages/validate/dataset-config-model';
 
 export class ValidationConfigurationModel {
-  constructor(public validationrunId: string,
-              public datasets: number[],
-              public datasetsVersions: number[],
-              public datasetsVariables: number[],
-              public refDataset: number,
-              public refDatasetVersion: number,
-              public refDatasetVariable: number
+  constructor(public datasetConfig: DatasetConfigModel[],
+              public isReference: boolean[],
   ){}
 }

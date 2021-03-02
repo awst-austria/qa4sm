@@ -4,7 +4,6 @@ import { ValidationrunRowComponent } from './components/validationrun-row/valida
 import {PanelModule} from 'primeng/panel';
 
 
-
 @NgModule({
     declarations: [ValidationrunRowComponent],
     exports: [
@@ -12,7 +11,7 @@ import {PanelModule} from 'primeng/panel';
     ],
   imports: [
     CommonModule,
-    PanelModule
+    PanelModule,
   ]
 })
 export class ValidationResultModule { }

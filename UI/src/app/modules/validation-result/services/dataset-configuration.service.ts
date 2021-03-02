@@ -27,6 +27,9 @@ export class DatasetConfigurationService {
     this.requestCacheString.set(
       CACHE_VAL_ID,
       new ConfigurationCacheItem(new Date(), this.httpClient.get<DatasetConfigurationDto[]>(CONFIGURATION_URL).pipe(shareReplay())));
+    this.requestCacheNumber.set(
+      CACHE_CONFIG_ID,
+      new ConfigurationCacheItem(new Date(), this.httpClient.get<DatasetConfigurationDto[]>(CONFIGURATION_URL).pipe(shareReplay())));
   }
   getAllConfigs(): Observable<DatasetConfigurationDto[]> {
     return this.getConfigByValidationrun(CACHE_VAL_ID);
@@ -38,7 +41,7 @@ export class DatasetConfigurationService {
       request = this.httpClient.get<DatasetConfigurationDto[]>(CONFIGURATION_URL).pipe(shareReplay());
     } else {
       let params = new HttpParams().set('config_id', String(configId));
-      request = this.httpClient.get<DatasetConfigurationDto[]>(CONFIGURATION_URL, {params: params}).pipe(shareReplay());
+      request = this.httpClient.get<DatasetConfigurationDto>(CONFIGURATION_URL, {params: params}).pipe(shareReplay());
     }
     let cacheItem = new ConfigurationCacheItem(new Date(), request);
     this.requestCacheNumber.set(configId, cacheItem);
