@@ -5,6 +5,9 @@ import {NewValidationRunDto} from './new-validation-run-dto';
 
 const runValidationUrl: string = environment.API_URL + 'api/run-validation';
 
+/**
+ * This service -together with its DTOs- responsible for submitting new validations
+ */
 @Injectable({
   providedIn: 'root'
 })
