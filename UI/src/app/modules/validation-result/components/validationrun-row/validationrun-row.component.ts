@@ -17,8 +17,8 @@ import {DatasetVersionService} from '../../../dataset/services/dataset-version.s
 })
 export class ValidationrunRowComponent implements OnInit {
 
-  // validationDatasetsConfigurations: ValidationConfigurationModel[] = [];
-  validationDatasetsConfigurations: ValidationConfigurationModel = {datasetConfig: [], isReference: []};
+  validationDatasetsConfigurations: ValidationConfigurationModel[] = [];
+  // validationDatasetsConfigurations: ValidationConfigurationModel = {datasetConfig: [], isReference: []};
   validationReferenceConfiguration: ValidationConfigurationModel[] = []; // this array will always contain exactly 1 element
 
   @Input() published: boolean = false;
@@ -46,47 +46,47 @@ export class ValidationrunRowComponent implements OnInit {
     this.getValidationConfiguration(this.validationDatasetsConfigurations);
   }
 
-  // private getValidationConfiguration(targetArray: ValidationConfigurationModel[]) {
-  //   this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
-  //     configs.forEach(config => {
-  //       let datasetModel = new DatasetComponentSelectionModel(null, null, null );
-  //       let model = new ValidationConfigurationModel(new DatasetConfigModel(datasetModel, [], []), false);
-  //       targetArray.push(model);
-  //       model.isReference = config.id === this.valrun.reference_configuration;
-  //       let datasetId = config.dataset;
-  //       let versionId = config.version;
-  //       let variableId = config.variable;
-  //       // console.log(config);
-  //       this.datasetService.getDatasetById(datasetId).subscribe(dataset => {
-  //         // console.log(dataset);
-  //         model.datasetConfig.datasetModel.selectedDataset = dataset;
-  //       });
-  //       this.datasetVersionService.getVersionById(versionId).subscribe(version => {
-  //               model.datasetConfig.datasetModel.selectedVersion = version;
-  //             });
-  //     });
-  //   });
-  // }
-
-  private getValidationConfiguration(model: ValidationConfigurationModel){
+  private getValidationConfiguration(targetArray: ValidationConfigurationModel[]) {
     this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
       configs.forEach(config => {
-        model.isReference.push(config.id === this.valrun.reference_configuration);
-        let itemDatasetConfig = new DatasetConfigModel(
-                                new DatasetComponentSelectionModel(
-                                  null, null, null),
-                                  [], []);
+        let datasetModel = new DatasetComponentSelectionModel(null, null, null );
+        let model = new ValidationConfigurationModel(new DatasetConfigModel(datasetModel, [], []), false);
+        targetArray.push(model);
+        model.isReference = config.id === this.valrun.reference_configuration;
         let datasetId = config.dataset;
         let versionId = config.version;
         let variableId = config.variable;
+        // console.log(config);
         this.datasetService.getDatasetById(datasetId).subscribe(dataset => {
-          itemDatasetConfig.datasetModel.selectedDataset = dataset;
+          // console.log(dataset);
+          model.datasetConfig.datasetModel.selectedDataset = dataset;
         });
         this.datasetVersionService.getVersionById(versionId).subscribe(version => {
-          itemDatasetConfig.datasetModel.selectedVersion = version;
-        });
-        model.datasetConfig.push(itemDatasetConfig);
+                model.datasetConfig.datasetModel.selectedVersion = version;
+              });
       });
     });
   }
+
+  // private getValidationConfiguration(model: ValidationConfigurationModel){
+  //   this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
+  //     configs.forEach(config => {
+  //       model.isReference.push(config.id === this.valrun.reference_configuration);
+  //       let itemDatasetConfig = new DatasetConfigModel(
+  //                               new DatasetComponentSelectionModel(
+  //                                 null, null, null),
+  //                                 [], []);
+  //       let datasetId = config.dataset;
+  //       let versionId = config.version;
+  //       let variableId = config.variable;
+  //       this.datasetService.getDatasetById(datasetId).subscribe(dataset => {
+  //         itemDatasetConfig.datasetModel.selectedDataset = dataset;
+  //       });
+  //       this.datasetVersionService.getVersionById(versionId).subscribe(version => {
+  //         itemDatasetConfig.datasetModel.selectedVersion = version;
+  //       });
+  //       model.datasetConfig.push(itemDatasetConfig);
+  //     });
+  //   });
+  // }
 }
