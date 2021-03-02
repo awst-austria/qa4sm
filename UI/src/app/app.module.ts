@@ -68,7 +68,6 @@ import {ValidationResultModule} from './modules/validation-result/validation-res
     TabViewModule,
     DropdownModule,
     AccordionModule,
-    PanelModule,
     TooltipModule,
     ButtonModule,
     PasswordModule,
@@ -76,7 +75,6 @@ import {ValidationResultModule} from './modules/validation-result/validation-res
     FilterModule,
     ToastModule,
     ValidationResultModule,
-
   ],
   providers: [
     {
