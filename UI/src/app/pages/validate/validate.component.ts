@@ -134,7 +134,8 @@ export class ValidateComponent implements OnInit {
     let newValidationDto = new NewValidationRunDto(
       datasets,
       reference,
-      this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto());
+      this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto(),
+      this.validationModel.validationPeriodModel.toNewValidationRunValidationPeriodDto());
     this.newValidationService.startValidation(newValidationDto);
   }
 }
