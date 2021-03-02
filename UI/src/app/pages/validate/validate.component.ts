@@ -130,9 +130,6 @@ export class ValidateComponent implements OnInit {
       datasets.push(datasetConfig.toNewValRunDatasetConfigDto());
     });
 
-    //prepare the reference dto  (dataset, version, variable and filter settings)
-    let reference = this.validationModel.referenceConfigurations[0].toNewValRunDatasetConfigDto();
-
     //prepare metrics
     let metricDtos: NewValidationRunMetricDto[] = [];
     this.validationModel.metrics.forEach(metric => {
@@ -141,11 +138,12 @@ export class ValidateComponent implements OnInit {
 
     let newValidationDto = new NewValidationRunDto(
       datasets,
-      reference,
+      this.validationModel.referenceConfigurations[0].toNewValRunDatasetConfigDto(),
       this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto(),
       this.validationModel.validationPeriodModel.toNewValidationRunValidationPeriodDto(),
       metricDtos,
-      this.validationModel.anomalies.toNewValidationRunAnomaliesDto());
+      this.validationModel.anomalies.toNewValidationRunAnomaliesDto(),
+      this.validationModel.scalingModel.toNewValidationRunScalingDto());
 
     this.newValidationService.startValidation(newValidationDto);
   }

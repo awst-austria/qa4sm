@@ -3,6 +3,7 @@ import {NewValidationRunSpatialSubsettingDto} from './new-validation-run-spatial
 import {NewValidationRunValidationPeriodDto} from './new-validation-run-validation-period-dto';
 import {NewValidationRunMetricDto} from './new-validation-run-metric-dto';
 import {NewValidationRunAnomaliesDto} from './new-validation-run-anomalies-dto';
+import {NewValidationRunScalingDto} from './new-validation-run-scaling-dto';
 
 export class NewValidationRunDto {
   constructor(public dataset_configs: NewValRunDatasetConfigDto[],
@@ -10,6 +11,7 @@ export class NewValidationRunDto {
               public spatial_subsetting: NewValidationRunSpatialSubsettingDto,
               public validation_period: NewValidationRunValidationPeriodDto,
               public metrics: NewValidationRunMetricDto[],
-              public anomalies: NewValidationRunAnomaliesDto) {
+              public anomalies: NewValidationRunAnomaliesDto,
+              public scaling: NewValidationRunScalingDto) {
   }
 }
