@@ -131,7 +131,10 @@ export class ValidateComponent implements OnInit {
 
     //prepare the reference dto  (dataset, version, variable and filter settings)
     let reference = this.validationModel.referenceConfigurations[0].toNewValRunDatasetConfigDto();
-    let newValidationDto = new NewValidationRunDto(datasets, reference);
+    let newValidationDto = new NewValidationRunDto(
+      datasets,
+      reference,
+      this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto());
     this.newValidationService.startValidation(newValidationDto);
   }
 }
