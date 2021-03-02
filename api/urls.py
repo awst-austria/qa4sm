@@ -1,17 +1,17 @@
 from django.conf.urls import url
 from django.urls import path
 
-from api.views.DataFilterView import data_filter
-from api.views.DatasetVariableView import dataset_variable
-from api.views.DatasetVersionView import dataset_version
-from api.views.DatasetView import dataset
-from api.views.LoginView import api_login
-from api.views.LogoutView import api_logout
-from api.views.PathVarTestEndpoint import path_var_get
-from api.views.UserView import users
-from api.views.ValidationRunView import published_results, my_results
-from api.views.DatasetConfigurationView import dataset_configuration
-from api.views.GlobalParamsView import global_params
+from api.views.data_filter_view import data_filter
+from api.views.dataset_variable_view import dataset_variable
+from api.views.dataset_version_view import dataset_version
+from api.views.dataset_view import dataset
+from api.views.login_view import api_login
+from api.views.logout_view import api_logout
+from api.views.path_var_test_endpoint import path_var_get
+from api.views.user_view import users
+from api.views.validation_run_view import published_results, my_results
+from api.views.dataset_configuration_view import dataset_configuration
+from api.views.global_params_view import global_params
 
 # schema_view = get_schema_view(
 #     openapi.Info(
