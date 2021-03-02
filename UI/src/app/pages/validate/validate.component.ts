@@ -12,6 +12,9 @@ import {ValidationPeriodModel} from '../../modules/validation-period/components/
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
+import {NewValidationRunDto} from '../../modules/core/services/new-validation-run/new-validation-run-dto';
+import {NewValRunDatasetConfigDto} from '../../modules/core/services/new-validation-run/new-val-run-dataset-config-dto';
+import {NewValidationRunService} from '../../modules/core/services/new-validation-run/new-validation-run.service';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -37,7 +40,8 @@ export class ValidateComponent implements OnInit {
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
-              private filterService: FilterService) {
+              private filterService: FilterService,
+              private newValidationService: NewValidationRunService) {
 
   }
 
@@ -113,5 +117,21 @@ export class ValidateComponent implements OnInit {
 
   addDatasetButtonDisabled(): boolean {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
+  }
+
+  public startValidation() {
+    //debug
+    console.log(JSON.stringify(this.validationModel));
+
+    //prepare the dataset dtos (dataset, version, variable and filter settings)
+    let datasets: NewValRunDatasetConfigDto[] = [];
+    this.validationModel.datasetConfigurations.forEach(datasetConfig => {
+      datasets.push(datasetConfig.toNewValRunDatasetConfigDto());
+    });
+
+    //prepare the reference dto  (dataset, version, variable and filter settings)
+    let reference = this.validationModel.referenceConfigurations[0].toNewValRunDatasetConfigDto();
+    let newValidationDto = new NewValidationRunDto(datasets, reference);
+    this.newValidationService.startValidation(newValidationDto);
   }
 }
