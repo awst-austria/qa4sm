@@ -1,6 +1,7 @@
 <div class="p-grid">
   <div class="p-col-12">
-    <p-checkbox [label]="metricModel.description" [value]="metricModel.value" [disabled]="disabled"></p-checkbox>
+    <p-checkbox [label]="metricModel.description" [value]="metricModel.value" [binary]="true"
+                [disabled]="disabled"></p-checkbox>
     <label class="p-panel-header-icon"
            pTooltip="{{metricModel.helperText}}"
            tooltipPosition="bottom">

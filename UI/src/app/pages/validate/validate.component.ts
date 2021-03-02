@@ -15,6 +15,7 @@ import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/s
 import {NewValidationRunDto} from '../../modules/core/services/new-validation-run/new-validation-run-dto';
 import {NewValRunDatasetConfigDto} from '../../modules/core/services/new-validation-run/new-val-run-dataset-config-dto';
 import {NewValidationRunService} from '../../modules/core/services/new-validation-run/new-validation-run.service';
+import {NewValidationRunMetricDto} from '../../modules/core/services/new-validation-run/new-validation-run-metric-dto';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -131,11 +132,20 @@ export class ValidateComponent implements OnInit {
 
     //prepare the reference dto  (dataset, version, variable and filter settings)
     let reference = this.validationModel.referenceConfigurations[0].toNewValRunDatasetConfigDto();
+
+    //prepare metrics
+    let metricDtos: NewValidationRunMetricDto[] = [];
+    this.validationModel.metrics.forEach(metric => {
+      metricDtos.push(metric.toNewValidationRunMetricDto());
+    });
+
     let newValidationDto = new NewValidationRunDto(
       datasets,
       reference,
       this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto(),
-      this.validationModel.validationPeriodModel.toNewValidationRunValidationPeriodDto());
+      this.validationModel.validationPeriodModel.toNewValidationRunValidationPeriodDto(),
+      metricDtos);
+
     this.newValidationService.startValidation(newValidationDto);
   }
 }
