@@ -11,14 +11,19 @@ from validator.models import DatasetVersion, Dataset
 @permission_classes([IsAuthenticated])
 def dataset_version(request):
     dataset_id = request.query_params.get('dataset', None)
+    version_id = request.query_params.get('version_id', None)
     # # get single dataset
-    if dataset_id:
-        versions = Dataset.objects.get(id=dataset_id).versions
-    # get all datasets
+    if version_id:
+        version = DatasetVersion.objects.get(id=version_id)
+        serializer = DatasetVersionSerializer(version)
     else:
-        versions = DatasetVersion.objects.all()
+        if dataset_id:
+            versions = Dataset.objects.get(id=dataset_id).versions
+        # get all datasets
+        else:
+            versions = DatasetVersion.objects.all()
 
-    serializer = DatasetVersionSerializer(versions, many=True)
+        serializer = DatasetVersionSerializer(versions, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
