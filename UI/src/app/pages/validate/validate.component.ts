@@ -144,7 +144,8 @@ export class ValidateComponent implements OnInit {
       reference,
       this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto(),
       this.validationModel.validationPeriodModel.toNewValidationRunValidationPeriodDto(),
-      metricDtos);
+      metricDtos,
+      this.validationModel.anomalies.toNewValidationRunAnomaliesDto());
 
     this.newValidationService.startValidation(newValidationDto);
   }

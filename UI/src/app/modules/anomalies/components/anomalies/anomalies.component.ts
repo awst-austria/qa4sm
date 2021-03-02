@@ -19,9 +19,9 @@ export const ANOMALIES_35D_MA_DESC: string = '35 day moving average';
 export class AnomaliesComponent implements OnInit {
 
   // these fields are required because templates have no access to constants
-  readonly anomaliesNoneID: string = ANOMALIES_NONE;
-  readonly anomaliesClimatologyID: string = ANOMALIES_CLIMATOLOGY;
-  readonly anomalies35DMaID: string = ANOMALIES_35D_MA;
+  readonly anomaliesNone: string = ANOMALIES_NONE;
+  readonly anomaliesClimatology: string = ANOMALIES_CLIMATOLOGY;
+  readonly anomalies35DMa: string = ANOMALIES_35D_MA;
 
   availableAnomalyMethodModels: AnomaliesModel[] = [];
   selectedMethod: AnomaliesModel;
@@ -36,7 +36,7 @@ export class AnomaliesComponent implements OnInit {
   }
 
   selectedMethodChanged() {
-    this.methodForValidation.id = this.selectedMethod.id;
+    this.methodForValidation.method = this.selectedMethod.method;
     this.methodForValidation.anomaliesFrom = this.selectedMethod.anomaliesFrom;
     this.methodForValidation.anomaliesTo = this.selectedMethod.anomaliesTo;
   }
