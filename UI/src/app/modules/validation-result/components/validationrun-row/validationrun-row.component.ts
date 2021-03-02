@@ -1,9 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../services/validationrun.service';
-import {Observable} from 'rxjs';
 import {ValidationrunDto} from '../../services/validationrun.dto';
-import {ConfigurationCacheItem, DatasetConfigurationService} from '../../services/dataset-configuration.service';
-import {DatasetConfigurationDto} from '../../services/dataset-configuration.dto';
+import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
 import {ValidationConfigurationModel} from '../../services/validation-configuration-model';
 import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
@@ -36,7 +34,7 @@ export class ValidationrunRowComponent implements OnInit {
 
   ngOnInit(): void {
     this.addDatasetToList();
-    console.log(this.validationDatasetsConfigurations);
+    // console.log(this.validationDatasetsConfigurations);
   }
 
   getDoiPrefix(): string {
@@ -55,15 +53,15 @@ export class ValidationrunRowComponent implements OnInit {
                                 new DatasetComponentSelectionModel(
                                   null, null, null),
                                   [], []);
+        let datasetId = config.dataset;
         let versionId = config.version;
         let variableId = config.variable;
-        this.datasetService.getDatasetById(config.dataset).subscribe(dataset => {
+        this.datasetService.getDatasetById(datasetId).subscribe(dataset => {
           itemDatasetConfig.datasetModel.selectedDataset = dataset;
         });
-        // this.datasetService.getAllDatasets().subscribe(datasets => {
-        //   itemDatasetConfig.datasetModel.selectedDataset = datasets[0];
-        //   console.log(datasets[0]);
-        // });
+        this.datasetVersionService.getVersionById(versionId).subscribe(version => {
+          itemDatasetConfig.datasetModel.selectedVersion = version;
+        });
         model.datasetConfig.push(itemDatasetConfig);
       });
     });
@@ -113,9 +111,9 @@ export class ValidationrunRowComponent implements OnInit {
   // //
   // }
 
-  private updateValidationConfiguration(model: ValidationConfigurationModel){
-    console.log('Monika');
-  }
+  // private updateValidationConfiguration(model: ValidationConfigurationModel){
+  //   console.log('Monika');
+  // }
 //   private updateValidationConfiguration(model: ValidationConfigurationModel){
 //     this.configurationService.getConfigByValidationrun(model.validationrunId).subscribe(configs => {
 //       model.datasets = [];

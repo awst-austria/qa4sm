@@ -9,7 +9,9 @@
       <div class="p-col-4">
         <strong>Data:</strong><br/>
         <span *ngFor="let config of validationDatasetsConfigurations.datasetConfig; let ind = index">
-          <span *ngIf="!validationDatasetsConfigurations.isReference[ind]"> {{config.datasetModel.selectedDataset?.pretty_name}} </span> <br>
+          <span *ngIf="!validationDatasetsConfigurations.isReference[ind]">
+            {{config.datasetModel.selectedDataset?.pretty_name}}, {{config.datasetModel.selectedVersion?.pretty_name}}
+          </span> <br>
         </span>
 <!--        <span>{{ addDatasetToList() }} </span>-->
       </div>
@@ -17,7 +19,9 @@
       <div class="p-col-4">
         <strong>Reference:</strong><br/>
         <span *ngFor="let config of validationDatasetsConfigurations.datasetConfig; let ind = index">
-          <span *ngIf="validationDatasetsConfigurations.isReference[ind]"> {{config.datasetModel.selectedDataset?.pretty_name}} </span>
+          <span *ngIf="validationDatasetsConfigurations.isReference[ind]">
+            {{config.datasetModel.selectedDataset?.pretty_name}}, {{config.datasetModel.selectedVersion?.pretty_name}}
+          </span>
         </span>
 
   <!--      {{ valrun.reference_configuration.dataset.pretty_name }},-->
