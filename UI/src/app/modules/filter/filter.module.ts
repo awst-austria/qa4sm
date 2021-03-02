@@ -1,7 +1,8 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {CheckboxModule} from 'primeng/checkbox';
-import { BasicFilterComponent } from './components/basic-filter/basic-filter.component';
+import {BasicFilterComponent} from './components/basic-filter/basic-filter.component';
+import {FormsModule} from '@angular/forms';
 
 
 @NgModule({
@@ -11,7 +12,8 @@ import { BasicFilterComponent } from './components/basic-filter/basic-filter.com
   ],
   imports: [
     CommonModule,
-    CheckboxModule
+    CheckboxModule,
+    FormsModule
 
   ]
 })
