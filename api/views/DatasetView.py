@@ -20,7 +20,7 @@ def dataset(request):
     else:
         datasets = Dataset.objects.all()
         serializer = DatasetSerializer(datasets, many=True)
-    print('Monika', serializer.data)
+
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
