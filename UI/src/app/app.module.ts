@@ -44,7 +44,6 @@ import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
 
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -85,6 +84,7 @@ import {ScalingModule} from './modules/scaling/scaling.module';
     MetricsModule,
     AnomaliesModule,
     ScalingModule,
+    PanelModule,
 
 
   ],
