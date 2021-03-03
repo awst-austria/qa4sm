@@ -42,6 +42,7 @@ import {ValidationPeriodModule} from './modules/validation-period/validation-per
 import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
+import {PaginatorModule} from 'primeng/paginator';
 
 
 @NgModule({
@@ -85,7 +86,7 @@ import {ScalingModule} from './modules/scaling/scaling.module';
     MetricsModule,
     AnomaliesModule,
     ScalingModule,
-
+    PaginatorModule,
 
   ],
   providers: [
