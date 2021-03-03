@@ -12,6 +12,10 @@ import {ValidationPeriodModel} from '../../modules/validation-period/components/
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
+import {NewValidationRunDto} from './service/new-validation-run-dto';
+import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dto';
+import {NewValidationRunService} from './service/new-validation-run.service';
+import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -37,7 +41,8 @@ export class ValidateComponent implements OnInit {
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
-              private filterService: FilterService) {
+              private filterService: FilterService,
+              private newValidationService: NewValidationRunService) {
 
   }
 
@@ -113,5 +118,33 @@ export class ValidateComponent implements OnInit {
 
   addDatasetButtonDisabled(): boolean {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
+  }
+
+  public startValidation() {
+    //debug
+    console.log(JSON.stringify(this.validationModel));
+
+    //prepare the dataset dtos (dataset, version, variable and filter settings)
+    let datasets: NewValRunDatasetConfigDto[] = [];
+    this.validationModel.datasetConfigurations.forEach(datasetConfig => {
+      datasets.push(datasetConfig.toNewValRunDatasetConfigDto());
+    });
+
+    //prepare metrics
+    let metricDtos: NewValidationRunMetricDto[] = [];
+    this.validationModel.metrics.forEach(metric => {
+      metricDtos.push(metric.toNewValidationRunMetricDto());
+    });
+
+    let newValidationDto = new NewValidationRunDto(
+      datasets,
+      this.validationModel.referenceConfigurations[0].toNewValRunDatasetConfigDto(),
+      this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto(),
+      this.validationModel.validationPeriodModel.toNewValidationRunValidationPeriodDto(),
+      metricDtos,
+      this.validationModel.anomalies.toNewValidationRunAnomaliesDto(),
+      this.validationModel.scalingModel.toNewValidationRunScalingDto());
+
+    this.newValidationService.startValidation(newValidationDto);
   }
 }

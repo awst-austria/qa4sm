@@ -71,6 +71,7 @@ import {ScalingModule} from './modules/scaling/scaling.module';
     ToastModule,
     DropdownModule,
     AccordionModule,
+    PanelModule,
     TooltipModule,
     ButtonModule,
     PasswordModule,
@@ -84,7 +85,6 @@ import {ScalingModule} from './modules/scaling/scaling.module';
     MetricsModule,
     AnomaliesModule,
     ScalingModule,
-    PanelModule,
 
 
   ],

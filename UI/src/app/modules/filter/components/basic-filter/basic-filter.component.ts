@@ -15,5 +15,4 @@ export class BasicFilterComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
 }

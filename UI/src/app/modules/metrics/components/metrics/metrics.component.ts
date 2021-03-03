@@ -16,7 +16,7 @@ export class MetricsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.tripleCollocationMetrics = new MetricModel('Include Triple Collocation Metrics', 'Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.', false, false);
+    this.tripleCollocationMetrics = new MetricModel('Include Triple Collocation Metrics', 'Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.', false, false, 'tcol');
     this.validationModel.metrics.push(this.tripleCollocationMetrics);
   }
 

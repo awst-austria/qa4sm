@@ -19,18 +19,18 @@
           </ng-template>
           <p-accordion multiple="true">
 
-            <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; let i = index"
+            <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; let datasetIdx = index"
                             [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / '+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.pretty_name)"
-                            [selected]="i == 0">
+                            [selected]="datasetIdx == 0">
 
-              <qa-dataset *ngIf="validationModel.datasetConfigurations[i].datasetModel.selectedDataset"
-                          [selectionModel]="validationModel.datasetConfigurations[i].datasetModel"
+              <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset"
+                          [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                           [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
 
-              <qa-basic-filter *ngFor="let filter of item.basicFilters; let i = index"
+              <qa-basic-filter *ngFor="let filter of item.basicFilters; let filterIdx = index"
                                [filterModel]="filter"></qa-basic-filter>
-              <button pButton type="button" (click)="removeDataset(validationModel.datasetConfigurations[i])"
+              <button pButton type="button" (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
                       label="Remove dataset"
                       icon="pi pi-trash"
                       class="p-button-danger" style="padding: 0.2rem;"></button>
@@ -95,6 +95,15 @@
       <div class="p-col-12">
         <qa-scaling [validationModel]="validationModel"></qa-scaling>
       </div>
+
+      <div class="p-col-12">
+        <div>
+          <div class="p-d-flex p-jc-center">
+            <p-button label="Validate" (onClick)="startValidation()"></p-button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
