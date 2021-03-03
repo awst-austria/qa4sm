@@ -28,6 +28,7 @@
     "@ng-bootstrap/ng-bootstrap": "^9.0.2",
     "angular2-uuid": "^1.1.1",
     "bootstrap": "^4.6.0",
+    "jw-angular-pagination": "^1.2.0",
     "ngx-logger": "^4.1.9",
     "primeflex": "^2.0.0",
     "primeicons": "^4.1.0",
