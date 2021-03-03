@@ -67,24 +67,4 @@ export class ValidationrunRowComponent implements OnInit {
       });
     });
   }
-
-//   private getValidationConfiguration(model: ValidationConfigurationModel){
-//     this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
-//       configs.forEach(config => {
-//         model.isReference.push(config.id === this.valrun.reference_configuration);
-//         let itemDatasetConfig = new DatasetConfigModel(
-//                                 new DatasetComponentSelectionModel(
-//                                   null, null, null),
-//                                   [], []);
-//
-//         itemDatasetConfig.datasetModel.selectedDataset = this.allDatasets.find(value => value.id === config.dataset);
-//         itemDatasetConfig.datasetModel.selectedVersion = this.allVersions.find(value => value.id === config.version);
-//         itemDatasetConfig.datasetModel.selectedVariable = this.allVariables.find(value => value.id === config.variable);
-//         // this.datasetVersionService.getVersionById(versionId).subscribe(version => {
-//         //   itemDatasetConfig.datasetModel.selectedVersion = version;
-//         // });
-//         model.datasetConfig.push(itemDatasetConfig);
-//       });
-//     });
-//   }
 }
