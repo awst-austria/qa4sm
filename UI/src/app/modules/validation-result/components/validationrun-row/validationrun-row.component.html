@@ -8,33 +8,21 @@
     <div class="p-grid">
       <div class="p-col-4">
         <strong>Data:</strong><br/>
-        <span *ngFor="let config of validationDatasetsConfigurations; let ind = index">
-          <span *ngIf="!config.isReference">
-            <span *ngIf="!config.isReference">
+        <span *ngFor="let config of validationDatasetsConfigurations">
               {{config.datasetConfig.datasetModel.selectedDataset?.pretty_name}},
-              {{config.datasetConfig.datasetModel.selectedVersion?.pretty_name}}
-            </span>
-<!--            {{config.datasetModel.selectedDataset?.pretty_name}}, {{config.datasetModel.selectedVersion?.pretty_name}}-->
-          </span> <br>
+              {{config.datasetConfig.datasetModel.selectedVersion?.pretty_name}},
+              {{config.datasetConfig.datasetModel.selectedVariable?.pretty_name}} <br>
         </span>
-<!--        <span *ngFor="let config of validationDatasetsConfigurations.datasetConfig; let ind = index">-->
-<!--          <span *ngIf="!validationDatasetsConfigurations.isReference[ind]">-->
-<!--            {{config.datasetModel.selectedDataset?.pretty_name}}, {{config.datasetModel.selectedVersion?.pretty_name}}-->
-<!--          </span><br/>-->
-<!--        </span>-->
+
       </div>
 
       <div class="p-col-4">
         <strong>Reference:</strong><br/>
-<!--        <span *ngFor="let config of validationDatasetsConfigurations.datasetConfig; let ind = index">-->
-<!--          <span *ngIf="validationDatasetsConfigurations.isReference[ind]">-->
-<!--            {{config.datasetModel.selectedDataset?.pretty_name}}, {{config.datasetModel.selectedVersion?.pretty_name}}-->
-<!--          </span>-->
-<!--        </span>-->
-
-  <!--      {{ valrun.reference_configuration.dataset.pretty_name }},-->
-  <!--      {{ valrun.reference_configuration.version.pretty_name }},-->
-  <!--      {{ valrun.reference_configuration.variable.pretty_name }}-->
+        <span *ngFor="let config of validationReferenceConfiguration">
+            {{config.datasetConfig.datasetModel.selectedDataset?.pretty_name}},
+            {{config.datasetConfig.datasetModel.selectedVersion?.pretty_name}},
+            {{config.datasetConfig.datasetModel.selectedVariable?.pretty_name}}
+        </span>
       </div>
 
       <div class="p-col-2" style="max-width: 7rem;">

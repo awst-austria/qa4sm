@@ -6,8 +6,9 @@ import {GlobalParamsService} from '../../../core/services/gloabal-params/global-
 import {ValidationConfigurationModel} from '../../services/validation-configuration-model';
 import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
-import {DatasetService} from '../../../dataset/services/dataset.service';
-import {DatasetVersionService} from '../../../dataset/services/dataset-version.service';
+import {DatasetDto} from '../../../dataset/services/dataset.dto';
+import {DatasetVersionDto} from '../../../dataset/services/dataset-version.dto';
+import {DatasetVariableDto} from '../../../dataset/services/dataset-variable.dto';
 
 
 @Component({
@@ -18,24 +19,23 @@ import {DatasetVersionService} from '../../../dataset/services/dataset-version.s
 export class ValidationrunRowComponent implements OnInit {
 
   validationDatasetsConfigurations: ValidationConfigurationModel[] = [];
-  // validationDatasetsConfigurations: ValidationConfigurationModel = {datasetConfig: [], isReference: []};
   validationReferenceConfiguration: ValidationConfigurationModel[] = []; // this array will always contain exactly 1 element
+  datasets?: any;
 
   @Input() published: boolean = false;
   @Input() valrun: ValidationrunDto;
+  @Input() allDatasets: DatasetDto[];
+  @Input() allVersions: DatasetVersionDto[];
+  @Input() allVariables: DatasetVariableDto[];
+  // @Input()  allVersions: DatasetVersionDto[] = [];
 
   constructor(private validationrunService: ValidationrunService,
               private configurationService: DatasetConfigurationService,
-              private globalParamsService: GlobalParamsService,
-              private datasetService: DatasetService,
-              private datasetVersionService: DatasetVersionService) {
-    // const validationDatasetsConfigurations = new ValidationConfigurationModel(this.valrun.id, [], [], null, null, null, null);
-
+              private globalParamsService: GlobalParamsService) {
   }
 
   ngOnInit(): void {
     this.addDatasetToList();
-    console.log(this.validationDatasetsConfigurations);
   }
 
   getDoiPrefix(): string {
@@ -43,50 +43,48 @@ export class ValidationrunRowComponent implements OnInit {
   }
 
   addDatasetToList() {
-    this.getValidationConfiguration(this.validationDatasetsConfigurations);
+    this.getValidationConfiguration(this.validationDatasetsConfigurations,this.validationReferenceConfiguration);
   }
 
-  private getValidationConfiguration(targetArray: ValidationConfigurationModel[]) {
+  private getValidationConfiguration(targetDatasetArray: ValidationConfigurationModel[],
+                                     targetReferenceArray: ValidationConfigurationModel[]) {
+
     this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
       configs.forEach(config => {
         let datasetModel = new DatasetComponentSelectionModel(null, null, null );
-        let model = new ValidationConfigurationModel(new DatasetConfigModel(datasetModel, [], []), false);
-        targetArray.push(model);
+        let datasetConfigModel = new DatasetConfigModel(datasetModel, [], []);
+        let model = new ValidationConfigurationModel(datasetConfigModel, false);
         model.isReference = config.id === this.valrun.reference_configuration;
-        let datasetId = config.dataset;
-        let versionId = config.version;
-        let variableId = config.variable;
-        // console.log(config);
-        this.datasetService.getDatasetById(datasetId).subscribe(dataset => {
-          // console.log(dataset);
-          model.datasetConfig.datasetModel.selectedDataset = dataset;
-        });
-        this.datasetVersionService.getVersionById(versionId).subscribe(version => {
-                model.datasetConfig.datasetModel.selectedVersion = version;
-              });
+        model.datasetConfig.datasetModel.selectedDataset = this.allDatasets.find(value => value.id === config.dataset);
+        model.datasetConfig.datasetModel.selectedVersion = this.allVersions.find(value => value.id === config.version);
+        model.datasetConfig.datasetModel.selectedVariable = this.allVariables.find(value => value.id === config.variable);
+        if (!model.isReference){
+          targetDatasetArray.push(model);
+        } else {
+          targetReferenceArray.push(model);
+        }
+
       });
     });
   }
 
-  // private getValidationConfiguration(model: ValidationConfigurationModel){
-  //   this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
-  //     configs.forEach(config => {
-  //       model.isReference.push(config.id === this.valrun.reference_configuration);
-  //       let itemDatasetConfig = new DatasetConfigModel(
-  //                               new DatasetComponentSelectionModel(
-  //                                 null, null, null),
-  //                                 [], []);
-  //       let datasetId = config.dataset;
-  //       let versionId = config.version;
-  //       let variableId = config.variable;
-  //       this.datasetService.getDatasetById(datasetId).subscribe(dataset => {
-  //         itemDatasetConfig.datasetModel.selectedDataset = dataset;
-  //       });
-  //       this.datasetVersionService.getVersionById(versionId).subscribe(version => {
-  //         itemDatasetConfig.datasetModel.selectedVersion = version;
-  //       });
-  //       model.datasetConfig.push(itemDatasetConfig);
-  //     });
-  //   });
-  // }
+//   private getValidationConfiguration(model: ValidationConfigurationModel){
+//     this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
+//       configs.forEach(config => {
+//         model.isReference.push(config.id === this.valrun.reference_configuration);
+//         let itemDatasetConfig = new DatasetConfigModel(
+//                                 new DatasetComponentSelectionModel(
+//                                   null, null, null),
+//                                   [], []);
+//
+//         itemDatasetConfig.datasetModel.selectedDataset = this.allDatasets.find(value => value.id === config.dataset);
+//         itemDatasetConfig.datasetModel.selectedVersion = this.allVersions.find(value => value.id === config.version);
+//         itemDatasetConfig.datasetModel.selectedVariable = this.allVariables.find(value => value.id === config.variable);
+//         // this.datasetVersionService.getVersionById(versionId).subscribe(version => {
+//         //   itemDatasetConfig.datasetModel.selectedVersion = version;
+//         // });
+//         model.datasetConfig.push(itemDatasetConfig);
+//       });
+//     });
+//   }
 }
