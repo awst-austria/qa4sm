@@ -28,7 +28,7 @@ export class DatasetVariableService {
       new DatasetVariableCacheItem(new Date(), this.httpClient.get<DatasetVariableDto[]>(DATASET_VARIABLE_URL).pipe(shareReplay())));
   }
 
-  getAllVersions(): Observable<DatasetVariableDto[]> {
+  getAllVariables(): Observable<DatasetVariableDto[]> {
     return this.getVariablesByDataset(CACHE_KEY_ALL_VERSIONS);
   }
 
