@@ -8,7 +8,7 @@ from validator.models import DatasetVersion, Dataset
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def dataset_version(request):
     dataset_id = request.query_params.get('dataset', None)
     version_id = request.query_params.get('version_id', None)

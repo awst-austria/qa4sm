@@ -1,14 +1,14 @@
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.serializers import ModelSerializer
 
 from validator.models import DatasetConfiguration
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def dataset_configuration(request):
     validation_id = request.query_params.get('validationrun', None)
     config_id = request.query_params.get('config_id', None)
