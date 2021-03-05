@@ -8,7 +8,6 @@
 
 </div>
 <div class="container" >
-  <p-paginator [rows]="10">
   <!--  <div *ngFor="let dataset of datasets">{{dataset.pretty_name}}</div>-->
   <div *ngFor="let valrun of myValidation$|async">
     <qa-validationrun-row [published]="false" [valrun]="valrun" [allDatasets]="datasets" [allVersions]="versions"
@@ -16,5 +15,4 @@
 
     </qa-validationrun-row>
   </div>
-  </p-paginator>
 </div>
