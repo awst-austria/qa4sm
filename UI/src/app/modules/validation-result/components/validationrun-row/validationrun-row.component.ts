@@ -3,7 +3,7 @@ import {ValidationrunService} from '../../services/validationrun.service';
 import {ValidationrunDto} from '../../services/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
-import {ValidationConfigurationModel} from '../../services/validation-configuration-model';
+import {ValidationConfigurationModel} from './validation-configuration-model';
 import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
 import {DatasetDto} from '../../../dataset/services/dataset.dto';

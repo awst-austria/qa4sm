@@ -1,4 +1,4 @@
-import {DatasetConfigModel} from '../../../pages/validate/dataset-config-model';
+import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
 
 export class ValidationConfigurationModel {
   constructor(public datasetConfig: DatasetConfigModel,
