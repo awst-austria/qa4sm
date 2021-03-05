@@ -1,7 +1,8 @@
-import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
+import {DatasetRowModel} from './dataset-row.model';
 
 export class ValidationConfigurationModel {
-  constructor(public datasetConfig: DatasetConfigModel,
+  constructor(public datasetConfig: DatasetRowModel,
               public isReference: boolean,
   ){}
 }
+
