@@ -43,7 +43,7 @@ export class ValidationrunRowComponent implements OnInit {
   }
 
   addDatasetToList() {
-    this.getValidationConfiguration(this.validationDatasetsConfigurations,this.validationReferenceConfiguration);
+    this.getValidationConfiguration(this.validationDatasetsConfigurations, this.validationReferenceConfiguration);
   }
 
   private getValidationConfiguration(targetDatasetArray: ValidationConfigurationModel[],
