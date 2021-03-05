@@ -4,11 +4,10 @@ import {ValidationrunDto} from '../../services/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
 import {ValidationConfigurationModel} from './validation-configuration-model';
-import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
-import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
 import {DatasetDto} from '../../../dataset/services/dataset.dto';
 import {DatasetVersionDto} from '../../../dataset/services/dataset-version.dto';
 import {DatasetVariableDto} from '../../../dataset/services/dataset-variable.dto';
+import {DatasetRowModel} from './dataset-row.model';
 
 
 @Component({
@@ -51,13 +50,12 @@ export class ValidationrunRowComponent implements OnInit {
 
     this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
       configs.forEach(config => {
-        let datasetModel = new DatasetComponentSelectionModel(null, null, null );
-        let datasetConfigModel = new DatasetConfigModel(datasetModel, [], []);
-        let model = new ValidationConfigurationModel(datasetConfigModel, false);
+        let datasetModel = new DatasetRowModel(null, null, null );
+        let model = new ValidationConfigurationModel(datasetModel, false);
         model.isReference = config.id === this.valrun.reference_configuration;
-        model.datasetConfig.datasetModel.selectedDataset = this.allDatasets.find(value => value.id === config.dataset);
-        model.datasetConfig.datasetModel.selectedVersion = this.allVersions.find(value => value.id === config.version);
-        model.datasetConfig.datasetModel.selectedVariable = this.allVariables.find(value => value.id === config.variable);
+        model.datasetConfig.selectedDataset = this.allDatasets.find(value => value.id === config.dataset);
+        model.datasetConfig.selectedVersion = this.allVersions.find(value => value.id === config.version);
+        model.datasetConfig.selectedVariable = this.allVariables.find(value => value.id === config.variable);
         if (!model.isReference){
           targetDatasetArray.push(model);
         } else {

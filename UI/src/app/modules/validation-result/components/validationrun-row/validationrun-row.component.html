@@ -9,9 +9,9 @@
       <div class="p-col-4">
         <strong>Data:</strong><br/>
         <span *ngFor="let config of validationDatasetsConfigurations">
-              {{config.datasetConfig.datasetModel.selectedDataset?.pretty_name}},
-              {{config.datasetConfig.datasetModel.selectedVersion?.pretty_name}},
-              {{config.datasetConfig.datasetModel.selectedVariable?.pretty_name}} <br>
+              {{config.datasetConfig.selectedDataset?.pretty_name}},
+              {{config.datasetConfig.selectedVersion?.pretty_name}},
+              {{config.datasetConfig.selectedVariable?.pretty_name}} <br>
         </span>
 
       </div>
@@ -19,9 +19,9 @@
       <div class="p-col-4">
         <strong>Reference:</strong><br/>
         <span *ngFor="let config of validationReferenceConfiguration">
-            {{config.datasetConfig.datasetModel.selectedDataset?.pretty_name}},
-            {{config.datasetConfig.datasetModel.selectedVersion?.pretty_name}},
-            {{config.datasetConfig.datasetModel.selectedVariable?.pretty_name}}
+            {{config.datasetConfig.selectedDataset?.pretty_name}},
+            {{config.datasetConfig.selectedVersion?.pretty_name}},
+            {{config.datasetConfig.selectedVariable?.pretty_name}}
         </span>
       </div>
 
