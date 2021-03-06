@@ -4,31 +4,44 @@ import {DatasetDto} from './dataset.dto';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../environments/environment';
 import {shareReplay} from 'rxjs/operators';
+import {DataCache} from '../../core/tools/DataCache';
 
 const datasetUrl: string = environment.API_URL + 'api/dataset';
-const CACHE_LIFETIME: number = 5 * 60 * 1000; // 5 minutes
+const CACHE_KEY_ALL_DATASETS = -1;
 
 @Injectable({
   providedIn: 'root'
 })
 export class DatasetService {
 
-  datasets$: Observable<DatasetDto[]>;
-  datasetsCreatedOn: Date;
-
+  //cache for dataset arrays
+  arrayRequestCache = new DataCache<Observable<DatasetDto[]>>(5);
+  //cache for single dataset dtos
+  singleRequestCache = new DataCache<Observable<DatasetDto>>(5);
 
   constructor(private httpClient: HttpClient) {
-    this.datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl).pipe(shareReplay());
-    this.datasetsCreatedOn = new Date();
+    this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, this.httpClient.get<DatasetDto[]>(datasetUrl).pipe(shareReplay()));
   }
 
   getAllDatasets(): Observable<DatasetDto[]> {
-    if (((new Date()).getTime() - this.datasetsCreatedOn.getTime()) > CACHE_LIFETIME) {
-      this.datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl).pipe(shareReplay());
-      this.datasetsCreatedOn = new Date();
+    if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS)) {
+      return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS);
+    } else {
+      let datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl).pipe(shareReplay());
+      this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, datasets$);
+      return datasets$;
     }
-    return this.datasets$;
   }
 
+  getDatasetById(datasetId: number): Observable<DatasetDto> {
+    if (this.singleRequestCache.isCached(datasetId)) {
+      return this.singleRequestCache.get(datasetId);
+    } else {
+      let getURL = datasetUrl + '/' + datasetId;
+      let dataset$ = this.httpClient.get<DatasetDto>(getURL).pipe(shareReplay());
+      this.singleRequestCache.push(datasetId, dataset$);
+      return dataset$;
+    }
+  }
 
 }
