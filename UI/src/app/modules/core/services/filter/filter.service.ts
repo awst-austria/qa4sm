@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {shareReplay} from 'rxjs/operators';
-import {environment} from '../../../../environments/environment';
+import {environment} from '../../../../../environments/environment';
 import {FilterDto} from './filter.dto';
 
 

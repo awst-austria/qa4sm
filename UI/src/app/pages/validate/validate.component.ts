@@ -4,7 +4,7 @@ import {DatasetComponentSelectionModel} from '../../modules/dataset/components/d
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
 import {DatasetConfigModel} from './dataset-config-model';
-import {FilterService} from '../../modules/filter/services/filter.service';
+import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
