@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {environment} from '../../../../environments/environment';
+import {environment} from '../../../../../environments/environment';
 import {DatasetVersionDto} from './dataset-version.dto';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {shareReplay} from 'rxjs/operators';

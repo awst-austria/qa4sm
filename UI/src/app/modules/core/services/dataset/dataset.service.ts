@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {DatasetDto} from './dataset.dto';
 import {Observable} from 'rxjs';
-import {environment} from '../../../../environments/environment';
+import {environment} from '../../../../../environments/environment';
 import {shareReplay} from 'rxjs/operators';
-import {DataCache} from '../../core/tools/DataCache';
+import {DataCache} from '../../tools/DataCache';
 
 const datasetUrl: string = environment.API_URL + 'api/dataset';
 const CACHE_KEY_ALL_DATASETS = -1;

@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {DatasetService} from '../../modules/dataset/services/dataset.service';
+import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
-import {DatasetVersionService} from '../../modules/dataset/services/dataset-version.service';
-import {DatasetVariableService} from '../../modules/dataset/services/dataset-variable.service';
+import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
+import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
 import {DatasetConfigModel} from './dataset-config-model';
 import {FilterService} from '../../modules/filter/services/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
