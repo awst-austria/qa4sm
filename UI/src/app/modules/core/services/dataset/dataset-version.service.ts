@@ -14,9 +14,9 @@ const CACHE_KEY_ALL_VERSIONS = -1;
 })
 export class DatasetVersionService {
 
-  //cache for dataset arrays
+  //cache for dataset version arrays
   arrayRequestCache = new DataCache<Observable<DatasetVersionDto[]>>(5);
-  //cache for single dataset dtos
+  //cache for single dataset version dtos
   singleRequestCache = new DataCache<Observable<DatasetVersionDto>>(5);
 
 
@@ -42,6 +42,18 @@ export class DatasetVersionService {
       this.arrayRequestCache.push(datasetId, datasetVariables$);
       return datasetVariables$;
     }
+  }
+
+  getVersionById(versionId: number): Observable<DatasetVersionDto> {
+    if (this.singleRequestCache.isCached(versionId)) {
+      return this.singleRequestCache.get(versionId);
+    } else {
+      let getURL = DATASET_VERSION_URL + '/' + versionId;
+      let datasetVersion$ = this.httpClient.get<DatasetVersionDto>(getURL).pipe(shareReplay());
+      this.singleRequestCache.push(versionId, datasetVersion$);
+      return datasetVersion$;
+    }
+
   }
 
 }
