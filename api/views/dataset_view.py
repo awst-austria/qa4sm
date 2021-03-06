@@ -28,6 +28,15 @@ def dataset(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK,safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dataset_by_id(request, **kwargs):
+    ds = Dataset.objects.get(pk=kwargs['id'])
+    serializer = DatasetSerializer(ds)
+    print(serializer.data)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
 class DatasetSerializer(ModelSerializer):
     class Meta:
         model = Dataset
