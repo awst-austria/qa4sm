@@ -44,4 +44,17 @@ export class DatasetVariableService {
       return datasetVariables$;
     }
   }
+
+  getVariableById(variableId: number): Observable<DatasetVariableDto> {
+    //simplified implementation for demo purposes
+    if (this.singleRequestCache.isCached(variableId)) {
+      return this.singleRequestCache.get(variableId);
+    } else {
+      let getURL = DATASET_VARIABLE_URL + '/' + variableId;
+      let datasetVariable$ = this.httpClient.get<DatasetVariableDto>(getURL).pipe(shareReplay());
+      this.singleRequestCache.push(variableId, datasetVariable$);
+      return datasetVariable$;
+    }
+
+  }
 }
