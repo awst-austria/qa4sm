@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { DatasetVariableService } from './dataset-variable.service';
+import {DatasetVariableService} from './dataset-variable.service';
 
 describe('DatasetVariavleService', () => {
   let service: DatasetVariableService;
