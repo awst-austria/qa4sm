@@ -2,9 +2,9 @@ from django.conf.urls import url
 from django.urls import path
 
 from api.views.data_filter_view import data_filter
-from api.views.dataset_variable_view import dataset_variable
-from api.views.dataset_version_view import dataset_version
-from api.views.dataset_view import dataset
+from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id
+from api.views.dataset_version_view import dataset_version, dataset_version_by_id
+from api.views.dataset_view import dataset, dataset_by_id
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
@@ -43,8 +43,11 @@ urlpatterns = [
     path('auth/login', api_login, name='login'),
     path('auth/logout', api_logout, name='logout'),
     path('dataset', dataset, name='Datasets'),
+    url(r'^dataset/(?P<id>.+)$', dataset_by_id),
     path('dataset-version', dataset_version, name='Dataset versions'),
+    url(r'^dataset-version/(?P<id>.+)$', dataset_version_by_id),
     path('dataset-variable', dataset_variable, name='Dataset variables'),
+    url(r'^dataset-variable/(?P<id>.+)$', dataset_variable_by_id),
     path('published-results', published_results, name='Published results'),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
