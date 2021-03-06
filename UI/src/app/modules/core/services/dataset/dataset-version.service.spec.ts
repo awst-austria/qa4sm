@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { DatasetVersionService } from './dataset-version.service';
+import {DatasetVersionService} from './dataset-version.service';
 
 describe('DatasetVersionService', () => {
   let service: DatasetVersionService;
