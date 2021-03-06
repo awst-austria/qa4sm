@@ -4,66 +4,44 @@ import {environment} from '../../../../../environments/environment';
 import {DatasetVersionDto} from './dataset-version.dto';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {shareReplay} from 'rxjs/operators';
+import {DataCache} from '../../tools/DataCache';
 
-const datasetVersionUrl: string = environment.API_URL + 'api/dataset-version';
-const CACHE_LIFETIME: number = 5 * 60 * 1000; // 5 minutes
+const DATASET_VERSION_URL: string = environment.API_URL + 'api/dataset-version';
 const CACHE_KEY_ALL_VERSIONS = -1;
-
-export class DatasetVersionCacheItem {
-  constructor(public lastFetched: Date, public datasetVersions$: Observable<DatasetVersionDto[]>) {
-  }
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class DatasetVersionService {
 
-  requestCache = new Map<number, DatasetVersionCacheItem>();
+  //cache for dataset arrays
+  arrayRequestCache = new DataCache<Observable<DatasetVersionDto[]>>(5);
+  //cache for single dataset dtos
+  singleRequestCache = new DataCache<Observable<DatasetVersionDto>>(5);
 
 
   constructor(private httpClient: HttpClient) {
-    this.requestCache.set(
-      CACHE_KEY_ALL_VERSIONS,
-      new DatasetVersionCacheItem(new Date(), this.httpClient.get<DatasetVersionDto[]>(datasetVersionUrl).pipe(shareReplay())));
   }
 
   getAllVersions(): Observable<DatasetVersionDto[]> {
-    return this.getVersionsByDataset(CACHE_KEY_ALL_VERSIONS);
+    if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_VERSIONS)) {
+      return this.arrayRequestCache.get(CACHE_KEY_ALL_VERSIONS);
+    } else {
+      let datasetVersions$ = this.httpClient.get<DatasetVersionDto[]>(DATASET_VERSION_URL).pipe(shareReplay());
+      this.arrayRequestCache.push(CACHE_KEY_ALL_VERSIONS, datasetVersions$);
+      return datasetVersions$;
+    }
   }
 
   getVersionsByDataset(datasetId: number): Observable<DatasetVersionDto[]> {
-    if (this.isCached(datasetId)) {
-      return this.requestCache.get(datasetId).datasetVersions$;
-    }
-
-    let request;
-    if (datasetId == CACHE_KEY_ALL_VERSIONS) {
-      request = this.httpClient.get<DatasetVersionDto[]>(datasetVersionUrl).pipe(shareReplay());
+    if (this.arrayRequestCache.isCached(datasetId)) {
+      return this.arrayRequestCache.get(datasetId);
     } else {
       let params = new HttpParams().set('dataset', String(datasetId));
-      request = this.httpClient.get<DatasetVersionDto[]>(datasetVersionUrl, {params: params}).pipe(shareReplay());
+      let datasetVariables$ = this.httpClient.get<DatasetVersionDto[]>(DATASET_VERSION_URL, {params: params}).pipe(shareReplay());
+      this.arrayRequestCache.push(datasetId, datasetVariables$);
+      return datasetVariables$;
     }
-
-    let cacheItem = new DatasetVersionCacheItem(new Date(), request);
-    this.requestCache.set(datasetId, cacheItem);
-
-    return request;
   }
 
-  /**
-   * Checks whether there is valid cache item for the specified datasetId
-   * @param datasetId
-   * @private
-   */
-  private isCached(datasetId: number): boolean {
-    if (this.requestCache.has(datasetId)) {
-      let cacheItem = this.requestCache.get(datasetId);
-      if (((new Date()).getTime() - cacheItem.lastFetched.getTime()) < CACHE_LIFETIME) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 }
