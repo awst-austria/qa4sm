@@ -83,7 +83,7 @@ export class ValidateComponent implements OnInit {
   }
 
   private updateDatasetConfigFilters(model: DatasetConfigModel) {
-    this.filterService.getFilterByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
+    this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
       model.basicFilters = [];
       model.parameterisedFilters = [];
       filters.forEach(filter => {
