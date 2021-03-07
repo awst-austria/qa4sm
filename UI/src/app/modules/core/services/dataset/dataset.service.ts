@@ -20,7 +20,6 @@ export class DatasetService {
   singleRequestCache = new DataCache<Observable<DatasetDto>>(5);
 
   constructor(private httpClient: HttpClient) {
-    this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, this.httpClient.get<DatasetDto[]>(datasetUrl).pipe(shareReplay()));
   }
 
   getAllDatasets(): Observable<DatasetDto[]> {
