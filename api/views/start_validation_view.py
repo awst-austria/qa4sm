@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 
 from api.dto import Dto
-from validator.models import ValidationRun
+from validator.models import ValidationRun, DatasetConfiguration, DataFilter
 
 
 @api_view(['POST'])
@@ -169,23 +169,48 @@ class NewValidationSerializer(serializers.Serializer):
         pass
 
     def create(self, validated_data):
-        new_val_run = ValidationRun(start_time=timezone.now())
-
-        new_val_run.interval_from = validated_data.get('validation_period').get('interval_from', None)
-        new_val_run.interval_to = validated_data.get('validation_period').get('interval_to', None)
-        new_val_run.anomalies = validated_data.get('anomalies').get('method')
-        new_val_run.anomalies_from = validated_data.get('anomalies').get('anomalies_from', None)
-        new_val_run.anomalies_to = validated_data.get('anomalies').get('anomalies_to', None)
-        new_val_run.min_lat = validated_data.get('spatial_subsetting').get('min_lat', None)
-        new_val_run.min_lon = validated_data.get('spatial_subsetting').get('min_lon', None)
-        new_val_run.max_lat = validated_data.get('spatial_subsetting').get('max_lat', None)
-        new_val_run.max_lon = validated_data.get('spatial_subsetting').get('max_lon', None)
-        new_val_run.scaling_method = validated_data.get('scaling').get('method', None)
-        for metric in validated_data.get('metrics'):
-            if metric.get('id') == 'tcol':
-                new_val_run.tcol = metric.get('value')
 
         with transaction.atomic():
+            # prepare ValidationRun model
+            new_val_run = ValidationRun(start_time=timezone.now())
+            new_val_run.interval_from = validated_data.get('validation_period').get('interval_from', None)
+            new_val_run.interval_to = validated_data.get('validation_period').get('interval_to', None)
+            new_val_run.anomalies = validated_data.get('anomalies').get('method')
+            new_val_run.anomalies_from = validated_data.get('anomalies').get('anomalies_from', None)
+            new_val_run.anomalies_to = validated_data.get('anomalies').get('anomalies_to', None)
+            new_val_run.min_lat = validated_data.get('spatial_subsetting').get('min_lat', None)
+            new_val_run.min_lon = validated_data.get('spatial_subsetting').get('min_lon', None)
+            new_val_run.max_lat = validated_data.get('spatial_subsetting').get('max_lat', None)
+            new_val_run.max_lon = validated_data.get('spatial_subsetting').get('max_lon', None)
+            new_val_run.scaling_method = validated_data.get('scaling').get('method', None)
+
+            for metric in validated_data.get('metrics'):
+                if metric.get('id') == 'tcol':
+                    new_val_run.tcol = metric.get('value')
+
+            new_val_run.save()
+
+            # prepare DatasetConfiguration models
+            reference_config = None
+            dataset_config_models = []
+            configs_to_save = [validated_data.get('reference_config')]
+            configs_to_save.extend(validated_data.get('dataset_configs'))
+            for config in configs_to_save:
+                config_model = DatasetConfiguration.objects.create(validation=new_val_run,
+                                                                   dataset_id=config.get('dataset_id'),
+                                                                   version_id=config.get('version_id'),
+                                                                   variable_id=config.get('variable_id'))
+                config_model.save()
+                filter_models = []
+                for filter_id in config.get('basic_filters'):
+                    filter_models.append(DataFilter.objects.get(id=filter_id))
+
+                for filter_model in filter_models:
+                    config_model.filters.add(filter_model)
+                config_model.save()
+                dataset_config_models.append(config_model)
+
+            new_val_run.reference_configuration = dataset_config_models[0]
             new_val_run.save()
 
         return new_val_run
