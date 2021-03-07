@@ -1,4 +1,6 @@
+from django.db import transaction
 from django.http import JsonResponse
+from django.utils import timezone
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -13,6 +15,8 @@ def start_validation(request):
     print(request.data)
     ser = NewValidationSerializer(data=request.data)
     ser.is_valid(raise_exception=True)
+    ser.save(user=request.user)
+
     return JsonResponse('{}', status=status.HTTP_200_OK, safe=False)
 
 
@@ -46,10 +50,10 @@ class SpatialSubsetSerializer(serializers.Serializer):
     def create(self, validated_data):
         pass
 
-    min_lat = serializers.FloatField(required=False)
-    min_lon = serializers.FloatField(required=False)
-    max_lat = serializers.FloatField(required=False)
-    max_lon = serializers.FloatField(required=False)
+    min_lat = serializers.FloatField(required=False, default=34.0)
+    min_lon = serializers.FloatField(required=False, default=-11.2)
+    max_lat = serializers.FloatField(required=False, default=71.6)
+    max_lon = serializers.FloatField(required=False, default=48.3)
 
 
 class SpatialSubsetDto(Dto):
@@ -165,7 +169,26 @@ class NewValidationSerializer(serializers.Serializer):
         pass
 
     def create(self, validated_data):
-        pass
+        new_val_run = ValidationRun(start_time=timezone.now())
+
+        new_val_run.interval_from = validated_data.get('validation_period').get('interval_from', None)
+        new_val_run.interval_to = validated_data.get('validation_period').get('interval_to', None)
+        new_val_run.anomalies = validated_data.get('anomalies').get('method')
+        new_val_run.anomalies_from = validated_data.get('anomalies').get('anomalies_from', None)
+        new_val_run.anomalies_to = validated_data.get('anomalies').get('anomalies_to', None)
+        new_val_run.min_lat = validated_data.get('spatial_subsetting').get('min_lat', None)
+        new_val_run.min_lon = validated_data.get('spatial_subsetting').get('min_lon', None)
+        new_val_run.max_lat = validated_data.get('spatial_subsetting').get('max_lat', None)
+        new_val_run.max_lon = validated_data.get('spatial_subsetting').get('max_lon', None)
+        new_val_run.scaling_method = validated_data.get('scaling').get('method', None)
+        for metric in validated_data.get('metrics'):
+            if metric.get('id') == 'tcol':
+                new_val_run.tcol = metric.get('value')
+
+        with transaction.atomic():
+            new_val_run.save()
+
+        return new_val_run
 
     dataset_configs = DatasetConfigSerializer(many=True, required=True)
     reference_config = DatasetConfigSerializer(required=True)
