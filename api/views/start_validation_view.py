@@ -33,15 +33,6 @@ class DatasetConfigSerializer(serializers.Serializer):
     basic_filters = serializers.ListField(child=serializers.IntegerField(), required=True)
 
 
-class DatasetConfigDto(Dto):
-    def __init__(self, **kwargs):
-        attributes = {'dataset_id', 'version_id', 'variable_id', 'basic_filters'}
-        self.__create_attrs__(attributes)
-        for key, value in kwargs.items():
-            if key in attributes:
-                setattr(self, key, value)
-
-
 # Spatial subsetting DTO and serializer
 class SpatialSubsetSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
@@ -56,15 +47,6 @@ class SpatialSubsetSerializer(serializers.Serializer):
     max_lon = serializers.FloatField(required=False, default=48.3)
 
 
-class SpatialSubsetDto(Dto):
-    def __init__(self, **kwargs):
-        attributes = {'min_lat', 'min_lon', 'max_lat', 'max_lon'}
-        self.__create_attrs__(attributes)
-        for key, value in kwargs.items():
-            if key in attributes:
-                setattr(self, key, value)
-
-
 # Validation period DTO and serializer
 class ValidationPeriodSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
@@ -77,15 +59,6 @@ class ValidationPeriodSerializer(serializers.Serializer):
     interval_to = serializers.DateTimeField(required=False)
 
 
-class ValidationPeriodDto(Dto):
-    def __init__(self, **kwargs):
-        attributes = {'interval_from', 'interval_to'}
-        self.__create_attrs__(attributes)
-        for key, value in kwargs.items():
-            if key in attributes:
-                setattr(self, key, value)
-
-
 # Metrics DTO and serializer
 class MetricsSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
@@ -96,15 +69,6 @@ class MetricsSerializer(serializers.Serializer):
 
     id = serializers.CharField(required=True)
     value = serializers.BooleanField(required=True)
-
-
-class MetricsDto(Dto):
-    def __init__(self, **kwargs):
-        attributes = {'id', 'value'}
-        self.__create_attrs__(attributes)
-        for key, value in kwargs.items():
-            if key in attributes:
-                setattr(self, key, value)
 
 
 # Anomalies DTO and serializer
@@ -120,15 +84,6 @@ class AnomaliesSerializer(serializers.Serializer):
     anomalies_to = serializers.DateTimeField(required=False)
 
 
-class AnomaliesDto(Dto):
-    def __init__(self, **kwargs):
-        attributes = {'method', 'anomalies_from', 'anomalies_to'}
-        self.__create_attrs__(attributes)
-        for key, value in kwargs.items():
-            if key in attributes:
-                setattr(self, key, value)
-
-
 # Scaling DTO and serializer
 class ScalingSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
@@ -139,29 +94,6 @@ class ScalingSerializer(serializers.Serializer):
 
     method = serializers.ChoiceField(choices=ValidationRun.SCALING_METHODS, required=True)
     scale_to = serializers.ChoiceField(choices=ValidationRun.SCALE_TO_OPTIONS, required=True)
-
-
-class ScalingDto(Dto):
-    def __init__(self, **kwargs):
-        attributes = {'method', 'scale_to'}
-        self.__create_attrs__(attributes)
-        for key, value in kwargs.items():
-            if key in attributes:
-                setattr(self, key, value)
-
-
-# New validation DTO that wraps the other DTOs
-class NewValidationDto(Dto):
-    """
-    New validation run DTO with the necessary model fields
-    """
-
-    def __init__(self, **kwargs):
-        attributes = {'dataset_configs', 'reference_config', 'spatial_subsetting', 'validation_period', 'metrics'}
-        self.__create_attrs__(attributes)
-        for key, value in kwargs.items():
-            if key in attributes:
-                setattr(self, key, value)
 
 
 class NewValidationSerializer(serializers.Serializer):
