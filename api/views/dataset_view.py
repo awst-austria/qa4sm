@@ -10,22 +10,10 @@ from validator.models import Dataset
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def dataset(request):
-    # dataset_id = request.query_params.get('dataset', None)
-    # datasets = []
-    # # get single dataset
-    # if dataset_id:
-    #     pass
-    # # get all datasets
-    # else:
-    #     pass
-    #
-    # if request.user.is_superuser:
-    #     print('super')
-
     datasets = Dataset.objects.all()
     serializer = DatasetSerializer(datasets, many=True)
     print(serializer.data)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK,safe=False)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
