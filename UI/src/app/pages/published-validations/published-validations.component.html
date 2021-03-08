@@ -6,11 +6,7 @@
   </p>
 </div>
 <div class="container" >
-<!--  <div *ngFor="let dataset of datasets">{{dataset.pretty_name}}</div>-->
   <div *ngFor="let valrun of publishedValidation$|async">
-    <qa-validationrun-row [published]="true" [valrun]="valrun" [allDatasets]="datasets" [allVersions]="versions"
-                          [allVariables]="variables">
-
-    </qa-validationrun-row>
+    <qa-validationrun-row [published]="true" [validationRun]="valrun"></qa-validationrun-row>
   </div>
 </div>
