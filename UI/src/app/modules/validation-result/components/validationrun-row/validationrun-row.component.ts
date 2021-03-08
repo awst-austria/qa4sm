@@ -1,13 +1,12 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ValidationrunService} from '../../services/validationrun.service';
 import {ValidationrunDto} from '../../services/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
-import {ValidationConfigurationModel} from './validation-configuration-model';
-import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
-import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
-import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
+import {ValidationRunRowModel} from './validation-configuration-model';
 import {DatasetRowModel} from './dataset-row.model';
+import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
+import {DatasetVersionService} from 'src/app/modules/core/services/dataset/dataset-version.service';
+import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 
 
 @Component({
@@ -17,52 +16,42 @@ import {DatasetRowModel} from './dataset-row.model';
 })
 export class ValidationrunRowComponent implements OnInit {
 
-  validationDatasetsConfigurations: ValidationConfigurationModel[] = [];
-  validationReferenceConfiguration: ValidationConfigurationModel[] = []; // this array will always contain exactly 1 element
-  datasets?: any;
-
   @Input() published: boolean = false;
-  @Input() valrun: ValidationrunDto;
-  @Input() allDatasets: DatasetDto[];
-  @Input() allVersions: DatasetVersionDto[];
-  @Input() allVariables: DatasetVariableDto[];
-  // @Input()  allVersions: DatasetVersionDto[] = [];
+  @Input() validationRun: ValidationrunDto;
 
-  constructor(private validationrunService: ValidationrunService,
-              private configurationService: DatasetConfigurationService,
+  model: ValidationRunRowModel;
+
+  constructor(private datasetConfigService: DatasetConfigurationService,
+              private datasetService: DatasetService,
+              private datasetVersionService: DatasetVersionService,
+              private datasetVariableService: DatasetVariableService,
               private globalParamsService: GlobalParamsService) {
   }
 
   ngOnInit(): void {
-    this.addDatasetToList();
+    this.model = new ValidationRunRowModel(this.validationRun, [], new DatasetRowModel());
+    this.loadRowData();
+    console.log(this.model)
+  }
+
+  private loadRowData() {
+    this.datasetConfigService.getConfigByValidationrun(this.model.validationRun.id).subscribe(configs => {
+      configs.forEach(config => {
+        let dataset$ = this.datasetService.getDatasetById(config.dataset);
+        let datasetVersion$ = this.datasetVersionService.getVersionById(config.version);
+        let datasetVariable$ = this.datasetVariableService.getVariableById(config.variable);
+        let datasetRowModel = new DatasetRowModel(dataset$, datasetVersion$, datasetVariable$);
+
+        if (this.model.validationRun.reference_configuration === config.id) {
+          this.model.referenceRow = datasetRowModel;
+        } else {
+          this.model.datasetRows.push(datasetRowModel);
+        }
+      });
+    });
   }
 
   getDoiPrefix(): string {
     return this.globalParamsService.globalContext.doi_prefix;
-  }
-
-  addDatasetToList() {
-    this.getValidationConfiguration(this.validationDatasetsConfigurations, this.validationReferenceConfiguration);
-  }
-
-  private getValidationConfiguration(targetDatasetArray: ValidationConfigurationModel[],
-                                     targetReferenceArray: ValidationConfigurationModel[]) {
-
-    this.configurationService.getConfigByValidationrun(this.valrun.id).subscribe(configs => {
-      configs.forEach(config => {
-        let datasetModel = new DatasetRowModel(null, null, null );
-        let model = new ValidationConfigurationModel(datasetModel, false);
-        model.isReference = config.id === this.valrun.reference_configuration;
-        model.datasetConfig.selectedDataset = this.allDatasets.find(value => value.id === config.dataset);
-        model.datasetConfig.selectedVersion = this.allVersions.find(value => value.id === config.version);
-        model.datasetConfig.selectedVariable = this.allVariables.find(value => value.id === config.variable);
-        if (!model.isReference){
-          targetDatasetArray.push(model);
-        } else {
-          targetReferenceArray.push(model);
-        }
-
-      });
-    });
   }
 }

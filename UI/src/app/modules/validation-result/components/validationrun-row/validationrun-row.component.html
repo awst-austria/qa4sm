@@ -1,33 +1,33 @@
 <p-panel *ngIf="published">
     <ng-template pTemplate="header">
-      <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ valrun.name_tag }}</h5>
+      <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
     </ng-template>
     <ng-template pTemplate="icons" class="doilink">
-      <h5 class="my-0"> DOI: <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ valrun.doi }}">{{ valrun.doi }}</a></h5>
+      <h5 class="my-0"> DOI: <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ model.validationRun.doi }}">{{ model.validationRun.doi }}</a></h5>
     </ng-template>
     <div class="p-grid">
       <div class="p-col-4">
         <strong>Data:</strong><br/>
-        <span *ngFor="let config of validationDatasetsConfigurations">
-              {{config.datasetConfig.selectedDataset?.pretty_name}},
-              {{config.datasetConfig.selectedVersion?.pretty_name}},
-              {{config.datasetConfig.selectedVariable?.pretty_name}} <br>
+        <span *ngFor="let datasetRowModel of model.datasetRows">
+          {{(datasetRowModel.dataset$|async)?.pretty_name}},
+          {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
+          {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
         </span>
 
       </div>
 
       <div class="p-col-4">
         <strong>Reference:</strong><br/>
-        <span *ngFor="let config of validationReferenceConfiguration">
-            {{config.datasetConfig.selectedDataset?.pretty_name}},
-            {{config.datasetConfig.selectedVersion?.pretty_name}},
-            {{config.datasetConfig.selectedVariable?.pretty_name}}
+        <span>
+          {{(model.referenceRow.dataset$|async)?.pretty_name}},
+          {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
+          {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
         </span>
       </div>
 
       <div class="p-col-2" style="max-width: 7rem;">
         <strong>Created:</strong><br/>
-        {{ valrun.start_time|date:"YYYY-MM-dd" }}
+        {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
       </div>
     </div>
 </p-panel>
