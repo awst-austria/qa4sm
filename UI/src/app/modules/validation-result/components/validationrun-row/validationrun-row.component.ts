@@ -31,7 +31,6 @@ export class ValidationrunRowComponent implements OnInit {
   ngOnInit(): void {
     this.model = new ValidationRunRowModel(this.validationRun, [], new DatasetRowModel());
     this.loadRowData();
-    console.log(this.model)
   }
 
   private loadRowData() {
