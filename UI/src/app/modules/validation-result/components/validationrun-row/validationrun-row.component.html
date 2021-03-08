@@ -32,6 +32,37 @@
     </div>
 </p-panel>
 
+<!-- Custom validations-->
 <p-panel *ngIf="!published">
-  There is still a lot of stuff to do!
+  <ng-template pTemplate="header">
+    <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+  </ng-template>
+  <ng-template pTemplate="icons" class="doilink">
+    <h5 class="my-0"> <span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+  </ng-template>
+  <div class="p-grid">
+    <div class="p-col-4">
+      <strong>Data:</strong><br/>
+      <span *ngFor="let datasetRowModel of model.datasetRows">
+          {{(datasetRowModel.dataset$|async)?.pretty_name}},
+        {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
+        {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
+        </span>
+
+    </div>
+
+    <div class="p-col-4">
+      <strong>Reference:</strong><br/>
+      <span>
+          {{(model.referenceRow.dataset$|async)?.pretty_name}},
+        {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
+        {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
+        </span>
+    </div>
+
+    <div class="p-col-2" style="max-width: 7rem;">
+      <strong>Status:</strong><br/>
+      {{ getStatusFromProgress(validationRun)}}
+    </div>
+  </div>
 </p-panel>

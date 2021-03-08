@@ -54,4 +54,18 @@ export class ValidationrunRowComponent implements OnInit {
   getDoiPrefix(): string {
     return this.globalParamsService.globalContext.doi_prefix;
   }
+
+  getStatusFromProgress(valrun): string {
+    let status: string;
+    if (valrun.progress === 0 && valrun.end_time === null) {
+      status = 'Scheduled';
+    } else if (valrun.progress === 100 && valrun.end_time){
+      status = 'Done';
+    } else if (valrun.progress === -1) {
+      status = 'Cancelled';
+    } else if (valrun.end_time != null) {
+      status = 'ERROR';
+    }
+    return status;
+  }
 }

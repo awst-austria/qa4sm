@@ -17,6 +17,7 @@ export class ValidationrunService {
 
   constructor(private httpClient: HttpClient) {
     this.publishedValidationrun$ = this.httpClient.get<ValidationrunDto[]>(publishedValidationRunUrl);
+    this.customValidationrun$ = this.httpClient.get<ValidationrunDto[]>(customValidationRunUrl);
   }
 
   getPublishedValidationruns(): Observable<ValidationrunDto[]>{
