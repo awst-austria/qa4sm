@@ -34,7 +34,7 @@ import {InputTextModule} from 'primeng/inputtext';
 import {FilterModule} from './modules/filter/filter.module';
 import {ToastModule} from 'primeng/toast';
 import {MessageService} from 'primeng/api';
-import { PublishedValidationsComponent } from './pages/published-validations/published-validations.component';
+import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationResultModule} from './modules/validation-result/validation-result.module';
 import {SpatialSubsetModule} from './modules/spatial-subset/spatial-subset.module';
 import {CarouselModule} from 'primeng/carousel';
@@ -42,7 +42,7 @@ import {ValidationPeriodModule} from './modules/validation-period/validation-per
 import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
-
+import {JwPaginationModule} from 'jw-angular-pagination';
 
 
 @NgModule({
@@ -55,7 +55,8 @@ import {ScalingModule} from './modules/scaling/scaling.module';
     ValidationComponent,
     LoginComponent,
     UserProfileComponent,
-    PublishedValidationsComponent
+    PublishedValidationsComponent,
+    // JwPaginationComponent
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -86,7 +87,7 @@ import {ScalingModule} from './modules/scaling/scaling.module';
     MetricsModule,
     AnomaliesModule,
     ScalingModule,
-
+    JwPaginationModule
 
   ],
   providers: [

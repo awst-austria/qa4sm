@@ -1,24 +1,29 @@
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.serializers import ModelSerializer
 
 from validator.models import DatasetVersion, Dataset
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def dataset_version(request):
     dataset_id = request.query_params.get('dataset', None)
+    version_id = request.query_params.get('version_id', None)
     # # get single dataset
-    if dataset_id:
-        versions = Dataset.objects.get(id=dataset_id).versions
-    # get all datasets
+    if version_id:
+        version = DatasetVersion.objects.get(id=version_id)
+        serializer = DatasetVersionSerializer(version)
     else:
-        versions = DatasetVersion.objects.all()
+        if dataset_id:
+            versions = Dataset.objects.get(id=dataset_id).versions
+        # get all datasets
+        else:
+            versions = DatasetVersion.objects.all()
 
-    serializer = DatasetVersionSerializer(versions, many=True)
+        serializer = DatasetVersionSerializer(versions, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 

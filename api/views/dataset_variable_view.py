@@ -11,15 +11,18 @@ from validator.models import DatasetVersion, Dataset, DataVariable
 @permission_classes([IsAuthenticated])
 def dataset_variable(request):
     dataset_id = request.query_params.get('dataset', None)
+    variable_id = request.query_params.get('variable_id', None)
 
-    # # get single dataset
-    if dataset_id:
-        variables = Dataset.objects.get(id=dataset_id).variables
-    # get all datasets
+    if variable_id:
+        variable = DataVariable.objects.get(id=variable_id)
+        serializer = DatasetVariableSerializer(variable)
     else:
-        variables = DataVariable.objects.all()
+        if dataset_id:
+            variables = Dataset.objects.get(id=dataset_id).variables
+        else:
+            variables = DataVariable.objects.all()
 
-    serializer = DatasetVariableSerializer(variables, many=True)
+        serializer = DatasetVariableSerializer(variables, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 

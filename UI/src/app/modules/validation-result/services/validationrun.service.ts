@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ValidationrunDto} from './validationrun.dto';
 import {Observable} from 'rxjs';
@@ -17,6 +17,7 @@ export class ValidationrunService {
 
   constructor(private httpClient: HttpClient) {
     this.publishedValidationrun$ = this.httpClient.get<ValidationrunDto[]>(publishedValidationRunUrl);
+    this.customValidationrun$ = this.httpClient.get<ValidationrunDto[]>(customValidationRunUrl);
   }
 
   getPublishedValidationruns(): Observable<ValidationrunDto[]>{
@@ -28,5 +29,4 @@ export class ValidationrunService {
     this.customValidationrun$ = this.httpClient.get<ValidationrunDto[]>(customValidationRunUrl);
     return  this.customValidationrun$;
   }
-
 }

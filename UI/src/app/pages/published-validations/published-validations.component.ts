@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {ValidationrunDto} from '../../modules/validation-result/services/validationrun.dto';
 import {ValidationrunService} from '../../modules/validation-result/services/validationrun.service';
@@ -11,10 +11,10 @@ import {ValidationrunService} from '../../modules/validation-result/services/val
 export class PublishedValidationsComponent implements OnInit {
   publishedValidation$: Observable<ValidationrunDto[]>;
 
-  constructor(private validationrunService: ValidationrunService) { }
+  constructor(private validationrunService: ValidationrunService) {
+  }
 
   ngOnInit(): void {
     this.publishedValidation$ = this.validationrunService.getPublishedValidationruns();
   }
-
 }
