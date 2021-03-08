@@ -63,15 +63,16 @@ def _get_reference_reader(val_run):
     ref_reader = create_reader(val_run.reference_configuration.dataset, val_run.reference_configuration.version)
 
     # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
-    ref_reader = setup_filtering(ref_reader, list(val_run.reference_configuration.filters.all()),\
-                                 list(val_run.reference_configuration.parametrisedfilter_set.all()),\
-                                 val_run.reference_configuration.dataset, val_run.reference_configuration.variable)
+    ref_reader = setup_filtering(
+        ref_reader,
+        list(val_run.reference_configuration.filters.all()),
+        list(val_run.reference_configuration.parametrisedfilter_set.all()),
+        val_run.reference_configuration.dataset,
+        val_run.reference_configuration.variable
+    )
+    
     while(hasattr(ref_reader, 'cls')):
         ref_reader = ref_reader.cls
-
-    if not isinstance(ref_reader, ISMN_Interface):
-        global METADATA_TEMPLATE
-        METADATA_TEMPLATE = None
 
     return ref_reader
 
@@ -191,6 +192,7 @@ def create_pytesmo_validation(validation_run):
         if ((validation_run.reference_configuration) and
             (dataset_config.id == validation_run.reference_configuration.id)):
             ref_name = dataset_name
+            ref_reader = reader
         if ((validation_run.scaling_ref) and
             (dataset_config.id == validation_run.scaling_ref.id)):
             scaling_ref_name = dataset_name
@@ -208,17 +210,23 @@ def create_pytesmo_validation(validation_run):
     datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
+    # set value of the metadata template according to what reference dataset is used
+    if isinstance(ref_reader, ISMN_Interface):
+        metadata_template = METADATA_TEMPLATE['ismn_ref']
+    else:
+        metadata_template = METADATA_TEMPLATE['other_ref']
+
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         # if there are 3 or more dataset, do TC, exclude ref metrics
         metrics = TCMetrics(
                     dataset_names=ds_names, tc_metrics_for_ref=False,
                     other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
-                    metadata_template = METADATA_TEMPLATE)
+                    metadata_template = metadata_template)
     else:
         metrics = IntercomparisonMetrics(
                         dataset_names=ds_names,
                         other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
-                        metadata_template = METADATA_TEMPLATE)
+                        metadata_template = metadata_template)
 
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None

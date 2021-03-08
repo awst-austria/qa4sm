@@ -15,7 +15,7 @@ from validator.tests.testutils import set_dataset_paths
 
 import shutil
 
-def cleanup(ISMN_storage_path):
+def cleanup_metadata(ISMN_storage_path):
     # clean existing metadata; needed in case changes are made to the ismn reader
     paths_to_metadata = ISMN_storage_path.glob('**/python_metadata')
     for path in paths_to_metadata:
@@ -46,7 +46,7 @@ class TestHacks(TestCase):
         self.assertTrue((not hasattr(data.index, 'tz')) or (data.index.tz is None))
 
         ismn_storage_path = Path(Dataset.objects.get(short_name='ISMN').storage_path)
-        cleanup(ismn_storage_path)
+        cleanup_metadata(ismn_storage_path)
 
         ismn_data_folder = ismn_storage_path.joinpath('ISMN_V20191211')
         ismn_reader = ISMN_Interface(ismn_data_folder)

@@ -1,4 +1,4 @@
-import numpy as  np
+import numpy as np
 import pandas as pd
 
 from ismn.interface import ISMN_Interface
@@ -97,7 +97,12 @@ def create_jobs(validation_run, ref_reader):
     elif isinstance(ref_reader, ISMN_Interface):
         depth_from, depth_to = get_depths_params(validation_run.reference_configuration.parametrisedfilter_set.all())
 
-        ids = ref_reader.get_dataset_ids(variable=validation_run.reference_configuration.variable.pretty_name, min_depth=depth_from, max_depth=depth_to, groupby='network')
+        ids = ref_reader.get_dataset_ids(
+            variable=validation_run.reference_configuration.variable.pretty_name,
+            min_depth=depth_from,
+            max_depth=depth_to,
+            groupby='network'
+        )
 
         def reshape_meta(meta):
             reshaped = {}
