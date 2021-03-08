@@ -1,0 +1,61 @@
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {shareReplay} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {environment} from '../../../../../environments/environment';
+import {DatasetVariableDto} from './dataset-variable.dto';
+import {DataCache} from '../../tools/DataCache';
+
+const DATASET_VARIABLE_URL: string = environment.API_URL + 'api/dataset-variable';
+const CACHE_KEY_ALL_VERSIONS = -1;
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DatasetVariableService {
+
+  //cache for dataset arrays
+  arrayRequestCache = new DataCache<Observable<DatasetVariableDto[]>>(5);
+  //cache for single dataset dtos
+  singleRequestCache = new DataCache<Observable<DatasetVariableDto>>(5);
+
+
+  constructor(private httpClient: HttpClient) {
+  }
+
+  getAllVersions(): Observable<DatasetVariableDto[]> {
+    if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_VERSIONS)) {
+      return this.arrayRequestCache.get(CACHE_KEY_ALL_VERSIONS);
+    } else {
+      let datasetVariables$ = this.httpClient.get<DatasetVariableDto[]>(DATASET_VARIABLE_URL).pipe(shareReplay());
+      this.arrayRequestCache.push(CACHE_KEY_ALL_VERSIONS, datasetVariables$);
+      return datasetVariables$;
+    }
+
+  }
+
+  getVariablesByDataset(datasetId: number): Observable<DatasetVariableDto[]> {
+    if (this.arrayRequestCache.isCached(datasetId)) {
+      return this.arrayRequestCache.get(datasetId);
+    } else {
+      let params = new HttpParams().set('dataset', String(datasetId));
+      let datasetVariables$ = this.httpClient.get<DatasetVariableDto[]>(DATASET_VARIABLE_URL, {params: params}).pipe(shareReplay());
+      this.arrayRequestCache.push(datasetId, datasetVariables$);
+      return datasetVariables$;
+    }
+  }
+
+  getVariableById(variableId: number): Observable<DatasetVariableDto> {
+    //simplified implementation for demo purposes
+    if (this.singleRequestCache.isCached(variableId)) {
+      return this.singleRequestCache.get(variableId);
+    } else {
+      let getURL = DATASET_VARIABLE_URL + '/' + variableId;
+      let datasetVariable$ = this.httpClient.get<DatasetVariableDto>(getURL).pipe(shareReplay());
+      this.singleRequestCache.push(variableId, datasetVariable$);
+      return datasetVariable$;
+    }
+
+  }
+}

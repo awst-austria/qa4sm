@@ -8,7 +8,7 @@ from validator.models import DatasetVersion, Dataset, DataVariable
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def dataset_variable(request):
     dataset_id = request.query_params.get('dataset', None)
     variable_id = request.query_params.get('variable_id', None)
@@ -26,6 +26,14 @@ def dataset_variable(request):
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dataset_variable_by_id(request, **kwargs):
+    ds = DataVariable.objects.get(pk=kwargs['id'])
+    serializer = DatasetVariableSerializer(ds)
+    print(serializer.data)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 class DatasetVariableSerializer(ModelSerializer):
     class Meta:

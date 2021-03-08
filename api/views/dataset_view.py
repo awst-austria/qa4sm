@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 
 from validator.models import Dataset
@@ -10,17 +10,18 @@ from validator.models import Dataset
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset(request):
-    dataset_id = request.query_params.get('dataset_id', None)
-    # datasets = []
-    # # get single dataset
-    if dataset_id:
-        dataset = Dataset.objects.get(id=dataset_id)
-        serializer = DatasetSerializer(dataset)
-    # # get all datasets
-    else:
-        datasets = Dataset.objects.all()
-        serializer = DatasetSerializer(datasets, many=True)
+    datasets = Dataset.objects.all()
+    serializer = DatasetSerializer(datasets, many=True)
+    print(serializer.data)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def dataset_by_id(request, **kwargs):
+    ds = Dataset.objects.get(pk=kwargs['id'])
+    serializer = DatasetSerializer(ds)
+    print(serializer.data)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 

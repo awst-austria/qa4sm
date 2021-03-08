@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {DatasetService} from '../../modules/dataset/services/dataset.service';
+import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
-import {DatasetVersionService} from '../../modules/dataset/services/dataset-version.service';
-import {DatasetVariableService} from '../../modules/dataset/services/dataset-variable.service';
+import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
+import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
 import {DatasetConfigModel} from './dataset-config-model';
-import {FilterService} from '../../modules/filter/services/filter.service';
+import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
@@ -83,7 +83,7 @@ export class ValidateComponent implements OnInit {
   }
 
   private updateDatasetConfigFilters(model: DatasetConfigModel) {
-    this.filterService.getFilterByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
+    this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
       model.basicFilters = [];
       model.parameterisedFilters = [];
       filters.forEach(filter => {

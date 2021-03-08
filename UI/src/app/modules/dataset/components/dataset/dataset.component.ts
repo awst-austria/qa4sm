@@ -1,13 +1,13 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DatasetService} from '../../services/dataset.service';
-import {DatasetDto} from '../../services/dataset.dto';
+import {DatasetService} from '../../../core/services/dataset/dataset.service';
+import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 
 import {Observable} from 'rxjs';
-import {DatasetVersionDto} from '../../services/dataset-version.dto';
-import {DatasetVersionService} from '../../services/dataset-version.service';
+import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
+import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetComponentSelectionModel} from './dataset-component-selection-model';
-import {DatasetVariableDto} from '../../services/dataset-variable.dto';
-import {DatasetVariableService} from '../../services/dataset-variable.service';
+import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
+import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
 import {map} from 'rxjs/operators';
 
 
