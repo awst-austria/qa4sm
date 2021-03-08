@@ -4,9 +4,9 @@ import {ValidationrunDto} from '../../services/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
 import {ValidationConfigurationModel} from './validation-configuration-model';
-import {DatasetDto} from '../../../dataset/services/dataset.dto';
-import {DatasetVersionDto} from '../../../dataset/services/dataset-version.dto';
-import {DatasetVariableDto} from '../../../dataset/services/dataset-variable.dto';
+import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
+import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
+import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
 import {DatasetRowModel} from './dataset-row.model';
 
 

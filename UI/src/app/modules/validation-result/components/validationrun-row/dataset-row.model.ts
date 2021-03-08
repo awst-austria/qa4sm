@@ -1,6 +1,6 @@
-import {DatasetDto} from '../../../dataset/services/dataset.dto';
-import {DatasetVersionDto} from '../../../dataset/services/dataset-version.dto';
-import {DatasetVariableDto} from '../../../dataset/services/dataset-variable.dto';
+import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
+import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
+import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
 
 export class DatasetRowModel{
   constructor(public selectedDataset: DatasetDto,

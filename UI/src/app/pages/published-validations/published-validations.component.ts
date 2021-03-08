@@ -2,9 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {ValidationrunDto} from '../../modules/validation-result/services/validationrun.dto';
 import {ValidationrunService} from '../../modules/validation-result/services/validationrun.service';
-import {DatasetDto} from '../../modules/dataset/services/dataset.dto';
-import {DatasetVersionDto} from '../../modules/dataset/services/dataset-version.dto';
-import {DatasetVariableDto} from '../../modules/dataset/services/dataset-variable.dto';
+import {DatasetDto} from '../../modules/core/services/dataset/dataset.dto';
+import {DatasetVersionDto} from '../../modules/core/services/dataset/dataset-version.dto';
+import {DatasetVariableDto} from '../../modules/core/services/dataset/dataset-variable.dto';
 
 @Component({
   selector: 'qa-published-validations',
@@ -29,6 +29,6 @@ export class PublishedValidationsComponent implements OnInit {
   getDatasetsInfo(){
     this.validationrunService.getAllDatasets(this.datasets);
     this.validationrunService.getAllVersions(this.versions);
-    this.validationrunService.getAllVariables(this.variables);
+    // this.validationrunService.getAllVariables(this.variables);
   }
 }

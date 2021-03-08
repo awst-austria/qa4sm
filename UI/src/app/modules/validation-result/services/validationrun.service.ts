@@ -3,12 +3,11 @@ import {HttpClient} from '@angular/common/http';
 import {ValidationrunDto} from './validationrun.dto';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../environments/environment';
-import {DatasetDto} from '../../dataset/services/dataset.dto';
-import {DatasetVersionDto} from '../../dataset/services/dataset-version.dto';
-import {DatasetVariableDto} from '../../dataset/services/dataset-variable.dto';
-import {DatasetService} from '../../dataset/services/dataset.service';
-import {DatasetVersionService} from '../../dataset/services/dataset-version.service';
-import {DatasetVariableService} from '../../dataset/services/dataset-variable.service';
+import {DatasetDto} from '../../core/services/dataset/dataset.dto';
+import {DatasetVersionDto} from '../../core/services/dataset/dataset-version.dto';
+import {DatasetService} from '../../core/services/dataset/dataset.service';
+import {DatasetVersionService} from '../../core/services/dataset/dataset-version.service';
+import {DatasetVariableService} from '../../core/services/dataset/dataset-variable.service';
 
 const publishedValidationRunUrl: string = environment.API_URL + 'api/published-results';
 const customValidationRunUrl: string = environment.API_URL + 'api/my-results';
@@ -54,12 +53,12 @@ export class ValidationrunService {
     });
   }
 
-  getAllVariables(targetArray: DatasetVariableDto[]) {
-    this.datasetVariableService.getAllVariables().subscribe(variables => {
-      variables.forEach(variable => {
-        targetArray.push(variable);
-      });
-    });
-  }
+  // getAllVariables(targetArray: DatasetVariableDto[]) {
+  //   this.datasetVariableService.getAllVariables().subscribe(variables => {
+  //     variables.forEach(variable => {
+  //       targetArray.push(variable);
+  //     });
+  //   });
+  // }
 
 }
