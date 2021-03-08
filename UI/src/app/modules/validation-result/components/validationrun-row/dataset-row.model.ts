@@ -6,6 +6,6 @@ import {Observable} from 'rxjs';
 export class DatasetRowModel {
   constructor(public dataset$?: Observable<DatasetDto>,
               public datasetVersion$?: Observable<DatasetVersionDto>,
-              public datasetVariable$?: Observable<DatasetVariableDto>,) {
+              public datasetVariable$?: Observable<DatasetVariableDto>) {
   }
 }
