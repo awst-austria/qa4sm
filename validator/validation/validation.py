@@ -192,7 +192,8 @@ def create_pytesmo_validation(validation_run):
         if ((validation_run.reference_configuration) and
             (dataset_config.id == validation_run.reference_configuration.id)):
             ref_name = dataset_name
-            ref_reader = reader
+            ref_short_name = validation_run.reference_configuration.dataset.short_name
+
         if ((validation_run.scaling_ref) and
             (dataset_config.id == validation_run.scaling_ref.id)):
             scaling_ref_name = dataset_name
@@ -211,7 +212,7 @@ def create_pytesmo_validation(validation_run):
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
     # set value of the metadata template according to what reference dataset is used
-    if isinstance(ref_reader, ISMN_Interface):
+    if ref_short_name == 'ISMN':
         metadata_template = METADATA_TEMPLATE['ismn_ref']
     else:
         metadata_template = METADATA_TEMPLATE['other_ref']
