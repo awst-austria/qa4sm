@@ -1,8 +1,10 @@
 import {DatasetRowModel} from './dataset-row.model';
+import {ValidationrunDto} from '../../services/validationrun.dto';
 
-export class ValidationConfigurationModel {
-  constructor(public datasetConfig: DatasetRowModel,
-              public isReference: boolean,
-  ){}
+
+export class ValidationRunRowModel {
+  constructor(public validationRun: ValidationrunDto,
+              public datasetRows: DatasetRowModel[] = [],
+              public referenceRow?: DatasetRowModel) {
+  }
 }
-
