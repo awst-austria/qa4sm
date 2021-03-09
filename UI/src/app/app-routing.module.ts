@@ -15,7 +15,7 @@ const routes: Routes = [
   {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard]},
-  {path: 'validation/:validationId', component: ValidationComponent, canActivate: [AuthGuard]},
+  {path: 'result/:validationId', component: ValidationComponent, canActivate: [AuthGuard]},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},

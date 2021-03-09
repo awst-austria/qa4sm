@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
-import {ValidationrunDto} from '../../modules/validation-result/services/validationrun.dto';
-import {ValidationrunService} from '../../modules/validation-result/services/validationrun.service';
+import {ValidationrunDto} from '../../modules/core/services/validation-run/validationrun.dto';
+import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 
 @Component({
   selector: 'app-validations',
@@ -11,7 +11,8 @@ import {ValidationrunService} from '../../modules/validation-result/services/val
 export class ValidationsComponent implements OnInit {
   myValidation$: Observable<ValidationrunDto[]>;
 
-  constructor(private validationrunService: ValidationrunService) { }
+  constructor(private validationrunService: ValidationrunService) {
+  }
 
   ngOnInit(): void {
     this.myValidation$ = this.validationrunService.getMyValidationruns();

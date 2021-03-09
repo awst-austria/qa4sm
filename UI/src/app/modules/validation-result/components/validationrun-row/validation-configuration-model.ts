@@ -1,5 +1,5 @@
 import {DatasetRowModel} from './dataset-row.model';
-import {ValidationrunDto} from '../../services/validationrun.dto';
+import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 
 
 export class ValidationRunRowModel {

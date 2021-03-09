@@ -16,6 +16,8 @@ import {NewValidationRunDto} from './service/new-validation-run-dto';
 import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dto';
 import {NewValidationRunService} from './service/new-validation-run.service';
 import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto';
+import {ToastService} from '../../modules/core/services/toast/toast.service';
+import {Router} from '@angular/router';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -42,7 +44,9 @@ export class ValidateComponent implements OnInit {
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
               private filterService: FilterService,
-              private newValidationService: NewValidationRunService) {
+              private newValidationService: NewValidationRunService,
+              private toastService: ToastService,
+              private router: Router) {
 
   }
 
@@ -122,7 +126,7 @@ export class ValidateComponent implements OnInit {
 
   public startValidation() {
     //debug
-    console.log(JSON.stringify(this.validationModel));
+    //console.log(JSON.stringify(this.validationModel));
 
     //prepare the dataset dtos (dataset, version, variable and filter settings)
     let datasets: NewValRunDatasetConfigDto[] = [];
@@ -145,6 +149,13 @@ export class ValidateComponent implements OnInit {
       this.validationModel.anomalies.toNewValidationRunAnomaliesDto(),
       this.validationModel.scalingModel.toNewValidationRunScalingDto());
 
-    this.newValidationService.startValidation(newValidationDto);
+    this.newValidationService.startValidation(newValidationDto).subscribe(
+      data => {
+        this.router.navigate([`result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
+      },
+      error => {
+        this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
+        console.error(error);
+      });
   }
 }
