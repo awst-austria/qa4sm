@@ -6,6 +6,7 @@ import {environment} from '../../../../../environments/environment';
 
 const publishedValidationRunUrl: string = environment.API_URL + 'api/published-results';
 const customValidationRunUrl: string = environment.API_URL + 'api/my-results';
+const validationRunsUrl: string = environment.API_URL + 'api/validation-runs';
 
 @Injectable({
   providedIn: 'root'
@@ -20,13 +21,21 @@ export class ValidationrunService {
     this.customValidationrun$ = this.httpClient.get<ValidationrunDto[]>(customValidationRunUrl);
   }
 
-  getPublishedValidationruns(): Observable<ValidationrunDto[]>{
+  getPublishedValidationruns(): Observable<ValidationrunDto[]> {
     this.publishedValidationrun$ = this.httpClient.get<ValidationrunDto[]>(publishedValidationRunUrl);
-    return  this.publishedValidationrun$;
+    return this.publishedValidationrun$;
   }
 
-  getMyValidationruns(): Observable<ValidationrunDto[]>{
+  getMyValidationruns(): Observable<ValidationrunDto[]> {
     this.customValidationrun$ = this.httpClient.get<ValidationrunDto[]>(customValidationRunUrl);
-    return  this.customValidationrun$;
+    return this.customValidationrun$;
+  }
+
+  getValidationRuns(): Observable<ValidationrunDto[]> {
+    return this.httpClient.get<ValidationrunDto[]>(validationRunsUrl);
+  }
+
+  getValidationRunById(id: string): Observable<ValidationrunDto> {
+    return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
   }
 }
