@@ -34,8 +34,7 @@ def published_results(request):
 def my_results(request):
     page = request.GET.get('page', 1)
 
-    # toDO: val_runs should be filtered by user
-    val_runs = ValidationRun.objects.all()
+    val_runs = ValidationRun.objects.filter(user=request.user)
 
     paginator = Paginator(val_runs, 10)
     try:
@@ -46,6 +45,25 @@ def my_results(request):
         paginated_runs = paginator.page(paginator.num_pages)
 
     serializer = ValidationRunSerializer(paginated_runs, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def validation_runs(request, **kwargs):
+    val_runs = ValidationRun.objects.all()
+    serializer = ValidationRunSerializer(val_runs, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def validation_run_by_id(request, **kwargs):
+    val_run = ValidationRun.objects.get(pk=kwargs['id'])
+    if val_run is None:
+        return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
+
+    serializer = ValidationRunSerializer(val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 

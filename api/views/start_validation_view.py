@@ -1,4 +1,6 @@
-from django.db import transaction
+from multiprocessing.context import Process
+
+from django.db import transaction, connections
 from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import status, serializers
@@ -7,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter
+from validator.validation import run_validation
 
 
 @api_view(['POST'])
@@ -19,6 +22,12 @@ def start_validation(request):
     new_val_run.user = request.user
     new_val_run.save()
 
+    # need to close all db connections before forking, see
+    # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
+    connections.close_all()
+
+    p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
+    p.start()
     serializer = ValidationRunSerializer(new_val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
@@ -129,6 +138,8 @@ class NewValidationSerializer(serializers.Serializer):
             reference_config = None
             dataset_config_models = []
             configs_to_save = [validated_data.get('reference_config')]
+            print('Reference config:')
+            print(configs_to_save)
             configs_to_save.extend(validated_data.get('dataset_configs'))
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,
