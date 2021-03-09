@@ -2,6 +2,9 @@ import {Injectable} from '@angular/core';
 import {environment} from '../../../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {NewValidationRunDto} from './new-validation-run-dto';
+import {ValidationrunDto} from '../../../modules/core/services/validation-run/validationrun.dto';
+import {Observable} from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 const runValidationUrl: string = environment.API_URL + 'api/run-validation';
 
@@ -17,17 +20,7 @@ export class NewValidationRunService {
 
   }
 
-  public startValidation(newValidationConfiguration: NewValidationRunDto) {
-    console.log('sending: ', JSON.stringify(newValidationConfiguration));
-    this.httpClient
-      .post(runValidationUrl, newValidationConfiguration)
-      .subscribe(
-        data => {
-          console.log(data);
-        },
-        error => {
-          console.error(error);
-        }
-      );
+  public startValidation(newValidationConfiguration: NewValidationRunDto): Observable<ValidationrunDto> {
+    return this.httpClient.post<ValidationrunDto>(runValidationUrl, newValidationConfiguration).pipe(tap(data => console.log('resp: ', data)));
   }
 }
