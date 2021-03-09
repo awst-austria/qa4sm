@@ -15,7 +15,7 @@ from validator.models import ValidationRun
 def published_results(request):
     page = request.GET.get('page', 1)
 
-    val_runs = ValidationRun.objects.exclude(doi='')
+    val_runs = ValidationRun.objects.exclude(doi='').order_by('-start_time')
 
     paginator = Paginator(val_runs, 10)
     try:
@@ -35,7 +35,7 @@ def my_results(request):
     page = request.GET.get('page', 1)
 
     # toDO: val_runs should be filtered by user
-    val_runs = ValidationRun.objects.all()
+    val_runs = ValidationRun.objects.all().order_by('-start_time')
 
     paginator = Paginator(val_runs, 10)
     try:
