@@ -17,7 +17,7 @@ def dataset(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def dataset_by_id(request, **kwargs):
     ds = Dataset.objects.get(pk=kwargs['id'])
     serializer = DatasetSerializer(ds)

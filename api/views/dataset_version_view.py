@@ -29,7 +29,7 @@ def dataset_version(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def dataset_version_by_id(request, **kwargs):
     ds = DatasetVersion.objects.get(pk=kwargs['id'])
     serializer = DatasetVersionSerializer(ds)
