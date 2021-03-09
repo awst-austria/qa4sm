@@ -1,44 +1,80 @@
 <p-panel *ngIf="published">
-    <ng-template pTemplate="header">
-      <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
-    </ng-template>
-    <ng-template pTemplate="icons" class="doilink">
-      <h5 class="my-0"> DOI: <a class="doilink" target="_blank" href="{{this.getDoiPrefix()}}{{ model.validationRun.doi }}">{{ model.validationRun.doi }}</a></h5>
-    </ng-template>
-    <div class="p-grid">
-      <div class="p-col-4">
-        <strong>Data:</strong><br/>
-        <span *ngFor="let datasetRowModel of model.datasetRows">
+  <ng-template pTemplate="header">
+    <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+  </ng-template>
+  <ng-template pTemplate="icons" class="doilink">
+    <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
+                              href="{{this.getDoiPrefix()}}{{ model.validationRun.doi }}">{{ model.validationRun.doi }}</a>
+    </h5>
+  </ng-template>
+  <div class="p-grid">
+    <div class="p-col-4">
+      <strong>Data:</strong><br/>
+      <span *ngFor="let datasetRowModel of model.datasetRows">
           {{(datasetRowModel.dataset$|async)?.pretty_name}},
-          {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
-          {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
+        {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
+        {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
         </span>
 
-      </div>
-
-      <div class="p-col-4">
-        <strong>Reference:</strong><br/>
-        <span>
-          {{(model.referenceRow.dataset$|async)?.pretty_name}},
-          {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
-          {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
-        </span>
-      </div>
-
-      <div class="p-col-2" style="max-width: 7rem;">
-        <strong>Created:</strong><br/>
-        {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
-      </div>
     </div>
+
+    <div class="p-col-4">
+      <strong>Reference:</strong><br/>
+      <span>
+          {{(model.referenceRow.dataset$|async)?.pretty_name}},
+        {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
+        {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
+        </span>
+    </div>
+
+    <div class="p-col-2" style="max-width: 7rem;">
+      <strong>Created:</strong><br/>
+      {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
+    </div>
+  </div>
 </p-panel>
 
 <!-- Custom validations-->
 <p-panel *ngIf="!published">
   <ng-template pTemplate="header">
-    <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+    <h5 class="my-0" style="float: left">
+
+      <span *ngIf="validationRun.expiry_date">
+        <label *ngIf="validationRun.is_near_expiry" class="p-panel-header-icon"
+               pTooltip="This validation will SOON be automatically removed during cleanup on
+                        {{ validationRun.expiry_date|date: dateFormat :timeZone}}."
+               tooltipPosition="bottom">
+          <span class="pi pi-exclamation-triangle expiry-icons"></span>
+        </label>
+        <label *ngIf="!validationRun.is_near_expiry" class="p-panel-header-icon"
+               pTooltip="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }}."
+               tooltipPosition="bottom">
+          <span class="pi pi-calendar expiry-icons" title=""></span>
+        </label>
+      </span>
+
+      <span *ngIf="!validationRun.expiry_date">
+        <label *ngIf="validationRun.progress === -1" class="p-panel-header-icon"
+               pTooltip="This validation was cancelled."
+               tooltipPosition="bottom">
+          <span class="pi pi-ban expiry-icons" title=""></span>
+        </label>
+        <label *ngIf="!validationRun.end_time" class="p-panel-header-icon"
+               pTooltip="This validation was cancelled."
+               tooltipPosition="bottom">
+          <span class="pi pi-ban expiry-icons" title=""></span>
+        </label>
+
+      </span>
+
+      <span class=" font-weight-normal">Started:
+        {{ validationRun.start_time|date: dateFormat :timeZone }}
+      </span>
+
+    </h5>
   </ng-template>
-  <ng-template pTemplate="icons" class="doilink">
-    <h5 class="my-0"> <span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+  <ng-template pTemplate="icons">
+    <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
   </ng-template>
   <div class="p-grid">
     <div class="p-col-4">
