@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
-import {BehaviorSubject, from, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
 import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
+import {catchError, map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +35,16 @@ export class AuthService {
 
         }
       );
+  }
+
+  public isAuthenticated(): Observable<boolean> {
+    return this.httpClient
+      .get<UserDto>(this.loginUrl).pipe(map(user => {
+        if (user != null) {
+          return true;
+        }
+        return false;
+      }), catchError(error => of(false)));
   }
 
   login(credentials: LoginDto): Subject<boolean> {
