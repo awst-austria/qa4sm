@@ -1,9 +1,13 @@
 <div class="p-grid">
   <div class="p-col-12">
     <div class="p-d-flex p-jc-center">
-      <h1>ValidationResults</h1>
+      <h1>Validation Results</h1>
+    </div>
+  </div>
+  <div class="p-col-12">
+    <div class="p-d-flex p-jc-center">
+      <p *ngIf="validationModel.validationRun|async as valRun">{{valRun.id}}</p>
     </div>
   </div>
 </div>
-<p>validation works!</p>
-<!--<input id="float-input" type="text" pInputText [(ngModel)]="validationId" readonly="true">-->
+
