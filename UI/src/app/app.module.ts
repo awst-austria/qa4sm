@@ -13,7 +13,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ErrorComponent} from './pages/error/error.component';
 
 import {ValidationsComponent} from './pages/validations/validations.component';
-import {ValidationComponent} from './pages/validation/validation.component';
+import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
 import {LoginComponent} from './pages/login/login.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
@@ -52,7 +52,7 @@ import {JwPaginationModule} from 'jw-angular-pagination';
     ValidateComponent,
     ErrorComponent,
     ValidationsComponent,
-    ValidationComponent,
+    ValidationResultComponent,
     LoginComponent,
     UserProfileComponent,
     PublishedValidationsComponent,

@@ -4,7 +4,7 @@ import {HomeComponent} from './pages/home/home.component';
 import {ValidateComponent} from './pages/validate/validate.component';
 import {ErrorComponent} from './pages/error/error.component';
 import {AuthGuard} from './auth.guard';
-import {ValidationComponent} from './pages/validation/validation.component';
+import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
 import {LoginComponent} from './pages/login/login.component';
 import {UserProfileComponent} from './pages/user-profile/user-profile.component';
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
@@ -15,7 +15,7 @@ const routes: Routes = [
   {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard]},
-  {path: 'result/:validationId', component: ValidationComponent, canActivate: [AuthGuard]},
+  {path: 'validation-result/:validationId', component: ValidationResultComponent, canActivate: [AuthGuard]},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},
