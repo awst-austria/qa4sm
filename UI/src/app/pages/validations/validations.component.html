@@ -10,6 +10,6 @@
 <div class="container" >
   <!--  <div *ngFor="let dataset of datasets">{{dataset.pretty_name}}</div>-->
   <div *ngFor="let valrun of myValidation$|async">
-    <qa-validationrun-row [published]="false" [validationRun]="valrun"></qa-validationrun-row>
+    <qa-validationrun-row [published]="false" [validationRun]="valrun"></qa-validationrun-row><br/>
   </div>
 </div>
