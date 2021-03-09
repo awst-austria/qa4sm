@@ -20,6 +20,8 @@ export class ValidationrunRowComponent implements OnInit {
   @Input() validationRun: ValidationrunDto;
 
   model: ValidationRunRowModel;
+  dateFormat = 'MMM. dd, YYYY, hh:mm a O';
+  timeZone = 'UTC';
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -67,4 +69,5 @@ export class ValidationrunRowComponent implements OnInit {
     }
     return status;
   }
+
 }
