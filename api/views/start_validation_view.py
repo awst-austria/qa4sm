@@ -3,21 +3,24 @@ from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
-from api.dto import Dto
+from api.views.validation_run_view import ResultsSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def start_validation(request):
     print(request.data)
     ser = NewValidationSerializer(data=request.data)
     ser.is_valid(raise_exception=True)
-    ser.save(user=request.user)
+    new_val_run = ser.save(user=request.user)
+    new_val_run.user = request.user
+    new_val_run.save()
 
-    return JsonResponse('{}', status=status.HTTP_200_OK, safe=False)
+    serializer = ResultsSerializer(new_val_run)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 class DatasetConfigSerializer(serializers.Serializer):
