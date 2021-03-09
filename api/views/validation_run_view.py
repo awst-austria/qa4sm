@@ -25,7 +25,7 @@ def published_results(request):
     except EmptyPage:
         paginated_runs = paginator.page(paginator.num_pages)
 
-    serializer = ResultsSerializer(paginated_runs, many=True)
+    serializer = ValidationRunSerializer(paginated_runs, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
@@ -45,11 +45,11 @@ def my_results(request):
     except EmptyPage:
         paginated_runs = paginator.page(paginator.num_pages)
 
-    serializer = ResultsSerializer(paginated_runs, many=True)
+    serializer = ValidationRunSerializer(paginated_runs, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
-class ResultsSerializer(ModelSerializer):
+class ValidationRunSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
         fields = get_fields_as_list(ValidationRun)

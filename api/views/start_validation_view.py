@@ -5,7 +5,7 @@ from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from api.views.validation_run_view import ResultsSerializer
+from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter
 
 
@@ -19,7 +19,7 @@ def start_validation(request):
     new_val_run.user = request.user
     new_val_run.save()
 
-    serializer = ResultsSerializer(new_val_run)
+    serializer = ValidationRunSerializer(new_val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
