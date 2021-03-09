@@ -7,6 +7,7 @@ import {DatasetRowModel} from './dataset-row.model';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
 import {DatasetVersionService} from 'src/app/modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
+import {fas} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -22,6 +23,7 @@ export class ValidationrunRowComponent implements OnInit {
   model: ValidationRunRowModel;
   dateFormat = 'MMM. dd, YYYY, hh:mm a O';
   timeZone = 'UTC';
+  faIcons = {faArchive: fas.faArchive};
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
