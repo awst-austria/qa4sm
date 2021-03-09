@@ -34,8 +34,7 @@ def published_results(request):
 def my_results(request):
     page = request.GET.get('page', 1)
 
-    # toDO: val_runs should be filtered by user
-    val_runs = ValidationRun.objects.all()
+    val_runs = ValidationRun.objects.filter(user=request.user)
 
     paginator = Paginator(val_runs, 10)
     try:
