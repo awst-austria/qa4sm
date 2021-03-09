@@ -12,7 +12,7 @@ import {ValidationResultModel} from './validation-result-model';
 })
 export class ValidationResultComponent implements OnInit {
   private validationId: string;
-  public validationModel: ValidationResultModel;
+  public validationModel?: ValidationResultModel;
 
   constructor(private route: ActivatedRoute,
               private validationRunService: ValidationrunService,
@@ -22,12 +22,13 @@ export class ValidationResultComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.validationId = params['validationId'];
-      let cucc = forkJoin([
+      forkJoin([
         this.validationRunService.getValidationRunById(this.validationId),
         this.datasetConfigurationService.getConfigByValidationrun(this.validationId)
-      ]);
+      ]).subscribe(valResAndConfigs => {
+        this.validationModel = new ValidationResultModel(valResAndConfigs[0], valResAndConfigs[1]);
+      });
 
-      cucc.subscribe(data => console.log(data));
 
     });
   }
