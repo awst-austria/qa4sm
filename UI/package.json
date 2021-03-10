@@ -31,6 +31,7 @@
     "bootstrap": "^4.6.0",
     "jw-angular-pagination": "^1.2.0",
     "ngx-logger": "^4.1.9",
+    "ngx-pagination": "^5.0.0",
     "primeflex": "^2.0.0",
     "primeicons": "^4.1.0",
     "primeng": "^11.2.3",
