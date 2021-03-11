@@ -42,7 +42,7 @@ import {ValidationPeriodModule} from './modules/validation-period/validation-per
 import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
-import {JwPaginationModule} from 'jw-angular-pagination';
+import {NgxPaginationModule} from 'ngx-pagination';
 
 
 @NgModule({
@@ -56,7 +56,7 @@ import {JwPaginationModule} from 'jw-angular-pagination';
     LoginComponent,
     UserProfileComponent,
     PublishedValidationsComponent,
-    // JwPaginationComponent
+
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -87,7 +87,7 @@ import {JwPaginationModule} from 'jw-angular-pagination';
     MetricsModule,
     AnomaliesModule,
     ScalingModule,
-    JwPaginationModule
+    NgxPaginationModule
 
   ],
   providers: [

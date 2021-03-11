@@ -1,15 +1,15 @@
 <div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
   <h1 class="jumbotron-heading">My validations</h1>
 
-<!--  <p *ngIf="!(myValidation$|async)" class="lead text-muted">-->
-<!--    You have not started any validations yet. Visit the <a href="{% url 'validation' %}">validation page</a>-->
-<!--    to start your own validation run.-->
-<!--  </p>-->
-
 </div>
-<div class="container" >
-  <!--  <div *ngFor="let dataset of datasets">{{dataset.pretty_name}}</div>-->
-  <div *ngFor="let valrun of myValidation$|async">
+<div class="container">
+  <div *ngFor="let valrun of validations  | paginate :
+  {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
     <qa-validationrun-row [published]="false" [validationRun]="valrun"></qa-validationrun-row>
+    <br/>
   </div>
+  <pagination-controls previousLabel="Prev"
+                       nextLabel="Next"
+                       [responsive]="true"
+                       (pageChange)="handlePageChange($event)"></pagination-controls>
 </div>

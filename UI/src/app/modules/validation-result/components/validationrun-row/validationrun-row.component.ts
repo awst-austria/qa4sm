@@ -7,6 +7,7 @@ import {DatasetRowModel} from './dataset-row.model';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
 import {DatasetVersionService} from 'src/app/modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
+import {fas} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -20,6 +21,9 @@ export class ValidationrunRowComponent implements OnInit {
   @Input() validationRun: ValidationrunDto;
 
   model: ValidationRunRowModel;
+  dateFormat = 'MMM. dd, YYYY, hh:mm a O';
+  timeZone = 'UTC';
+  faIcons = {faArchive: fas.faArchive};
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -31,7 +35,6 @@ export class ValidationrunRowComponent implements OnInit {
   ngOnInit(): void {
     this.model = new ValidationRunRowModel(this.validationRun, [], new DatasetRowModel());
     this.loadRowData();
-    console.log(this.model)
   }
 
   private loadRowData() {
@@ -68,4 +71,5 @@ export class ValidationrunRowComponent implements OnInit {
     }
     return status;
   }
+
 }
