@@ -319,7 +319,7 @@ def run_validation(validation_id):
         validation_run.total_points = total_points
         validation_run.save() # save the number of gpis before we start
 
-        __logger.debug("Jobs to run: {}".format(jobs[:-1]))
+        __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
 
         save_path = run_dir
 
