@@ -1,15 +1,3 @@
-<div class="container text-center mb-5 mt-4" style="max-width: 40rem;">
-  <h1 class="jumbotron-heading">My validations</h1>
-
-</div>
 <div class="container">
-  <div *ngFor="let valrun of validations  | paginate :
-  {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
-    <qa-validationrun-row [published]="false" [validationRun]="valrun"></qa-validationrun-row>
-    <br/>
-  </div>
-  <pagination-controls previousLabel="Prev"
-                       nextLabel="Next"
-                       [responsive]="true"
-                       (pageChange)="handlePageChange($event)"></pagination-controls>
+  <qa-validation-page-paginated [published]="false"></qa-validation-page-paginated>
 </div>
