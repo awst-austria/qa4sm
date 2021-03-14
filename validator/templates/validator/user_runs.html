@@ -154,25 +154,51 @@
                                             {% endif %}
                                         </span>
                                     {% endif %}
-                                    <div class="dropdown">
-                                        <button class="dropdownbutton">More...</button>
-                                        <div class="dropdown-content" style="text-align: left">
-                                            {% if valrun.output_file %}
-                                                <button class="btn btn-sm btn-primary btn-action" onclick="location.href='{{ valrun.output_dir_url }}graphs.zip';" title="Download all graphs"><span class="fas fa-download"></span></button>
-                                                <button class="btn btn-sm btn-primary btn-action" onclick="location.href='{{ valrun.output_file.url }}';" title="Download NetCDF"><span class="fas fa-file-download"></span></button>
-                                            {% endif %}
-                                            {% if valrun.is_unpublished %}
-                                                <span class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">
-                                                    <button class="btn btn-sm btn-primary btn-action" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
-                                                    {% if not valrun.is_archived %}
-                                                        <button class="btn btn-sm btn-primary btn-action" title="Extend lifespan" onclick="ajax_extend_result('{{ valrun.id }}', true)"><span class="fas fa-calendar-plus"></span></button>
-                                                    {% endif %}
-                                                </span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
                                 {% endif %}
                             </div>
+
+                            <div class="col-sm" style="text-align: right; max-width: 5.00rem">
+                                <div class="dropdown">
+                                    <button class="dropdownbutton" title="More Options">
+                                        <span class="fas fa-angle-double-right"> </span>
+                                    </button>
+                                    <div class="dropdown-content" style="text-align: left">
+                                        {% if valrun.output_file %}
+                                            <button class="dropdown-item"
+                                                onclick="location.href='{{ valrun.output_dir_url }}graphs.zip';"
+                                                title="Download all graphs">
+                                                <span class="fas fa-download"></span>
+                                            Download Graphs
+                                            </button>
+                                            <button class="dropdown-item"
+                                                    onclick="location.href='{{ valrun.output_file.url }}';"
+                                                    title="Download NetCDF">
+                                                    <span class="fas fa-file-download"></span>
+                                            Download NetCDF file
+                                            </button>
+                                        {% endif %}
+                                        {% if valrun.is_unpublished %}
+                                            <span class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">
+                                            <button class="dropdown-item"
+                                                    title="Remove result"
+                                                    onclick="ajax_delete_result('{{ valrun.id }}', false)">
+                                                    <span class="fas fa-times"></span>
+                                            Remove Validation Run
+                                            </button>
+                                            {% if not valrun.is_archived %}
+                                                <button class="dropdown-item"
+                                                        title="Extend lifespan"
+                                                        onclick="ajax_extend_result('{{ valrun.id }}', true)">
+                                                        <span class="fas fa-calendar-plus"></span>
+                                                Extend Life Span
+                                                </button>
+                                            {% endif %}
+                                            </span>
+                                        {% endif %}
+                                        </div>
+                                    </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

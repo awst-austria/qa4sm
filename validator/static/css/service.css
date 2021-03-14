@@ -203,17 +203,20 @@ div.ui-dialog-titlebar{
   text-align: right;
 }
 
+.dropdown {
+  position: relative;
+  background: none;
+  display: inline-block;
+}
+
 .dropdownbutton {
   background-color: inherit;
   color: black;
   padding: 8px;
   font-size: 1em;
   border: none;
-}
-.dropdown {
-  position: relative;
-  background: none;
   display: inline-block;
+  white-space: normal;
 }
 
 .dropdown-content {
