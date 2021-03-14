@@ -49,9 +49,9 @@ class CglsS1Filename(SmartFilename):
                                      delimiter=CglsS1Filename._delimiter,
                                      convert=convert)
 
-class CSarSsmTiffReader(object):
+class CglsS1TiffReader(object):
     # Reader to extract SSM time series from a yeoda data cube of
-    def __init__(self, path, grid_sampling=500):
+    def __init__(self, path, grid_sampling=500, param='1'):
 
         self.path = path
 
@@ -59,6 +59,7 @@ class CSarSsmTiffReader(object):
         self.datacube = None
         self.grid = None
         self.dc = None
+        self.param = param
 
     def _setUp(self):
         # build data cube
@@ -96,14 +97,13 @@ class CSarSsmTiffReader(object):
         df = df.set_index(df.index.get_level_values('time'))
         df = df[~df.index.duplicated(keep='last')]
 
-        return decode(df).rename(columns={'1': 'S1_SSM'})
+        return decode(df).rename(columns={'1': self.param})
 
 if __name__ == '__main__':
-    path = "/home/wolfgang/code/qa4sm/testdata/input_data/CGLS_CSAR_SSM1km/CGLS_CSAR_SSM1km_V1_1/tiff"
+    path = "/home/wolfgang/code/qa4sm/testdata/input_data/CGLS_SCATSAR_SWI1km/CGLS_SCATSAR_SWI1km_V1_0/tiff"
     str(datetime.now())
-    reader = CSarSsmTiffReader(path)
+    reader = CglsS1TiffReader(path, param='SWI')
     lon, lat = 15.8, 48.3 # 15.78112, 46.91691
     str(datetime.now())
     ts = reader.read(lon, lat)
-
     print(ts)

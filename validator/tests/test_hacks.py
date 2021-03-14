@@ -4,7 +4,7 @@ Because even (or especially?) hacks should be tested
 
 from os import path
 
-from validator.validation.input_readers.cgls_csar_ssm_readers import CSarSsmTiffReader
+from validator.validation.input_readers.cgls_s1_readers import CglsS1TiffReader
 from django.test import TestCase
 from ismn.interface import ISMN_Interface
 
@@ -23,7 +23,7 @@ class TestHacks(TestCase):
 
     def test_timezone_adapter(self):
         cgls_data_folder = path.join(Dataset.objects.get(short_name='CGLS_CSAR_SSM1km').storage_path, 'CGLS_CSAR_SSM1km_V1_1/tiff')
-        cgls_reader = CSarSsmTiffReader(cgls_data_folder)
+        cgls_reader = CglsS1TiffReader(cgls_data_folder, param='CGLS_SSM')
 
         timezone_reader = TimezoneAdapter(cgls_reader)
 

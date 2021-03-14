@@ -2,7 +2,7 @@ from os import path
 from ismn.interface import ISMN_Interface
 from validator.hacks import TimezoneAdapter
 from validator.validation import globals
-from validator.validation.input_readers.cgls_csar_ssm_readers import CSarSsmTiffReader
+from validator.validation.input_readers.cgls_s1_readers import CglsS1TiffReader
 from smos.smos_ic.interface import SMOSTs
 
 def create_reader(dataset, version):
@@ -15,8 +15,11 @@ def create_reader(dataset, version):
 
     if dataset.short_name == globals.CGLS_CSAR_SSM1km:
         cgls_1km_ssm_folder = path.join(folder_name, 'tiff')
-        reader = CSarSsmTiffReader(cgls_1km_ssm_folder, grid_sampling=500)
-        # todo:setup or not?
+        reader = CglsS1TiffReader(cgls_1km_ssm_folder, grid_sampling=500, param='CGLS_SSM')
+
+    if dataset.short_name == globals.CGLS_SCATSAR_SWI1km:
+        cgls_1km_swi_folder = path.join(folder_name, 'tiff')
+        reader = CglsS1TiffReader(cgls_1km_swi_folder, grid_sampling=500, param='CGLS_SWI')
 
     if dataset.short_name == globals.SMOS:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk':True})

@@ -91,7 +91,7 @@ class TestValidation(TestCase):
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
         data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
-        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
+        data_c.variable = DataVariable.objects.get(short_name='CGLS_SSM')
         data_c.save()
 
         ref_c = DatasetConfiguration()
@@ -117,14 +117,14 @@ class TestValidation(TestCase):
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
         data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
-        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
+        data_c.variable = DataVariable.objects.get(short_name='CGLS_SSM')
         data_c.save()
 
         other_data_c = DatasetConfiguration()
         other_data_c.validation = run
-        other_data_c.dataset = Dataset.objects.get(short_name='SMOS')
-        other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
-        other_data_c.variable = DataVariable.objects.get(short_name='SMOS_sm')
+        other_data_c.dataset = Dataset.objects.get(short_name='CGLS_SCATSAR_SWI1km')
+        other_data_c.version = DatasetVersion.objects.get(short_name='CGLS_SCATSAR_SWI1km_V1_0')
+        other_data_c.variable = DataVariable.objects.get(short_name='CGLS_SWI')
         other_data_c.save()
 
         ref_c = DatasetConfiguration()
@@ -369,6 +369,7 @@ class TestValidation(TestCase):
     @pytest.mark.filterwarnings(
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_validation_tcol(self):
+        # we cannot check S1 SWI vs SSM because one has time stamps at 00:00 and the other at 12:00 ... so we use SMOS
         run = generate_default_validation_triple_coll()
         run.user = self.testuser
 
@@ -376,7 +377,7 @@ class TestValidation(TestCase):
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+        run.interval_to = datetime(2020, 12, 31, tzinfo=UTC)
 
         run.save()
 
@@ -384,8 +385,6 @@ class TestValidation(TestCase):
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                if config.dataset.short_name == 'SMOS':
-                    config.filters.add(DataFilter.objects.get(name='FIL_SMOS_UNFROZEN'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
@@ -776,7 +775,7 @@ class TestValidation(TestCase):
                         if dataset.short_name == val.globals.ISMN:
                             data = msk_reader.read_ts(0)
                         else:
-                            data = msk_reader.read_ts(15.8, 48.3) ### austriia
+                            data = msk_reader.read_ts(15.8, 48.3)  # austria
 
                         assert data is not None
                         assert isinstance(data, pd.DataFrame)
@@ -1282,7 +1281,7 @@ class TestValidation(TestCase):
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
         data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
-        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
+        data_c.variable = DataVariable.objects.get(short_name='CGLS_SSM')
         data_c.save()
 
         is_there_one = _compare_validation_runs(run, published_runs, user)

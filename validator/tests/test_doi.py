@@ -60,7 +60,7 @@ class TestDOI(TestCase):
         data_c.validation = val
         data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
         data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
-        data_c.variable = DataVariable.objects.get(short_name='S1_SSM')
+        data_c.variable = DataVariable.objects.get(short_name='CGLS_SSM')
         data_c.save()
 
         ref_c = DatasetConfiguration()

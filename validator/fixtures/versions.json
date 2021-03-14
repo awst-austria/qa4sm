@@ -31,6 +31,17 @@
             "time_range_start": "2014-10-03",
             "time_range_end": "2020-08-31"
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 31,
+        "fields": {
+            "short_name": "CGLS_SCATSAR_SWI1km_V1_0",
+            "pretty_name": "V1.0",
+            "help_text": "CGLS S1/ASCAT SWI 1km (TIF) product",
+            "time_range_start": "2015-01-01",
+            "time_range_end": "2020-07-31"
+        }
     }
 
 ]

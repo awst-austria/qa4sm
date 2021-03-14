@@ -33,22 +33,25 @@ TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_
 ISMN = 'ISMN'
 SMOS = 'SMOS'
 CGLS_CSAR_SSM1km = 'CGLS_CSAR_SSM1km'
+CGLS_SCATSAR_SWI1km = 'CGLS_SCATSAR_SWI1km'
 
 ## dataset versions
 ISMN_V20191211 = 'ISMN_V20191211'
 SMOS_105_ASC = 'SMOS_105_ASC'
 CGLS_CSAR_SSM1km_V1_1 = 'CGLS_CSAR_SSM1km_V1_1'
+CGLS_SCATSAR_SWI1km_V1_0 = 'CGLS_SCATSAR_SWI1km_V1_0'
 
 ## dataset data variables
 ISMN_soil_moisture = 'ISMN_soil_moisture'
 SMOS_sm = 'SMOS_sm'
-CGLS_CSAR_SSM1km_ssm = 'S1_SSM'
+CGLS_CSAR_SSM1km_ssm = 'CGLS_SSM'
+CGLS_SCATSAR_SWI1km_swi = 'CGLS_SWI'
 
 
 DEFAULT_DATASET = CGLS_CSAR_SSM1km
 DEFAULT_REFERENCE = ISMN
 
-NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km]
+NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, CGLS_SCATSAR_SWI1km]
 
 IRREGULAR_GRIDS = {'SMOS': 0.25}
 
@@ -57,8 +60,7 @@ VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'm
                  'anomalies', 'anomalies_from', 'anomalies_to']
 DS_FIELDS = ['dataset', 'version']
 
-IRREGULAR_GRIDS = {'SMOS': 0.25,
-                   }
+IRREGULAR_GRIDS = {'SMOS': 0.25,}
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
