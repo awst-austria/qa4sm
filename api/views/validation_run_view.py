@@ -13,39 +13,30 @@ from validator.models import ValidationRun
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def published_results(request):
-    page = request.GET.get('page', 1)
+    limit = int(request.query_params.get('limit', None))
+    offset = int(request.query_params.get('offset', None))
 
-    val_runs = ValidationRun.objects.exclude(doi='')
+    val_runs = ValidationRun.objects.exclude(doi='').order_by('-start_time')
 
-    paginator = Paginator(val_runs, 10)
-    try:
-        paginated_runs = paginator.page(page)
-    except PageNotAnInteger:
-        paginated_runs = paginator.page(1)
-    except EmptyPage:
-        paginated_runs = paginator.page(paginator.num_pages)
+    serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+    response = {'validations': serializer.data, 'length': len(val_runs)}
 
-    serializer = ValidationRunSerializer(paginated_runs, many=True)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+    return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def my_results(request):
-    page = request.GET.get('page', 1)
+    current_user = request.user
+    limit = int(request.query_params.get('limit', None))
+    offset = int(request.query_params.get('offset', None))
 
-    val_runs = ValidationRun.objects.filter(user=request.user)
+    val_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
 
-    paginator = Paginator(val_runs, 10)
-    try:
-        paginated_runs = paginator.page(page)
-    except PageNotAnInteger:
-        paginated_runs = paginator.page(1)
-    except EmptyPage:
-        paginated_runs = paginator.page(paginator.num_pages)
+    serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+    response = {'validations': serializer.data, 'length': len(val_runs)}
 
-    serializer = ValidationRunSerializer(paginated_runs, many=True)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+    return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])

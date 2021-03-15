@@ -26,7 +26,9 @@ export class ValidationrunDto{
               public expiry_notified: boolean,
               public doi: string,
               public publishing_in_progress: boolean,
-              public tcol: boolean) {
+              public tcol: boolean,
+              public expiry_date: Date,
+              public is_near_expiry: boolean) {
   }
 }
 
