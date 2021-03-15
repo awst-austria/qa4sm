@@ -18,21 +18,41 @@
 </div>
 <!-- Rows -->
 <div class="card-deck mb-3">
-      <div class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
-        <div *ngFor="let valrun of validations  | paginate :
+  <div class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
+    <div *ngFor="let valrun of validations  | paginate :
         {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
 
-          <qa-validationrun-row [published]="false" [validationRun]="valrun"></qa-validationrun-row>
-          <br/>
-        </div>
+      <qa-validationrun-row [published]="false" [validationRun]="valrun"></qa-validationrun-row>
+      <br/>
+    </div>
 
-        <div class="p-text-center">
-          <pagination-controls class="my-pagination"
-                               previousLabel=""
-                               nextLabel=""
-                               maxSize="5"
-                               [responsive]="true"
-                               (pageChange)="handlePageChange($event)"></pagination-controls>
-        </div>
+<!--    Pagination -->
+    <pagination-template #p="paginationApi"
+                         (pageChange)="handlePageChange($event)">
+
+      <div class="p-text-center">
+        <ul class="custom-pagination custom-responsive custom-star-inserted" aria-label="Pagination">
+          <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
+            <a *ngIf="!p.isFirstPage()" (click)="p.previous()"> < </a>
+          </li>
+
+          <li  *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
+            <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value">
+              <span>{{ page.label }}</span>
+            </a>
+            <div *ngIf="p.getCurrent() === page.value">
+              <span>{{ page.label }}</span>
+            </div>
+          </li>
+
+          <li class="pagination-next" [class.disabled]="p.isLastPage()">
+            <a *ngIf="!p.isLastPage()" (click)="p.next()"> > </a>
+          </li>
+        </ul>
       </div>
+
+    </pagination-template>
+
+
+  </div>
 </div>
