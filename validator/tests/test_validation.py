@@ -19,6 +19,7 @@ from django.test.utils import override_settings
 import netCDF4
 import pytest
 from pytz import UTC
+from pygeogrids.netcdf import load_grid
 
 import numpy as np
 import pandas as pd
@@ -43,6 +44,15 @@ from django.shortcuts import get_object_or_404
 from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
 
 
+def get_global_test_grid():
+    grid = load_grid(os.path.join(os.path.dirname(__file__),
+                     '..',
+                     '..',
+                     'testdata',
+                     'input_data',
+                     'SMOS',
+                     'global_smos_grid.nc'))
+    return grid
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -885,8 +895,9 @@ class TestValidation(TestCase):
         russia_gpi2 = 777287  # qdeg: 898567
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
-            smos_reader = val.create_reader(Dataset.objects.get(short_name='SMOS'), DatasetVersion.objects.get(short_name='SMOS_105_ASC'))
-            gpis, lats, lons, cells = smos_reader.cls.grid.get_grid_points()
+
+            grid = get_global_test_grid()
+            gpis, lats, lons, cells = grid.get_grid_points()
 
 
             subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat,
@@ -900,8 +911,8 @@ class TestValidation(TestCase):
 
     def test_geographic_subsetting_shifted(self):
         ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
-        smosreader = val.create_reader(Dataset.objects.get(short_name='SMOS'), DatasetVersion.objects.get(short_name='SMOS_105_ASC'))
-        gpis, lats, lons, cells = smosreader.cls.grid.get_grid_points()
+        grid = get_global_test_grid()
+        gpis, lats, lons, cells = grid.get_grid_points()
 
 
         test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1),  # americas
