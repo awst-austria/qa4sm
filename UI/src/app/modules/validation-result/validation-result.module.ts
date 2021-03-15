@@ -8,7 +8,6 @@ import {NgxPaginationModule} from 'ngx-pagination';
 import {ValidationPagePaginatedComponent} from './components/validation-page-paginated/validation-page-paginated.component';
 import {RouterModule} from '@angular/router';
 
-
 @NgModule({
     declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent],
   exports: [
@@ -23,5 +22,6 @@ import {RouterModule} from '@angular/router';
     NgxPaginationModule,
     RouterModule
   ]
+
 })
 export class ValidationResultModule { }
