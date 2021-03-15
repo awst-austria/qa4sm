@@ -206,7 +206,7 @@ dependencies:
     - pytest-django==4.1.0
     - pytest-mpl==0.12
     - pytileproj==0.0.12
-    - qa4sm-reader==0.4
+    - qa4sm-reader==0.4.1
     - redis==3.5.3
     - regex==2020.11.13
     - repurpose==0.8
