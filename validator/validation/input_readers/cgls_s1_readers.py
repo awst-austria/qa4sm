@@ -51,7 +51,7 @@ class CglsS1Filename(SmartFilename):
 
 class CglsS1TiffReader(object):
     # Reader to extract SSM time series from a yeoda data cube of
-    def __init__(self, path, grid_sampling=500, param='1'):
+    def __init__(self, path, grid_sampling=500, param='1', drop_time=True):
 
         self.path = path
 
@@ -60,6 +60,7 @@ class CglsS1TiffReader(object):
         self.grid = None
         self.dc = None
         self.param = param
+        self.drop_time = drop_time
 
     def _setUp(self):
         # build data cube
@@ -97,7 +98,12 @@ class CglsS1TiffReader(object):
         df = df.set_index(df.index.get_level_values('time'))
         df = df[~df.index.duplicated(keep='last')]
 
-        return decode(df).rename(columns={'1': self.param})
+        df = decode(df).rename(columns={'1': self.param})
+
+        if self.drop_time:
+            df.index = df.index.normalize()
+
+        return df
 
 if __name__ == '__main__':
     path = "/home/wolfgang/code/qa4sm/testdata/input_data/CGLS_SCATSAR_SWI1km/CGLS_SCATSAR_SWI1km_V1_0/tiff"
