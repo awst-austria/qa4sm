@@ -1,0 +1,92 @@
+@import "~bootstrap/dist/css/bootstrap.css";
+
+.pagination-previous,.pagination-next{
+  display: inline-block;
+  font-weight: bold;
+}
+.custom-pagination{
+  margin-left: 0;
+  margin-bottom: 1rem;
+  color: red;
+}
+.custom-pagination::before, .custom-pagination::after {
+  content: ' ';
+  display: table; }
+
+.custom-pagination::after {
+  content: ' ';
+  display: table; }
+
+.custom-pagination::after {
+  clear: both; }
+
+.custom-pagination li {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  margin-right: 0.0625rem;
+  border-radius: 0; }
+
+.custom-pagination li {
+  display: inline-block; }
+
+.custom-pagination a, .custom-pagination button {
+  color: #0a0a0a;
+  display: block;
+  padding: 0.1875rem 0.625rem;
+  border-radius: 0; }
+
+.custom-pagination a:hover,
+.custom-pagination button:hover {
+  background: #e6e6e6; }
+
+.custom-pagination .current {
+  padding: 0.1875rem 0.625rem;
+  background: #2199e8;
+  color: #fefefe;
+  cursor: default; }
+
+.custom-pagination .disabled {
+  padding: 0.1875rem 0.625rem;
+  color: #cacaca;
+  cursor: default; }
+
+.custom-pagination .disabled:hover {
+  background: transparent; }
+
+.custom-pagination a, .custom-pagination button {
+  cursor: pointer; }
+
+.custom-pagination .pagination-previous a::before,
+.custom-pagination .pagination-previous.disabled::before {
+  display: inline-block;
+  margin-right: 0.5rem; }
+
+
+.custom-pagination .pagination-next a::after,
+.custom-pagination .pagination-next.disabled::after {
+  display: inline-block;
+  margin-left: 0.5rem; }
+
+.custom-pagination .show-for-sr {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0); }
+
+.custom-pagination .small-screen {
+  display: none; }
+
+
+
+
+
+
+
+
+
+
+
+
+

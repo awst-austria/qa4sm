@@ -1,6 +1,6 @@
 <p-panel *ngIf="published">
   <ng-template pTemplate="header">
-    <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
   </ng-template>
   <ng-template pTemplate="icons" class="doilink">
     <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
@@ -37,51 +37,37 @@
 <!-- Custom validations-->
 <p-panel *ngIf="!published">
   <ng-template pTemplate="header">
-    <h5 class="my-0" style="float: left">
+    <h5 class="my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
-        <label *ngIf="validationRun.is_near_expiry" class="p-panel-header-icon"
-               pTooltip="This validation will SOON be automatically removed during cleanup on
-                        {{ validationRun.expiry_date|date: dateFormat :timeZone}}."
-               tooltipPosition="bottom">
-          <span class="pi pi-exclamation-triangle expiry-icons"></span>
-        </label>
-        <label *ngIf="!validationRun.is_near_expiry" class="p-panel-header-icon"
-               pTooltip="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }}."
-               tooltipPosition="bottom">
-          <span class="pi pi-calendar expiry-icons" title=""></span>
-        </label>
+          <span *ngIf="validationRun.is_near_expiry" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
+                title="'This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}}."></span>
+          <span *ngIf="!validationRun.is_near_expiry" class="p-panel-header-icon pi pi-calendar expiry-icons"
+                title="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }}.">
+          </span>
       </span>
       <!--      if there is no expiry date property: -->
       <span *ngIf="!validationRun.expiry_date">
-        <label *ngIf="validationRun.progress === -1" class="p-panel-header-icon"
-               pTooltip="This validation was cancelled."
-               tooltipPosition="bottom">
-          <span class="pi pi-ban expiry-icons" title=""></span>
-        </label>
-        <label *ngIf="!validationRun.end_time && validationRun.progress === 0" class="p-panel-header-icon"
-               pTooltip="This validation is still running."
-               tooltipPosition="bottom">
-          <span class="pi pi-spin pi-spinner expiry-icons" title=""></span>
-        </label>
+          <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
+                title="This validation was cancelled."></span>
+          <span *ngIf="!validationRun.end_time && validationRun.progress === 0"
+                class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
+                title="This validation is still running."></span>
 
-        <label *ngIf="validationRun.doi" class="p-panel-header-icon"
-               pTooltip="This result has been published with zenodo. It will NOT be automatically removed during cleanup."
-               tooltipPosition="bottom">
-          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}"><span
-            class="pi pi-book expiry-icons"></span></a>
-
-        </label>
-
-        <label *ngIf="validationRun.is_archived" class="p-panel-header-icon"
-               pTooltip="This validation has been archived. It will NOT be automatically removed during cleanup."
-               tooltipPosition="bottom">
-         <fa-icon class="expiry-icons" [icon]="faIcons.faArchive"></fa-icon>
-        </label>
+          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}">
+            <span *ngIf="validationRun.doi" class="p-panel-header-icon pi pi-book expiry-icons"
+                  title="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
+            </span>
+          </a>
+        <span *ngIf="validationRun.is_archived" class="p-panel-header-icon pi pi- expiry-icons"
+              title="This validation has been archived. It will NOT be automatically removed during cleanup.">
+          <fa-icon [icon]="faIcons.faArchive"></fa-icon>
+        </span>
 
       </span>
 
-      <span class=" font-weight-normal">Started:
+      <span class="font-weight-normal"> Started:
+
         {{ validationRun.start_time|date: dateFormat :timeZone }}
       </span>
 
@@ -90,6 +76,7 @@
   <ng-template pTemplate="icons">
     <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
   </ng-template>
+
   <div class="p-grid">
     <div class="p-col-4">
       <strong>Data:</strong><br/>
