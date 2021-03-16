@@ -1,3 +1,13 @@
+<!--<p-button label="Map" (onClick)="showMap()"></p-button>-->
+<!--<p-dialog header="Map" [visible]="(mapVisible|async)" (close)="mapVisible.next(false)">-->
+<!--  <qa-map class="map"-->
+<!--          [center]="[-483281,6904172]"-->
+
+<!--          [zoom]="8.5"></qa-map>-->
+<!--</p-dialog>-->
+<!--<qa-map class="map"-->
+<!--        [center]="[-483281,6904172]"-->
+<!--        [zoom]="8.5"></qa-map>-->
 <div class="p-grid no-gutters">
   <div class="
     p-col-12
@@ -71,6 +81,15 @@
         </p-panel>
       </div>
 
+      <!--      Map-->
+      <div class="p-col-12">
+        <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel">
+          <qa-map class="map"
+                  [center]="[-37.1,37.6]"
+                  [zoom]="8.5"></qa-map>
+        </p-panel>
+
+      </div>
       <!--      Spatial subsetting-->
       <div class="p-col-12">
         <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
