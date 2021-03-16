@@ -76,6 +76,13 @@ if [ "x$ENV" == "xtestenv" ]; then
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
 fi
 
+if [ "x$ENV" == "xhirestestenv" ]; then
+    SITE_URL="https://hires-test.qa4sm.eu"
+    DEBUGFLAG="False"
+    ALLOWED_HOSTS="['127.0.0.1', 'localhost', '10.48.108.24', 'hires-test.qa4sm.eu', '10.10.10.66']"
+    DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
+fi
+
 echo $DOI_ACCESS_TOKEN_ENV
 
 sed -e "s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
