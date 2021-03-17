@@ -12,6 +12,10 @@ import OSM from 'ol/source/OSM';
 // import * as proj4 from 'proj4';
 // import {proj4} from 'proj4';
 import * as proj4x from 'proj4';
+import Draw, {createBox} from 'ol/interaction/Draw';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import GeometryType from 'ol/geom/GeometryType';
 
 const proj4 = (proj4x as any).default;
 
@@ -66,7 +70,7 @@ export class MapComponent implements AfterViewInit, AfterViewChecked {
       })],
       target: 'map',
       // controls: DefaultControls({attribution: false}).extend([new MyControl(),new Attribution({collapsible: true,})]),
-      controls: [new MyControl(), new Attribution({collapsible: true,})],
+      controls: [new MyControl(this.Map), new Attribution({collapsible: true,})],
       view: this.view,
     });
   }
@@ -77,12 +81,13 @@ export class MapComponent implements AfterViewInit, AfterViewChecked {
 }
 
 export class MyControl extends Control {
-  constructor() {
+  constructor(private map) {
     super({});
     let button = document.createElement('button');
     button.type = 'button';
     button.innerHTML = '<i class="pi pi-check"></i>';
     button.title = 'Nyaloka';
+
     let element = document.createElement('div');
     element.className = 'rotate-north ol-unselectable ol-control';
     element.appendChild(button);
@@ -95,6 +100,20 @@ export class MyControl extends Control {
   click() {
     console.log('click');
     console.log(this.getMap());
+    var source = new VectorSource({wrapX: false});
+
+    var vector = new VectorLayer({
+      source: source,
+    });
+    let geomFunction = createBox();
+    let draw = new Draw({
+      source: source,
+      type: GeometryType.CIRCLE,
+      geometryFunction: geomFunction,
+    });
+    this.getMap().addLayer(vector);
+    this.getMap().addInteraction(draw);
+
   }
 
 }
