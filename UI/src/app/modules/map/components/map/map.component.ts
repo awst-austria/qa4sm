@@ -30,8 +30,8 @@ export class MapComponent implements AfterViewInit, AfterViewChecked {
   @Input() zoom: number;
   view: View;
   projection: Projection;
-  extent: Extent = [-11.2, -34,
-    48.3, 71.6];
+  extent: Extent = [-20026376.39, -20048966.10,
+    20026376.39, 20048966.10];
   Map: Map;
   @Output() mapReady = new EventEmitter<Map>();
 
@@ -56,7 +56,7 @@ export class MapComponent implements AfterViewInit, AfterViewChecked {
     proj4.defs('EPSG:4326', '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs');
 
     register(proj4);
-    this.projection = GetProjection('EPSG:4326');
+    this.projection = GetProjection('EPSG:3857');
     this.projection.setExtent(this.extent);
     this.view = new View({
       center: this.center,
@@ -85,8 +85,8 @@ export class MyControl extends Control {
     super({});
     let button = document.createElement('button');
     button.type = 'button';
-    button.innerHTML = '<i class="pi pi-check"></i>';
-    button.title = 'Nyaloka';
+    button.innerHTML = '<i class="pi pi-pencil"></i>';
+    button.title = 'Select region';
 
     let element = document.createElement('div');
     element.className = 'rotate-north ol-unselectable ol-control';
