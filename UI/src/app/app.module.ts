@@ -56,7 +56,6 @@ import {NgxPaginationModule} from 'ngx-pagination';
     LoginComponent,
     UserProfileComponent,
     PublishedValidationsComponent,
-
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
