@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {GlobalParamsService} from '../../modules/core/services/gloabal-params/global-params.service';
 
 @Component({
   selector: 'qa-about',
@@ -7,9 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AboutComponent implements OnInit {
 
-  constructor() { }
+  constructor(private globalParamsService: GlobalParamsService) { }
 
   ngOnInit(): void {
   }
+  getAppVersion(): string {
+    return this.globalParamsService.globalContext.app_version;
+   }
 
 }
