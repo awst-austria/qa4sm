@@ -11,7 +11,6 @@ import {SortingFormComponent} from './components/sorting-form/sorting-form.compo
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 
-
 @NgModule({
     declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent],
   exports: [

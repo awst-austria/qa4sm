@@ -18,6 +18,7 @@ import {NewValidationRunService} from './service/new-validation-run.service';
 import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto';
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {Router} from '@angular/router';
+import {BehaviorSubject} from 'rxjs';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -30,7 +31,7 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either con
 export class ValidateComponent implements OnInit {
   // datasetConfigurations: DatasetConfigModel[] = [];
   // referenceConfiguration: DatasetConfigModel[] = []; // this array will always contain exactly 1 element
-
+  mapVisible: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
     [],
     [],
@@ -151,11 +152,15 @@ export class ValidateComponent implements OnInit {
 
     this.newValidationService.startValidation(newValidationDto).subscribe(
       data => {
-        this.router.navigate([`result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
+        this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
       },
       error => {
         this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
         console.error(error);
       });
+  }
+
+  showMap() {
+    this.mapVisible.next(true);
   }
 }
