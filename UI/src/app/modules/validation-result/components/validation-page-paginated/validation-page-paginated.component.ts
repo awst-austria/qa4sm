@@ -16,7 +16,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   page = 1;
   limit = 10;
   offset = 0;
-  parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit));
+  order = '-start_time';
 
   constructor(private validationrunService: ValidationrunService) { }
 
@@ -26,7 +26,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   getValidationsAndItsNumber(published: boolean): void{
     console.log(this.offset, this.limit);
-    let parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit));
+    const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
+                        .set('order', String(this.order));
     if (!published){
     this.validationrunService.getMyValidationruns(parameters).subscribe(
       response => {
@@ -48,6 +49,12 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.page = event;
     this.offset = (this.page - 1) * this.limit;
     this.getValidationsAndItsNumber(this.published);
+  }
+
+  getOrder(order): void {
+    this.order = order;
+    this.getValidationsAndItsNumber(this.published);
+    console.log(this.order);
   }
 
 }
