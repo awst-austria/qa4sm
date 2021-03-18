@@ -7,21 +7,26 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgxPaginationModule} from 'ngx-pagination';
 import {ValidationPagePaginatedComponent} from './components/validation-page-paginated/validation-page-paginated.component';
 import {RouterModule} from '@angular/router';
+import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
+import {DropdownModule} from 'primeng/dropdown';
+import {FormsModule} from '@angular/forms';
 
 
 @NgModule({
-    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent],
+    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent],
   exports: [
     ValidationrunRowComponent,
     ValidationPagePaginatedComponent,
   ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    NgxPaginationModule,
-    RouterModule
-  ]
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        NgxPaginationModule,
+        RouterModule,
+        DropdownModule,
+        FormsModule
+    ]
 })
 export class ValidationResultModule { }
