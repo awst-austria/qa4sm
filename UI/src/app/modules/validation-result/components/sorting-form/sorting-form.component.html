@@ -1,0 +1,18 @@
+ <div>
+    <div>
+      <span class="input-group-text addon-w" id="sorting_form">Sort By</span>
+      <span class="p-float-label p-mb-5 p-mt-3 p-col-4">
+        <p-dropdown id="sortingChoiceSelector" (onChange)="onSortingChange()"
+                    [options]="sortingChoicesModels"
+                    [(ngModel)]="selectedChoicesModel"
+                    optionLabel="displayName" [style]="{'width': '100%'}"></p-dropdown>
+      </span>
+      <span class="p-float-label p-mb-5 p-mt-3 p-col-4">
+        <p-dropdown id="orderSelector" (onChange)="onSortingChange()"
+                    [options]="orderChoicesModels"
+                    [(ngModel)]="selectedOrderModel"
+                    optionLabel="direction"
+                     [style]="{'width': '100%'}"></p-dropdown>
+      </span>
+    </div>
+  </div>
