@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from validator.forms import ResultsSortingForm
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun
@@ -13,13 +14,16 @@ from validator.models import ValidationRun
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def published_results(request):
+
     limit = int(request.query_params.get('limit', None))
     offset = int(request.query_params.get('offset', None))
+    order = request.query_params.get('order',None)
 
-    val_runs = ValidationRun.objects.exclude(doi='').order_by('-start_time')
+    val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
 
     serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
-    response = {'validations': serializer.data, 'length': len(val_runs)}
+    response = {'validations': serializer.data,
+                'length': len(val_runs)}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
@@ -30,8 +34,9 @@ def my_results(request):
     current_user = request.user
     limit = int(request.query_params.get('limit', None))
     offset = int(request.query_params.get('offset', None))
+    order = request.query_params.get('order', None)
 
-    val_runs = ValidationRun.objects.filter(user=current_user).order_by('-start_time')
+    val_runs = ValidationRun.objects.filter(user=current_user).order_by(order)
 
     serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
     response = {'validations': serializer.data, 'length': len(val_runs)}
