@@ -4,8 +4,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from validator.forms import ResultsSortingForm
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun
