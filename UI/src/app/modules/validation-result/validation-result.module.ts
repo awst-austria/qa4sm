@@ -10,13 +10,14 @@ import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
-import {SummaryComponent} from './components/summary/summary.component';
+import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
 
 @NgModule({
-    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, SummaryComponent],
+    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent],
   exports: [
     ValidationrunRowComponent,
     ValidationPagePaginatedComponent,
+    ValidationSummaryComponent,
   ],
     imports: [
         CommonModule,
