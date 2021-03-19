@@ -25,7 +25,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   getValidationsAndItsNumber(published: boolean): void{
-    console.log(this.offset, this.limit);
     const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
                         .set('order', String(this.order));
     if (!published){
@@ -54,7 +53,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
   getOrder(order): void {
     this.order = order;
     this.getValidationsAndItsNumber(this.published);
-    console.log(this.order);
   }
 
 }
