@@ -1,14 +1,24 @@
 <div class="p-grid">
   <div class="p-col-12">
     <div class="p-d-flex p-jc-center">
-      <h1>Validation Results</h1>
+
+      <div *ngIf="!(validationModel.validationRun|async)?.end_time" class="container p-text-center mb-5 mt-4"
+           style="max-width: 40rem;">
+        <h1 class="jumbotron-heading">Validation Running...</h1>
+        <p class="lead text-muted">
+          Your validation is still running. You'll be notified via e-mail once it's finished.</p>
+        <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
+      </div>
+
+      <div *ngIf="(validationModel.validationRun|async)?.end_time" class="container text-center mb-5 mt-4"
+           style="max-width: 40rem;">
+        <h1>Validation Results</h1>
+      </div>
+
     </div>
   </div>
   <div class="p-col-12">
     <qa-validation-summary></qa-validation-summary>
-<!--    <div class="p-d-flex p-jc-center">-->
-<!--      <p *ngIf="validationModel.validationRun|async as valRun">{{valRun.id}}</p>-->
-<!--    </div>-->
   </div>
 </div>
 
