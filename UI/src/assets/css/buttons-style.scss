@@ -1,0 +1,52 @@
+.btn-primary {
+  color: #fff;
+  background-color: $button-base-color;
+  border-color: $button-base-color;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  color: #fff;
+  background-color: $button-base-color;
+  border-color: $button-base-color;
+}
+
+.btn-primary:not(:disabled):not(.disabled):hover, .btn-primary:not(:disabled):not(.disabled):active {
+  color: #fff;
+  background-color: $button-hover-color;
+  border-color: $button-hover-color;
+}
+
+.btn-primary.focus, .btn-primary:focus, .btn-primary:not(:disabled):not(.disabled):active:focus {
+  box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .5);
+}
+.btn-action {
+  width: 2.4em;
+  margin-top: 0.12rem;
+  margin-bottom: 0.12rem;
+}
+.btn-primary.edit_name_btn{
+  color: #fff;
+  background-color: #00AAE3;
+  border-color: #00AAE3;
+  transform: scale(0.9);
+  width: 0;
+}
+.btn-primary.edit_name_btn:not(.disabled):hover{
+  color: #4760E5;
+  background-color: #00AAE3;
+  border-color: #00AAE3;
+  transform: scale(1.2);
+}
+.edit_name{
+  border: 1px solid #00AAE3;
+  border-radius: 4px;
+  position: relative;
+  padding: 3px;
+
+}
+.edit_name:focus{
+  border: 1px solid #00AAE3;
+  box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .3);
+  outline: none;
+}
