@@ -5,9 +5,10 @@
     </div>
   </div>
   <div class="p-col-12">
-    <div class="p-d-flex p-jc-center">
-      <p *ngIf="validationModel.validationRun|async as valRun">{{valRun.id}}</p>
-    </div>
+    <qa-validation-summary></qa-validation-summary>
+<!--    <div class="p-d-flex p-jc-center">-->
+<!--      <p *ngIf="validationModel.validationRun|async as valRun">{{valRun.id}}</p>-->
+<!--    </div>-->
   </div>
 </div>
 

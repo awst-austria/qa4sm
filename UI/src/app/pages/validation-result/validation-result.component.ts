@@ -21,7 +21,7 @@ export class ValidationResultComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.validationId = params['validationId'];
+      this.validationId = params.validationId;
       this.validationModel = new ValidationResultModel(
         this.validationRunService.getValidationRunById(this.validationId),
         this.datasetConfigurationService.getConfigByValidationrun(this.validationId)
