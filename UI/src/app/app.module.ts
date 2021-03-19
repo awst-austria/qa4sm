@@ -43,6 +43,7 @@ import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
 import {NgxPaginationModule} from 'ngx-pagination';
+import {MapModule} from './modules/map/map.module';
 
 
 @NgModule({
@@ -86,7 +87,8 @@ import {NgxPaginationModule} from 'ngx-pagination';
     MetricsModule,
     AnomaliesModule,
     ScalingModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    MapModule
 
   ],
   providers: [

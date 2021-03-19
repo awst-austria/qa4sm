@@ -6,4 +6,4 @@ docker stop qa4sm_ui
 docker rm qa4sm_ui --force
 docker image rm qa4sm_ui
 docker build -t qa4sm_ui ../docker
-docker run --rm --name qa4sm_ui -d -p 8013:80 qa4sm_ui
+docker run --name qa4sm_ui --restart unless-stopped -d -p 8013:80 qa4sm_ui
