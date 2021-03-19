@@ -158,7 +158,7 @@
                     </ul>
 
                     {% if is_owner and val.is_unpublished %}
-                        <div style="float: right;" class="patchButtonGroup{% if val.publishing_in_progress %} collapse {% endif %}">
+                        <div style="float: right" class="patchButtonGroup{% if val.publishing_in_progress %} collapse {% endif %}">
                             <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ val.id }}', true)"><span class="fas fa-times"></span> Remove</button>
                             {% if val.is_archived %}
                                 <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ val.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>
@@ -171,6 +171,7 @@
                                     <span class="fas fa-book" ></span> Publish
                                 </button>
                             {% endif %}
+                            <a class="btn btn-sm btn-primary" title="Load settings" href="{% url 'validation' %}?valrun_uuid={{ val.id }}"><span class="fas fa-redo"></span> Load settings</a>
                         </div>
                         {% if val.output_file %}
                             <div class="publishingNote small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}" style="float: right">
@@ -180,6 +181,7 @@
                         {% endif %}
                     {% else %}
                     <div style="float: right;" class="patchButtonGroup">
+                        <a class="btn btn-sm btn-primary" title="Load settings" href="{% url 'validation' %}?valrun_uuid={{ val.id }}"><span class="fas fa-redo"></span> Load settings</a>
                         {% if current_user %}
                             {% if is_copied %}
                                 <button class="btn btn-sm btn-primary" title="Remove this validation from your list" onclick="ajax_detach_validation('{{ val.id }}', false)"><span class="fas fa-times"></span> Untrack </button>
