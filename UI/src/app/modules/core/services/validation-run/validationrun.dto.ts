@@ -28,7 +28,8 @@ export class ValidationrunDto{
               public publishing_in_progress: boolean,
               public tcol: boolean,
               public expiry_date: Date,
-              public is_near_expiry: boolean) {
+              public is_near_expiry: boolean,
+              public is_unpublished: boolean) {
   }
 }
 
