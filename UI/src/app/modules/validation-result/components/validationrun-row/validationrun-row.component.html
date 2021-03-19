@@ -1,42 +1,16 @@
-<p-panel *ngIf="published">
-  <ng-template pTemplate="header">
+<p-panel>
+  <!--Header-->
+  <!-- PUBLISHED  -->
+  <ng-template *ngIf="published" pTemplate="header">
     <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
   </ng-template>
-  <ng-template pTemplate="icons" class="doilink">
+  <ng-template *ngIf="published" pTemplate="icons" class="doilink">
     <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
                               href="{{this.getDoiPrefix()}}{{ model.validationRun.doi }}">{{ model.validationRun.doi }}</a>
     </h5>
   </ng-template>
-  <div class="p-grid">
-    <div class="p-col-4">
-      <strong>Data:</strong><br/>
-      <span *ngFor="let datasetRowModel of model.datasetRows">
-          {{(datasetRowModel.dataset$|async)?.pretty_name}},
-        {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
-        {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
-        </span>
-
-    </div>
-
-    <div class="p-col-4">
-      <strong>Reference:</strong><br/>
-      <span>
-          {{(model.referenceRow.dataset$|async)?.pretty_name}},
-        {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
-        {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
-        </span>
-    </div>
-
-    <div class="p-col-2" style="max-width: 7rem;">
-      <strong>Created:</strong><br/>
-      {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
-    </div>
-  </div>
-</p-panel>
-
-<!-- Custom validations-->
-<p-panel *ngIf="!published">
-  <ng-template pTemplate="header">
+  <!--  CUSTOM    -->
+  <ng-template *ngIf="!published" pTemplate="header">
     <h5 class="my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
@@ -73,10 +47,12 @@
 
     </h5>
   </ng-template>
-  <ng-template pTemplate="icons">
+  <ng-template *ngIf="!published" pTemplate="icons">
     <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
   </ng-template>
 
+<!-- Body -->
+  <!-- Datasets -->
   <div class="p-grid">
     <div class="p-col-4">
       <strong>Data:</strong><br/>
@@ -87,7 +63,7 @@
         </span>
 
     </div>
-
+    <!-- Reference -->
     <div class="p-col-4">
       <strong>Reference:</strong><br/>
       <span>
@@ -96,10 +72,23 @@
         {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
         </span>
     </div>
-
-    <div class="p-col-2" style="max-width: 7rem;">
+    <!-- Status / Created   -->
+    <!--    PUBLISHED -->
+    <div *ngIf="published" class="p-col-2" style="max-width: 7rem;">
+      <strong>Created:</strong><br/>
+      {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
+    </div>
+    <!--    CUSTOM -->
+    <div *ngIf="!published" class="p-col-2" style="max-width: 7rem;">
       <strong>Status:</strong><br/>
       {{ getStatusFromProgress(validationRun)}}
     </div>
+
+    <!-- Action Buttons -->
+    <div class="p-col-2">
+      <a class="btn btn-sm btn-primary btn-action" routerLink="/validation-result/{{model.validationRun.id}}"  title="View results"><span class="pi pi-folder-open"></span></a>
+    </div>
+
+
   </div>
 </p-panel>
