@@ -10,11 +10,11 @@
         <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
       </div>
 
-      <div *ngIf="(validationModel.validationRun|async)?.end_time" class="container text-center mb-5 mt-4"
-           style="max-width: 40rem;">
-        <h1>Validation Results</h1>
+      <div *ngIf="(validationModel.validationRun|async)?.end_time" class="container mb-5 mt-4"
+           style="max-width: 60rem;">
+        <h1 class="text-center">Validation Results</h1>
         <div class="p-col-12">
-          <qa-validation-summary [valrun]="(validationModel.validationRun|async)"></qa-validation-summary>
+          <qa-validation-summary [validationModel]="validationModel"></qa-validation-summary>
         </div>
       </div>
 
