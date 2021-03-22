@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.serializers import ModelSerializer
 
 from validator.models import Dataset, DataFilter
@@ -19,6 +19,15 @@ def data_filter(request):
         data_filters = DataFilter.objects.all()
 
     serializer = DataFilterSerializer(data_filters, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def data_filter_by_id(request, **kwargs):
+    # filter_id = request.query_params.get(pk=kwargs['id'])
+    dataset_filter = DataFilter.objects.get(pk=kwargs['id'])
+    serializer = DataFilterSerializer(dataset_filter)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
