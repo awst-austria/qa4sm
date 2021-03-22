@@ -16,8 +16,10 @@ const CACHE_KEY_ALL_FILTERS = -1;
 })
 export class FilterService {
 
-  //cache for dataset arrays
+  //cache for filter arrays
   arrayRequestCache = new DataCache<Observable<FilterDto[]>>(5);
+  //cache for single filter dtos
+  singleRequestCache = new DataCache<Observable<FilterDto>>(5);
 
 
   constructor(private httpClient: HttpClient) {
@@ -43,5 +45,17 @@ export class FilterService {
       return filters$;
     }
   }
+
+  getFilterById(filterId: number): Observable<FilterDto> {
+    if (this.singleRequestCache.isCached(filterId)) {
+      return this.singleRequestCache.get(filterId);
+    } else {
+      const getURL = dataFilterUrl + '/' + filterId;
+      const filter$ = this.httpClient.get<FilterDto>(getURL).pipe(shareReplay());
+      this.singleRequestCache.push(filterId, filter$);
+      return filter$;
+    }
+  }
+
 }
 
