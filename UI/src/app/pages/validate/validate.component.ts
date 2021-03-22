@@ -136,7 +136,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   public startValidation() {
     //debug
-    //console.log(JSON.stringify(this.validationModel));
 
     //prepare the dataset dtos (dataset, version, variable and filter settings)
     let datasets: NewValRunDatasetConfigDto[] = [];

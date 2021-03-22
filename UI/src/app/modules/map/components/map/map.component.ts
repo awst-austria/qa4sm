@@ -36,7 +36,6 @@ export class MapComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    console.log('View init');
     if (!this.Map) {
       this.zone.runOutsideAngular(() => this.initMap());
     }

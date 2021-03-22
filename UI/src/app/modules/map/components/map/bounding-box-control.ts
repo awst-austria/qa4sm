@@ -86,11 +86,8 @@ export class BoundingBoxControl extends Control {
       ];
 
       let bbox = new Polygon(boxCoordinates);
-
       bbox.transform('EPSG:4326', this.getMap().getView().getProjection().getCode());
       this.boundingBoxSource.addFeature(new Feature<Geometry>(bbox));
-      //TODO to be implemented
-      console.log('Implement map update. ', extent);
     }
   }
 

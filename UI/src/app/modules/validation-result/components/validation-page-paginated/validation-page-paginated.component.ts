@@ -25,7 +25,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   getValidationsAndItsNumber(published: boolean): void{
-    console.log(this.offset, this.limit);
     let parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit));
     if (!published){
     this.validationrunService.getMyValidationruns(parameters).subscribe(
