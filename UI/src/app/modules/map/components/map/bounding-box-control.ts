@@ -1,17 +1,19 @@
 import {Control} from 'ol/control';
 import VectorSource from 'ol/source/Vector';
 import Draw, {createBox} from 'ol/interaction/Draw';
-import {Map} from 'ol';
+import {Feature, Map} from 'ol';
+import {boundingExtent, getBottomLeft, getBottomRight, getTopLeft, getTopRight} from 'ol/extent';
 import VectorLayer from 'ol/layer/Vector';
 import GeometryType from 'ol/geom/GeometryType';
 import {transformExtent} from 'ol/proj';
 import {SpatialSubsetModel} from '../../../spatial-subset/components/spatial-subset/spatial-subset-model';
 import {NgZone} from '@angular/core';
+import {Geometry, Polygon} from 'ol/geom';
 
 export class BoundingBoxControl extends Control {
   boundingBoxSource: VectorSource;
   bboxDraw: Draw = null;
-  currentSelectedCoordinates: SpatialSubsetModel;
+  currentSelectedCoordinates: number[] = [null, null, null, null];
   ngZone: NgZone;
 
   constructor(private map: Map, private boundingBox: SpatialSubsetModel, ngZone?: NgZone) {
@@ -55,13 +57,41 @@ export class BoundingBoxControl extends Control {
     this.ngZone.run(() => {
     });
 
+    //remove previous selection
+    this.boundingBoxSource.clear();
+
     if (this.isCoordinateValid(this.boundingBox.maxLat$.getValue(), this.boundingBox.maxLon$.getValue()) &&
       this.isCoordinateValid(this.boundingBox.minLat$.getValue(), this.boundingBox.minLon$.getValue())) {
+
+      if (this.currentSelectedCoordinates[0] == this.boundingBox.minLon$.getValue() &&
+        this.currentSelectedCoordinates[1] == this.boundingBox.minLat$.getValue() &&
+        this.currentSelectedCoordinates[2] == this.boundingBox.maxLon$.getValue() &&
+        this.currentSelectedCoordinates[3] == this.boundingBox.maxLat$.getValue()) {
+        //if the coordinates are the same then no update is needed.
+        return;
+      }
+
+      let extent = boundingExtent([
+        [this.boundingBox.minLon$.getValue(), this.boundingBox.minLat$.getValue()],
+        [this.boundingBox.maxLon$.getValue(), this.boundingBox.maxLat$.getValue()]]);
+
+      const boxCoordinates = [
+        [
+          getBottomLeft(extent),
+          getBottomRight(extent),
+          getTopRight(extent),
+          getTopLeft(extent),
+          getBottomLeft(extent),
+        ],
+      ];
+
+      let bbox = new Polygon(boxCoordinates);
+
+      bbox.transform('EPSG:4326', this.getMap().getView().getProjection().getCode());
+      this.boundingBoxSource.addFeature(new Feature<Geometry>(bbox));
       //TODO to be implemented
-      console.log('Implement map update. ');
+      console.log('Implement map update. ', extent);
     }
-
-
   }
 
   private isCoordinateValid(lat: number, lon: number): boolean {
@@ -88,6 +118,7 @@ export class BoundingBoxControl extends Control {
       this.boundingBox.maxLon$.next(null);
       this.boundingBox.minLat$.next(null);
       this.boundingBox.minLon$.next(null);
+      this.currentSelectedCoordinates = [0, 0, 0, 0];
       return;
     }
 
@@ -105,15 +136,15 @@ export class BoundingBoxControl extends Control {
     this.bboxDraw.on('drawend', evt => {
       //the map uses EPSG:3857 projection while the backend expects the coordinates in EPSG:4326 which means first we need to transform
       //the bounding box coordinates
-      let bbCoordinates = transformExtent(evt.feature.getGeometry().getExtent(),
+      this.currentSelectedCoordinates = transformExtent(evt.feature.getGeometry().getExtent(),
         this.getMap().getView().getProjection().getCode(),
         'EPSG:4326');
 
       //then update the model.
-      this.boundingBox.minLon$.next(bbCoordinates[0]);
-      this.boundingBox.minLat$.next(bbCoordinates[1]);
-      this.boundingBox.maxLon$.next(bbCoordinates[2]);
-      this.boundingBox.maxLat$.next(bbCoordinates[3]);
+      this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
+      this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
+      this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
+      this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
 
       this.getMap().removeInteraction(this.bboxDraw);
       this.bboxDraw = null;
