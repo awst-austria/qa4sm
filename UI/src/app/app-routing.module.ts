@@ -9,6 +9,7 @@ import {LoginComponent} from './pages/login/login.component';
 import {UserProfileComponent} from './pages/user-profile/user-profile.component';
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationsComponent} from './pages/validations/validations.component';
+import {AboutComponent} from './pages/about/about.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -19,6 +20,7 @@ const routes: Routes = [
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},
+  {path: 'about', component: AboutComponent},
   {path: '**', component: ErrorComponent}
 ];
 

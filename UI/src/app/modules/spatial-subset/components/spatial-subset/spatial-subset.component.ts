@@ -8,18 +8,19 @@ import {SpatialSubsetModel} from './spatial-subset-model';
 })
 export class SpatialSubsetComponent implements OnInit {
 
-  @Input() subsetModel:SpatialSubsetModel;
+  @Input() subsetModel: SpatialSubsetModel;
+
   constructor() {
   }
 
   ngOnInit(): void {
   }
 
-  clearCoordinates(){
-    this.subsetModel.maxLat=null;
-    this.subsetModel.maxLon=null;
-    this.subsetModel.minLat=null;
-    this.subsetModel.minLon=null;
+  clearCoordinates() {
+    this.subsetModel.maxLat$.next(null);
+    this.subsetModel.maxLon$.next(null);
+    this.subsetModel.minLat$.next(null);
+    this.subsetModel.minLon$.next(null);
   }
 
 }
