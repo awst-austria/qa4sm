@@ -685,7 +685,7 @@
     </script>
 
     <script type="text/javascript">
-        function ajax_change_dataset() {
+        function ajax_change_dataset(event) {
             var url = $("#validation_form").attr("data-options-url");
             var datasetId = $(this).val();
             // var datasetName = $(this).text();
@@ -693,9 +693,22 @@
             var datasetName = $(`#${widgetId} option[value=${datasetId}]`).text();
             var filterWidgetId = widgetId.replace(/dataset$/, "filters");
             var paramFilterWidgetId = widgetId.replace(/dataset$/, "parametrised_filters");
+	    var initialFilters = event.data.initialFilters;
+	    var initialParamfilters = event.data.initialParamfilters;
+	    var initialParamfilterParams = event.data.initialParamfilterParams;
+            var initialVersion = event.data.initialVersion;
+            var initialVariable = event.data.initialVariable;
+            var disableAjaxValidationPeriod = event.data.disableAjaxValidationPeriod;
             $.ajax({
                 url: url,
-                data: { 'dataset_id': datasetId, 'filter_widget_id': filterWidgetId, 'param_filter_widget_id': paramFilterWidgetId },
+                data: { 'dataset_id': datasetId,
+			'filter_widget_id': filterWidgetId,
+			'param_filter_widget_id': paramFilterWidgetId,
+		        'initial_filters': initialFilters,
+                        'initial_paramfilters': initialParamfilters,
+                        'initial_paramfilter_params': initialParamfilterParams,
+		        'initial_version': initialVersion,
+		        'initial_variable': initialVariable },
                 success: function (return_data) {
                     var dataset_widget = "#" + widgetId;
                     var version_widget = dataset_widget.replace(/dataset$/, "version");
@@ -713,7 +726,9 @@
                     } else{
                         $('#id_target_hidden_input_version').val('');
                     };
-                    start_ajax_to_set_valiadtion_period();
+                    if(disableAjaxValidationPeriod == "False") {
+                        start_ajax_to_set_validation_period();
+                    }
                 }
             });
         }
@@ -819,9 +834,9 @@
             $('#id_interval_to').val(min_date_to_str);
           }
 
-          function start_ajax_to_set_valiadtion_period(){
-            var versionIds = find_current_ids();
-            ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
+          function start_ajax_to_set_validation_period(){
+              var versionIds = find_current_ids();
+              ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
           }
 //================================================================================
       
@@ -832,8 +847,16 @@
         }
 
         {% for dc_form in dc_formset.forms %}
-            $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
-            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_valiadtion_period)
+            $("#{{ dc_form.dataset.auto_id }}").change(
+                {initialFilters: "{{ dc_form.initial_filters }}",
+                 initialParamfilters: "{{ dc_form.initial_paramfilters }}",
+                 initialParamfilterParams: "{{ dc_form.initial_paramfilter_params }}",
+                 initialVersion: "{{ dc_form.initial_version }}",
+                 initialVariable: "{{ dc_form.initial_variable}}",
+                 disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},
+                ajax_change_dataset
+            ).change(change_tab_name).change(); // last change() to call change on pageload
+            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_validation_period)
         {% endfor %}
 
         function get_version_id(){
@@ -848,10 +871,16 @@
             }
         }
 
-
-        $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
-
+        $("#{{ ref_dc_form.dataset.auto_id }}").change(
+            {initialFilters: "{{ ref_dc_form.initial_filters }}",
+             initialParamfilters: "{{ ref_dc_form.initial_paramfilters }}",
+             initialParamfilterParams: "{{ ref_dc_form.initial_paramfilter_params }}",
+             initialVersion: "{{ ref_dc_form.initial_version }}",
+             initialVariable: "{{ ref_dc_form.initial_variable }}",
+             disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},
+            ajax_change_dataset
+        ).change(); // last change() to call change on pageload
+        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_validation_period)
 
     </script>
 
@@ -970,12 +999,13 @@
             setTcLock();
         });
 
-        function setTcLock() {
+        function setTcLock(checked = false) {
             var formsetPrefix = 'datasets';
             var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
             var totalNoForms = $(totalSelector).val();
             var n_datasets = parseInt(totalNoForms) + 1
             if ( n_datasets >= 3) {
+                $('#tcol').prop('checked', checked);
                 $('#tcol').prop('disabled', false);
             } else {
                 $('#tcol').prop('checked', false);
@@ -1095,7 +1125,7 @@
 
         $('#remove_dc_form').click(function() {
             removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
-            start_ajax_to_set_valiadtion_period();
+            start_ajax_to_set_validation_period();
         });
 
         function set_after(first_element_selector, second_element_selector){
@@ -1189,6 +1219,10 @@
       if($('#id_datasets-TOTAL_FORMS') >= $('#id_datasets-MIN_NUM_FORMS')){
         set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
       }
+      // and here the same just for tcol, but make sure to remember the
+      // original state
+      setTcLock("{{ val_form.initial_tcol|yesno:"true,false" }}");
+
 
       if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){
         var url_to_go = $('#pub_validate-confirm').attr('data-url')
