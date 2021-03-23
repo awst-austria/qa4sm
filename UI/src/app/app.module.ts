@@ -59,7 +59,6 @@ import {AboutComponent} from './pages/about/about.component';
     UserProfileComponent,
     PublishedValidationsComponent,
     AboutComponent,
-
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
