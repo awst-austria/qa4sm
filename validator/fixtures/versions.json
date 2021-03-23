@@ -229,5 +229,49 @@
             "time_range_start": "", 
             "time_range_end": ""
         }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 31,
+        "fields": {
+            "short_name": "C3S_V202012",
+            "pretty_name": "v202012",
+            "help_text": "C3S from December 2020",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2020-12-31"
+        }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 32,
+        "fields": {
+            "short_name": "ESA_CCI_SM_P_V06_1",
+            "pretty_name": "v06.1",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2020-12-31"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 33,
+        "fields": {
+            "short_name": "ESA_CCI_SM_A_V06_1",
+            "pretty_name": "v06.1",
+            "help_text": "-",
+            "time_range_start": "1991-08-05",
+            "time_range_end": "2020-12-31"
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 34,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_V06_1",
+            "pretty_name": "v05.2",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2020-12-31"
+        }
     }
 ]
