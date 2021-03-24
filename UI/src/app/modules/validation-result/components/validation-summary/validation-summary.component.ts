@@ -5,7 +5,6 @@ import {combineLatest, Observable} from 'rxjs';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {FilterDto} from '../../../core/services/filter/filter.dto';
 import {FilterService} from '../../../core/services/filter/filter.service';
 import {map} from 'rxjs/operators';
 
@@ -30,6 +29,9 @@ export class ValidationSummaryComponent implements OnInit {
 
   ngOnInit(): void {
     this.getFullConfig();
+    console.log(this.configurations$);
+    this.filterService.getParameterisedFilterById(1490).subscribe(data =>
+      console.log(data));
   }
 
   private getFullConfig(): void{
@@ -37,12 +39,16 @@ export class ValidationSummaryComponent implements OnInit {
       this.validationModel.datasetConfigs,
       this.datasetService.getAllDatasets(),
       this.datasetVersionService.getAllVersions(),
-      this.datasetVariableService.getAllVariables()
+      this.datasetVariableService.getAllVariables(),
+      this.filterService.getAllFilters(),
+      this.filterService.getAllParameterisedFilters()
     ).pipe(
       map(([configurations,
              datasets,
              versions,
-             variables]) =>
+             variables,
+             dataFilters,
+             paramFilters]) =>
       configurations.map(
         config =>
           ({...config,
@@ -53,24 +59,24 @@ export class ValidationSummaryComponent implements OnInit {
           config.version === dsVersion.id).pretty_name,
 
           variable: variables.find(dsVar =>
-          config.variable === dsVar.id).pretty_name
+          config.variable === dsVar.id).pretty_name,
+
+          filters: config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
+
+          parametrisedFilters: config.parametrised_filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
+
+          parametrisedFiltersValues: config.parametrised_filters
+            .map(fId => config.parametrisedfilter_set
+              .map(pf => [paramFilters.find(pF => pF.id === pf).filter_id, paramFilters
+                .find(pF => pF.id === pf).parameters])
+              .find(f => f[0] === fId)[1])
+
           })
       ))
     );
     this.configurations$.subscribe(data => {
       console.log(data);
     });
-    console.log(this.configurations$);
-  }
-
-  private getUsedFilters(filtersId: any): FilterDto[]{
-    const filtersArray: FilterDto[] = [];
-    filtersId.forEach(filterId => {
-      this.filterService.getFilterById(filterId).subscribe(filter => {
-        filtersArray.push(filter);
-      });
-    });
-    return filtersArray;
   }
 
 }

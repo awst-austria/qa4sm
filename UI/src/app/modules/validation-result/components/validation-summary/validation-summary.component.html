@@ -31,7 +31,13 @@
                 <li *ngFor="let config of configurations; let ind = index">
                   <em *ngIf="config.id != validationRun.reference_configuration">Dataset {{ind + 1}}:</em>
                   <em *ngIf="config.id == validationRun.reference_configuration">Reference:</em>
+
                   {{config.dataset}} ({{config.version}}, {{config.variable}})
+                  [Filters: <span *ngFor="let filter of config.filters"> {{filter}}; </span>
+                            <span *ngFor="let paramFilter of config.parametrisedFilters; let ind = index">
+                              {{paramFilter}} {{config.parametrisedFiltersValues[ind]}}
+                            </span>
+                  ]
                 </li>
 
               </ul>
