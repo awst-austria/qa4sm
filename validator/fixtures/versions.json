@@ -268,7 +268,7 @@
         "pk": 34,
         "fields": {
             "short_name": "ESA_CCI_SM_C_V06_1",
-            "pretty_name": "v05.2",
+            "pretty_name": "v06.1",
             "help_text": "-",
             "time_range_start": "1978-11-01",
             "time_range_end": "2020-12-31"
