@@ -34,4 +34,5 @@ class ConfigurationSerializer(ModelSerializer):
                   'version',
                   'variable',
                   'filters',
-                  'parametrised_filters']
+                  'parametrised_filters',
+                  'parametrisedfilter_set']
