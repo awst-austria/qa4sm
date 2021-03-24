@@ -15,9 +15,9 @@
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
           <span *ngIf="validationRun.is_near_expiry" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
-                title="'This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}}."></span>
+                title="'This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
           <span *ngIf="!validationRun.is_near_expiry" class="p-panel-header-icon pi pi-calendar expiry-icons"
-                title="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }}.">
+                title="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
           </span>
       </span>
       <!--      if there is no expiry date property: -->
@@ -42,7 +42,7 @@
 
       <span class="font-weight-normal"> Started:
 
-        {{ validationRun.start_time|date: dateFormat :timeZone }}
+        {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}}
       </span>
 
     </h5>

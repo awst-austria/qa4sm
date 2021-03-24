@@ -21,7 +21,7 @@ export class ValidationrunRowComponent implements OnInit {
   @Input() validationRun: ValidationrunDto;
 
   model: ValidationRunRowModel;
-  dateFormat = 'MMM. dd, YYYY, hh:mm a O';
+  dateFormat = 'medium';
   timeZone = 'UTC';
   faIcons = {faArchive: fas.faArchive};
 
