@@ -40,8 +40,8 @@ urlpatterns = [
     #
     url(r'^test$', users),
     url(r'^path_test/(?P<username>.+)$', path_var_get),
-    path('auth/login', api_login, name='login'),
-    path('auth/logout', api_logout, name='logout'),
+    path('auth/login', api_login, name='api-login'),
+    path('auth/logout', api_logout, name='api-logout'),
     path('dataset', dataset, name='Datasets'),
     url(r'^dataset/(?P<id>.+)$', dataset_by_id),
     path('dataset-version', dataset_version, name='Dataset versions'),
