@@ -139,11 +139,11 @@
                                 {% endif %}
                             </div>
 
-                            <div class="col-sm" style="text-align: right; max-width: 8.75rem">
-                                <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
+                            <div class="col-sm" style="text-align: right; max-width: 12rem">
                                 {% if valrun.progress > -1 and valrun.progress < 100 and valrun.end_time == null %}
                                     <button class="btn btn-sm btn-primary btn-action" title="Cancel validation" onclick="ajax_stop_validation('{{ valrun.id }}')"><span class="fas fa-stop"></span></button>
                                 {% endif %}
+                                <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
                                 {% if valrun.end_time %}
                                     {% if valrun.is_unpublished %}
                                         <span class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">
@@ -174,6 +174,13 @@
                                                 <span class="fas fa-file-download"></span>
                                         Download NetCDF file
                                         </button>
+                                        <button class="dropdown-item"
+                                                onclick="location.href='{% url 'validation' %}?valrun_uuid={{ valrun.id }}';"
+                                                title="Restore settings from this validation">
+                                                <span class="fas fa-redo"></span>
+                                        Load validation settings
+                                        </button>
+
                                     {% endif %}
                                     {% if valrun.is_unpublished %}
                                         <span class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">

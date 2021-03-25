@@ -12,6 +12,9 @@ from django.utils import timezone
 from django.utils.timezone import now
 import pytest
 
+from validator.tests.testutils import set_dataset_paths
+import os
+
 import numpy as np
 from validator.models import CeleryTask
 from validator.models import DataFilter
@@ -74,6 +77,16 @@ class TestModels(TestCase):
         assert len(run.dataset_configurations.all()) == 1
         assert run.reference_configuration
         assert run.scaling_ref
+        
+    def test_testdata_integrity(self):
+        """
+        checks whether a submodule update is needed for the testdata repository
+        """
+        set_dataset_paths()
+        for dataset in Dataset.objects.all():
+            for version in dataset.versions.all():
+                
+                assert os.path.isdir(os.path.join(dataset.storage_path, version.short_name)), "Folder not present for dataset version {}. Did you remember to update the submodule?".format(version)
 
     def test_dataset_configuration(self):
         dc = DatasetConfiguration()
