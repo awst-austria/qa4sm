@@ -145,25 +145,65 @@
                                 {% endif %}
                                 <a class="btn btn-sm btn-primary btn-action" href="{% url 'result' valrun.id %}" title="View results"><span class="fas fa-folder-open"></span></a>
                                 {% if valrun.end_time %}
+                                    {% if valrun.is_unpublished %}
+                                        <span class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">
+                                            {% if valrun.is_archived %}
+                                                <button class="btn btn-sm btn-primary btn-action" title="Un-archive" onclick="ajax_archive_result('{{ valrun.id }}', false)"><span class="fas fa-calendar-alt"></span></button>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-primary btn-action" title="Archive" onclick="ajax_archive_result('{{ valrun.id }}', true)"><span class="fas fa-archive"></span></button>
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                {% endif %}
+
+                            <div class="dropdown">
+                                <button class="dropdownbutton" style="color: #003eff;">
+                                    <span class="fas fa-angle-double-right"> </span>
+                                </button>
+                                <div class="dropdown-content" style="text-align: left">
                                     {% if valrun.output_file %}
-                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_dir_url }}graphs.zip" title="Download all graphs"><span class="fas fa-download"></span></a>
-                                    <a class="btn btn-sm btn-primary btn-action" href="{{ valrun.output_file.url }}" title="Download NetCDF"><span class="fas fa-file-download"></span></a>
-                                {% endif %}
-                                <br>
-                                {% if valrun.is_unpublished %}
-                                    <span class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">
-                                        <button class="btn btn-sm btn-primary btn-action" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>
-                                        {% if valrun.is_archived %}
-                                            <button class="btn btn-sm btn-primary btn-action" title="Un-archive" onclick="ajax_archive_result('{{ valrun.id }}', false)"><span class="fas fa-calendar-alt"></span></button>
-                                        {% else %}
-                                            <button class="btn btn-sm btn-primary btn-action" title="Extend lifespan" onclick="ajax_extend_result('{{ valrun.id }}', true)"><span class="fas fa-calendar-plus"></span></button>
-                                            <button class="btn btn-sm btn-primary btn-action" title="Archive" onclick="ajax_archive_result('{{ valrun.id }}', true)"><span class="fas fa-archive"></span></button>
+                                        <button class="dropdown-item"
+                                            onclick="location.href='{{ valrun.output_dir_url }}graphs.zip';"
+                                            title="Download graphs .zip">
+                                            <span class="fas fa-download"></span>
+                                        Download Graphs
+                                        </button>
+                                        <button class="dropdown-item"
+                                                onclick="location.href='{{ valrun.output_file.url }}';"
+                                                title="Download validation run .nc file">
+                                                <span class="fas fa-file-download"></span>
+                                        Download NetCDF File
+                                        </button>
+                                        <button class="dropdown-item"
+                                                onclick="location.href='{% url 'validation' %}?valrun_uuid={{ valrun.id }}';"
+                                                title="Restore settings from this validation">
+                                                <span class="fas fa-redo"></span>
+                                        Load Validation Settings
+                                        </button>
+
+                                    {% endif %}
+                                    {% if valrun.is_unpublished %}
+                                        <span class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">
+                                        <button class="dropdown-item"
+                                                title="Remove this validation run"
+                                                onclick="ajax_delete_result('{{ valrun.id }}', false)">
+                                                <span class="fas fa-times"></span>
+                                        Delete Validation Run
+                                        </button>
+                                        {% if not valrun.is_archived %}
+                                            <button class="dropdown-item"
+                                                    title="Extend lifespan of this validation run"
+                                                    onclick="ajax_extend_result('{{ valrun.id }}', true)">
+                                                    <span class="fas fa-calendar-plus"></span>
+                                            Extend Life Span
+                                            </button>
                                         {% endif %}
-                                    </span>
-                                {% endif %}
-                                <a class="btn btn-sm btn-primary btn-action" href="{% url 'validation' %}?valrun_uuid={{ valrun.id }}" title="Load validation settings"><span class="fas fa-redo"></span></a>
-                                {% endif %}
+                                        </span>
+                                    {% endif %}
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -208,10 +248,12 @@
 {% endblock %}
 
 {% block javascript %}
+
     <script type="text/javascript">
         csrf_token = '{{csrf_token}}';
         result_url = "{% url 'result' '00000000-0000-0000-0000-000000000000' %}";
         stop_validation_url = "{% url 'stop_validation' '00000000-0000-0000-0000-000000000000' %}";
     </script>
     <script src="{% static 'js/results_buttons.js' %}"></script>
+
 {% endblock %}
