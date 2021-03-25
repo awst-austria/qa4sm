@@ -44,6 +44,7 @@ import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
 import {NgxPaginationModule} from 'ngx-pagination';
 import {MapModule} from './modules/map/map.module';
+import {AboutComponent} from './pages/about/about.component';
 
 
 @NgModule({
@@ -57,7 +58,7 @@ import {MapModule} from './modules/map/map.module';
     LoginComponent,
     UserProfileComponent,
     PublishedValidationsComponent,
-
+    AboutComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
