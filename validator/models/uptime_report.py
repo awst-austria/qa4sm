@@ -25,4 +25,4 @@ class UptimeReport(models.Model):
         null=False,
         blank=False,
     )
-    sla = models.FloatField(null=False, blank=False)
+    uptime_percentage = models.FloatField(null=False, blank=False)
