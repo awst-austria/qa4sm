@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
@@ -19,6 +19,7 @@ import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
+import {MapComponent} from '../../modules/map/components/map/map.component';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -28,14 +29,18 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either con
   styleUrls: ['./validate.component.scss'],
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ValidateComponent implements OnInit {
-  // datasetConfigurations: DatasetConfigModel[] = [];
-  // referenceConfiguration: DatasetConfigModel[] = []; // this array will always contain exactly 1 element
+export class ValidateComponent implements OnInit, AfterViewInit {
+  @ViewChild(MapComponent) child: MapComponent;
+
   mapVisible: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
     [],
     [],
-    new SpatialSubsetModel(),
+    new SpatialSubsetModel(
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<number>(null)),
     new ValidationPeriodModel(),
     [],
     new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC),
@@ -49,6 +54,10 @@ export class ValidateComponent implements OnInit {
               private toastService: ToastService,
               private router: Router) {
 
+  }
+
+  ngAfterViewInit() {
+    // child init could be done here
   }
 
   ngOnInit(): void {
@@ -127,7 +136,6 @@ export class ValidateComponent implements OnInit {
 
   public startValidation() {
     //debug
-    //console.log(JSON.stringify(this.validationModel));
 
     //prepare the dataset dtos (dataset, version, variable and filter settings)
     let datasets: NewValRunDatasetConfigDto[] = [];
@@ -158,9 +166,5 @@ export class ValidateComponent implements OnInit {
         this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
         console.error(error);
       });
-  }
-
-  showMap() {
-    this.mapVisible.next(true);
   }
 }
