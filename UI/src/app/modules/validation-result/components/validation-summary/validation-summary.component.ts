@@ -7,6 +7,8 @@ import {DatasetVersionService} from '../../../core/services/dataset/dataset-vers
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
 import {FilterService} from '../../../core/services/filter/filter.service';
 import {map} from 'rxjs/operators';
+import {SCALING_CHOICES} from '../../../scaling/components/scaling/scaling.component';
+
 
 @Component({
   selector: 'qa-validation-summary',
@@ -18,8 +20,9 @@ export class ValidationSummaryComponent implements OnInit {
   @Input() validationModel: ValidationResultModel;
 
   configurations$: Observable<any>;
-  dateFormat = 'MMM. dd, YYYY, hh:mm a O';
+  dateFormat = 'medium';
   timeZone = 'UTC';
+  scalingMethods = SCALING_CHOICES;
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -32,6 +35,7 @@ export class ValidationSummaryComponent implements OnInit {
     console.log(this.configurations$);
     this.filterService.getParameterisedFilterById(1490).subscribe(data =>
       console.log(data));
+    console.log(this.scalingMethods[0]);
   }
 
   private getFullConfig(): void{
@@ -78,5 +82,4 @@ export class ValidationSummaryComponent implements OnInit {
       console.log(data);
     });
   }
-
 }

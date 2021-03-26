@@ -23,8 +23,8 @@
         </div>
         <div class="card-body">
           <ul>
-            <li>Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }}, finished
-              on {{ validationRun.end_time | date: dateFormat :timeZone }}.
+            <li>Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
+              on {{ validationRun.end_time | date: dateFormat :timeZone }} {{timeZone}}.
             </li>
             <li>Compared {{ configurations.length  }} datasets:
               <ul>
@@ -34,120 +34,112 @@
 
                   {{config.dataset}} ({{config.version}}, {{config.variable}})
                   [Filters: <span *ngFor="let filter of config.filters"> {{filter}}; </span>
-                            <span *ngFor="let paramFilter of config.parametrisedFilters; let ind = index">
-                              {{paramFilter}} {{config.parametrisedFiltersValues[ind]}}
+                  <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
+                              {{paramFilter}} {{config.parametrisedFiltersValues[indF]}}
                             </span>
                   ]
                 </li>
-
               </ul>
-              <!--              {% for dc in valrun.dataset_configurations.all %}-->
-              <!--              {% if dc.id != valrun.reference_configuration.id %}-->
-              <!--              <li>-->
-              <!--                <em>Dataset {{ forloop.counter }}:</em> {{ dc.dataset.pretty_name }} ({{ dc.version.pretty_name }}, {{ dc.variable.pretty_name }})-->
-              <!--                [Filters:-->
-              <!--                {% if not dc.filters.all and not dc.parametrisedfilter_set.all %}-->
-              <!--                none-->
-              <!--                {% else %}-->
-              <!--                {% for filter in dc.filters.all %} {{ filter.description }}; {% endfor %}-->
-              <!--                {% for pfilter in dc.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}-->
-              <!--                {% endif %}]-->
-              <!--              </li>-->
-              <!--              {% endif %}-->
-              <!--              {% endfor %}-->
+            <li
+              *ngIf="validationRun.min_lat && validationRun.min_lon && validationRun.max_lat && validationRun.max_lon; else elseSpatial">
+              Spatial filter bounding box: [{{ validationRun.min_lat }}, {{ validationRun.min_lon }}
+              , {{ validationRun.max_lat }}, {{ validationRun.max_lon }}].
+            </li>
+            <ng-template #elseSpatial>
+              <li>
+                Validated globally.
+              </li>
+            </ng-template>
 
-              <!--              <li>-->
-              <!--                <em>Reference:</em> {{ valrun.reference_configuration.dataset.pretty_name }} ({{ valrun.reference_configuration.version.pretty_name }}, {{ valrun.reference_configuration.variable.pretty_name }})-->
-              <!--                [Filters:-->
-              <!--                {% if not valrun.reference_configuration.filters.all and not valrun.reference_configuration.parametrisedfilter_set.all %}-->
-              <!--                none-->
-              <!--                {% else %}-->
-              <!--                {% for filter in valrun.reference_configuration.filters.all %} {{ filter.description }}; {% endfor %}-->
-              <!--                {% for pfilter in valrun.reference_configuration.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}-->
-              <!--                {% endif %}]-->
-              <!--              </li>-->
-              <!--                    </ul>-->
-              <!--          </li>-->
 
-              <!--          {% if valrun.min_lat and valrun.min_lon and valrun.max_lat and valrun.max_lon %}-->
-              <!--          <li>Spatial filter bounding box: [{{ valrun.min_lat }}, {{ valrun.min_lon }}, {{ valrun.max_lat }}, {{ valrun.max_lon }}].</li>-->
-              <!--          {% else %}-->
-              <!--          <li>Validated globally.</li>-->
-              <!--          {% endif %}-->
+            <li *ngIf="validationRun.interval_from && validationRun.interval_to; else elseTemporal">Validation period /
+              temporal
+              filter: {{ validationRun.interval_from | date: dateFormat :timeZone }} {{timeZone}}
+              to {{ validationRun.interval_to | date: dateFormat :timeZone }} {{timeZone}}.
+            </li>
+            <ng-template #elseTemporal>
+              <li>Validated over entire available timespan.</li>
+            </ng-template>
 
-              <!--          {% if valrun.interval_from and valrun.interval_to %}-->
-              <!--          <li>Validation period / temporal filter: {{ valrun.interval_from }} to {{ valrun.interval_to }}.</li>-->
-              <!--          {% else %}-->
-              <!--          <li>Validated over entire available timespan.</li>-->
-              <!--          {% endif %}-->
 
-              <!--          {% if valrun.anomalies != 'none' %}-->
-              <!--          <li>Validation metrics calculated from anomalies-->
-              <!--            {% if valrun.anomalies == 'climatology' %}-->
-              <!--            against climatology computed on years {{ valrun.anomalies_from|date:"Y" }} through {{ valrun.anomalies_to|date:"Y" }}.-->
-              <!--            {% elif valrun.anomalies == 'moving_avg_35_d' %}-->
-              <!--            against 35 day moving average.-->
-              <!--            {% endif %}-->
-              <!--          </li>-->
-              <!--          {% else %}-->
-              <!--          <li>Validation metrics calculated from absolute values.</li>-->
-              <!--          {% endif %}-->
+            <li *ngIf="validationRun.anomalies != 'none'; else elseAnomalies">
+              Validation metrics calculated from anomalies
+              <span *ngIf="validationRun.anomalies == 'climatology'">
+                against climatology computed on years {{ validationRun.anomalies_from|date:"Y" }}
+                through {{ validationRun.anomalies_to|date:"Y" }}.
+              </span>
+              <span *ngIf="validationRun.anomalies == 'moving_avg_35_d'">
+              against 35 day moving average.
+              </span>
+            </li>
+            <ng-template #elseAnomalies>
+              <li>Validation metrics calculated from absolute values.</li>
+            </ng-template>
 
-              <!--          <li>Triple collocation analysis was-->
-              <!--            {% if valrun.tcol %} activated. {% else %} deactivated. {% endif %}-->
-              <!--          </li>-->
 
-              <!--          {% if valrun.scaling_method != 'none' %}-->
-              <!--          <li>Scaling reference:-->
-              <!--            {{ valrun.scaling_ref.dataset.pretty_name }} ({{ valrun.scaling_ref.version.pretty_name }}, {{ valrun.scaling_ref.variable.pretty_name }})-->
-              <!--            [Filters:-->
-              <!--            {% if not valrun.scaling_ref.filters.all and not valrun.scaling_ref.parametrisedfilter_set.all %}-->
-              <!--            none-->
-              <!--            {% else %}-->
-              <!--            {% for filter in valrun.scaling_ref.filters.all %} {{ filter.description }}; {% endfor %}-->
-              <!--            {% for pfilter in valrun.scaling_ref.parametrisedfilter_set.all %} {{ pfilter.filter.description }} {{ pfilter.parameters }}; {% endfor %}-->
-              <!--            {% endif %}]-->
-              <!--          </li>-->
-              <!--          {% else %}-->
-              <!--          <li>Scaling reference: {{ valrun.get_scaling_method_display }}.</li>-->
-              <!--          {% endif %}-->
+            <li>Triple collocation analysis was
+              <span *ngIf="validationRun.tcol">activated. </span>
+              <span *ngIf="!validationRun.tcol">deactivated. </span>
+            </li>
 
-              <!--          <li>Scaling method: {{ valrun.get_scaling_method_display }}.</li>-->
+            <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
+              <span *ngFor="let config of configurations">
+                <span *ngIf="config.id === validationRun.reference_configuration">
+                  {{config.dataset}} ({{ config.version }}, {{ config.variable }})
 
-              <!--          <li>Processing took {{ run_time }} minutes (wall time).</li>-->
+                  <span *ngIf="config.filters || config.parameterisedFilters; else elseFilters">[Filters:
+                  <span *ngFor="let filter of config.filters"> {{filter}}; </span>
+                  <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
+                              {{paramFilter}} {{config.parametrisedFiltersValues[indF]}}
+                            </span>
+                    ]</span>
+                  <ng-template #elseFilters>
+                    none
+                  </ng-template>
+              </span>
+              </span>
+            </li>
 
-              <!--          {% if valrun.progress == -1 %}-->
-              <!--          <li>The validation was cancelled.</li>-->
-              <!--          {% else %}-->
-              <!--          <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>-->
-              <!--            {% widthratio error_rate 1 100 %}% ({{ valrun.error_points }} of {{ valrun.total_points }}) of the processed locations (grid points) produced errors during calculation.-->
-              <!--          </li>-->
-              <!--          {% endif %}-->
+            <ng-template #elseScaling>
+              <li> Scaling reference: {{ scalingMethods[validationRun.scaling_method] }}.</li>
+            </ng-template>
+            <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
-              <!--          {% if is_owner %}-->
-              <!--          {% if valrun.expiry_date %}-->
-              <!--          <li>-->
-              <!--            {% if valrun.is_near_expiry %}-->
-              <!--            <span class="fas fa-exclamation-triangle"></span>-->
-              <!--            This validation will SOON be automatically removed during cleanup on {{ valrun.expiry_date }}.-->
-              <!--            {% else %}-->
-              <!--            <span class="fas fa-calendar-alt"></span>-->
-              <!--            This validation will be automatically removed during cleanup on {{ valrun.expiry_date }}.-->
-              <!--            {% endif %}-->
-              <!--          </li>-->
-              <!--          {% elif valrun.is_archived %}-->
-              <!--          <li>-->
-              <!--            <span class="fas fa-archive"></span>-->
-              <!--            This validation has been archived. It will NOT be automatically removed during cleanup.-->
-              <!--          </li>-->
-              <!--          {% endif %}-->
-              <!--          {% endif %}-->
 
-              <!--          {% if valrun.doi %}-->
-              <!--          <li>-->
-              <!--            <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank" href="{{doi_prefix}}{{ valrun.doi }}">{{ valrun.doi }}</a>.-->
-              <!--          </li>-->
-              <!--          {% endif %}-->
+<!--            <li>Processing took {{ run_time }} minutes (wall time).</li>-->
+
+            <!--          {% if valrun.progress == -1 %}-->
+            <!--          <li>The validation was cancelled.</li>-->
+            <!--          {% else %}-->
+            <!--          <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>-->
+            <!--            {% widthratio error_rate 1 100 %}% ({{ valrun.error_points }} of {{ valrun.total_points }}) of the processed locations (grid points) produced errors during calculation.-->
+            <!--          </li>-->
+            <!--          {% endif %}-->
+
+            <!--          {% if is_owner %}-->
+            <!--          {% if valrun.expiry_date %}-->
+            <!--          <li>-->
+            <!--            {% if valrun.is_near_expiry %}-->
+            <!--            <span class="fas fa-exclamation-triangle"></span>-->
+            <!--            This validation will SOON be automatically removed during cleanup on {{ valrun.expiry_date }}.-->
+            <!--            {% else %}-->
+            <!--            <span class="fas fa-calendar-alt"></span>-->
+            <!--            This validation will be automatically removed during cleanup on {{ valrun.expiry_date }}.-->
+            <!--            {% endif %}-->
+            <!--          </li>-->
+            <!--          {% elif valrun.is_archived %}-->
+            <!--          <li>-->
+            <!--            <span class="fas fa-archive"></span>-->
+            <!--            This validation has been archived. It will NOT be automatically removed during cleanup.-->
+            <!--          </li>-->
+            <!--          {% endif %}-->
+            <!--          {% endif %}-->
+
+            <!--          {% if valrun.doi %}-->
+            <!--          <li>-->
+            <!--            <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank" href="{{doi_prefix}}{{ valrun.doi }}">{{ valrun.doi }}</a>.-->
+            <!--          </li>-->
+            <!--          {% endif %}-->
 
           </ul>
 
