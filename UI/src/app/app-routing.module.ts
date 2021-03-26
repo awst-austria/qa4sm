@@ -10,6 +10,7 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {AboutComponent} from './pages/about/about.component';
+import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -21,6 +22,7 @@ const routes: Routes = [
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},
   {path: 'about', component: AboutComponent},
+  {path: 'datasets', component: DatasetInfoComponent},
   {path: '**', component: ErrorComponent}
 ];
 
