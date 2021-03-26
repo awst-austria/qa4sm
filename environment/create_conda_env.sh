@@ -100,7 +100,7 @@ pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 pip install ismn
 pip install requests
-pip install qa4sm-reader>=0.3.3
+pip install qa4sm-reader>=0.3.4
 
 cd $TEMP_DIR
 

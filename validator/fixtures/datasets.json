@@ -14,7 +14,8 @@
             "versions": [
                 1,
                 10,
-                28
+                28,
+                31
             ],
             "variables": [
                 1
@@ -91,11 +92,12 @@
             "storage_path": "testdata/input_data/ISMN",
             "detailed_description": "The ISMN provides in-situ soil moisture data from over 2600 monitoring stations worldwide. The data is harmonised and quality controlled to ensure the highest quality data is provided through the portal. Data is provided from 1952 to present day (<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/\">more information</a>).",
             "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/data-access/\"> here</a>.",
-            "citation": "<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/terms-and-conditions/\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\">readme (v20180830)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\">readme (v20190222)</a>",
+            "citation": "<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/terms-and-conditions/\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\">readme (v20180830)</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\">readme (v20190222)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20210131_Readme.txt\">readme (v20210131)</a>",
             "is_only_reference": true,
             "versions": [
                 5,
-                18
+                18,
+                30
             ],
             "variables": [
                 4
@@ -151,7 +153,8 @@
                 12,
                 19,
                 24,
-                27
+                27,
+                34
             ],
             "variables": [
                 9
@@ -257,7 +260,8 @@
             "is_only_reference": false,
             "versions": [
                 20,
-                26
+                26,
+                33
             ],
             "variables": [
                 13
@@ -286,7 +290,8 @@
             "is_only_reference": false,
             "versions": [
                 21,
-                25
+                25,
+                32
             ],
             "variables": [
                 14
