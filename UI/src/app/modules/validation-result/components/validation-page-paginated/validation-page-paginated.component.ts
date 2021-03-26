@@ -53,7 +53,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
   getOrder(order): void {
     this.order = order;
     this.getValidationsAndItsNumber(this.published);
-    console.log(this.order);
   }
 
 }

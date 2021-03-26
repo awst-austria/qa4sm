@@ -11,8 +11,8 @@ export class ValidationrunDto{
               public reference_configuration: number,
               public scaling_ref: number,
               public scaling_method: string,
-              public interval_from: new (Date) => string,
-              public interval_to: new (Date) => string,
+              public interval_from: Date,
+              public interval_to: Date,
               public anomalies: string,
               public min_lat: number,
               public min_lon: number,
@@ -28,7 +28,8 @@ export class ValidationrunDto{
               public publishing_in_progress: boolean,
               public tcol: boolean,
               public expiry_date: Date,
-              public is_near_expiry: boolean) {
+              public is_near_expiry: boolean,
+              public is_unpublished: boolean) {
   }
 }
 

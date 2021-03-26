@@ -6,7 +6,8 @@ export class DatasetConfigurationDto {
     public version: number,
     public variable: number,
     public filters: number[],
-    public parametrised_filters: number[]
+    public parametrised_filters: number[],
+    public parametrisedfilter_set: number[]
   ) {
   }
 }

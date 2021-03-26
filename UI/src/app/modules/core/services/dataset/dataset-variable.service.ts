@@ -24,7 +24,7 @@ export class DatasetVariableService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getAllVersions(): Observable<DatasetVariableDto[]> {
+  getAllVariables(): Observable<DatasetVariableDto[]> {
     if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_VERSIONS)) {
       return this.arrayRequestCache.get(CACHE_KEY_ALL_VERSIONS);
     } else {
