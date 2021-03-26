@@ -1,6 +1,6 @@
 <div class="container center-text">
   <div class="card-deck">
-    <div *ngIf="validationModel.validationRun | async as validationRun" id="result_summary" class="card mb-4 shadow-sm">
+    <div *ngIf="validationRun$ | async as validationRun" id="result_summary" class="card mb-4 shadow-sm">
       <div *ngIf="configurations$| async as configurations">
         <div class="card-header text-center">
           <h4 class="my-0 font-weight-normal">
@@ -106,15 +106,17 @@
             <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
 
-<!--            <li>Processing took {{ run_time }} minutes (wall time).</li>-->
+            <li>Processing took {{ validationRun.runTime }} minutes (wall time).</li>
 
-            <!--          {% if valrun.progress == -1 %}-->
-            <!--          <li>The validation was cancelled.</li>-->
-            <!--          {% else %}-->
-            <!--          <li {% if error_rate > 0 %} class="alert-danger" {% endif %}>-->
-            <!--            {% widthratio error_rate 1 100 %}% ({{ valrun.error_points }} of {{ valrun.total_points }}) of the processed locations (grid points) produced errors during calculation.-->
-            <!--          </li>-->
-            <!--          {% endif %}-->
+
+            <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
+            <ng-template #elseProgress>
+              <li [ngClass]="{'alert-danger': validationRun.errorRate > 0}">
+                {{validationRun.errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
+                of {{ validationRun.total_points }}) of the processed locations (grid points) produced errors during
+                calculation.
+              </li>
+            </ng-template>
 
             <!--          {% if is_owner %}-->
             <!--          {% if valrun.expiry_date %}-->
@@ -135,11 +137,12 @@
             <!--          {% endif %}-->
             <!--          {% endif %}-->
 
-            <!--          {% if valrun.doi %}-->
-            <!--          <li>-->
-            <!--            <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank" href="{{doi_prefix}}{{ valrun.doi }}">{{ valrun.doi }}</a>.-->
-            <!--          </li>-->
-            <!--          {% endif %}-->
+
+            <li *ngIf="validationRun.doi">
+              <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank"
+                                                                                                href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
+            </li>
+
 
           </ul>
 

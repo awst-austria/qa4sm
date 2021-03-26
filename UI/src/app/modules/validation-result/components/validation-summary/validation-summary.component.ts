@@ -8,6 +8,7 @@ import {DatasetVariableService} from '../../../core/services/dataset/dataset-var
 import {FilterService} from '../../../core/services/filter/filter.service';
 import {map} from 'rxjs/operators';
 import {SCALING_CHOICES} from '../../../scaling/components/scaling/scaling.component';
+import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class ValidationSummaryComponent implements OnInit {
   @Input() validationModel: ValidationResultModel;
 
   configurations$: Observable<any>;
+  validationRun$: Observable<any>;
   dateFormat = 'medium';
   timeZone = 'UTC';
   scalingMethods = SCALING_CHOICES;
@@ -28,17 +30,15 @@ export class ValidationSummaryComponent implements OnInit {
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
-              private filterService: FilterService) { }
+              private filterService: FilterService,
+              private globalParamsService: GlobalParamsService) { }
 
   ngOnInit(): void {
-    this.getFullConfig();
-    console.log(this.configurations$);
-    this.filterService.getParameterisedFilterById(1490).subscribe(data =>
-      console.log(data));
-    console.log(this.scalingMethods[0]);
+    this.updateConfig();
+    this.updateValidationRun();
   }
 
-  private getFullConfig(): void{
+  private updateConfig(): void{
     this.configurations$ = combineLatest(
       this.validationModel.datasetConfigs,
       this.datasetService.getAllDatasets(),
@@ -79,7 +79,28 @@ export class ValidationSummaryComponent implements OnInit {
       ))
     );
     this.configurations$.subscribe(data => {
-      console.log(data);
     });
   }
+
+  private updateValidationRun(): void{
+    this.validationRun$ = this.validationModel.validationRun.pipe(
+      map(validation => ({
+        ...validation,
+        runTime: this.getRunTime(validation.start_time, validation.end_time),
+        errorRate: validation.total_points !== 0 ? (validation.total_points - validation.ok_points) / validation.total_points : 1
+      })),
+    );
+  }
+
+  private getRunTime(startTime: Date, endTime: Date): number{
+    const startTimeDate = new Date(startTime);
+    const endTimeDate = new Date(endTime);
+    const runTime = endTimeDate.getTime() - startTimeDate.getTime();
+    return Math.round(runTime / 60000);
+  }
+
+  getDoiPrefix(): string {
+    return this.globalParamsService.globalContext.doi_prefix;
+  }
+
 }
