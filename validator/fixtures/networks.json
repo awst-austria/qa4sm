@@ -59,7 +59,7 @@
         "model": "validator.ismnnetworks",
         "pk": 5,
         "fields": {
-            "name": "CTP_SMTMN",
+            "name": "CTP-SMTMN",
             "continent": "Asia",
             "country": "China",
             "number_of_stations": "57",
@@ -73,7 +73,7 @@
         "model": "validator.ismnnetworks",
         "pk": 6,
         "fields": {
-            "name": "HiWATER_EHWSN",
+            "name": "HiWATER-EHWSN",
             "continent": "Asia",
             "country": "China",
             "number_of_stations": "174",
@@ -87,7 +87,7 @@
         "model": "validator.ismnnetworks",
         "pk": 7,
         "fields": {
-            "name": "HSC_SEOLMACHEON",
+            "name": "HSC-SEOLMACHEON",
             "continent": "Asia",
             "country": "Korea",
             "number_of_stations": "1",
@@ -114,7 +114,7 @@
         "model": "validator.ismnnetworks",
         "pk": 9,
         "fields": {
-            "name": "IIT_KANPUR",
+            "name": "IIT-KANPUR",
             "continent": "Asia",
             "country": "India",
             "number_of_stations": "1",
@@ -296,7 +296,7 @@
         "model": "validator.ismnnetworks",
         "pk": 22,
         "fields": {
-            "name": "BIEBRZA_S-1",
+            "name": "BIEBRZA-S-1",
             "continent": "Europe",
             "country": "Poland",
             "number_of_stations": "30",
@@ -352,7 +352,7 @@
         "model": "validator.ismnnetworks",
         "pk": 26,
         "fields": {
-            "name": "FR_Aqui",
+            "name": "FR-Aqui",
             "continent": "Europe",
             "country": "France",
             "number_of_stations": "5",
@@ -408,7 +408,7 @@
         "model": "validator.ismnnetworks",
         "pk": 30,
         "fields": {
-            "name": "HYDROL-NET_PERUGIA",
+            "name": "HYDROL-NET-PERUGIA",
             "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "2",
@@ -422,7 +422,7 @@
         "model": "validator.ismnnetworks",
         "pk": 31,
         "fields": {
-            "name": "IMA_CAN1",
+            "name": "IMA-CAN1",
             "continent": "Europe",
             "country": "Italy",
             "number_of_stations": "12",
@@ -520,7 +520,7 @@
         "model": "validator.ismnnetworks",
         "pk": 38,
         "fields": {
-            "name": "SWEX_POLAND",
+            "name": "SWEX-POLAND",
             "continent": "Europe",
             "country": "Poland",
             "number_of_stations": "6",
@@ -548,7 +548,7 @@
         "model": "validator.ismnnetworks",
         "pk": 40,
         "fields": {
-            "name": "UDC_SMOS",
+            "name": "UDC-SMOS",
             "continent": "Europe",
             "country": "Germany",
             "number_of_stations": "11",
@@ -745,7 +745,7 @@
         "model": "validator.ismnnetworks",
         "pk": 54,
         "fields": {
-            "name": "PBO_H2O",
+            "name": "PBO-H2O",
             "continent": "North America",
             "country": "USA",
             "number_of_stations": "159",
@@ -886,7 +886,7 @@
         "model": "validator.ismnnetworks",
         "pk": 64,
         "fields": {
-            "name": "KIHS_CMC",
+            "name": "KIHS-CMC",
             "continent": "Asia",
             "country": "Korea",
             "number_of_stations": "18",
@@ -899,7 +899,7 @@
         "model": "validator.ismnnetworks",
         "pk": 65,
         "fields": {
-            "name": "KHIS_SMC",
+            "name": "KHIS-SMC",
             "continent": "Asia",
             "country": "Korea",
             "number_of_stations": "19",

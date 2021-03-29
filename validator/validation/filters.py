@@ -34,7 +34,7 @@ def get_used_variables(filters, dataset, variable):
 
     for fil in filters:
         if(fil.name == "FIL_ISMN_GOOD"):
-            variables.append('soil_moisture_flag')
+            variables.append('soil moisture_flag')
             continue
 
         if((fil.name == "FIL_C3S_FLAG_0") or
@@ -155,7 +155,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
             continue
 
         if(fil.name == "FIL_ISMN_GOOD"):
-            masking_filters.append( ('soil_moisture_flag', '==', 'G') )
+            masking_filters.append( ('soil moisture_flag', '==', 'G') )
             continue
 
         if(fil.name == "FIL_C3S_FLAG_0"):
