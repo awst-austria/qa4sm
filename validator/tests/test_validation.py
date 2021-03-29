@@ -933,10 +933,8 @@ class TestValidation(TestCase):
                                      dataset_config=run.reference_configuration)
         pfilter.save()
 
-        ref_reader = val.validation._get_reference_reader(run)
-
         with pytest.raises(ValueError, match=r".*than.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(run)
 
         ParametrisedFilter.objects.all().delete()
 
@@ -946,7 +944,7 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(run)
 
         ParametrisedFilter.objects.all().delete()
 
@@ -955,7 +953,7 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(run)
 
         ParametrisedFilter.objects.all().delete()
 
@@ -964,7 +962,7 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(run)
 
     # test all combinations of datasets, versions, variables, and filters
     @pytest.mark.long_running
@@ -1002,16 +1000,13 @@ class TestValidation(TestCase):
 
         print("Test duration: {}".format(time.time() - start_time))
 
-    def _check_jobs(self, total_points, jobs, metadata_present=False):
+    def _check_jobs(self, total_points, jobs):
         assert jobs
         assert total_points > 0
         assert len(jobs) > 0
         gpisum = 0
         for job in jobs:
-            if metadata_present:
-                assert len(job) == 4
-            else:
-                assert len(job) == 3
+            assert len(job) == 3
             if np.isscalar(job[0]):
                 assert np.isscalar(job[1])
                 assert np.isscalar(job[2])
@@ -1045,16 +1040,11 @@ class TestValidation(TestCase):
                 run.reference_configuration = ref_c
                 run.save()
 
-                ref_reader = val.validation._get_reference_reader(run)
-
-                total_points, jobs = val.create_jobs(run, ref_reader)
+                total_points, jobs = val.create_jobs(run)
                 print(version)
                 print(len(jobs))
                 print(total_points)
-                if dataset.short_name == "ISMN":
-                    self._check_jobs(total_points, jobs, metadata_present=True)
-                else:
-                    self._check_jobs(total_points, jobs)
+                self._check_jobs(total_points, jobs)
 
     def test_geographic_subsetting(self):
         # hawaii bounding box
