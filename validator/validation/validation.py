@@ -9,6 +9,7 @@ from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
 from django.urls.base import reverse
+from ismn.interface import ISMN_Interface
 from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
@@ -29,7 +30,7 @@ from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
-from validator.validation.globals import START_TIME, END_TIME
+from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 
 
 __logger = logging.getLogger(__name__)
@@ -58,6 +59,22 @@ def _get_actual_time_range(val_run, dataset_version_id):
 
     return [actual_start, actual_end]
 
+def _get_reference_reader(val_run):
+    ref_reader = create_reader(val_run.reference_configuration.dataset, val_run.reference_configuration.version)
+
+    # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
+    ref_reader = setup_filtering(
+        ref_reader,
+        list(val_run.reference_configuration.filters.all()),
+        list(val_run.reference_configuration.parametrisedfilter_set.all()),
+        val_run.reference_configuration.dataset,
+        val_run.reference_configuration.variable
+    )
+    
+    while(hasattr(ref_reader, 'cls')):
+        ref_reader = ref_reader.cls
+
+    return ref_reader
 
 def set_outfile(validation_run, run_dir):
     outfile = first_file_in(run_dir, '.nc')
@@ -175,6 +192,8 @@ def create_pytesmo_validation(validation_run):
         if ((validation_run.reference_configuration) and
             (dataset_config.id == validation_run.reference_configuration.id)):
             ref_name = dataset_name
+            ref_short_name = validation_run.reference_configuration.dataset.short_name
+
         if ((validation_run.scaling_ref) and
             (dataset_config.id == validation_run.scaling_ref.id)):
             scaling_ref_name = dataset_name
@@ -192,16 +211,23 @@ def create_pytesmo_validation(validation_run):
     datamanager = DataManager(datasets, ref_name=ref_name, period=period, read_ts_names='read')
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
+    # set value of the metadata template according to what reference dataset is used
+    if ref_short_name == 'ISMN':
+        metadata_template = METADATA_TEMPLATE['ismn_ref']
+    else:
+        metadata_template = METADATA_TEMPLATE['other_ref']
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         # if there are 3 or more dataset, do TC, exclude ref metrics
         metrics = TCMetrics(
                     dataset_names=ds_names, tc_metrics_for_ref=False,
-                    other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+                    other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
+                    metadata_template = metadata_template)
     else:
         metrics = IntercomparisonMetrics(
                         dataset_names=ds_names,
-                        other_names=['k{}'.format(i + 1) for i in range(ds_num-1)])
+                        other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
+                        metadata_template = metadata_template)
 
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
@@ -273,6 +299,8 @@ def untrack_celery_task(task_id):
     except CeleryTask.DoesNotExist:
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
+
+
 def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
@@ -285,11 +313,13 @@ def run_validation(validation_id):
         run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
         mkdir_if_not_exists(run_dir)
 
-        total_points, jobs = create_jobs(validation_run)
+        ref_reader = _get_reference_reader(validation_run)
+
+        total_points, jobs = create_jobs(validation_run, ref_reader)
         validation_run.total_points = total_points
         validation_run.save() # save the number of gpis before we start
 
-        __logger.debug("Jobs to run: {}".format(jobs))
+        __logger.debug("Jobs to run: {}".format([job[:-1] for job in jobs]))
 
         save_path = run_dir
 
