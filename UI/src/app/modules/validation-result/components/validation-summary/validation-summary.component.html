@@ -145,29 +145,7 @@
 
 
           </ul>
-
-          <!--        {% if is_owner and valrun.is_unpublished %}-->
-          <!--        <div style="float: right;" class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">-->
-          <!--          <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}', true)"><span class="fas fa-times"></span> Remove</button>-->
-          <!--          {% if valrun.is_archived %}-->
-          <!--          <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ valrun.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>-->
-          <!--          {% else %}-->
-          <!--          <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ valrun.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>-->
-          <!--          <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ valrun.id }}', true)"><span class="fas fa-archive"></span> Archive</button>-->
-          <!--          {% endif %}-->
-          <!--          {% if valrun.output_file %}-->
-          <!--          <button type="button" title="Publish on Zenodo" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#publishDialog">-->
-          <!--            <span class="fas fa-book" ></span> Publish-->
-          <!--          </button>-->
-          <!--          {% endif %}-->
-          <!--        </div>-->
-          <!--        {% if valrun.output_file %}-->
-          <!--        <div class="publishingNote small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}" style="float: right">-->
-          <!--          <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing in progress...</span></div>-->
-          <!--          Publishing in progress...-->
-          <!--        </div>-->
-          <!--        {% endif %}-->
-          <!--        {% endif %}-->
+          <qa-buttons [validationList]="false" [validationRun]="validationRun"></qa-buttons>
         </div>
       </div>
     </div>
