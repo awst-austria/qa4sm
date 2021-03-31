@@ -11,9 +11,10 @@ import {SortingFormComponent} from './components/sorting-form/sorting-form.compo
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
+import {ButtonsComponent} from './components/buttons/buttons.component';
 
 @NgModule({
-    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent],
+    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent, ButtonsComponent],
   exports: [
     ValidationrunRowComponent,
     ValidationPagePaginatedComponent,
