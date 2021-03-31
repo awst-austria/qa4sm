@@ -86,7 +86,7 @@
 
     <!-- Action Buttons -->
     <div class="p-col-2">
-      <a class="btn btn-sm btn-primary btn-action" routerLink="/validation-result/{{model.validationRun.id}}"  title="View results"><span class="pi pi-folder-open"></span></a>
+     <qa-buttons [validationList]="true" [validationRun]="model.validationRun"></qa-buttons>
     </div>
 
 
