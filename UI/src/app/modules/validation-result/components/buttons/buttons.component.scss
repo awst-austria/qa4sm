@@ -1,0 +1,98 @@
+@import "~bootstrap/dist/css/bootstrap.css";
+$button-base-color: #4760E5;
+$button-hover-color: #213FE0;
+
+.btn-primary {
+  color: #fff;
+  background-color: $button-base-color;
+  border-color: $button-base-color;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  color: #fff;
+  background-color: $button-base-color;
+  border-color: $button-base-color;
+}
+
+.btn-primary:not(:disabled):not(.disabled):hover, .btn-primary:not(:disabled):not(.disabled):active {
+  color: #fff;
+  background-color: $button-hover-color;
+  border-color: $button-hover-color;
+}
+
+.btn-primary.focus, .btn-primary:focus, .btn-primary:not(:disabled):not(.disabled):active:focus {
+  box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .5);
+}
+.btn-action {
+  width: 2.4em;
+  margin-top: 0.12rem;
+  margin-bottom: 0.12rem;
+}
+.btn-primary.edit_name_btn{
+  color: #fff;
+  background-color: #00AAE3;
+  border-color: #00AAE3;
+  transform: scale(0.9);
+  width: 0;
+}
+.btn-primary.edit_name_btn:not(.disabled):hover{
+  color: #4760E5;
+  background-color: #00AAE3;
+  border-color: #00AAE3;
+  transform: scale(1.2);
+}
+.edit_name{
+  border: 1px solid #00AAE3;
+  border-radius: 4px;
+  position: relative;
+  padding: 3px;
+
+}
+.edit_name:focus{
+  border: 1px solid #00AAE3;
+  box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .3);
+  outline: none;
+}
+
+.dropdown {
+  position: relative;
+  background: none;
+  display: inline-block;
+}
+
+.dropdownbutton {
+  background-color: inherit;
+  color: #003eff;
+  padding: 8px;
+  font-size: 1em;
+  border: none;
+  display: inline-block;
+  white-space: normal;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a:hover {background-color: #ddd;}
+
+.dropdown:hover .dropdown-content {display: block;}
+
+.dropdown:hover .dropdownbutton {-webkit-transform: scale(1.1);}
+
+.dropdown-item.navbar-btn-active {
+  color: initial;
+}
+
+.dropdown-item:active, .dropdown-item:focus, .dropdown-item:hover {
+  background-color: rgba(248, 193, 0, .5);
+}
+a.no-decorations {
+  text-decoration: none;
+}
