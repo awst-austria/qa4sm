@@ -16,6 +16,9 @@ export class ButtonsComponent implements OnInit {
     faStop: fas.faStop,
     faFileDownload: fas.faFileDownload,
     faRedo: fas.faRedo};
+  isOwner = true;
+  isCurrentUser = true;
+  isCopied = true;
 
   constructor() { }
 
