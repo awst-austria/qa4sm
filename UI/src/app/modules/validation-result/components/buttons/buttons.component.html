@@ -51,7 +51,7 @@
       <span [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
         <button class="dropdown-item"
                 title="Remove this validation run"
-                (click)=basicOnclick(validationRun)>
+                (click)=deleteValidation(validationRun.id)>
           <span class="pi pi-times"></span>
           Delete Validation Run
         </button>
@@ -66,8 +66,12 @@
   </div>
 
   <span *ngIf="!validationRun.is_unpublished">
-    <a class="btn btn-sm btn-primary btn-action" routerLink="/validate/" [queryParams]="{valrun_uuid: validationRun.id}"
-       title="Load validation settings"><span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span></a>
+    <a class="btn btn-sm btn-primary btn-action"
+       routerLink="/validate/"
+       [queryParams]="{valrun_uuid: validationRun.id}"
+       title="Load validation settings">
+      <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
+    </a>
 
     <!--    {% if current_user %}-->
     <!--    {% if valrun not in copied_runs %}-->
@@ -87,8 +91,10 @@
 <div *ngIf="!validationList" class="col-sm" style="text-align: right;">
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
-    <button class="btn btn-sm btn-primary" title="Remove result" (click)="basicOnclick(validationRun)"><span
-      class="pi pi-times"></span> Remove
+    <button class="btn btn-sm btn-primary"
+            title="Remove result"
+            (click)="deleteValidation(validationRun.id)">
+      <span class="pi pi-times"></span> Delete
     </button>
 
     <button *ngIf="validationRun.is_archived; else elseIsArchived"
@@ -115,8 +121,10 @@
       <span class="pi pi-book"></span> Publish
     </button>
 
-    <a class="btn btn-sm btn-primary" title="Load settings"
-       href="{% url 'validation' %}?valrun_uuid={{ validationRun.id }}">
+    <a class="btn btn-sm btn-primary"
+       routerLink="/validate/"
+       [queryParams]="{valrun_uuid: validationRun.id}"
+       title="Load settings">
       <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings</a>
 
     <div [ngClass]="{'patchButtonGroup': true,  'collapse': !validationRun.publishing_in_progress}"
@@ -131,10 +139,12 @@
 
   <ng-template #elseSingleValidation>
     <div style="float: right;" class="patchButtonGroup">
-      <a class="btn btn-sm btn-primary" title="Load settings"
-         href="{% url 'validation' %}?valrun_uuid={{ validationRun.id }}">
-        <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load
-        settings</a>
+      <a class="btn btn-sm btn-primary"
+         routerLink="/validate/"
+         [queryParams]="{valrun_uuid: validationRun.id}"
+         title="Load settings">
+        <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings
+      </a>
 
       <button *ngIf="isCurrentUser && isCopied" class="btn btn-sm btn-primary"
               title="Remove this validation from your list"

@@ -1,12 +1,17 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
+import {HttpClient} from '@angular/common/http';
+import {Router} from '@angular/router';
+import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+
 
 @Component({
   selector: 'qa-buttons',
   templateUrl: './buttons.component.html',
   styleUrls: ['./buttons.component.scss']
 })
+
 export class ButtonsComponent implements OnInit {
 
   @Input() validationRun: ValidationrunDto;
@@ -16,17 +21,36 @@ export class ButtonsComponent implements OnInit {
     faStop: fas.faStop,
     faFileDownload: fas.faFileDownload,
     faRedo: fas.faRedo};
+
   isOwner = true;
   isCurrentUser = true;
   isCopied = true;
+  status: string;
 
-  constructor() { }
+
+  constructor(private httpClient: HttpClient,
+              private router: Router,
+              private validationService: ValidationrunService) { }
 
   ngOnInit(): void {
   }
 
   basicOnclick(validation: ValidationrunDto): void{
+  //  I'll remove this one, now it's just a function to check if buttons work
     console.log(validation.id);
+  }
+
+  reloadComponent(): void{
+    const targetUrl = '/my-validations';
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+    this.router.onSameUrlNavigation = 'reload';
+    this.router.navigate([targetUrl]);
+  }
+
+  deleteValidation(validationId: string): void{
+    this.validationService.deleteValidation(validationId);
+    this.reloadComponent();
+
   }
 
 }
