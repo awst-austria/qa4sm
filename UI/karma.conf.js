@@ -29,7 +29,7 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [
         { type: 'html' },
-        { type: 'text-summary' }
+        { type: 'text-validation-summary' }
       ]
     },
     reporters: ['progress', 'kjhtml'],

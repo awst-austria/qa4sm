@@ -53,4 +53,9 @@ export class ButtonsComponent implements OnInit {
 
   }
 
+  stopValidation(validationId: string): void{
+    this.validationService.stopValidation(validationId);
+    this.reloadComponent();
+  }
+
 }

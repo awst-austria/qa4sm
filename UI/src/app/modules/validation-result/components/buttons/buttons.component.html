@@ -1,7 +1,9 @@
 <!--Buttons shown on the validation list page (both custom and published)-->
 <div *ngIf="validationList" class="col-sm" style="text-align: right; max-width: 16rem">
   <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
-          class="btn btn-sm btn-primary btn-action" title="Cancel validation" (click)="basicOnclick(validationRun)">
+          class="btn btn-sm btn-primary btn-action"
+          title="Cancel validation"
+          (click)="stopValidation(validationRun.id)">
     <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span></button>
   <a class="btn btn-sm btn-primary btn-action" routerLink="/validation-result/{{validationRun.id}}"
      title="View results"><span class="pi pi-folder-open"></span></a>

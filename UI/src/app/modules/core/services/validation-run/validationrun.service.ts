@@ -10,8 +10,9 @@ const customValidationRunUrl: string = environment.API_URL + 'api/my-results';
 const validationRunsUrl: string = environment.API_URL + 'api/validation-runs';
 
 const csrfToken = '{{csrf_token}}';
-const resultUrl =  environment.API_URL + 'api/modify-validation/00000000-0000-0000-0000-000000000000';
+const resultUrl = environment.API_URL + 'api/modify-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = environment.API_URL + 'api/stop-validation/00000000-0000-0000-0000-000000000000';
+const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
 @Injectable({
   providedIn: 'root'
@@ -24,14 +25,14 @@ export class ValidationrunService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getPublishedValidationruns(params: any): Observable<ValidationSetDto>{
+  getPublishedValidationruns(params: any): Observable<ValidationSetDto> {
     this.publishedValidationrun$ = this.httpClient.get<ValidationSetDto>(publishedValidationRunUrl, {params});
-    return  this.publishedValidationrun$;
+    return this.publishedValidationrun$;
   }
 
-  getMyValidationruns(params: any): Observable<ValidationSetDto>{
+  getMyValidationruns(params: any): Observable<ValidationSetDto> {
     this.customValidationrun$ = this.httpClient.get<ValidationSetDto>(customValidationRunUrl, {params});
-    return  this.customValidationrun$;
+    return this.customValidationrun$;
   }
 
   getValidationRuns(): Observable<ValidationrunDto[]> {
@@ -42,19 +43,21 @@ export class ValidationrunService {
     return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
   }
 
-  deleteValidation(validationId: string): void{
+  deleteValidation(validationId: string): void {
     if (!confirm('Do you really want to delete the result?')) {
       return;
     }
     const deleteUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
     this.httpClient.delete(deleteUrl, {headers}).subscribe(
-      () => {
-        console.log('done');
-      }
-    );
+      () => {});
   }
 
-
-
+  stopValidation(validationId: string): void {
+    if (!confirm('Do you really want to stop the validation?')) {
+      return;
+    }
+    const stopUrl = stopValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    this.httpClient.delete(stopUrl, {headers}).subscribe(
+      () => {});
+  }
 }
