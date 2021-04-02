@@ -1,0 +1,20 @@
+@import "~bootstrap/dist/css/bootstrap.css";
+
+.align-middle {
+    width: 10%;
+    text-align: center;
+}
+
+.partner_logo {
+    height: 3rem;
+    vertical-align: middle;
+}
+
+.borderless td, .borderless th {
+    border: none;
+}
+
+#logo_ffg {
+    height: 6rem;
+    float: right;
+}

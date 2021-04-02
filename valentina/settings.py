@@ -22,7 +22,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'output/')
 
 LOGIN_REDIRECT_URL = 'validation'
 
-STATIC_ROOT=os.path.join(BASE_DIR, 'static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environment/qa4sm_env.yml"
 
@@ -30,7 +30,10 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 
 # Application definition
 INSTALLED_APPS = [
+    'api.apps.ApiConfig',
     'validator.apps.ValidatorConfig',
+    'drf_yasg',
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +43,28 @@ INSTALLED_APPS = [
     'widget_tweaks',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',  # make all views private
+    ),
+    'EXCEPTION_HANDLER': 'api.api_exception_handler.custom_exception_handler'
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
+}
+
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,19 +97,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'valentina.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 if DBSM == "postgresql":
     DATABASES = {
         'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'valentina',
-        'USER': 'django',
-        'PASSWORD': DB_PASSWORD,
-        'HOST': 'localhost',
-        'PORT': '',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'valentina',
+            'USER': 'django',
+            'PASSWORD': DB_PASSWORD,
+            'HOST': 'localhost',
+            'PORT': '',
         }
     }
 else:
@@ -116,7 +139,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -143,8 +165,8 @@ LOGGING = {
         'verbose': {
             'format': '{asctime} {levelname} {module}:{funcName}: {message}',
             'style': '{',
-            },
         },
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
@@ -162,11 +184,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-#         'py.warnings': {
-#             'handlers': ['file', 'console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
+        #         'py.warnings': {
+        #             'handlers': ['file', 'console'],
+        #             'level': 'DEBUG',
+        #             'propagate': True,
+        #         },
     },
 }
 

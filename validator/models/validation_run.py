@@ -16,7 +16,6 @@ from validator.models import DatasetConfiguration, User
 
 
 class ValidationRun(models.Model):
-
     ## scaling methods
     MIN_MAX = 'min_max'
     LINREG = 'linreg'
@@ -35,6 +34,11 @@ class ValidationRun(models.Model):
     ## scale to
     SCALE_TO_REF = 'ref'
     SCALE_TO_DATA = 'data'
+
+    SCALE_TO_OPTIONS = (
+        (SCALE_TO_REF, 'Scale to reference'),
+        (SCALE_TO_DATA, 'Scale to data')
+    )
 
     ## anomalies
     MOVING_AVG_35_D = "moving_avg_35_d"
@@ -58,9 +62,11 @@ class ValidationRun(models.Model):
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
 
-    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='ref_validation_run', null=True)
+    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                related_name='ref_validation_run', null=True)
 
-    scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='scaling_ref_validation_run', null=True)
+    scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                    related_name='scaling_ref_validation_run', null=True)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
@@ -133,22 +139,23 @@ class ValidationRun(models.Model):
         super(ValidationRun, self).clean()
 
         if self.interval_from is None and self.interval_to is not None:
-            raise ValidationError({'interval_from': 'What has an end must have a beginning.',})
+            raise ValidationError({'interval_from': 'What has an end must have a beginning.', })
         if self.interval_from is not None and self.interval_to is None:
-            raise ValidationError({'interval_to': 'What has a beginning must have an end.',})
+            raise ValidationError({'interval_to': 'What has a beginning must have an end.', })
         if self.interval_from is not None and self.interval_to is not None and self.interval_from > self.interval_to:
             raise ValidationError({'interval_from': 'From must be before To',
-                                   'interval_to': 'From must be before To',})
+                                   'interval_to': 'From must be before To', })
 
         if self.anomalies == self.CLIMATOLOGY:
             if self.anomalies_from is None or self.anomalies_to is None:
-                raise ValidationError({'anomalies': 'Need valid time period to calculate climatology from.',})
+                raise ValidationError({'anomalies': 'Need valid time period to calculate climatology from.', })
             if self.anomalies_from > self.anomalies_to:
                 raise ValidationError({'anomalies_from': 'Start of climatology period must be before end.',
-                                       'anomalies_to': 'Start of climatology period must be before end.',})
+                                       'anomalies_to': 'Start of climatology period must be before end.', })
         else:
             if self.anomalies_from is not None or self.anomalies_to is not None:
-                raise ValidationError({'anomalies': 'Time period makes no sense for anomalies calculation without climatology.',})
+                raise ValidationError(
+                    {'anomalies': 'Time period makes no sense for anomalies calculation without climatology.', })
 
         box = {'min_lat': self.min_lat, 'min_lon': self.min_lon, 'max_lat': self.max_lat, 'max_lon': self.max_lon}
         if (any(x is None for x in box.values()) and any(x is not None for x in box.values())):
@@ -175,4 +182,3 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         rundir = path.dirname(instance.output_file.path)
         if path.isdir(rundir):
             rmtree(rundir)
-

@@ -1,0 +1,94 @@
+<p-panel>
+  <!--Header-->
+  <!-- PUBLISHED  -->
+  <ng-template *ngIf="published" pTemplate="header">
+    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+  </ng-template>
+  <ng-template *ngIf="published" pTemplate="icons" class="doilink">
+    <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
+                              href="{{this.getDoiPrefix()}}{{ model.validationRun.doi }}">{{ model.validationRun.doi }}</a>
+    </h5>
+  </ng-template>
+  <!--  CUSTOM    -->
+  <ng-template *ngIf="!published" pTemplate="header">
+    <h5 class="my-0">
+      <!--      if there is expiry date property: -->
+      <span *ngIf="validationRun.expiry_date">
+          <span *ngIf="validationRun.is_near_expiry" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
+                title="'This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
+          <span *ngIf="!validationRun.is_near_expiry" class="p-panel-header-icon pi pi-calendar expiry-icons"
+                title="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
+          </span>
+      </span>
+      <!--      if there is no expiry date property: -->
+      <span *ngIf="!validationRun.expiry_date">
+          <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
+                title="This validation was cancelled."></span>
+          <span *ngIf="!validationRun.end_time && validationRun.progress === 0"
+                class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
+                title="This validation is still running."></span>
+
+          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}">
+            <span *ngIf="validationRun.doi" class="p-panel-header-icon pi pi-book expiry-icons"
+                  title="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
+            </span>
+          </a>
+        <span *ngIf="validationRun.is_archived" class="p-panel-header-icon pi pi- expiry-icons"
+              title="This validation has been archived. It will NOT be automatically removed during cleanup.">
+          <fa-icon [icon]="faIcons.faArchive"></fa-icon>
+        </span>
+
+      </span>
+
+      <span class="font-weight-normal"> Started:
+
+        {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}}
+      </span>
+
+    </h5>
+  </ng-template>
+  <ng-template *ngIf="!published" pTemplate="icons">
+    <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+  </ng-template>
+
+<!-- Body -->
+  <!-- Datasets -->
+  <div class="p-grid">
+    <div class="p-col-4">
+      <strong>Data:</strong><br/>
+      <span *ngFor="let datasetRowModel of model.datasetRows">
+          {{(datasetRowModel.dataset$|async)?.pretty_name}},
+        {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
+        {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
+        </span>
+
+    </div>
+    <!-- Reference -->
+    <div class="p-col-4">
+      <strong>Reference:</strong><br/>
+      <span>
+          {{(model.referenceRow.dataset$|async)?.pretty_name}},
+        {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
+        {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
+        </span>
+    </div>
+    <!-- Status / Created   -->
+    <!--    PUBLISHED -->
+    <div *ngIf="published" class="p-col-2" style="max-width: 7rem;">
+      <strong>Created:</strong><br/>
+      {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
+    </div>
+    <!--    CUSTOM -->
+    <div *ngIf="!published" class="p-col-2" style="max-width: 7rem;">
+      <strong>Status:</strong><br/>
+      {{ getStatusFromProgress(validationRun)}}
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="p-col-2">
+      <a class="btn btn-sm btn-primary btn-action" routerLink="/validation-result/{{model.validationRun.id}}"  title="View results"><span class="pi pi-folder-open"></span></a>
+    </div>
+
+
+  </div>
+</p-panel>
