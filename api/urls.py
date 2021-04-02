@@ -14,6 +14,7 @@ from api.views.user_view import users
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
+from api.views.modify_validation_view import stop_validation, modify_result
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -60,4 +61,6 @@ urlpatterns = [
     url(r'^data-filter/(?P<id>.+)$', data_filter_by_id),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),
+    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
+    path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
 ]

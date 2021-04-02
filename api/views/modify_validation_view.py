@@ -1,0 +1,119 @@
+from django.http import QueryDict
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
+from validator.doi import get_doi_for_validation
+from validator.forms import PublishingForm
+from validator.models import ValidationRun, CopiedValidations
+from validator.validation.validation import stop_running_validation
+from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404, render
+from rest_framework import status
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def stop_validation(request, result_uuid):
+    if request.method == "DELETE":
+        validation_run = get_object_or_404(ValidationRun, pk=result_uuid)
+        if validation_run.user != request.user:
+            return HttpResponse(status=403)
+
+        stop_running_validation(result_uuid)
+        return HttpResponse(status=200)
+
+    return HttpResponse(status=405)  # if we're not DELETEing, send back "Method not Allowed"
+
+
+@api_view(['POST', 'GET', 'DELETE', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def modify_result(request, result_uuid):
+    val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+    current_user = request.user
+
+    # copied_runs = current_user.copiedvalidations_set.all() if current_user.username else CopiedValidations.objects.none()
+    # is_copied = val_run.id in copied_runs.values_list('copied_run', flat=True)
+
+    # if is_copied and val_run.doi == '':
+    #     original_start = copied_runs.get(copied_run=val_run).original_run.start_time
+    #     original_end = copied_runs.get(copied_run=val_run).original_run.end_time
+    # else:
+    #     original_start = None
+    #     original_end = None
+
+    if request.method == 'DELETE':
+        ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
+        if(val_run.user != request.user):
+            return HttpResponse(status = status.HTTP_403_FORBIDDEN)
+
+        ## check that our validation can be deleted; it can't if it already has a DOI
+        if(not val_run.is_unpublished):
+            return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED) #405
+
+        val_run.delete()
+        return HttpResponse(status=status.HTTP_200_OK)
+
+    elif (request.method == 'PATCH'):
+        ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+
+        if (val_run.user != request.user):
+            return HttpResponse(status=403)
+
+        patch_params = request.data
+        patch_params_keys = patch_params.keys()
+
+
+        if 'save_name' in patch_params_keys:
+            ## check that our validation's name can be changed'; it can't if it already has a DOI
+            if (not val_run.is_unpublished):
+                return HttpResponse('Validation has been published', status=405)
+
+            save_mode = patch_params['save_name']
+
+            if save_mode != 'true':
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            val_run.name_tag = patch_params['new_name']
+            val_run.save()
+
+            return HttpResponse("Changed.", status=200)
+
+        if 'archive' in patch_params_keys:
+            archive_mode = patch_params['archive']
+
+            if not type(archive_mode) is bool:
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            val_run.archive(unarchive=(not archive_mode))
+            return HttpResponse("Changed.", status=200)
+
+        if 'extend' in patch_params_keys:
+            extend = patch_params['extend']
+            if type(extend) != bool or not extend:
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            val_run.extend_lifespan()
+            return HttpResponse(val_run.expiry_date, status=200)
+
+        if 'publish' in patch_params_keys:
+            publish = patch_params['publish']
+
+            # check we've got the action set correctly
+            if publish != 'true':
+                return HttpResponse("Wrong action parameter.", status=400)
+
+            # check that the publication parameters are valid
+            pub_form = PublishingForm(data=patch_params, validation=val_run)
+            if not pub_form.is_valid():
+                # if not, send back an updated publication form with errors set and http code 420 (picked up in javascript)
+                return render(request, 'validator/publishing_dialog.html',
+                              {'publishing_form': pub_form, 'val': val_run}, status=420)
+
+            try:
+                get_doi_for_validation(val_run, pub_form.pub_metadata)
+            except Exception as e:
+                m = getattr(e, 'message', repr(e))
+                return HttpResponse(m, status=400)
+
+            return HttpResponse("Published.", status=200)
+
+        return HttpResponse("Wrong action parameter.", status=400)
