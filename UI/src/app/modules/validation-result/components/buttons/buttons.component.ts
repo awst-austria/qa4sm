@@ -64,4 +64,8 @@ export class ButtonsComponent implements OnInit {
     window.location.reload();
   }
 
+  extendResults(validationId: string): void{
+    this.validationService.extendResults(validationId);
+  }
+
 }

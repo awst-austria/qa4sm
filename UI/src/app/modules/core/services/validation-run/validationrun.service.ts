@@ -74,4 +74,40 @@ export class ValidationrunService {
       });
   }
 
+  extendResults(validationId: string): void {
+    if (!confirm('Do you want to extend the lifespan of this result?')) {
+      return;
+    }
+    const extendUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const extend = true;
+    this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'}).subscribe(
+      (response) => {
+        const newExpiry = new Date(response);
+        console.log(newExpiry, response);
+        alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString());
+      });
+  }
+
 }
+
+// function ajax_extend_result(result_id) {
+//   if (!confirm('Do you want to extend the lifespan of this result?')) {
+//     return;
+//   }
+//   var url = result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
+//
+//   $.ajaxSetup({
+//     headers: { "X-CSRFToken": csrf_token }
+//   });
+//
+//   $.ajax({
+//     url: url,
+//     type: 'PATCH',
+//     data : { "extend" : true },
+//     success : function(return_data) {
+//       var newExpiry = new Date(return_data);
+//       alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString())
+//       location.reload();
+//     }
+//   });
+// }

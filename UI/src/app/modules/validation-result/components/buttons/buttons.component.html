@@ -59,7 +59,7 @@
         </button>
         <button *ngIf="!validationRun.is_archived" class="dropdown-item"
                 title="Extend lifespan of this validation run"
-                (click)=basicOnclick(validationRun)>
+                (click)=extendResults(validationRun.id)>
           <span class="pi pi-calendar-plus"></span>
           Extend Life Span
         </button>
@@ -109,7 +109,7 @@
     <ng-template #elseIsArchived>
       <button class="btn btn-sm btn-primary"
               title="Extend lifespan"
-              (click)="basicOnclick(validationRun)">
+              (click)="extendResults(validationRun.id)">
         <span class="pi pi-calendar-plus"></span> Renew
       </button>
       <button class="btn btn-sm btn-primary"

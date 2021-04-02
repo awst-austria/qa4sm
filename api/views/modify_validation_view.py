@@ -88,8 +88,7 @@ def modify_result(request, result_uuid):
 
         if 'extend' in patch_params_keys:
             extend = patch_params['extend']
-
-            if extend != 'true':
+            if type(extend) != bool or not extend:
                 return HttpResponse("Wrong action parameter.", status=400)
 
             val_run.extend_lifespan()
