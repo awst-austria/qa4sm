@@ -49,7 +49,8 @@ export class ValidationrunService {
     }
     const deleteUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     this.httpClient.delete(deleteUrl, {headers}).subscribe(
-      () => {});
+      () => {
+      });
   }
 
   stopValidation(validationId: string): void {
@@ -58,6 +59,19 @@ export class ValidationrunService {
     }
     const stopUrl = stopValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     this.httpClient.delete(stopUrl, {headers}).subscribe(
-      () => {});
+      () => {
+      });
   }
+
+  archiveResults(validationId: string, archive: boolean): void {
+    if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
+      + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
+      return;
+    }
+    const archiveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'}).subscribe(
+      () => {
+      });
+  }
+
 }
