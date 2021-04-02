@@ -40,22 +40,28 @@ export class ButtonsComponent implements OnInit {
     console.log(validation.id);
   }
 
-  reloadComponent(): void{
+  reloadMyValidations(): void{
     const targetUrl = '/my-validations';
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     this.router.onSameUrlNavigation = 'reload';
     this.router.navigate([targetUrl]);
   }
 
+
   deleteValidation(validationId: string): void{
     this.validationService.deleteValidation(validationId);
-    this.reloadComponent();
+    this.reloadMyValidations();
 
   }
 
   stopValidation(validationId: string): void{
     this.validationService.stopValidation(validationId);
-    this.reloadComponent();
+    this.reloadMyValidations();
+  }
+
+  archiveResults(validationId: string, archive: boolean): void{
+    this.validationService.archiveResults(validationId, archive);
+    window.location.reload();
   }
 
 }

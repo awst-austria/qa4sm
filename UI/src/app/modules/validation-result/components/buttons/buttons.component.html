@@ -12,10 +12,10 @@
         [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
 
     <button *ngIf="validationRun.is_archived" class="btn btn-sm btn-primary btn-action" title="Un-archive"
-            (click)="basicOnclick(validationRun)"><span class="pi pi-calendar"></span></button>
+            (click)="archiveResults(validationRun.id, false)"><span class="pi pi-calendar"></span></button>
 
     <button *ngIf="!validationRun.is_archived" class="btn btn-sm btn-primary btn-action" title="Archive"
-            (click)="basicOnclick(validationRun)"><span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span></button>
+            (click)="archiveResults(validationRun.id, true)"><span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span></button>
   </span>
 
   <div *ngIf="validationRun.is_unpublished" class="dropdown">
@@ -102,7 +102,7 @@
     <button *ngIf="validationRun.is_archived; else elseIsArchived"
             class="btn btn-sm btn-primary"
             title="Un-archive"
-            (click)="basicOnclick(validationRun)">
+            (click)="archiveResults(validationRun.id, false)">
       <span class="pi pi-calendar"></span> Un-archive
     </button>
 
@@ -112,7 +112,9 @@
               (click)="basicOnclick(validationRun)">
         <span class="pi pi-calendar-plus"></span> Renew
       </button>
-      <button class="btn btn-sm btn-primary" title="Archive" (click)="basicOnclick(validationRun)">
+      <button class="btn btn-sm btn-primary"
+              title="Archive"
+              (click)="archiveResults(validationRun.id, true)">
         <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> Archive
       </button>
     </ng-template>
