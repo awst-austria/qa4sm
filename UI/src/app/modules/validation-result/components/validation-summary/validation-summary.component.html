@@ -7,18 +7,39 @@
             Summary:
             <!--          {% if is_owner and val.is_unpublished %}-->
             <span *ngIf="validationRun.is_unpublished">
-          <span class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}</span>
+              <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}</span>
               <!--          <input class="d-none edit_name"/>-->
-          <button class="btn btn-sm btn-primary btn-action edit_name_btn" title="Change Name"
-                  onclick="editName(event)"><span class="pi pi-pencil"></span></button>
-              <!--          <button class="btn btn-sm btn-primary btn-action d-none save_name_btn result_page" title="Save Name" onclick="ajax_save_name(event, '{{ valrun.id }}')"><span class="fas fa-save"></span></button>-->
-              <!--          <button class="btn btn-sm btn-primary btn-action d-none cancel_editing_btn result_page" title="Cancel" onclick="cancel_editing(event)"><span class="fas fa-ban"></span></button>-->
+            <button
+              [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
+              title="Change Name"
+              (click)="editName()">
+              <span class="pi pi-pencil"></span>
+            </button>
+            <span *ngIf="!hideElement">
+              <label for="new-name"></label>
+              <input id="new-name"
+                     type="text"
+                     value="{{validationRun.name_tag}}"
+                     #newName
+                     [ngClass]="{'edit_name': true}">
+              <button
+                [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
+                title="Save Name"
+                (click)="saveName(validationRun.id, newName.value)">
+                <span class="pi pi-save"></span></button>
+              <button
+                [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
+                title="Cancel"
+                (click)="cancelEditing()">
+                <span class="pi pi-ban"></span>
+              </button>
+            </span>
           </span>
             <span *ngIf="!validationRun.is_unpublished"
                   class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
               <span class="no_name_change_info pi pi-question-circle help-icon"
                     title="Validation has been published. There is no possibility of changing its name."> </span>
-          </span>
+            </span>
           </h4>
         </div>
         <div class="card-body">

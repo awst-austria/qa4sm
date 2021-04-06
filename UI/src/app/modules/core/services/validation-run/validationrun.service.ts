@@ -83,31 +83,17 @@ export class ValidationrunService {
     this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'}).subscribe(
       (response) => {
         const newExpiry = new Date(response);
-        console.log(newExpiry, response);
         alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString());
       });
   }
 
-}
+  saveResults(validationId: string, newName: string): void {
+    const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const data = {save_name: true, new_name: newName};
+    console.log(data);
+    this.httpClient.patch(saveUrl + '/', data, {headers , observe: 'body', responseType: 'json'}).subscribe(
+      () => {
+      });
 
-// function ajax_extend_result(result_id) {
-//   if (!confirm('Do you want to extend the lifespan of this result?')) {
-//     return;
-//   }
-//   var url = result_url.replace('00000000-0000-0000-0000-000000000000',result_id);
-//
-//   $.ajaxSetup({
-//     headers: { "X-CSRFToken": csrf_token }
-//   });
-//
-//   $.ajax({
-//     url: url,
-//     type: 'PATCH',
-//     data : { "extend" : true },
-//     success : function(return_data) {
-//       var newExpiry = new Date(return_data);
-//       alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString())
-//       location.reload();
-//     }
-//   });
-// }
+  }
+}

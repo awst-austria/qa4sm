@@ -47,11 +47,49 @@
 
     </h5>
   </ng-template>
-  <ng-template *ngIf="!published" pTemplate="icons">
-    <h5 class="my-0"><span class=" font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem">
+    <h5 class="my-0">
+      <span *ngIf="hideElement"
+            class=" font-weight-normal">
+        Name: {{ model.validationRun.name_tag }}
+      </span>
+      <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
+            class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
+        <span class="no_name_change_info pi pi-question-circle help-icon"
+              title="Validation has been published. There is no possibility of changing its name.">
+      </span>
+    </span>
+      <ng-template #elseUnpublished>
+        <button
+          [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
+          title="Change Name"
+          (click)="editName()">
+          <span class="pi pi-pencil"></span>
+        </button>
+        <span *ngIf="!hideElement">
+        <label for="new-name"></label>
+        <input id="new-name"
+               type="text"
+               value="{{validationRun.name_tag}}"
+               #newName
+               [ngClass]="{'edit_name': true}">
+        <button
+          [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
+          title="Save Name"
+          (click)="saveName(validationRun.id, newName.value)">
+          <span class="pi pi-save"></span></button>
+        <button
+          [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
+          title="Cancel"
+          (click)="cancelEditing()">
+          <span class="pi pi-ban"></span>
+        </button>
+      </span>
+      </ng-template>
+    </h5>
   </ng-template>
 
-<!-- Body -->
+  <!-- Body -->
   <!-- Datasets -->
   <div class="p-grid">
     <div class="p-col-4">
@@ -86,7 +124,7 @@
 
     <!-- Action Buttons -->
     <div class="p-col-2">
-     <qa-buttons [validationList]="true" [validationRun]="model.validationRun"></qa-buttons>
+      <qa-buttons [validationList]="true" [validationRun]="model.validationRun"></qa-buttons>
     </div>
 
 

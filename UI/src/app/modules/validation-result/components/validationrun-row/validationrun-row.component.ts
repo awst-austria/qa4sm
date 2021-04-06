@@ -8,6 +8,7 @@ import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.serv
 import {DatasetVersionService} from 'src/app/modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
+import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 
 
 @Component({
@@ -24,12 +25,14 @@ export class ValidationrunRowComponent implements OnInit {
   dateFormat = 'medium';
   timeZone = 'UTC';
   faIcons = {faArchive: fas.faArchive};
+  hideElement = true;
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
-              private globalParamsService: GlobalParamsService) {
+              private globalParamsService: GlobalParamsService,
+              private validationService: ValidationrunService) {
   }
 
   ngOnInit(): void {
@@ -70,6 +73,17 @@ export class ValidationrunRowComponent implements OnInit {
       status = 'ERROR';
     }
     return status;
+  }
+
+  editName(): void{
+    this.hideElement = false;
+  }
+  saveName(validationId: string, newName: string): void{
+    this.validationService.saveResults(validationId, newName);
+    window.location.reload();
+  }
+  cancelEditing(): void{
+    this.hideElement = true;
   }
 
 }
