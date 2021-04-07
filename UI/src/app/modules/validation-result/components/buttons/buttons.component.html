@@ -99,7 +99,7 @@
 
 <!--Buttons shown on the single validation page (both custom and published)-->
 <div *ngIf="!validationList" class="col-sm" style="text-align: right;">
-  <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
+  <div *ngIf="validationRun.isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
     <button class="btn btn-sm btn-primary"
             title="Remove result"

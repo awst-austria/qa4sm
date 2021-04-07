@@ -10,6 +10,7 @@ import {map} from 'rxjs/operators';
 import {SCALING_CHOICES} from '../../../scaling/components/scaling/scaling.component';
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -34,7 +35,8 @@ export class ValidationSummaryComponent implements OnInit {
               private datasetVariableService: DatasetVariableService,
               private filterService: FilterService,
               private globalParamsService: GlobalParamsService,
-              private validationService: ValidationrunService) { }
+              private validationService: ValidationrunService,
+              private authService: AuthService) { }
 
   ngOnInit(): void {
     this.updateConfig();
@@ -91,7 +93,7 @@ export class ValidationSummaryComponent implements OnInit {
         ...validation,
         runTime: this.getRunTime(validation.start_time, validation.end_time),
         errorRate: validation.total_points !== 0 ? (validation.total_points - validation.ok_points) / validation.total_points : 1,
-        newName: validation.name_tag
+        isOwner: validation.user === this.authService.currentUser.id
       })),
     );
   }
