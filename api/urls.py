@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from api.views.data_filter_view import data_filter, data_filter_by_id, data_parameterised_filter_by_id, \
     data_parameterised_filter
@@ -63,4 +65,5 @@ urlpatterns = [
     url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
-]
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

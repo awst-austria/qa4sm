@@ -13,13 +13,22 @@ from validator.models import ValidationRun
 @permission_classes([AllowAny])
 def published_results(request):
 
-    limit = int(request.query_params.get('limit', None))
-    offset = int(request.query_params.get('offset', None))
+    limit = request.query_params.get('limit', None)
+    offset = request.query_params.get('offset', None)
     order = request.query_params.get('order',None)
 
-    val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
+    if order:
+        val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
+    else:
+        val_runs = ValidationRun.objects.exclude(doi='')
 
-    serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+    if limit and offset:
+        limit = int(limit)
+        offset = int(offset)
+        serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+    else:
+        serializer = ValidationRunSerializer(val_runs, many=True)
+
     response = {'validations': serializer.data,
                 'length': len(val_runs)}
 
@@ -30,13 +39,24 @@ def published_results(request):
 @permission_classes([IsAuthenticated])
 def my_results(request):
     current_user = request.user
-    limit = int(request.query_params.get('limit', None))
-    offset = int(request.query_params.get('offset', None))
+    limit = request.query_params.get('limit', None)
+    offset = request.query_params.get('offset', None)
     order = request.query_params.get('order', None)
 
-    val_runs = ValidationRun.objects.filter(user=current_user).order_by(order)
+    if order:
+        val_runs = ValidationRun.objects.filter(user=current_user).order_by(order)
+    else:
+        val_runs = ValidationRun.objects.filter(user=current_user)
 
-    serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+    if limit and offset:
+        limit = int(limit)
+        offset = int(offset)
+        serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+    else:
+        serializer = ValidationRunSerializer(val_runs, many=True)
+
+
+
     response = {'validations': serializer.data, 'length': len(val_runs)}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)

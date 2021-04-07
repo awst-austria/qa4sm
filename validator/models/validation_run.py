@@ -168,11 +168,19 @@ class ValidationRun(models.Model):
     def __str__(self):
         return "id: {}, user: {}, start: {} )".format(self.id, self.user, self.start_time)
 
+    @property
     def output_dir_url(self):
         if bool(self.output_file) is False:
             return None
         url = regex_sub('[^/]+$', '', self.output_file.url)
         return url
+
+    @property
+    def output_file_name(self):
+        if bool(self.output_file) is False:
+            return None
+        name = self.output_file.name
+        return name
 
 
 # delete model output directory on disk when model is deleted
