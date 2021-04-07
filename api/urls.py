@@ -13,7 +13,8 @@ from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
 from api.views.start_validation_view import start_validation
 from api.views.user_view import users
-from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs
+from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs,\
+    custom_copied_validation_runs
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
@@ -66,5 +67,6 @@ urlpatterns = [
     url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
+    path('custom-copied-run', custom_copied_validation_runs, name='Copied run')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

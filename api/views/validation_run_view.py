@@ -6,7 +6,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated
 
 from api.views.auxiliary_functions import get_fields_as_list
-from validator.models import ValidationRun
+from validator.models import ValidationRun, CopiedValidations
 
 
 @api_view(['GET'])
@@ -80,8 +80,22 @@ def validation_run_by_id(request, **kwargs):
     serializer = ValidationRunSerializer(val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def custom_copied_validation_runs(request):
+    current_user = request.user
+    copied_runs = current_user.copiedvalidations_set.all() if current_user.username else CopiedValidations.objects.none()
+    serializer = CopiedValidationRunSerializer(copied_runs, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
-        fields = get_fields_as_list(ValidationRun)
+        fields = get_fields_as_list(model)
+
+
+class CopiedValidationRunSerializer(ModelSerializer):
+    class Meta:
+        model = CopiedValidations
+        fields = get_fields_as_list(model)
