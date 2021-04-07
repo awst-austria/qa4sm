@@ -9,9 +9,10 @@ const publishedValidationRunUrl: string = environment.API_URL + 'api/published-r
 const customValidationRunUrl: string = environment.API_URL + 'api/my-results';
 const validationRunsUrl: string = environment.API_URL + 'api/validation-runs';
 
+const urlPrefix = environment.API_URL + 'api';
 const csrfToken = '{{csrf_token}}';
-const resultUrl = environment.API_URL + 'api/modify-validation/00000000-0000-0000-0000-000000000000';
-const stopValidationUrl = environment.API_URL + 'api/stop-validation/00000000-0000-0000-0000-000000000000';
+const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
+const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
 @Injectable({
@@ -96,4 +97,11 @@ export class ValidationrunService {
       });
 
   }
+
+  downloadResultFile(fileUrl: string): Observable<Blob> {
+    return this.httpClient.get(urlPrefix + fileUrl, {
+      responseType: 'blob'
+    });
+  }
+
 }

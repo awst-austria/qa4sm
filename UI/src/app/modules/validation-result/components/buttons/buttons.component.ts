@@ -4,6 +4,7 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {saveAs} from 'file-saver';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class ButtonsComponent implements OnInit {
   isCurrentUser = true;
   isCopied = true;
   status: string;
+  graphicsFileName = 'graphs.zip';
 
 
   constructor(private httpClient: HttpClient,
@@ -66,6 +68,11 @@ export class ButtonsComponent implements OnInit {
 
   extendResults(validationId: string): void{
     this.validationService.extendResults(validationId);
+  }
+
+  downloadResultFile(fileUrl: string, fileName: string): void{
+    this.validationService.downloadResultFile(fileUrl)
+      .subscribe(blob => saveAs(blob, fileName));
   }
 
 }
