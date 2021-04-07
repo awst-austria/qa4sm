@@ -31,7 +31,8 @@ export class ValidationrunDto{
               public is_near_expiry: boolean,
               public is_unpublished: boolean,
               public output_dir_url: string,
-              public output_file_name: string) {
+              public output_file_name: string,
+              public isOwner: boolean) {
   }
 }
 
