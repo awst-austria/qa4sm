@@ -4,23 +4,36 @@
           class="btn btn-sm btn-primary btn-action"
           title="Cancel validation"
           (click)="stopValidation(validationRun.id)">
-    <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span></button>
-  <a class="btn btn-sm btn-primary btn-action" routerLink="/validation-result/{{validationRun.id}}"
-     title="View results"><span class="pi pi-folder-open"></span></a>
+    <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
+  </button>
+  <a class="btn btn-sm btn-primary btn-action"
+     routerLink="/validation-result/{{validationRun.id}}"
+     title="View results">
+    <span class="pi pi-folder-open"></span>
+  </a>
 
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished"
         [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
 
-    <button *ngIf="validationRun.is_archived" class="btn btn-sm btn-primary btn-action" title="Un-archive"
-            (click)="archiveResults(validationRun.id, false)"><span class="pi pi-calendar"></span></button>
+    <button *ngIf="validationRun.is_archived"
+            class="btn btn-sm btn-primary btn-action"
+            title="Un-archive"
+            (click)="archiveResults(validationRun.id, false)">
+      <span class="pi pi-calendar"></span>
+    </button>
 
-    <button *ngIf="!validationRun.is_archived" class="btn btn-sm btn-primary btn-action" title="Archive"
-            (click)="archiveResults(validationRun.id, true)"><span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span></button>
+    <button *ngIf="!validationRun.is_archived"
+            class="btn btn-sm btn-primary btn-action"
+            title="Archive"
+            (click)="archiveResults(validationRun.id, true)">
+      <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
+    </button>
+
   </span>
 
-  <div *ngIf="validationRun.is_unpublished" class="dropdown">
+  <div *ngIf="!published" class="dropdown">
     <button class="dropdownbutton">
-      <span class="pi pi-angle-double-right"> </span>
+      <span class="pi pi-angle-double-right"></span>
     </button>
     <div class="dropdown-content" style="text-align: left">
       <div *ngIf="validationRun.output_file">
@@ -42,15 +55,10 @@
            title="Load validation settings">
           <span class="dropdown-item"><fa-icon [icon]="faIcons.faRedo"></fa-icon> Load Validation Settings</span>
         </a>
-        <!--        <button class="dropdown-item"-->
-        <!--                (click)="basicOnclick(validationRun)"-->
-        <!--                title="Restore settings from this validation">-->
-        <!--          <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span>-->
-        <!--          Load Validation Settings-->
-        <!--        </button>-->
       </div>
 
-      <span [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
+      <span *ngIf="validationRun.is_unpublished"
+            [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
         <button class="dropdown-item"
                 title="Remove this validation run"
                 (click)=deleteValidation(validationRun.id)>
@@ -67,7 +75,7 @@
     </div>
   </div>
 
-  <span *ngIf="!validationRun.is_unpublished">
+  <span *ngIf="published">
     <a class="btn btn-sm btn-primary btn-action"
        routerLink="/validate/"
        [queryParams]="{valrun_uuid: validationRun.id}"
@@ -119,7 +127,10 @@
       </button>
     </ng-template>
 
-    <button *ngIf="validationRun.output_file" type="button" title="Publish on Zenodo" class="btn btn-sm btn-primary"
+    <button *ngIf="validationRun.output_file"
+            type="button"
+            title="Publish on Zenodo"
+            class="btn btn-sm btn-primary"
             data-toggle="modal"
             data-target="#publishDialog">
       <span class="pi pi-book"></span> Publish
@@ -133,7 +144,8 @@
 
     <div [ngClass]="{'patchButtonGroup': true,  'collapse': !validationRun.publishing_in_progress}"
          style="float: right">
-      <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing in progress...</span>
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="sr-only">Publishing in progress...</span>
       </div>
       Publishing in progress...
     </div>
@@ -150,13 +162,17 @@
         <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings
       </a>
 
-      <button *ngIf="isCurrentUser && isCopied" class="btn btn-sm btn-primary"
+      <button *ngIf="isCurrentUser && isCopied"
+              class="btn btn-sm btn-primary"
               title="Remove this validation from your list"
-              onclick=""><span class="pi pi-times"></span> Untrack
+              onclick="">
+        <span class="pi pi-times"></span> Untrack
       </button>
 
-      <button *ngIf="isCurrentUser && !isCopied" class="btn btn-sm btn-primary" title="Track this validation"
-              onclick=""><span class="pi pi-plus"></span> Track
+      <button *ngIf="isCurrentUser && !isCopied" class="btn btn-sm btn-primary"
+              title="Track this validation"
+              onclick="">
+        <span class="pi pi-plus"></span> Track
       </button>
 
     </div>

@@ -16,6 +16,7 @@ import {saveAs} from 'file-saver';
 export class ButtonsComponent implements OnInit {
 
   @Input() validationRun: ValidationrunDto;
+  @Input() published: boolean;
   @Input() validationList: boolean;
 
   faIcons = {faArchive: fas.faArchive,
