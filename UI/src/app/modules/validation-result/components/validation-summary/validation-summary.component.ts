@@ -107,15 +107,11 @@ export class ValidationSummaryComponent implements OnInit {
     return this.globalParamsService.globalContext.doi_prefix;
   }
 
-  editName(): void{
-    this.hideElement = false;
+  toggleEditing(): void{
+    this.hideElement = !this.hideElement;
   }
   saveName(validationId: string, newName: string): void{
     this.validationService.saveResults(validationId, newName);
     window.location.reload();
   }
-  cancelEditing(): void{
-    this.hideElement = true;
-  }
-
 }

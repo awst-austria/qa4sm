@@ -63,7 +63,7 @@
         <button
           [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
           title="Change Name"
-          (click)="editName()">
+          (click)="toggleEditing()">
           <span class="pi pi-pencil"></span>
         </button>
         <span *ngIf="!hideElement">
@@ -81,7 +81,7 @@
         <button
           [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
           title="Cancel"
-          (click)="cancelEditing()">
+          (click)="toggleEditing()">
           <span class="pi pi-ban"></span>
         </button>
       </span>
