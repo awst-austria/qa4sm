@@ -5,11 +5,12 @@ import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {ValidationSetDto} from '../../../validation-result/services/validation.set.dto';
 
-const publishedValidationRunUrl: string = environment.API_URL + 'api/published-results';
-const customValidationRunUrl: string = environment.API_URL + 'api/my-results';
-const validationRunsUrl: string = environment.API_URL + 'api/validation-runs';
-
 const urlPrefix = environment.API_URL + 'api';
+const publishedValidationRunUrl: string = urlPrefix + '/published-results';
+const customValidationRunUrl: string = urlPrefix + '/my-results';
+const validationRunsUrl: string = urlPrefix + '/validation-runs';
+const copiedCustomRunsUrl: string = urlPrefix + '/custom-copied-run';
+
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
@@ -42,6 +43,10 @@ export class ValidationrunService {
 
   getValidationRunById(id: string): Observable<ValidationrunDto> {
     return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
+  }
+
+  getCustomTrackedValidations(): Observable<ValidationrunDto[]> {
+    return this.httpClient.get<ValidationrunDto[]>(copiedCustomRunsUrl);
   }
 
   deleteValidation(validationId: string): void {
