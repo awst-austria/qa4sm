@@ -1,3 +1,5 @@
+from django.db.models import Q, ExpressionWrapper, F, BooleanField
+
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -55,8 +57,6 @@ def my_results(request):
     else:
         serializer = ValidationRunSerializer(val_runs, many=True)
 
-
-
     response = {'validations': serializer.data, 'length': len(val_runs)}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
@@ -80,12 +80,19 @@ def validation_run_by_id(request, **kwargs):
     serializer = ValidationRunSerializer(val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def custom_copied_validation_runs(request):
     current_user = request.user
-    copied_runs = current_user.copiedvalidations_set.all() if current_user.username else CopiedValidations.objects.none()
-    serializer = CopiedValidationRunSerializer(copied_runs, many=True)
+    # taking only tracked validationruns, i.e. those with the same copied and original validationrun
+    tracked_runs = current_user.copiedvalidations_set\
+        .annotate(is_only_tracked=ExpressionWrapper(Q(copied_run=F('original_run')), output_field=BooleanField()))\
+        .filter(is_only_tracked=True)
+
+    # filtering copied runs by the tracked ones
+    val_runs = current_user.copied_runs.filter(id__in=tracked_runs.values_list('original_run', flat=True))
+    serializer = ValidationRunSerializer(val_runs, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
@@ -95,7 +102,7 @@ class ValidationRunSerializer(ModelSerializer):
         fields = get_fields_as_list(model)
 
 
-class CopiedValidationRunSerializer(ModelSerializer):
-    class Meta:
-        model = CopiedValidations
-        fields = get_fields_as_list(model)
+# class CopiedValidationRunSerializer(ModelSerializer):
+#     class Meta:
+#         model = CopiedValidations
+#         fields = get_fields_as_list(model)
