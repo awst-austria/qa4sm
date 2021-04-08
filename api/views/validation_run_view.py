@@ -83,7 +83,7 @@ def validation_run_by_id(request, **kwargs):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def custom_copied_validation_runs(request):
+def custom_tracked_validation_runs(request):
     current_user = request.user
     # taking only tracked validationruns, i.e. those with the same copied and original validationrun
     tracked_runs = current_user.copiedvalidations_set\
