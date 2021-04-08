@@ -1,17 +1,20 @@
 <!--Buttons shown on the validation list page (both custom and published)-->
 <div *ngIf="validationList" class="col-sm" style="text-align: right; max-width: 16rem">
+<!--  this one will be shown on custom validation page only due to given conditions-->
   <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
           class="btn btn-sm btn-primary btn-action"
           title="Cancel validation"
           (click)="stopValidation(validationRun.id)">
     <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
   </button>
+<!--  both pages -->
   <a class="btn btn-sm btn-primary btn-action"
      routerLink="/validation-result/{{validationRun.id}}"
      title="View results">
     <span class="pi pi-folder-open"></span>
   </a>
 
+<!--custom validations only-->
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished"
         [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
 
@@ -31,7 +34,7 @@
 
   </span>
 
-  <div *ngIf="!published" class="dropdown">
+  <div *ngIf="!published && !tracked" class="dropdown">
     <button class="dropdownbutton">
       <span class="pi pi-angle-double-right"></span>
     </button>
@@ -74,7 +77,7 @@
       </span>
     </div>
   </div>
-
+<!--published validations page only-->
   <span *ngIf="published">
     <a class="btn btn-sm btn-primary btn-action"
        routerLink="/validate/"
@@ -82,17 +85,20 @@
        title="Load validation settings">
       <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
     </a>
+  </span>
 
-    <!--    {% if current_user %}-->
-    <!--    {% if valrun not in copied_runs %}-->
-    <!--    <button class="btn btn-sm btn-primary btn-action" title="Track this validation"-->
-    <!--            onclick="ajax_attach_validation('{{ valrun.id}}')"><span class="fas fa-plus"></span></button>-->
-    <!--    {% else %}-->
-    <!--    <button class="btn btn-sm btn-primary btn-action" title="Remove this validation from your list"-->
-    <!--            onclick="ajax_detach_validation('{{ valrun.id }}', false)"><span class="fas fa-times"></span></button>-->
-    <!--    {% endif %}-->
-    <!--    {% endif %}-->
-
+<!--  tracked validations -->
+  <span *ngIf="validationRun.output_file && tracked">
+    <button class="btn btn-sm btn-primary btn-action"
+            (click)="downloadResultFile(validationRun.output_dir_url+graphicsFileName, graphicsFileName)"
+            title="Download graphs .zip">
+      <span class="pi pi-download"></span>
+    </button>
+    <button class="btn btn-sm btn-primary btn-action"
+            (click)="downloadResultFile(validationRun.output_file, validationRun.output_file_name)"
+            title="Download validation run .nc file">
+      <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
+    </button>
   </span>
 
 </div>

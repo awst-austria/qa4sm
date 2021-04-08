@@ -18,6 +18,7 @@ export class ButtonsComponent implements OnInit {
   @Input() validationRun: ValidationrunDto;
   @Input() published: boolean;
   @Input() validationList: boolean;
+  @Input() tracked: boolean;
 
   faIcons = {faArchive: fas.faArchive,
     faStop: fas.faStop,
