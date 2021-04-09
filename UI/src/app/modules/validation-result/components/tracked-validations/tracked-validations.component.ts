@@ -18,10 +18,6 @@ export class TrackedValidationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.trackedRuns$ = this.validationrunService.getCustomTrackedValidations();
-    this.validationrunService.getCustomTrackedValidations().subscribe(
-     data => {
-     }
-   );
   }
 
 }
