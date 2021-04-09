@@ -8,8 +8,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated
 
 from api.views.auxiliary_functions import get_fields_as_list
-from validator.models import ValidationRun, CopiedValidations
-
+from validator.models import ValidationRun
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -87,8 +86,8 @@ def custom_tracked_validation_runs(request):
     current_user = request.user
     # taking only tracked validationruns, i.e. those with the same copied and original validationrun
     tracked_runs = current_user.copiedvalidations_set\
-        .annotate(is_only_tracked=ExpressionWrapper(Q(copied_run=F('original_run')), output_field=BooleanField()))\
-        .filter(is_only_tracked=True)
+        .annotate(is_tracked=ExpressionWrapper(Q(copied_run=F('original_run')), output_field=BooleanField()))\
+        .filter(is_tracked=True)
 
     # filtering copied runs by the tracked ones
     val_runs = current_user.copied_runs.filter(id__in=tracked_runs.values_list('original_run', flat=True))
@@ -100,9 +99,3 @@ class ValidationRunSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
         fields = get_fields_as_list(model)
-
-
-# class CopiedValidationRunSerializer(ModelSerializer):
-#     class Meta:
-#         model = CopiedValidations
-#         fields = get_fields_as_list(model)
