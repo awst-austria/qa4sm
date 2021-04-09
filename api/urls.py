@@ -67,6 +67,6 @@ urlpatterns = [
     url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
-    path('custom-copied-run', custom_tracked_validation_runs, name='Copied run')
+    path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
