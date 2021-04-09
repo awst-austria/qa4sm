@@ -113,7 +113,9 @@ export class ValidationrunService {
     const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {add_validation: true};
     this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      response => alert(response)
+      response => {
+        alert(response);
+      }
     );
   }
 
