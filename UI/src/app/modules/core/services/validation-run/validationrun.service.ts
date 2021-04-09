@@ -109,4 +109,22 @@ export class ValidationrunService {
     });
   }
 
+  addValidation(validationId: string): void {
+    const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const data = {add_validation: true};
+    this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
+      response => alert(response)
+    );
+  }
+
+  removeValidation(validationId: string): void {
+    if (!confirm('Do you really want to remove this validation from your list?')) {
+      return;
+    }
+    const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const data = {remove_validation: true};
+    this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
+      response => alert(response)
+    );
+  }
 }

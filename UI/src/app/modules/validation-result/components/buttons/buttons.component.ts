@@ -81,4 +81,14 @@ export class ButtonsComponent implements OnInit {
       .subscribe(blob => saveAs(blob, fileName));
   }
 
+  addValidation(validationId: string): void{
+    this.validationService.addValidation(validationId);
+    window.location.reload();
+  }
+
+  removeValidation(validationId: string): void{
+    this.validationService.removeValidation(validationId);
+    window.location.reload();
+  }
+
 }

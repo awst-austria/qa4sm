@@ -88,12 +88,13 @@
     <button *ngIf="isCurrentUser && isTrackedByTheUser"
             class="btn btn-sm btn-primary btn-action"
             title="Remove this validation from your list"
-            onclick="">
+            (click)="removeValidation(validationRun.id)">
         <span class="pi pi-times"></span>
     </button>
     <button *ngIf="isCurrentUser && !isTrackedByTheUser"
             class="btn btn-sm btn-primary btn-action"
-            title="Remove this validation from your list"
+            title="Track this validation"
+            (click)="addValidation(validationRun.id)"
             onclick="">
         <span class="pi pi-plus"></span>
     </button>
@@ -115,7 +116,7 @@
     <button *ngIf="isCurrentUser"
             class="btn btn-sm btn-primary btn-action"
             title="Remove this validation from your list"
-            onclick="">
+            (click)="removeValidation(validationRun.id)">
         <span class="pi pi-times"></span>
     </button>
   </span>
@@ -190,13 +191,13 @@
       <button *ngIf="isCurrentUser && isTrackedByTheUser"
               class="btn btn-sm btn-primary"
               title="Remove this validation from your list"
-              onclick="">
+              (click)="removeValidation(validationRun.id)">
         <span class="pi pi-times"></span> Untrack
       </button>
 
       <button *ngIf="isCurrentUser && !isTrackedByTheUser" class="btn btn-sm btn-primary"
               title="Track this validation"
-              onclick="">
+              (click)="addValidation(validationRun.id)">
         <span class="pi pi-plus"></span> Track
       </button>
 
