@@ -12,7 +12,8 @@ from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
-from validator.models import DatasetConfiguration, User
+from validator.models import DatasetConfiguration, User, CopiedValidations
+from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
 class ValidationRun(models.Model):
@@ -89,7 +90,7 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
-    used_by = models.ManyToManyField(User, through="CopiedValidations", through_fields=('original_run', 'used_by_user'),
+    used_by = models.ManyToManyField(User, through=CopiedValidations, through_fields=('original_run', 'used_by_user'),
                                      related_name='copied_runs')
 
     # many-to-one relationships coming from other models:
@@ -181,6 +182,15 @@ class ValidationRun(models.Model):
             return None
         name = self.output_file.name
         return name
+
+    @property
+    def is_a_copy(self):
+        copied_runs = CopiedValidations.objects.filter(copied_run_id=self.id)\
+            .annotate(is_copied=ExpressionWrapper(~Q(copied_run=F('original_run')), output_field=BooleanField())) \
+            .filter(is_copied=True)
+
+        return len(copied_runs) != 0
+
 
 
 # delete model output directory on disk when model is deleted
