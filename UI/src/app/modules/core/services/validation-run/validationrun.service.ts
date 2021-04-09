@@ -9,7 +9,7 @@ const urlPrefix = environment.API_URL + 'api';
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
 const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
-const copiedCustomRunsUrl: string = urlPrefix + '/custom-copied-run';
+const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -46,7 +46,7 @@ export class ValidationrunService {
   }
 
   getCustomTrackedValidations(): Observable<ValidationrunDto[]> {
-    return this.httpClient.get<ValidationrunDto[]>(copiedCustomRunsUrl);
+    return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl);
   }
 
   deleteValidation(validationId: string): void {
