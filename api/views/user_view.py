@@ -45,4 +45,5 @@ class UserSerializer(ModelSerializer):
                   'date_joined',
                   'country',
                   'orcid',
-                  'id']
+                  'id',
+                  'copied_runs']
