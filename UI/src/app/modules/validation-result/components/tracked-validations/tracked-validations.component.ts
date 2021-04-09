@@ -20,7 +20,6 @@ export class TrackedValidationsComponent implements OnInit {
     this.trackedRuns$ = this.validationrunService.getCustomTrackedValidations();
     this.validationrunService.getCustomTrackedValidations().subscribe(
      data => {
-       console.log(data);
      }
    );
   }
