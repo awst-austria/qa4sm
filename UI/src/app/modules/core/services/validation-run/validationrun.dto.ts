@@ -32,7 +32,8 @@ export class ValidationrunDto{
               public is_unpublished: boolean,
               public output_dir_url: string,
               public output_file_name: string,
-              public isOwner: boolean) {
+              public copied_run: number[],
+              public is_a_copy: boolean) {
   }
 }
 
