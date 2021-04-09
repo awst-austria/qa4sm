@@ -31,7 +31,6 @@ export class AuthService {
         data => {
           this.currentUser = data;
           this.authenticated.next(true);
-          console.log(data);
         },
         error => {
 
