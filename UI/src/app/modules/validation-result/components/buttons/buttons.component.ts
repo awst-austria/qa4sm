@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {saveAs} from 'file-saver';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -25,18 +26,21 @@ export class ButtonsComponent implements OnInit {
     faFileDownload: fas.faFileDownload,
     faRedo: fas.faRedo};
 
-  isOwner = true;
   isCurrentUser = true;
-  isCopied = true;
+  isOwner: boolean;
+  isTrackedByTheUser: boolean;
   status: string;
   graphicsFileName = 'graphs.zip';
 
 
   constructor(private httpClient: HttpClient,
               private router: Router,
-              private validationService: ValidationrunService) { }
+              private validationService: ValidationrunService,
+              public authService: AuthService) { }
 
   ngOnInit(): void {
+    this.isOwner = this.authService.currentUser.id === this.validationRun.user;
+    this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
   }
 
   basicOnclick(validation: ValidationrunDto): void{

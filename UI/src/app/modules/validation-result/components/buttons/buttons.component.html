@@ -85,9 +85,22 @@
        title="Load validation settings">
       <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
     </a>
+    <button *ngIf="isCurrentUser && isTrackedByTheUser"
+            class="btn btn-sm btn-primary btn-action"
+            title="Remove this validation from your list"
+            onclick="">
+        <span class="pi pi-times"></span>
+    </button>
+    <button *ngIf="isCurrentUser && !isTrackedByTheUser"
+            class="btn btn-sm btn-primary btn-action"
+            title="Remove this validation from your list"
+            onclick="">
+        <span class="pi pi-plus"></span>
+    </button>
   </span>
 
-<!--  tracked validations -->
+
+<!--  tracked validations on custom validations page-->
   <span *ngIf="validationRun.output_file && tracked">
     <button class="btn btn-sm btn-primary btn-action"
             (click)="downloadResultFile(validationRun.output_dir_url+graphicsFileName, graphicsFileName)"
@@ -99,13 +112,19 @@
             title="Download validation run .nc file">
       <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
     </button>
+    <button *ngIf="isCurrentUser"
+            class="btn btn-sm btn-primary btn-action"
+            title="Remove this validation from your list"
+            onclick="">
+        <span class="pi pi-times"></span>
+    </button>
   </span>
 
 </div>
 
 <!--Buttons shown on the single validation page (both custom and published)-->
 <div *ngIf="!validationList" class="col-sm" style="text-align: right;">
-  <div *ngIf="validationRun.isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
+  <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
     <button class="btn btn-sm btn-primary"
             title="Remove result"
@@ -168,14 +187,14 @@
         <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings
       </a>
 
-      <button *ngIf="isCurrentUser && isCopied"
+      <button *ngIf="isCurrentUser && isTrackedByTheUser"
               class="btn btn-sm btn-primary"
               title="Remove this validation from your list"
               onclick="">
         <span class="pi pi-times"></span> Untrack
       </button>
 
-      <button *ngIf="isCurrentUser && !isCopied" class="btn btn-sm btn-primary"
+      <button *ngIf="isCurrentUser && !isTrackedByTheUser" class="btn btn-sm btn-primary"
               title="Track this validation"
               onclick="">
         <span class="pi pi-plus"></span> Track
