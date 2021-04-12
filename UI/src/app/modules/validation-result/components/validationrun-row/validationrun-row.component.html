@@ -91,8 +91,8 @@
 
   <!-- Body -->
   <!-- Datasets -->
-  <div class="p-grid">
-    <div class="p-col-4">
+  <div class="p-grid mx-0 px-0 my-0">
+    <div class="p-col">
       <strong>Data:</strong><br/>
       <span *ngFor="let datasetRowModel of model.datasetRows">
           {{(datasetRowModel.dataset$|async)?.pretty_name}},
@@ -102,7 +102,7 @@
 
     </div>
     <!-- Reference -->
-    <div class="p-col-4">
+    <div class="p-col">
       <strong>Reference:</strong><br/>
       <span>
           {{(model.referenceRow.dataset$|async)?.pretty_name}},
@@ -111,19 +111,21 @@
         </span>
     </div>
     <!-- Status / Created   -->
-    <!--    PUBLISHED -->
-    <div *ngIf="published" class="p-col-2" style="max-width: 7rem;">
-      <strong>Created:</strong><br/>
-      {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
-    </div>
-    <!--    CUSTOM -->
-    <div *ngIf="!published" class="p-col-2" style="max-width: 7rem;">
-      <strong>Status:</strong><br/>
-      {{ getStatusFromProgress(validationRun)}}
+    <div class="p-col status pl-2">
+      <!--    PUBLISHED -->
+      <div *ngIf="published">
+        <strong>Created:</strong><br/>
+        {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
+      </div>
+      <!--    CUSTOM -->
+      <div *ngIf="!published">
+        <strong>Status:</strong><br/>
+        {{ getStatusFromProgress(validationRun)}}
+      </div>
     </div>
 
     <!-- Action Buttons -->
-    <div class="p-col-2">
+    <div class="p-col-3">
       <qa-buttons [validationList]="true" [validationRun]="model.validationRun" [published]="published"></qa-buttons>
     </div>
 
