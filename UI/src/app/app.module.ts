@@ -48,6 +48,7 @@ import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
+import {CoreModule} from './modules/core/core.module';
 
 
 @NgModule({
@@ -96,7 +97,8 @@ import {NgxPageScrollModule} from 'ngx-page-scroll';
     ScalingModule,
     NgxPaginationModule,
     MapModule,
-    NgxPageScrollModule
+    NgxPageScrollModule,
+    CoreModule
 
   ],
   providers: [
