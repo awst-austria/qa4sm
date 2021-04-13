@@ -28,6 +28,8 @@ $button-hover-color: #213FE0;
   width: 2.4em;
   margin-top: 0.12rem;
   margin-bottom: 0.12rem;
+  margin-left: 0.12rem;
+  margin-right: 0.12rem;
 }
 .btn-primary.edit_name_btn{
   color: #fff;
@@ -95,4 +97,7 @@ $button-hover-color: #213FE0;
 }
 a.no-decorations {
   text-decoration: none;
+}
+.hidden {
+  visibility: hidden;
 }

@@ -4,6 +4,8 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {saveAs} from 'file-saver';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -15,24 +17,30 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 export class ButtonsComponent implements OnInit {
 
   @Input() validationRun: ValidationrunDto;
+  @Input() published: boolean;
   @Input() validationList: boolean;
+  @Input() tracked: boolean;
 
   faIcons = {faArchive: fas.faArchive,
     faStop: fas.faStop,
     faFileDownload: fas.faFileDownload,
     faRedo: fas.faRedo};
 
-  isOwner = true;
   isCurrentUser = true;
-  isCopied = true;
+  isOwner: boolean;
+  isTrackedByTheUser: boolean;
   status: string;
+  graphicsFileName = 'graphs.zip';
 
 
   constructor(private httpClient: HttpClient,
               private router: Router,
-              private validationService: ValidationrunService) { }
+              private validationService: ValidationrunService,
+              public authService: AuthService) { }
 
   ngOnInit(): void {
+    this.isOwner = this.authService.currentUser.id === this.validationRun.user;
+    this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
   }
 
   basicOnclick(validation: ValidationrunDto): void{
@@ -66,6 +74,21 @@ export class ButtonsComponent implements OnInit {
 
   extendResults(validationId: string): void{
     this.validationService.extendResults(validationId);
+  }
+
+  downloadResultFile(fileUrl: string, fileName: string): void{
+    this.validationService.downloadResultFile(fileUrl)
+      .subscribe(blob => saveAs(blob, fileName));
+  }
+
+  addValidation(validationId: string): void{
+    this.validationService.addValidation(validationId);
+    window.location.reload();
+  }
+
+  removeValidation(validationId: string): void{
+    this.validationService.removeValidation(validationId);
+    window.location.reload();
   }
 
 }

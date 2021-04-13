@@ -9,6 +9,8 @@ import {FilterService} from '../../../core/services/filter/filter.service';
 import {map} from 'rxjs/operators';
 import {SCALING_CHOICES} from '../../../scaling/components/scaling/scaling.component';
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
+import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -25,13 +27,16 @@ export class ValidationSummaryComponent implements OnInit {
   dateFormat = 'medium';
   timeZone = 'UTC';
   scalingMethods = SCALING_CHOICES;
+  hideElement = true;
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
               private filterService: FilterService,
-              private globalParamsService: GlobalParamsService) { }
+              private globalParamsService: GlobalParamsService,
+              private validationService: ValidationrunService,
+              private authService: AuthService) { }
 
   ngOnInit(): void {
     this.updateConfig();
@@ -78,7 +83,7 @@ export class ValidationSummaryComponent implements OnInit {
           })
       ))
     );
-    this.configurations$.subscribe(data => {
+    this.configurations$.subscribe(() => {
     });
   }
 
@@ -87,12 +92,13 @@ export class ValidationSummaryComponent implements OnInit {
       map(validation => ({
         ...validation,
         runTime: this.getRunTime(validation.start_time, validation.end_time),
-        errorRate: validation.total_points !== 0 ? (validation.total_points - validation.ok_points) / validation.total_points : 1
+        errorRate: validation.total_points !== 0 ? (validation.total_points - validation.ok_points) / validation.total_points : 1,
+        isOwner: validation.user === this.authService.currentUser.id
       })),
     );
   }
 
-  private getRunTime(startTime: Date, endTime: Date): number{
+  getRunTime(startTime: Date, endTime: Date): number{
     const startTimeDate = new Date(startTime);
     const endTimeDate = new Date(endTime);
     const runTime = endTimeDate.getTime() - startTimeDate.getTime();
@@ -103,4 +109,11 @@ export class ValidationSummaryComponent implements OnInit {
     return this.globalParamsService.globalContext.doi_prefix;
   }
 
+  toggleEditing(): void{
+    this.hideElement = !this.hideElement;
+  }
+  saveName(validationId: string, newName: string): void{
+    this.validationService.saveResults(validationId, newName);
+    window.location.reload();
+  }
 }
