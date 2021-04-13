@@ -4,6 +4,7 @@ from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 
 
+
 class Dataset(models.Model):
     short_name = models.CharField(max_length=30)
     pretty_name = models.CharField(max_length=30)
@@ -27,3 +28,9 @@ class Dataset(models.Model):
 
     def __str__(self):
         return self.short_name
+
+    @property
+    def not_as_reference(self):
+        # I know it should be imported globally, but it doesn't work then
+        from validator.validation.globals import NOT_AS_REFERENCE
+        return self.short_name in NOT_AS_REFERENCE

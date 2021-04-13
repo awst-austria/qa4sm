@@ -40,4 +40,5 @@ class DatasetSerializer(ModelSerializer):
                   'versions',
                   'variables',
                   'filters',
+                  'not_as_reference'
                   ]
