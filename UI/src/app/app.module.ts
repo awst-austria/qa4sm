@@ -45,7 +45,7 @@ import {ScalingModule} from './modules/scaling/scaling.module';
 import {NgxPaginationModule} from 'ngx-pagination';
 import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
-import { TermsComponent } from './pages/terms/terms.component';
+import {TermsComponent} from './pages/terms/terms.component';
 
 
 @NgModule({
