@@ -1,0 +1,72 @@
+<div *ngIf="datasetInfo$ | async as datasets" style="width: 100%; margin: auto; max-width: 85rem;">
+  <div *ngFor="let refFlag of [false, true]">
+
+    <div *ngIf="refFlag; else elseRefFlag">
+      <a id="data"></a>
+      <h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated and to be used as a reference</h1>
+      <p>
+        The following datasets can be validated within the QA4SM tool. These datasets are available in both the "data"
+        and the 'reference' sections and of the validate page.
+      </p>
+    </div>
+
+    <ng-template #elseRefFlag>
+      <a id="ref"></a>
+      <h1 class="h3 mb-3 font-weight-normal">Datasets - Reference Data</h1>
+      <p>
+        The following datasets can be used only as a reference within the QA4SM tool. These datasets are available in
+        the
+        "reference" section of the validate page.
+      </p>
+    </ng-template>
+
+    <table id="table_{% if not refFlag %}datasets{% else %}references{% endif %}"
+           class="table table-bordered table-striped">
+      <thead class="thead-dark">
+      <tr>
+        <th scope="col" style="width: 10%">Dataset</th>
+        <th scope="col" style="width: 20%">Details</th>
+        <th scope="col" style="width: 20%">Versions supported with Time Range Covered</th>
+        <th scope="col" style="width: 15%">Data availability</th>
+        <th scope="col" style="width: 10%">Citation</th>
+        <th scope="col" style="width: 25%">Filters</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let dataset of datasets">
+        <th *ngIf="dataset.is_only_reference == refFlag" scope="row">{{ dataset.pretty_name }}
+          <sup *ngIf="dataset.not_as_reference">*</sup></th>
+        <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.detailed_description"></td>
+        <td *ngIf="dataset.is_only_reference == refFlag">
+          <ul class="p-pl-0">
+            <li *ngFor="let version of dataset.versions; let ind=index" class="p-ml-2">
+              <b> {{ version }}</b> <br>
+              <span *ngIf="dataset.versionsHelpText[ind] != '-' && dataset.versionsHelpText[ind] !=''">
+                ({{ dataset.versionsHelpText[ind] }}) <br>
+              </span>
+              <span *ngIf="dataset.versionsStart[ind] == '' && dataset.versionsEnd[ind] == ''; else elseTimeRange">
+                Time coverage is station dependent
+              </span>
+              <ng-template #elseTimeRange>
+                From: {{ dataset.versionsStart[ind]}} <br>
+                To: {{dataset.versionsEnd[ind]}}
+              </ng-template>
+            </li>
+          </ul>
+        </td>
+        <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.source_reference"></td>
+        <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.citation"></td>
+        <td *ngIf="dataset.is_only_reference == refFlag">
+          <ul class="p-pl-0">
+            <li *ngFor="let filter of dataset.filters; let ind = index" class="p-ml-2">
+              {{filter}}: {{dataset.filtersHelpText[ind]}}
+            </li>
+          </ul>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <span *ngIf="!refFlag"><sup>*</sup> dataset temporarily excluded from the reference list for technical reasons<br> </span>
+    <br>
+  </div>
+</div>

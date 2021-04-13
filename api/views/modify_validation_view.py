@@ -6,9 +6,12 @@ from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm
 from validator.models import ValidationRun, CopiedValidations
 from validator.validation.validation import stop_running_validation
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from rest_framework import status
+
+from validator.views.results import _copy_validationrun
+
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -69,7 +72,7 @@ def modify_result(request, result_uuid):
 
             save_mode = patch_params['save_name']
 
-            if save_mode != 'true':
+            if not save_mode:
                 return HttpResponse("Wrong action parameter.", status=400)
 
             val_run.name_tag = patch_params['new_name']
@@ -117,3 +120,28 @@ def modify_result(request, result_uuid):
             return HttpResponse("Published.", status=200)
 
         return HttpResponse("Wrong action parameter.", status=400)
+
+    elif request.method == 'POST':
+        post_params = request.data
+        post_params_keys = post_params.keys()
+
+        user = request.user
+        if 'add_validation' in post_params_keys and post_params['add_validation']:
+            if val_run not in user.copied_runs.all():
+                valrun_user = CopiedValidations(used_by_user=user, original_run=val_run, copied_run=val_run)
+                valrun_user.save()
+                response = HttpResponse("Validation added to your list", status=200)
+            else:
+                response = HttpResponse("You have already added this validation to your list", status=200)
+        elif 'remove_validation' in post_params_keys and post_params['remove_validation']:
+            user.copied_runs.remove(val_run)
+            response = HttpResponse("Validation has been removed from your list", status=200)
+
+        elif 'copy_validation' in post_params and post_params['copy_validation'] == 'true':
+            resp = _copy_validationrun(val_run, request.user)
+            response = JsonResponse(resp)
+
+        else:
+            response = HttpResponse("Wrong action parameter.", status=400)
+
+        return response

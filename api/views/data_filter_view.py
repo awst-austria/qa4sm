@@ -8,7 +8,7 @@ from validator.models import Dataset, DataFilter, DatasetConfiguration, Parametr
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def data_filter(request):
     dataset_id = request.query_params.get('dataset', None)
     # # get single dataset

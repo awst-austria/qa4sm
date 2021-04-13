@@ -10,6 +10,7 @@ export class DatasetDto {
               public is_only_reference: boolean,
               public versions: number[],
               public variables: number[],
-              public filters: number[]) {
+              public filters: number[],
+              public not_as_reference: boolean) {
   }
 }

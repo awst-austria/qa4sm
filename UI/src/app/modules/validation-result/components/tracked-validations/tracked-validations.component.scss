@@ -1,0 +1,18 @@
+@import "~bootstrap/dist/css/bootstrap.css";
+@import "../buttons/buttons.component.scss";
+.att_val_container{
+  background-color: white;
+  color: black;
+  padding: 0.3em 0.3em 0.3em 0.3em;
+}
+.att_val_container h5.my-0{
+  float: left;
+  padding-top: 0.3em;
+}
+.att_val_container div.col-sm span{
+  text-align: right;
+}
+.buttons{
+  position: relative;
+  left: 55%;
+}

@@ -11,6 +11,8 @@ import {PublishedValidationsComponent} from './pages/published-validations/publi
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from "./pages/terms/terms.component";
+import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
+
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
@@ -23,6 +25,7 @@ const routes: Routes = [
   {path: 'published-validations', component: PublishedValidationsComponent},
   {path: 'about', component: AboutComponent},
   {path: 'terms', component: TermsComponent},
+  {path: 'datasets', component: DatasetInfoComponent},
   {path: '**', component: ErrorComponent}
 ];
 
