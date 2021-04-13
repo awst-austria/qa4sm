@@ -30,7 +30,8 @@ export class NavigationBarComponent implements OnInit {
           {label: 'About', icon: 'pi pi-fw pi-info', routerLink: ['about']},
           {label: 'Help', icon: 'pi pi-fw pi-question'},
           {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']},
-          {label: 'Terms', icon: 'pi pi-fw pi-briefcase'},
+          {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']},
+
         ]
       },
       {
