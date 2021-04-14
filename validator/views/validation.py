@@ -18,7 +18,7 @@ from django.template import loader
 
 from validator.forms import DatasetConfigurationForm, FilterCheckboxSelectMultiple,\
     ValidationRunForm, ParamFilterChoiceField, ParamFilterSelectMultiple
-from validator.models import DataFilter, DatasetVersion
+from validator.models import DataFilter, DatasetVersion, DataVariable
 from validator.models import Dataset
 from validator.models import Settings
 from validator.models import ValidationRun, DatasetConfiguration
@@ -27,6 +27,7 @@ from validator.validation import run_validation
 import validator.validation.globals as val_globals
 from validator.validation.validation import stop_running_validation
 from django.db.models import Case, When
+from django.urls import reverse
 
 # see https://docs.djangoproject.com/en/2.1/topics/forms/formsets/
 DatasetConfigurationFormSet = formset_factory(DatasetConfigurationForm, extra=0, max_num=5, min_num=1, validate_max=True, validate_min=True)
@@ -207,12 +208,124 @@ def stop_validation(request, result_uuid):
 @login_required(login_url='/login/')
 def validation(request):
     dc_prefix = 'datasets'
-    ref_repfix = 'ref'
-    data_initial_values = [{'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
-                            'dataset': Dataset.objects.get(short_name=val_globals.C3S), }]
+    ref_prefix = 'ref'
 
-    ref_initial_values = {'filters': DataFilter.objects.filter(name='FIL_ALL_VALID_RANGE'),
-                          'dataset': Dataset.objects.get(short_name=val_globals.ISMN), }
+    # some parameters to pass to template
+    valrun_found = request.GET.get('valrun_found', None)
+    valrun_uuid = request.GET.get("valrun_uuid", None)
+    is_published = request.GET.get('is_published', None)
+    belongs_to_user = request.GET.get('belongs', None)
+    val_date = None
+
+    # Get initial values for dataset forms
+    def _default_initials():
+        ref_initial_values = {
+            "filters": DataFilter.objects.filter(
+                name="FIL_ALL_VALID_RANGE"
+            ),
+            "dataset": Dataset.objects.get(short_name=val_globals.ISMN),
+        }
+        data_initial_values = [{
+            "filters": DataFilter.objects.filter(
+                name="FIL_ALL_VALID_RANGE"
+            ),
+            "dataset": Dataset.objects.get(short_name=val_globals.C3S),
+        }]
+        return ref_initial_values, data_initial_values
+
+    # infer initial configuration values from POST request
+    if request.method == "POST":
+        def object_list_from_key(typ, key):
+            return list(map(
+                lambda x: typ.objects.get(pk=int(x)),
+                request.POST.getlist(key)
+            ))
+
+        def object_from_key(typ, key):
+            return typ.objects.get(pk=int(request.POST.get(key)[0]))
+
+        try:
+            prefixes = ["ref"]
+            num_forms = int(request.POST.get("datasets-TOTAL_FORMS")[0])
+            for i in range(num_forms):
+                prefixes.append(f"datasets-{i}")
+
+            initial_values = []
+            for pfx in prefixes:
+                initial_values.append({
+                    "filters": object_list_from_key(
+                        DataFilter, pfx + "-filters"
+                    ),
+                    "parametrised_filters": object_list_from_key(
+                        DataFilter, pfx + "-parametrised_filters"
+                    ),
+                    "paramfilter_params": request.POST.getlist(
+                        pfx + "-parametrised_filters_params"
+                    ),
+                    "dataset": object_from_key(
+                        Dataset, pfx + "-dataset"
+                    ),
+                    "version": object_from_key(
+                        DatasetVersion, pfx + "-version"
+                    ),
+                    "variable": object_from_key(
+                        DataVariable, pfx + "-variable"
+                    ),
+                })
+            ref_initial_values = initial_values[0]
+            data_initial_values = initial_values[1:]
+
+        except TypeError:
+            # happens with invalid requests
+            ref_initial_values, data_initial_values = _default_initials()
+
+    # infer initial configuration values from GET request
+    else:
+        valrun_uuid = request.GET.get("valrun_uuid", None)
+        if valrun_uuid is None:
+            ref_initial_values, data_initial_values = _default_initials()
+        else:
+            valrun = get_object_or_404(ValidationRun, pk=valrun_uuid)
+            # initial settings for datasets
+            ref_config = valrun.reference_configuration
+            data_configs = [dc for dc in valrun.dataset_configurations.all()
+                            if dc.id != ref_config.id]
+            initial_values = []
+            for dc in [ref_config] + data_configs:
+                initial_values.append({
+                    "filters": dc.filters.all(),
+                    "parametrised_filters": dc.parametrised_filters.all(),
+                    "dataset": dc.dataset,
+                    "version": dc.version,
+                    "variable": dc.variable,
+                })
+                if initial_values[-1]["parametrised_filters"]:
+                    paramfilter_params = dc.parametrisedfilter_set.all()
+                    initial_values[-1].update({
+                        "paramfilter_params": [
+                            paramfilter_params.get(filter=filter_name).parameters
+                            for filter_name in initial_values[-1]['parametrised_filters']
+                        ]
+                    })
+
+            ref_initial_values = initial_values[0]
+            data_initial_values = initial_values[1:]
+
+    # get initial values for the validation run settings
+    valrun_initial_values = {}
+    for field in ValidationRunForm.Meta.fields:
+        if request.method != "POST" and valrun_uuid is None:
+            valrun_initial_values = None
+        else:
+            if request.method == "POST":
+                valrun_initial_values[field] = request.POST.get(field)
+            else:
+                valrun_initial_values[field] = getattr(valrun, field)
+            # the dates should be without time
+            if isinstance(valrun_initial_values[field], datetime):
+                valrun_initial_values[field] = (
+                    valrun_initial_values[field].strftime("%Y-%m-%d")
+                )
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:
@@ -232,9 +345,9 @@ def validation(request):
                 return HttpResponseBadRequest('Not a valid request: ' + e.message)
 
         # form for the reference configuration
-        ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
+        ref_dc_form = DatasetConfigurationForm(request.POST, prefix=ref_prefix, is_reference=True, initial=ref_initial_values)
         # form for the rest of the validation parameters
-        val_form = ValidationRunForm(request.POST)
+        val_form = ValidationRunForm(request.POST, initial=valrun_initial_values)
         if val_form.is_valid() and dc_formset.is_valid() and ref_dc_form.is_valid():
             newrun = val_form.save(commit=False)
             newrun.user = request.user
@@ -300,13 +413,13 @@ def validation(request):
                 newrun.delete()
                 comparison, is_published = (comparison_pub, comparison_pub['is_published'])
                 val_id = comparison['val_id']
-                val_date = ValidationRun.objects.get(id=val_id).start_time
                 belongs_to_user = comparison['belongs_to_user']
-                return render(request, 'validator/validate.html',
-                              {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                               'maintenance_mode': Settings.load().maintenance_mode, 'if_run_exists': if_run_exists,
-                               'val_id': val_id, 'is_published': is_published, 'belongs_to_user': belongs_to_user,
-                               'val_date': val_date})
+                validation_settings = reverse('validation') + \
+                                      '?valrun_uuid=' + str(val_id) + \
+                                      '&valrun_found=' + str(int(if_run_exists)) + \
+                                      '&is_published=' + str(int(is_published)) + \
+                                      '&belongs=' + str(int(belongs_to_user))
+                return redirect(validation_settings)
 
             # checking how many times the validation button was clicked - in try so that tests pass
             # need to close all db connections before forking, see
@@ -320,56 +433,108 @@ def validation(request):
         else:
             __logger.error("Errors in validation form {}\n{}\n{}".format(val_form.errors, dc_formset.errors, ref_dc_form.errors))
     else:
-        val_form = ValidationRunForm()
+        val_form = ValidationRunForm(initial=valrun_initial_values)
         dc_formset = DatasetConfigurationFormSet(prefix=dc_prefix, initial=data_initial_values)
-        ref_dc_form = DatasetConfigurationForm(prefix=ref_repfix, is_reference=True, initial=ref_initial_values)
+        ref_dc_form = DatasetConfigurationForm(prefix=ref_prefix, is_reference=True, initial=ref_initial_values)
         # ref_dc_form.
+
+        # if validation exists:
+        if valrun_found is not None:
+            val_date = ValidationRun.objects.get(id=valrun_uuid).start_time
+            valrun_found = bool(int(valrun_found))
+            is_published = bool(int(is_published))
+            belongs_to_user = bool(int(belongs_to_user))
 
     return render(request, 'validator/validate.html',
                   {'val_form': val_form, 'dc_formset': dc_formset, 'ref_dc_form': ref_dc_form,
-                   'maintenance_mode':Settings.load().maintenance_mode, 'if_run_exists':False, 'val_id': None})
+                   'maintenance_mode':Settings.load().maintenance_mode, 'if_run_exists': valrun_found,
+                   'val_id': valrun_uuid, 'is_published': is_published, 'belongs_to_user': belongs_to_user,
+                   'val_date': val_date})
 
 
 ## Ajax stuff required for validation view
 
 ## render string options as html
-def __render_options(entity_list):
+def __render_options(entity_list, initial):
     widgets = []
     for entity in entity_list:
         widget = {
-            'value' : entity.id,
+            'value': entity.id,
             'label': entity.pretty_name,
             }
         widgets.append(widget)
+    # reorder such that "initial" is at the front
+    if initial != "":
+        init_val = int(initial)
+        try:
+            init_idx = [w["value"] for w in widgets].index(init_val)
+            widgets.insert(0, widgets.pop(init_idx))
+        except ValueError:  # pragma: no cover
+            pass
 
     content = loader.render_to_string('widgets/select_options.html', {'widgets': widgets})
     return content
 
-# render filters as html checkboxes with descriptions
-def __render_filters(filters, filter_widget_id, parametrised = False):
-    widget_name = regex_subs(r'^id_', '', filter_widget_id)
-    if parametrised:
-        filter_field = ParamFilterChoiceField(widget=ParamFilterSelectMultiple, queryset=filters, required=False)
-    else:
-        filter_field = ModelMultipleChoiceField(widget=FilterCheckboxSelectMultiple, queryset=filters, required=False)
 
-    preselected = None
-    if filters:
-        # pre-select the first filter
-        preselected = filters[0].id
+# render filters as html checkboxes with descriptions
+def __render_filters(filters, filter_widget_id, initial_filters):
+    widget_name = regex_subs(r'^id_', '', filter_widget_id)
+    filter_field = ModelMultipleChoiceField(
+        widget=FilterCheckboxSelectMultiple, queryset=filters, required=False
+    )
+
+    # extracts the initial filters to be selected from the initial_filters
+    # string, see DatasetConfigurationForm.__init__
+    if filters and initial_filters:
+        initial_filter_ids = list(map(int, initial_filters.split(',')))
+    else:
+        initial_filter_ids = None
 
     filter_html = filter_field.widget.render(
         name=widget_name,
-        value=preselected,
+        value=initial_filter_ids,
         attrs={'id': filter_widget_id})
     return filter_html
 
-## returns the options for the variable and version select dropdowns and the filter checkboxes based on the selected dataset
+
+# render filters as html checkboxes with descriptions
+def __render_parametrised_filters(
+        filters, filter_widget_id, initial_filters, initial_params
+):
+    widget_name = regex_subs(r'^id_', '', filter_widget_id)
+    filter_field = ParamFilterChoiceField(
+        widget=ParamFilterSelectMultiple, queryset=filters, required=False
+    )
+
+    # extracts the initial filters and params to be selected from the
+    # initial_filters string, see DatasetConfigurationForm.__init__
+    if filters and initial_filters:
+        initial_filter_ids = list(map(int, initial_filters.split(",")))
+        initial_parameters = initial_params.split(";")
+    else:
+        initial_filter_ids = None
+        initial_parameters = None
+
+    filter_html = filter_field.widget.render(
+        name=widget_name,
+        value=initial_filter_ids,
+        attrs={'id': filter_widget_id,
+               'initial_params': initial_parameters})
+    return filter_html
+
+
+## returns the options for the variable and version select dropdowns and the
+## filter checkboxes based on the selected dataset
 @login_required(login_url='/login/')
 def ajax_get_dataset_options(request):
     selected_dataset_name = request.GET.get('dataset_id')
     filter_widget_id = request.GET.get('filter_widget_id')
     param_filter_widget_id = request.GET.get('param_filter_widget_id')
+    initial_filters = request.GET.get('initial_filters')
+    initial_paramfilters = request.GET.get('initial_paramfilters')
+    initial_paramfilter_params = request.GET.get('initial_paramfilter_params')
+    initial_version = request.GET.get('initial_version')
+    initial_variable = request.GET.get('initial_variable')
 
     try:
         selected_dataset = Dataset.objects.get(pk=selected_dataset_name)
@@ -377,10 +542,25 @@ def ajax_get_dataset_options(request):
         return HttpResponseBadRequest("Not a valid dataset")
 
     response_data = {
-        'versions': __render_options(selected_dataset.versions.all().order_by('-pretty_name')),
-        'variables': __render_options(selected_dataset.variables.all().order_by('id')),
-        'filters': __render_filters(selected_dataset.filters.filter(parameterised=False), filter_widget_id, parametrised = False),
-        'paramfilters': __render_filters(selected_dataset.filters.filter(parameterised=True), param_filter_widget_id, parametrised = True),
+        'versions': __render_options(
+            selected_dataset.versions.all().order_by('-pretty_name'),
+            initial_version,
+        ),
+        'variables': __render_options(
+            selected_dataset.variables.all().order_by('id'),
+            initial_variable
+        ),
+        'filters': __render_filters(
+            selected_dataset.filters.filter(parameterised=False),
+            filter_widget_id,
+            initial_filters,
+        ),
+        'paramfilters': __render_parametrised_filters(
+            selected_dataset.filters.filter(parameterised=True),
+            param_filter_widget_id,
+            initial_paramfilters,
+            initial_paramfilter_params,
+        ),
         }
 
     return JsonResponse(response_data)
@@ -427,4 +607,3 @@ def ajax_get_version_info(request):
         'intervals_to' : intervals_to
         }
     return JsonResponse(response_data)
-

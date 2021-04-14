@@ -482,7 +482,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V05_2)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V06_1)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_A_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
@@ -610,7 +610,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3S)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V201912)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V202012)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.C3S_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 

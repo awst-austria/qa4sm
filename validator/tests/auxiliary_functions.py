@@ -11,7 +11,7 @@ def generate_default_validation():
     data_c = DatasetConfiguration()
     data_c.validation = run
     data_c.dataset = Dataset.objects.get(short_name='C3S')
-    data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
+    data_c.version = DatasetVersion.objects.get(short_name='C3S_V202012')
     data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
     data_c.save()
 
