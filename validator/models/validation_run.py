@@ -180,7 +180,7 @@ class ValidationRun(models.Model):
     def output_file_name(self):
         if bool(self.output_file) is False:
             return None
-        name = self.output_file.name
+        name = self.output_file.name.split('/')[1]
         return name
 
     @property
