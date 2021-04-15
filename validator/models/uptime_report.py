@@ -26,3 +26,4 @@ class UptimeReport(models.Model):
         blank=False,
     )
     uptime_percentage = models.FloatField(null=False, blank=False)
+    agent_key = models.CharField(max_length=200, default='unknown')
