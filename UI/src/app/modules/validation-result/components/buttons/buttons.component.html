@@ -41,13 +41,13 @@
     <div class="dropdown-content" style="text-align: left">
       <div *ngIf="validationRun.output_file">
         <button class="dropdown-item"
-                (click)="downloadResultFile(validationRun.output_dir_url+graphicsFileNameAppendix, validationRun.id+'_'+graphicsFileNameAppendix)"
+                (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id+'_'+graphicsFileNameAppendix)"
                 title="Download graphs .zip">
           <span class="pi pi-download"></span>
           Download Graphs
         </button>
         <button class="dropdown-item"
-                (click)="downloadResultFile(validationRun.output_file, validationRun.output_file_name)"
+                (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
                 title="Download validation run .nc file">
           <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
           Download NetCDF File

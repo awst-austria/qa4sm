@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {saveAs} from 'file-saver';
+import {saveAs} from 'file-saver-es';
 import {AuthService} from '../../../core/services/auth/auth.service';
 
 
@@ -76,8 +76,9 @@ export class ButtonsComponent implements OnInit {
     this.validationService.extendResults(validationId);
   }
 
-  downloadResultFile(fileUrl: string, fileName: string): void{
-    this.validationService.downloadResultFile(fileUrl)
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
+    const parameters = new HttpParams().set('validationId', String(validationId)).set('fileType', String(fileType));
+    this.validationService.downloadResultFile(parameters)
       .subscribe(blob => saveAs(blob, fileName));
   }
 
