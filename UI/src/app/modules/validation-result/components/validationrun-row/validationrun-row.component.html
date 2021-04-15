@@ -33,7 +33,8 @@
                   title="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
             </span>
           </a>
-        <span *ngIf="validationRun.is_archived" class="p-panel-header-icon pi pi- expiry-icons"
+        <span *ngIf="validationRun.is_archived && validationRun.is_unpublished"
+              class="p-panel-header-icon pi pi- expiry-icons"
               title="This validation has been archived. It will NOT be automatically removed during cleanup.">
           <fa-icon [icon]="faIcons.faArchive"></fa-icon>
         </span>
@@ -57,8 +58,8 @@
             class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
         <span class="no_name_change_info pi pi-question-circle help-icon"
               title="Validation has been published. There is no possibility of changing its name.">
+        </span>
       </span>
-    </span>
       <ng-template #elseUnpublished>
         <button
           [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
@@ -67,24 +68,24 @@
           <span class="pi pi-pencil"></span>
         </button>
         <span *ngIf="!hideElement">
-        <label for="new-name"></label>
-        <input id="new-name"
-               type="text"
-               value="{{validationRun.name_tag}}"
-               #newName
-               [ngClass]="{'edit_name': true}">
-        <button
-          [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
-          title="Save Name"
-          (click)="saveName(validationRun.id, newName.value)">
-          <span class="pi pi-save"></span></button>
-        <button
-          [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
-          title="Cancel"
-          (click)="toggleEditing()">
-          <span class="pi pi-ban"></span>
-        </button>
-      </span>
+          <label for="new-name"></label>
+          <input id="new-name"
+                 type="text"
+                 value="{{validationRun.name_tag}}"
+                 #newName
+                 [ngClass]="{'edit_name': true}">
+          <button
+            [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
+            title="Save Name"
+            (click)="saveName(validationRun.id, newName.value)">
+            <span class="pi pi-save"></span></button>
+          <button
+            [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
+            title="Cancel"
+            (click)="toggleEditing()">
+            <span class="pi pi-ban"></span>
+          </button>
+        </span>
       </ng-template>
     </h5>
   </ng-template>
