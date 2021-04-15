@@ -11,6 +11,7 @@ import {SCALING_CHOICES} from '../../../scaling/components/scaling/scaling.compo
 import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {fas} from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -29,6 +30,8 @@ export class ValidationSummaryComponent implements OnInit {
   scalingMethods = SCALING_CHOICES;
   hideElement = true;
 
+  faIcons = {faArchive: fas.faArchive};
+
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -41,6 +44,10 @@ export class ValidationSummaryComponent implements OnInit {
   ngOnInit(): void {
     this.updateConfig();
     this.updateValidationRun();
+  }
+
+  getCurrentUser(): number {
+    return this.authService.currentUser.id;
   }
 
   private updateConfig(): void{
