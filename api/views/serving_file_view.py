@@ -5,6 +5,7 @@ from wsgiref.util import FileWrapper
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.encoding import smart_str
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -39,3 +40,4 @@ def download_results(request):
 #         filename = file_path + 'graphs.zip'
 #     response = FileResponse(open(filename, 'rb'))
 #     return response
+
