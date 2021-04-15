@@ -1,7 +1,5 @@
 from django.conf.urls import url
 from django.urls import path
-from django.conf import settings
-from django.conf.urls.static import static
 
 from api.views.data_filter_view import data_filter, data_filter_by_id, data_parameterised_filter_by_id, \
     data_parameterised_filter
