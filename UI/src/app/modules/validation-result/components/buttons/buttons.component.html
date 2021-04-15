@@ -15,7 +15,7 @@
   </a>
 
 <!--custom validations only-->
-  <span *ngIf="validationRun.end_time && validationRun.is_unpublished"
+  <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
         [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
 
     <button *ngIf="validationRun.is_archived"
