@@ -1,6 +1,7 @@
 @import "~bootstrap/dist/css/bootstrap.css";
 $button-base-color: #4760E5;
 $button-hover-color: #213FE0;
+$edit-name-button-backgroud-color: #EFEFEF;
 
 .btn-primary {
   color: #fff;
@@ -32,16 +33,16 @@ $button-hover-color: #213FE0;
   margin-right: 0.12rem;
 }
 .btn-primary.edit_name_btn{
-  color: #fff;
-  background-color: #00AAE3;
-  border-color: #00AAE3;
+  color: #000;
+  background-color: $edit-name-button-backgroud-color;
+  border-color: $edit-name-button-backgroud-color;
   transform: scale(0.9);
   width: 2rem;
 }
 .btn-primary.edit_name_btn:not(.disabled):hover{
-  color: #4760E5;
-  background-color: #00AAE3;
-  border-color: #00AAE3;
+  color: $button-hover-color;
+  background-color: $edit-name-button-backgroud-color;
+  border-color: $edit-name-button-backgroud-color;
   transform: scale(1.2);
 }
 .edit_name{

@@ -90,6 +90,7 @@ export class ValidationrunService {
       (response) => {
         const newExpiry = new Date(response);
         alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString());
+        location.reload();
       });
   }
 
