@@ -4,7 +4,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
 from validator.models import ValidationRun
-from django.conf.urls.static import static
 from django.conf import settings
 
 
@@ -15,7 +14,6 @@ def download_results(request):
     file_type = request.query_params.get('fileType', None)
     valrun = get_object_or_404(ValidationRun, pk=validation_id)
     file_path = valrun.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
-    print('filePath:', file_path)
     if file_type == 'netCDF':
         filename = file_path + valrun.output_file_name
     else:
