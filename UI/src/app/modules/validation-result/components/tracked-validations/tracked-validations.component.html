@@ -1,6 +1,6 @@
 <div *ngIf="trackedRuns$ | async as myCopiedRuns" class="container text-center mb-5 mt-4" style="max-width: 60rem;">
   <div *ngIf="myCopiedRuns.length != 0">
-    <h1 class="jumbotron-heading">Tracked validations</h1>
+    <h1 class="jumbotron-heading">Pinned validations</h1>
     <div class="card-deck mb-3">
       <div class="col">
         <div *ngFor="let valrun of myCopiedRuns" class="mx-0" id="attached_result_row_{{ valrun.id }}">
