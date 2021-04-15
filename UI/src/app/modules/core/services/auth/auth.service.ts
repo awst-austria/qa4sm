@@ -16,8 +16,9 @@ export class AuthService {
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
 
+  emptyUser = {username: '', firstName: '', id: null, copied_runs: []};
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public currentUser: UserDto = {username: '', firstName: ''};
+  public currentUser: UserDto = this.emptyUser;
 
   constructor(private httpClient: HttpClient, private logger: NGXLogger) {
     this.init();
@@ -53,7 +54,7 @@ export class AuthService {
       .post<UserDto>(this.loginUrl, credentials)
       .subscribe(
         data => {
-          this.currentUser = {username: '', firstName: ''};
+          this.currentUser = this.emptyUser;
           this.authenticated.next(true);
           authResult.next(true);
         },
@@ -72,7 +73,7 @@ export class AuthService {
       .post(this.logoutUrl, null)
       .subscribe(
         data => {
-          this.currentUser = {username: '', firstName: ''};
+          this.currentUser = this.emptyUser;
           this.authenticated.next(false);
           logoutResult.next(true);
         },

@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 
 from api.views.data_filter_view import data_filter, data_filter_by_id, data_parameterised_filter_by_id, \
     data_parameterised_filter
@@ -12,9 +14,12 @@ from api.views.path_var_test_endpoint import path_var_get
 from api.views.start_validation_view import start_validation
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import users
-from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs
+from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs,\
+    custom_tracked_validation_runs
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
+from api.views.modify_validation_view import stop_validation, modify_result
+from api.views.serving_file_view import download_results
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -42,6 +47,7 @@ urlpatterns = [
     #
     url(r'^test$', users),
     url(r'^path_test/(?P<username>.+)$', path_var_get),
+    path('user', users, name='Users'),
     path('auth/login', api_login, name='api-login'),
     path('auth/logout', api_logout, name='api-logout'),
     path('dataset', dataset, name='Datasets'),
@@ -61,6 +67,11 @@ urlpatterns = [
     url(r'^data-filter/(?P<id>.+)$', data_filter_by_id),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),
+    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
+    path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
+    path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
+    path('download-result', download_results)
+
     path('uptime-ping', uptime_ping),
     path('test-rep', get_uptime)
 ]

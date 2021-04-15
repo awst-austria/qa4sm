@@ -15,8 +15,8 @@ def users(request):
     if request.user.is_superuser:
         print('super')
 
-    user = User.objects.all()[:1].get()
-    serializer = UserSerializer(user)
+    user = User.objects.all()
+    serializer = UserSerializer(user, many=True)
 
     return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -44,4 +44,6 @@ class UserSerializer(ModelSerializer):
                   'last_login',
                   'date_joined',
                   'country',
-                  'orcid', ]
+                  'orcid',
+                  'id',
+                  'copied_runs']

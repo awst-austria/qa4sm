@@ -11,14 +11,18 @@ import {SortingFormComponent} from './components/sorting-form/sorting-form.compo
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
+import {ButtonsComponent} from './components/buttons/buttons.component';
+import {InputTextModule} from 'primeng/inputtext';
+import {TrackedValidationsComponent} from './components/tracked-validations/tracked-validations.component';
 
 @NgModule({
-    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent],
-  exports: [
-    ValidationrunRowComponent,
-    ValidationPagePaginatedComponent,
-    ValidationSummaryComponent,
-  ],
+    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent, ButtonsComponent, TrackedValidationsComponent],
+    exports: [
+        ValidationrunRowComponent,
+        ValidationPagePaginatedComponent,
+        ValidationSummaryComponent,
+        TrackedValidationsComponent,
+    ],
     imports: [
         CommonModule,
         PanelModule,
@@ -27,7 +31,8 @@ import {ValidationSummaryComponent} from './components/validation-summary/valida
         NgxPaginationModule,
         RouterModule,
         DropdownModule,
-        FormsModule
+        FormsModule,
+        InputTextModule
     ]
 })
 export class ValidationResultModule { }
