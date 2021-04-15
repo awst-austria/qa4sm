@@ -30,7 +30,7 @@ export class ButtonsComponent implements OnInit {
   isOwner: boolean;
   isTrackedByTheUser: boolean;
   status: string;
-  graphicsFileName = 'graphs.zip';
+  graphicsFileNameAppendix = 'graphs.zip';
 
 
   constructor(private httpClient: HttpClient,

@@ -41,7 +41,7 @@
     <div class="dropdown-content" style="text-align: left">
       <div *ngIf="validationRun.output_file">
         <button class="dropdown-item"
-                (click)="downloadResultFile(validationRun.output_dir_url+graphicsFileName, graphicsFileName)"
+                (click)="downloadResultFile(validationRun.output_dir_url+graphicsFileNameAppendix, validationRun.id+'_'+graphicsFileNameAppendix)"
                 title="Download graphs .zip">
           <span class="pi pi-download"></span>
           Download Graphs
