@@ -19,12 +19,14 @@ import {ResultFilesComponent} from './components/result-files/result-files.compo
 
 @NgModule({
     declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent, ButtonsComponent, TrackedValidationsComponent, SummaryStatisticsComponent, ResultFilesComponent],
-    exports: [
-        ValidationrunRowComponent,
-        ValidationPagePaginatedComponent,
-        ValidationSummaryComponent,
-        TrackedValidationsComponent,
-    ],
+  exports: [
+    ValidationrunRowComponent,
+    ValidationPagePaginatedComponent,
+    ValidationSummaryComponent,
+    TrackedValidationsComponent,
+    SummaryStatisticsComponent,
+    ResultFilesComponent,
+  ],
     imports: [
         CommonModule,
         PanelModule,
