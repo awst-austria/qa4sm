@@ -4,6 +4,7 @@ import {ValidationrunDto} from './validationrun.dto';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {ValidationSetDto} from '../../../validation-result/services/validation.set.dto';
+import {saveAs} from 'file-saver-es';
 
 const urlPrefix = environment.API_URL + 'api';
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
@@ -105,10 +106,9 @@ export class ValidationrunService {
 
   }
 
-  downloadResultFile(params): Observable<Blob> {
-    return this.httpClient.get(downloadUrl, {params,
-      responseType: 'blob'
-    });
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
+    const fileUrl = `${urlPrefix}?validationId=${validationId}&fileType=${fileType}`;
+    saveAs(fileUrl, fileName);
   }
 
   addValidation(validationId: string): void {
