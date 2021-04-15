@@ -10,6 +10,7 @@ const publishedValidationRunUrl: string = urlPrefix + '/published-results';
 const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
 const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
+const downloadUrl: string = urlPrefix + '/download-result';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -104,8 +105,8 @@ export class ValidationrunService {
 
   }
 
-  downloadResultFile(fileUrl: string): Observable<Blob> {
-    return this.httpClient.get(urlPrefix + fileUrl, {
+  downloadResultFile(params): Observable<Blob> {
+    return this.httpClient.get(downloadUrl, {params,
       responseType: 'blob'
     });
   }
