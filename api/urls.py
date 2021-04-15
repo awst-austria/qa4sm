@@ -18,6 +18,7 @@ from api.views.validation_run_view import published_results, my_results, validat
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
+from api.views.serving_file_view import download_results
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -67,6 +68,7 @@ urlpatterns = [
     url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
-    path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run')
+    path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
+    path('download-result', download_results)
 
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
