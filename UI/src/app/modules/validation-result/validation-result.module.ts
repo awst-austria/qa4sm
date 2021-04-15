@@ -14,9 +14,11 @@ import {ValidationSummaryComponent} from './components/validation-summary/valida
 import {ButtonsComponent} from './components/buttons/buttons.component';
 import {InputTextModule} from 'primeng/inputtext';
 import {TrackedValidationsComponent} from './components/tracked-validations/tracked-validations.component';
+import {SummaryStatisticsComponent} from './components/summary-statistics/summary-statistics.component';
+import {ResultFilesComponent} from './components/result-files/result-files.component';
 
 @NgModule({
-    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent, ButtonsComponent, TrackedValidationsComponent],
+    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent, ButtonsComponent, TrackedValidationsComponent, SummaryStatisticsComponent, ResultFilesComponent],
     exports: [
         ValidationrunRowComponent,
         ValidationPagePaginatedComponent,
