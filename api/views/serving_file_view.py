@@ -24,20 +24,6 @@ def download_results(request):
         filename = file_path + valrun.output_file_name
     else:
         filename = file_path + 'graphs.zip'
-    file_wrapper = FileWrapper(open(filename, 'rb'))
-    file_mimetype = mimetypes.guess_type(filename)
-    response = HttpResponse(file_wrapper, content_type=file_mimetype)
+    response = FileResponse(open(filename, 'rb'))
     return response
-
-# def download_results(request):
-#     validation_id = request.query_params.get('validationId', None)
-#     file_type = request.query_params.get('fileType', None)
-#     valrun = get_object_or_404(ValidationRun, pk=validation_id)
-#     file_path = valrun.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
-#     if file_type == 'netCDF':
-#         filename = file_path + valrun.output_file_name
-#     else:
-#         filename = file_path + 'graphs.zip'
-#     response = FileResponse(open(filename, 'rb'))
-#     return response
 
