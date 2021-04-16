@@ -1,1 +1,17 @@
-<p>summary-statistics works!</p>
+<div class="p-grid no-gutters">
+      <div class="p-col-12">
+        <p-panel [toggleable]="true">
+          <ng-template pTemplate="header">
+            <div class="text-center my-1" style="width: 91%">
+              <h4 class="my-0 font-weight-normal">Summary statistics</h4>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="icons">
+            <label class="mb-0" pTooltip="Expand this section to inspect a table of statistics of the validation results."
+                   tooltipPosition="bottom">
+              <span class="p-panel-header-icon pi pi-question-circle"></span>
+            </label>
+          </ng-template>
+        </p-panel>
+      </div>
+</div>
