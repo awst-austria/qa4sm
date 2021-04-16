@@ -2,6 +2,7 @@ import logging
 from calendar import monthrange
 
 import pytz
+from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from valentina.settings import UPTIME_PING_INTERVAL
@@ -31,10 +32,10 @@ def generate_daily_report(date, overwrite=False):
     if isinstance(date, datetime) is False:
         raise Exception('The date parameter should be date type')
 
-    if date > datetime.now():
+    if date > datetime.now(tz=pytz.UTC):
         raise Exception('Report cannot be generated for a future date')
 
-    if date.date() == datetime.today().date():
+    if date.date() == datetime.now(tz=pytz.UTC).date():
         report_for_today = True
     else:
         report_for_today = False
@@ -96,13 +97,70 @@ def generate_daily_report(date, overwrite=False):
         report.save()
 
 
-def generate_monthly_report(year, month, overwrite=False):
+def get_daily_reports(date=datetime.now(tz=pytz.UTC).date()):
+    """
+    Get daily reports for all agents
+    Parameters
+    ----------
+    date
+
+    Returns
+    -------
+
+    """
+    if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
+        raise Exception("Input date should be time zone aware")
+
+    return UptimeReport.objects.filter(
+        start_time__gte=datetime(year=date.year, month=date.month, day=date.day),
+        start_time__lt=datetime(year=date.year, month=date.month, day=date.day) + timedelta(days=1),
+        period='DAILY').order_by('start_time')
+
+
+def get_report(period, date=datetime.now(tz=pytz.UTC).date()):
+    """
+    Return report with the highest uptime for the specified date and period.
+    Parameters
+    ----------
+    period Either DAILY ar MONTHLY
+    date Start date of the period
+
+    Returns
+    -------
+
+    """
+
+    if period is None or (period != 'DAILY' and period != 'MONTHLY'):
+        raise Exception("Period should be either DAILY or MONTHLY")
+
+    if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
+        raise Exception("Input date should be time zone aware")
+
+    end_time = datetime(year=date.year, month=date.month, day=date.day) + timedelta(days=1)
+    if period == 'MONTHLY':
+        end_time = datetime(year=date.year, month=date.month, day=date.day) + relativedelta(months=+1)
+
+    daily_reports = UptimeReport.objects.filter(
+        start_time__gte=datetime(year=date.year, month=date.month, day=date.day),
+        end_time__lt=end_time,
+        period=period).order_by('start_time')
+
+    report_to_return = None
+
+    for report in daily_reports:
+        if report_to_return is None or report.uptime_percentage > report_to_return.uptime_percentage:
+            report_to_return = report
+
+    return report_to_return
+
+
+def generate_monthly_report(year, month):
     if year < 1970 or month < 1 or month > 12:
         raise Exception("Invalid filters")
 
     end_day = monthrange(year, month)[1]
-    if datetime.today().date().month == month:
-        end_day = datetime.today().date().day
+    if datetime.now(tz=pytz.UTC).date().month == month:
+        end_day = datetime.now(tz=pytz.UTC).date().day
 
     agents = UptimeAgent.objects.all()
     for agent in agents:
@@ -119,11 +177,11 @@ def generate_monthly_report(year, month, overwrite=False):
         daily_percentages = [0] * end_day
         print('daily reports: {}'.format(daily_reports.count()))
         for report in daily_reports:
-            if daily_percentages[report.start_time.day-1] != 0:
+            if daily_percentages[report.start_time.day - 1] != 0:
                 __logger.error('Multiple daily reports found. Agent key: {0} Date: {1}'.format(report.agent_key,
                                                                                                report.start_time))
             else:
-                daily_percentages[report.start_time.day-1] = report.uptime_percentage
+                daily_percentages[report.start_time.day - 1] = report.uptime_percentage
 
         for i in daily_percentages:
             sum_percentage = sum_percentage + i
@@ -137,16 +195,18 @@ def generate_monthly_report(year, month, overwrite=False):
                                           start_time=start_time,
                                           end_time=end_time,
                                           period='MONTHLY',
-                                          updated=datetime.now(),
+                                          updated=datetime.now(tz=pytz.UTC),
                                           uptime_percentage=monthly_uptime,
                                           )
             monthly_report.save()
         elif monthly_reports.count() == 1:
             monthly_report = monthly_reports[0]
             monthly_report.uptime_percentage = monthly_uptime
-            monthly_report.updated = datetime.now()
+            monthly_report.updated = datetime.now(tz=pytz.UTC)
             monthly_report.save()
         else:
+            __logger.error("generate_monthly_report - More than one monthly report found within a month for the specified agent. Date: {0} Agent: {1}".format(
+                    start_time.date(), agent.agent_key))
             raise Exception(
-                "More than one monthly report found within a month for the specified agent. Date: {0} Agent: {1}".format(
+                "generate_monthly_report - More than one monthly report found within a month for the specified agent. Date: {0} Agent: {1}".format(
                     start_time.date(), agent.agent_key))

@@ -70,8 +70,7 @@ urlpatterns = [
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
-    path('download-result', download_results)
-
+    path('download-result', download_results),
     path('uptime-ping', uptime_ping),
     path('test-rep', get_uptime)
 ]
