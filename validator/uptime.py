@@ -16,7 +16,7 @@ def scheduled_task():
     print('Scheduled task. {0}'.format(datetime.now()))
 
 
-def generate_daily_report(date, overwrite=False):
+def generate_daily_report(date):
     """
     Takes the UptimePing table as input and generates a daily report for the date. Reports are stored
     in the UptimeReport table.
@@ -40,8 +40,7 @@ def generate_daily_report(date, overwrite=False):
     else:
         report_for_today = False
 
-    start_time = datetime(year=date.year, month=date.month, day=date.day, hour=0,
-                          minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
+    start_time = datetime(year=date.year, month=date.month, day=date.day, tzinfo=pytz.UTC)
     end_time = datetime(year=date.year, month=date.month, day=date.day, hour=23,
                         minute=59, second=59, microsecond=9999, tzinfo=pytz.UTC)
 
@@ -136,13 +135,12 @@ def get_report(period, date=datetime.now(tz=pytz.UTC).date()):
     if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
         raise Exception("Input date should be time zone aware")
 
-    end_time = datetime(year=date.year, month=date.month, day=date.day) + timedelta(days=1)
+    start_date = datetime(year=date.year, month=date.month, day=date.day)
     if period == 'MONTHLY':
-        end_time = datetime(year=date.year, month=date.month, day=date.day) + relativedelta(months=+1)
+        start_date = datetime(year=date.year, month=date.month, day=1)
 
     daily_reports = UptimeReport.objects.filter(
-        start_time__gte=datetime(year=date.year, month=date.month, day=date.day),
-        end_time__lt=end_time,
+        start_time=start_date,
         period=period).order_by('start_time')
 
     report_to_return = None
@@ -164,8 +162,7 @@ def generate_monthly_report(year, month):
 
     agents = UptimeAgent.objects.all()
     for agent in agents:
-        start_time = datetime(year=year, month=month, day=1, hour=0,
-                              minute=0, second=0, microsecond=0, tzinfo=pytz.UTC)
+        start_time = datetime(year=year, month=month, day=1, tzinfo=pytz.UTC)
         end_time = datetime(year=year, month=month, day=end_day, hour=23,
                             minute=59, second=59, microsecond=9999, tzinfo=pytz.UTC)
         daily_reports = UptimeReport.objects.filter(agent_key=agent.agent_key,
@@ -175,7 +172,6 @@ def generate_monthly_report(year, month):
 
         sum_percentage = 0
         daily_percentages = [0] * end_day
-        print('daily reports: {}'.format(daily_reports.count()))
         for report in daily_reports:
             if daily_percentages[report.start_time.day - 1] != 0:
                 __logger.error('Multiple daily reports found. Agent key: {0} Date: {1}'.format(report.agent_key,
@@ -205,7 +201,8 @@ def generate_monthly_report(year, month):
             monthly_report.updated = datetime.now(tz=pytz.UTC)
             monthly_report.save()
         else:
-            __logger.error("generate_monthly_report - More than one monthly report found within a month for the specified agent. Date: {0} Agent: {1}".format(
+            __logger.error(
+                "generate_monthly_report - More than one monthly report found within a month for the specified agent. Date: {0} Agent: {1}".format(
                     start_time.date(), agent.agent_key))
             raise Exception(
                 "generate_monthly_report - More than one monthly report found within a month for the specified agent. Date: {0} Agent: {1}".format(

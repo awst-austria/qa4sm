@@ -72,5 +72,5 @@ urlpatterns = [
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
     path('download-result', download_results),
     path('uptime-ping', uptime_ping),
-    path('test-rep', get_uptime)
+    path('uptime-report', get_uptime)
 ]
