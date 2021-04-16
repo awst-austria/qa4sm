@@ -1,6 +1,7 @@
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -9,6 +10,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun
+from validator.validation import get_inspection_table
+from rest_pandas.serializers import PandasSerializer
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -95,7 +99,21 @@ def custom_tracked_validation_runs(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_summary_statistics(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    inspection_table = get_inspection_table(validation)
+    print(inspection_table.to_json)
+    return JsonResponse(inspection_table.to_json(), status=status.HTTP_200_OK, safe=False)
+
+
 class ValidationRunSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
         fields = get_fields_as_list(model)
+
+# class PandasDataFrameSerializer(ModelSerializer):
+
+    # class Meta:

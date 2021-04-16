@@ -12,7 +12,7 @@ from api.views.path_var_test_endpoint import path_var_get
 from api.views.start_validation_view import start_validation
 from api.views.user_view import users
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs,\
-    custom_tracked_validation_runs
+    custom_tracked_validation_runs, get_summary_statistics
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
@@ -67,6 +67,6 @@ urlpatterns = [
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
-    path('download-result', download_results)
-
+    path('download-result', download_results),
+    path('summary-statistics', get_summary_statistics)
 ]
