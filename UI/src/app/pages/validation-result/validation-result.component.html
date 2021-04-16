@@ -17,7 +17,7 @@
           <qa-validation-summary [validationModel]="validationModel"></qa-validation-summary>
         </div>
         <div class="p-col-12">
-          <qa-summary-statistics></qa-summary-statistics>
+          <qa-summary-statistics [validationRunId]="(validationModel.validationRun|async)?.id"></qa-summary-statistics>
         </div>
         <div class="p-col-12">
           <qa-result-files></qa-result-files>
