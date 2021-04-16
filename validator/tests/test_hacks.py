@@ -2,7 +2,7 @@
 Because even (or especially?) hacks should be tested
 '''
 
-from os import path
+from pathlib import Path
 
 from c3s_sm.interface import C3STs as c3s_read
 from django.test import TestCase
@@ -13,6 +13,13 @@ from validator.hacks import TimezoneAdapter
 from validator.models import Dataset
 from validator.tests.testutils import set_dataset_paths
 
+import shutil
+
+def cleanup_metadata(ISMN_storage_path):
+    # clean existing metadata; needed in case changes are made to the ismn reader
+    paths_to_metadata = ISMN_storage_path.glob('**/python_metadata')
+    for path in paths_to_metadata:
+        shutil.rmtree(path)
 
 class TestHacks(TestCase):
 
@@ -22,7 +29,8 @@ class TestHacks(TestCase):
         set_dataset_paths()
 
     def test_timezone_adapter(self):
-        c3s_data_folder = path.join(Dataset.objects.get(short_name='C3S').storage_path, 'C3S_V201706/TCDR/063_images_to_ts/combined-daily')
+        c3s_storage_path = Path(Dataset.objects.get(short_name='C3S').storage_path)
+        c3s_data_folder = c3s_storage_path.joinpath('C3S_V201706/TCDR/063_images_to_ts/combined-daily')
         c3s_reader = c3s_read(c3s_data_folder)
 
         timezone_reader = TimezoneAdapter(c3s_reader)
@@ -37,7 +45,10 @@ class TestHacks(TestCase):
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
         self.assertTrue((not hasattr(data.index, 'tz')) or (data.index.tz is None))
 
-        ismn_data_folder = path.join(Dataset.objects.get(short_name='ISMN').storage_path, 'ISMN_V20191211')
+        ismn_storage_path = Path(Dataset.objects.get(short_name='ISMN').storage_path)
+        cleanup_metadata(ismn_storage_path)
+
+        ismn_data_folder = ismn_storage_path.joinpath('ISMN_V20191211')
         ismn_reader = ISMN_Interface(ismn_data_folder)
 
         timezone_reader2 = TimezoneAdapter(ismn_reader)
