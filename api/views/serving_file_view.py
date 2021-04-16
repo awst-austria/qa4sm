@@ -1,4 +1,4 @@
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from validator.models import ValidationRun
 from django.conf import settings
 
+import mimetypes
+from wsgiref.util import FileWrapper
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -19,5 +21,7 @@ def download_results(request):
         filename = file_path + valrun.output_file_name
     else:
         filename = file_path + 'graphs.zip'
-    response = FileResponse(open(filename, 'rb'))
+    file_wrapper = FileWrapper(open(filename, 'rb'))
+    file_mimetype = mimetypes.guess_type(filename)
+    response = HttpResponse(file_wrapper, content_type=file_mimetype)
     return response
