@@ -1,4 +1,4 @@
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
@@ -7,6 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from validator.models import ValidationRun
 from django.conf import settings
 
+import mimetypes
+from wsgiref.util import FileWrapper
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

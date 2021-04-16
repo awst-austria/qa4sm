@@ -107,7 +107,7 @@ export class ValidationrunService {
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void{
-    const fileUrl = `${urlPrefix}?validationId=${validationId}&fileType=${fileType}`;
+    const fileUrl = `${downloadUrl}?validationId=${validationId}&fileType=${fileType}`;
     saveAs(fileUrl, fileName);
   }
 
