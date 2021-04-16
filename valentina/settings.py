@@ -34,7 +34,6 @@ UPTIME_PING_INTERVAL = 5
 # Application definition
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
-    'django_apscheduler',
     'validator.apps.ValidatorConfig',
     'drf_yasg',
     'rest_framework',
