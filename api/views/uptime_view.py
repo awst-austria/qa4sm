@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytz
 from django.http import HttpResponse, JsonResponse
@@ -31,6 +31,10 @@ def uptime_ping(request):
     except Exception as e:
         __logger.warning(e)
         return HttpResponse("Invalid request", status=400)
+
+    date_for_report = datetime.now(tz=pytz.UTC)
+    generate_daily_report(date_for_report)
+    generate_monthly_report(date_for_report.year, date_for_report.month)
 
     return HttpResponse("OK", status=200)
 
