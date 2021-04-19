@@ -1,8 +1,9 @@
 <div class="p-grid">
   <div class="p-col-12">
-    <div class="p-d-flex p-jc-center">
+    <div *ngIf="(validationModel.validationRun|async) as validationRun" class="p-d-flex p-jc-center">
+      <div *ngIf="(validationModel.datasetConfigs|async) as config">
 
-      <div *ngIf="!(validationModel.validationRun|async)?.end_time" class="container p-text-center mb-5 mt-4"
+      <div *ngIf="!validationRun.end_time" class="container p-text-center mb-5 mt-4"
            style="max-width: 40rem;">
         <h1 class="jumbotron-heading">Validation Running...</h1>
         <p class="lead text-muted">
@@ -10,20 +11,21 @@
         <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
       </div>
 
-      <div *ngIf="(validationModel.validationRun|async)?.end_time" class="container mb-5 mt-4"
+      <div *ngIf="validationRun.end_time" class="container mb-5 mt-4"
            style="max-width: 60rem;">
         <h1 class="text-center">Validation Results</h1>
         <div class="p-col-12">
           <qa-validation-summary [validationModel]="validationModel"></qa-validation-summary>
         </div>
         <div class="p-col-12">
-          <qa-summary-statistics [validationRunId]="(validationModel.validationRun|async)?.id"></qa-summary-statistics>
+          <qa-summary-statistics [validationRunId]="validationRun.id"></qa-summary-statistics>
         </div>
         <div class="p-col-12">
           <qa-result-files></qa-result-files>
         </div>
       </div>
 
+    </div>
     </div>
   </div>
 </div>
