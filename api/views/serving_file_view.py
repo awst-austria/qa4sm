@@ -10,6 +10,8 @@ from django.conf import settings
 import mimetypes
 from wsgiref.util import FileWrapper
 
+from validator.validation import get_inspection_table
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -31,4 +33,13 @@ def get_results(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_csv_with_statistics(request):
-    validation_id = request.query_params.get('validationId', None)
+
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    inspection_table = get_inspection_table(validation).reset_index()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Stats.csv'
+
+    inspection_table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
+    return response
