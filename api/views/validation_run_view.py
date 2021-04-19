@@ -105,8 +105,9 @@ def get_summary_statistics(request):
     validation_id = request.query_params.get('id', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
     inspection_table = get_inspection_table(validation)
-    print(inspection_table.to_json)
-    return JsonResponse(inspection_table.to_json(), status=status.HTTP_200_OK, safe=False)
+    print(inspection_table)
+    return HttpResponse(inspection_table.to_html())
+    # serializer = PandasDataFrameSerializer(inspection_table)
 
 
 class ValidationRunSerializer(ModelSerializer):
@@ -114,6 +115,10 @@ class ValidationRunSerializer(ModelSerializer):
         model = ValidationRun
         fields = get_fields_as_list(model)
 
-# class PandasDataFrameSerializer(ModelSerializer):
 
-    # class Meta:
+# class PandasDataFrameSerializer(ModelSerializer):
+#
+#     class Meta:
+#         model = get_summary_statistics
+#         fields = ['Metric', 'Mean', 'Median', 'IQ range', 'Dataset']
+#         pandas_index = ['Metric']
