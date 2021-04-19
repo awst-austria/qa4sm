@@ -17,6 +17,14 @@
             ({{ (refDatasetVersion$ | async)?.pretty_name }}, {{ (refDatasetVariable$ | async)?.pretty_name }}).
           </div>
           <span [innerHtml]="table | dompurify"></span>
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="button"
+                    style="width: 12rem;"
+                    class="btn btn-sm btn-primary"
+                    title="Download the table to a .csv file">
+              <span class="pi pi-download"></span> Download .csv table
+            </button>
+          </div>
         </p-panel>
       </div>
 </div>
