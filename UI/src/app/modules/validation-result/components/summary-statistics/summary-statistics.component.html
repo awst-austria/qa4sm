@@ -1,4 +1,4 @@
-<div class="p-grid no-gutters">
+<div *ngIf="(table$|async) as table" class="p-grid no-gutters">
       <div class="p-col-12">
         <p-panel [toggleable]="true">
           <ng-template pTemplate="header">
@@ -12,6 +12,7 @@
               <span class="p-panel-header-icon pi pi-question-circle"></span>
             </label>
           </ng-template>
+          <span [innerHtml]="table | dompurify"></span>
         </p-panel>
       </div>
 </div>
