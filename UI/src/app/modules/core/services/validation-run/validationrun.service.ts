@@ -138,9 +138,9 @@ export class ValidationrunService {
     return this.httpClient.get(summaryStatisticsUrl, {params, headers, responseType: 'text'});
   }
 
-  downloadSummaryStatisticsCsv(validationId: string, fileName: string): void {
+  downloadSummaryStatisticsCsv(validationId: string): void {
     const fileUrl = `${downloadStatisticsCsvUrl}?validationId=${validationId}`;
-    saveAs(fileUrl, fileName);
+    saveAs(fileUrl);
   }
 
 }
