@@ -34,7 +34,7 @@ def get_results(request):
 @permission_classes([IsAuthenticated])
 def get_csv_with_statistics(request):
 
-    validation_id = request.query_params.get('id', None)
+    validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
     inspection_table = get_inspection_table(validation).reset_index()
 
