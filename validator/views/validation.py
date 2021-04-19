@@ -300,10 +300,11 @@ def validation(request):
                     "variable": dc.variable,
                 })
                 if initial_values[-1]["parametrised_filters"]:
+                    paramfilter_params = dc.parametrisedfilter_set.all()
                     initial_values[-1].update({
                         "paramfilter_params": [
-                            fs.parameters
-                            for fs in dc.parametrisedfilter_set.all()
+                            paramfilter_params.get(filter=filter_name).parameters
+                            for filter_name in initial_values[-1]['parametrised_filters']
                         ]
                     })
 

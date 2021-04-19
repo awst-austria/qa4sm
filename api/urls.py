@@ -10,6 +10,7 @@ from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
 from api.views.start_validation_view import start_validation
+from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import users
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs,\
     custom_tracked_validation_runs, get_summary_statistics
@@ -70,4 +71,6 @@ urlpatterns = [
     path('download-result', get_results, name='Download results'),
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
     path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv')
+    path('uptime-ping', uptime_ping),
+    path('uptime-report', get_uptime)
 ]
