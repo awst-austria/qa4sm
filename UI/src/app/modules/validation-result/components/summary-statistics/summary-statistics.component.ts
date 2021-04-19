@@ -49,5 +49,9 @@ export class SummaryStatisticsComponent implements OnInit {
     this.refDatasetVariable$ = this.datasetVariableService.getVariableById(this.refConfig.variable);
   }
 
+  getSummaryStatisticsAsCsv(): void{
+    this.validationService.downloadSummaryStatisticsCsv(this.validationRun.id);
+  }
+
 
 }
