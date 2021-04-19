@@ -1,7 +1,7 @@
 <div class="p-grid">
   <div class="p-col-12">
     <div *ngIf="(validationModel.validationRun|async) as validationRun" class="p-d-flex p-jc-center">
-      <div *ngIf="(validationModel.datasetConfigs|async) as config">
+      <div *ngIf="(validationModel.datasetConfigs|async) as configs">
 
       <div *ngIf="!validationRun.end_time" class="container p-text-center mb-5 mt-4"
            style="max-width: 40rem;">
@@ -18,7 +18,7 @@
           <qa-validation-summary [validationModel]="validationModel"></qa-validation-summary>
         </div>
         <div class="p-col-12">
-          <qa-summary-statistics [validationRunId]="validationRun.id"></qa-summary-statistics>
+          <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"></qa-summary-statistics>
         </div>
         <div class="p-col-12">
           <qa-result-files></qa-result-files>
