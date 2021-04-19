@@ -12,6 +12,7 @@ const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
 const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
 const downloadUrl: string = urlPrefix + '/download-result';
+const summaryStatisticsUrl = urlPrefix + '/summary-statistics';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -100,13 +101,13 @@ export class ValidationrunService {
     const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {save_name: true, new_name: newName};
     console.log(data);
-    this.httpClient.patch(saveUrl + '/', data, {headers , observe: 'body', responseType: 'json'}).subscribe(
+    this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'json'}).subscribe(
       () => {
       });
 
   }
 
-  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void {
     const fileUrl = `${downloadUrl}?validationId=${validationId}&fileType=${fileType}`;
     saveAs(fileUrl, fileName);
   }
@@ -131,4 +132,9 @@ export class ValidationrunService {
       response => alert(response)
     );
   }
+
+  getSummaryStatistics(params: any): any {
+    return this.httpClient.get(summaryStatisticsUrl, {params, headers, responseType: 'text'});
+  }
+
 }
