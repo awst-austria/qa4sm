@@ -68,6 +68,6 @@ urlpatterns = [
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
     path('download-result', get_results, name='Download results'),
-    path('summary-statistics', get_summary_statistics, 'Summary statistics'),
-    path('download-statistics-csv', get_csv_with_statistics, 'Download statistics csv')
+    path('summary-statistics', get_summary_statistics, name='Summary statistics'),
+    path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv')
 ]
