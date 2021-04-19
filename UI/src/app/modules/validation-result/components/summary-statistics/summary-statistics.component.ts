@@ -1,13 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 
-
 @Component({
   selector: 'qa-summary-statistics',
   templateUrl: './summary-statistics.component.html',
-  styleUrls: ['./summary-statistics.component.scss']
+  styleUrls: ['./summary-statistics.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SummaryStatisticsComponent implements OnInit {
   @Input() validationRunId: any;
