@@ -11,8 +11,9 @@ const publishedValidationRunUrl: string = urlPrefix + '/published-results';
 const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
 const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
-const downloadUrl: string = urlPrefix + '/download-result';
+const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl = urlPrefix + '/summary-statistics';
+const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -108,7 +109,7 @@ export class ValidationrunService {
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void {
-    const fileUrl = `${downloadUrl}?validationId=${validationId}&fileType=${fileType}`;
+    const fileUrl = `${downloadResultsUrl}?validationId=${validationId}&fileType=${fileType}`;
     saveAs(fileUrl, fileName);
   }
 
@@ -133,8 +134,13 @@ export class ValidationrunService {
     );
   }
 
-  getSummaryStatistics(params: any): any {
+  getSummaryStatistics(params: any): Observable<any> {
     return this.httpClient.get(summaryStatisticsUrl, {params, headers, responseType: 'text'});
+  }
+
+  downloadSummaryStatisticsCsv(validationId: string, fileName: string): void {
+    const fileUrl = `${downloadStatisticsCsvUrl}?validationId=${validationId}`;
+    saveAs(fileUrl, fileName);
   }
 
 }
