@@ -1,3 +1,9 @@
 @import "~bootstrap/dist/css/bootstrap.css";
 @import "../buttons/buttons.component.scss";
 
+.dataframe thead th{
+  text-align: center;
+}
+.dataframe td:first-child{
+  font-weight: bold;
+}
