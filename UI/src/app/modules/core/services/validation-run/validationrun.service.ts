@@ -12,7 +12,7 @@ const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
 const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
 const downloadResultsUrl: string = urlPrefix + '/download-result';
-const summaryStatisticsUrl = urlPrefix + '/summary-statistics';
+const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 
 const csrfToken = '{{csrf_token}}';
