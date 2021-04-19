@@ -39,7 +39,7 @@ def get_csv_with_statistics(request):
     inspection_table = get_inspection_table(validation).reset_index()
 
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=Stats.csv'
+    response['Content-Disposition'] = 'attachment; filename=Stats_summary.csv'
 
     inspection_table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
     return response
