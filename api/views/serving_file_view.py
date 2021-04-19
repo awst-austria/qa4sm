@@ -10,9 +10,10 @@ from django.conf import settings
 import mimetypes
 from wsgiref.util import FileWrapper
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def download_results(request):
+def get_results(request):
     validation_id = request.query_params.get('validationId', None)
     file_type = request.query_params.get('fileType', None)
     valrun = get_object_or_404(ValidationRun, pk=validation_id)
@@ -25,3 +26,9 @@ def download_results(request):
     file_mimetype = mimetypes.guess_type(filename)
     response = HttpResponse(file_wrapper, content_type=file_mimetype)
     return response
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_csv_with_statistics(request):
+    validation_id = request.query_params.get('validationId', None)
