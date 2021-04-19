@@ -12,6 +12,10 @@
               <span class="p-panel-header-icon pi pi-question-circle"></span>
             </label>
           </ng-template>
+          <div class="pb-3">The mean, median and standard deviation are calculated on the validation results aggregated by metric
+            and dataset. The reference dataset used is {{ (refDataset$ | async)?.pretty_name }}
+            ({{ (refDatasetVersion$ | async)?.pretty_name }}, {{ (refDatasetVariable$ | async)?.pretty_name }}).
+          </div>
           <span [innerHtml]="table | dompurify"></span>
         </p-panel>
       </div>

@@ -2,6 +2,14 @@ import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
+import {DatasetConfigurationDto} from '../../services/dataset-configuration.dto';
+import {DatasetService} from '../../../core/services/dataset/dataset.service';
+import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
+import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
+import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
+import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
+import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
 
 @Component({
   selector: 'qa-summary-statistics',
@@ -10,30 +18,36 @@ import {Observable} from 'rxjs';
   encapsulation: ViewEncapsulation.None
 })
 export class SummaryStatisticsComponent implements OnInit {
-  @Input() validationRunId: any;
-  @Input() referenceValidation: object;
+  @Input() validationRun: ValidationrunDto;
+  @Input() configs: DatasetConfigurationDto[];
   table$: Observable<string>;
+  refConfig: DatasetConfigurationDto;
+  refDataset$: Observable<DatasetDto>;
+  refDatasetVersion$: Observable<DatasetVersionDto>;
+  refDatasetVariable$: Observable<DatasetVariableDto>;
 
-  constructor(private validationService: ValidationrunService) {
+  constructor(private validationService: ValidationrunService,
+              private datasetService: DatasetService,
+              private datasetVersionService: DatasetVersionService,
+              private datasetVariableService: DatasetVariableService) {
   }
 
   ngOnInit(): void {
-    console.log(this.validationRunId);
     this.getSummaryStatistics();
+    this.getRefConfig();
   }
 
   getSummaryStatistics(): void {
-    const parameters = new HttpParams().set('id', this.validationRunId);
+    const parameters = new HttpParams().set('id', this.validationRun.id);
     this.table$ = this.validationService.getSummaryStatistics(parameters);
-    // this.validationService.getSummaryStatistics(parameters).subscribe(data => {
-    //   this.table = data;
-    // });
   }
-  // getSummaryStatistics(): void {
-  //   const summaryStatisticsUrl = `/api/summary-statistics?id=${this.validationRunId}`;
-  //   const params = new HttpParams().set('id', this.validationRunId);
-  //   this.httpClient.get(summaryStatisticsUrl).subscribe(data => console.log(data));
-  //   // this.httpClient.get(summaryStatisticsUrl, {params}).map(r => r.text()).subscribe(v => this.table = v);
-  // }
+
+  getRefConfig(): void{
+    this.refConfig = this.configs.find(config => config.id === this.validationRun.reference_configuration);
+    this.refDataset$ = this.datasetService.getDatasetById(this.refConfig.dataset);
+    this.refDatasetVersion$ = this.datasetVersionService.getVersionById(this.refConfig.version);
+    this.refDatasetVariable$ = this.datasetVariableService.getVariableById(this.refConfig.variable);
+  }
+
 
 }
