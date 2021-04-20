@@ -82,17 +82,12 @@ def get_metric_names_and_associated_files(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_result_graphic_files(request):
+def get_graphic_files(request):
     file = request.query_params.get('file', None)
-
     open_file = open(file, 'rb')
     image = File(open_file)
     name = base64.b64encode(image.read())
     open_file.close()
-
-    # file_wrapper = FileWrapper(open(file, 'rb'))
-    # file_mimetype = mimetypes.guess_type(file)
-
     response = HttpResponse(name)
 
     return response
