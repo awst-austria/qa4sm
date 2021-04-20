@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 
@@ -10,7 +12,7 @@ from django.conf import settings
 import mimetypes
 from wsgiref.util import FileWrapper
 
-from validator.validation import get_inspection_table
+from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
 
 
 @api_view(['GET'])
@@ -18,10 +20,10 @@ from validator.validation import get_inspection_table
 def get_results(request):
     validation_id = request.query_params.get('validationId', None)
     file_type = request.query_params.get('fileType', None)
-    valrun = get_object_or_404(ValidationRun, pk=validation_id)
-    file_path = valrun.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+    validation = get_object_or_404(ValidationRun, pk=validation_id)
+    file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
     if file_type == 'netCDF':
-        filename = file_path + valrun.output_file_name
+        filename = file_path + validation.output_file_name
     else:
         filename = file_path + 'graphs.zip'
     file_wrapper = FileWrapper(open(filename, 'rb'))
@@ -43,3 +45,15 @@ def get_csv_with_statistics(request):
 
     inspection_table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
     return response
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_result_graphic_files(request):
+    validation_id = request.query_params.get('validationId', None)
+    validation = get_object_or_404(ValidationRun, pk=validation_id)
+
+    pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
+    combis = OrderedDict(sorted({**pairs, **triples}.items()))
+    metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
+
