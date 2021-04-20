@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun
 from validator.validation import get_inspection_table
-from rest_pandas.serializers import PandasSerializer
+
 
 
 @api_view(['GET'])
