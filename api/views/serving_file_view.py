@@ -68,7 +68,7 @@ def get_metric_names_and_associated_files(request):
         for file in files:
             if metrics[key] in file and 'boxplot' in file:
                 boxplot_file = file_path + file
-            if metrics[key] in file and 'overview' in file:
+            if metrics[key]+'.png' in file and 'overview' in file:
                 overview_files.append(file_path + file)
 
         metric_dict = {'metric_query_name': metrics[key],
