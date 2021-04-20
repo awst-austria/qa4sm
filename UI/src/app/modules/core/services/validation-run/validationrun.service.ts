@@ -5,6 +5,7 @@ import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {ValidationSetDto} from '../../../validation-result/services/validation.set.dto';
 import {saveAs} from 'file-saver-es';
+import {MetricsPlotsDto} from './metrics-plots.dto';
 
 const urlPrefix = environment.API_URL + 'api';
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
@@ -14,6 +15,8 @@ const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
 const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
+const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
+const downloadResultsGraphsUrl: string = urlPrefix + '/get-metric-plots';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -141,6 +144,10 @@ export class ValidationrunService {
   downloadSummaryStatisticsCsv(validationId: string): void {
     const fileUrl = `${downloadStatisticsCsvUrl}?validationId=${validationId}`;
     saveAs(fileUrl);
+  }
+
+  getMetricsAndPlotsNames(params: any): Observable<MetricsPlotsDto[]>{
+    return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
   }
 
 }
