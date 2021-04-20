@@ -1,5 +1,5 @@
-<div *ngIf="(table$|async) as table" class="p-grid no-gutters">
-      <div class="p-col-12">
+<div *ngIf="validationRun.progress === 100" class="p-grid no-gutters">
+      <div *ngIf="(table$|async) as table" class="p-col-12">
         <p-panel [toggleable]="true" [collapsed]="true">
           <ng-template pTemplate="header">
             <div class="text-center my-1" style="width: 92%">
