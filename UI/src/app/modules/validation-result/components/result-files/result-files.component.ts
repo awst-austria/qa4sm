@@ -4,6 +4,7 @@ import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plo
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
+import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 
 @Component({
   selector: 'qa-result-files',
@@ -17,7 +18,8 @@ export class ResultFilesComponent implements OnInit {
   boxplotSrc: string;
   overviewPlotsSrc: string[] = [];
 
-  constructor(private validationService: ValidationrunService) {
+  constructor(private validationService: ValidationrunService,
+              private plotService: WebsiteGraphicsService) {
   }
 
   ngOnInit(): void {
@@ -38,7 +40,7 @@ export class ResultFilesComponent implements OnInit {
 
   getBoxPlot(fileToGet: string): void {
     const params = new HttpParams().set('file', fileToGet);
-    this.validationService.getMetricsPlots(params).subscribe(data => {
+    this.plotService.getPlot(params).subscribe(data => {
       this.boxplotSrc = 'data:image/png;base64,' + data;
     });
   }
@@ -47,7 +49,7 @@ export class ResultFilesComponent implements OnInit {
     this.overviewPlotsSrc = [];
     filesToGet.forEach(file => {
       const params = new HttpParams().set('file', file);
-      this.validationService.getMetricsPlots(params).subscribe(data => {
+      this.plotService.getPlot(params).subscribe(data => {
         this.overviewPlotsSrc.push('data:image/png;base64,' + data);
       });
     });

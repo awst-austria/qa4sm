@@ -16,7 +16,7 @@ const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
-const downloadResultsGraphsUrl: string = urlPrefix + '/get-graphic-file';
+// const downloadResultsGraphsUrl: string = urlPrefix + '/get-graphic-file';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -150,8 +150,8 @@ export class ValidationrunService {
     return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
   }
 
-  getMetricsPlots(params: any): Observable<any>{
-    return this.httpClient.get(downloadResultsGraphsUrl, {params, responseType: 'text'});
-  }
+  // getMetricsPlots(params: any): Observable<any>{
+  //   return this.httpClient.get(downloadResultsGraphsUrl, {params, responseType: 'text'});
+  // }
 
 }
