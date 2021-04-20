@@ -17,7 +17,8 @@ from api.views.validation_run_view import published_results, my_results, validat
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
-from api.views.serving_file_view import get_results, get_csv_with_statistics, get_result_graphic_files
+from api.views.serving_file_view import get_results, get_csv_with_statistics, get_result_graphic_files, \
+    get_metric_names_and_associated_files
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -74,4 +75,5 @@ urlpatterns = [
     path('uptime-ping', uptime_ping),
     path('uptime-report', get_uptime),
     path('get-result-plots', get_result_graphic_files, name='Get result plots'),
+    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
 ]

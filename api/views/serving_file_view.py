@@ -1,6 +1,7 @@
+import os
 from collections import OrderedDict
 
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
@@ -49,11 +50,40 @@ def get_csv_with_statistics(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_metric_names_and_associated_files(request):
+    validation_id = request.query_params.get('validationId', None)
+    validation = get_object_or_404(ValidationRun, pk=validation_id)
+    file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+    files = os.listdir(file_path)
+
+    _, _, metrics, _ = get_dataset_combis_and_metrics_from_files(validation)
+    metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
+
+    response = []
+    for key in metrics:
+        boxplot_file = ''
+        overview_files = []
+        for file in files:
+            if metrics[key] in file and 'boxplot' in file:
+                boxplot_file = file
+            if metrics[key] in file and 'overview' in file:
+                overview_files.append(file)
+
+        metric_dict = {'metric_query_name': metrics[key],
+                       'metric_pretty_name': key,
+                       'boxplot_file': boxplot_file,
+                       'overview_files': overview_files}
+        response.append(metric_dict)
+
+    return JsonResponse(response, status=200, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_result_graphic_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
 
-    pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
-    combis = OrderedDict(sorted({**pairs, **triples}.items()))
-    metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
+    return HttpResponse(status=200)
+
 
