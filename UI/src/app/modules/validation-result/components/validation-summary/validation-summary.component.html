@@ -57,11 +57,11 @@
               <em *ngIf="config.id == validationRun.reference_configuration">Reference:</em>
 
               {{config.dataset}} ({{config.version}}, {{config.variable}})
-              [Filters: <span *ngFor="let filter of config.filters"> {{filter}}; </span>
+              [Filters:
+              <span *ngFor="let filter of config.filters"> {{filter}}; </span>
               <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
                               {{paramFilter}} {{config.parametrisedFiltersValues[indF]}}
-                            </span>
-              ]
+              </span>]
             </li>
           </ul>
         <li
