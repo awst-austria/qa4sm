@@ -21,7 +21,7 @@
           <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"></qa-summary-statistics>
         </div>
         <div class="p-col-12">
-          <qa-result-files></qa-result-files>
+          <qa-result-files [validationId]="validationRun.id"></qa-result-files>
         </div>
       </div>
 
