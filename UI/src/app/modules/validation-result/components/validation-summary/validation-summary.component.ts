@@ -8,7 +8,7 @@ import {DatasetVariableService} from '../../../core/services/dataset/dataset-var
 import {FilterService} from '../../../core/services/filter/filter.service';
 import {map} from 'rxjs/operators';
 import {SCALING_CHOICES} from '../../../scaling/components/scaling/scaling.component';
-import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
+import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
