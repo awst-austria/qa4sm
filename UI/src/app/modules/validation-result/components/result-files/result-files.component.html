@@ -1,5 +1,5 @@
-<div *ngIf="metricsPlotsNames$|async as metrics" class="p-grid no-gutters">
-  <div class="p-col-12">
+<div *ngIf="validation.progress === 100" class="p-grid no-gutters">
+  <div *ngIf="metricsPlotsNames$|async as metrics" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center" style="width: 95%">

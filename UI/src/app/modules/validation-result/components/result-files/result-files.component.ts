@@ -3,6 +3,7 @@ import {Observable} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
+import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 
 @Component({
   selector: 'qa-result-files',
@@ -10,7 +11,7 @@ import {HttpParams} from '@angular/common/http';
   styleUrls: ['./result-files.component.scss']
 })
 export class ResultFilesComponent implements OnInit {
-  @Input() validationId: string;
+  @Input() validation: ValidationrunDto;
   metricsPlotsNames$: Observable<MetricsPlotsDto[]>;
   selectedMetrics: MetricsPlotsDto;
   boxplotSrc: string;
@@ -24,7 +25,7 @@ export class ResultFilesComponent implements OnInit {
   }
 
   getMetricsAndPlotsNames(): void {
-    const params = new HttpParams().set('validationId', this.validationId);
+    const params = new HttpParams().set('validationId', this.validation.id);
     this.metricsPlotsNames$ = this.validationService.getMetricsAndPlotsNames(params);
     // this.boxplotSrc = 'response'
   }
