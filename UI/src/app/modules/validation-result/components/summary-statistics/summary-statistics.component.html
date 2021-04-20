@@ -1,5 +1,5 @@
-<div *ngIf="validationRun.progress === 100" class="p-grid no-gutters">
-      <div *ngIf="(table$|async) as table" class="p-col-12">
+<div class="p-grid no-gutters">
+      <div class="p-col-12">
         <p-panel [toggleable]="true" [collapsed]="true">
           <ng-template pTemplate="header">
             <div class="text-center my-1" style="width: 92%">
@@ -16,6 +16,7 @@
             and dataset. The reference dataset used is {{ (refDataset$ | async)?.pretty_name }}
             ({{ (refDatasetVersion$ | async)?.pretty_name }}, {{ (refDatasetVariable$ | async)?.pretty_name }}).
           </div>
+          <div *ngIf="(table$|async) as table" class="pb-3">
           <span [innerHtml]="table | dompurify"></span>
           <div class="d-flex justify-content-between align-items-center">
             <button type="button"
@@ -25,6 +26,7 @@
                     (click)="getSummaryStatisticsAsCsv()">
               <span class="pi pi-download"></span> Download .csv table
             </button>
+          </div>
           </div>
         </p-panel>
       </div>
