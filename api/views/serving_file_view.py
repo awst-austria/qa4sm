@@ -1,6 +1,8 @@
+import base64
 import os
 from collections import OrderedDict
 
+from django.core.files import File
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
@@ -65,9 +67,9 @@ def get_metric_names_and_associated_files(request):
         overview_files = []
         for file in files:
             if metrics[key] in file and 'boxplot' in file:
-                boxplot_file = file
+                boxplot_file = file_path + file
             if metrics[key] in file and 'overview' in file:
-                overview_files.append(file)
+                overview_files.append(file_path + file)
 
         metric_dict = {'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
@@ -81,9 +83,39 @@ def get_metric_names_and_associated_files(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_result_graphic_files(request):
-    validation_id = request.query_params.get('validationId', None)
-    validation = get_object_or_404(ValidationRun, pk=validation_id)
+    file = request.query_params.get('file', None)
 
-    return HttpResponse(status=200)
+    open_file = open(file, 'rb')
+    image = File(open_file)
+    name = base64.b64encode(image.read())
+    open_file.close()
+
+    # file_wrapper = FileWrapper(open(file, 'rb'))
+    # file_mimetype = mimetypes.guess_type(file)
+
+    response = HttpResponse(name)
+
+    return response
+
+# @api_view(['GET'])
+# @permission_classes([IsAuthenticated])
+# def get_result_graphic_files(request):
+#     files = request.query_params.getlist('files', None)
+#     print('files', type(files), files)
+#     data = []
+#     for file in files:
+#         open_file = open(file, 'rb')
+#         image = File(open_file)
+#         name = str(base64.b64encode(image.read()))
+#         name_dict = {'coded_name': name.lstrip("b'")}
+#         data.append(name_dict)
+#         open_file.close()
+#
+#     # file_wrapper = FileWrapper(open(file, 'rb'))
+#     # file_mimetype = mimetypes.guess_type(file)
+#
+#     response = JsonResponse(data, safe=False)
+#
+#     return response
 
 
