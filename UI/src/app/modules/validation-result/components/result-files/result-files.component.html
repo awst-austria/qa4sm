@@ -8,6 +8,16 @@
       </ng-template>
       <ng-template pTemplate="icons">
       </ng-template>
+
+      <div class="p-grid  p-align-center">
+        <div class="p-col">
+          <span class="p-float-label p-mb-4 p-mt-3">
+            <p-dropdown id="datasetSelector" (onChange)="onMetricChange()" [options]="(metricsPlotsNames$|async)"
+                optionLabel="metric_pretty_name" [style]="{'width': '100%'}"></p-dropdown>
+          </span>
+        </div>
+      </div>
+
     </p-panel>
   </div>
 </div>
