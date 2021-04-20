@@ -74,6 +74,6 @@ urlpatterns = [
     path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
     path('uptime-ping', uptime_ping),
     path('uptime-report', get_uptime),
-    path('get-result-plots', get_result_graphic_files, name='Get result plots'),
+    path('get-metric-plots', get_result_graphic_files, name='Get metric plots'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
 ]
