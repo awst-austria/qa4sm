@@ -150,4 +150,8 @@ export class ValidationrunService {
     return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
   }
 
+  getMetricsPlots(params: any): Observable<any>{
+    return this.httpClient.get(downloadResultsGraphsUrl, {params, responseType: 'text'});
+  }
+
 }

@@ -1,4 +1,4 @@
-<div class="p-grid no-gutters">
+<div *ngIf="metricsPlotsNames$|async as metrics" class="p-grid no-gutters">
   <div class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
@@ -11,9 +11,26 @@
 
       <div class="p-grid  p-align-center">
         <div class="p-col">
+            <img style="max-width:100%;max-height:100%;" src="{{boxplotSrc}}" />
+<!--            <img style="max-width:100%;max-height:100%;" src="{{boxplotSrc}}" />-->
+        </div>
+      </div>
+      <div class="p-grid  p-align-center">
+        <div *ngFor="let overview of overviewPlotsSrc" class="p-col">
+          <img style="max-width:100%;max-height:100%;" src="{{overview}}" />
+          <!--            <img style="max-width:100%;max-height:100%;" src="{{boxplotSrc}}" />-->
+        </div>
+      </div>
+      <div class="p-grid  p-align-center">
+        <div class="p-col">
           <span class="p-float-label p-mb-4 p-mt-3">
-            <p-dropdown id="datasetSelector" (onChange)="onMetricChange()" [options]="(metricsPlotsNames$|async)"
-                optionLabel="metric_pretty_name" [style]="{'width': '100%'}"></p-dropdown>
+            <p-dropdown id="metricSelector"
+                        (onChange)="onMetricChange()"
+                        [options]="metrics"
+                        [(ngModel)]="selectedMetrics"
+                        optionLabel="metric_pretty_name"
+                        [style]="{'width': '100%'}">
+            </p-dropdown>
           </span>
         </div>
       </div>

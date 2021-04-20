@@ -12,6 +12,9 @@ import {HttpParams} from '@angular/common/http';
 export class ResultFilesComponent implements OnInit {
   @Input() validationId: string;
   metricsPlotsNames$: Observable<MetricsPlotsDto[]>;
+  selectedMetrics: MetricsPlotsDto;
+  boxplotSrc: string;
+  overviewPlotsSrc: string[] = [];
 
   constructor(private validationService: ValidationrunService) {
   }
@@ -23,9 +26,30 @@ export class ResultFilesComponent implements OnInit {
   getMetricsAndPlotsNames(): void {
     const params = new HttpParams().set('validationId', this.validationId);
     this.metricsPlotsNames$ = this.validationService.getMetricsAndPlotsNames(params);
+    // this.boxplotSrc = 'response'
   }
 
   onMetricChange(): void {
-    console.log('Metric has changed');
+    this.getBoxPlot(this.selectedMetrics.boxplot_file);
+    this.getOverviewPlots(this.selectedMetrics.overview_files);
+
   }
+
+  getBoxPlot(fileToGet: string): void {
+    const params = new HttpParams().set('file', fileToGet);
+    this.validationService.getMetricsPlots(params).subscribe(data => {
+      this.boxplotSrc = 'data:image/png;base64,' + data;
+    });
+  }
+
+  getOverviewPlots(filesToGet: any): void{
+    this.overviewPlotsSrc = [];
+    filesToGet.forEach(file => {
+      const params = new HttpParams().set('file', file);
+      this.validationService.getMetricsPlots(params).subscribe(data => {
+        this.overviewPlotsSrc.push('data:image/png;base64,' + data);
+      });
+    });
+  }
+
 }
