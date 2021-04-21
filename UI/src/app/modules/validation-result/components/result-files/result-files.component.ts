@@ -17,6 +17,7 @@ export class ResultFilesComponent implements OnInit {
   selectedMetrics: MetricsPlotsDto;
   boxplotSrc: string;
   overviewPlotsSrc: string[] = [];
+  numOfOverviewPlots: number;
 
   constructor(private validationService: ValidationrunService,
               private plotService: WebsiteGraphicsService) {
@@ -29,7 +30,11 @@ export class ResultFilesComponent implements OnInit {
   getMetricsAndPlotsNames(): void {
     const params = new HttpParams().set('validationId', this.validation.id);
     this.metricsPlotsNames$ = this.validationService.getMetricsAndPlotsNames(params);
-    // this.boxplotSrc = 'response'
+    this.validationService.getMetricsAndPlotsNames(params).subscribe(data => {
+      this.getBoxPlot(data[0].boxplot_file);
+      this.getOverviewPlots(data[0].overview_files);
+      this.numOfOverviewPlots = data[0].overview_files.length;
+    });
   }
 
   onMetricChange(): void {
