@@ -32,6 +32,7 @@
     "@types/jquery": "^3.5.5",
     "@types/ol": "^6.4.2",
     "@types/proj4": "^2.5.0",
+    "angular-gallery": "^1.0.2",
     "angular2-uuid": "^1.1.1",
     "bootstrap": "^4.6.0",
     "dompurify": "^2.2.7",
