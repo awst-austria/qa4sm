@@ -3,7 +3,7 @@ import os
 from collections import OrderedDict
 
 from django.core.files import File
-from django.http import FileResponse, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
@@ -38,7 +38,6 @@ def get_results(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_csv_with_statistics(request):
-
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
     inspection_table = get_inspection_table(validation).reset_index()
@@ -58,18 +57,27 @@ def get_metric_names_and_associated_files(request):
     file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
     files = os.listdir(file_path)
 
-    _, _, metrics, _ = get_dataset_combis_and_metrics_from_files(validation)
+    pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
+    combis = OrderedDict(sorted({**pairs, **triples}.items()))
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
-
     response = []
+
     for key in metrics:
         boxplot_file = ''
-        overview_files = []
-        for file in files:
-            if metrics[key] in file and 'boxplot' in file:
-                boxplot_file = file_path + file
-            if metrics[key]+'.png' in file and 'overview' in file:
-                overview_files.append(file_path + file)
+        boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
+
+        # 'n_obs' doesn't refer to datasets so I create a list with independent metrics, if there are other similar
+        # metrics it's just enough to add them here:
+        independent_metrics = ['n_obs']
+
+        if metrics[key] not in independent_metrics:
+            overview_files_names = ['overview_' + name_key + '_' + metrics[key] + '.png' for name_key in combis]
+        else:
+            overview_files_names = ['overview_' + metrics[key] + '.png']
+
+        if boxplot_file_name in files:
+            boxplot_file = file_path + boxplot_file_name
+        overview_files = [file_path + file for file in overview_files_names if file in files]
 
         metric_dict = {'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
@@ -112,5 +120,3 @@ def get_graphic_files(request):
 #     response = JsonResponse(data, safe=False)
 #
 #     return response
-
-
