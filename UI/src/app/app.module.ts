@@ -47,7 +47,7 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
-import { ComparisonComponent } from './pages/comparison/comparison.component';
+import {ComparisonComponent} from './pages/comparison/comparison.component';
 
 
 @NgModule({
