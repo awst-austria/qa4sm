@@ -142,30 +142,31 @@
           </li>
         </ng-template>
         <li *ngIf="validationRun.expiry_date && getCurrentUser() === validationRun.user">
-              <span *ngIf="validationRun.is_near_expiry"
-                    class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons">
-                This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}
-                .
-              </span>
-          <span *ngIf="!validationRun.is_near_expiry"
-                class="p-panel-header-icon pi pi-calendar expiry-icons">
-                    This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}
-            .
-              </span>
+          <span *ngIf="validationRun.is_near_expiry">
+            <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
+            This validation will SOON be automatically removed during cleanup
+            on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}.
+          </span>
+
+          <span *ngIf="!validationRun.is_near_expiry">
+            <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
+            This validation will be automatically removed during cleanup
+            on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.
+          </span>
+
         </li>
         <li *ngIf="validationRun.is_archived && validationRun.is_unpublished">
               <span
                 class="p-panel-header-icon pi pi- expiry-icons">
                 <fa-icon [icon]="faIcons.faArchive"></fa-icon>
-                This validation has been archived. It will NOT be automatically removed during cleanup.
               </span>
+          This validation has been archived. It will NOT be automatically removed during cleanup.
+
         </li>
         <li *ngIf="validationRun.doi">
           <span class="fas fa-book"></span> This result was published on zenodo with DOI
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
-
-
       </ul>
       <qa-buttons [validationList]="false" [validationRun]="validationRun"></qa-buttons>
     </div>
