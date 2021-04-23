@@ -49,7 +49,6 @@ import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
 import {ComparisonModule} from './modules/comparison/comparison.module';
-import {ValidationSelectorModule} from './modules/validation-selector/validation-selector.module'
 
 
 @NgModule({
@@ -100,7 +99,6 @@ import {ValidationSelectorModule} from './modules/validation-selector/validation
     NgxPaginationModule,
     MapModule,
     ComparisonModule,
-    ValidationSelectorModule,
 
   ],
   providers: [
