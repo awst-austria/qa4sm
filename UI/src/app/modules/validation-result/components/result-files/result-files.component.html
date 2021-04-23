@@ -1,5 +1,5 @@
-<div *ngIf="validation.progress === 100" class="p-grid no-gutters">
-  <div *ngIf="updatedMetrics$|async as metrics" class="p-col-12">
+<div *ngIf="updatedMetrics$|async as metrics" class="p-grid no-gutters">
+  <div *ngIf="metrics[indx].overviewFiles|async as overviewPlots" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center" style="width: 95%">
@@ -10,22 +10,22 @@
       </ng-template>
 
       <div class="p-grid p-align-center">
-        <div [ngClass]="{'p-col-5': numOfOverviewPlots === 1, 'p-col-6': numOfOverviewPlots > 1}">
+        <div [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
           <img *ngIf="metrics[indx].boxplotFile|async as boxplot"
                width="95%"
                height="95%"
-               [src]="(plotPrefix+boxplot)"
-               (click)="showBoxplot(plotPrefix+boxplot)"
-               [ngClass]="{'result-plot':true, 'pcol': numOfOverviewPlots > 4}">
+               [src]="sanitizePlotUrl(boxplot[0].plot_name)"
+               (click)="showGallery(0, boxplot)"
+               [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}">
         </div>
         <div class="p-col">
-          <div class="p-grid">
-            <div *ngFor="let overviewPlot of metrics[indx].overviewFiles; let ind = index"
-                 [ngClass]="{'p-col': numOfOverviewPlots === 1, 'p-col-10': numOfOverviewPlots === 2, 'p-col-6': numOfOverviewPlots > 2}">
-              <img *ngIf="overviewPlot|async as plot" width="95%" height="95%"
-                   [src]="plotPrefix+plot"
-                   (click)="showOverviewPlotsGallery(ind)"
-                   [ngClass]="{'result-plot':true, 'pcol': numOfOverviewPlots === 2, 'pcol6': numOfOverviewPlots > 2}">
+          <div  class="p-grid">
+            <div *ngFor="let plot of overviewPlots; let ind = index"
+                 [ngClass]="{'p-col': overviewPlots.length === 1, 'p-col-10': overviewPlots.length === 2, 'p-col-6': overviewPlots.length > 2}">
+              <img  width="95%" height="95%"
+                   [src]="sanitizePlotUrl(plot.plot_name)"
+                   (click)="showGallery(ind, overviewPlots)"
+                   [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length === 2, 'pcol6': overviewPlots.length > 2}">
             </div>
           </div>
         </div>
