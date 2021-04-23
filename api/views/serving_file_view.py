@@ -62,7 +62,8 @@ def get_metric_names_and_associated_files(request):
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
     response = []
 
-    for key in metrics:
+    for ind, key in enumerate(metrics):
+        print(ind)
         boxplot_file = ''
         boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
 
@@ -79,7 +80,8 @@ def get_metric_names_and_associated_files(request):
             boxplot_file = file_path + boxplot_file_name
         overview_files = [file_path + file for file in overview_files_names if file in files]
 
-        metric_dict = {'metric_query_name': metrics[key],
+        metric_dict = {'ind': ind,
+                       'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
                        'boxplot_file': boxplot_file,
                        'overview_files': overview_files}
@@ -90,33 +92,16 @@ def get_metric_names_and_associated_files(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_graphic_files(request):
-    file = request.query_params.get('file', None)
-    open_file = open(file, 'rb')
-    image = File(open_file)
-    name = base64.b64encode(image.read())
-    open_file.close()
-    response = HttpResponse(name)
+def get_graphic_file(request):
+    files = request.query_params.getlist('file', None)
+    plots = []
+    for file in files:
+        open_file = open(file, 'rb')
+        image = File(open_file)
+        name = base64.b64encode(image.read())
+        open_file.close()
+        plots.append({'plot_name': str(name).lstrip("b'").rstrip("'")})
+    response = HttpResponse(plots)
 
-    return response
+    return JsonResponse(plots, safe=False)
 
-# @api_view(['GET'])
-# @permission_classes([IsAuthenticated])
-# def get_result_graphic_files(request):
-#     files = request.query_params.getlist('files', None)
-#     print('files', type(files), files)
-#     data = []
-#     for file in files:
-#         open_file = open(file, 'rb')
-#         image = File(open_file)
-#         name = str(base64.b64encode(image.read()))
-#         name_dict = {'coded_name': name.lstrip("b'")}
-#         data.append(name_dict)
-#         open_file.close()
-#
-#     # file_wrapper = FileWrapper(open(file, 'rb'))
-#     # file_mimetype = mimetypes.guess_type(file)
-#
-#     response = JsonResponse(data, safe=False)
-#
-#     return response
