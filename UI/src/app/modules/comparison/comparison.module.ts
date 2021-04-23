@@ -9,6 +9,7 @@ import {RouterModule} from '@angular/router';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
+import {ValidationSelectorModule} from '../validation-selector/validation-selector.module';
 
 @NgModule({
     declarations: [ComparisonPagePaginatedComponent],
@@ -24,7 +25,8 @@ import {InputTextModule} from 'primeng/inputtext';
         RouterModule,
         DropdownModule,
         FormsModule,
-        InputTextModule
+        InputTextModule,
+        ValidationSelectorModule
     ]
 })
 export class ComparisonModule { }
