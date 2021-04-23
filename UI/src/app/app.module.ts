@@ -48,6 +48,7 @@ import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
+import {ComparisonModule} from './modules/comparison/comparison.module';
 
 
 @NgModule({
@@ -96,7 +97,8 @@ import {ComparisonComponent} from './pages/comparison/comparison.component';
     AnomaliesModule,
     ScalingModule,
     NgxPaginationModule,
-    MapModule
+    MapModule,
+    ComparisonModule,
 
   ],
   providers: [
