@@ -1,5 +1,5 @@
 <div *ngIf="validation.progress === 100" class="p-grid no-gutters">
-  <div *ngIf="metricsPlotsNames$|async as metrics" class="p-col-12">
+  <div *ngIf="updatedMetrics$|async as metrics" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center" style="width: 95%">
@@ -11,18 +11,19 @@
 
       <div class="p-grid p-align-center">
         <div [ngClass]="{'p-col-5': numOfOverviewPlots === 1, 'p-col-6': numOfOverviewPlots > 1}">
-          <img width="95%"
+          <img *ngIf="metrics[indx].boxplotFile|async as boxplot"
+               width="95%"
                height="95%"
-               [src]="boxplotSrc"
-               (click)="showBoxplot()"
+               [src]="(plotPrefix+boxplot)"
+               (click)="showBoxplot(plotPrefix+boxplot)"
                [ngClass]="{'result-plot':true, 'pcol': numOfOverviewPlots > 4}">
         </div>
         <div class="p-col">
           <div class="p-grid">
-            <div *ngFor="let plot of overviewPlotsSrc; let ind = index"
+            <div *ngFor="let overviewPlot of metrics[indx].overviewFiles; let ind = index"
                  [ngClass]="{'p-col': numOfOverviewPlots === 1, 'p-col-10': numOfOverviewPlots === 2, 'p-col-6': numOfOverviewPlots > 2}">
-              <img width="95%" height="95%"
-                   [src]="plot"
+              <img *ngIf="overviewPlot|async as plot" width="95%" height="95%"
+                   [src]="plotPrefix+plot"
                    (click)="showOverviewPlotsGallery(ind)"
                    [ngClass]="{'result-plot':true, 'pcol': numOfOverviewPlots === 2, 'pcol6': numOfOverviewPlots > 2}">
             </div>

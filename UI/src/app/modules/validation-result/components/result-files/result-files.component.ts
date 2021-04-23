@@ -8,6 +8,7 @@ import {WebsiteGraphicsService} from '../../../core/services/global/website-grap
 import {Gallery} from 'angular-gallery';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {fas} from '@fortawesome/free-solid-svg-icons';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'qa-result-files',
@@ -17,54 +18,61 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 export class ResultFilesComponent implements OnInit {
   @Input() validation: ValidationrunDto;
   faIcons = {faFileDownload: fas.faFileDownload};
-  metricsPlotsNames$: Observable<MetricsPlotsDto[]>;
   selectedMetrics: MetricsPlotsDto;
-  boxplotSrc: string;
   overviewPlotsSrc: string[] = [];
   numOfOverviewPlots: number;
-  plotsSrc: string[] = [];
-  filesList: string[] = [];
+
+
+  updatedMetrics$: Observable<any>;
+  indx = 0;
+  plotPrefix = 'data:image/png;base64,';
 
   constructor(private validationService: ValidationrunService,
               private plotService: WebsiteGraphicsService,
               private gallery: Gallery) {
   }
 
+
   ngOnInit(): void {
-    this.getMetricsAndPlotsNames();
+    this.updateMetricsWithPlots();
+    this.getPreliminaryOverviewFiles();
   }
 
-  getMetricsAndPlotsNames(): void {
+  private updateMetricsWithPlots(): void {
     const params = new HttpParams().set('validationId', this.validation.id);
-    this.metricsPlotsNames$ = this.validationService.getMetricsAndPlotsNames(params);
-    this.validationService.getMetricsAndPlotsNames(params).subscribe(data => {
-      // data[0].overview_files.unshift(data[0].boxplot_file);
-      // this.getPlots(data[0].overview_files);
-      this.getBoxPlot(data[0].boxplot_file);
+    this.updatedMetrics$ = this.validationService.getMetricsAndPlotsNames(params).pipe(
+      map((metrics) =>
+        metrics.map(
+          metric =>
+            ({
+              ...metric,
+              boxplotFile: this.getFile(metric.boxplot_file),
+              overviewFiles: metric.overview_files.map(file => this.getFile(file))
+            })
+        )
+      )
+    );
+  }
+
+  getPreliminaryOverviewFiles(): void {
+    this.updatedMetrics$.subscribe(data => {
       this.getOverviewPlots(data[0].overview_files);
       this.numOfOverviewPlots = data[0].overview_files.length;
     });
   }
 
   onMetricChange(): void {
-    this.getBoxPlot(this.selectedMetrics.boxplot_file);
+    this.indx = this.selectedMetrics.ind;
     this.getOverviewPlots(this.selectedMetrics.overview_files);
     this.numOfOverviewPlots = this.selectedMetrics.overview_files.length;
-    // console.log(this.selectedMetrics.overview_files, this.selectedMetrics.boxplot_file);
-    // this.filesList = [];
-    // this.filesList = this.selectedMetrics.overview_files;
-    // this.filesList.unshift(this.selectedMetrics.boxplot_file);
-    // this.getPlots(this.filesList);
   }
 
-  getBoxPlot(fileToGet: string): void {
+  getFile(fileToGet: string): Observable<string> {
     const params = new HttpParams().set('file', fileToGet);
-    this.plotService.getPlot(params).subscribe(data => {
-      this.boxplotSrc = 'data:image/png;base64,' + data;
-    });
+    return this.plotService.getPlot(params);
   }
 
-  getOverviewPlots(filesToGet: any): void{
+  getOverviewPlots(filesToGet: any): void {
     this.overviewPlotsSrc = [];
     filesToGet.forEach(file => {
       const params = new HttpParams().set('file', file);
@@ -74,27 +82,17 @@ export class ResultFilesComponent implements OnInit {
     });
   }
 
-  // getPlots(filesToGet: any): void{
-  //   this.plotsSrc = [];
-  //   filesToGet.forEach(file => {
-  //     const params = new HttpParams().set('file', file);
-  //     this.plotService.getPlot(params).subscribe(data => {
-  //       this.plotsSrc.push('data:image/png;base64,' + data);
-  //     });
-  //   });
-  // }
-
-  showBoxplot(): void{
+  showBoxplot(boxplotPath: string): void {
     const plot = {
       images: [
-        {path: this.boxplotSrc}
+        {path: boxplotPath}
       ],
       arrows: false
     };
     this.gallery.load(plot);
   }
 
-  showOverviewPlotsGallery(index: number = 0): void{
+  showOverviewPlotsGallery(index: number = 0): void {
     const imagesList = [];
     this.overviewPlotsSrc.forEach(plot => {
       imagesList.push({path: plot});
@@ -107,7 +105,7 @@ export class ResultFilesComponent implements OnInit {
     this.gallery.load(prop);
   }
 
-  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void {
     this.validationService.downloadResultFile(validationId, fileType, fileName);
   }
 
