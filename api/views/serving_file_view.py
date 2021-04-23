@@ -101,7 +101,6 @@ def get_graphic_file(request):
         name = base64.b64encode(image.read())
         open_file.close()
         plots.append({'plot_name': str(name).lstrip("b'").rstrip("'")})
-    response = HttpResponse(plots)
 
     return JsonResponse(plots, safe=False)
 
