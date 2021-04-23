@@ -16,7 +16,8 @@
                height="95%"
                [src]="sanitizePlotUrl(boxplot[0].plot_name)"
                (click)="showGallery(0, boxplot)"
-               [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}">
+               [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
+               alt="Boxplot for {{metrics[indx].metric_pretty_name}}">
         </div>
         <div class="p-col">
           <div  class="p-grid">
@@ -25,14 +26,15 @@
               <img  width="95%" height="95%"
                    [src]="sanitizePlotUrl(plot.plot_name)"
                    (click)="showGallery(ind, overviewPlots)"
-                   [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length === 2, 'pcol6': overviewPlots.length > 2}">
+                   [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length === 2, 'pcol6': overviewPlots.length > 2}"
+                    alt="An Overview map for {{metrics[indx].metric_pretty_name}}">
             </div>
           </div>
         </div>
 
       </div>
-      <div class="p-grid  p-align-center">
-        <div class="p-col-3">
+      <div class="p-grid">
+        <div class="p-col-3 center p-mt-2">
           <button type="button"
                   style="width: 9rem;"
                   class="btn btn-sm btn-primary"
@@ -52,7 +54,7 @@
             </p-dropdown>
           </span>
         </div>
-        <div class="p-col-3 px-0">
+        <div class="p-col-3 px-0 p-mt-2 center">
           <button type="button"
                   style="width: 9rem;"
                   class="btn btn-sm btn-primary"
