@@ -21,4 +21,12 @@ export class WebsiteGraphicsService {
   sanitizePlotUrl(plotBase64: string): SafeUrl {
     return this.domSanitizer.bypassSecurityTrustUrl(this.plotPrefix + plotBase64);
   }
+  sanitizeManyPlotUrls(plotObjectList: PlotDto[]): SafeUrl[]{
+    const urlList = [];
+    plotObjectList.forEach(plot => {
+      console.log(plot.plot);
+      urlList.push(this.sanitizePlotUrl(plot.plot));
+    });
+    return urlList;
+  }
 }
