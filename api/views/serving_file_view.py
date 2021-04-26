@@ -106,4 +106,3 @@ def get_graphic_file(request):
 
     return JsonResponse(plots, safe=False)
 
-

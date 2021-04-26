@@ -48,6 +48,8 @@ import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {IvyGalleryModule} from 'angular-gallery';
+import {NgxPageScrollModule} from 'ngx-page-scroll';
+import {CoreModule} from './modules/core/core.module';
 
 
 @NgModule({
@@ -97,6 +99,8 @@ import {IvyGalleryModule} from 'angular-gallery';
     NgxPaginationModule,
     MapModule,
     IvyGalleryModule
+    NgxPageScrollModule,
+    CoreModule
 
   ],
   providers: [

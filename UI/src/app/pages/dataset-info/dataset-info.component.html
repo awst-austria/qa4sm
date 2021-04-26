@@ -2,7 +2,6 @@
   <div *ngFor="let refFlag of [false, true]">
 
     <div *ngIf="refFlag; else elseRefFlag">
-      <a id="data"></a>
       <h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated and to be used as a reference</h1>
       <p>
         The following datasets can be validated within the QA4SM tool. These datasets are available in both the "data"
@@ -69,4 +68,6 @@
     <span *ngIf="!refFlag"><sup>*</sup> dataset temporarily excluded from the reference list for technical reasons<br> </span>
     <br>
   </div>
+<!--  <a pageScroll [pageScrollDuration]="1" href="#top">Back to top</a>-->
+  <qa-scroll-to-top></qa-scroll-to-top>
 </div>

@@ -58,6 +58,7 @@ export class ResultFilesComponent implements OnInit {
     const imagesList = [];
     imagesListObject.forEach(image => {
       imagesList.push({path: this.plotService.plotPrefix + image.plot});
+
     });
     const prop: any = {};
     prop.component = CarouselComponent;
@@ -82,6 +83,7 @@ export class ResultFilesComponent implements OnInit {
   // sanitizePlotUrl(plotBase64: string): SafeUrl {
   //   return this.domSanitizer.bypassSecurityTrustUrl(this.plotPrefix + plotBase64);
   // }
+
 
 
 }
