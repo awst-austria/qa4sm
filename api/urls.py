@@ -1,7 +1,5 @@
 from django.conf.urls import url
 from django.urls import path
-from django.conf import settings
-from django.conf.urls.static import static
 
 from api.views.data_filter_view import data_filter, data_filter_by_id, data_parameterised_filter_by_id, \
     data_parameterised_filter
@@ -15,11 +13,12 @@ from api.views.start_validation_view import start_validation
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import users
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs,\
-    custom_tracked_validation_runs
+    custom_tracked_validation_runs, get_summary_statistics
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
-from api.views.serving_file_view import download_results
+from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_file, \
+    get_metric_names_and_associated_files
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -70,7 +69,11 @@ urlpatterns = [
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
-    path('download-result', download_results),
+    path('download-result', get_results, name='Download results'),
+    path('summary-statistics', get_summary_statistics, name='Summary statistics'),
+    path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
     path('uptime-ping', uptime_ping),
-    path('uptime-report', get_uptime)
+    path('uptime-report', get_uptime),
+    path('get-graphic-file', get_graphic_file, name='Get graphic file'),
+    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
 ]
