@@ -7,7 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from validator.models import ValidationRun
 from django.conf import settings
@@ -91,11 +91,13 @@ def get_metric_names_and_associated_files(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_graphic_file(request):
     files = request.query_params.getlist('file', None)
     plots = []
     for file in files:
+        if '/static/' in file:
+            file.replace('/static/', settings.STATIC_ROOT)
         open_file = open(file, 'rb')
         image = File(open_file)
         name = base64.b64encode(image.read())
@@ -103,4 +105,5 @@ def get_graphic_file(request):
         plots.append({'plot_name': str(name).lstrip("b'").rstrip("'")})
 
     return JsonResponse(plots, safe=False)
+
 
