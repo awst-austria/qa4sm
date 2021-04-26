@@ -4,6 +4,7 @@ import {WebsiteGraphicsService} from '../../modules/core/services/global/website
 import {Observable} from 'rxjs';
 import {PlotDto} from '../../modules/core/services/global/plot.dto';
 import {HttpParams} from '@angular/common/http';
+import {SafeUrl} from '@angular/platform-browser';
 
 const logoUrlPrefix = '/static/images/logo/';
 const logoAwstUrl = logoUrlPrefix + 'logo_awst.png';
@@ -42,6 +43,9 @@ export class AboutComponent implements OnInit {
       params = params.append('file', file);
     });
     return this.plotService.getPlots(params);
+  }
+  sanitizePlotUrl(plotUrl: string): SafeUrl{
+    return this.plotService.sanitizePlotUrl(plotUrl);
   }
 
 }
