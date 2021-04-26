@@ -1,13 +1,14 @@
 <link rel="stylesheet" href="help.component.scss">
 
 <div style="text-align: left; max-width: 40rem; width: 100%; margin: auto;">
+    <a id="top"></a>
     <h1 class="h3 mb-3 font-weight-normal">Got to section</h1>
     <p>
         <a pageScroll [pageScrollDuration]="1" href="#validation">Validate Page</a><br/>
-        <a href="#results_list">My Validations - Results List Page</a><br/>
-        <a href="#results">Validation Results Page</a><br/>
-        <a href="#publication">Publication</a><br/>
-        <a href="#published">Published Validations Page</a><br/>
+        <a pageScroll [pageScrollDuration]="1" href="#results_list">My Validations - Results List Page</a><br/>
+        <a pageScroll [pageScrollDuration]="1" href="#results">Validation Results Page</a><br/>
+        <a pageScroll [pageScrollDuration]="1" href="#publication">Publication</a><br/>
+        <a pageScroll [pageScrollDuration]="1" href="#published">Published Validations Page</a><br/>
     </p>
 
     <a id="validation"></a>
@@ -353,6 +354,6 @@
 
     <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so at {{ this.getAdminMail() }}.</p>
 
-    <a href="#">Back to top</a>
+    <a pageScroll [pageScrollDuration]="1" href="#top">Back to top</a>
 
 </div>

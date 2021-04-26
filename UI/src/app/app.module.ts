@@ -47,6 +47,7 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
+import {NgxPageScrollModule} from 'ngx-page-scroll';
 import { HelpComponent } from './pages/help/help.component';
 
 
@@ -96,7 +97,8 @@ import { HelpComponent } from './pages/help/help.component';
     AnomaliesModule,
     ScalingModule,
     NgxPaginationModule,
-    MapModule
+    MapModule,
+    NgxPageScrollModule,
 
   ],
   providers: [
