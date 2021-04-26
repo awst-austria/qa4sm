@@ -10,6 +10,7 @@ import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {map} from 'rxjs/operators';
 import {PlotDto} from '../../../core/services/global/plot.dto';
+import {SafeUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'qa-result-files',
@@ -80,9 +81,9 @@ export class ResultFilesComponent implements OnInit {
     return this.plotService.getPlots(params);
   }
 
-  // sanitizePlotUrl(plotBase64: string): SafeUrl {
-  //   return this.domSanitizer.bypassSecurityTrustUrl(this.plotPrefix + plotBase64);
-  // }
+  sanitizePlotUrl(plotBase64: string): SafeUrl {
+    return this.plotService.sanitizePlotUrl(plotBase64);
+  }
 
 
 
