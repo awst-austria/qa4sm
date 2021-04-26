@@ -1,8 +1,9 @@
 <link rel="stylesheet" href="help.component.scss">
 
 <div style="text-align: left; max-width: 40rem; width: 100%; margin: auto;">
+    <h1 class="h3 mb-3 font-weight-normal">Got to section</h1>
     <p>
-        <a href="#validation">Validate Page</a><br/>
+        <a pageScroll [pageScrollDuration]="1" href="#validation">Validate Page</a><br/>
         <a href="#results_list">My Validations - Results List Page</a><br/>
         <a href="#results">Validation Results Page</a><br/>
         <a href="#publication">Publication</a><br/>
@@ -57,7 +58,7 @@
         validation including the dataset name, the version of the dataset, and the soil moisture variables provided in
         the dataset. More details on the supported datasets can be found <a href="{% url 'datasets' %}#ref">here</a>.
     </p>
-    <img class="scaled_image mb-3" src="assets/help_images/reference_data_set_selections.png">
+    <img class="w3-round" src="assets/help_images/reference_data_set_selections.png">
     <p>
         <b>Step 5 [optional]</b> - Choose the criteria by which you would like to filter the reference data prior to
         running the validation. The filters available depend on the data contained within the chosen dataset. For example,
@@ -213,7 +214,6 @@
             deletion and will be notified (again).
         </li>
         </ul>
-    </p>
     <img class="scaled_image mb-3" src="assets/help_images/my_validations.png">
 
     <a id="results"></a>
