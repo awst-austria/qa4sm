@@ -57,7 +57,7 @@ export class ResultFilesComponent implements OnInit {
   showGallery(index: number = 0, imagesListObject): void {
     const imagesList = [];
     imagesListObject.forEach(image => {
-      imagesList.push({path: this.plotService.plotPrefix + image.plot_name});
+      imagesList.push({path: this.plotService.plotPrefix + image.plot});
     });
     const prop: any = {};
     prop.component = CarouselComponent;

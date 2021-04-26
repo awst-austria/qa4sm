@@ -5,10 +5,11 @@ import {Observable} from 'rxjs';
 import {PlotDto} from '../../modules/core/services/global/plot.dto';
 import {HttpParams} from '@angular/common/http';
 
-const logoAwstUrl = '/static/images/logo/logo_awst.png';
-const logoEodcUrl = '/static/images/logo/logo_eodc.png';
-const logoFfgUrl = '/static/images/logo/logo_ffg.png';
-const logoTuWienUrl = '/static/images/logo/logo_tuwien_geo.png';
+const logoUrlPrefix = '/static/images/logo/';
+const logoAwstUrl = logoUrlPrefix + 'logo_awst.png';
+const logoEodcUrl = logoUrlPrefix + 'logo_eodc.png';
+const logoFfgUrl = logoUrlPrefix + 'logo_ffg.png';
+const logoTuWienUrl = logoUrlPrefix + 'logo_tuwien_geo.png';
 
 @Component({
   selector: 'qa-about',

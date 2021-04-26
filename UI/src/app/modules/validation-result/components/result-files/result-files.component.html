@@ -14,7 +14,7 @@
           <img *ngIf="metrics[indx].boxplotFile|async as boxplot"
                width="95%"
                height="95%"
-               [src]="plotService.sanitizePlotUrl(boxplot[0].plot_name)"
+               [src]="plotService.sanitizePlotUrl(boxplot[0].plot)"
                (click)="showGallery(0, boxplot)"
                [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
                alt="Boxplot for {{metrics[indx].metric_pretty_name}}">
@@ -24,7 +24,7 @@
             <div *ngFor="let plot of overviewPlots; let ind = index"
                  [ngClass]="{'p-col': overviewPlots.length === 1, 'p-col-10': overviewPlots.length === 2, 'p-col-6': overviewPlots.length > 2}">
               <img  width="95%" height="95%"
-                   [src]="plotService.sanitizePlotUrl(plot.plot_name)"
+                   [src]="plotService.sanitizePlotUrl(plot.plot)"
                    (click)="showGallery(ind, overviewPlots)"
                    [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length === 2, 'pcol6': overviewPlots.length > 2}"
                     alt="An Overview map for {{metrics[indx].metric_pretty_name}}">
