@@ -98,7 +98,7 @@ import {CoreModule} from './modules/core/core.module';
     ScalingModule,
     NgxPaginationModule,
     MapModule,
-    IvyGalleryModule
+    IvyGalleryModule,
     NgxPageScrollModule,
     CoreModule
 
