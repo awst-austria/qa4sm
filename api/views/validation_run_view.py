@@ -1,6 +1,7 @@
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -9,6 +10,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun
+from validator.validation import get_inspection_table
+
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -93,6 +97,20 @@ def custom_tracked_validation_runs(request):
     val_runs = current_user.copied_runs.filter(id__in=tracked_runs.values_list('original_run', flat=True))
     serializer = ValidationRunSerializer(val_runs, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_summary_statistics(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
+    # rest of the columns when df rendered as html
+    inspection_table = get_inspection_table(validation).reset_index()
+
+    return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+                                                 index=False))
+
 
 
 class ValidationRunSerializer(ModelSerializer):

@@ -28,6 +28,9 @@ ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environm
 
 ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 
+# Expected ping frequency in minutes
+UPTIME_PING_INTERVAL = 5
+
 # Application definition
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
+
 ]
 
 REST_FRAMEWORK = {

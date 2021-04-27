@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {GlobalParamsService} from '../../modules/core/services/gloabal-params/global-params.service';
+import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 
 @Component({

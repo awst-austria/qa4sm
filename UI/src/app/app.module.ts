@@ -47,8 +47,10 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
-import {NgxPageScrollModule} from 'ngx-page-scroll';
 import { HelpComponent } from './pages/help/help.component';
+import {IvyGalleryModule} from 'angular-gallery';
+import {NgxPageScrollModule} from 'ngx-page-scroll';
+import {CoreModule} from './modules/core/core.module';
 
 
 @NgModule({
@@ -98,7 +100,9 @@ import { HelpComponent } from './pages/help/help.component';
     ScalingModule,
     NgxPaginationModule,
     MapModule,
+    IvyGalleryModule,
     NgxPageScrollModule,
+    CoreModule
 
   ],
   providers: [

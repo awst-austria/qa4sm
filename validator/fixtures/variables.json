@@ -37,7 +37,7 @@
         "pk": 4,
         "fields": {
             "short_name": "ISMN_soil_moisture",
-            "pretty_name": "soil moisture",
+            "pretty_name": "soil_moisture",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 1.0

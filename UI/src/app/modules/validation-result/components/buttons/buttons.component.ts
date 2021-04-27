@@ -4,7 +4,6 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {saveAs} from 'file-saver';
 import {AuthService} from '../../../core/services/auth/auth.service';
 
 
@@ -30,7 +29,6 @@ export class ButtonsComponent implements OnInit {
   isOwner: boolean;
   isTrackedByTheUser: boolean;
   status: string;
-  graphicsFileNameAppendix = 'graphs.zip';
 
 
   constructor(private httpClient: HttpClient,
@@ -76,9 +74,8 @@ export class ButtonsComponent implements OnInit {
     this.validationService.extendResults(validationId);
   }
 
-  downloadResultFile(fileUrl: string, fileName: string): void{
-    this.validationService.downloadResultFile(fileUrl)
-      .subscribe(blob => saveAs(blob, fileName));
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
+    this.validationService.downloadResultFile(validationId, fileType, fileName);
   }
 
   addValidation(validationId: string): void{
