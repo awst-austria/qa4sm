@@ -18,10 +18,7 @@ from api.views.validation_run_view import published_results, my_results, validat
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
-<<<<<<< Updated upstream
 from api.views.comparison_view import compare_results
-=======
->>>>>>> Stashed changes
 
 # schema_view = get_schema_view(
 #     openapi.Info(
