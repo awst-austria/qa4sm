@@ -6,6 +6,7 @@ from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from qa4sm_reader.plot_all import plot_all, get_img_stats
+from qa4sm_reader.comparing import QA4SMComparison
 
 from django.conf import settings
 
@@ -180,3 +181,69 @@ def get_inspection_table(validation_run):
         # the validation is still running. In this case the table won't be
         # rendered anyways.
         return None
+
+
+def generate_comparison(
+        validation_runs:list,
+        extent:tuple=None,
+        get_intersection:bool=True
+) -> tuple:
+    """
+
+    Parameters
+    ----------
+    validation_runs: list
+        list of ValidationRun to be compared
+    extent : tuple, optional (default: None)
+        Area to subset the values for.
+        (min_lon, max_lon, min_lat, max_lat)
+    get_intersection: bool, default is True
+        Whether to get the intersection or union of the two spatial exents
+
+    Returns
+    -------
+    Comparison: QA4SMComparison
+        initialized Comparison object
+    """
+    outfiles = [validation_run.output_file for validation_run in validation_runs]
+    # handle single validation or multiple validations
+    if len(outfiles) == 1:
+        outpaths = outfiles[0].path
+    else:
+        outpaths = []
+        for file in outfiles:
+            outpaths.append(file.path)
+
+    comparison = QA4SMComparison(
+        paths=outpaths,
+        extent=extent,
+        get_intersection=get_intersection
+    )
+
+    return comparison
+
+
+def get_comparison_plot(
+        comparison:QA4SMComparison,
+        plot_type:str,
+        metric:str,
+):
+    """
+    Creates a plot showing the comparison result for a set (2) or a single validation run (if contains 2
+    satellite datasets)
+
+    Parameters
+    ----------
+    comparison: QA4SMComparison object
+        initialized comparison object to extract the plots from
+    plot_type: str
+        the plot type to show in the comparison page. Can be one of "table", "boxplot", "correlation",
+        "mapplot" ("difference")
+    metric: str
+        the selected metric type
+
+    """
+    comparison.wrapper(
+        method=plot_type,
+        metric=metric
+    )

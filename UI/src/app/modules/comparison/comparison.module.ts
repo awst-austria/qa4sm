@@ -10,9 +10,10 @@ import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import { ValidationSelectorComponent } from './components/validation-selector/validation-selector.component';
+import { PlotsPaginationComponent } from './components/plots-pagination/plots-pagination.component';
 
 @NgModule({
-    declarations: [ComparisonPagePaginatedComponent, ValidationSelectorComponent],
+    declarations: [ComparisonPagePaginatedComponent, ValidationSelectorComponent, PlotsPaginationComponent],
     exports: [
         ComparisonPagePaginatedComponent,
     ],

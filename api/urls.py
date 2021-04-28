@@ -17,7 +17,7 @@ from api.views.validation_run_view import published_results, my_results, validat
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
-from api.views.comparison_view import eligible_results
+from api.views.comparison_view import get_comparison, getimage, get_comparison_table, download_comparison_table
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_file, \
     get_metric_names_and_associated_files
 
@@ -70,7 +70,10 @@ urlpatterns = [
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
-    path('results-comparison', eligible_results, name='Compare results'),
+    path('results-comparison', get_comparison, name='Compare results'),
+    path('comparison-plot', getimage, name='Get comparison plot'), # todo: correct paths?
+    path('comparison-table', get_comparison_table, name='Get comparison table')
+    path('download-comparison-table', download_comparison_table, name='Download comparison table')
     path('download-result', get_results, name='Download results'),
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
     path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),

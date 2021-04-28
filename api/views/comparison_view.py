@@ -1,27 +1,75 @@
 from django.http import JsonResponse
 
-from django.http import JsonResponse
-from rest_framework import status
+from django.http import JsonResponse, HttpResponse
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated
 
 from validator.models import ValidationRun
-from api.views.auxiliary_functions import get_fields_as_list
+from validator.validation import generate_comparison, get_comparison_plot
+
+import matplotlib as pl
+pl.use('Agg')
+import matplotlib.pyplot as plt
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def eligible_results(request):
-    val_runs = ValidationRun.objects.all()
-    current_user = request.user
-    user_only = request.query_params.get('user_only', None)  # todo: user_only to get only the validations belonging to user
-    reference_ds = request.query_params.get('reference', None)
+def get_comparison(request):
+    validation_ids = request.query_params.get('ids', None)
+    extent = request.query_params.get('extent', None)
+    get_intersection = request.query_params.get('get_intersection', None)
 
-    if user_only:
-        val_runs = ValidationRun.objects.filter(user=current_user)
-    else:
-        val_runs = ValidationRun.objects.all()
+    validation_runs = []
+    for id in validation_ids:
+        validation = get_object_or_404(ValidationRun, id=validation_id)
+        validation_runs.append(validation)
+    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
+    # rest of the columns when df rendered as html
+    comparison = generate_comparison(
+        validation_runs=validation_runs,
+        extent=extent,
+        get_intersection=get_intersection
+    )
 
+    return HttpResponse(comparison)
 
-    return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_comparison_table(request):
+    comparison = request.query_params.get('comparison', None)
+
+    diff_table = get_comparison_plot(
+        comparison=comparison,
+        plot_type="table"
+    )
+
+    return HttpResponse(diff_table)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_comparison_table(request):
+    comparison = request.query_params.get('comparison', None)
+
+    diff_table = get_comparison_plot(
+        comparison=comparison,
+        plot_type="table"
+    )
+
+    return HttpResponse(diff_table)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getimage(request):
+    comparison = request.query_params.get('comparison', None)
+    plot_type = request.query_params.get('plot_type', None)
+    metric = request.query_params.get('metric', None)
+
+    get_comparison_plot(
+        comparison=comparison,
+        plot_type=plot_type,
+        metric=metric
+    )
+
+    response = HttpResponse(content_type="image/jpeg")
+    plt.savefig(response, format="png")
+
+    return response
