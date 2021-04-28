@@ -97,7 +97,8 @@ def get_graphic_file(request):
     plots = []
     for file in files:
         if '/static/' in file:
-            file = file.replace('/static/', settings.STATIC_ROOT)
+            file = file.replace('/static/', os.path.join(settings.BASE_DIR, 'validator/static/'))
+            print('Monika', file)
         open_file = open(file, 'rb')
         image = File(open_file)
         name = base64.b64encode(image.read())
