@@ -24,20 +24,4 @@ def eligible_results(request):
         val_runs = ValidationRun.objects.all()
 
 
-
-    if limit and offset:
-        limit = int(limit)
-        offset = int(offset)
-        serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
-    else:
-        serializer = ValidationRunSerializer(val_runs, many=True)
-
-    response = {'validations': serializer.data, 'length': len(val_runs)}
-
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
-
-
-class ValidationRunSerializer(ModelSerializer):
-    class Meta:
-        model = ValidationRun
-        fields = get_fields_as_list(model)

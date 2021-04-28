@@ -9,7 +9,6 @@ import {RouterModule} from '@angular/router';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
-import {ValidationSelectorModule} from '../validation-selector/validation-selector.module';
 import { ValidationSelectorComponent } from './components/validation-selector/validation-selector.component';
 
 @NgModule({
@@ -27,7 +26,6 @@ import { ValidationSelectorComponent } from './components/validation-selector/va
         DropdownModule,
         FormsModule,
         InputTextModule,
-        ValidationSelectorModule
     ]
 })
 export class ComparisonModule { }
