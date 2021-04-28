@@ -49,6 +49,10 @@ import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
 import {ComparisonModule} from './modules/comparison/comparison.module';
+import { HelpComponent } from './pages/help/help.component';
+import {IvyGalleryModule} from 'angular-gallery';
+import {NgxPageScrollModule} from 'ngx-page-scroll';
+import {CoreModule} from './modules/core/core.module';
 
 
 @NgModule({
@@ -66,6 +70,7 @@ import {ComparisonModule} from './modules/comparison/comparison.module';
     TermsComponent,
     DatasetInfoComponent,
     ComparisonComponent,
+    HelpComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -99,6 +104,9 @@ import {ComparisonModule} from './modules/comparison/comparison.module';
     NgxPaginationModule,
     MapModule,
     ComparisonModule,
+    IvyGalleryModule,
+    NgxPageScrollModule,
+    CoreModule
 
   ],
   providers: [

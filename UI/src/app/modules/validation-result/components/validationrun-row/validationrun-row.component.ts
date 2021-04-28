@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
-import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
+import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {ValidationRunRowModel} from './validation-configuration-model';
 import {DatasetRowModel} from './dataset-row.model';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';

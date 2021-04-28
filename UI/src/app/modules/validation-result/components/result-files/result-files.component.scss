@@ -1,0 +1,19 @@
+.pcol6:hover{
+  transform: scale(2);
+}
+.pcol:hover{
+  transform: scale(1.2);
+}
+.result-plot{
+  border-color: #dddddd;
+  border-style: solid;
+  border-width: thin;
+}
+.result-plot:hover{
+  box-shadow: 0 0 2em gray;
+  z-index: 1;
+  cursor: pointer;
+}
+.center{
+  text-align: center;
+}

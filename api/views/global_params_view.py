@@ -12,5 +12,11 @@ from django.conf import settings
 def global_params(request):
     data = globals_processor(request)
     data['app_version'] = settings.APP_VERSION
+    # add parameters for 'Help' page
+    help_context = {
+        'expiry_period' : settings.VALIDATION_EXPIRY_DAYS,
+        'warning_period' : settings.VALIDATION_EXPIRY_WARNING_DAYS,
+        }
+    data.update(help_context)
 
     return JsonResponse(data, status=status.HTTP_200_OK)

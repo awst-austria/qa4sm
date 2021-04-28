@@ -7,6 +7,7 @@ $edit-name-button-backgroud-color: #EFEFEF;
   color: #fff;
   background-color: $button-base-color;
   border-color: $button-base-color;
+  margin: 0.12rem;
 }
 
 .btn-primary:disabled {
@@ -27,10 +28,10 @@ $edit-name-button-backgroud-color: #EFEFEF;
 }
 .btn-action {
   width: 2.4em;
-  margin-top: 0.12rem;
-  margin-bottom: 0.12rem;
-  margin-left: 0.12rem;
-  margin-right: 0.12rem;
+  //margin-top: 0.12rem;
+  //margin-bottom: 0.12rem;
+  //margin-left: 0.12rem;
+  //margin-right: 0.12rem;
 }
 .btn-primary.edit_name_btn{
   color: #000;

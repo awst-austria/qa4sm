@@ -14,25 +14,39 @@ import {ValidationSummaryComponent} from './components/validation-summary/valida
 import {ButtonsComponent} from './components/buttons/buttons.component';
 import {InputTextModule} from 'primeng/inputtext';
 import {TrackedValidationsComponent} from './components/tracked-validations/tracked-validations.component';
+import {SummaryStatisticsComponent} from './components/summary-statistics/summary-statistics.component';
+import {ResultFilesComponent} from './components/result-files/result-files.component';
+import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
 
 @NgModule({
-    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent, ButtonsComponent, TrackedValidationsComponent],
-    exports: [
-        ValidationrunRowComponent,
-        ValidationPagePaginatedComponent,
-        ValidationSummaryComponent,
-        TrackedValidationsComponent,
-    ],
-    imports: [
-        CommonModule,
-        PanelModule,
-        TooltipModule,
-        FontAwesomeModule,
-        NgxPaginationModule,
-        RouterModule,
-        DropdownModule,
-        FormsModule,
-        InputTextModule
-    ]
+  declarations: [ValidationrunRowComponent,
+    ValidationPagePaginatedComponent,
+    SortingFormComponent,
+    ValidationSummaryComponent,
+    ButtonsComponent,
+    TrackedValidationsComponent,
+    SummaryStatisticsComponent,
+    ResultFilesComponent],
+  exports: [
+    ValidationrunRowComponent,
+    ValidationPagePaginatedComponent,
+    ValidationSummaryComponent,
+    TrackedValidationsComponent,
+    SummaryStatisticsComponent,
+    ResultFilesComponent,
+  ],
+  imports: [
+    CommonModule,
+    PanelModule,
+    TooltipModule,
+    FontAwesomeModule,
+    NgxPaginationModule,
+    RouterModule,
+    DropdownModule,
+    FormsModule,
+    InputTextModule,
+    NgDompurifyModule
+  ]
 })
-export class ValidationResultModule { }
+export class ValidationResultModule {
+}
