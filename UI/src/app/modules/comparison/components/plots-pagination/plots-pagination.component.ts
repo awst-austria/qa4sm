@@ -26,7 +26,7 @@ export class PlotsPaginationComponent implements OnInit {
   }
 
   getComparisonObject(): void {
-    const parameters = new HttpParams().set('ids', this.comparisonObj.ids);
+    //const parameters = new HttpParams().set('ids', this.comparisonObj.ids);
   }
 
   getComparisonPlot(): void {
@@ -34,7 +34,7 @@ export class PlotsPaginationComponent implements OnInit {
   }
 
   getDifferenceTable(): void{
-    this.comparisonTable$ = this.comparisonService.getComparisonTable()
+    //this.comparisonTable$ = this.comparisonService.getComparisonTable()
   }
 
   getComparisonTableAsCsv(): void{

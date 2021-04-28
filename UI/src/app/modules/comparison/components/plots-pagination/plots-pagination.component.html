@@ -14,14 +14,14 @@
     <div class="pb-3"> Shown are the median values for each metric in the two comparison datasets, and the difference
       between REF0 and REF1.
     </div>
-    <div *ngIf="(table$|async) as table" class="pb-3">
+    <div *ngIf="(comparisonTable$|async) as table" class="pb-3">
       <span [innerHtml]="table | dompurify"></span>
       <div class="d-flex justify-content-between align-items-center">
         <button type="button"
                 style="width: 12rem;"
                 class="btn btn-sm btn-primary"
                 title="Download the table to a .csv file"
-                (click)="getSummaryStatisticsAsCsv()">
+                (click)="getComparisonTableAsCsv()">
           <span class="pi pi-download"></span> Download .csv table
         </button>
       </div>
@@ -30,5 +30,21 @@
 </div>
 
 <div class="p-col-12">
-
+  <p-panel [toggleable]="true" [collapsed]="false">
+    <ng-template pTemplate="header">
+      <div class="text-center my-1" style="width: 92%">
+        <h4 class="my-0 font-weight-normal">Comparison results</h4>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="icons">
+      <label class="mb-0" pTooltip="View the results of the comparison in form of images."
+             tooltipPosition="bottom">
+        <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+      </label>
+    </ng-template>
+    <div class="pb-3"> Shown are the comparison plots of REF0 and REF1. To generate maps and correlation plots with the
+      comparison results, make sure that the input validations have overalpping extents and/or either 'Intersection' or
+      a common extent is given in the 'extent' setting.
+    </div>
+  </p-panel>
 </div>

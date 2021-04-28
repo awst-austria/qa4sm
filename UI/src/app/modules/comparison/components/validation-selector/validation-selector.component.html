@@ -1,1 +1,28 @@
-<p>validation-selector works!</p>
+<div class="p-col-12">
+  <p-panel [toggleable]="false">
+    <ng-template pTemplate="header">
+      <div class="text-center my-1" style="width: 92%">
+        <h4 class="my-0 font-weight-normal">Validations selection</h4>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="icons">
+      <label class="mb-0" pTooltip="Select the validations to compare."
+             tooltipPosition="bottom">
+        <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+      </label>
+    </ng-template>
+
+    <p-accordion multiple="true">
+
+      <p-accordionTab > <!-- here filtering modules -->
+
+        <button pButton type="button" (click)="removeValidation()"
+                label="Remove validation"
+                icon="pi pi-trash"
+                class="p-button-danger" style="padding: 0.2rem;"></button>
+      </p-accordionTab>
+
+    </p-accordion>
+
+  </p-panel>
+</div>

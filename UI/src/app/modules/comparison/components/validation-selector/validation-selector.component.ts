@@ -11,5 +11,7 @@ export class ValidationSelectorComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  removeValidation(){
 
+  }
 }

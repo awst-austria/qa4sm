@@ -53,6 +53,8 @@ import { HelpComponent } from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
 import {CoreModule} from './modules/core/core.module';
+import {ValidationSelectorComponent} from "./modules/comparison/components/validation-selector/validation-selector.component";
+import {PlotsPaginationComponent} from "./modules/comparison/components/plots-pagination/plots-pagination.component";
 
 
 @NgModule({
@@ -71,6 +73,7 @@ import {CoreModule} from './modules/core/core.module';
     DatasetInfoComponent,
     ComparisonComponent,
     HelpComponent,
+
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -106,7 +109,7 @@ import {CoreModule} from './modules/core/core.module';
     ComparisonModule,
     IvyGalleryModule,
     NgxPageScrollModule,
-    CoreModule
+    CoreModule,
 
   ],
   providers: [
