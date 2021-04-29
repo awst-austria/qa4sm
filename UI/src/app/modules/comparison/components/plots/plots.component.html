@@ -14,9 +14,8 @@
     <div class="pb-3"> Shown are the median values for each metric in the two comparison datasets, and the difference
       between REF0 and REF1.
     </div>
-<<<<<<< HEAD:UI/src/app/modules/comparison/components/plots-pagination/plots-pagination.component.html
     <div *ngIf="(comparisonTable$|async) as table" class="pb-3">
-      <span [innerHtml]="table | dompurify"></span>
+
       <div class="d-flex justify-content-between align-items-center">
         <button type="button"
                 style="width: 12rem;"
@@ -27,20 +26,6 @@
         </button>
       </div>
     </div>
-=======
-<!--    <div *ngIf="(table$|async) as table" class="pb-3">-->
-<!--      <span [innerHtml]="table | dompurify"></span>-->
-<!--      <div class="d-flex justify-content-between align-items-center">-->
-<!--        <button type="button"-->
-<!--                style="width: 12rem;"-->
-<!--                class="btn btn-sm btn-primary"-->
-<!--                title="Download the table to a .csv file"-->
-<!--                (click)="getSummaryStatisticsAsCsv()">-->
-<!--          <span class="pi pi-download"></span> Download .csv table-->
-<!--        </button>-->
-<!--      </div>-->
-<!--    </div>-->
->>>>>>> Monika_PR:UI/src/app/modules/comparison/components/plots/plots.component.html
   </p-panel>
 </div>
 
@@ -58,7 +43,7 @@
       </label>
     </ng-template>
     <div class="pb-3"> Shown are the comparison plots of REF0 and REF1. To generate maps and correlation plots with the
-      comparison results, make sure that the input validations have overalpping extents and/or either 'Intersection' or
+      comparison results, make sure that the input validations have overlapping extents and/or either 'Intersection' or
       a common extent is given in the 'extent' setting.
     </div>
   </p-panel>
