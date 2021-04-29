@@ -4,18 +4,17 @@ import {PanelModule} from 'primeng/panel';
 import {TooltipModule} from 'primeng/tooltip';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgxPaginationModule} from 'ngx-pagination';
-import {ComparisonPagePaginatedComponent} from './components/comparison-page-paginated/comparison-page-paginated.component';
 import {RouterModule} from '@angular/router';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
-import { ValidationSelectorComponent } from './components/validation-selector/validation-selector.component';
-import { PlotsPaginationComponent } from './components/plots-pagination/plots-pagination.component';
+import {ValidationSelectorComponent} from './components/validation-selector/validation-selector.component';
+import {PlotsComponent} from './components/plots/plots.component';
 
 @NgModule({
-    declarations: [ComparisonPagePaginatedComponent, ValidationSelectorComponent, PlotsPaginationComponent],
+    declarations: [ValidationSelectorComponent, PlotsComponent],
     exports: [
-        ComparisonPagePaginatedComponent,
+        ValidationSelectorComponent, PlotsComponent
     ],
     imports: [
         CommonModule,
