@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_comparison(request):
-    validation_ids = request.query_params.get('ids', None)
+    validation_ids = request.query_params.getlist('ids', None)
     extent = request.query_params.get('extent', None)
     get_intersection = request.query_params.get('get_intersection', None)
 
@@ -30,6 +30,8 @@ def get_comparison(request):
         extent=extent,
         get_intersection=get_intersection
     )
+
+    print(comparison)
 
     return HttpResponse(comparison)
 
