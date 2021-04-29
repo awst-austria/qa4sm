@@ -1,5 +1,5 @@
 <div class="p-col-12">
-  <p-panel [toggleable]="true" [collapsed]="true">
+  <p-panel [toggleable]="true">
     <ng-template pTemplate="header">
       <div class="text-center my-1" style="width: 92%">
         <h4 class="my-0 font-weight-normal">Comparison summary</h4>
@@ -14,6 +14,7 @@
     <div class="pb-3"> Shown are the median values for each metric in the two comparison datasets, and the difference
       between REF0 and REF1.
     </div>
+<<<<<<< HEAD:UI/src/app/modules/comparison/components/plots-pagination/plots-pagination.component.html
     <div *ngIf="(comparisonTable$|async) as table" class="pb-3">
       <span [innerHtml]="table | dompurify"></span>
       <div class="d-flex justify-content-between align-items-center">
@@ -26,6 +27,20 @@
         </button>
       </div>
     </div>
+=======
+<!--    <div *ngIf="(table$|async) as table" class="pb-3">-->
+<!--      <span [innerHtml]="table | dompurify"></span>-->
+<!--      <div class="d-flex justify-content-between align-items-center">-->
+<!--        <button type="button"-->
+<!--                style="width: 12rem;"-->
+<!--                class="btn btn-sm btn-primary"-->
+<!--                title="Download the table to a .csv file"-->
+<!--                (click)="getSummaryStatisticsAsCsv()">-->
+<!--          <span class="pi pi-download"></span> Download .csv table-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </div>-->
+>>>>>>> Monika_PR:UI/src/app/modules/comparison/components/plots/plots.component.html
   </p-panel>
 </div>
 

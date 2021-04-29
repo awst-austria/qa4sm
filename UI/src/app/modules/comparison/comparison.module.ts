@@ -8,16 +8,14 @@ import {RouterModule} from '@angular/router';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
-import { ValidationSelectorComponent } from './components/validation-selector/validation-selector.component';
-import { PlotsPaginationComponent } from './components/plots-pagination/plots-pagination.component';
-import {NgDompurifyModule} from "@tinkoff/ng-dompurify";
+import {ValidationSelectorComponent} from './components/validation-selector/validation-selector.component';
+import {PlotsComponent} from './components/plots/plots.component';
 import {AccordionModule} from "primeng/accordion";
 
 @NgModule({
-    declarations: [ValidationSelectorComponent, PlotsPaginationComponent],
+    declarations: [ValidationSelectorComponent, PlotsComponent],
     exports: [
-      ValidationSelectorComponent,
-      PlotsPaginationComponent
+        ValidationSelectorComponent, PlotsComponent
     ],
   imports: [
     CommonModule,
@@ -29,7 +27,6 @@ import {AccordionModule} from "primeng/accordion";
     DropdownModule,
     FormsModule,
     InputTextModule,
-    NgDompurifyModule,
     AccordionModule,
   ]
 })

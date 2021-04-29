@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -14,13 +15,13 @@ import matplotlib.pyplot as plt
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_comparison(request):
-    validation_ids = request.query_params.get('ids', None)
+    validation_ids = request.query_params.getlist('ids', None)
     extent = request.query_params.get('extent', None)
     get_intersection = request.query_params.get('get_intersection', None)
 
     validation_runs = []
-    for id in validation_ids:
-        validation = get_object_or_404(ValidationRun, id=validation_id)
+    for val_id in validation_ids:
+        validation = get_object_or_404(ValidationRun, id=val_id)
         validation_runs.append(validation)
     # resetting index added, otherwise there would be a row shift between the index column header and the header of the
     # rest of the columns when df rendered as html
@@ -29,6 +30,8 @@ def get_comparison(request):
         extent=extent,
         get_intersection=get_intersection
     )
+
+    print(comparison)
 
     return HttpResponse(comparison)
 
