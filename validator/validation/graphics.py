@@ -15,6 +15,8 @@ cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS, TC_METRICS, METRIC_TEMPLATE, TC_METRIC_TEMPLATE
 import os
+from io import BytesIO
+import base64
 from parse import *
 
 
@@ -223,14 +225,14 @@ def generate_comparison(
     return comparison
 
 
-def get_comparison_plot(
+def encode_plot(
         comparison:QA4SMComparison,
         plot_type:str,
         metric:str,
 ):
     """
-    Creates a plot showing the comparison result for a set (2) or a single validation run (if contains 2
-    satellite datasets)
+    Creates a plot encoding in base64 showing the comparison result for a set (2) or a single validation run
+    (if contains 2 satellite datasets)
 
     Parameters
     ----------
@@ -242,8 +244,21 @@ def get_comparison_plot(
     metric: str
         the selected metric type
 
+    Returns
+    -------
+    encoded: str
+        base64 encoding of the plot image
     """
-    comparison.wrapper(
-        method=plot_type,
-        metric=metric
-    )
+    image = BytesIO()
+    try:
+        comparison.wrapper(
+            method=plot_type,
+            metric=metric
+        )
+        plt.savefig(image, format='png')
+        encoded = base64.encodebytes(image.getvalue())
+
+        return encoded
+
+    except ComparisonError:
+        return "error encountered"

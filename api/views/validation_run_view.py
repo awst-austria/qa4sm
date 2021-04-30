@@ -111,6 +111,28 @@ def get_summary_statistics(request):
     return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
                                                  index=False))
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_validations_for_comparison(request, **kwargs):
+    ref_dataset = request.query_params.get('ref_dataset')
+    ref_version = request.query_params.get('ref_version')
+    max_datasets = request.query_params.get('max_datasets', 3)
+    # filter the validation runs based on the reference dataset/version
+    ref_filtered = ValidationRun.objects.filter(
+        reference_configuration__dataset__short_name=ref_dataset,
+        reference_configuration__version__short_name=ref_version,
+    )
+    # filter based on the number of non-reference datasets
+    eligible4comparison = []
+    for val in ref_filtered:
+        if val.dataset_configurations.count() <= max_datasets:
+            eligible4comparison.append(val)
+
+    if not eligible4comparison:
+        return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
+
+    serializer = ValidationRunSerializer(eligible4comparison, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 class ValidationRunSerializer(ModelSerializer):
