@@ -1,27 +1,21 @@
 <div class="p-col-12">
-  <p-panel [toggleable]="false">
-    <ng-template pTemplate="header">
-      <div class="text-center my-1" style="width: 92%">
-        <h4 class="my-0 font-weight-normal">Validations selection</h4>
-      </div>
-    </ng-template>
+  <p-panel header="Validations selection" [toggleable]="false">
     <ng-template pTemplate="icons">
       <label class="mb-0" pTooltip="Select the validations to compare."
              tooltipPosition="bottom">
         <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
       </label>
     </ng-template>
-    <p-accordion multiple="false">
-      <p> Select the reference dataset and version from the menu below to access a list of available validations for
+    <p> Select the reference dataset and version from the menu below to access a list of available validations for
       comparison. You can choose as many as one or two validations from the list, according to the number of non-reference
       datasets contained (respectively, two or one).
-      </p>
+    </p>
+    <p-accordion multiple="false">
       <!-- here dataset/version selection -->
       <p-accordionTab [header]="(selectedDatasetModel.datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel.datasetModel.selectedVersion?.pretty_name)">
 
         <qa-dataset *ngIf="selectedDatasetModel.datasetModel.selectedDataset"
-                    [selectionModel]="selectedDatasetModel.datasetModel"
-                    [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
+                    [selectionModel]="selectedDatasetModel.datasetModel"></qa-dataset>
 
         <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDatasetToSelection()"
                 class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"></button>

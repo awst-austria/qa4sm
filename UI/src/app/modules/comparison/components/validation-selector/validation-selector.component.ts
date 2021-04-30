@@ -41,10 +41,6 @@ export class ValidationSelectorComponent implements OnInit {
     });
   }
 
-  onDatasetChange(datasetConfig: DatasetComponentSelectionModel) {
-    // should change dataset selection with input
-  }
-
   private filterValidations(element: ValidationResultModel){
     // function to filter the validations list based on the reference dataset
     return //condition of selected reference dataset and version
