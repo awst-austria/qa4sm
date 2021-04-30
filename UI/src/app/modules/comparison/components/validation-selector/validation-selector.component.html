@@ -12,27 +12,28 @@
     </p>
     <p-accordion multiple="false">
       <!-- here dataset/version selection -->
-      <p-accordionTab [header]="(selectedDatasetModel.datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel.datasetModel.selectedVersion?.pretty_name)">
+      <p-accordionTab *ngFor="let item of selectedDatasetModel; let datasetIdx = index"
+        [header]="(selectedDatasetModel[datasetIdx].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[datasetIdx].datasetModel.selectedVersion?.pretty_name)">
 
-        <qa-dataset *ngIf="selectedDatasetModel.datasetModel.selectedDataset"
-                    [selectionModel]="selectedDatasetModel.datasetModel"></qa-dataset>
+        <qa-dataset *ngIf="selectedDatasetModel[datasetIdx].datasetModel.selectedDataset"
+                    [selectionModel]="selectedDatasetModel[datasetIdx].datasetModel"></qa-dataset>
 
         <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDatasetToSelection()"
                 class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"></button>
       </p-accordionTab>
     </p-accordion>
 
-    <p-accordion multiple="true">
-      <p-accordionTab > <!-- should be *ngFor loop with all the selected validations -->
-        <!-- here validation selection -->
+<!--    <p-accordion multiple="true">-->
+<!--      <p-accordionTab > &lt;!&ndash; should be *ngFor loop with all the selected validations &ndash;&gt;-->
+<!--        &lt;!&ndash; here validation selection &ndash;&gt;-->
 
-        <button pButton type="button" (click)="removeValidation()"
-                label="Remove validation"
-                icon="pi pi-trash"
-                class="p-button-danger" style="padding: 0.2rem;"></button>
-      </p-accordionTab>
+<!--        <button pButton type="button" (click)="removeValidation()"-->
+<!--                label="Remove validation"-->
+<!--                icon="pi pi-trash"-->
+<!--                class="p-button-danger" style="padding: 0.2rem;"></button>-->
+<!--      </p-accordionTab>-->
 
-    </p-accordion>
+<!--    </p-accordion>-->
 
   </p-panel>
 </div>
