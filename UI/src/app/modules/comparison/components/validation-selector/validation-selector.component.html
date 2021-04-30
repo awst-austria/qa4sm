@@ -11,14 +11,26 @@
         <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
       </label>
     </ng-template>
-
-    <p-accordion multiple="true">
+    <p-accordion multiple="false">
       <p> Select the reference dataset and version from the menu below to access a list of available validations for
       comparison. You can choose as many as one or two validations from the list, according to the number of non-reference
       datasets contained (respectively, two or one).
       </p>
+      <!-- here dataset/version selection -->
+      <p-accordionTab [header]="(selectedDatasetModel.datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel.datasetModel.selectedVersion?.pretty_name)">
 
-      <p-accordionTab > <!-- here filtering modules -->
+        <qa-dataset *ngIf="selectedDatasetModel.datasetModel.selectedDataset"
+                    [selectionModel]="selectedDatasetModel.datasetModel"
+                    [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
+
+        <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDatasetToSelection()"
+                class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"></button>
+      </p-accordionTab>
+    </p-accordion>
+
+    <p-accordion multiple="true">
+      <p-accordionTab > <!-- should be *ngFor loop with all the selected validations -->
+        <!-- here validation selection -->
 
         <button pButton type="button" (click)="removeValidation()"
                 label="Remove validation"

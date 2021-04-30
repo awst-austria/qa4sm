@@ -11,6 +11,8 @@ import {InputTextModule} from 'primeng/inputtext';
 import {ValidationSelectorComponent} from './components/validation-selector/validation-selector.component';
 import {PlotsComponent} from './components/plots/plots.component';
 import {AccordionModule} from "primeng/accordion";
+import {DatasetModule} from "../dataset/dataset.module";
+import {ButtonModule} from "primeng/button";
 
 @NgModule({
     declarations: [ValidationSelectorComponent, PlotsComponent],
@@ -28,6 +30,8 @@ import {AccordionModule} from "primeng/accordion";
     FormsModule,
     InputTextModule,
     AccordionModule,
+    DatasetModule,
+    ButtonModule,
   ]
 })
 export class ComparisonModule { }
