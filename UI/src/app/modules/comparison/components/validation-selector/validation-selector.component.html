@@ -13,13 +13,12 @@
     <p-accordion multiple="false">
       <!-- here dataset/version selection -->
       <p-accordionTab *ngFor="let item of selectedDatasetModel; let datasetIdx = index"
-        [header]="(selectedDatasetModel[datasetIdx].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[datasetIdx].datasetModel.selectedVersion?.pretty_name)">
+        [header]="(selectedDatasetModel[0].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[datasetIdx].datasetModel.selectedVersion?.pretty_name)">
 
-        <qa-dataset *ngIf="selectedDatasetModel[datasetIdx].datasetModel.selectedDataset"
-                    [selectionModel]="selectedDatasetModel[datasetIdx].datasetModel"></qa-dataset>
+        <qa-dataset *ngIf="selectedDatasetModel[0].datasetModel.selectedDataset"
+                    [removable]="false"
+                    [selectionModel]="selectedDatasetModel[0].datasetModel"></qa-dataset>
 
-        <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDatasetToSelection()"
-                class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"></button>
       </p-accordionTab>
     </p-accordion>
 
