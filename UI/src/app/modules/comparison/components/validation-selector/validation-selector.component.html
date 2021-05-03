@@ -15,7 +15,11 @@
 
           <qa-dataset *ngIf="selectedDatasetModel[0].datasetModel.selectedDataset"
                       [removable]="false"
-                      [selectionModel]="selectedDatasetModel[0].datasetModel"></qa-dataset>
+                      [reference]="true"
+                      (changeDataset)="onDatasetChange()"
+                      [selectionModel]="selectedDatasetModel[0].datasetModel">
+
+          </qa-dataset>
 
         </p-accordionTab>
       </p-accordion>
@@ -41,7 +45,7 @@
                 <p-dropdown id="validationSelector" (onChange)="selectedValidationChanged()"
                             [options]="validations4Comparison"
                             [(ngModel)]="selectedValidation"
-                            optionLabel="description" [style]="{'width':'100%'}"></p-dropdown>
+                            optionLabel="id" [style]="{'width':'100%'}"></p-dropdown>
                 <label for="validationSelector">Select a validation</label>
               </div>
             </div>
@@ -82,7 +86,7 @@ have non-overlapping extents-->
           'Get union' to compare the union instead of the intersection. Be aware that spatial-dependent comparison methods
           (i.e. map plot and correlation plot) will not be produced.</p>
         <div class="p-col-12">
-          <qa-spatial-extent [extentModel]="spatialExtent" [disabled]="true"></qa-spatial-extent>
+<!--          <qa-spatial-extent [extentModel]="spatialExtent" [disabled]="true"></qa-spatial-extent>-->
         </div>
       </div>
     </p-panel>
