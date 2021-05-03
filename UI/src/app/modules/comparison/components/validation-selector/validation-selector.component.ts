@@ -79,11 +79,12 @@ export class ValidationSelectorComponent implements OnInit {
       .set('max_datasets', String(this.maxDatasets));
     console.log(parameters);
     this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
-      const validations = response;
-      console.log(validations);
-      this.validations4Comparison = validations;
+      if (response){
+        this.validations4Comparison = response;
+      } else{
+        this.validations4Comparison = [];
+      }
     });
-    this.selectedValidation = this.validations4Comparison[0];
   }
 
   selectedValidationChanged(): void {
