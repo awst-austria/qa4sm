@@ -130,7 +130,7 @@ def get_validations_for_comparison(request):
             eligible4comparison.append(val)
 
     if not eligible4comparison:
-        return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
+        return JsonResponse(None, status=status.HTTP_200_OK, safe=False)
 
     serializer = ValidationRunSerializer(eligible4comparison, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
