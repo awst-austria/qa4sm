@@ -1,0 +1,35 @@
+<div class="p-grid  p-align-center">
+  <div class="p-col">
+    <span class="p-float-label p-mb-4 p-mt-3">
+    <p-dropdown id="datasetSelector" (onChange)="onDatasetChange()" [options]="(datasets$|async)"
+                [(ngModel)]="selectionModel.selectedDataset"
+                optionLabel="pretty_name" [style]="{'width': '100%'}"></p-dropdown>
+      <label for="datasetSelector">Dataset</label>
+    </span>
+
+  </div>
+</div>
+
+<div class="p-grid  p-align-center">
+  <div class="p-col">
+    <span class="p-float-label p-mb-4">
+      <p-dropdown id="versionSelector" [style]="{'width': '100%'}" [options]="(selectableDatasetVersions$|async)"
+                  [(ngModel)]="selectionModel.selectedVersion" optionLabel="pretty_name"></p-dropdown>
+      <label for="versionSelector">Version</label>
+    </span>
+
+  </div>
+</div>
+
+<div class="p-grid  p-align-center">
+  <div class="p-col">
+    <span class="p-float-label">
+      <p-dropdown id="variableSelector" optionLabel="pretty_name" [style]="{'width': '100%'}"
+                  [options]="(selectableDatasetVariables$|async)"
+                  [(ngModel)]="selectionModel.selectedVariable"></p-dropdown>
+            <label for="variableSelector">Variable</label>
+    </span>
+
+  </div>
+</div>
+

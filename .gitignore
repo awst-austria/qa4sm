@@ -17,3 +17,4 @@ emails
 run_celery/
 .coverage*
 */python_metadata/*
+node_modules

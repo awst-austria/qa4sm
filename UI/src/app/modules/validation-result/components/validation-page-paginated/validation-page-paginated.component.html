@@ -1,0 +1,63 @@
+<!-- custom -->
+<div *ngIf="!published" class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
+  <h1 class="jumbotron-heading">My validations</h1>
+  <p *ngIf="!validations" class="lead text-muted">
+    You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
+    to start your own validation run.
+  </p>
+</div>
+
+<!-- published -->
+<div *ngIf="published" class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
+  <h1 class="jumbotron-heading">Published validations</h1>
+  <p class="lead text-muted">
+    The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/">Zenodo</a>
+    and
+    can be referenced with a <a target="_blank" href="https://www.doi.org/">DOI</a>.
+  </p>
+</div>
+<!-- Sorting -->
+<div *ngIf="validations" class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
+  <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
+</div>
+
+<!-- Rows -->
+<div class="card-deck mb-3">
+  <div class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
+    <div *ngFor="let valrun of validations  | paginate :
+        {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
+
+      <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
+      <br/>
+    </div>
+
+    <!--    Pagination -->
+    <pagination-template #p="paginationApi"
+                         (pageChange)="handlePageChange($event)">
+
+      <div class="p-text-center">
+        <ul class="custom-pagination custom-responsive custom-star-inserted" aria-label="Pagination">
+          <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
+            <a *ngIf="!p.isFirstPage()" (click)="p.previous()"> < </a>
+          </li>
+
+          <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
+            <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value">
+              <span>{{ page.label }}</span>
+            </a>
+            <div *ngIf="p.getCurrent() === page.value">
+              <span>{{ page.label }}</span>
+            </div>
+          </li>
+
+          <li class="pagination-next" [class.disabled]="p.isLastPage()">
+            <a *ngIf="!p.isLastPage()" (click)="p.next()"> > </a>
+          </li>
+        </ul>
+      </div>
+
+    </pagination-template>
+
+
+  </div>
+</div>

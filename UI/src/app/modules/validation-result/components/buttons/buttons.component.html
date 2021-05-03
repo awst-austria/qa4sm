@@ -1,0 +1,229 @@
+<!--Buttons shown on the validation list page (both custom and published)-->
+<div *ngIf="validationList" class="col-sm" style="text-align: right; max-width: 25rem">
+<!--  this one will be shown on custom validation page only due to given conditions-->
+  <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
+          class="btn btn-sm btn-primary btn-action"
+          title="Cancel validation"
+          (click)="stopValidation(validationRun.id)">
+    <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
+  </button>
+<!--  both pages -->
+  <a class="btn btn-sm btn-primary btn-action"
+     routerLink="/validation-result/{{validationRun.id}}"
+     title="View results">
+    <span class="pi pi-folder-open"></span>
+  </a>
+
+<!--custom validations only-->
+  <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
+        [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
+
+    <button *ngIf="validationRun.is_archived"
+            class="btn btn-sm btn-primary btn-action"
+            title="Un-archive"
+            (click)="archiveResults(validationRun.id, false)">
+      <span class="pi pi-calendar"></span>
+    </button>
+
+    <button *ngIf="!validationRun.is_archived"
+            class="btn btn-sm btn-primary btn-action"
+            title="Archive"
+            (click)="archiveResults(validationRun.id, true)">
+      <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
+    </button>
+
+  </span>
+
+  <div *ngIf="!published && !tracked" class="dropdown">
+    <button class="dropdownbutton">
+      <span class="pi pi-angle-double-right"></span>
+    </button>
+    <div class="dropdown-content" style="text-align: left">
+      <div *ngIf="validationRun.output_file">
+        <button class="dropdown-item"
+                (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id + '_graphs.zip')"
+                title="Download graphs .zip">
+          <span class="pi pi-download"></span>
+          Download Graphs
+        </button>
+        <button class="dropdown-item"
+                (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
+                title="Download validation run .nc file">
+          <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
+          Download NetCDF File
+        </button>
+        <a class="no-decorations"
+           routerLink="/validate/"
+           [queryParams]="{valrun_uuid: validationRun.id}"
+           title="Load validation settings">
+          <span class="dropdown-item"><fa-icon [icon]="faIcons.faRedo"></fa-icon> Load Validation Settings</span>
+        </a>
+      </div>
+
+      <span *ngIf="validationRun.is_unpublished"
+            [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
+        <button class="dropdown-item"
+                title="Remove this validation run"
+                (click)=deleteValidation(validationRun.id)>
+          <span class="pi pi-times"></span>
+          Delete Validation Run
+        </button>
+        <button *ngIf="!validationRun.is_archived" class="dropdown-item"
+                title="Extend lifespan of this validation run"
+                (click)=extendResults(validationRun.id)>
+          <span class="pi pi-calendar-plus"></span>
+          Extend Life Span
+        </button>
+      </span>
+    </div>
+  </div>
+<!--published validations page only-->
+  <span *ngIf="published">
+    <a class="btn btn-sm btn-primary btn-action"
+       routerLink="/validate/"
+       [queryParams]="{valrun_uuid: validationRun.id}"
+       title="Load validation settings">
+      <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
+    </a>
+    <button *ngIf="isCurrentUser && isTrackedByTheUser"
+            class="btn btn-sm btn-primary btn-action"
+            title="Remove this validation from your list"
+            (click)="removeValidation(validationRun.id)">
+        <span class="pi pi-times"></span>
+    </button>
+    <button *ngIf="isCurrentUser && !isTrackedByTheUser"
+            class="btn btn-sm btn-primary btn-action"
+            title="Track this validation"
+            (click)="addValidation(validationRun.id)"
+            onclick="">
+        <span class="pi pi-plus"></span>
+    </button>
+  </span>
+
+
+<!--  tracked validations on custom validations page-->
+  <span *ngIf="validationRun.output_file && tracked">
+    <button class="btn btn-sm btn-primary btn-action"
+            (click)="downloadResultFile(validationRun.output_dir_url+graphicsFileName, graphicsFileName)"
+            title="Download graphs .zip">
+      <span class="pi pi-download"></span>
+    </button>
+    <button class="btn btn-sm btn-primary btn-action"
+            (click)="downloadResultFile(validationRun.output_file, validationRun.output_file_name)"
+            title="Download validation run .nc file">
+      <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
+    </button>
+    <button *ngIf="isCurrentUser"
+            class="btn btn-sm btn-primary btn-action"
+            title="Remove this validation from your list"
+            (click)="removeValidation(validationRun.id)">
+        <span class="pi pi-times"></span>
+    </button>
+  </span>
+
+</div>
+
+<!--Buttons shown on the single validation page (both custom and published)-->
+<div *ngIf="!validationList" class="col-sm" style="text-align: right;">
+  <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
+       [ngClass]="{'patchButtonGroup': true,  'collapse': validationRun.publishing_in_progress}">
+    <button class="btn btn-sm btn-primary"
+            title="Remove result"
+            (click)="deleteValidation(validationRun.id)">
+      <span class="pi pi-times"></span> Delete
+    </button>
+
+    <button *ngIf="validationRun.is_archived; else elseIsArchived"
+            class="btn btn-sm btn-primary"
+            title="Un-archive"
+            (click)="archiveResults(validationRun.id, false)">
+      <span class="pi pi-calendar"></span> Un-archive
+    </button>
+
+    <ng-template #elseIsArchived>
+      <button class="btn btn-sm btn-primary"
+              title="Extend lifespan"
+              (click)="extendResults(validationRun.id)">
+        <span class="pi pi-calendar-plus"></span> Renew
+      </button>
+      <button class="btn btn-sm btn-primary"
+              title="Archive"
+              (click)="archiveResults(validationRun.id, true)">
+        <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> Archive
+      </button>
+    </ng-template>
+
+    <button *ngIf="validationRun.output_file"
+            type="button"
+            title="Publish on Zenodo"
+            class="btn btn-sm btn-primary"
+            data-toggle="modal"
+            data-target="#publishDialog">
+      <span class="pi pi-book"></span> Publish
+    </button>
+
+    <a class="btn btn-sm btn-primary"
+       routerLink="/validate/"
+       [queryParams]="{valrun_uuid: validationRun.id}"
+       title="Load settings">
+      <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings</a>
+
+    <div [ngClass]="{'patchButtonGroup': true,  'collapse': !validationRun.publishing_in_progress}"
+         style="float: right">
+      <div class="spinner-border spinner-border-sm" role="status">
+        <span class="sr-only">Publishing in progress...</span>
+      </div>
+      Publishing in progress...
+    </div>
+
+  </div>
+
+
+  <ng-template #elseSingleValidation>
+    <div style="float: right;" class="patchButtonGroup">
+      <a class="btn btn-sm btn-primary"
+         routerLink="/validate/"
+         [queryParams]="{valrun_uuid: validationRun.id}"
+         title="Load settings">
+        <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings
+      </a>
+
+      <button *ngIf="isCurrentUser && isTrackedByTheUser"
+              class="btn btn-sm btn-primary"
+              title="Remove this validation from your list"
+              (click)="removeValidation(validationRun.id)">
+        <span class="pi pi-times"></span> Untrack
+      </button>
+
+      <button *ngIf="isCurrentUser && !isTrackedByTheUser" class="btn btn-sm btn-primary"
+              title="Track this validation"
+              (click)="addValidation(validationRun.id)">
+        <span class="pi pi-plus"></span> Track
+      </button>
+
+    </div>
+  </ng-template>
+</div>
+
+<!--        {% if is_owner and valrun.is_unpublished %}-->
+<!--        <div style="float: right;" class="patchButtonGroup{% if valrun.publishing_in_progress %} collapse {% endif %}">-->
+<!--          <button class="btn btn-sm btn-primary" title="Remove result" onclick="ajax_delete_result('{{ valrun.id }}', true)"><span class="fas fa-times"></span> Remove</button>-->
+<!--          {% if valrun.is_archived %}-->
+<!--          <button class="btn btn-sm btn-primary" title="Un-archive" onclick="ajax_archive_result('{{ valrun.id }}', false)"><span class="fas fa-calendar-alt"></span> Un-archive</button>-->
+<!--          {% else %}-->
+<!--          <button class="btn btn-sm btn-primary" title="Extend lifespan" onclick="ajax_extend_result('{{ valrun.id }}', true)"><span class="fas fa-calendar-plus"></span> Renew</button>-->
+<!--          <button class="btn btn-sm btn-primary" title="Archive" onclick="ajax_archive_result('{{ valrun.id }}', true)"><span class="fas fa-archive"></span> Archive</button>-->
+<!--          {% endif %}-->
+<!--          {% if valrun.output_file %}-->
+<!--          <button type="button" title="Publish on Zenodo" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#publishDialog">-->
+<!--            <span class="fas fa-book" ></span> Publish-->
+<!--          </button>-->
+<!--          {% endif %}-->
+<!--        </div>-->
+<!--        {% if valrun.output_file %}-->
+<!--        <div class="publishingNote small text-muted {% if not val.publishing_in_progress %} collapse {% endif %}" style="float: right">-->
+<!--          <div class="spinner-border spinner-border-sm" role="status"><span class="sr-only">Publishing in progress...</span></div>-->
+<!--          Publishing in progress...-->
+<!--        </div>-->
+<!--        {% endif %}-->
+<!--        {% endif %}-->

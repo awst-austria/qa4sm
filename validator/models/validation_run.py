@@ -12,11 +12,11 @@ from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
-from validator.models import DatasetConfiguration, User
+from validator.models import DatasetConfiguration, User, CopiedValidations
+from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
 class ValidationRun(models.Model):
-
     ## scaling methods
     MIN_MAX = 'min_max'
     LINREG = 'linreg'
@@ -35,6 +35,11 @@ class ValidationRun(models.Model):
     ## scale to
     SCALE_TO_REF = 'ref'
     SCALE_TO_DATA = 'data'
+
+    SCALE_TO_OPTIONS = (
+        (SCALE_TO_REF, 'Scale to reference'),
+        (SCALE_TO_DATA, 'Scale to data')
+    )
 
     ## anomalies
     MOVING_AVG_35_D = "moving_avg_35_d"
@@ -58,9 +63,11 @@ class ValidationRun(models.Model):
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
 
-    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='ref_validation_run', null=True)
+    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                related_name='ref_validation_run', null=True)
 
-    scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL, related_name='scaling_ref_validation_run', null=True)
+    scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                    related_name='scaling_ref_validation_run', null=True)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
@@ -83,7 +90,7 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
-    used_by = models.ManyToManyField(User, through="CopiedValidations", through_fields=('original_run', 'used_by_user'),
+    used_by = models.ManyToManyField(User, through=CopiedValidations, through_fields=('original_run', 'used_by_user'),
                                      related_name='copied_runs')
 
     # many-to-one relationships coming from other models:
@@ -133,22 +140,23 @@ class ValidationRun(models.Model):
         super(ValidationRun, self).clean()
 
         if self.interval_from is None and self.interval_to is not None:
-            raise ValidationError({'interval_from': 'What has an end must have a beginning.',})
+            raise ValidationError({'interval_from': 'What has an end must have a beginning.', })
         if self.interval_from is not None and self.interval_to is None:
-            raise ValidationError({'interval_to': 'What has a beginning must have an end.',})
+            raise ValidationError({'interval_to': 'What has a beginning must have an end.', })
         if self.interval_from is not None and self.interval_to is not None and self.interval_from > self.interval_to:
             raise ValidationError({'interval_from': 'From must be before To',
-                                   'interval_to': 'From must be before To',})
+                                   'interval_to': 'From must be before To', })
 
         if self.anomalies == self.CLIMATOLOGY:
             if self.anomalies_from is None or self.anomalies_to is None:
-                raise ValidationError({'anomalies': 'Need valid time period to calculate climatology from.',})
+                raise ValidationError({'anomalies': 'Need valid time period to calculate climatology from.', })
             if self.anomalies_from > self.anomalies_to:
                 raise ValidationError({'anomalies_from': 'Start of climatology period must be before end.',
-                                       'anomalies_to': 'Start of climatology period must be before end.',})
+                                       'anomalies_to': 'Start of climatology period must be before end.', })
         else:
             if self.anomalies_from is not None or self.anomalies_to is not None:
-                raise ValidationError({'anomalies': 'Time period makes no sense for anomalies calculation without climatology.',})
+                raise ValidationError(
+                    {'anomalies': 'Time period makes no sense for anomalies calculation without climatology.', })
 
         box = {'min_lat': self.min_lat, 'min_lon': self.min_lon, 'max_lat': self.max_lat, 'max_lon': self.max_lon}
         if (any(x is None for x in box.values()) and any(x is not None for x in box.values())):
@@ -161,11 +169,28 @@ class ValidationRun(models.Model):
     def __str__(self):
         return "id: {}, user: {}, start: {} )".format(self.id, self.user, self.start_time)
 
+    @property
     def output_dir_url(self):
         if bool(self.output_file) is False:
             return None
         url = regex_sub('[^/]+$', '', self.output_file.url)
         return url
+
+    @property
+    def output_file_name(self):
+        if bool(self.output_file) is False:
+            return None
+        name = self.output_file.name.split('/')[1]
+        return name
+
+    @property
+    def is_a_copy(self):
+        copied_runs = CopiedValidations.objects.filter(copied_run_id=self.id)\
+            .annotate(is_copied=ExpressionWrapper(~Q(copied_run=F('original_run')), output_field=BooleanField())) \
+            .filter(is_copied=True)
+
+        return len(copied_runs) != 0
+
 
 
 # delete model output directory on disk when model is deleted
@@ -175,4 +200,3 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         rundir = path.dirname(instance.output_file.path)
         if path.isdir(rundir):
             rmtree(rundir)
-
