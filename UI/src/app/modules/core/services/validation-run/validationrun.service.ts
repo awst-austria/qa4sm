@@ -16,7 +16,7 @@ const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
-const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-comparison';
+const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comparison';
 // const downloadResultsGraphsUrl: string = urlPrefix + '/get-graphic-file';
 
 const csrfToken = '{{csrf_token}}';
