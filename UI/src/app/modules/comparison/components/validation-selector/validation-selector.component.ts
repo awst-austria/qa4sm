@@ -7,6 +7,7 @@ import {Validations2CompareModel} from "./validation-selection.model";
 import {ValidationrunService} from "../../../core/services/validation-run/validationrun.service";
 import {HttpParams} from "@angular/common/http";
 import {ValidationrunDto} from "../../../core/services/validation-run/validationrun.dto";
+import {ExtentModel} from "../spatial-extent/extent-model";
 
 @Component({
   selector: 'qa-validation-selector',
@@ -19,6 +20,7 @@ export class ValidationSelectorComponent implements OnInit {
   selectedDatasetModel: DatasetConfigModel[] = [];
     // new DatasetConfigModel(null, null, null);
   comparisonModel: Validations2CompareModel = new Validations2CompareModel([]);
+  spatialExtent: ExtentModel;
   validations4Comparison: ValidationrunDto[] = [];
   selectedValidation: ValidationrunDto;
 
@@ -31,6 +33,7 @@ export class ValidationSelectorComponent implements OnInit {
     // this.comparisonModel = new Validations2CompareModel();
     this.addDatasetToSelection();
     this.getValidations4comparison();
+    this.generateExtentOptions();
   }
 
   addDatasetToSelection(): void{
@@ -51,16 +54,18 @@ export class ValidationSelectorComponent implements OnInit {
     });
   }
 
-  getValidations4comparison() {
+  getValidations4comparison(): void {
     // return validations available for comparison, given dataset and version
     const parameters = new HttpParams()
-      .set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset?.short_name))
-      .set('ref_version', String(this.selectedDatasetModel[0].datasetModel.selectedDataset?.short_name));
+      .set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name))
+      .set('ref_version', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name));
 
     this.validationrunService.getValidations4Comparison(parameters).subscribe(response => {
       const validations = response;
+      console.log(validations)
       this.validations4Comparison = validations;
     })
+    this.selectedValidation = this.validations4Comparison[0]
   }
 
   selectedValidationChanged(): void {
@@ -73,6 +78,11 @@ export class ValidationSelectorComponent implements OnInit {
 
   removeValidation(){
     // should remove the selected validation from the comparisonModel
+  }
+
+  generateExtentOptions(): void {
+    // should be expanded to include custom selection, and should have non-fixed default conditions
+    this.spatialExtent = new ExtentModel(false,"Union can only be chosen when the default is Intesection", true, 'Compare the union of spatial extents');
   }
 
   startComparison(){

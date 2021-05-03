@@ -67,6 +67,26 @@
   </div>
 <!--  Add section with possibility to validate the "Union" of spatial extents. Make it mandatory if the two validations
 have non-overlapping extents-->
+  <div class="p-col-12">
+    <p-panel header="Spatial extent" [toggleable]="true">
+      <ng-template pTemplate="icons">
+        <label class="p-panel-header-icon"
+               pTooltip="Specify the spatial extent of the comparison."
+               tooltipPosition="bottom">
+          <span class="pi pi-question-circle"></span>
+        </label>
+      </ng-template>
+      <div class="p-grid">
+        <p> When two different validations are selected, the intersection of the spatial extents is chosen by default. In
+          case these have a non-overlapping extent, the union is taken instead. However, if applicable, you can toggle
+          'Get union' to compare the union instead of the intersection. Be aware that spatial-dependent comparison methods
+          (i.e. map plot and correlation plot) will not be produced.</p>
+        <div class="p-col-12">
+          <qa-spatial-extent [extentModel]="spatialExtent" [disabled]="true"></qa-spatial-extent>
+        </div>
+      </div>
+    </p-panel>
+  </div>
 </div>
 <div class="p-col-12">
   <div>

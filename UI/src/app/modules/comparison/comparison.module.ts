@@ -13,11 +13,13 @@ import {PlotsComponent} from './components/plots/plots.component';
 import {AccordionModule} from "primeng/accordion";
 import {DatasetModule} from "../dataset/dataset.module";
 import {ButtonModule} from "primeng/button";
+import {CheckboxModule} from "primeng/checkbox";
+import { SpatialExtentComponent } from './components/spatial-extent/spatial-extent.component';
 
 @NgModule({
-    declarations: [ValidationSelectorComponent, PlotsComponent],
+    declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent],
     exports: [
-        ValidationSelectorComponent, PlotsComponent
+        ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent
     ],
   imports: [
     CommonModule,
@@ -32,6 +34,7 @@ import {ButtonModule} from "primeng/button";
     AccordionModule,
     DatasetModule,
     ButtonModule,
+    CheckboxModule,
   ]
 })
 export class ComparisonModule { }
