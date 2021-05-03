@@ -12,7 +12,9 @@ export class SpatialExtentComponent implements OnInit {
   @Input() extentModel: ExtentModel;
   @Input() disabled: boolean = false;
 
-  constructor() { }
+  constructor() {
+
+  }
 
   ngOnInit(): void {
   }

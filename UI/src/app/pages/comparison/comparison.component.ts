@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ComparisonModule } from '../../modules/comparison/comparison.module'
 
 @Component({
   selector: 'qa-comparison',

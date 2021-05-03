@@ -9,6 +9,8 @@ import {HttpParams} from "@angular/common/http";
 import {ValidationrunDto} from "../../../core/services/validation-run/validationrun.dto";
 import {ExtentModel} from "../spatial-extent/extent-model";
 
+const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compared, at the moment
+
 @Component({
   selector: 'qa-validation-selector',
   templateUrl: './validation-selector.component.html',
@@ -16,13 +18,13 @@ import {ExtentModel} from "../spatial-extent/extent-model";
 })
 export class ValidationSelectorComponent implements OnInit {
 
-  max_datasets: Number = 3; // how to provide a number parameter to HttpParams?
+  max_datasets: Number // how to provide a number parameter to HttpParams?
   selectedDatasetModel: DatasetConfigModel[] = [];
-    // new DatasetConfigModel(null, null, null);
-  comparisonModel: Validations2CompareModel = new Validations2CompareModel([]);
   spatialExtent: ExtentModel;
   validations4Comparison: ValidationrunDto[] = [];
-  selectedValidation: ValidationrunDto;
+  // model that stores all the inputs for the comparison run
+  comparisonModel: Validations2CompareModel = new Validations2CompareModel([], true); // how to connect to extent selection?
+
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -56,20 +58,23 @@ export class ValidationSelectorComponent implements OnInit {
 
   getValidations4comparison(): void {
     // return validations available for comparison, given dataset and version
-    const parameters = new HttpParams()
-      .set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name))
+    const parameters = new HttpParams().set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name))
       .set('ref_version', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name));
 
     this.validationrunService.getValidations4Comparison(parameters).subscribe(response => {
       const validations = response;
-      console.log(validations)
       this.validations4Comparison = validations;
     })
-    this.selectedValidation = this.validations4Comparison[0]
+    this.comparisonModel.selectedValidations.push(this.validations4Comparison[0])
+  }
+
+  addValidationButtonDisabled(): boolean {
+    // if the # of selected validations exceeds 2
+    return this.comparisonModel.selectedValidations.length >= N_MAX_VALIDATIONS;
   }
 
   selectedValidationChanged(): void {
-    // change validation from dropdown menu on click
+    // change validation from dropdown menu on click in this.comparisonModel.selectedValidations
   }
 
   addValidation2Comparison(): void {

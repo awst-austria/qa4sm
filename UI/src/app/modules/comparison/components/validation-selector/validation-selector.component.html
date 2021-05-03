@@ -1,4 +1,5 @@
 <div class="p-grid">
+  <!-- selection of the reference dataset -->
   <div class="p-md-6 p-col-12">
     <p-panel header="Reference dataset selection" [toggleable]="false">
       <ng-template pTemplate="icons">
@@ -19,8 +20,24 @@
 
         </p-accordionTab>
       </p-accordion>
+
+      <!--  here selection of single or multiple non-reference validations. How to divide?  -->
+      <div class="p-grid">
+        <div class="p-col-12">
+          <p-checkbox label="{{'Multiple non-reference datasets'}}" [(ngModel)]="max_datasets" [binary]="true"
+          ></p-checkbox>
+          <label class="p-panel-header-icon"
+                 pTooltip="{{'Toggle to compare validations with 2 non-reference datasets'}}"
+                 tooltipPosition="bottom">
+            <span class="pi pi-question-circle p-ml-2"></span>
+          </label>
+        </div>
+      </div>
+
     </p-panel>
   </div>
+
+  <!-- selection of the validation results -->
   <div class="p-md-6 p-col-12">
     <p-panel header="Validations selection" [toggleable]="false">
       <ng-template pTemplate="icons">
@@ -31,26 +48,22 @@
         </label>
       </ng-template>
       <p-accordion multiple="true">
-        <p-accordionTab > <!-- should be *ngFor loop with all the selected validations -->
-          <!-- here validation selection -->
+        <p-accordionTab>
+<!--                        *ngFor="let item of this.comparisonModel.selectedValidations"-->
+<!--                        [header]="'Start time: ' + (item.start_time) + '/ Name: ' + (item.name_tag)"> &lt;!&ndash; should be *ngFor loop with all the selected validations &ndash;&gt;-->
+
           <div class="p-grid">
             <div class="p-col-12">
 
               <div class="p-float-label p-m-2">
 
                 <p-dropdown id="validationSelector" (onChange)="selectedValidationChanged()"
-                            [options]="validations4Comparison"
-                            [(ngModel)]="selectedValidation"
+                            [options]="this.validations4Comparison"
+                            [(ngModel)]="this.comparisonModel.selectedValidations"
                             optionLabel="description" [style]="{'width':'100%'}"></p-dropdown>
                 <label for="validationSelector">Select a validation</label>
               </div>
             </div>
-            <!--    copy from anomalies selection
-
-            <div class="p-col-12 p-sm-6">
-              <qa-anom-climatology *ngIf="selectedMethod.method==anomaliesClimatology"
-                                   [anomaliesModel]="methodForValidation"></qa-anom-climatology>
-            </div> -->
           </div>
 
           <button pButton type="button" (click)="removeValidation()"
@@ -59,35 +72,35 @@
                   class="p-button-danger" style="padding: 0.2rem;"></button>
         </p-accordionTab>
         <button pButton type="button" label="Add validation" icon="pi pi-plus-circle" (click)="addValidation2Comparison()"
-                class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"></button>
+                class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
+                [disabled]="addValidationButtonDisabled()"></button>
 
       </p-accordion>
 
     </p-panel>
   </div>
-<!--  Add section with possibility to validate the "Union" of spatial extents. Make it mandatory if the two validations
-have non-overlapping extents-->
+
+  <!-- selection of the spatial extent -->
   <div class="p-col-12">
     <p-panel header="Spatial extent" [toggleable]="true">
       <ng-template pTemplate="icons">
         <label class="p-panel-header-icon"
-               pTooltip="Specify the spatial extent of the comparison."
+               pTooltip="Specify the spatial extent of the comparison. By default, the intersection of the spatial extents is chosen; in case of non-overlapping extents, the union is taken instead."
                tooltipPosition="bottom">
           <span class="pi pi-question-circle"></span>
         </label>
       </ng-template>
       <div class="p-grid">
-        <p> When two different validations are selected, the intersection of the spatial extents is chosen by default. In
-          case these have a non-overlapping extent, the union is taken instead. However, if applicable, you can toggle
-          'Get union' to compare the union instead of the intersection. Be aware that spatial-dependent comparison methods
-          (i.e. map plot and correlation plot) will not be produced.</p>
         <div class="p-col-12">
-          <qa-spatial-extent [extentModel]="spatialExtent" [disabled]="true"></qa-spatial-extent>
+<!--          <qa-spatial-extent [extentModel]="this.spatialExtent"-->
+<!--                             [disabled]="true"></qa-spatial-extent>-->
         </div>
       </div>
     </p-panel>
   </div>
 </div>
+
+<!-- Start validation button -->
 <div class="p-col-12">
   <div>
     <div class="p-d-flex p-jc-center">

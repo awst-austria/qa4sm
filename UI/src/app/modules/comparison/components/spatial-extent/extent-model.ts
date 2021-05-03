@@ -1,5 +1,6 @@
 export class ExtentModel {
-  constructor(public value: boolean,
+
+  constructor(public getIntersection: boolean,
               public helperText: string,
               public disabled: boolean,  // needed to force 'union' comparison when extents are non-overlapping
               public description: string) {
