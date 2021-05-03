@@ -55,24 +55,46 @@ export class DatasetComponent implements OnInit {
     this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
   }
 
-  private updateSelectableVersionsAndVariable() {
-    if (this.selectionModel.selectedDataset == undefined || this.selectionModel.selectedDataset.versions.length == 0) {
+  // private updateSelectableVersionsAndVariable() {
+  //   if (this.selectionModel.selectedDataset == undefined || this.selectionModel.selectedDataset.versions.length == 0) {
+  //     return;
+  //   }
+  //
+  //   this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
+  //   this.selectableDatasetVersions$.subscribe(versions => {
+  //     this.selectionModel.selectedVersion = versions[0];
+  //   });
+  //
+  //   this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+  //   this.selectableDatasetVariables$.subscribe(variables => {
+  //     this.selectionModel.selectedVariable = variables[0];
+  //   });
+  // }
+
+  private updateSelectableVersionsAndVariableAndEmmit(): void{
+    if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length == 0) {
       return;
     }
 
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
     this.selectableDatasetVersions$.subscribe(versions => {
-      this.selectionModel.selectedVersion = versions[0];
-    });
-
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
-    this.selectableDatasetVariables$.subscribe(variables => {
-      this.selectionModel.selectedVariable = variables[0];
-    });
+        this.selectionModel.selectedVersion = versions[0];
+      },
+      () => {},
+      () => {
+        this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+        this.selectableDatasetVariables$.subscribe(variables => {
+            this.selectionModel.selectedVariable = variables[0];
+          },
+          () => {},
+          () => this.changeDataset.emit(this.selectionModel));
+      });
   }
 
-  onDatasetChange() {
-    this.updateSelectableVersionsAndVariable();
+  onDatasetChange(): void{
+    this.updateSelectableVersionsAndVariableAndEmmit();
+  }
+  onVersionChange(): void{
     this.changeDataset.emit(this.selectionModel);
   }
 }
