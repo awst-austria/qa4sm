@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {DatasetConfigModel} from "../../../../pages/validate/dataset-config-model";
-import {DatasetService} from "../../../core/services/dataset/dataset.service";
-import {DatasetVersionService} from "../../../core/services/dataset/dataset-version.service";
-import {DatasetComponentSelectionModel} from "../../../dataset/components/dataset/dataset-component-selection-model";
-import {Validations2CompareModel} from "./validation-selection.model";
-import {ValidationrunService} from "../../../core/services/validation-run/validationrun.service";
-import {HttpParams} from "@angular/common/http";
-import {ValidationrunDto} from "../../../core/services/validation-run/validationrun.dto";
-import {ExtentModel} from "../spatial-extent/extent-model";
+import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
+import {DatasetService} from '../../../core/services/dataset/dataset.service';
+import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
+import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
+import {Validations2CompareModel} from './validation-selection.model';
+import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {HttpParams} from '@angular/common/http';
+import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
+import {ExtentModel} from '../spatial-extent/extent-model';
 
 const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compared, at the moment
 
@@ -28,21 +28,21 @@ export class ValidationSelectorComponent implements OnInit {
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
-              private validationrunService: ValidationrunService) { }
+              private validationrunService: ValidationrunService) {
+  }
 
   ngOnInit(): void {
     // you have already created this object in line 17, there is no need to do it one more time
     // this.comparisonModel = new Validations2CompareModel();
     this.addDatasetToSelection();
-    this.getValidations4comparison();
     this.generateExtentOptions();
   }
 
-  addDatasetToSelection(): void{
+  addDatasetToSelection(): void {
     this.selectDataset(this.selectedDatasetModel);
   }
 
-  private selectDataset(selected: DatasetConfigModel[]): void{
+  private selectDataset(selected: DatasetConfigModel[]): void {
     const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
     selected.push(model);
     //get all datasets
@@ -52,20 +52,39 @@ export class ValidationSelectorComponent implements OnInit {
       //then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
         model.datasetModel.selectedVersion = versions[0];
+
+        const parameters = new HttpParams()
+          .set('ref_dataset', String(datasets[0].short_name))
+          .set('ref_version', String(versions[0].short_name));
+        console.log(parameters);
+
+        this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
+          // const validations = response;
+          // console.log(validations);
+          console.log(response);
+          this.validations4Comparison = response;
+        });
+
       });
     });
   }
 
   getValidations4comparison(): void {
     // return validations available for comparison, given dataset and version
-    const parameters = new HttpParams().set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name))
-      .set('ref_version', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name));
-
-    this.validationrunService.getValidations4Comparison(parameters).subscribe(response => {
-      const validations = response;
-      this.validations4Comparison = validations;
-    })
-    this.comparisonModel.selectedValidations.push(this.validations4Comparison[0])
+    console.log(this.selectedDatasetModel);
+    const parameters = new HttpParams()
+      .set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name))
+      .set('ref_version', String(this.selectedDatasetModel[0].datasetModel.selectedVersion.short_name))
+      .set('max_datasets', String(this.max_datasets));
+    console.log(parameters);
+    this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
+      if (response){
+        this.validations4Comparison = response;
+        this.comparisonModel.selectedValidations.push(this.validations4Comparison[0])
+      } else{
+        this.validations4Comparison = [];
+      }
+    });
   }
 
   addValidationButtonDisabled(): boolean {
@@ -81,16 +100,20 @@ export class ValidationSelectorComponent implements OnInit {
     // should add the selected validation in the comparisonModel
   }
 
-  removeValidation(){
+  removeValidation() {
     // should remove the selected validation from the comparisonModel
   }
 
   generateExtentOptions(): void {
     // should be expanded to include custom selection, and should have non-fixed default conditions
-    this.spatialExtent = new ExtentModel(false,"Union can only be chosen when the default is Intesection", true, 'Compare the union of spatial extents');
+    this.spatialExtent = new ExtentModel(false, 'Union can only be chosen when the default is Intesection', true, 'Compare the union of spatial extents');
   }
 
-  startComparison(){
+  startComparison() {
     // should start the comparison
+  }
+
+  onDatasetChange(): void{
+    this.getValidations4comparison();
   }
 }

@@ -78,6 +78,6 @@ urlpatterns = [
     path('uptime-report', get_uptime),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
-    path('validation-runs4comparison', get_validations_for_comparison, name='Get validations for comparison')
+    path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison')
 ]
 

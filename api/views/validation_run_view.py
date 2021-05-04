@@ -113,10 +113,11 @@ def get_summary_statistics(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_validations_for_comparison(request, **kwargs):
-    ref_dataset = request.query_params.get('ref_dataset')
-    ref_version = request.query_params.get('ref_version')
-    max_datasets = request.query_params.get('max_datasets', 3)
+def get_validations_for_comparison(request):
+    ref_dataset = request.query_params.get('ref_dataset', 'ISMN')
+    ref_version = request.query_params.get('ref_version', 'ISMN_V20191211')
+    max_datasets = int(request.query_params.get('max_datasets', 3))
+    print(max_datasets, type(max_datasets))
     # filter the validation runs based on the reference dataset/version
     ref_filtered = ValidationRun.objects.filter(
         reference_configuration__dataset__short_name=ref_dataset,
@@ -129,7 +130,7 @@ def get_validations_for_comparison(request, **kwargs):
             eligible4comparison.append(val)
 
     if not eligible4comparison:
-        return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
+        return JsonResponse(None, status=status.HTTP_200_OK, safe=False)
 
     serializer = ValidationRunSerializer(eligible4comparison, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)

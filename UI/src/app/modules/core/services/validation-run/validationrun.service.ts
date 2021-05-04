@@ -16,7 +16,7 @@ const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
-const validations4ComparisonUrl: string = urlPrefix + '/validation-runs4comparison'
+const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comparison';
 // const downloadResultsGraphsUrl: string = urlPrefix + '/get-graphic-file';
 
 const csrfToken = '{{csrf_token}}';
@@ -57,7 +57,7 @@ export class ValidationrunService {
     return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl);
   }
 
-  getValidations4Comparison(params: any): Observable<ValidationrunDto[]> {
+  getValidationsForComparison(params: any): Observable<ValidationrunDto[]> {
     return this.httpClient.get<ValidationrunDto[]>(validations4ComparisonUrl, {params});
   }
 

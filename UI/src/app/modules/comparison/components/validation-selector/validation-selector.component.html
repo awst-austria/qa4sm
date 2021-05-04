@@ -16,7 +16,11 @@
 
           <qa-dataset *ngIf="selectedDatasetModel[0].datasetModel.selectedDataset"
                       [removable]="false"
-                      [selectionModel]="selectedDatasetModel[0].datasetModel"></qa-dataset>
+                      [reference]="true"
+                      (changeDataset)="onDatasetChange()"
+                      [selectionModel]="selectedDatasetModel[0].datasetModel">
+
+          </qa-dataset>
 
         </p-accordionTab>
       </p-accordion>
@@ -58,9 +62,10 @@
               <div class="p-float-label p-m-2">
 
                 <p-dropdown id="validationSelector" (onChange)="selectedValidationChanged()"
-                            [options]="this.validations4Comparison"
-                            [(ngModel)]="this.comparisonModel.selectedValidations"
-                            optionLabel="description" [style]="{'width':'100%'}"></p-dropdown>
+                            [options]="validations4Comparison"
+                            [(ngModel)]="comparisonModel.selectedValidations"
+                            optionLabel="id" [style]="{'width':'100%'}"></p-dropdown>
+
                 <label for="validationSelector">Select a validation</label>
               </div>
             </div>
@@ -92,8 +97,7 @@
       </ng-template>
       <div class="p-grid">
         <div class="p-col-12">
-<!--          <qa-spatial-extent [extentModel]="this.spatialExtent"-->
-<!--                             [disabled]="true"></qa-spatial-extent>-->
+          <qa-spatial-extent [extentModel]="spatialExtent" [disabled]="true"></qa-spatial-extent>
         </div>
       </div>
     </p-panel>
