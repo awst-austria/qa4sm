@@ -20,6 +20,7 @@ const routes: Routes = [
   {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard]},
+  {path: 'validate/:validationId', component: ValidateComponent, canActivate: [AuthGuard]},
   {path: 'validation-result/:validationId', component: ValidationResultComponent, canActivate: [AuthGuard]},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
