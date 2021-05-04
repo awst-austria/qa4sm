@@ -116,8 +116,9 @@ def get_summary_statistics(request):
 def get_validations_for_comparison(request):
     ref_dataset = request.query_params.get('ref_dataset', 'ISMN')
     ref_version = request.query_params.get('ref_version', 'ISMN_V20191211')
-    max_datasets = int(request.query_params.get('max_datasets', 3))
-    print(max_datasets, type(max_datasets))
+    # by default, take 2 datasets at maximum
+    max_non_reference_datasets = int(request.query_params.get('max_datasets', 1))
+    max_datasets = max_non_reference_datasets + 1  # add the reference
     # filter the validation runs based on the reference dataset/version
     ref_filtered = ValidationRun.objects.filter(
         reference_configuration__dataset__short_name=ref_dataset,
@@ -126,7 +127,7 @@ def get_validations_for_comparison(request):
     # filter based on the number of non-reference datasets
     eligible4comparison = []
     for val in ref_filtered:
-        if val.dataset_configurations.count() <= max_datasets:
+        if val.dataset_configurations.count() == max_datasets:
             eligible4comparison.append(val)
 
     if not eligible4comparison:

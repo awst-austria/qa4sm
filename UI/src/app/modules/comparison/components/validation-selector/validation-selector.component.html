@@ -1,15 +1,16 @@
 <div class="p-grid">
   <!-- selection of the reference dataset -->
   <div class="p-md-6 p-col-12">
-    <p-panel header="Reference dataset selection" [toggleable]="false">
+    <p-panel header="Datasets configuration" [toggleable]="false">
       <ng-template pTemplate="icons">
-        <label class="mb-0" pTooltip="Select from the menu below to access a list of available
-        validations for comparison, based on common dataset and version."
+        <label class="mb-0"
+               pTooltip="Select from the menu below to access a list of available validations for comparison, based on
+               common reference dataset and version."
                tooltipPosition="bottom">
           <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
         </label>
       </ng-template>
-      <p-accordion multiple="false">
+      <p-accordion multiple="true" >
         <!-- here dataset/version selection -->
         <p-accordionTab *ngFor="let item of selectedDatasetModel; let datasetIdx = index"
           [header]=" 'Reference selection: ' + (selectedDatasetModel[0].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[datasetIdx].datasetModel.selectedVersion?.pretty_name)">
@@ -28,20 +29,25 @@
       <!--  here selection of single or multiple non-reference validations. How to divide?  -->
       <div class="p-grid">
         <div class="p-col-12">
-          <p-checkbox label="{{'Multiple non-reference datasets'}}" [(ngModel)]="max_datasets" [binary]="true"
-          ></p-checkbox>
-          <label class="p-panel-header-icon"
-                 pTooltip="{{'Toggle to compare validations with 2 non-reference datasets'}}"
-                 tooltipPosition="bottom">
-            <span class="pi pi-question-circle p-ml-2"></span>
-          </label>
+          <p-panel header="Non-reference datasets" [toggleable]="false">
+            <p-checkbox label="{{'Multiple non-reference datasets'}}"
+                        [(ngModel)]="multipleNonReference"
+                        [binary]="true"
+                        (click)="multipleNonReferenceChange()"
+            ></p-checkbox>
+            <label class="p-panel-header-icon"
+                   pTooltip="{{'Toggle to compare validations with 2 non-reference datasets'}}"
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle p-ml-2"></span>
+            </label>
+          </p-panel>
         </div>
       </div>
 
     </p-panel>
   </div>
 
-  <!-- selection of the validation results -->
+  <!-- selection of the validations -->
   <div class="p-md-6 p-col-12">
     <p-panel header="Validations selection" [toggleable]="false">
       <ng-template pTemplate="icons">
@@ -53,33 +59,34 @@
       </ng-template>
       <p-accordion multiple="true">
         <p-accordionTab>
-<!--                        *ngFor="let item of this.comparisonModel.selectedValidations"-->
-<!--                        [header]="'Start time: ' + (item.start_time) + '/ Name: ' + (item.name_tag)"> &lt;!&ndash; should be *ngFor loop with all the selected validations &ndash;&gt;-->
-
           <div class="p-grid">
             <div class="p-col-12">
 
               <div class="p-float-label p-m-2">
 
-                <p-dropdown id="validationSelector" (onChange)="selectedValidationChanged()"
+                <p-dropdown id="validationSelector"
                             [options]="validations4Comparison"
-                            [(ngModel)]="comparisonModel.selectedValidations"
-                            optionLabel="id" [style]="{'width':'100%'}"></p-dropdown>
+                            [(ngModel)]="this.selectedValidation"
+                            optionLabel="id"
+                            [style]="{'width':'100%'}"></p-dropdown>
 
                 <label for="validationSelector">Select a validation</label>
               </div>
             </div>
           </div>
 
-          <button pButton type="button" (click)="removeValidation()"
-                  label="Remove validation"
-                  icon="pi pi-trash"
-                  class="p-button-danger" style="padding: 0.2rem;"></button>
-        </p-accordionTab>
-        <button pButton type="button" label="Add validation" icon="pi pi-plus-circle" (click)="addValidation2Comparison()"
-                class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
-                [disabled]="addValidationButtonDisabled()"></button>
+          <button pButton type="button" label="Add validation" icon="pi pi-plus-circle" (click)="addValidation2Comparison()"
+                  class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
+                  [disabled]="addValidationButtonDisabled()"></button>
 
+        </p-accordionTab>
+
+          <button *ngFor="let item of this.comparisonModel.selectedValidations"
+                  pButton type="button" (click)="removeValidation(item)"
+                  [label]="'Remove ' + (item.id)"
+                  icon="pi pi-trash"
+                  class="p-button-danger" style="padding: 0.2rem;">
+          </button>
       </p-accordion>
 
     </p-panel>
@@ -104,7 +111,7 @@
   </div>
 </div>
 
-<!-- Start validation button -->
+<!-- Start comparison button -->
 <div class="p-col-12">
   <div>
     <div class="p-d-flex p-jc-center">

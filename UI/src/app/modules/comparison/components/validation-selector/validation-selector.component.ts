@@ -8,8 +8,9 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ExtentModel} from '../spatial-extent/extent-model';
+import {Observable} from "rxjs";
 
-const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compared, at the moment
+const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
 @Component({
   selector: 'qa-validation-selector',
@@ -18,13 +19,14 @@ const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compar
 })
 export class ValidationSelectorComponent implements OnInit {
 
-  max_datasets: Number // how to provide a number parameter to HttpParams?
+  multipleNonReference: boolean = false;
+  selectedValidation: ValidationrunDto
   selectedDatasetModel: DatasetConfigModel[] = [];
   spatialExtent: ExtentModel;
+  // all the possible validations given filters
   validations4Comparison: ValidationrunDto[] = [];
   // model that stores all the inputs for the comparison run
   comparisonModel: Validations2CompareModel = new Validations2CompareModel([], true); // how to connect to extent selection?
-
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -32,7 +34,7 @@ export class ValidationSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // you have already created this object in line 17, there is no need to do it one more time
+    // console.log(this.multipleNonReference)
     // this.comparisonModel = new Validations2CompareModel();
     this.addDatasetToSelection();
     this.generateExtentOptions();
@@ -56,52 +58,73 @@ export class ValidationSelectorComponent implements OnInit {
         const parameters = new HttpParams()
           .set('ref_dataset', String(datasets[0].short_name))
           .set('ref_version', String(versions[0].short_name));
-        console.log(parameters);
+        // console.log(parameters);
 
         this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
-          // const validations = response;
           // console.log(validations);
-          console.log(response);
+          // console.log(response);
           this.validations4Comparison = response;
+          if (response) {
+            this.selectedValidation = response[0];  // problem initializing this
+          }
         });
-
       });
     });
   }
 
   getValidations4comparison(): void {
     // return validations available for comparison, given dataset and version
-    console.log(this.selectedDatasetModel);
+    // console.log('the dataset selection is:', this.checkbox2NonReferenceNumber(this.multipleNonReference))
     const parameters = new HttpParams()
       .set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name))
       .set('ref_version', String(this.selectedDatasetModel[0].datasetModel.selectedVersion.short_name))
-      .set('max_datasets', String(this.max_datasets));
-    console.log(parameters);
+      // number of non-reference datasets
+      .set('max_datasets', String(this.checkbox2NonReferenceNumber()));
+    // console.log(parameters);
     this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
       if (response){
         this.validations4Comparison = response;
-        this.comparisonModel.selectedValidations.push(this.validations4Comparison[0])
       } else{
         this.validations4Comparison = [];
       }
     });
   }
 
-  addValidationButtonDisabled(): boolean {
-    // if the # of selected validations exceeds 2
-    return this.comparisonModel.selectedValidations.length >= N_MAX_VALIDATIONS;
+  multipleNonReferenceChange(): void {
+    // reinitialize list when checkbox value is changed
+    this.getValidations4comparison()
   }
 
-  selectedValidationChanged(): void {
-    // change validation from dropdown menu on click in this.comparisonModel.selectedValidations
+  checkbox2NonReferenceNumber(){
+    // convert the checkbox boolean selection to number of non-references
+    this.comparisonModel.selectedValidations = []  // empty the selection in case the button is clicked
+    if (this.multipleNonReference){
+      return 2
+    }
+    return 1
+  }
+
+  addValidationButtonDisabled(): boolean {
+    // if the checkbox has been toggled - this shouldn't be hardcoded
+    if (this.multipleNonReference){
+      return this.comparisonModel.selectedValidations.length >= 1;
+    }
+    // if not
+    return this.comparisonModel.selectedValidations.length >= N_MAX_VALIDATIONS;
   }
 
   addValidation2Comparison(): void {
     // should add the selected validation in the comparisonModel
+    // console.log(this.comparisonModel.selectedValidations)
+    console.log(this.selectedValidation)
+    this.comparisonModel.selectedValidations.push(this.selectedValidation)
   }
 
-  removeValidation() {
+  removeValidation(target: ValidationrunDto) {
     // should remove the selected validation from the comparisonModel
+    console.log(this.comparisonModel.selectedValidations)
+    let toBeRemoved = this.comparisonModel.selectedValidations.indexOf(target);
+    this.comparisonModel.selectedValidations.splice(toBeRemoved, 1);
   }
 
   generateExtentOptions(): void {
