@@ -17,9 +17,10 @@ import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dt
 import {NewValidationRunService} from './service/new-validation-run.service';
 import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto';
 import {ToastService} from '../../modules/core/services/toast/toast.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
+import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -31,6 +32,7 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either con
 })
 export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild(MapComponent) child: MapComponent;
+  validationrunId: string;
 
   mapVisible: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
@@ -52,7 +54,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private filterService: FilterService,
               private newValidationService: NewValidationRunService,
               private toastService: ToastService,
-              private router: Router) {
+              private router: Router,
+              private route: ActivatedRoute,
+              private validationrunService: ValidationrunService) {
 
   }
 
@@ -61,8 +65,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.addDatasetToValidate();
-    this.addReferenceDataset();
+    // console.log('Monika', this.route.snapshot.paramMap.get('validationId'));
+    this.validationrunId = this.route.snapshot.paramMap.get('validationId');
+    console.log(this.validationrunId);
+    this.readValidationSettings(this.validationrunId, this.validationModel);
+
+    // this.addDatasetToValidate();
+    // this.addReferenceDataset();
   }
 
   addDatasetToValidate() {
@@ -165,6 +174,30 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       error => {
         this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
         console.error(error);
+      });
+  }
+
+  readValidationSettings(validationId: string, validationModel: ValidationModel): void {
+    console.log(this.validationModel);
+    // let validationrun: ValidationrunDto;
+    this.validationrunService.getValidationRunById(validationId).subscribe(validation => {
+        // validationModel.anomalies.method = validation.anomalies;
+        // validationModel.anomalies.anomaliesFrom = new Date(validation.anomalies_from);
+        // validationModel.anomalies.anomaliesTo = new Date(validation.anomalies_to);
+        // validationModel.anomalies.setAnomalies(validation.anomalies, new Date(validation.anomalies_from),
+        //   new Date(validation.anomalies_to));
+        console.log(validation.anomalies, new Date(validation.anomalies_from));
+        validationModel.anomalies.selected = true;
+        validationModel.anomalies.method = validation.anomalies;
+        validationModel.validationPeriodModel.intervalFrom = new Date(validation.interval_from);
+        validationModel.validationPeriodModel.intervalTo = new Date(validation.interval_to);
+        validationModel.spatialSubsetModel.setValues(validation.max_lat, validation.max_lon, validation.min_lat, validation.min_lon);
+        // validationModel.metrics
+      },
+      () => {
+      },
+      () => {
+
       });
   }
 }
