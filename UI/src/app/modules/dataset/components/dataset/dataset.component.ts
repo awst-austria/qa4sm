@@ -24,25 +24,27 @@ export class DatasetComponent implements OnInit {
   selectableDatasetVariables$: Observable<DatasetVariableDto[]>;
 
   @Input() selectionModel: DatasetComponentSelectionModel;
-  @Input() removable: boolean = false;
-  @Input() reference: boolean = false;
+  @Input() removable = false;
+  @Input() reference = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
 
-  constructor(private datasetService: DatasetService, private datasetVersionService: DatasetVersionService, private datasetVariableService: DatasetVariableService) {
+  constructor(private datasetService: DatasetService,
+              private datasetVersionService: DatasetVersionService,
+              private datasetVariableService: DatasetVariableService) {
   }
 
   ngOnInit(): void {
 
-    //Create dataset observable
+    // Create dataset observable
     if (this.reference) {
       this.datasets$ = this.datasetService.getAllDatasets();
     } else {
-      //filter out datasets than can be used only as reference
+      // filter out datasets than can be used only as reference
       this.datasets$ = this.datasetService.getAllDatasets().pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-        let nonReferenceDatasets: DatasetDto[] = [];
+        const nonReferenceDatasets: DatasetDto[] = [];
         datasets.forEach(dataset => {
-          if (dataset.is_only_reference == false) {
+          if (dataset.is_only_reference === false) {
             nonReferenceDatasets.push(dataset);
           }
         });
@@ -50,47 +52,48 @@ export class DatasetComponent implements OnInit {
       }));
     }
 
-
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
     this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
   }
 
-  private updateSelectableVersionsAndVariable() {
-    if (this.selectionModel.selectedDataset == undefined || this.selectionModel.selectedDataset.versions.length == 0) {
-      return;
-    }
-
-    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
-    this.selectableDatasetVersions$.subscribe(versions => {
-      this.selectionModel.selectedVersion = versions[0];
-    });
-
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
-    this.selectableDatasetVariables$.subscribe(variables => {
-      this.selectionModel.selectedVariable = variables[0];
-    });
-  }
+  // private updateSelectableVersionsAndVariable(): void{
+  //   if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length === 0) {
+  //     return;
+  //   }
+  //
+  //   this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
+  //   this.selectableDatasetVersions$.subscribe(versions => {
+  //     this.selectionModel.selectedVersion = versions[0];
+  //   });
+  //
+  //   this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+  //   this.selectableDatasetVariables$.subscribe(variables => {
+  //     this.selectionModel.selectedVariable = variables[0];
+  //   });
+  // }
 
   private updateSelectableVersionsAndVariableAndEmmit(): void{
-    if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length == 0) {
+    if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length === 0) {
       return;
     }
 
     this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
-    this.selectableDatasetVersions$.subscribe(versions => {
+    this.selectableDatasetVersions$.subscribe(
+      versions => {
       this.selectionModel.selectedVersion = versions[0];
-    },
-      () => {},
+      },
+      () => {
+      },
       () => {
         this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
-        this.selectableDatasetVariables$.subscribe(variables => {
+        this.selectableDatasetVariables$.subscribe(
+          variables => {
           this.selectionModel.selectedVariable = variables[0];
         },
           () => {},
-          () => this.changeDataset.emit(this.selectionModel));
+          () => {this.changeDataset.emit(this.selectionModel);
+          });
       });
-
-
   }
 
   onDatasetChange(): void{
