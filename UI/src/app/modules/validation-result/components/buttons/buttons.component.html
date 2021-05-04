@@ -53,8 +53,7 @@
           Download NetCDF File
         </button>
         <a class="no-decorations"
-           routerLink="/validate/"
-           [queryParams]="{valrun_uuid: validationRun.id}"
+           [routerLink]="['/validate/', validationRun.id]"
            title="Load validation settings">
           <span class="dropdown-item"><fa-icon [icon]="faIcons.faRedo"></fa-icon> Load Validation Settings</span>
         </a>
@@ -80,8 +79,7 @@
 <!--published validations page only-->
   <span *ngIf="published">
     <a class="btn btn-sm btn-primary btn-action"
-       routerLink="/validate/"
-       [queryParams]="{valrun_uuid: validationRun.id}"
+       [routerLink]="['/validate/', validationRun.id]"
        title="Load validation settings">
       <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
     </a>
@@ -163,8 +161,7 @@
     </button>
 
     <a class="btn btn-sm btn-primary"
-       routerLink="/validate/"
-       [queryParams]="{valrun_uuid: validationRun.id}"
+       [routerLink]="['/validate/', validationRun.id]"
        title="Load settings">
       <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings</a>
 
@@ -182,8 +179,7 @@
   <ng-template #elseSingleValidation>
     <div style="float: right;" class="patchButtonGroup">
       <a class="btn btn-sm btn-primary"
-         routerLink="/validate/"
-         [queryParams]="{valrun_uuid: validationRun.id}"
+         [routerLink]="['/validate/', validationRun.id]"
          title="Load settings">
         <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span> Load settings
       </a>
