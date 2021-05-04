@@ -45,7 +45,18 @@ export class AnomaliesComponent implements OnInit {
     this.availableAnomalyMethodModels.push(new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC));
     this.availableAnomalyMethodModels.push(new AnomaliesModel(ANOMALIES_35D_MA, ANOMALIES_35D_MA_DESC));
     this.availableAnomalyMethodModels.push(new AnomaliesModel(ANOMALIES_CLIMATOLOGY, ANOMALIES_CLIMATOLOGY_DESC));
-    this.selectedMethod = this.availableAnomalyMethodModels[0];
+    console.log('Monika', this.methodForValidation);
+    if (this.methodForValidation.selected){
+      this.availableAnomalyMethodModels.forEach(model => {
+        if (model.method === this.methodForValidation.method){
+          this.selectedMethod = model;
+          // this.selectedMethod.anomaliesFrom = this.
+        }
+      });
+    } else {
+      this.selectedMethod = this.availableAnomalyMethodModels[0];
+    }
+
   }
 
 }
