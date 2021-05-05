@@ -33,6 +33,7 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either con
 export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild(MapComponent) child: MapComponent;
   validationrunId: string;
+  mapCenter = [100, 100];
 
   mapVisible: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
@@ -69,9 +70,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     // console.log('Monika', this.route.snapshot.paramMap.get('validationId'));
     this.validationrunId = this.route.snapshot.paramMap.get('validationId');
-    console.log(this.validationrunId);
-    this.readValidationSettings(this.validationrunId, this.validationModel);
-
+    // console.log(this.validationrunId);
+    if (this.validationrunId){
+      this.readValidationSettings(this.validationrunId, this.validationModel);
+    }
+    // console.log('validation run in ngOnInit', this.validationModel);
     // this.addDatasetToValidate();
     // this.addReferenceDataset();
   }
@@ -90,24 +93,25 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
-        model.datasetModel.selectedDataset = datasets[0];
+      model.datasetModel.selectedDataset = datasets[0];
 
-        //then get all versions for the first dataset in the result list
-        this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
+      //then get all versions for the first dataset in the result list
+      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
           model.datasetModel.selectedVersion = versions[0];
         },
-          () => {},
-          () => this.setDefaultValidationPeriod()
-        );
+        () => {
+        },
+        () => this.setDefaultValidationPeriod()
+      );
 
-        // in the same time get the variables too
-        this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
-          model.datasetModel.selectedVariable = variables[0];
-        });
-
-        //and the filters
-        this.updateDatasetConfigFilters(model);
+      // in the same time get the variables too
+      this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
+        model.datasetModel.selectedVariable = variables[0];
       });
+
+      //and the filters
+      this.updateDatasetConfigFilters(model);
+    });
   }
 
   private updateDatasetConfigFilters(model: DatasetConfigModel) {
@@ -189,22 +193,22 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const datesFrom = [];
     const datesTo = [];
     this.validationModel.datasetConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end){
+      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
         datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
         datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
       }
     });
 
     this.validationModel.referenceConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end){
+      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
         datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
         datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
       }
     });
-    if (datesFrom.length !== 0){
+    if (datesFrom.length !== 0) {
       this.validationStart = new Date(Math.max.apply(null, datesFrom));
     }
-    if (datesTo.length !== 0){
+    if (datesTo.length !== 0) {
       this.validationEnd = new Date(Math.min.apply(null, datesTo));
     }
 
@@ -214,26 +218,49 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   readValidationSettings(validationId: string, validationModel: ValidationModel): void {
-    console.log(this.validationModel);
+    // console.log('taken from resolver: ', this.route.snapshot.data.loadingSettings);
+    this.validationrunService.getValidationRunById(validationId).subscribe(val => {
+      // validationModel.spatialSubsetModel.setValues(val.max_lat, val.max_lon, val.min_lat, val.min_lon);
+    });
+    const validation = this.route.snapshot.data.loadingSettings;
+    validationModel.anomalies.setAnomalies(this.route.snapshot.data.loadingSettings.anomalies,
+      new Date(this.route.snapshot.data.loadingSettings.anomalies_from),
+      new Date(this.route.snapshot.data.loadingSettings.anomalies_to));
+    // console.log(this.validationModel);
     // let validationrun: ValidationrunDto;
-    this.validationrunService.getValidationRunById(validationId).subscribe(validation => {
-        // validationModel.anomalies.method = validation.anomalies;
-        // validationModel.anomalies.anomaliesFrom = new Date(validation.anomalies_from);
-        // validationModel.anomalies.anomaliesTo = new Date(validation.anomalies_to);
-        // validationModel.anomalies.setAnomalies(validation.anomalies, new Date(validation.anomalies_from),
-        //   new Date(validation.anomalies_to));
-        console.log(validation.anomalies, new Date(validation.anomalies_from));
-        validationModel.anomalies.selected = true;
-        validationModel.anomalies.method = validation.anomalies;
-        validationModel.validationPeriodModel.intervalFrom = new Date(validation.interval_from);
-        validationModel.validationPeriodModel.intervalTo = new Date(validation.interval_to);
-        validationModel.spatialSubsetModel.setValues(validation.max_lat, validation.max_lon, validation.min_lat, validation.min_lon);
-        // validationModel.metrics
-      },
-      () => {
-      },
-      () => {
-
-      });
+    // this.route.data.subscribe(validation => {
+    // this.validationrunService.getValidationRunById(validationId).subscribe(validation => {
+    //     // validationModel.anomalies.method = validation.anomalies;
+    //     // validationModel.anomalies.anomaliesFrom = new Date(validation.anomalies_from);
+    //     // validationModel.anomalies.anomaliesTo = new Date(validation.anomalies_to);
+    //     // validationModel.anomalies.setAnomalies(validation.anomalies, new Date(validation.anomalies_from),
+    //     //   new Date(validation.anomalies_to));
+    //     // console.log(validation.anomalies, new Date(validation.anomalies_from));
+    //     // validationModel.anomalies.selected = true;
+    //     // validationModel.anomalies.method = validation.anomalies;
+    //     validationModel.anomalies.setAnomalies(validation.anomalies, ANOMALIES[validation.anomalies],
+    //       new Date(validation.anomalies_from), new Date(validation.anomalies_to));
+    //     // const anomaliesModel = new AnomaliesModel(validation.anomalies, ANOMALIES[validation.anomalies], validation.anomalies_from,
+    //     //   validation.anomalies_to, true);
+    //     // console.log('tralalala', anomaliesModel);
+    //     // validationModel.anomalies = anomaliesModel;
+    //
+    validationModel.validationPeriodModel.intervalFrom = new Date(validation.interval_from);
+    validationModel.validationPeriodModel.intervalTo = new Date(validation.interval_to);
+    this.mapCenter = [(validation.max_lat + validation.min_lat) / 2, (validation.max_lon + validation.min_lon) / 2];
+    const maxLat = new BehaviorSubject<number>(validation.max_lat);
+    const maxLon = new BehaviorSubject<number>(validation.max_lon);
+    const minLat = new BehaviorSubject<number>(validation.min_lat);
+    const minLon = new BehaviorSubject<number>(validation.min_lon);
+    // validationModel.spatialSubsetModel = new SpatialSubsetModel(maxLat, maxLon, minLat, minLon);
+    validationModel.spatialSubsetModel.setValues(validation.max_lat, validation.max_lon, validation.min_lat, validation.min_lon);
+    //
+    //     // validationModel.metrics
+    //   },
+    //   () => {
+    //   },
+    //   () => {
+    //
+    //   });
   }
 }
