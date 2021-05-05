@@ -13,6 +13,7 @@ import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from "./pages/terms/terms.component";
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {HelpComponent} from './pages/help/help.component';
+import {ValidationrunResolver} from './pages/validate/service/validationrun.resolver';
 
 
 const routes: Routes = [
@@ -20,7 +21,10 @@ const routes: Routes = [
   {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
   {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard]},
-  {path: 'validate/:validationId', component: ValidateComponent, canActivate: [AuthGuard]},
+  {path: 'validate/:validationId',
+    component: ValidateComponent,
+    canActivate: [AuthGuard],
+    resolve: {loadingSettings: ValidationrunResolver}},
   {path: 'validation-result/:validationId', component: ValidationResultComponent, canActivate: [AuthGuard]},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
