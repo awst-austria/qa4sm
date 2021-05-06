@@ -80,10 +80,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // console.log(this.validationrunId);
     if (this.validationrunId){
       this.readValidationSettings(this.validationrunId, this.validationModel);
+    } else{
+      this.addDatasetToValidate();
+      this.addReferenceDataset();
     }
     // console.log('validation run in ngOnInit', this.validationModel);
-    this.addDatasetToValidate();
-    this.addReferenceDataset();
   }
 
   addDatasetToValidate() {
@@ -224,15 +225,25 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
 
-  readValidationSettings(validationId: string, validationModel: ValidationModel): void {
+  readValidationSettings(validationId: string,
+                         validationModel: ValidationModel): void {
     // todo: solve the problem of a bounding, when validation from resolver is used
     // using resolver causes that the bounding box doesn't render, because there is a subscription meanwhile, this way
     // the problem doesn't show up, but I we should not use two different ways of getting data
     this.validationrunService.getValidationRunById(validationId).subscribe(val => {
       validationModel.spatialSubsetModel.setValues(val.max_lat, val.max_lon, val.min_lat, val.min_lon);
     });
-
     const validation = this.route.snapshot.data.loadingSettings;
+    const configs = this.route.snapshot.data.datasetConfiguration;
+    configs.forEach(config => {
+      if (config.id !== validation.reference_configuration){
+        this.addDatasetFromConfig(this.validationModel.datasetConfigurations, config.dataset, config.version, config.variable);
+      } else {
+        this.addDatasetFromConfig(this.validationModel.referenceConfigurations, config.dataset, config.version, config.variable);
+      }
+
+    });
+
     // anomalies
     validationModel.anomalies.setAnomalies(this.route.snapshot.data.loadingSettings.anomalies,
       new Date(this.route.snapshot.data.loadingSettings.anomalies_from),
@@ -258,4 +269,35 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // validationModel.spatialSubsetModel.setValues(validation.max_lat, validation.max_lon, validation.min_lat, validation.min_lon);
     //
   }
+
+  private addDatasetFromConfig(targetArray: DatasetConfigModel[],
+                               selectedDatasetId: number,
+                               selectedVersionId: number,
+                               selectedVariableId: number): void{
+
+    const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
+    targetArray.push(model);
+    // get selected dataset
+    this.datasetService.getDatasetById(selectedDatasetId).subscribe(dataset => {
+      model.datasetModel.selectedDataset = dataset;
+
+      //then get all versions for the first dataset in the result list
+      this.versionService.getVersionById(selectedVersionId).subscribe(version => {
+          model.datasetModel.selectedVersion = version;
+        }
+      );
+
+      // in the same time get the variables too
+      this.variableService.getVariableById(selectedVariableId).subscribe(variable => {
+        model.datasetModel.selectedVariable = variable;
+      });
+
+      //and the filters
+      this.updateDatasetConfigFilters(model);
+    });
+  }
+
+
+
+
 }
