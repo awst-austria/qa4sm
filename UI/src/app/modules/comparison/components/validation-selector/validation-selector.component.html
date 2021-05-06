@@ -77,13 +77,14 @@
 
           <button pButton type="button" label="Add validation" icon="pi pi-plus-circle" (click)="addValidation2Comparison()"
                   class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
-                  [disabled]="addValidationButtonDisabled()"></button>
+                  [disabled]="addValidationButtonDisabled()"
+                  ngDefaultControl></button>
 
         </p-accordionTab>
 
           <button *ngFor="let item of this.comparisonModel.selectedValidations"
                   pButton type="button" (click)="removeValidation(item)"
-                  [label]="'Remove ' + (item.id)"
+                  [label]="'Remove: ' + (item.id)"
                   icon="pi pi-trash"
                   class="p-button-danger" style="padding: 0.2rem;">
           </button>
@@ -104,7 +105,11 @@
       </ng-template>
       <div class="p-grid">
         <div class="p-col-12">
-          <qa-spatial-extent [extentModel]="spatialExtent" [disabled]="true"></qa-spatial-extent>
+          <qa-spatial-extent
+            [extentModel]="this.spatialExtent"
+            [disabled]="this.spatialExtentDisabled()"
+            (onChecked)="unionChecked($event)">
+          </qa-spatial-extent>
         </div>
       </div>
     </p-panel>

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, Output, OnInit, EventEmitter} from '@angular/core';
 import {ExtentModel} from "./extent-model";
 
 
@@ -10,13 +10,18 @@ import {ExtentModel} from "./extent-model";
 export class SpatialExtentComponent implements OnInit {
 
   @Input() extentModel: ExtentModel;
-  @Input() disabled: boolean = false;
+  @Input() disabled: boolean;
+
+  @Output() onChecked: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() {
-
   }
 
   ngOnInit(): void {
   }
 
+  spatialExtentChange(event: any) {
+    // assign the new extent selection to the comparison settings
+    this.onChecked.emit(!event.checked)
+  }
 }

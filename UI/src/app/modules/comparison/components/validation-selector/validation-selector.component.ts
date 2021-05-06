@@ -8,7 +8,6 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ExtentModel} from '../spatial-extent/extent-model';
-import {Observable} from "rxjs";
 
 const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
@@ -22,11 +21,15 @@ export class ValidationSelectorComponent implements OnInit {
   multipleNonReference: boolean = false;
   selectedValidation: ValidationrunDto
   selectedDatasetModel: DatasetConfigModel[] = [];
-  spatialExtent: ExtentModel;
+  // initialize the extent model with a default intersection configuration
+  spatialExtent: ExtentModel = new ExtentModel(true);
   // all the possible validations given filters
   validations4Comparison: ValidationrunDto[] = [];
   // model that stores all the inputs for the comparison run
-  comparisonModel: Validations2CompareModel = new Validations2CompareModel([], true); // how to connect to extent selection?
+  comparisonModel: Validations2CompareModel = new Validations2CompareModel(
+    [],
+    new ExtentModel(true).getIntersection,
+  );
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -37,11 +40,15 @@ export class ValidationSelectorComponent implements OnInit {
     // console.log(this.multipleNonReference)
     // this.comparisonModel = new Validations2CompareModel();
     this.addDatasetToSelection();
-    this.generateExtentOptions();
+    this.comparisonModel.getIntersection = this.checkOverlapping();
   }
 
   addDatasetToSelection(): void {
     this.selectDataset(this.selectedDatasetModel);
+  }
+
+  onDatasetChange(): void{
+    this.getValidations4comparison();
   }
 
   private selectDataset(selected: DatasetConfigModel[]): void {
@@ -115,28 +122,45 @@ export class ValidationSelectorComponent implements OnInit {
 
   addValidation2Comparison(): void {
     // should add the selected validation in the comparisonModel
-    // console.log(this.comparisonModel.selectedValidations)
-    console.log(this.selectedValidation)
+    // console.log('selected validation', this.selectedValidation)
     this.comparisonModel.selectedValidations.push(this.selectedValidation)
+    this.comparisonModel.getIntersection = this.checkOverlapping()
   }
 
   removeValidation(target: ValidationrunDto) {
     // should remove the selected validation from the comparisonModel
-    console.log(this.comparisonModel.selectedValidations)
+    // console.log(this.comparisonModel.selectedValidations)
     let toBeRemoved = this.comparisonModel.selectedValidations.indexOf(target);
     this.comparisonModel.selectedValidations.splice(toBeRemoved, 1);
+    this.comparisonModel.getIntersection = this.checkOverlapping();
   }
 
-  generateExtentOptions(): void {
-    // should be expanded to include custom selection, and should have non-fixed default conditions
-    this.spatialExtent = new ExtentModel(false, 'Union can only be chosen when the default is Intesection', true, 'Compare the union of spatial extents');
+  checkOverlapping(): boolean {
+    // check that the two selected validations have overlapping extents
+    if (this.comparisonModel.selectedValidations.length > 1) {  // two validations selected
+      let val1 = this.comparisonModel.selectedValidations[0];
+      let val2 = this.comparisonModel.selectedValidations[1];
+      // condition for intersection:
+      return !(val1.max_lon < val2.min_lon || val1.min_lon > val2.max_lon || val1.min_lat > val2.max_lat || val1.max_lat < val2.min_lat)
+    } else {  // only one validation selected. Return 'false' to workaround
+      return false
+    }
+  }
+
+  spatialExtentDisabled(): boolean {
+    // check conditions for union selection checkbox
+    if (this.multipleNonReference) { return true } else {
+      // console.log('overlapping', this.checkOverlapping())
+     return !this.checkOverlapping();
+    }
+  }
+
+  unionChecked(isChecked: boolean) {
+    this.comparisonModel.getIntersection = !isChecked;
   }
 
   startComparison() {
     // should start the comparison
-  }
-
-  onDatasetChange(): void{
-    this.getValidations4comparison();
+    console.log(this.comparisonModel)
   }
 }

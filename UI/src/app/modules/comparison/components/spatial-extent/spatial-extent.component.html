@@ -1,9 +1,12 @@
 <div class="p-grid">
   <div class="p-col-12">
-    <p-checkbox [label]="extentModel.description" [(ngModel)]="extentModel.getIntersection" [binary]="true"
+    <p-checkbox label="Compare the union of spatial extents"
+                [binary]="true"
+                [disabled]="this.disabled"
+                (click)="spatialExtentChange($event)"
     ></p-checkbox>
     <label class="p-panel-header-icon"
-           pTooltip="{{extentModel.helperText}}"
+           pTooltip="{{'When the default is intersection, you can choose to compare the union instead'}}"
            tooltipPosition="bottom">
       <span class="pi pi-question-circle p-ml-2"></span>
     </label>
