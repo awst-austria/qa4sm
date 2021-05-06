@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import pandas as pd
+
 plt.switch_backend('agg') ## this allows headless graph production
 
 import logging
@@ -6,7 +8,7 @@ from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from qa4sm_reader.plot_all import plot_all, get_img_stats
-from qa4sm_reader.comparing import QA4SMComparison
+from qa4sm_reader.comparing import QA4SMComparison, ComparisonError
 
 from django.conf import settings
 
@@ -190,23 +192,7 @@ def generate_comparison(
         extent:tuple=None,
         get_intersection:bool=True
 ) -> tuple:
-    """
-
-    Parameters
-    ----------
-    validation_runs: list
-        list of ValidationRun to be compared
-    extent : tuple, optional (default: None)
-        Area to subset the values for.
-        (min_lon, max_lon, min_lat, max_lat)
-    get_intersection: bool, default is True
-        Whether to get the intersection or union of the two spatial exents
-
-    Returns
-    -------
-    Comparison: QA4SMComparison
-        initialized Comparison object
-    """
+    """Initializes a QA4SMComparison class"""
     outfiles = [validation_run.output_file for validation_run in validation_runs]
     # handle single validation or multiple validations
     if len(outfiles) == 1:
@@ -225,19 +211,62 @@ def generate_comparison(
     return comparison
 
 
-def encode_plot(
-        comparison:QA4SMComparison,
+def comparison_table(
+        validation_runs:list,
+        metric_list:list,
+        extent:tuple=None,
+        get_intersection:bool=True,
+) -> pd.DataFrame:
+    """
+    Creates a pandas comparison table
+
+    Parameters
+    ----------
+    validation_runs: list
+        list of ValidationRun to be compared
+    extent : tuple, optional (default: None)
+        Area to subset the values for.
+        (min_lon, max_lon, min_lat, max_lat)
+    get_intersection: bool, default is True
+        Whether to get the intersection or union of the two spatial exents
+    metric_list: list
+        list of metrics for the table
+
+    Returns
+    -------
+    table: pd.DataFrame
+        comparison table
+    """
+    comparison = generate_comparison(
+        validation_runs=validation_runs,
+        extent=extent,
+        get_intersection=get_intersection
+    )
+    table = comparison.diff_table(metric_list)
+
+    return table
+
+
+def encoded_comparisonPlots(
+        validation_runs:list,
         plot_type:str,
         metric:str,
-):
+        extent:tuple=None,
+        get_intersection:bool=True,
+) -> str:
     """
     Creates a plot encoding in base64 showing the comparison result for a set (2) or a single validation run
     (if contains 2 satellite datasets)
 
     Parameters
     ----------
-    comparison: QA4SMComparison object
-        initialized comparison object to extract the plots from
+    validation_runs: list
+        list of ValidationRun to be compared
+    extent : tuple, optional (default: None)
+        Area to subset the values for.
+        (min_lon, max_lon, min_lat, max_lat)
+    get_intersection: bool, default is True
+        Whether to get the intersection or union of the two spatial exents
     plot_type: str
         the plot type to show in the comparison page. Can be one of "table", "boxplot", "correlation",
         "mapplot" ("difference")
@@ -249,6 +278,11 @@ def encode_plot(
     encoded: str
         base64 encoding of the plot image
     """
+    comparison = generate_comparison(
+        validation_runs=validation_runs,
+        extent=extent,
+        get_intersection=get_intersection
+    )
     image = BytesIO()
     try:
         comparison.wrapper(

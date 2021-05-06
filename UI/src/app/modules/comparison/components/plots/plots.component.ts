@@ -1,9 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ComparisonService} from '../../services/comparison.service';
 import {HttpParams} from '@angular/common/http';
-import {ComparisonDto} from '../../services/comparison.dto';
-import {PlotConfigurationDto} from '../../services/plot-configuration.dto';
 import {Observable} from 'rxjs';
+import {Validations2CompareModel} from "../validation-selector/validation-selection.model";
+import {MetricModel} from "../../../metrics/components/metric/metric-model";
 
 @Component({
   selector: 'qa-plots',
@@ -11,33 +11,24 @@ import {Observable} from 'rxjs';
   styleUrls: ['./plots.component.scss'],
 })
 export class PlotsComponent implements OnInit {
-  @Input() comparisonObj: ComparisonDto;
-  @Input() comparisonPlot: PlotConfigurationDto;
-  comparisonTable$: Observable<string>;
 
+  @Input() comparisonModel: Validations2CompareModel;
+  // metrics to show the table/plots for
+  metric: MetricModel
 
   constructor(private comparisonService: ComparisonService,) {
   }
 
   ngOnInit(): void {
-    this.getComparisonObject();
-    this.getComparisonPlot();
+    this.getComparisonPlots();
   }
 
-  getComparisonObject(): void {
-    // const parameters = new HttpParams().set('ids', this.comparisonObj.ids);
+  getComparisonPlots(): void {
+    const parameters = new HttpParams()
+      .set('ids', String(this.comparisonModel.selectedValidations)) // should be ids instead?
+      .set('get_intersection', String(this.comparisonModel.getIntersection))
+      // number of non-reference datasets
+      .set('metric', String(this.metric));
+
   }
-
-  getComparisonPlot(): void {
-    const parameters = new HttpParams().set('metric', this.comparisonPlot.metric);
-  }
-
-  // getDifferenceTable(): void{
-  //   this.comparisonTable$ = this.comparisonService.getComparisonTable()
-  // }
-
-  getComparisonTableAsCsv(): void{
-    this.comparisonService.downloadComparisonTableCsv();
-  }
-
 }
