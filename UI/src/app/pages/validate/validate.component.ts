@@ -11,7 +11,12 @@ import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatia
 import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
-import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
+import {
+  SCALING_METHOD_DEFAULT,
+  SCALING_REFERENCE_CHOICES,
+  SCALING_REFERENCE_DATA,
+  SCALING_REFERENCE_REF
+} from '../../modules/scaling/components/scaling/scaling.component';
 import {NewValidationRunDto} from './service/new-validation-run-dto';
 import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dto';
 import {NewValidationRunService} from './service/new-validation-run.service';
@@ -218,42 +223,34 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   readValidationSettings(validationId: string, validationModel: ValidationModel): void {
-    // console.log('taken from resolver: ', this.route.snapshot.data.loadingSettings);
+    // todo: solve the problem of a bounding, when validation from resolver is used
+    // using resolver causes that the bounding box doesn't render, because there is a subscription meanwhile, this way
+    // the problem doesn't show up, but I we should not use two different ways of getting data
     this.validationrunService.getValidationRunById(validationId).subscribe(val => {
-      // validationModel.spatialSubsetModel.setValues(val.max_lat, val.max_lon, val.min_lat, val.min_lon);
+      validationModel.spatialSubsetModel.setValues(val.max_lat, val.max_lon, val.min_lat, val.min_lon);
     });
+
     const validation = this.route.snapshot.data.loadingSettings;
+    console.log(validation);
     validationModel.anomalies.setAnomalies(this.route.snapshot.data.loadingSettings.anomalies,
       new Date(this.route.snapshot.data.loadingSettings.anomalies_from),
       new Date(this.route.snapshot.data.loadingSettings.anomalies_to));
-    // console.log(this.validationModel);
-    // let validationrun: ValidationrunDto;
-    // this.route.data.subscribe(validation => {
-    // this.validationrunService.getValidationRunById(validationId).subscribe(validation => {
-    //     // validationModel.anomalies.method = validation.anomalies;
-    //     // validationModel.anomalies.anomaliesFrom = new Date(validation.anomalies_from);
-    //     // validationModel.anomalies.anomaliesTo = new Date(validation.anomalies_to);
-    //     // validationModel.anomalies.setAnomalies(validation.anomalies, new Date(validation.anomalies_from),
-    //     //   new Date(validation.anomalies_to));
-    //     // console.log(validation.anomalies, new Date(validation.anomalies_from));
-    //     // validationModel.anomalies.selected = true;
-    //     // validationModel.anomalies.method = validation.anomalies;
-    //     validationModel.anomalies.setAnomalies(validation.anomalies, ANOMALIES[validation.anomalies],
-    //       new Date(validation.anomalies_from), new Date(validation.anomalies_to));
-    //     // const anomaliesModel = new AnomaliesModel(validation.anomalies, ANOMALIES[validation.anomalies], validation.anomalies_from,
-    //     //   validation.anomalies_to, true);
-    //     // console.log('tralalala', anomaliesModel);
-    //     // validationModel.anomalies = anomaliesModel;
-    //
     validationModel.validationPeriodModel.intervalFrom = new Date(validation.interval_from);
     validationModel.validationPeriodModel.intervalTo = new Date(validation.interval_to);
-    this.mapCenter = [(validation.max_lat + validation.min_lat) / 2, (validation.max_lon + validation.min_lon) / 2];
-    const maxLat = new BehaviorSubject<number>(validation.max_lat);
-    const maxLon = new BehaviorSubject<number>(validation.max_lon);
-    const minLat = new BehaviorSubject<number>(validation.min_lat);
-    const minLon = new BehaviorSubject<number>(validation.min_lon);
+
+    // scaling:
+    let scalingRef = SCALING_REFERENCE_REF;
+    if (validation.scaling_ref !== validation.reference_configuration){
+      scalingRef = SCALING_REFERENCE_DATA;
+    }
+    validationModel.scalingModel.setScalingMethod(validation.scaling_method, scalingRef, SCALING_REFERENCE_CHOICES[scalingRef]);
+
+    // const maxLat = new BehaviorSubject<number>(validation.max_lat);
+    // const maxLon = new BehaviorSubject<number>(validation.max_lon);
+    // const minLat = new BehaviorSubject<number>(validation.min_lat);
+    // const minLon = new BehaviorSubject<number>(validation.min_lon);
     // validationModel.spatialSubsetModel = new SpatialSubsetModel(maxLat, maxLon, minLat, minLon);
-    validationModel.spatialSubsetModel.setValues(validation.max_lat, validation.max_lon, validation.min_lat, validation.min_lon);
+    // validationModel.spatialSubsetModel.setValues(validation.max_lat, validation.max_lon, validation.min_lat, validation.min_lon);
     //
     //     // validationModel.metrics
     //   },
