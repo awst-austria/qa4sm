@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 import json
 
 from validator.models import ValidationRun
-from validator.validation import comparison_table, encoded_comparisonPlots
+from validator.validation import comparison_table, encoded_comparisonPlots, generate_comparison
 
 
 @api_view(['GET'])
@@ -59,8 +59,23 @@ def download_comparison_table(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=Comparison_summary.csv'
 
-    inspection_table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
+    table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
     return response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_comparison_metrics(request):
+    """Get the metrics that are common to all validations"""
+    validation_ids = request.query_params.getlist('ids', None)
+    validation_runs = []
+    for val_id in validation_ids:
+        validation = get_object_or_404(ValidationRun, id=val_id)
+        validation_runs.append(validation)
+
+    comp = generate_comparison(validation_runs)
+
+    return HttpResponse(comp.common_metrics)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
