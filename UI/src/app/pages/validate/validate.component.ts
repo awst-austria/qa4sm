@@ -26,6 +26,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
+import {METRIC_LIST, TRIPLE_COLLOCATION} from '../../modules/metrics/components/metrics/metrics.component';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -39,6 +40,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild(MapComponent) child: MapComponent;
   validationrunId: string;
   mapCenter = [100, 100];
+  metricsList = METRIC_LIST;
 
   mapVisible: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
@@ -80,8 +82,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       this.readValidationSettings(this.validationrunId, this.validationModel);
     }
     // console.log('validation run in ngOnInit', this.validationModel);
-    // this.addDatasetToValidate();
-    // this.addReferenceDataset();
+    this.addDatasetToValidate();
+    this.addReferenceDataset();
   }
 
   addDatasetToValidate() {
@@ -246,6 +248,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       scalingRef = SCALING_REFERENCE_DATA;
     }
     validationModel.scalingModel.setScalingMethod(validation.scaling_method, scalingRef, SCALING_REFERENCE_CHOICES[scalingRef]);
+    this.metricsList[TRIPLE_COLLOCATION] = validation.tcol;
 
     // const maxLat = new BehaviorSubject<number>(validation.max_lat);
     // const maxLon = new BehaviorSubject<number>(validation.max_lon);
