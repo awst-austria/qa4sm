@@ -1,19 +1,51 @@
-<div class="p-col-12">
-  <p-panel [toggleable]="true" [collapsed]="false">
-    <ng-template pTemplate="header">
-      <div class="text-center my-1" style="width: 92%">
-        <h4 class="my-0 font-weight-normal">Comparison results</h4>
+<div *ngIf="comparisonPlots$|async as plots" class="p-col-12">
+    <p-panel>
+      <p-panel [toggleable]="true" [collapsed]="true">
+        <ng-template pTemplate="header">
+          <div class="text-center my-1" style="width: 92%">
+            <h4 class="my-0 font-weight-normal">Comparison plots</h4>
+          </div>
+        </ng-template>
+      <ng-template pTemplate="icons">
+      </ng-template>
+
+      <div class="pb-3"> Shown are the comparison plots of  and . To generate maps and correlation plots with the
+        comparison results, make sure that the input validations have overlapping extents and/or either 'Intersection' or
+        a common extent is given in the 'extent' setting.
       </div>
-    </ng-template>
-    <ng-template pTemplate="icons">
-      <label class="mb-0" pTooltip="View the results of the comparison in form of images."
-             tooltipPosition="bottom">
-        <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
-      </label>
-    </ng-template>
-    <div class="pb-3"> Shown are the comparison plots of  and . To generate maps and correlation plots with the
-      comparison results, make sure that the input validations have overlapping extents and/or either 'Intersection' or
-      a common extent is given in the 'extent' setting.
-    </div>
+
+      <div class="p-grid p-align-center">
+        <div >
+          <img *ngFor="let plot of plots">
+        </div>
+      </div>
+      <!--  buttons  -->
+      <div class="p-grid">
+      <!--  Multiple file download  -->
+        <div class="p-col-3 center p-mt-2">
+          <button type="button"
+                  style="width: 9rem;"
+                  class="btn btn-sm btn-primary"
+                  title="Download graphs .zip"
+                  (click)="downloadResultFiles()">
+            <span class="pi pi-download"></span> Download graphs
+          </button>
+        </div>
+      <!--   Metric selector  -->
+        <div class="p-col">
+        <span class="p-float-label p-mb-4 p-mt-3">
+          <p-dropdown id="metricSelector"
+                      (onChange)="onMetricChange()"
+                      [options]="comparisonMetrics"
+                      [(ngModel)]="selectedMetric"
+                      optionLabel="metric_pretty_name"
+                      [style]="{'width': '100%'}">
+          </p-dropdown>
+        </span>
+        </div>
+      </div>
+
+    </p-panel>
   </p-panel>
 </div>
+

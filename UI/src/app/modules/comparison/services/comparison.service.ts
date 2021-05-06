@@ -4,7 +4,7 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 
 const urlPrefix = environment.API_URL + 'api';
-const comparisonPlotUrl: string = urlPrefix + '/plots-comparison';
+const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
 const comparisonTableUrl: string = urlPrefix + '/table-comparison';
 const downloadComparisonTableUrl: string = urlPrefix + '/download-comparison-table'
 // what do these do?
@@ -31,7 +31,7 @@ export class ComparisonService {
     saveAs(fileUrl);
   }
 
-  getComparisonPlots(ds: string[], metric:string[], extent:string, get_intersection:boolean){
-    return this.httpClient.get(comparisonPlotUrl);
+  getComparisonPlots(params: any): Observable<any> {
+    return this.httpClient.get(comparisonPlotsUrl, {params});
   }
 }
