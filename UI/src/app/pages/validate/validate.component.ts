@@ -231,10 +231,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
 
     const validation = this.route.snapshot.data.loadingSettings;
-    console.log(validation);
+    // anomalies
     validationModel.anomalies.setAnomalies(this.route.snapshot.data.loadingSettings.anomalies,
       new Date(this.route.snapshot.data.loadingSettings.anomalies_from),
       new Date(this.route.snapshot.data.loadingSettings.anomalies_to));
+
+    // validation period
     validationModel.validationPeriodModel.intervalFrom = new Date(validation.interval_from);
     validationModel.validationPeriodModel.intervalTo = new Date(validation.interval_to);
 
@@ -252,12 +254,5 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // validationModel.spatialSubsetModel = new SpatialSubsetModel(maxLat, maxLon, minLat, minLon);
     // validationModel.spatialSubsetModel.setValues(validation.max_lat, validation.max_lon, validation.min_lat, validation.min_lon);
     //
-    //     // validationModel.metrics
-    //   },
-    //   () => {
-    //   },
-    //   () => {
-    //
-    //   });
   }
 }
