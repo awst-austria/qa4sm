@@ -16,7 +16,7 @@ from validator.validation import run_validation
 @permission_classes([IsAuthenticated])
 def start_validation(request):
     print(request.data)
-    ser = NewValidationSerializer(data=request.data)
+    ser = ValidationConfigurationSerializer(data=request.data)
     ser.is_valid(raise_exception=True)
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
@@ -108,7 +108,7 @@ class ScalingSerializer(serializers.Serializer):
     scale_to = serializers.ChoiceField(choices=ValidationRun.SCALE_TO_OPTIONS, required=True)
 
 
-class NewValidationSerializer(serializers.Serializer):
+class ValidationConfigurationSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         pass
 
