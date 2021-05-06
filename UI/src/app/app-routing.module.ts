@@ -14,6 +14,7 @@ import {TermsComponent} from "./pages/terms/terms.component";
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {HelpComponent} from './pages/help/help.component';
 import {ValidationrunResolver} from './pages/validate/service/validationrun.resolver';
+import {DatasetConfigurationResolver} from './pages/validate/service/dataset-configuration.resolver';
 
 
 const routes: Routes = [
@@ -24,7 +25,7 @@ const routes: Routes = [
   {path: 'validate/:validationId',
     component: ValidateComponent,
     canActivate: [AuthGuard],
-    resolve: {loadingSettings: ValidationrunResolver}},
+    resolve: {loadingSettings: ValidationrunResolver, datasetConfiguration: DatasetConfigurationResolver}},
   {path: 'validation-result/:validationId', component: ValidationResultComponent, canActivate: [AuthGuard]},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
