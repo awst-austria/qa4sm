@@ -28,6 +28,12 @@ SCALING_CHOICES[SCALING_METHOD_NO_SCALING] = SCALING_METHOD_NO_SCALING_DESC;
 SCALING_CHOICES[SCALING_METHOD_MIN_MAX] = SCALING_METHOD_MIN_MAX_DESC;
 SCALING_CHOICES[SCALING_METHOD_LIN_REG] = SCALING_METHOD_LIN_REG_DESC;
 SCALING_CHOICES[SCALING_METHOD_MEAN_STD] = SCALING_METHOD_MEAN_STD_DESC;
+
+export let SCALING_REFERENCE_CHOICES = {};
+SCALING_REFERENCE_CHOICES[SCALING_REFERENCE_REF] = SCALING_REFERENCE_REF_DESC;
+SCALING_REFERENCE_CHOICES[SCALING_REFERENCE_DATA] = SCALING_REFERENCE_DATA_DESC;
+
+
 // export const SCALING_METHOD_LIN_CDF_MATCH='lin_cdf_match';
 // export const SCALING_METHOD_CDF_MATCH='cdf_match';
 
@@ -82,7 +88,19 @@ export class ScalingComponent implements OnInit {
     this.scalingModels.push(new ScalingModel(SCALING_METHOD_MIN_MAX, SCALING_METHOD_MIN_MAX_DESC, SCALING_REFERENCE_DEFAULT));
     this.scalingModels.push(new ScalingModel(SCALING_METHOD_LIN_REG, SCALING_METHOD_LIN_REG_DESC, SCALING_REFERENCE_DEFAULT));
     this.scalingModels.push(new ScalingModel(SCALING_METHOD_MEAN_STD, SCALING_METHOD_MEAN_STD_DESC, SCALING_REFERENCE_DEFAULT));
-    this.selectedScalingModel = this.scalingModels[0];
+
+    if (this.validationModel.scalingModel.selected){
+      this.scalingModels.forEach(model => {
+        if (model.id === this.validationModel.scalingModel.id){
+          model.scaleTo = this.validationModel.scalingModel.scaleTo;
+          this.selectedScalingModel = model;
+        }
+      });
+      // this.selectedScalingModel = this.validationModel.scalingModel;
+      // console.log('from scaling component', this.selectedScalingModel);
+    } else{
+      this.selectedScalingModel = this.scalingModels[0];
+    }
   }
 
 }
