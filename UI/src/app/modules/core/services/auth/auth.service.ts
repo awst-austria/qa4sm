@@ -16,7 +16,15 @@ export class AuthService {
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
 
-  emptyUser = {username: '', firstName: '', id: null, copied_runs: []};
+  emptyUser = {username: '',
+    first_name: '',
+    id: null,
+    copied_runs: [],
+    email: '',
+    last_name: '',
+    organisation: '',
+    country: '',
+    orcid: ''};
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
 
