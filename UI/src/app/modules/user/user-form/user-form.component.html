@@ -1,55 +1,104 @@
-<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+<div class="center">
+  <div>
+    <h1 *ngIf="!userData" class="h3 p-mb-3 font-weight-normal">Sign up</h1>
+    <h1 *ngIf="userData" class="h3 p-mb-3 font-weight-normal">User profile</h1>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
 
-  <span class="p-float-label">
-    <input id="username" type="text" pInputText formControlName="username">
-    <label for="username">Username</label>
-  </span>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="username" type="text" pInputText formControlName="username">
+          <label for="username">Username</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
 
-  <span class="p-float-label">
-    <input id="password" type="password" pInputText formControlName="password">
-    <label for="password">Password</label>
-  </span>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="password" type="password" pInputText formControlName="password">
+          <label for="password">Password</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
 
-  <span class="p-float-label">
-    <input id="password-confirm" type="password" pInputText formControlName="passwordConfirmation">
-    <label for="password-confirm">Password confirmation</label>
-  </span>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="password-confirm" type="password" pInputText formControlName="passwordConfirmation">
+          <label for="password-confirm">Password confirmation</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
 
-  <span class="p-float-label">
-    <input id="email" type="email" pInputText formControlName="email">
-    <label for="email">Email address</label>
-  </span>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="email" type="email" pInputText formControlName="email">
+          <label for="email">Email address</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
 
-  <span class="p-float-label">
-    <input id="first-name" type="text" pInputText formControlName="firstName">
-    <label for="first-name">First name</label>
-  </span>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="first-name" type="text" pInputText formControlName="firstName">
+          <label for="first-name">First name</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
 
-  <span class="p-float-label">
-    <input id="last-name" type="text" pInputText formControlName="lastName">
-    <label for="last-name">Last name</label>
-  </span>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="last-name" type="text" pInputText formControlName="lastName">
+          <label for="last-name">Last name</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
 
-  <span class="p-float-label">
-    <input id="organisation" type="text" pInputText formControlName="organisation">
-    <label for="organisation">Organisation</label>
-  </span>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="organisation" type="text" pInputText formControlName="organisation">
+          <label for="organisation">Organisation</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
 
-  <p-dropdown [options]="countries"
-              formControlName="country"
-              optionLabel="name"
-              placeholder="Country">
-  </p-dropdown>
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <p-dropdown class="form-field"
+                      [options]="countries"
+                      [style]="{'width':'15rem', 'height': '2.5rem'}"
+                      formControlName="country"
+                      optionLabel="name"
+                      placeholder=" ">
+          </p-dropdown>
+          <label>Country</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
+          <label for="orcid">Orcid</label>
+          <span class="pi pi-question-circle"></span>
+        </span>
+      </div>
+
+      <button *ngIf="!userData"
+              pButton
+              type="submit"
+              label="Submit"
+              [disabled]="!userForm.valid">
+      </button>
+      <button *ngIf="userData"
+              pButton
+              class="submit-button"
+              label="Save"
+              [disabled]="!userForm.valid">
+      </button>
 
 
-  <!--  <span class="p-float-label">-->
-<!--    <input id="country" type="text" pInputText formControlName="country">-->
-<!--    <label for="country">Country</label>-->
-<!--  </span>-->
-
-  <span class="p-float-label">
-    <input id="orcid" type="text" pInputText formControlName="orcid">
-    <label for="orcid">Orcid</label>
-  </span>
-
-</form>
+    </form>
+    <p>
+      <button *ngIf="userData" pButton type="button" label="Deactivate my account" class="p-button-danger"></button>
+    </p>
+  </div>
+</div>
