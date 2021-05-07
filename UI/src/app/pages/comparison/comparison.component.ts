@@ -16,6 +16,7 @@ export class ComparisonComponent implements OnInit {
   }
 
   provideConfiguration(configuration: Validations2CompareModel): void {
+    console.log('emitted', configuration)
     this.selectedComparisonConfiguration = configuration
   }
 }

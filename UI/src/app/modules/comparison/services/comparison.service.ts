@@ -9,7 +9,7 @@ const urlPrefix = environment.API_URL + 'api';
 const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
 const comparisonTableUrl: string = urlPrefix + '/table-comparison';
 const downloadComparisonTableUrl: string = urlPrefix + '/download-comparison-table'
-const metrics4ComparisonUrl: string = urlPrefix + 'metrics-for-comparison'
+const metrics4ComparisonUrl: string = urlPrefix + '/metrics-for-comparison'
 // what do these do?
 const csrfToken = '{{csrf_token}}';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken})

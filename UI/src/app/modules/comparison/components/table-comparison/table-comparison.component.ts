@@ -21,7 +21,6 @@ export class TableComparisonComponent implements OnInit {
   constructor(private comparisonService: ComparisonService,) { }
 
   ngOnInit(): void {
-    this.getComparisonTable()
   }
 
   getComparisonMetrics() {
@@ -51,8 +50,7 @@ export class TableComparisonComponent implements OnInit {
     const parameters = new HttpParams()
       .set('ids', null)
       .set('metric_list', String(metric_list))  // How to pass list??
-      .set('get_intersection', null)
-      .set('extent', null)
+      .set('get_intersection', null);
     this.comparisonTable$ = this.comparisonService.getComparisonTable(parameters);
   }
 

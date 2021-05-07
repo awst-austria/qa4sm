@@ -1,4 +1,4 @@
-<div *ngIf="this.comparisonMetrics$|async as metrics" class="p-col-12">
+<div *ngIf="(metricPlots$|async) as plots" class="p-col-12">
   <p-panel>
     <p-panel [toggleable]="true" [collapsed]="true">
       <ng-template pTemplate="header">
@@ -15,7 +15,7 @@
       </div>
 
       <div class="p-grid p-align-center">
-          <img *ngFor="let plot of selectedMetric.comparison_plots"
+          <img *ngFor="let plot of plots"
                width="95%"
                height="95%"
                [src]="sanitizePlotUrl(plot)">
@@ -29,14 +29,13 @@
                   class="btn btn-sm btn-primary"
                   title="Download graphs .zip"
                   (click)="downloadResultFiles()">
-            <span class="pi pi-download"></span> Download graphs
-          </button>
+            <span class="pi pi-download"></span>Download graphs</button>
         </div>
       <!--   Metric selector  -->
         <div class="p-col">
         <span class="p-float-label p-mb-4 p-mt-3">
           <p-dropdown id="metricSelector"
-                      [options]="metrics"
+                      [options]="this.comparisonMetrics"
                       [(ngModel)]="selectedMetric"
                       optionLabel="metric_pretty_name"
                       [style]="{'width': '100%'}"></p-dropdown>
