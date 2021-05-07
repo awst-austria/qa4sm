@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Output, EventEmitter} from '@angular/core';
 import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
@@ -17,6 +17,8 @@ const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compar
   styleUrls: ['./validation-selector.component.scss']
 })
 export class ValidationSelectorComponent implements OnInit {
+
+  @Output() emitComparisonInput = new EventEmitter<Validations2CompareModel>();
 
   multipleNonReference: boolean = false;
   selectedValidation: ValidationrunDto
@@ -162,5 +164,6 @@ export class ValidationSelectorComponent implements OnInit {
   startComparison() {
     // should start the comparison
     console.log(this.comparisonModel)
+    this.emitComparisonInput.emit(this.comparisonModel)
   }
 }

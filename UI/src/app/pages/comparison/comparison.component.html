@@ -14,10 +14,10 @@
     p-xl-8 p-xl-offset-2">
 
   <!--   validations selection   -->
-    <qa-validation-selector></qa-validation-selector>
+    <qa-validation-selector (emitComparisonInput)="provideConfiguration($event)"></qa-validation-selector>
   <!--  table section  -->
-    <qa-table-comparison [comparisonModel]="null"></qa-table-comparison>
+    <qa-table-comparison [comparisonModel]="selectedComparisonConfiguration"></qa-table-comparison>
   <!--  plots section  -->
-    <qa-plots [comparisonModel]="null"></qa-plots>
+    <qa-plots [comparisonModel]="selectedComparisonConfiguration"></qa-plots>
   </div>
 </div>

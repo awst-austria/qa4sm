@@ -4,7 +4,11 @@ import {HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Validations2CompareModel} from "../validation-selector/validation-selection.model";
 import {MetricModel} from "../../../metrics/components/metric/metric-model";
+import {MetricsComparisonDto} from "../../services/metrics-comparison.dto";
+import {map} from "rxjs/operators";
+import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 
+// types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES =  ['boxplot', 'correlation', 'difference', 'mapplot'];
 
 @Component({
@@ -16,41 +20,56 @@ export class PlotsComponent implements OnInit {
 
   @Input() comparisonModel: Validations2CompareModel;
   // metrics to show the table/plots for
-  comparisonMetrics: MetricModel[]
-  selectedMetric: MetricModel
-  comparisonPlots$: Observable<any>
+  comparisonMetrics$: Observable<{
+    metric_pretty_name: string;
+    metric_query_name: string;
+    comparison_plots: Observable<string[]> }[]>
+  selectedMetric: MetricsComparisonDto
+  // for showing the plots
+  plotPrefix = 'data:image/png;base64,';
 
-  constructor(private comparisonService: ComparisonService,) {
+  constructor(private comparisonService: ComparisonService,
+              private domSanitizer: DomSanitizer) {
   }
 
   ngOnInit(): void {
     this.getComparisonMetrics();
   }
 
-  getComparisonPlots(): void {
+  getComparisonPlots(metric:string): Observable<string[]> {
     const parameters = new HttpParams()
       .set('ids', String(this.comparisonModel.selectedValidations))
       .set('plot_types', String(PLOT_TYPES))  // should be list instead?
-      .set('metric', String(this.selectedMetric.value))
+      .set('metric', metric)
       .set('get_intersection', String(this.comparisonModel.getIntersection))
-      .set('extent', null)
+      .set('extent', null);
 
-    this.comparisonPlots$ = this.comparisonService.getComparisonPlots(parameters)
+    return this.comparisonService.getComparisonPlots(parameters);
   }
 
-  getComparisonMetrics(){
+  getComparisonMetrics(): void {
     // get all the available metrics for this particular comparison configuration
+    const ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations);
+    const params = new HttpParams().set('ids', String(ids));
+    this.comparisonMetrics$ = this.comparisonService.getMetrics4Comparison(params).pipe(
+      map((metrics) =>
+        metrics.map(
+          metric =>
+            ({
+              ...metric,
+              comparison_plots: this.getComparisonPlots(metric.metric_query_name)
+            })
+        )
+      )
+    )
+    this.selectedMetric = this.comparisonMetrics$[0]
   }
 
-  getMetrics4Validation(validationId:string): void {
-    // get the metrics of a specific validation (by id)
+  sanitizePlotUrl(plotBase64: string): SafeUrl {
+    return this.domSanitizer.bypassSecurityTrustUrl(this.plotPrefix + plotBase64);
   }
 
   downloadResultFiles(): void {
     // download all the shown images as .png
-  }
-
-  onMetricChange(): void {
-    // reinitialize getComparisonPlots
   }
 }

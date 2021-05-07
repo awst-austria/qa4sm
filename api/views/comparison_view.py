@@ -62,6 +62,7 @@ def download_comparison_table(request):
     table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
     return response
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_comparison_metrics(request):
@@ -73,8 +74,13 @@ def get_comparison_metrics(request):
         validation_runs.append(validation)
 
     comp = generate_comparison(validation_runs)
+    response = []
+    for short_name, pretty_name in comp.common_metrics.items():
+        metric_dict = {'metric_query_name': short_name,
+                       'metric_pretty_name': pretty_name}
+        response.append(metric_dict)
 
-    return HttpResponse(comp.common_metrics)
+    return JsonResponse(response, status=200, safe=False)
 
 
 @api_view(['GET'])
@@ -100,6 +106,7 @@ def get_comparisonPlots4Metric(request):
             extent=extent,
             get_intersection=get_intersection
         )
-        encoded_plots.append(base64_plot)
+        if not base64_plot == "error encountered":
+            encoded_plots.append(base64_plot)
 
     return HttpResponse(encoded_plots)

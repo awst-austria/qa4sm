@@ -1,23 +1,24 @@
-<div *ngIf="comparisonPlots$|async as plots" class="p-col-12">
-    <p-panel>
-      <p-panel [toggleable]="true" [collapsed]="true">
-        <ng-template pTemplate="header">
-          <div class="text-center my-1" style="width: 92%">
-            <h4 class="my-0 font-weight-normal">Comparison plots</h4>
-          </div>
-        </ng-template>
+<div *ngIf="this.comparisonMetrics$|async as metrics" class="p-col-12">
+  <p-panel>
+    <p-panel [toggleable]="true" [collapsed]="true">
+      <ng-template pTemplate="header">
+        <div class="text-center my-1" style="width: 92%">
+          <h4 class="my-0 font-weight-normal">Comparison plots</h4>
+        </div>
+      </ng-template>
       <ng-template pTemplate="icons">
       </ng-template>
 
-      <div class="pb-3"> Shown are the comparison plots of  and . To generate maps and correlation plots with the
-        comparison results, make sure that the input validations have overlapping extents and/or either 'Intersection' or
-        a common extent is given in the 'extent' setting.
+      <div class="pb-3"> Shown are the comparison plots for {{selectedMetric.metric_pretty_name}}. To generate maps and
+        correlation plots with the comparison results, make sure that the input validations have overlapping extents
+        and that 'Compare the union of spatial extents' is unchecked.
       </div>
 
       <div class="p-grid p-align-center">
-        <div >
-          <img *ngFor="let plot of plots">
-        </div>
+          <img *ngFor="let plot of selectedMetric.comparison_plots"
+               width="95%"
+               height="95%"
+               [src]="sanitizePlotUrl(plot)">
       </div>
       <!--  buttons  -->
       <div class="p-grid">
@@ -35,12 +36,11 @@
         <div class="p-col">
         <span class="p-float-label p-mb-4 p-mt-3">
           <p-dropdown id="metricSelector"
-                      (onChange)="onMetricChange()"
-                      [options]="comparisonMetrics"
+                      [options]="metrics"
                       [(ngModel)]="selectedMetric"
                       optionLabel="metric_pretty_name"
-                      [style]="{'width': '100%'}">
-          </p-dropdown>
+                      [style]="{'width': '100%'}"></p-dropdown>
+          <label for="metricSelector">Select a metric</label>
         </span>
         </div>
       </div>
