@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
+import {Router} from '@angular/router';
 
 interface City {
   name: string,
@@ -20,7 +21,12 @@ export class HomeComponent implements OnInit {
 
   loginButtonDisabled: boolean = false;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService,
+              private router: Router) {
+  }
+
+  goToSignUp(): void{
+    this.router.navigate(['/signup']);
   }
 
   ngOnInit(): void {
