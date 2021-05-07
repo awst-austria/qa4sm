@@ -41,7 +41,9 @@ export class PlotsComponent implements OnInit {
   getComparisonMetrics(): void {
     // get all the available metrics in the MetricsComparisonDto format
     const ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations);
-    const params = new HttpParams().set('ids', String(ids));
+    let params = new HttpParams().set('get_intersection', String(this.comparisonModel.getIntersection));
+    ids.forEach(id => {params = params.append('ids', id)});
+
     this.comparisonService.getMetrics4Comparison(params).subscribe(response => {
         if (response) {
           response.forEach(metric => {
@@ -58,7 +60,7 @@ export class PlotsComponent implements OnInit {
     let plots = []
     let parameters = new HttpParams()
       .set('metric', metric)
-      .set('get_intersection', String(this.comparisonModel.getIntersection));
+      .set('get_intersection', String(this.comparisonModel.getIntersection));  // TODO: is this correct?
 
     let ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations)
     ids.forEach(id => {parameters = parameters.append('ids', id)});

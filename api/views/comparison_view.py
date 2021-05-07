@@ -13,9 +13,9 @@ from validator.validation import comparison_table, encoded_comparisonPlots, gene
 def get_comparisonTable(request):
     """Get the comparison table as an html table"""
     validation_ids = request.query_params.getlist('ids', None)
-    metric_list = request.query_params.get('metric_list', None)
+    metric_list = request.query_params.getlist('metric_list', None)
     extent = request.query_params.get('extent', None)
-    get_intersection = request.query_params.get('get_intersection', None)
+    get_intersection = request.query_params.get('get_intersection', False)
     validation_runs = []
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)
@@ -28,22 +28,18 @@ def get_comparisonTable(request):
             extent=extent,
             get_intersection=get_intersection
         ).reset_index()
-    table = table.to_html(
-        table_id=None,
-        classes=['table', 'table-bordered', 'table-striped'],
-        index=False
-    )
 
-    return HttpResponse(table)
+    return HttpResponse(table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+                                      index=False))
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def download_comparison_table(request):
     """Dowanload the table as a .csv file"""
     validation_ids = request.query_params.getlist('ids', None)
-    metric_list = request.query_params.get('metric_list', None)
+    metric_list = request.query_params.getlist('metric_list', None)
     extent = request.query_params.get('extent', None)
-    get_intersection = request.query_params.get('get_intersection', None)
+    get_intersection = request.query_params.get('get_intersection', False)
     validation_runs = []
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)
@@ -68,12 +64,13 @@ def download_comparison_table(request):
 def get_comparison_metrics(request):
     """Get the metrics that are common to all validations"""
     validation_ids = request.query_params.getlist('ids', None)
+    get_intersection = request.query_params.get('get_intersection', False)
     validation_runs = []
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)
         validation_runs.append(validation)
 
-    comp = generate_comparison(validation_runs)
+    comp = generate_comparison(validation_runs, get_intersection=get_intersection)
     response = []
     for short_name, pretty_name in comp.common_metrics.items():
         metric_dict = {'metric_query_name': short_name,
@@ -91,7 +88,7 @@ def get_comparisonPlots4Metric(request):
     plot_types = request.query_params.getlist('plot_types', None)
     metric = request.query_params.get('metric', None)
     extent = request.query_params.get('extent', None)
-    get_intersection = request.query_params.get('get_intersection', None)
+    get_intersection = request.query_params.get('get_intersection', False)
     validation_runs = []
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)

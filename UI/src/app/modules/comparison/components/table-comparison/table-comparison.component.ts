@@ -1,10 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
 import {ComparisonService} from "../../services/comparison.service";
 import {Observable} from "rxjs";
 import {MetricModel} from "../../../metrics/components/metric/metric-model";
 import {HttpParams} from "@angular/common/http";
 import {Validations2CompareModel} from "../validation-selector/validation-selection.model";
 import {map} from "rxjs/operators";
+import {MetricsComparisonDto} from "../../services/metrics-comparison.dto";
 
 @Component({
   selector: 'qa-table-comparison',
@@ -15,6 +16,7 @@ export class TableComparisonComponent implements OnInit {
 
   @Input() comparisonModel: Validations2CompareModel;
   comparisonTable$: Observable<string>;
+  comparisonMetrics: string[] = []
   // need to connect comparisonModel to metrics for showing and validation ids
   private comparisonMetrics$: Observable<{ metric_pretty_name: string; metric_query_name: string; comparison_plots: any }[]>;
 
@@ -23,34 +25,33 @@ export class TableComparisonComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  getComparisonMetrics() {
-    // get all the available metrics for this particular comparison configuration
-    const ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations);
-    const params = new HttpParams().set('ids', String(ids));
-    this.comparisonMetrics$ = this.comparisonService.getMetrics4Comparison(params).pipe(
-      map((metrics) =>
-        metrics.map(
-          metric =>
-            ({
-              ...metric,
-              comparison_plots: null
-            })
-        )
-      )
-    )
-    // let metrics = []
-    // for (let metric of this.comparisonMetrics$){
-    //   metrics.push(metric.metric_query_name)
-    // }
-    // return metrics
+  ngOnChanges(changes: SimpleChanges){
+    // change according to the model, unless it's undefined
+    if(this.comparisonModel){this.getComparisonMetrics()}
   }
 
-  getComparisonTable(): void {
-    const metric_list = this.getComparisonMetrics()
-    const parameters = new HttpParams()
-      .set('ids', null)
-      .set('metric_list', String(metric_list))  // How to pass list??
-      .set('get_intersection', null);
+  getComparisonMetrics(): void {
+    // get all the available metrics in the MetricsComparisonDto format
+    const ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations);
+    let parameters = new HttpParams().set('get_intersection', String(this.comparisonModel.getIntersection).toString());  // TODO: is this correct?
+    ids.forEach(id => {parameters = parameters.append('ids', id)});
+
+    this.comparisonService.getMetrics4Comparison(parameters).subscribe(response => {
+      if (response) {
+        response.forEach(metric => {
+          this.comparisonMetrics.push(metric.metric_query_name)});
+        this.getComparisonTable(this.comparisonMetrics);
+      }
+    })
+  }
+
+  getComparisonTable(metric_list: string[]): void {
+    const ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations);
+    let parameters = new HttpParams().set('get_intersection', this.comparisonModel.getIntersection.toString());
+    ids.forEach(id => {parameters = parameters.append('ids', id)});
+    metric_list.forEach(metric => {parameters = parameters.append('metric_list', metric)});
+    // console.log(metric_list)
+    // console.log('parameters', parameters)
     this.comparisonTable$ = this.comparisonService.getComparisonTable(parameters);
   }
 
