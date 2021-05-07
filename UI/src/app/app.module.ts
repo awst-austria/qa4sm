@@ -52,6 +52,7 @@ import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
 import {CoreModule} from './modules/core/core.module';
 import {SignupComponent} from './pages/signup/signup.component';
+import {UserModule} from './modules/user/user.module';
 
 
 @NgModule({
@@ -104,7 +105,8 @@ import {SignupComponent} from './pages/signup/signup.component';
     MapModule,
     IvyGalleryModule,
     NgxPageScrollModule,
-    CoreModule
+    CoreModule,
+    UserModule
 
   ],
   providers: [
