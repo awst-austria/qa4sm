@@ -11,7 +11,7 @@ from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
 from api.views.start_validation_view import start_validation
 from api.views.uptime_view import uptime_ping, get_uptime
-from api.views.user_view import users
+from api.views.user_view import users, get_list_od_countries
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs,\
     custom_tracked_validation_runs, get_summary_statistics
 from api.views.dataset_configuration_view import dataset_configuration
@@ -76,4 +76,5 @@ urlpatterns = [
     path('uptime-report', get_uptime),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
+    path('country', get_list_od_countries, name = 'List of countries')
 ]
