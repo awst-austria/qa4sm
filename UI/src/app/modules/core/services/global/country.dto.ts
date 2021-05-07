@@ -1,5 +1,5 @@
 export class CountryDto{
-  constructor(private abbreviation: string,
-              private name: string) {
+  constructor(public abbreviation: string,
+              public name: string) {
   }
 }
