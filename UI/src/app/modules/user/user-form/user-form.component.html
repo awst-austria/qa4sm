@@ -1,1 +1,55 @@
-<p>user-form works!</p>
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+
+  <span class="p-float-label">
+    <input id="username" type="text" pInputText formControlName="username">
+    <label for="username">Username</label>
+  </span>
+
+  <span class="p-float-label">
+    <input id="password" type="password" pInputText formControlName="password">
+    <label for="password">Password</label>
+  </span>
+
+  <span class="p-float-label">
+    <input id="password-confirm" type="password" pInputText formControlName="passwordConfirmation">
+    <label for="password-confirm">Password confirmation</label>
+  </span>
+
+  <span class="p-float-label">
+    <input id="email" type="email" pInputText formControlName="email">
+    <label for="email">Email address</label>
+  </span>
+
+  <span class="p-float-label">
+    <input id="first-name" type="text" pInputText formControlName="firstName">
+    <label for="first-name">First name</label>
+  </span>
+
+  <span class="p-float-label">
+    <input id="last-name" type="text" pInputText formControlName="lastName">
+    <label for="last-name">Last name</label>
+  </span>
+
+  <span class="p-float-label">
+    <input id="organisation" type="text" pInputText formControlName="organisation">
+    <label for="organisation">Organisation</label>
+  </span>
+
+  <p-dropdown [options]="countries"
+              formControlName="country"
+              optionLabel="name"
+              placeholder="Country">
+  </p-dropdown>
+
+
+  <!--  <span class="p-float-label">-->
+<!--    <input id="country" type="text" pInputText formControlName="country">-->
+<!--    <label for="country">Country</label>-->
+<!--  </span>-->
+
+  <span class="p-float-label">
+    <input id="orcid" type="text" pInputText formControlName="orcid">
+    <label for="orcid">Orcid</label>
+  </span>
+
+</form>
