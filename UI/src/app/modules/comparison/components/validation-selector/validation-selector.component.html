@@ -10,10 +10,9 @@
           <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
         </label>
       </ng-template>
-      <p-accordion multiple="true" >
+      <p-accordion multiple="true" activeIndex="0">
         <!-- here dataset/version selection -->
-        <p-accordionTab *ngFor="let item of selectedDatasetModel; let datasetIdx = index"
-          [header]=" 'Reference selection: ' + (selectedDatasetModel[0].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[datasetIdx].datasetModel.selectedVersion?.pretty_name)">
+        <p-accordionTab [header]=" 'Reference selection: ' + (selectedDatasetModel[0].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[0].datasetModel.selectedVersion?.pretty_name)">
 
           <qa-dataset *ngIf="selectedDatasetModel[0].datasetModel.selectedDataset"
                       [removable]="false"
@@ -57,7 +56,7 @@
           <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
         </label>
       </ng-template>
-      <p-accordion multiple="true">
+      <p-accordion multiple="true" activeIndex="0">
         <p-accordionTab>
           <div class="p-grid">
             <div class="p-col-12">
