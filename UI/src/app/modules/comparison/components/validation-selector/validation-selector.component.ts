@@ -157,9 +157,9 @@ export class ValidationSelectorComponent implements OnInit {
     }
   }
 
-  unionChecked(isChecked: boolean) {
-    console.log(isChecked)
-    this.comparisonModel.getIntersection = !isChecked;
+  unionChecked(isNotChecked: boolean) {
+    // should be true when checkbox is unchecked, and vice-versa
+    this.comparisonModel.getIntersection = isNotChecked;
   }
 
   startComparison() {
