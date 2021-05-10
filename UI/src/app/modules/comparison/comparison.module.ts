@@ -15,26 +15,29 @@ import {DatasetModule} from "../dataset/dataset.module";
 import {ButtonModule} from "primeng/button";
 import {CheckboxModule} from "primeng/checkbox";
 import { SpatialExtentComponent } from './components/spatial-extent/spatial-extent.component';
+import {NgDompurifyModule} from "@tinkoff/ng-dompurify";
+import { TableComparisonComponent } from './components/table-comparison/table-comparison.component';
 
 @NgModule({
-    declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent],
-    exports: [
-        ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent
-    ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    NgxPaginationModule,
-    RouterModule,
-    DropdownModule,
-    FormsModule,
-    InputTextModule,
-    AccordionModule,
-    DatasetModule,
-    ButtonModule,
-    CheckboxModule,
-  ]
+    declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent],
+  exports: [
+    ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent
+  ],
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        NgxPaginationModule,
+        RouterModule,
+        DropdownModule,
+        FormsModule,
+        InputTextModule,
+        AccordionModule,
+        DatasetModule,
+        ButtonModule,
+        CheckboxModule,
+        NgDompurifyModule,
+    ]
 })
 export class ComparisonModule { }

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {Validations2CompareModel} from "../../modules/comparison/components/validation-selector/validation-selection.model";
 
 @Component({
   selector: 'qa-comparison',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ComparisonComponent implements OnInit {
 
+  selectedComparisonConfiguration: Validations2CompareModel;
+
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  provideConfiguration(configuration: Validations2CompareModel): void {
+    console.log('emitted', configuration)
+    this.selectedComparisonConfiguration = configuration
+  }
 }
