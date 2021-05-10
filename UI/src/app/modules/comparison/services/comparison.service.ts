@@ -49,6 +49,6 @@ export class ComparisonService {
   }
 
   getComparisonPlots(params: any): Observable<any> {
-    return this.httpClient.get(comparisonPlotsUrl, {params});
+    return this.httpClient.get<string[]>(comparisonPlotsUrl, {params});
   }
 }

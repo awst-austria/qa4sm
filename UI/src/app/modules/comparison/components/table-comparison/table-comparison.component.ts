@@ -52,6 +52,7 @@ export class TableComparisonComponent implements OnInit {
     metric_list.forEach(metric => {parameters = parameters.append('metric_list', metric)});
     // console.log(metric_list)
     // console.log('parameters', parameters)
+    console.log('table', this.comparisonService.getComparisonTable(parameters))
     this.comparisonTable$ = this.comparisonService.getComparisonTable(parameters);
   }
 

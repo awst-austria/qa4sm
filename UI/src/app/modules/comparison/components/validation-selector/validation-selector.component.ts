@@ -163,7 +163,7 @@ export class ValidationSelectorComponent implements OnInit {
 
   startComparison() {
     // should start the comparison
-    console.log(this.comparisonModel)
+    // console.log(this.comparisonModel)
     this.emitComparisonInput.emit(this.comparisonModel)
   }
 }

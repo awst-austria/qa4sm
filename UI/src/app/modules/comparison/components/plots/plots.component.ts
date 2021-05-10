@@ -65,9 +65,8 @@ export class PlotsComponent implements OnInit {
     let ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations)
     ids.forEach(id => {parameters = parameters.append('ids', id)});
     PLOT_TYPES.forEach(plotType => {parameters = parameters.append('plot_types', plotType)});
-
-    this.metricPlots$ = this.comparisonService.getComparisonPlots(parameters);
-    console.log(this.metricPlots$)
+    console.log('plots', this.comparisonService.getComparisonPlots(parameters))
+    this.metricPlots$ = this.comparisonService.getComparisonPlots(parameters)
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
