@@ -1,4 +1,4 @@
-import {Component, OnInit, Output, EventEmitter} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
@@ -21,7 +21,8 @@ export class ValidationSelectorComponent implements OnInit {
   @Output() emitComparisonInput = new EventEmitter<Validations2CompareModel>();
 
   multipleNonReference: boolean = false;
-  selectedValidation: ValidationrunDto
+  selectValidationLabel: string;
+  selectedValidation: ValidationrunDto;
   selectedDatasetModel: DatasetConfigModel[] = [];
   // initialize the extent model with a default intersection configuration
   spatialExtent: ExtentModel = new ExtentModel(true);
@@ -59,7 +60,7 @@ export class ValidationSelectorComponent implements OnInit {
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
       model.datasetModel.selectedDataset = datasets[0];
-
+      this.selectValidationLabel = 'Wait for validations to be loaded';
       //then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
         model.datasetModel.selectedVersion = versions[0];
@@ -75,6 +76,9 @@ export class ValidationSelectorComponent implements OnInit {
           this.validations4Comparison = response;
           if (response) {
             this.selectedValidation = response[0];  // problem initializing this
+            this.selectValidationLabel = 'Select a validation';
+          } else {
+            this.selectValidationLabel = 'There are no validations with given settings';
           }
         });
       });
@@ -90,11 +94,14 @@ export class ValidationSelectorComponent implements OnInit {
       // number of non-reference datasets
       .set('max_datasets', String(this.checkbox2NonReferenceNumber()));
     // console.log(parameters);
+    this.selectValidationLabel = 'Wait for validations to be loaded';
     this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
       if (response){
         this.validations4Comparison = response;
+        this.selectValidationLabel = 'Select a validation';
       } else{
         this.validations4Comparison = [];
+        this.selectValidationLabel = 'There are no validations available';
       }
     });
   }
@@ -108,9 +115,9 @@ export class ValidationSelectorComponent implements OnInit {
     // convert the checkbox boolean selection to number of non-references
     this.comparisonModel.selectedValidations = []  // empty the selection in case the button is clicked
     if (this.multipleNonReference){
-      return 2
+      return 2;
     }
-    return 1
+    return 1;
   }
 
   addValidationButtonDisabled(): boolean {
@@ -145,7 +152,7 @@ export class ValidationSelectorComponent implements OnInit {
       // condition for intersection:
       return !(val1.max_lon < val2.min_lon || val1.min_lon > val2.max_lon || val1.min_lat > val2.max_lat || val1.max_lat < val2.min_lat)
     } else {  // only one validation selected. Return 'false' to workaround
-      return false
+      return false;
     }
   }
 
@@ -165,6 +172,6 @@ export class ValidationSelectorComponent implements OnInit {
   startComparison() {
     // should start the comparison
     // console.log(this.comparisonModel)
-    this.emitComparisonInput.emit(this.comparisonModel)
+    this.emitComparisonInput.emit(this.comparisonModel);
   }
 }

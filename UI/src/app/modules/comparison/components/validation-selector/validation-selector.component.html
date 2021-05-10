@@ -69,7 +69,7 @@
                             optionLabel="id"
                             [style]="{'width':'100%'}"></p-dropdown>
 
-                <label for="validationSelector">Select a validation</label>
+                <label *ngIf="selectedDatasetModel[0]" for="validationSelector">{{selectValidationLabel}}</label>
               </div>
             </div>
           </div>
