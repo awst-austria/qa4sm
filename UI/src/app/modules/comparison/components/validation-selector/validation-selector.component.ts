@@ -156,11 +156,12 @@ export class ValidationSelectorComponent implements OnInit {
   }
 
   unionChecked(isChecked: boolean) {
+    console.log(isChecked)
     this.comparisonModel.getIntersection = !isChecked;
   }
 
   startComparison() {
     // should start the comparison
-    console.log(this.comparisonModel)
+    console.log(this.comparisonModel);
   }
 }

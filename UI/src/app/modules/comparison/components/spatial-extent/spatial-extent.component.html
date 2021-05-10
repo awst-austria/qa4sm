@@ -3,8 +3,9 @@
     <p-checkbox label="Compare the union of spatial extents"
                 [binary]="true"
                 [disabled]="this.disabled"
-                (click)="spatialExtentChange($event)"
-    ></p-checkbox>
+                [ngModel]="spatialExtentChecked"
+                (ngModelChange)="spatialExtentChange($event)">
+    </p-checkbox>
     <label class="p-panel-header-icon"
            pTooltip="{{'When the default is intersection, you can choose to compare the union instead'}}"
            tooltipPosition="bottom">
