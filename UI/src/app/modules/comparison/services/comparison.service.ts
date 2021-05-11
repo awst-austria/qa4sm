@@ -43,8 +43,8 @@ export class ComparisonService {
 
   downloadComparisonTableCsv(ids: string, metricList: string[], getIntersection: boolean, extent: string): void {
     // download comparison table
-    const fileUrl = `${downloadComparisonTableUrl}?validationId=${ids}&metricList=${metricList}
-    &get_intersecton=${getIntersection}&extent=${extent}`;
+    const fileUrl = `${downloadComparisonTableUrl}?ids=${ids}&metric_list=${metricList}
+    &get_intersection=${getIntersection}&extent=${extent}`;
     saveAs(fileUrl);
   }
 
