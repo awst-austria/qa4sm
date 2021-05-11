@@ -1,6 +1,6 @@
 <div *ngIf="(metricPlots$|async) as plots" class="p-col-12">
 <!--  <p-panel>-->
-    <p-panel [toggleable]="true" [collapsed]="true">
+    <p-panel [toggleable]="true" [collapsed]="false">
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">
           <h4 class="my-0 font-weight-normal">Comparison plots</h4>
@@ -42,8 +42,10 @@
           <p-dropdown id="metricSelector"
                       [options]="this.comparisonMetrics"
                       [(ngModel)]="selectedMetric"
+                      (onChange)="onMetricChange()"
                       optionLabel="metric_pretty_name"
-                      [style]="{'width': '100%'}"></p-dropdown>
+                      [style]="{'width': '100%'}">
+          </p-dropdown>
           <label for="metricSelector">Select a metric</label>
         </span>
         </div>

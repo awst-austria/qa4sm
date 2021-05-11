@@ -7,6 +7,7 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {Observable} from 'rxjs';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
+import {ExtentModel} from '../spatial-extent/extent-model';
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'correlation', 'difference', 'mapplot'];
@@ -17,6 +18,10 @@ const PLOT_TYPES = ['boxplot', 'correlation', 'difference', 'mapplot'];
   styleUrls: ['./plots.component.scss'],
 })
 export class PlotsComponent implements OnInit {
+  comparisonModel: Validations2CompareModel = new Validations2CompareModel(
+    [],
+    new ExtentModel(true).getIntersection,
+  );
   // metrics to show the table/plots for
   comparisonMetrics: MetricsComparisonDto[] = [];
   selectedMetric: MetricsComparisonDto;
@@ -37,6 +42,7 @@ export class PlotsComponent implements OnInit {
     // start comparison on button click; updated recursively
     this.comparisonService.currentComparisonModel.subscribe(comparison => {
       if (comparison.selectedValidations.length > 0) {
+        this.comparisonModel = comparison;
         this.getComparisonMetrics(comparison);
       }
     });
@@ -79,13 +85,15 @@ export class PlotsComponent implements OnInit {
     PLOT_TYPES.forEach(plotType => {
       parameters = parameters.append('plot_types', plotType);
     });
-    console.log('plots', this.comparisonService.getComparisonPlots(parameters));
     this.metricPlots$ = this.comparisonService.getComparisonPlots(parameters);
-    this.metricPlots$.subscribe(plots => console.log(plots[0].plot));
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plotBase64);
+  }
+
+  onMetricChange(): void{
+    this.getComparisonPlots(this.selectedMetric.metric_query_name, this.comparisonModel);
   }
 
   downloadResultFiles(): void {
