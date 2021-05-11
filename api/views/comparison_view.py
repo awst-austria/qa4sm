@@ -28,7 +28,7 @@ def get_comparison_table(request):
                 validation_runs=validation_runs,
                 metric_list=metric_list,
                 extent=extent,
-                get_intersection=get_intersection
+                get_intersection=json.loads(get_intersection)
             ).reset_index()
         response = HttpResponse(table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
                                       index=False))
@@ -57,7 +57,7 @@ def download_comparison_table(request):
                 validation_runs=validation_runs,
                 metric_list=metric_list,
                 extent=extent,
-                get_intersection=get_intersection
+                get_intersection=json.loads(get_intersection)
             ).reset_index()
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=Comparison_summary.csv'
@@ -75,13 +75,13 @@ def get_comparison_metrics(request):
     """Get the metrics that are common to all validations"""
     validation_ids = request.query_params.getlist('ids', None)
     get_intersection = request.query_params.get('get_intersection', False)
-    print('Monika', get_intersection)
+    print('Monika', get_intersection, json.loads(get_intersection))
     validation_runs = []
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)
         validation_runs.append(validation)
     try:
-        comp = generate_comparison(validation_runs, get_intersection=get_intersection)
+        comp = generate_comparison(validation_runs, get_intersection=json.loads(get_intersection))
         response = []
         for short_name, pretty_name in comp.common_metrics.items():
             metric_dict = {'metric_query_name': short_name,
@@ -120,7 +120,7 @@ def get_comparison_plots_for_metric(request):
             plot_type=plot_type,
             metric=metric,
             extent=extent,
-            get_intersection=get_intersection
+            get_intersection=json.loads(get_intersection)
         )
         if not base64_plot == "error encountered":
             encoded_plots.append(base64_plot)
