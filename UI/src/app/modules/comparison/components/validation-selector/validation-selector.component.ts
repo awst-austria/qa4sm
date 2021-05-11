@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
@@ -8,8 +8,9 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ExtentModel} from '../spatial-extent/extent-model';
+import {ComparisonService} from '../../services/comparison.service';
 
-const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
+const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
 @Component({
   selector: 'qa-validation-selector',
@@ -18,9 +19,7 @@ const N_MAX_VALIDATIONS = 2 // A maximum of two validation results can be compar
 })
 export class ValidationSelectorComponent implements OnInit {
 
-  @Output() emitComparisonInput = new EventEmitter<Validations2CompareModel>();
-
-  multipleNonReference: boolean = false;
+  multipleNonReference = false;
   selectValidationLabel: string;
   selectedValidation: ValidationrunDto;
   selectedDatasetModel: DatasetConfigModel[] = [];
@@ -36,12 +35,14 @@ export class ValidationSelectorComponent implements OnInit {
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
-              private validationrunService: ValidationrunService) {
+              private validationrunService: ValidationrunService,
+              private comparisonService: ComparisonService) {
   }
 
   ngOnInit(): void {
     // console.log(this.multipleNonReference)
     // this.comparisonModel = new Validations2CompareModel();
+    this.comparisonService.currentComparisonModel.subscribe(model => this.comparisonModel = model);
     this.addDatasetToSelection();
     this.comparisonModel.getIntersection = this.checkOverlapping();
   }
@@ -57,11 +58,11 @@ export class ValidationSelectorComponent implements OnInit {
   private selectDataset(selected: DatasetConfigModel[]): void {
     const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
     selected.push(model);
-    //get all datasets
+    // get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
       model.datasetModel.selectedDataset = datasets[0];
       this.selectValidationLabel = 'Wait for validations to be loaded';
-      //then get all versions for the first dataset in the result list
+      // then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
         model.datasetModel.selectedVersion = versions[0];
 
@@ -108,12 +109,12 @@ export class ValidationSelectorComponent implements OnInit {
 
   multipleNonReferenceChange(): void {
     // reinitialize list when checkbox value is changed
-    this.getValidations4comparison()
+    this.getValidations4comparison();
   }
 
-  checkbox2NonReferenceNumber(){
+  checkbox2NonReferenceNumber(): number{
     // convert the checkbox boolean selection to number of non-references
-    this.comparisonModel.selectedValidations = []  // empty the selection in case the button is clicked
+    this.comparisonModel.selectedValidations = []; // empty the selection in case the button is clicked
     if (this.multipleNonReference){
       return 2;
     }
@@ -132,14 +133,14 @@ export class ValidationSelectorComponent implements OnInit {
   addValidation2Comparison(): void {
     // should add the selected validation in the comparisonModel
     // console.log('selected validation', this.selectedValidation)
-    this.comparisonModel.selectedValidations.push(this.selectedValidation)
-    this.comparisonModel.getIntersection = this.checkOverlapping()
+    this.comparisonModel.selectedValidations.push(this.selectedValidation);
+    this.comparisonModel.getIntersection = this.checkOverlapping();
   }
 
-  removeValidation(target: ValidationrunDto) {
+  removeValidation(target: ValidationrunDto): void {
     // should remove the selected validation from the comparisonModel
     // console.log(this.comparisonModel.selectedValidations)
-    let toBeRemoved = this.comparisonModel.selectedValidations.indexOf(target);
+    const toBeRemoved = this.comparisonModel.selectedValidations.indexOf(target);
     this.comparisonModel.selectedValidations.splice(toBeRemoved, 1);
     this.comparisonModel.getIntersection = this.checkOverlapping();
   }
@@ -147,10 +148,10 @@ export class ValidationSelectorComponent implements OnInit {
   checkOverlapping(): boolean {
     // check that the two selected validations have overlapping extents
     if (this.comparisonModel.selectedValidations.length > 1) {  // two validations selected
-      let val1 = this.comparisonModel.selectedValidations[0];
-      let val2 = this.comparisonModel.selectedValidations[1];
+      const val1 = this.comparisonModel.selectedValidations[0];
+      const val2 = this.comparisonModel.selectedValidations[1];
       // condition for intersection:
-      return !(val1.max_lon < val2.min_lon || val1.min_lon > val2.max_lon || val1.min_lat > val2.max_lat || val1.max_lat < val2.min_lat)
+      return !(val1.max_lon < val2.min_lon || val1.min_lon > val2.max_lon || val1.min_lat > val2.max_lat || val1.max_lat < val2.min_lat);
     } else {  // only one validation selected. Return 'false' to workaround
       return false;
     }
@@ -158,20 +159,21 @@ export class ValidationSelectorComponent implements OnInit {
 
   spatialExtentDisabled(): boolean {
     // check conditions for union selection checkbox
-    if (this.multipleNonReference) { return true } else {
+    if (this.multipleNonReference) {
+      return true;
+    } else {
       // console.log('overlapping', this.checkOverlapping())
      return !this.checkOverlapping();
     }
   }
 
-  unionChecked(isNotChecked: boolean) {
+  unionChecked(isNotChecked: boolean): void {
     // should be true when checkbox is unchecked, and vice-versa
     this.comparisonModel.getIntersection = isNotChecked;
   }
 
-  startComparison() {
+  startComparison(): void{
     // should start the comparison
-    // console.log(this.comparisonModel)
-    this.emitComparisonInput.emit(this.comparisonModel);
+    this.comparisonService.sendComparisonModel(this.comparisonModel);
   }
 }

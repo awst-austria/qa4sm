@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {Validations2CompareModel} from "../../modules/comparison/components/validation-selector/validation-selection.model";
+import {Validations2CompareModel} from '../../modules/comparison/components/validation-selector/validation-selection.model';
+import {ComparisonService} from '../../modules/comparison/services/comparison.service';
 
 @Component({
   selector: 'qa-comparison',
@@ -7,16 +8,14 @@ import {Validations2CompareModel} from "../../modules/comparison/components/vali
   styleUrls: ['./comparison.component.scss']
 })
 export class ComparisonComponent implements OnInit {
-
   selectedComparisonConfiguration: Validations2CompareModel;
-
-  constructor() { }
+  comparisonModel: Validations2CompareModel;
+  constructor(private comparisonService: ComparisonService) { }
 
   ngOnInit(): void {
-  }
-
-  provideConfiguration(configuration: Validations2CompareModel): void {
-    console.log('emitted', configuration);
-    this.selectedComparisonConfiguration = configuration;
+    this.comparisonService.currentComparisonModel.subscribe(comparison => {
+      this.comparisonModel = comparison;
+    });
+    // console.log('Parent', this.comparisonModel);
   }
 }
