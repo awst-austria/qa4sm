@@ -123,7 +123,8 @@ def get_validations_for_comparison(request):
     ref_filtered = ValidationRun.objects.filter(
         reference_configuration__dataset__short_name=ref_dataset,
         reference_configuration__version__short_name=ref_version,
-    )
+    ).exclude(
+        output_file='')
     # filter based on the number of non-reference datasets
     eligible4comparison = []
     for val in ref_filtered:
