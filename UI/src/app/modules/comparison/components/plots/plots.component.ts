@@ -27,10 +27,11 @@ export class PlotsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.startComparison();
+    this. startComparison();
   }
 
   startComparison(): void {
+    // start comparison on button click; updated recursively
     this.comparisonService.currentComparisonModel.subscribe(comparison => {
       if (comparison.selectedValidations.length > 0) {
         this.getComparisonMetrics(comparison);
@@ -39,7 +40,7 @@ export class PlotsComponent implements OnInit {
   }
 
   getComparisonMetrics(comparisonModel: Validations2CompareModel): void {
-    // get all the available metrics in the MetricsComparisonDto format
+    // get all the available metrics in the MetricsComparisonDto format and initialize plots for a metric
     const ids = this.comparisonService.getValidationsIds(comparisonModel.selectedValidations);
     let params = new HttpParams();
     params = params.append('get_intersection', String(comparisonModel.getIntersection));
