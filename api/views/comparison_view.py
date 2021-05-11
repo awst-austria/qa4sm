@@ -1,5 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
+from qa4sm_reader.comparing import ComparisonError
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 import json
@@ -69,15 +70,23 @@ def get_comparison_metrics(request):
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)
         validation_runs.append(validation)
+    try:
+        comp = generate_comparison(validation_runs, get_intersection=get_intersection)
+        response = []
+        for short_name, pretty_name in comp.common_metrics.items():
+            metric_dict = {'metric_query_name': short_name,
+                           'metric_pretty_name': pretty_name}
+            response.append(metric_dict)
 
-    comp = generate_comparison(validation_runs, get_intersection=get_intersection)
-    response = []
-    for short_name, pretty_name in comp.common_metrics.items():
-        metric_dict = {'metric_query_name': short_name,
-                       'metric_pretty_name': pretty_name}
-        response.append(metric_dict)
+    except ComparisonError:
+        response = [{'message': 'there should go a message from Comparison Error'}]
 
     return JsonResponse(response, status=200, safe=False)
+
+
+
+
+
 
 
 @api_view(['GET'])
