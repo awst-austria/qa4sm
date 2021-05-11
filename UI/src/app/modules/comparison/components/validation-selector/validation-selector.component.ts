@@ -99,6 +99,7 @@ export class ValidationSelectorComponent implements OnInit {
     this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
       if (response){
         this.validations4Comparison = response;
+        this.selectedValidation = response[0];
         this.selectValidationLabel = 'Select a validation';
       } else{
         this.validations4Comparison = [];
