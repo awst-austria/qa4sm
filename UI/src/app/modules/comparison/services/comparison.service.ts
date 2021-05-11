@@ -1,9 +1,11 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../../environments/environment';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {ValidationrunDto} from '../../core/services/validation-run/validationrun.dto';
 import {MetricsComparisonDto} from './metrics-comparison.dto';
+import {Validations2CompareModel} from '../components/validation-selector/validation-selection.model';
+import {ExtentModel} from '../components/spatial-extent/extent-model';
 
 const urlPrefix = environment.API_URL + 'api';
 const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
@@ -18,8 +20,18 @@ const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
   providedIn: 'root'
 })
 export class ComparisonService {
+  comparisonModel: Validations2CompareModel = new Validations2CompareModel(
+    [],
+    new ExtentModel(true).getIntersection,
+  );
+  private comparisonModelSubject = new BehaviorSubject<Validations2CompareModel>(this.comparisonModel);
+  currentComparisonModel = this.comparisonModelSubject.asObservable();
 
   constructor(private httpClient: HttpClient) {
+  }
+
+  sendComparisonModel(newModel: Validations2CompareModel): void{
+    this.comparisonModelSubject.next(newModel);
   }
 
   getValidationsIds(validations: ValidationrunDto[]): string[] {
