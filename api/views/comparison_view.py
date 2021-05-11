@@ -94,11 +94,6 @@ def get_comparison_metrics(request):
     return JsonResponse(response, status=200, safe=False)
 
 
-
-
-
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_comparison_plots_for_metric(request):
@@ -123,6 +118,6 @@ def get_comparison_plots_for_metric(request):
             get_intersection=json.loads(get_intersection)
         )
         if not base64_plot == "error encountered":
-            encoded_plots.append(base64_plot)
+            encoded_plots.append({'plot': base64_plot})
 
-    return HttpResponse(encoded_plots)
+    return JsonResponse(encoded_plots, status=200, safe=False)

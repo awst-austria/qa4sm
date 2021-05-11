@@ -290,7 +290,7 @@ def encoded_comparisonPlots(
             metric=metric
         )
         plt.savefig(image, format='png')
-        encoded = base64.encodebytes(image.getvalue())
+        encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
 
         return encoded
 
