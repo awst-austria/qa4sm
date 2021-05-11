@@ -11,7 +11,7 @@ from validator.validation import comparison_table, encoded_comparisonPlots, gene
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_comparisonTable(request):
+def get_comparison_table(request):
     """Get the comparison table as an html table"""
     validation_ids = request.query_params.getlist('ids', None)
     metric_list = request.query_params.getlist('metric_list', None)
@@ -41,22 +41,27 @@ def download_comparison_table(request):
     metric_list = request.query_params.getlist('metric_list', None)
     extent = request.query_params.get('extent', None)
     get_intersection = request.query_params.get('get_intersection', False)
+    print()
     validation_runs = []
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)
         validation_runs.append(validation)
         # resetting index added, otherwise there would be a row shift between the index column header and the header of the
     # rest of the columns when df rendered as html
-    table = comparison_table(
-            validation_runs=validation_runs,
-            metric_list=metric_list,
-            extent=extent,
-            get_intersection=get_intersection
-        ).reset_index()
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=Comparison_summary.csv'
+    try:
+        table = comparison_table(
+                validation_runs=validation_runs,
+                metric_list=metric_list,
+                extent=extent,
+                get_intersection=get_intersection
+            ).reset_index()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=Comparison_summary.csv'
 
-    table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
+        table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
+    except ComparisonError:
+        response = HttpResponse('Here should go some message')
+
     return response
 
 
@@ -66,6 +71,7 @@ def get_comparison_metrics(request):
     """Get the metrics that are common to all validations"""
     validation_ids = request.query_params.getlist('ids', None)
     get_intersection = request.query_params.get('get_intersection', False)
+    print('Monika', get_intersection)
     validation_runs = []
     for val_id in validation_ids:
         validation = get_object_or_404(ValidationRun, id=val_id)
@@ -91,7 +97,7 @@ def get_comparison_metrics(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_comparisonPlots4Metric(request):
+def get_comparison_plots_for_metric(request):
     """Get all the comparison plots as a base64 encoding"""
     validation_ids = request.query_params.getlist('ids', None)
     plot_types = request.query_params.getlist('plot_types', None)
