@@ -12,8 +12,6 @@ import {Validations2CompareModel} from '../validation-selector/validation-select
 export class TableComparisonComponent implements OnInit {
 
   comparisonTable$: Observable<string>;
-  // need to connect comparisonModel to metrics for showing and validation ids
-  private comparisonMetrics$: Observable<{ metric_pretty_name: string; metric_query_name: string; comparison_plots: any }[]>;
 
   constructor(private comparisonService: ComparisonService) {
   }
@@ -23,6 +21,7 @@ export class TableComparisonComponent implements OnInit {
   }
 
   startComparison(): void {
+    // start comparison on button click; updated recursively
     this.comparisonService.currentComparisonModel.subscribe(comparison => {
       if (comparison.selectedValidations.length > 0) {
         this.getComparisonMetrics(comparison);
