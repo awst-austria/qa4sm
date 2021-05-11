@@ -5,6 +5,8 @@ import {Validations2CompareModel} from '../validation-selector/validation-select
 import {MetricsComparisonDto} from '../../services/metrics-comparison.dto';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {Observable} from 'rxjs';
+import {PlotDto} from '../../../core/services/global/plot.dto';
+import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'correlation', 'difference', 'mapplot'];
@@ -15,15 +17,16 @@ const PLOT_TYPES = ['boxplot', 'correlation', 'difference', 'mapplot'];
   styleUrls: ['./plots.component.scss'],
 })
 export class PlotsComponent implements OnInit {
+  // metrics to show the table/plots for
+  comparisonMetrics: MetricsComparisonDto[] = [];
   selectedMetric: MetricsComparisonDto;
-  // for showing the plots
-  plotPrefix = 'data:image/png;base64,';
   // metric-relative plots
-  metricPlots$: Observable<string[]>;
+  metricPlots$: Observable<PlotDto[]>;
   metricsErrorMessage: string;
 
   constructor(private comparisonService: ComparisonService,
-              private domSanitizer: DomSanitizer) {
+              private domSanitizer: DomSanitizer,
+              private plotService: WebsiteGraphicsService) {
   }
 
   ngOnInit(): void {
@@ -48,19 +51,17 @@ export class PlotsComponent implements OnInit {
     ids.forEach(id => {
       params = params.append('ids', id);
     });
-
+    this.comparisonMetrics = [];
     this.comparisonService.getMetrics4Comparison(params).subscribe(response => {
-      const comparisonMetrics = [];
       if (response && response.length > 1) {
         response.forEach(metric => {
-          comparisonMetrics.push(
+          this.comparisonMetrics.push(
             new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
         });
-        this.selectedMetric = comparisonMetrics[0];
+        this.selectedMetric = this.comparisonMetrics[0];
         this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
       } else {
         this.metricsErrorMessage = response[0].message; // this message can be shown somewhere so users know what is wrong
-        console.log(response[0].message);
       }
     });
   }
@@ -80,10 +81,11 @@ export class PlotsComponent implements OnInit {
     });
     console.log('plots', this.comparisonService.getComparisonPlots(parameters));
     this.metricPlots$ = this.comparisonService.getComparisonPlots(parameters);
+    this.metricPlots$.subscribe(plots => console.log(plots[0].plot));
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
-    return this.domSanitizer.bypassSecurityTrustUrl(this.plotPrefix + plotBase64);
+    return this.plotService.sanitizePlotUrl(plotBase64);
   }
 
   downloadResultFiles(): void {

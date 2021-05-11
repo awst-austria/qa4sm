@@ -1,5 +1,5 @@
 <div *ngIf="(metricPlots$|async) as plots" class="p-col-12">
-  <p-panel>
+<!--  <p-panel>-->
     <p-panel [toggleable]="true" [collapsed]="true">
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">
@@ -14,12 +14,17 @@
         and that 'Compare the union of spatial extents' is unchecked.
       </div>
 
-      <div class="p-grid p-align-center">
-          <img *ngFor="let plot of plots"
-               width="95%"
-               height="95%"
-               [src]=sanitizePlotUrl(plot)>
+      <div class="p-col">
+        <div  class="p-grid">
+          <div *ngFor="let plot of plots; let ind = index">
+            <img width="95%"
+                 height="95%"
+                 [src]=sanitizePlotUrl(plot.plot)>
+          </div>
+        </div>
       </div>
+
+
       <!--  buttons  -->
       <div class="p-grid">
       <!--  Multiple file download  -->
@@ -45,6 +50,6 @@
       </div>
 
     </p-panel>
-  </p-panel>
+<!--  </p-panel>-->
 </div>
 

@@ -6,6 +6,7 @@ import {ValidationrunDto} from '../../core/services/validation-run/validationrun
 import {MetricsComparisonDto} from './metrics-comparison.dto';
 import {Validations2CompareModel} from '../components/validation-selector/validation-selection.model';
 import {ExtentModel} from '../components/spatial-extent/extent-model';
+import {PlotDto} from '../../core/services/global/plot.dto';
 
 const urlPrefix = environment.API_URL + 'api';
 const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
@@ -60,7 +61,7 @@ export class ComparisonService {
     saveAs(fileUrl);
   }
 
-  getComparisonPlots(params: any): Observable<any> {
-    return this.httpClient.get<string[]>(comparisonPlotsUrl, {params});
+  getComparisonPlots(params: any): Observable<PlotDto[]> {
+    return this.httpClient.get<PlotDto[]>(comparisonPlotsUrl, {params});
   }
 }
