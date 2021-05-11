@@ -23,15 +23,19 @@ def get_comparison_table(request):
         validation_runs.append(validation)
         # resetting index added, otherwise there would be a row shift between the index column header and the header of the
     # rest of the columns when df rendered as html
-    table = comparison_table(
-            validation_runs=validation_runs,
-            metric_list=metric_list,
-            extent=extent,
-            get_intersection=get_intersection
-        ).reset_index()
-
-    return HttpResponse(table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+    try:
+        table = comparison_table(
+                validation_runs=validation_runs,
+                metric_list=metric_list,
+                extent=extent,
+                get_intersection=get_intersection
+            ).reset_index()
+        response = HttpResponse(table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
                                       index=False))
+    except ComparisonError as e:
+        response = HttpResponse(str(e))
+
+    return response
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -59,8 +63,8 @@ def download_comparison_table(request):
         response['Content-Disposition'] = 'attachment; filename=Comparison_summary.csv'
 
         table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
-    except ComparisonError:
-        response = HttpResponse('Here should go some message')
+    except ComparisonError as e:
+        response = HttpResponse(str(e))
 
     return response
 
@@ -84,8 +88,8 @@ def get_comparison_metrics(request):
                            'metric_pretty_name': pretty_name}
             response.append(metric_dict)
 
-    except ComparisonError:
-        response = [{'message': 'there should go a message from Comparison Error'}]
+    except ComparisonError as e:
+        response = [{'message': str(e)}]
 
     return JsonResponse(response, status=200, safe=False)
 
