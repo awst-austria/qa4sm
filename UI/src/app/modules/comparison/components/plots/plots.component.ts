@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ComparisonService} from '../../services/comparison.service';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
@@ -14,11 +14,7 @@ const PLOT_TYPES = ['boxplot', 'correlation', 'difference', 'mapplot'];
   templateUrl: './plots.component.html',
   styleUrls: ['./plots.component.scss'],
 })
-export class PlotsComponent implements OnInit, OnChanges {
-
-  @Input() comparisonModel: Validations2CompareModel;
-  // metrics to show the table/plots for
-  comparisonMetrics: MetricsComparisonDto[] = [];
+export class PlotsComponent implements OnInit {
   selectedMetric: MetricsComparisonDto;
   // for showing the plots
   plotPrefix = 'data:image/png;base64,';
@@ -31,49 +27,50 @@ export class PlotsComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    this.startComparison();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    // change according to the model, unless it's undefined
-    // console.log('changes', changes)
-    if (this.comparisonModel) {
-      this.getComparisonMetrics();
-    }
+  startComparison(): void {
+    this.comparisonService.currentComparisonModel.subscribe(comparison => {
+      if (comparison.selectedValidations.length > 0) {
+        this.getComparisonMetrics(comparison);
+      }
+    });
   }
 
-  getComparisonMetrics(): void {
+  getComparisonMetrics(comparisonModel: Validations2CompareModel): void {
     // get all the available metrics in the MetricsComparisonDto format
-    const ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations);
+    const ids = this.comparisonService.getValidationsIds(comparisonModel.selectedValidations);
     let params = new HttpParams();
-    params = params.append('get_intersection', String(this.comparisonModel.getIntersection));
-    // let params = new HttpParams().set('get_intersection', String(this.comparisonModel.getIntersection));
+    params = params.append('get_intersection', String(comparisonModel.getIntersection));
+    // let params = new HttpParams().set('get_intersection', String(comparisonModel.getIntersection));
     ids.forEach(id => {
       params = params.append('ids', id);
     });
 
     this.comparisonService.getMetrics4Comparison(params).subscribe(response => {
+      const comparisonMetrics = [];
       if (response && response.length > 1) {
-        console.log(response, response.length, response[0].message);
         response.forEach(metric => {
-          this.comparisonMetrics.push(
+          comparisonMetrics.push(
             new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
         });
-        this.selectedMetric = this.comparisonMetrics[0];
-        this.getComparisonPlots(this.selectedMetric.metric_query_name);
+        this.selectedMetric = comparisonMetrics[0];
+        this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
       } else {
-        this.metricsErrorMessage = response[0].message;
-        console.log(response[0].message); // this message can be shown somewhere so users know what is wrong
+        this.metricsErrorMessage = response[0].message; // this message can be shown somewhere so users know what is wrong
+        console.log(response[0].message);
       }
     });
   }
 
-  getComparisonPlots(metric: string): void {
+  getComparisonPlots(metric: string, comparisonModel: Validations2CompareModel): void {
     // Get all the plots for a specific comparison and metric
     let parameters = new HttpParams()
       .set('metric', metric)
-      .set('get_intersection', String(this.comparisonModel.getIntersection));  // TODO: is this correct?
+      .set('get_intersection', String(comparisonModel.getIntersection));
 
-    const ids = this.comparisonService.getValidationsIds(this.comparisonModel.selectedValidations);
+    const ids = this.comparisonService.getValidationsIds(comparisonModel.selectedValidations);
     ids.forEach(id => {
       parameters = parameters.append('ids', id);
     });

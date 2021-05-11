@@ -8,7 +8,6 @@ import {ComparisonService} from '../../modules/comparison/services/comparison.se
   styleUrls: ['./comparison.component.scss']
 })
 export class ComparisonComponent implements OnInit {
-  selectedComparisonConfiguration: Validations2CompareModel;
   comparisonModel: Validations2CompareModel;
   constructor(private comparisonService: ComparisonService) { }
 
@@ -16,6 +15,5 @@ export class ComparisonComponent implements OnInit {
     this.comparisonService.currentComparisonModel.subscribe(comparison => {
       this.comparisonModel = comparison;
     });
-    // console.log('Parent', this.comparisonModel);
   }
 }
