@@ -7,12 +7,13 @@
         </div>
       </ng-template>
       <ng-template pTemplate="icons">
-      </ng-template>
-
-      <div class="pb-3"> Shown are the comparison plots for {{selectedMetric.metric_pretty_name}}. To generate maps and
+        <label class="mb-0" pTooltip="Shown are the comparison plots for {{selectedMetric.metric_pretty_name}}. To generate maps and
         correlation plots with the comparison results, make sure that the input validations have overlapping extents
-        and that 'Compare the union of spatial extents' is unchecked.
-      </div>
+        and that 'Compare the union of spatial extents' is unchecked."
+               tooltipPosition="bottom">
+          <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+        </label>
+      </ng-template>
 
       <div class="p-col">
         <div class="p-grid p-align-center">
@@ -20,7 +21,9 @@
               <img width="95%"
                    height="95%"
                    [src]=sanitizePlotUrl(comparisonplot.plot)
-                   (click)="showGallery(ind, plots)">
+                   (click)="showGallery(ind, plots)"
+                   [ngClass]="{'result-plot':true, 'pcol6': true}"
+                   alt="An Overview map for {{selectedMetric.metric_pretty_name}}">
           </div>
         </div>
       </div>
