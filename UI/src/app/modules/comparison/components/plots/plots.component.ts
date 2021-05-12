@@ -8,15 +8,18 @@ import {Observable} from 'rxjs';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {ExtentModel} from '../spatial-extent/extent-model';
+import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
+import {Gallery} from 'angular-gallery';
 
 // types of plots to show up. Shouldn't be hardcoded
-const PLOT_TYPES = ['boxplot', 'correlation', 'difference', 'mapplot'];
+const PLOT_TYPES = ['boxplot', 'correlation', 'mapplot'];
 
 @Component({
   selector: 'qa-plots',
   templateUrl: './plots.component.html',
   styleUrls: ['./plots.component.scss'],
 })
+
 export class PlotsComponent implements OnInit {
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(
     [],
@@ -31,7 +34,8 @@ export class PlotsComponent implements OnInit {
 
   constructor(private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
-              private plotService: WebsiteGraphicsService) {
+              private plotService: WebsiteGraphicsService,
+              private gallery: Gallery) {
   }
 
   ngOnInit(): void {
@@ -72,6 +76,20 @@ export class PlotsComponent implements OnInit {
     });
   }
 
+  showGallery(index: number = 0, imagesListObject): void {
+    const imagesList = [];
+    imagesListObject.forEach(image => {
+      imagesList.push({path: this.plotService.plotPrefix + image.plot});
+
+    });
+    const prop: any = {};
+    prop.component = CarouselComponent;
+    prop.images = imagesList;
+    prop.index = index;
+    prop.arrows = imagesList.length > 1;
+    this.gallery.load(prop);
+  }
+
   getComparisonPlots(metric: string, comparisonModel: Validations2CompareModel): void {
     // Get all the plots for a specific comparison and metric
     let parameters = new HttpParams()
@@ -99,4 +117,5 @@ export class PlotsComponent implements OnInit {
   downloadResultFiles(): void {
     // download all the shown images as .png
   }
+
 }

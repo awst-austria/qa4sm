@@ -15,11 +15,12 @@
       </div>
 
       <div class="p-col">
-        <div  class="p-grid">
-          <div *ngFor="let plot of plots; let ind = index">
-            <img width="95%"
-                 height="95%"
-                 [src]=sanitizePlotUrl(plot.plot)>
+        <div class="p-grid p-align-center">
+          <div *ngFor="let comparisonplot of plots; let ind = index" ngClass='p-col'>
+              <img width="95%"
+                   height="95%"
+                   [src]=sanitizePlotUrl(comparisonplot.plot)
+                   (click)="showGallery(ind, plots)">
           </div>
         </div>
       </div>
@@ -34,7 +35,7 @@
                   class="btn btn-sm btn-primary"
                   title="Download graphs .zip"
                   (click)="downloadResultFiles()">
-            <span class="pi pi-download"></span>Download graphs</button>
+            <span class="pi pi-download"></span> Download graphs</button>
         </div>
       <!--   Metric selector  -->
         <div class="p-col">
