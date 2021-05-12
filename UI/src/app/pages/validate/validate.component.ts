@@ -45,6 +45,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     [],
     new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC),
     SCALING_METHOD_DEFAULT);
+  validationStart: Date = new Date('1978-01-01');
+  validationEnd: Date = new Date();
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -56,7 +58,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     // child init could be done here
   }
 
@@ -79,21 +81,24 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
-      model.datasetModel.selectedDataset = datasets[0];
+        model.datasetModel.selectedDataset = datasets[0];
 
-      //then get all versions for the first dataset in the result list
-      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
-        model.datasetModel.selectedVersion = versions[0];
+        //then get all versions for the first dataset in the result list
+        this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
+          model.datasetModel.selectedVersion = versions[0];
+        },
+          () => {},
+          () => this.setDefaultValidationPeriod()
+        );
+
+        // in the same time get the variables too
+        this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
+          model.datasetModel.selectedVariable = variables[0];
+        });
+
+        //and the filters
+        this.updateDatasetConfigFilters(model);
       });
-
-      // in the same time get the variables too
-      this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
-        model.datasetModel.selectedVariable = variables[0];
-      });
-
-      //and the filters
-      this.updateDatasetConfigFilters(model);
-    });
   }
 
   private updateDatasetConfigFilters(model: DatasetConfigModel) {
@@ -115,6 +120,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (toBeRemoved > -1) {
       this.validationModel.datasetConfigurations.splice(toBeRemoved, 1);
     }
+    this.setDefaultValidationPeriod();
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel) {
@@ -123,10 +129,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.updateDatasetConfigFilters(config);
       }
     });
+    this.setDefaultValidationPeriod();
   }
 
   onReferenceChange() {
     this.updateDatasetConfigFilters(this.validationModel.referenceConfigurations[0]);
+    this.setDefaultValidationPeriod();
   }
 
 
@@ -167,4 +175,32 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         console.error(error);
       });
   }
+
+  setDefaultValidationPeriod(): void {
+    const datesFrom = [];
+    const datesTo = [];
+    this.validationModel.datasetConfigurations.forEach(config => {
+      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end){
+        datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
+        datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
+      }
+    });
+
+    this.validationModel.referenceConfigurations.forEach(config => {
+      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end){
+        datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
+        datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
+      }
+    });
+    if (datesFrom.length !== 0){
+      this.validationStart = new Date(Math.max.apply(null, datesFrom));
+    }
+    if (datesTo.length !== 0){
+      this.validationEnd = new Date(Math.min.apply(null, datesTo));
+    }
+
+    this.validationModel.validationPeriodModel.intervalFrom = this.validationStart;
+    this.validationModel.validationPeriodModel.intervalTo = this.validationEnd;
+  }
+
 }
