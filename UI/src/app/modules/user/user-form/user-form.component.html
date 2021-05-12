@@ -22,7 +22,7 @@
 
       <div class="p-py-3">
         <span class="p-float-label">
-          <input class="form-field" id="password-confirm" type="password" pInputText formControlName="passwordConfirmation">
+          <input class="form-field" id="password-confirm" type="password" pInputText formControlName="password2">
           <label for="password-confirm">Password confirmation</label>
           <span class="pi pi-question-circle"></span>
         </span>
@@ -38,7 +38,7 @@
 
       <div class="p-py-3">
         <span class="p-float-label">
-          <input class="form-field" id="first-name" type="text" pInputText formControlName="firstName">
+          <input class="form-field" id="first-name" type="text" pInputText formControlName="first_name">
           <label for="first-name">First name</label>
           <span class="pi pi-question-circle"></span>
         </span>
@@ -46,7 +46,7 @@
 
       <div class="p-py-3">
         <span class="p-float-label">
-          <input class="form-field" id="last-name" type="text" pInputText formControlName="lastName">
+          <input class="form-field" id="last-name" type="text" pInputText formControlName="last_name">
           <label for="last-name">Last name</label>
           <span class="pi pi-question-circle"></span>
         </span>
@@ -63,10 +63,11 @@
       <div class="p-py-3">
         <span class="p-float-label">
           <p-dropdown class="form-field"
-                      [options]="countries"
+                      [options]="countries$|async"
                       [style]="{'width':'15rem', 'height': '2.5rem'}"
                       formControlName="country"
                       optionLabel="name"
+                      optionValue="code"
                       placeholder=" ">
           </p-dropdown>
           <label>Country</label>
@@ -90,7 +91,7 @@
       </button>
       <button *ngIf="userData"
               pButton
-              class="submit-button"
+              type="submit"
               label="Save"
               [disabled]="!userForm.valid">
       </button>
