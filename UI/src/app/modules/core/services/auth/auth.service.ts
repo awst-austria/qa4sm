@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
@@ -7,6 +7,8 @@ import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
 
+const csrfToken = '{{csrf_token}}';
+const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 @Injectable({
   providedIn: 'root'
 })
@@ -15,6 +17,7 @@ export class AuthService {
 
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
+  private signUpUrl = this.API_URL + 'api/sign-up';
 
   emptyUser = {username: '',
     first_name: '',
@@ -91,5 +94,23 @@ export class AuthService {
       );
     return logoutResult;
   }
+
+  signUp(userForm: any): void{
+    this.httpClient.post(this.signUpUrl, userForm, {headers, observe: 'body', responseType: 'text'}).subscribe(
+      response => {
+         console.log(response);
+      });
+  }
+  // addValidation(validationId: string): void {
+  //   const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  //   const data = {add_validation: true};
+  //   this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
+  //     response => {
+  //       alert(response);
+  //     }
+  //   );
+  // }
+  //
+
 
 }
