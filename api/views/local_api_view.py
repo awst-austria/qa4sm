@@ -9,5 +9,5 @@ from django_countries import countries
 @permission_classes([AllowAny])
 def get_list_of_countries(request):
     country_dict = countries.countries
-    response = [{'abbreviation': key, 'name': country_dict[key]} for key in country_dict]
+    response = [{'code': key, 'name': country_dict[key]} for key in country_dict]
     return JsonResponse(response, safe=False)
