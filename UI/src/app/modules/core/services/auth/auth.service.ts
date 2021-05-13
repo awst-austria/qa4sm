@@ -18,6 +18,7 @@ export class AuthService {
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
   private signUpUrl = this.API_URL + 'api/sign-up';
+  private userUpdateUrl = this.API_URL + 'api/user-update';
 
   emptyUser = {username: '',
     first_name: '',
@@ -101,16 +102,12 @@ export class AuthService {
          console.log(response);
       });
   }
-  // addValidation(validationId: string): void {
-  //   const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-  //   const data = {add_validation: true};
-  //   this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
-  //     response => {
-  //       alert(response);
-  //     }
-  //   );
-  // }
-  //
+  updateUser(userForm: any): void{
+    this.httpClient.patch(this.userUpdateUrl, userForm, {headers, observe: 'body', responseType: 'text'}).subscribe(
+      response => {
+        console.log(response);
+      });
+  }
 
 
 }

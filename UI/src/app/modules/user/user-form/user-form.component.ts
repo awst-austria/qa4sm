@@ -46,7 +46,11 @@ export class UserFormComponent implements OnInit {
     // const selectedCountryCode = this.userForm.value.country.code;
     // this.userForm.controls.country.setValue(selectedCountryCode);
     console.warn(this.userForm.value);
-    this.userService.signUp(this.userForm.value);
+    if (!this.userData){
+      this.userService.signUp(this.userForm.value);
+    } else {
+      this.userService.updateUser(this.userForm.value);
+    }
   }
 
   getListOfCountries(): void{
