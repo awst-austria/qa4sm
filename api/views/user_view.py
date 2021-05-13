@@ -42,6 +42,22 @@ def signup_post(request):
     return HttpResponse(response, status=200)
 
 
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def user_update(request):
+    user = User.objects.get(username=request.user.username)
+    if request.method == 'PATCH':
+        user_data = request.data
+        del user_data['password2']
+        for key in user_data:
+            print(key, user_data[key], getattr(user, key))
+            if getattr(user, key) != user_data[key]:
+                setattr(user, key, user_data[key])
+            user.save()
+        response = 'User data updated'
+        return HttpResponse(response, status=200)
+
+
 class UserSerializer(ModelSerializer):
     last_login = DateTimeField(read_only=True)
     date_joined = DateTimeField(read_only=True)
