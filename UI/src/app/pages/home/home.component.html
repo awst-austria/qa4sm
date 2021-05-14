@@ -1,4 +1,6 @@
-<div class="p-grid p-justify-center">
+<script src="../../modules/core/services/global/global-params.dto.ts"></script>
+<script src="home.component.ts"></script>
+<div *ngIf="images$|async as images" class="p-grid p-justify-center">
   <div class="p-col-12">
 
     <div class="carousel-desc centered" style="top: 17rem">
@@ -16,7 +18,7 @@
       </div>
     </div>
 
-    <p-carousel [value]="landingPageImages"  [circular]="true" [autoplayInterval]="5000">
+    <p-carousel [value]="getListOfPlots(images)" [circular]="true" [autoplayInterval]="5000">
       <ng-template let-image pTemplate="item">
         <img class="carousel-img" src="{{image[0]}}" />
         <div class="image-attribution">

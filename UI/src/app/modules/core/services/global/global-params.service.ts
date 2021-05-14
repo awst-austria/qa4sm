@@ -11,7 +11,15 @@ const globalContextUrl: string = environment.API_URL + 'api/globals';
 export class GlobalParamsService {
 
   // globalContext$: Observable<GlobalContextDto[]>;
-  public globalContext: GlobalParamsDto = {admin_mail: '', doi_prefix: '', site_url: '', app_version: '', news: ''};
+  public globalContext: GlobalParamsDto = {
+  admin_mail: '',
+  doi_prefix: '',
+  site_url: '',
+  app_version: '',
+  expiry_period: '',
+  warning_period: '',
+  news: '',
+  };
 
   constructor(private httpClient: HttpClient) {
     this.init();

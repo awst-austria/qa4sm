@@ -12,6 +12,7 @@ import {ValidationsComponent} from './pages/validations/validations.component';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from "./pages/terms/terms.component";
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
+import {HelpComponent} from './pages/help/help.component';
 
 
 const routes: Routes = [
@@ -24,6 +25,7 @@ const routes: Routes = [
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},
   {path: 'about', component: AboutComponent},
+  {path: 'help', component: HelpComponent},
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
   {path: '**', component: ErrorComponent}

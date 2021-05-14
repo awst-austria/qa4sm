@@ -47,6 +47,10 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
+import { HelpComponent } from './pages/help/help.component';
+import {IvyGalleryModule} from 'angular-gallery';
+import {NgxPageScrollModule} from 'ngx-page-scroll';
+import {CoreModule} from './modules/core/core.module';
 
 
 @NgModule({
@@ -63,6 +67,7 @@ import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component'
     AboutComponent,
     TermsComponent,
     DatasetInfoComponent,
+    HelpComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -94,7 +99,10 @@ import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component'
     AnomaliesModule,
     ScalingModule,
     NgxPaginationModule,
-    MapModule
+    MapModule,
+    IvyGalleryModule,
+    NgxPageScrollModule,
+    CoreModule
 
   ],
   providers: [

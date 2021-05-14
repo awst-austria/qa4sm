@@ -1,0 +1,70 @@
+<div *ngIf="updatedMetrics$|async as metrics" class="p-grid no-gutters">
+  <div *ngIf="metrics[indx].overviewFiles|async as overviewPlots" class="p-col-12">
+    <p-panel>
+      <ng-template pTemplate="header">
+        <div class="text-center" style="width: 95%">
+          <h4 class="my-0 py-0 font-weight-normal">Result files</h4>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="icons">
+      </ng-template>
+
+      <div class="p-grid p-align-center">
+        <div [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
+          <img *ngIf="metrics[indx].boxplotFile|async as boxplot"
+               width="95%"
+               height="95%"
+               [src]="sanitizePlotUrl(boxplot[0].plot)"
+               (click)="showGallery(0, boxplot)"
+               [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
+               alt="Boxplot for {{metrics[indx].metric_pretty_name}}">
+        </div>
+        <div class="p-col">
+          <div  class="p-grid">
+            <div *ngFor="let plot of overviewPlots; let ind = index"
+                 [ngClass]="{'p-col': overviewPlots.length === 1, 'p-col-10': overviewPlots.length === 2, 'p-col-6': overviewPlots.length > 2}">
+              <img  width="95%" height="95%"
+                   [src]="sanitizePlotUrl(plot.plot)"
+                   (click)="showGallery(ind, overviewPlots)"
+                   [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length === 2, 'pcol6': overviewPlots.length > 2}"
+                    alt="An Overview map for {{metrics[indx].metric_pretty_name}}">
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="p-grid">
+        <div class="p-col-3 center p-mt-2">
+          <button type="button"
+                  style="width: 9rem;"
+                  class="btn btn-sm btn-primary"
+                  title="Download graphs .zip"
+                  (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
+            <span class="pi pi-download"></span> Download graphs
+          </button>
+        </div>
+        <div class="p-col">
+          <span class="p-float-label p-mb-4 p-mt-3">
+            <p-dropdown id="metricSelector"
+                        (onChange)="onMetricChange()"
+                        [options]="metrics"
+                        [(ngModel)]="selectedMetrics"
+                        optionLabel="metric_pretty_name"
+                        [style]="{'width': '100%'}">
+            </p-dropdown>
+          </span>
+        </div>
+        <div class="p-col-3 px-0 p-mt-2 center">
+          <button type="button"
+                  style="width: 9rem;"
+                  class="btn btn-sm btn-primary"
+                  title="Download all results in NetCDF format"
+                  (click)="downloadResultFile(validation.id, 'netCDF', validation.output_file_name)">
+            <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> Download NetCDF
+          </button>
+        </div>
+      </div>
+
+    </p-panel>
+  </div>
+</div>

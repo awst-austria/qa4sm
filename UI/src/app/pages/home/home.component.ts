@@ -1,14 +1,19 @@
 import {Component, OnInit} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {GlobalParamsService} from '../../modules/core/services/gloabal-params/global-params.service';
+import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
+import {WebsiteGraphicsService} from '../../modules/core/services/global/website-graphics.service';
+import {Observable} from 'rxjs';
+import {PlotDto} from '../../modules/core/services/global/plot.dto';
+import {HttpParams} from '@angular/common/http';
+import {SafeUrl} from '@angular/platform-browser';
 
 interface City {
-  name: string,
-  code: string
+  name: string;
+  code: string;
 }
-
-@Component({
+const homeUrlPrefix = '/static/images/home/';
+  @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -16,13 +21,14 @@ interface City {
 export class HomeComponent implements OnInit {
 
   landingPageImages = [
-    ['assets/landing_page_images/map_us_spearman.png',
+    [homeUrlPrefix + 'map_us_spearman.png',
       'Image: QA4SM', '#'],
-    ['assets/landing_page_images/smos.jpg',
+    [homeUrlPrefix + 'smos.jpg',
       'Image: ESA', 'https://www.esa.int/spaceinimages/Images/2009/09/SMOS'],
-    ['assets/landing_page_images/root-zone_soil_moisture_may_2016.jpg',
+    [homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
       'Image: ESA', 'https://www.esa.int/spaceinimages/Images/2016/05/Root-zone_soil_moisture_May_2016'],
   ];
+  images$: Observable<PlotDto[]>;
 
   processDiagramImage = 'assets/landing_page_images/qa4am_overview_diagram.png';
   datasetSettingsImage = 'assets/landing_page_images/validate.png';
@@ -32,10 +38,12 @@ export class HomeComponent implements OnInit {
   loginButtonDisabled: boolean = false;
 
   constructor(private authService: AuthService,
-              private globalParamsService: GlobalParamsService) { }
-
+              private globalParamsService: GlobalParamsService,
+              public plotService: WebsiteGraphicsService) {
+  }
 
   ngOnInit(): void {
+    this.images$ = this.getPictures(this.landingPageImages);
     this.authService.authenticated.subscribe(authenticated => this.loginButtonDisabled = authenticated);
   }
 
@@ -43,4 +51,15 @@ export class HomeComponent implements OnInit {
     return this.globalParamsService.globalContext.news;
   }
 
+  getPictures(files: any): Observable<PlotDto[]> {
+    let params = new HttpParams();
+    files.forEach(file => {
+      params = params.append('file', file);
+    });
+    return this.plotService.getPlots(params);
+  }
+
+  getListOfPlots(listOfPlotDto: PlotDto[]): SafeUrl[]{
+    return this.plotService.sanitizeManyPlotUrls(listOfPlotDto);
+  }
 }

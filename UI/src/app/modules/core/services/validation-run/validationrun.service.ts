@@ -5,13 +5,18 @@ import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {ValidationSetDto} from '../../../validation-result/services/validation.set.dto';
 import {saveAs} from 'file-saver-es';
+import {MetricsPlotsDto} from './metrics-plots.dto';
 
 const urlPrefix = environment.API_URL + 'api';
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
 const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
 const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
-const downloadUrl: string = urlPrefix + '/download-result';
+const downloadResultsUrl: string = urlPrefix + '/download-result';
+const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
+const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
+const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
+// const downloadResultsGraphsUrl: string = urlPrefix + '/get-graphic-file';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -100,14 +105,14 @@ export class ValidationrunService {
     const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {save_name: true, new_name: newName};
     console.log(data);
-    this.httpClient.patch(saveUrl + '/', data, {headers , observe: 'body', responseType: 'json'}).subscribe(
+    this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'json'}).subscribe(
       () => {
       });
 
   }
 
-  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
-    const fileUrl = `${downloadUrl}?validationId=${validationId}&fileType=${fileType}`;
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void {
+    const fileUrl = `${downloadResultsUrl}?validationId=${validationId}&fileType=${fileType}`;
     saveAs(fileUrl, fileName);
   }
 
@@ -131,4 +136,22 @@ export class ValidationrunService {
       response => alert(response)
     );
   }
+
+  getSummaryStatistics(params: any): Observable<any> {
+    return this.httpClient.get(summaryStatisticsUrl, {params, headers, responseType: 'text'});
+  }
+
+  downloadSummaryStatisticsCsv(validationId: string): void {
+    const fileUrl = `${downloadStatisticsCsvUrl}?validationId=${validationId}`;
+    saveAs(fileUrl);
+  }
+
+  getMetricsAndPlotsNames(params: any): Observable<MetricsPlotsDto[]>{
+    return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
+  }
+
+  // getMetricsPlots(params: any): Observable<any>{
+  //   return this.httpClient.get(downloadResultsGraphsUrl, {params, responseType: 'text'});
+  // }
+
 }
