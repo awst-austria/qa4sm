@@ -18,7 +18,6 @@ from validator.validation import run_validation
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def start_validation(request):
-    print(request.data)
     ser = ValidationConfigurationSerializer(data=request.data)
     ser.is_valid(raise_exception=True)
     new_val_run = ser.save(user=request.user)
@@ -189,8 +188,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             reference_config = None
             dataset_config_models = []
             configs_to_save = [validated_data.get('reference_config')]
-            print('Reference config:')
-            print(configs_to_save)
             configs_to_save.extend(validated_data.get('dataset_configs'))
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,

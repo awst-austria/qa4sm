@@ -51,6 +51,4 @@ class TestLoginEndpoint(TestCase):
         # Http response status should be OK(200)
         assert response.status_code == 200
 
-        print(response.data['token'])
-
     # payload = jwt.decode(token, settings.API_SECRET_KEY, algorithms=[settings.JWT_ALGORYTHM])
