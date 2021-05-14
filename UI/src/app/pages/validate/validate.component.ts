@@ -17,9 +17,10 @@ import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dt
 import {NewValidationRunService} from './service/new-validation-run.service';
 import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto';
 import {ToastService} from '../../modules/core/services/toast/toast.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
+import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -53,8 +54,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private variableService: DatasetVariableService,
               private filterService: FilterService,
               private newValidationService: NewValidationRunService,
+              private validationRunService: ValidationrunService,
               private toastService: ToastService,
-              private router: Router) {
+              private router: Router,
+              private route: ActivatedRoute) {
 
   }
 
@@ -63,8 +66,19 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.addDatasetToValidate();
-    this.addReferenceDataset();
+    this.route.queryParams.subscribe(params => {
+      if (params['validation_id']) {
+        this.validationRunService.getValidationRunById(params['validation_id']).subscribe(
+          valrun => console.log('Val run:', valrun)
+        );
+      } else {
+        this.addDatasetToValidate();
+        this.addReferenceDataset();
+      }
+
+    });
+
+
   }
 
   addDatasetToValidate() {
@@ -81,24 +95,25 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
-        model.datasetModel.selectedDataset = datasets[0];
+      model.datasetModel.selectedDataset = datasets[0];
 
-        //then get all versions for the first dataset in the result list
-        this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
+      //then get all versions for the first dataset in the result list
+      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
           model.datasetModel.selectedVersion = versions[0];
         },
-          () => {},
-          () => this.setDefaultValidationPeriod()
-        );
+        () => {
+        },
+        () => this.setDefaultValidationPeriod()
+      );
 
-        // in the same time get the variables too
-        this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
-          model.datasetModel.selectedVariable = variables[0];
-        });
-
-        //and the filters
-        this.updateDatasetConfigFilters(model);
+      // in the same time get the variables too
+      this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
+        model.datasetModel.selectedVariable = variables[0];
       });
+
+      //and the filters
+      this.updateDatasetConfigFilters(model);
+    });
   }
 
   private updateDatasetConfigFilters(model: DatasetConfigModel) {
@@ -180,22 +195,22 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const datesFrom = [];
     const datesTo = [];
     this.validationModel.datasetConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end){
+      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
         datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
         datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
       }
     });
 
     this.validationModel.referenceConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end){
+      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
         datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
         datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
       }
     });
-    if (datesFrom.length !== 0){
+    if (datesFrom.length !== 0) {
       this.validationStart = new Date(Math.max.apply(null, datesFrom));
     }
-    if (datesTo.length !== 0){
+    if (datesTo.length !== 0) {
       this.validationEnd = new Date(Math.min.apply(null, datesTo));
     }
 
