@@ -28,8 +28,6 @@ def users(request):
 def signup_post(request):
     if request.method == 'POST':
         new_user_data = request.data
-        del new_user_data['password2']
-
         try:
             new_user = UserSerializer().create(new_user_data)
             new_user.is_active = False
@@ -48,14 +46,8 @@ def user_update(request):
     user = User.objects.get(username=request.user.username)
     if request.method == 'PATCH':
         user_data = request.data
-        del user_data['password2']
-        for key in user_data:
-            print(key, user_data[key], getattr(user, key))
-            if getattr(user, key) != user_data[key]:
-                setattr(user, key, user_data[key])
-            user.save()
-        response = 'User data updated'
-        return HttpResponse(response, status=200)
+        updated_user = UserSerializer().update(user, user_data)
+        return Response(UserSerializer(updated_user).data, status=status.HTTP_200_OK)
 
 
 class UserSerializer(ModelSerializer):
@@ -80,6 +72,30 @@ class UserSerializer(ModelSerializer):
                   'copied_runs']
         extra_kwargs = {'password': {"write_only": True, 'required': True}}
 
+    @staticmethod
+    def validate_password(validated_data):
+        if validated_data['password2'] == validated_data['password']:
+            del validated_data['password2']
+        else:
+            raise IntegrityError('Passwords do not match')
+
+        return validated_data
+
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        cleaned_data = self.validate_password(validated_data)
+        user = User.objects.create_user(**cleaned_data)
         return user
+
+    def update(self, instance, validated_data):
+        cleaned_data = self.validate_password(validated_data)
+        password = cleaned_data.pop('password', None)
+
+        for (key, value) in cleaned_data.items():
+            setattr(instance, key, value)
+
+        if password is not None and password != '':
+            instance.set_password(password)
+
+        instance.save()
+
+        return instance
