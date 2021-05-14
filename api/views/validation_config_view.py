@@ -1,12 +1,15 @@
 from multiprocessing.context import Process
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connections
 from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.serializers import ModelSerializer
 
+from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter
 from validator.validation import run_validation
@@ -30,6 +33,54 @@ def start_validation(request):
     p.start()
     serializer = ValidationRunSerializer(new_val_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_validation_configuration(request, **kwargs):
+    validation_run_id = kwargs['id']
+    try:
+        val_run = ValidationRun.objects.get(pk=validation_run_id)
+        val_run_dict = {}
+        val_run_dict['id'] = val_run.id
+        val_run_dict['scaling_ref'] = val_run.scaling_ref
+        val_run_dict['scaling_method'] = val_run.scaling_method
+        val_run_dict['interval_from'] = val_run.interval_from
+        val_run_dict['interval_to'] = val_run.interval_to
+        val_run_dict['anomalies'] = val_run.anomalies
+        val_run_dict['min_lat'] = val_run.min_lat
+        val_run_dict['min_lon'] = val_run.min_lon
+        val_run_dict['max_lat'] = val_run.max_lat
+        val_run_dict['max_lon'] = val_run.max_lon
+        val_run_dict['anomalies_from'] = val_run.anomalies_from
+        val_run_dict['anomalies_to'] = val_run.anomalies_to
+        val_run_dict['tcol'] = val_run.tcol
+        val_run_dict['ref_dataset_config'] = val_run.reference_configuration_id
+        validation_run_serializer = ValidationRunSerializer(val_run)
+
+        datasets = []
+        val_run_dict['dataset_configs'] = datasets
+        for ds in val_run.dataset_configurations.all():
+            ds_dict = {}
+            ds_dict['id'] = ds.id
+            ds_dict['dataset'] = ds.dataset_id
+            ds_dict['version'] = ds.version_id
+            ds_dict['variable'] = ds.variable_id
+            filters_list = []
+            ds_dict['filters'] = filters_list
+            for filter in ds.filters.all():
+                filters_list.append(filter.id)
+
+            param_filters_list = []
+            ds_dict['param_filters'] = param_filters_list
+            for filter in ds.parametrised_filters.all():
+                param_filters_list.append({'id': filter.filter.id, 'parameters': filter.parameters})
+            datasets.append(ds_dict)
+        # configs = ValidationConfigurationModelSerializer(validation_run.dataset_configurations.all(), many=True)
+        return JsonResponse({'val': val_run_dict, 'val2': datasets},
+                            status=status.HTTP_404_NOT_FOUND, safe=False)
+    except ObjectDoesNotExist:
+        return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
 
 class DatasetConfigSerializer(serializers.Serializer):
@@ -168,3 +219,9 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     metrics = MetricsSerializer(many=True, required=True)
     anomalies = AnomaliesSerializer(required=True)
     scaling = ScalingSerializer(required=True)
+
+
+class ValidationConfigurationModelSerializer(ModelSerializer):
+    class Meta:
+        model = ValidationRun
+        fields = get_fields_as_list(model)
