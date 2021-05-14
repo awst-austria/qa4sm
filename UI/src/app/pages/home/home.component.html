@@ -1,18 +1,124 @@
-<div class="p-grid">
+<div class="p-grid p-justify-center">
   <div class="p-col-12">
-    <p-carousel [value]="landingPageImages"  [circular]="true" [autoplayInterval]="3000">
-      <ng-template let-image pTemplate="item">
-        <img style="max-width:100%;max-height:100%;" src="{{image}}" />
-      </ng-template>
-    </p-carousel>
-  </div>
-  <div class="p-col-12">
-    <div class="p-d-flex p-jc-center ">
-      <p-button label="Sign up" styleClass="p-mr-2 "></p-button>
-      <p-button label="Sign in" styleClass="p-mr-2 " routerLink="/login" [disabled]="loginButtonDisabled"></p-button>
+
+    <div class="carousel-desc centered" style="top: 17rem">
+      <div class="carousel-box">
+        <h1>Quality Assurance for Soil Moisture</h1>
+        <h3 class="carousel-desc">
+          Validation of satellite soil moisture products <br/>
+          against in-situ and model reference data
+        </h3>
+      </div>
+      <div class="p-d-flex p-jc-center">
+        <p-button label="Sign up" styleClass="p-mr-2 "></p-button>
+        <p-button label="Sign in" styleClass="p-mr-2 " routerLink="/login"
+                  [disabled]="loginButtonDisabled"></p-button>
+      </div>
     </div>
+
+    <p-carousel [value]="landingPageImages"  [circular]="true" [autoplayInterval]="5000">
+      <ng-template let-image pTemplate="item">
+        <img class="carousel-img" src="{{image[0]}}" />
+        <div class="image-attribution">
+          <a href="{{image[2]}}">{{image[1]}}</a>
+        </div>
+      </ng-template>
+
+    </p-carousel>
+
+  </div>
+</div>
+
+<!--        <p>-->
+<!--          <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" role="button">See results</a>-->
+<!--          <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>-->
+<!--        </p>-->
+
+
+<!--  <p>-->
+<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'published_results' %}" role="button">See results</a>-->
+<!--    <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>-->
+<!--    {% if user.is_authenticated %}-->
+<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'validation' %}" role="button">Try it</a>-->
+<!--    {% else %}-->
+<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'signup' %}" role="button">Sign up</a>-->
+<!--    <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>-->
+<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'login' %}" role="button">Log in</a>-->
+<!--    {% endif %}-->
+
+<!--  <div class="p-d-flex p-jc-center" style="position: relative">-->
+<!--    <p-button label="Sign up" styleClass="p-mr-2 "></p-button>-->
+<!--    <p-button label="Sign in" styleClass="p-mr-2 " routerLink="/login" [disabled]="loginButtonDisabled"></p-button>-->
+<!--  </div>-->
+<!--  -->
+<!--  </p>-->
+
+<hr class="featurette-divider">
+
+<div class="p-grid p-justify-center">
+  <div class="p-md-4 p-col-12">
+    <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
+    The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
+    <ul class="list">
+      <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the <a href="https://ismn.geo.tuwien.ac.at/">international soil moisture network</a></li>
+      <li>A traceble and consistent methodology for all comparisons</li>
+      <li>Various filtering and scaling options to assess the impact of these on the validation results</li>
+      <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>
+    </ul>
+    The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality control of soil moisture data products and provider users with <b>traceable validation results</b>.
+    <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
+  </div>
+
+  <div class="p-md-4 p-col-12">
+    <!-- hide div if news is empty -->
+    <div class="card news">
+      <div class="card-body">
+        <h5 class="card-title">News</h5>
+        {{this.getNewsText()}}
+        <!-- {{ news_text |safe }} -->
+      </div>
+    </div>
+    <!--{% endif %} -->
+    <img class="scaled_image" src="{{processDiagramImage}}" />
   </div>
 
 </div>
+
+<hr class="featurette-divider">
+
+<div class="p-grid p-justify-center">
+  <div class="p-col-10 card-deck">
+
+    <div class="card">
+      <div class="card-body">
+        <h4 class="text-center mt-0">Datasets and Settings</h4>
+        <p class="text-muted text-center" style="min-height: 3rem;">Allows specification of input datasets and settings for your validation</p>
+        <img class="scaled_image img-screen" id="serviceScreenshot1" alt="Validate" src="{{datasetSettingsImage}}" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h4 class="text-center mt-0">Results</h4>
+        <p class="text-muted text-center" style="min-height: 3rem;">Provides a list of all validation results</p>
+        <img class="scaled_image img-screen" id="serviceScreenshot2" alt="Results" src="{{resultsImage}}" />
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h4 class="text-center mt-0">Download and Visualize</h4>
+        <p class="text-muted text-center" style="min-height: 3rem;">Allows download of validation results in netCDF format and as graphics</p>
+        <img class="scaled_image img-screen" id="serviceScreenshot3" alt="Download and Visualise" src="{{downloadVisualiseImage}}" />
+      </div>
+    </div>
+  </div>
+  <div class="p-col-10 card-deck">
+    <a href="#">Back to top</a>
+  </div>
+</div>
+
+
 
 

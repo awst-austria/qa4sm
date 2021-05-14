@@ -1,1 +1,66 @@
+@import "~bootstrap/dist/css/bootstrap.css";
 
+.scaled_image {
+  display: block;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.carousel-img {
+  width: 100%;
+  max-height: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.carousel-caption {
+  z-index: 1;
+}
+
+.carousel-box {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.carousel-desc {
+  text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.carousel-desc>h1 {
+  text-shadow: .15rem .15rem .15rem rgba(0, 0, 0, 0.5);
+}
+
+.image-attribution {
+  color: white;
+  text-shadow: 0 0 .1rem black, 0 0 .5rem black;
+  position: relative;
+  z-index: 200;
+  margin-left: 0.1rem;
+  text-align: left;
+}
+
+.image-attribution>a {
+  color: #ffffff;
+}
+
+svg rect {
+  fill: gray;
+}
+
+svg text {
+  fill: yellow;
+  font: 12px sans-serif;
+  text-anchor: end;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  text-align: center;
+  color: white;
+}
