@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
@@ -7,8 +7,8 @@ import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
 
-const csrfToken = '{{csrf_token}}';
-const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
+// const csrfToken = '{{csrf_token}}';
+// const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 @Injectable({
   providedIn: 'root'
 })
@@ -66,7 +66,7 @@ export class AuthService {
       .post<UserDto>(this.loginUrl, credentials)
       .subscribe(
         data => {
-          this.currentUser = this.emptyUser;
+          this.currentUser = data;
           this.authenticated.next(true);
           authResult.next(true);
         },
@@ -97,16 +97,27 @@ export class AuthService {
   }
 
   signUp(userForm: any): void{
-    this.httpClient.post(this.signUpUrl, userForm, {headers, observe: 'body', responseType: 'text'}).subscribe(
+    this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'text'}).subscribe(
       response => {
          console.log(response);
       });
   }
-  updateUser(userForm: any): void{
-    this.httpClient.patch(this.userUpdateUrl, userForm, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      response => {
-        console.log(response);
-      });
+
+  updateUser(userForm: any): Subject<boolean>{
+    const authResult = new Subject<boolean>();
+    this.httpClient.patch<UserDto>(this.userUpdateUrl, userForm).subscribe(
+      data => {
+        this.currentUser = data;
+        this.authenticated.next(true);
+        authResult.next(true);
+        alert('User profile has been updated');
+      },
+      error => {
+        this.authenticated.next(false);
+        authResult.next(false);
+      }
+    );
+    return authResult;
   }
 
 
