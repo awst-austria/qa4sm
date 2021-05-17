@@ -14,6 +14,7 @@ import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {HelpComponent} from './pages/help/help.component';
 import {SignupComponent} from './pages/signup/signup.component';
+import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 
 
 const routes: Routes = [
@@ -30,6 +31,7 @@ const routes: Routes = [
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
   {path: 'signup', component: SignupComponent},
+  {path: 'signup-complete', component: SignupCompleteComponent, data: {showNavigationBar: false}},
   {path: '**', component: ErrorComponent}
 ];
 
