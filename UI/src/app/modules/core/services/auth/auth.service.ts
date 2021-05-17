@@ -19,7 +19,7 @@ export class AuthService {
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
   private signUpUrl = this.API_URL + 'api/sign-up';
-  private userUpdateUrl = this.API_URL + 'api/user-update';
+  private userModifyUrl = this.API_URL + 'api/user-modify';
 
   emptyUser = {username: '',
     first_name: '',
@@ -107,12 +107,26 @@ export class AuthService {
 
   updateUser(userForm: any): Subject<boolean>{
     const authResult = new Subject<boolean>();
-    this.httpClient.patch<UserDto>(this.userUpdateUrl, userForm).subscribe(
+    this.httpClient.patch<UserDto>(this.userModifyUrl, userForm).subscribe(
       data => {
         this.currentUser = data;
         this.authenticated.next(true);
         authResult.next(true);
         alert('User profile has been updated');
+      },
+      error => {
+        this.authenticated.next(false);
+        authResult.next(false);
+      }
+    );
+    return authResult;
+  }
+
+  deactivateUser(username: any): Subject<boolean>{
+    const authResult = new Subject<boolean>();
+    this.httpClient.delete<UserDto>(this.userModifyUrl, username).subscribe(
+      data => {
+        this.router.navigate(['/deactivate-user-complete']);
       },
       error => {
         this.authenticated.next(false);

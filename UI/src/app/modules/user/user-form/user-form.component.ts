@@ -43,9 +43,6 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit(): void{
-    // const selectedCountryCode = this.userForm.value.country.code;
-    // this.userForm.controls.country.setValue(selectedCountryCode);
-    console.warn(this.userForm.value);
     if (!this.userData){
       this.userService.signUp(this.userForm.value);
     } else {
@@ -67,6 +64,11 @@ export class UserFormComponent implements OnInit {
     this.userForm.controls.organisation.setValue(this.userData.organisation);
     this.userForm.controls.country.setValue(this.userData.country);
     this.userForm.controls.orcid.setValue(this.userData.orcid);
+  }
+
+  deactivateAccount(): void{
+    const username = this.userService.currentUser.username;
+    this.userService.deactivateUser(username);
   }
 
 }

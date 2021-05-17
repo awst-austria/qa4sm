@@ -99,7 +99,13 @@
 
     </form>
     <p>
-      <button *ngIf="userData" pButton type="button" label="Deactivate my account" class="p-button-danger"></button>
+      <button *ngIf="userData"
+              pButton
+              type="button"
+              label="Deactivate my account"
+              (click)="deactivateAccount()"
+              class="p-button-danger">
+      </button>
     </p>
   </div>
 </div>
