@@ -1,3 +1,4 @@
+from django.contrib.auth import logout
 from django.db import IntegrityError
 from django.http import HttpResponse, QueryDict
 from django_countries.serializer_fields import CountryField
@@ -7,7 +8,7 @@ from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-from validator.mailer import send_new_user_signed_up
+from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
 from validator.models import User
 
 
@@ -40,14 +41,23 @@ def signup_post(request):
     return HttpResponse(response, status=200)
 
 
-@api_view(['PATCH'])
+@api_view(['PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
-def user_update(request):
+def user_modify(request):
+    # this one serves for both, updating and deactivating user
     user = User.objects.get(username=request.user.username)
     if request.method == 'PATCH':
         user_data = request.data
         updated_user = UserSerializer().update(user, user_data)
         return Response(UserSerializer(updated_user).data, status=status.HTTP_200_OK)
+    elif request.method == 'DELETE':
+        request.user.is_active = False
+        request.user.save()
+        send_user_account_removal_request(request.user)
+        send_user_status_changed(request.user,False)
+        logout(request)
+        return HttpResponse(status=200)
+
 
 
 class UserSerializer(ModelSerializer):
