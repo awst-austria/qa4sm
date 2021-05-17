@@ -6,13 +6,15 @@ import {Observable} from 'rxjs';
 import {PlotDto} from '../../modules/core/services/global/plot.dto';
 import {HttpParams} from '@angular/common/http';
 import {SafeUrl} from '@angular/platform-browser';
-import {map} from "rxjs/operators";
+import {SettingsDto} from "../../modules/core/services/global/settings.dto";
 
 interface City {
   name: string;
   code: string;
 }
 const homeUrlPrefix = '/static/images/home/';
+const logoUrlPrefix = '/static/images/logo/';
+
   @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -20,6 +22,7 @@ const homeUrlPrefix = '/static/images/home/';
 })
 export class HomeComponent implements OnInit {
 
+  imageSource: string;
 
   carousel_files = [
     //  Files
@@ -33,15 +36,22 @@ export class HomeComponent implements OnInit {
     'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
     'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
     ];
-  carousel_text = [
+  carousel_desc = [
     // Text
     'Image: QA4SM',
     'Image: ESA',
     'Image: ESA',
     ];
 
+  logos = [
+    logoUrlPrefix + 'logo_awst.png',
+    logoUrlPrefix + 'logo_tuwien_geo.png',
+    logoUrlPrefix + 'logo_ffg.png',
+  ]
+
   carousel_images$: Observable<PlotDto[]>;
-  settings$: Observable<any>;
+  settings$: Observable<SettingsDto[]>;
+  logos$: Observable<PlotDto[]>;
 
   loginButtonDisabled: boolean = false;
 
@@ -52,8 +62,9 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.loginButtonDisabled = authenticated);
-    this.settings$ = this.settingsService.getAllSettings()
+    this.settings$ = this.settingsService.getAllSettings();
     this.carousel_images$ = this.getPictures(this.carousel_files);
+    this.logos$ = this.getPictures(this.logos);
   }
 
   getPictures(files: any): Observable<PlotDto[]> {
