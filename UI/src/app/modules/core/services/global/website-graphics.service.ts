@@ -1,4 +1,4 @@
-import {Injectable, Optional} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
@@ -6,7 +6,8 @@ import {PlotDto} from './plot.dto';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 
 const urlPrefix = environment.API_URL + 'api';
-const getPlotsUrl: string = urlPrefix + '/get-graphic-file';
+const getPlotsUrl: string = urlPrefix + '/get-graphic-files';
+const getSinglePlotUrl: string = urlPrefix + '/get-graphic-file';
 @Injectable({
   providedIn: 'root'
 })
@@ -19,6 +20,11 @@ export class WebsiteGraphicsService {
   getPlots(params: any): Observable<PlotDto[]>{
     return this.httpClient.get<PlotDto[]>(
       getPlotsUrl, {params});
+  }
+
+  getSinglePlot(params: any): Observable<PlotDto>{
+    return this.httpClient.get<PlotDto>(
+      getSinglePlotUrl, {params});
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
