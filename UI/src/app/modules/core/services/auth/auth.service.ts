@@ -6,6 +6,7 @@ import {LoginDto} from './login.dto';
 import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
+import {Router} from '@angular/router';
 
 // const csrfToken = '{{csrf_token}}';
 // const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -32,7 +33,9 @@ export class AuthService {
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
 
-  constructor(private httpClient: HttpClient, private logger: NGXLogger) {
+  constructor(private httpClient: HttpClient,
+              private logger: NGXLogger,
+              private router: Router) {
     this.init();
   }
 
@@ -45,7 +48,6 @@ export class AuthService {
           this.authenticated.next(true);
         },
         error => {
-
         }
       );
   }
@@ -99,7 +101,7 @@ export class AuthService {
   signUp(userForm: any): void{
     this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'text'}).subscribe(
       response => {
-         console.log(response);
+         this.router.navigate(['/signup-complete']);
       });
   }
 
