@@ -54,6 +54,7 @@ import {CoreModule} from './modules/core/core.module';
 import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
+import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
 
 
 @NgModule({
@@ -73,6 +74,7 @@ import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.c
     HelpComponent,
     SignupComponent,
     SignupCompleteComponent,
+    DeactivateUserCompleteComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
