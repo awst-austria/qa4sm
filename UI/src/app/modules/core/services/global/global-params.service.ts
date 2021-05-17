@@ -18,7 +18,6 @@ export class GlobalParamsService {
   app_version: '',
   expiry_period: '',
   warning_period: '',
-  news: '',
   };
 
   constructor(private httpClient: HttpClient) {

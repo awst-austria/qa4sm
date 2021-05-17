@@ -1,6 +1,4 @@
-<script src="../../modules/core/services/global/global-params.dto.ts"></script>
-<script src="home.component.ts"></script>
-<div *ngIf="images$|async as images" class="p-grid p-justify-center">
+<div *ngIf="carousel_images$|async as images" class="p-grid">
   <div class="p-col-12">
 
     <div class="carousel-desc centered" style="top: 17rem">
@@ -11,54 +9,22 @@
           against in-situ and model reference data
         </h3>
       </div>
-      <div class="p-d-flex p-jc-center">
-        <p-button label="Sign up" styleClass="p-mr-2 "></p-button>
-        <p-button label="Sign in" styleClass="p-mr-2 " routerLink="/login"
-                  [disabled]="loginButtonDisabled"></p-button>
-      </div>
-    </div>
 
+    </div>
     <p-carousel [value]="getListOfPlots(images)" [circular]="true" [autoplayInterval]="5000">
       <ng-template let-image pTemplate="item">
-        <img class="carousel-img" src="{{image[0]}}" />
-        <div class="image-attribution">
-          <a href="{{image[2]}}">{{image[1]}}</a>
-        </div>
+        <img class="carousel-img"  style="max-width:100%;max-height:100%;" [src]="image" />
+<!--        <p>{{ image.reference }}</p>-->
       </ng-template>
-
     </p-carousel>
-
   </div>
 </div>
 
-<!--        <p>-->
-<!--          <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" role="button">See results</a>-->
-<!--          <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>-->
-<!--        </p>-->
-
-
-<!--  <p>-->
-<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'published_results' %}" role="button">See results</a>-->
-<!--    <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>-->
-<!--    {% if user.is_authenticated %}-->
-<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'validation' %}" role="button">Try it</a>-->
-<!--    {% else %}-->
-<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'signup' %}" role="button">Sign up</a>-->
-<!--    <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>-->
-<!--    <a style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="{% url 'login' %}" role="button">Log in</a>-->
-<!--    {% endif %}-->
-
-<!--  <div class="p-d-flex p-jc-center" style="position: relative">-->
-<!--    <p-button label="Sign up" styleClass="p-mr-2 "></p-button>-->
-<!--    <p-button label="Sign in" styleClass="p-mr-2 " routerLink="/login" [disabled]="loginButtonDisabled"></p-button>-->
-<!--  </div>-->
-<!--  -->
-<!--  </p>-->
 
 <hr class="featurette-divider">
 
 <div class="p-grid p-justify-center">
-  <div class="p-md-4 p-col-12">
+  <div class="p-col-fixed p-md-4" style="width:50rem">
     <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
     The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
     <ul class="list">
@@ -71,17 +37,14 @@
     <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
   </div>
 
-  <div class="p-md-4 p-col-12">
-    <!-- hide div if news is empty -->
+  <div *ngIf="settings$|async as settings"   class="p-col-fixed p-md-4" style="width:50rem">
     <div class="card news">
       <div class="card-body">
         <h5 class="card-title">News</h5>
-        {{this.getNewsText()}}
-        <!-- {{ news_text |safe }} -->
+        <div [innerHTML]=settings[0].news></div>
       </div>
     </div>
-    <!--{% endif %} -->
-    <img class="scaled_image" src="{{processDiagramImage}}" />
+    <img class="scaled_image" src="assets/home_images/qa4am_overview_diagram.png" />
   </div>
 
 </div>
@@ -89,13 +52,12 @@
 <hr class="featurette-divider">
 
 <div class="p-grid p-justify-center">
-  <div class="p-col-10 card-deck">
-
+  <div class="card-deck p-col-fixed" style="width:100rem">
     <div class="card">
       <div class="card-body">
         <h4 class="text-center mt-0">Datasets and Settings</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">Allows specification of input datasets and settings for your validation</p>
-        <img class="scaled_image img-screen" id="serviceScreenshot1" alt="Validate" src="{{datasetSettingsImage}}" />
+        <img class="scaled_image img-screen" id="serviceScreenshot1" alt="Validate" src="assets/home_images/validate.png" />
       </div>
     </div>
 
@@ -103,7 +65,7 @@
       <div class="card-body">
         <h4 class="text-center mt-0">Results</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">Provides a list of all validation results</p>
-        <img class="scaled_image img-screen" id="serviceScreenshot2" alt="Results" src="{{resultsImage}}" />
+        <img class="scaled_image img-screen" id="serviceScreenshot2" alt="Results" src="assets/home_images/validation_result_list.png"  />
 
       </div>
     </div>
@@ -112,14 +74,19 @@
       <div class="card-body">
         <h4 class="text-center mt-0">Download and Visualize</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">Allows download of validation results in netCDF format and as graphics</p>
-        <img class="scaled_image img-screen" id="serviceScreenshot3" alt="Download and Visualise" src="{{downloadVisualiseImage}}" />
+        <img class="scaled_image img-screen" id="serviceScreenshot3" alt="Download and Visualise" src="assets/home_images/validation_result_details.png" />
       </div>
     </div>
   </div>
-  <div class="p-col-10 card-deck">
-    <a href="#">Back to top</a>
+</div>
+
+<div class="p-grid p-justify-center">
+  <div class="card-deck p-col-fixed" style="width:100rem">
+    <a pageScroll [pageScrollDuration]="1" href="#top">Back to top</a>
   </div>
 </div>
+
+
 
 
 

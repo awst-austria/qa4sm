@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
+import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {WebsiteGraphicsService} from '../../modules/core/services/global/website-graphics.service';
 import {Observable} from 'rxjs';
 import {PlotDto} from '../../modules/core/services/global/plot.dto';
 import {HttpParams} from '@angular/common/http';
 import {SafeUrl} from '@angular/platform-browser';
+import {map} from "rxjs/operators";
 
 interface City {
   name: string;
@@ -20,35 +20,40 @@ const homeUrlPrefix = '/static/images/home/';
 })
 export class HomeComponent implements OnInit {
 
-  landingPageImages = [
-    [homeUrlPrefix + 'map_us_spearman.png',
-      'Image: QA4SM', '#'],
-    [homeUrlPrefix + 'smos.jpg',
-      'Image: ESA', 'https://www.esa.int/spaceinimages/Images/2009/09/SMOS'],
-    [homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
-      'Image: ESA', 'https://www.esa.int/spaceinimages/Images/2016/05/Root-zone_soil_moisture_May_2016'],
-  ];
-  images$: Observable<PlotDto[]>;
 
-  processDiagramImage = 'assets/landing_page_images/qa4am_overview_diagram.png';
-  datasetSettingsImage = 'assets/landing_page_images/validate.png';
-  resultsImage = 'assets/landing_page_images/validation_result_list.png';
-  downloadVisualiseImage = 'assets/landing_page_images/validation_result_details.png';
+  carousel_files = [
+    //  Files
+    homeUrlPrefix + 'map_us_spearman.png',
+    homeUrlPrefix + 'smos.jpg',
+    homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
+    ];
+  carousel_links = [
+    // Links
+    'qa4sm.eu',
+    'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
+    'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
+    ];
+  carousel_text = [
+    // Text
+    'Image: QA4SM',
+    'Image: ESA',
+    'Image: ESA',
+    ];
+
+  carousel_images$: Observable<PlotDto[]>;
+  settings$: Observable<any>;
 
   loginButtonDisabled: boolean = false;
 
   constructor(private authService: AuthService,
-              private globalParamsService: GlobalParamsService,
+              private settingsService: SettingsService,
               public plotService: WebsiteGraphicsService) {
   }
 
   ngOnInit(): void {
-    this.images$ = this.getPictures(this.landingPageImages);
     this.authService.authenticated.subscribe(authenticated => this.loginButtonDisabled = authenticated);
-  }
-
-  getNewsText(): string {
-    return this.globalParamsService.globalContext.news;
+    this.settings$ = this.settingsService.getAllSettings()
+    this.carousel_images$ = this.getPictures(this.carousel_files);
   }
 
   getPictures(files: any): Observable<PlotDto[]> {
@@ -62,4 +67,5 @@ export class HomeComponent implements OnInit {
   getListOfPlots(listOfPlotDto: PlotDto[]): SafeUrl[]{
     return this.plotService.sanitizeManyPlotUrls(listOfPlotDto);
   }
+
 }
