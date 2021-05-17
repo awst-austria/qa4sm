@@ -92,7 +92,8 @@ def get_metric_names_and_associated_files(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_graphic_file(request):
+def get_graphic_files(request):
+    # Here we take a list of parameters 'file' and return a list of plots encoded to base64
     files = request.query_params.getlist('file', None)
     plots = []
     for file in files:
@@ -102,7 +103,21 @@ def get_graphic_file(request):
         image = File(open_file)
         name = base64.b64encode(image.read())
         open_file.close()
-        plots.append({'plot': str(name).lstrip("b'").rstrip("'")})
-
+        plots.append({'plot': name.decode('utf-8')})
     return JsonResponse(plots, safe=False)
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_graphic_file(request):
+    # Here we take only one file and return one plot;
+    # Sometimes it's just easier to read a single file, and this function is created not to refer to index 0 every time
+    file = request.query_params.get('file', None)
+    if '/static/' in file:
+        file = file.replace('/static/', os.path.join(settings.BASE_DIR, 'validator/static/'))
+    open_file = open(file, 'rb')
+    image = File(open_file)
+    name = base64.b64encode(image.read())
+    open_file.close()
+
+    return JsonResponse({'plot': name.decode('utf-8')}, safe=True)
