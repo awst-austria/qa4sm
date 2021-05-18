@@ -6,6 +6,8 @@ import {InputTextModule} from 'primeng/inputtext';
 import {DropdownModule} from 'primeng/dropdown';
 import {TooltipModule} from 'primeng/tooltip';
 import {ButtonModule} from 'primeng/button';
+import {CheckboxModule} from 'primeng/checkbox';
+import {RouterModule} from '@angular/router';
 
 
 @NgModule({
@@ -21,6 +23,8 @@ import {ButtonModule} from 'primeng/button';
     FormsModule,
     TooltipModule,
     ButtonModule,
+    CheckboxModule,
+    RouterModule,
   ]
 })
 export class UserModule { }
