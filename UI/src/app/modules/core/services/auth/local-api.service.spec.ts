@@ -1,13 +1,13 @@
 import {TestBed} from '@angular/core/testing';
 
-import {UserFormService} from './user-form.service';
+import {LocalApiService} from './local-api.service';
 
 describe('LocalApiService', () => {
-  let service: UserFormService;
+  let service: LocalApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(UserFormService);
+    service = TestBed.inject(LocalApiService);
   });
 
   it('should be created', () => {

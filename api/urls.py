@@ -19,7 +19,7 @@ from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_file, \
     get_metric_names_and_associated_files
-from api.views.user_form_view import get_list_of_countries, get_user_form_help
+from api.views.local_api_view import get_list_of_countries
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -80,5 +80,4 @@ urlpatterns = [
     path('country-list', get_list_of_countries, name = 'List of countries'),
     path('sign-up', signup_post, name='Sign up'),
     path('user-modify', user_modify, name='User update'),
-    path('user-form-help', get_user_form_help, name='User form help')
 ]
