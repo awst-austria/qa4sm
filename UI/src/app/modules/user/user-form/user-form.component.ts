@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
-import {UserFormService} from '../../core/services/auth/user-form.service';
+import {LocalApiService} from '../../core/services/auth/local-api.service';
 import {CountryDto} from '../../core/services/global/country.dto';
 import {UserDto} from '../../core/services/auth/user.dto';
 import {AuthService} from '../../core/services/auth/auth.service';
@@ -13,30 +13,29 @@ import {Observable} from 'rxjs';
 })
 export class UserFormComponent implements OnInit {
   userForm = this.formBuilder.group({
-      username: ['', Validators.required],
-      password: [''],
-      password2: [''],
-      email: [''],
+      username: ['', [Validators.required, Validators.maxLength(150)]],
+      password: ['', [Validators.required]],
+      password2: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       first_name: [''],
       last_name: [''],
       organisation: [''],
       country: [null],
       orcid: [''],
   });
-
   countries: CountryDto[];
   countries$: Observable<CountryDto[]>;
   selectedCountry: CountryDto;
 
   @Input() userData: UserDto;
 
-  constructor(private localApiService: UserFormService,
+  constructor(private userFormService: LocalApiService,
               private formBuilder: FormBuilder,
               private userService: AuthService) { }
 
   ngOnInit(): void {
     // this.getListOfCountries();
-    this.countries$ = this.localApiService.getCountryList();
+    this.countries$ = this.userFormService.getCountryList();
     if (this.userData){
       this.setDefaultValues();
     }
@@ -51,13 +50,14 @@ export class UserFormComponent implements OnInit {
   }
 
   getListOfCountries(): void{
-    this.localApiService.getCountryList().subscribe(countries => {
+    this.userFormService.getCountryList().subscribe(countries => {
       this.countries = countries;
     });
   }
 
   setDefaultValues(): void{
     this.userForm.controls.username.setValue(this.userData.username);
+    this.userForm.controls.username.disable();
     this.userForm.controls.email.setValue(this.userData.email);
     this.userForm.controls.first_name.setValue(this.userData.first_name);
     this.userForm.controls.last_name.setValue(this.userData.last_name);

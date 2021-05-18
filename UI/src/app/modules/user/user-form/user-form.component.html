@@ -3,12 +3,13 @@
     <h1 *ngIf="!userData" class="h3 p-mb-3 font-weight-normal">Sign up</h1>
     <h1 *ngIf="userData" class="h3 p-mb-3 font-weight-normal">User profile</h1>
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-
       <div class="p-py-3">
         <span class="p-float-label">
           <input class="form-field" id="username" type="text" pInputText formControlName="username">
           <label for="username">Username</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -16,7 +17,9 @@
         <span class="p-float-label">
           <input class="form-field" id="password" type="password" pInputText formControlName="password">
           <label for="password">Password</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Your password can't be too similar to your other personal information.Your password must contain at least 8 characters. Your password can't be a commonly used password. Your password can't be entirely numeric."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -24,7 +27,9 @@
         <span class="p-float-label">
           <input class="form-field" id="password-confirm" type="password" pInputText formControlName="password2">
           <label for="password-confirm">Password confirmation</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Enter the same password as before, for verification."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -32,7 +37,9 @@
         <span class="p-float-label">
           <input class="form-field" id="email" type="email" pInputText formControlName="email">
           <label for="email">Email address</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Required. A valid email address where you can receive notifications about validations."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -40,7 +47,9 @@
         <span class="p-float-label">
           <input class="form-field" id="first-name" type="text" pInputText formControlName="first_name">
           <label for="first-name">First name</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Optional."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -48,7 +57,9 @@
         <span class="p-float-label">
           <input class="form-field" id="last-name" type="text" pInputText formControlName="last_name">
           <label for="last-name">Last name</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Optional."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -71,7 +82,9 @@
                       placeholder=" ">
           </p-dropdown>
           <label>Country</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Optional. The organisation (university, company, etc.) you work for or represent."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -79,7 +92,10 @@
         <span class="p-float-label">
           <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
           <label for="orcid">Orcid</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used '
+                      'to identify you as the author if you publish results to zenodo through QA4SM."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -92,8 +108,7 @@
       <button *ngIf="userData"
               pButton
               type="submit"
-              label="Save"
-              [disabled]="!userForm.valid">
+              label="Save">
       </button>
 
 
