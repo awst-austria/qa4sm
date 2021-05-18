@@ -14,7 +14,17 @@ from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
 from pytesmo.validation_framework.data_manager import DataManager
-from pytesmo.validation_framework.metric_calculators import IntercomparisonMetrics, get_dataset_names, TCMetrics
+from pytesmo.validation_framework.metric_calculators import (
+    IntercomparisonMetrics,
+    get_dataset_names,
+    TCMetrics,
+    PairwiseIntercomparisonMetrics,
+    TripleCollocationMetrics,
+)
+from pytesmo.validation_framework.temporal_matchers import (
+    make_combined_temporal_matcher,
+)
+import pandas as pd
 from pytesmo.validation_framework.results_manager import netcdf_results_manager
 from pytesmo.validation_framework.validation import Validation
 from pytz import UTC
@@ -217,17 +227,19 @@ def create_pytesmo_validation(validation_run):
     else:
         metadata_template = METADATA_TEMPLATE['other_ref']
 
+    pairwise_metrics = PairwiseIntercomparisonMetrics(
+        metadata_template=metadata_template, calc_kendall=False,
+    )
+
+    metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
+
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
-        # if there are 3 or more dataset, do TC, exclude ref metrics
-        metrics = TCMetrics(
-                    dataset_names=ds_names, tc_metrics_for_ref=False,
-                    other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
-                    metadata_template = metadata_template)
-    else:
-        metrics = IntercomparisonMetrics(
-                        dataset_names=ds_names,
-                        other_names=['k{}'.format(i + 1) for i in range(ds_num-1)],
-                        metadata_template = metadata_template)
+
+        tcol_metrics = TripleCollocationMetrics(
+            ref_name, metadata_template=metadata_template,
+        )
+        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
+
 
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
@@ -239,11 +251,11 @@ def create_pytesmo_validation(validation_run):
 
     val = Validation(
         datasets=datamanager,
+        temporal_matcher=make_combined_temporal_matcher(pd.Timedelta(12, "H")),
         spatial_ref=ref_name,
-        temporal_window=0.5,
         scaling=scaling_method,
         scaling_ref=scaling_ref_name,
-        metrics_calculators={(ds_num, ds_num): metrics.calc_metrics},
+        metrics_calculators=metric_calculators,
         period=period)
 
     return val
@@ -266,7 +278,7 @@ def execute_job(self,validation_id, job):
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run)
 
-        result = val.calc(*job)
+        result = val.calc(*job, rename_cols=False, only_with_temporal_ref=True)
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + (duration.seconds)
@@ -274,6 +286,7 @@ def execute_job(self,validation_id, job):
         return result
     except Exception as e:
         self.retry(countdown=2, exc=e)
+
 
 def check_and_store_results(job_id, results, save_path):
     if len(results) < 1:
@@ -292,13 +305,13 @@ def celery_task_cancelled(task_id):
     ## stop_running_validation deletes the validation's tasks from the db. so if they don't exist in the db the task was cancelled
     return not CeleryTask.objects.filter(celery_task_id=task_id).exists()
 
+
 def untrack_celery_task(task_id):
     try:
         celery_task = CeleryTask.objects.get(celery_task_id=task_id)
         celery_task.delete()
     except CeleryTask.DoesNotExist:
         __logger.debug('Task {} already deleted from db.'.format(task_id))
-
 
 
 def run_validation(validation_id):
@@ -355,10 +368,11 @@ def run_validation(validation_id):
                 if validation_aborted:
                     validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 else:
+                    results = pytesmo_to_qa4sm_results(results)
                     check_and_store_results(async_result.id, results, run_dir)
                     validation_run.ok_points += num_gpis_from_job(job_table[async_result.id])
 
-            except Exception:
+            except Exception as e:
                 validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 __logger.exception('Celery could not execute the job. Job ID: {} Error: {}'.format(async_result.id, async_result.info))
             finally:
@@ -381,7 +395,7 @@ def run_validation(validation_id):
             save_validation_config(validation_run)
             generate_all_graphs(validation_run, run_dir)
 
-    except Exception:
+    except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(validation_run))
 
     finally:
@@ -405,3 +419,31 @@ def stop_running_validation(validation_id):
     for task in celery_tasks:
         app.control.revoke(task.celery_task_id)  # @UndefinedVariable
         task.delete()
+
+
+def pytesmo_to_qa4sm_results(results):
+    # each key is a tuple of ((ds1, col1), (ds2, col2))
+    # this adds all tuples to a single list, and then only 
+    # keeps unique entries
+    qa4sm_key = tuple(sorted(set(sum(map(list, results.keys()), []))))
+    
+    qa4sm_res = {qa4sm_key: {}}
+    for key in results:
+        for metric in results[key]:
+            if metric in ["gpi", "n_obs", "lat", "lon"]:
+                new_key = metric
+            else:
+                datasets = list(map(lambda t: t[0], key))
+                if isinstance(metric, tuple):
+                    # happens only for triple collocation metrics, where the 
+                    # metric key is a tuple of (metric, dataset)
+                    if metric[1].startswith("0-"):
+                        # triple collocation metrics for the reference should
+                        # not show up in the results
+                        continue
+                    new_metric = "_".join(metric)
+                else:
+                    new_metric = metric
+                new_key = f"{new_metric}_between_{'_and_'.join(datasets)}"
+            qa4sm_res[qa4sm_key][new_key] = results[key][metric]
+    return qa4sm_res
