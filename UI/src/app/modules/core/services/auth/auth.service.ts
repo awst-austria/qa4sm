@@ -21,7 +21,8 @@ export class AuthService {
   private signUpUrl = this.API_URL + 'api/sign-up';
   private userModifyUrl = this.API_URL + 'api/user-modify';
 
-  emptyUser = {username: '',
+  emptyUser = {
+    username: '',
     first_name: '',
     id: null,
     copied_runs: [],
@@ -29,7 +30,8 @@ export class AuthService {
     last_name: '',
     organisation: '',
     country: '',
-    orcid: ''};
+    orcid: ''
+  };
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
 
@@ -98,14 +100,11 @@ export class AuthService {
     return logoutResult;
   }
 
-  signUp(userForm: any): void{
-    this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'text'}).subscribe(
-      response => {
-         this.router.navigate(['/signup-complete']);
-      });
+  signUp(userForm: any): Observable<any> {
+    return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'});
   }
 
-  updateUser(userForm: any): Subject<boolean>{
+  updateUser(userForm: any): Subject<boolean> {
     const authResult = new Subject<boolean>();
     this.httpClient.patch<UserDto>(this.userModifyUrl, userForm).subscribe(
       data => {
@@ -122,7 +121,7 @@ export class AuthService {
     return authResult;
   }
 
-  deactivateUser(username: any): Subject<boolean>{
+  deactivateUser(username: any): Subject<boolean> {
     const authResult = new Subject<boolean>();
     this.httpClient.delete<UserDto>(this.userModifyUrl, username).subscribe(
       data => {
