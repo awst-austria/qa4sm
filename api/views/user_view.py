@@ -9,9 +9,17 @@ from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
-from validator.forms import SignUpForm
+from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
 from validator.models import User
+from django.contrib.auth import update_session_auth_hash
+
+
+def _get_querydict_from_user_data(request, userdata):
+    user_data_dict = QueryDict(mutable=True)
+    user_data_dict.update({'csrfmiddlewaretoken': get_token(request)})
+    user_data_dict.update(userdata)
+    return user_data_dict
 
 
 @api_view(['GET'])
@@ -30,11 +38,8 @@ def users(request):
 @permission_classes([AllowAny])
 def signup_post(request):
     if request.method == 'POST':
-        new_user_data = request.data
-        user_data_dict = QueryDict(mutable=True)
-        user_data_dict.update({'csrfmiddlewaretoken': get_token(request)})
-        user_data_dict.update(new_user_data)
-        form = SignUpForm(user_data_dict)
+        new_user_data = _get_querydict_from_user_data(request, request.data)
+        form = SignUpForm(new_user_data)
         if form.is_valid():
             newuser = form.save(commit=False)
             # new user should not be active by default, admin needs to confirm
@@ -46,9 +51,6 @@ def signup_post(request):
             response = JsonResponse({'response': 'New user registered'}, status=200)
         else:
             errors = form.errors.get_json_data()
-            print(form.errors.values())
-            print(dir(form.errors))
-
             response = JsonResponse(errors, status=400, safe=False)
 
         return response
@@ -60,17 +62,34 @@ def user_modify(request):
     # this one serves for both, updating and deactivating user
     user = User.objects.get(username=request.user.username)
     if request.method == 'PATCH':
-        user_data = request.data
-        updated_user = UserSerializer().update(user, user_data)
-        return Response(UserSerializer(updated_user).data, status=status.HTTP_200_OK)
+        new_user_data = _get_querydict_from_user_data(request, request.data)
+        form = UserProfileForm(new_user_data, instance=request.user)
+        if form.is_valid():
+            current_password_hash = request.user.password
+            newuser = form.save(commit=False)
+
+            if form.cleaned_data['password1'] == '':
+                newuser.password = current_password_hash
+
+            newuser.save()
+            update_session_auth_hash(request, newuser)
+            keys_to_remove = ['password1', 'password2', 'csrfmiddlewaretoken', 'terms_consent']
+            for key in keys_to_remove:
+                del form.data[key]
+            response = JsonResponse(form.data, status=200)
+        else:
+            errors = form.errors.get_json_data()
+            print(errors)
+            response = JsonResponse(errors, status=400, safe=False)
+        # updated_user = UserSerializer().update(user, user_data)
+        return response
     elif request.method == 'DELETE':
         request.user.is_active = False
         request.user.save()
         send_user_account_removal_request(request.user)
-        send_user_status_changed(request.user,False)
+        send_user_status_changed(request.user, False)
         logout(request)
         return HttpResponse(status=200)
-
 
 
 class UserSerializer(ModelSerializer):
@@ -93,32 +112,3 @@ class UserSerializer(ModelSerializer):
                   'orcid',
                   'id',
                   'copied_runs']
-        extra_kwargs = {'password': {"write_only": True, 'required': True}}
-
-    @staticmethod
-    def validate_password(validated_data):
-        if validated_data['password2'] == validated_data['password']:
-            del validated_data['password2']
-        else:
-            raise IntegrityError('Passwords do not match')
-
-        return validated_data
-
-    def create(self, validated_data):
-        cleaned_data = self.validate_password(validated_data)
-        user = User.objects.create_user(**cleaned_data)
-        return user
-
-    def update(self, instance, validated_data):
-        cleaned_data = self.validate_password(validated_data)
-        password = cleaned_data.pop('password', None)
-
-        for (key, value) in cleaned_data.items():
-            setattr(instance, key, value)
-
-        if password is not None and password != '':
-            instance.set_password(password)
-
-        instance.save()
-
-        return instance
