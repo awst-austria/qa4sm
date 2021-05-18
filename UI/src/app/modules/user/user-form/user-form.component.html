@@ -11,9 +11,9 @@
                 class="pi pi-question-circle">
           </span>
         </span>
-        <div *ngIf="signUpErrors && signUpErrors.username"
+        <div *ngIf="formErrors && formErrors.username"
              class="alert">
-          <span *ngFor="let error of signUpErrors.username">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>
         </div>
       </div>
 
@@ -25,9 +25,9 @@
                 class="pi pi-question-circle">
           </span>
         </span>
-        <div *ngIf="signUpErrors && signUpErrors.password1"
+        <div *ngIf="formErrors && formErrors.password1"
              class="alert">
-          <span *ngFor="let error of signUpErrors.password1">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.password1">{{error.message}}<br></span>
         </div>
       </div>
 
@@ -39,9 +39,9 @@
                 class="pi pi-question-circle">
           </span>
         </span>
-        <div *ngIf="signUpErrors && signUpErrors.password2"
+        <div *ngIf="formErrors && formErrors.password2"
              class="alert">
-          <span *ngFor="let error of signUpErrors.password2">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.password2">{{error.message}}<br></span>
         </div>
       </div>
 
@@ -53,9 +53,9 @@
                 class="pi pi-question-circle">
           </span>
         </span>
-        <div *ngIf="signUpErrors && signUpErrors.email"
+        <div *ngIf="formErrors && formErrors.email"
              class="alert">
-          <span *ngFor="let error of signUpErrors.email">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.email">{{error.message}}<br></span>
         </div>
       </div>
 
@@ -114,9 +114,9 @@
                 class="pi pi-question-circle">
           </span>
         </span>
-        <div *ngIf="signUpErrors && signUpErrors.orcid"
+        <div *ngIf="formErrors && formErrors.orcid"
              class="alert">
-          <span *ngFor="let error of signUpErrors.orcid">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.orcid">{{error.message}}<br></span>
         </div>
       </div>
 

@@ -3,10 +3,8 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
-import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
-import {Router} from '@angular/router';
 
 // const csrfToken = '{{csrf_token}}';
 // const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -35,9 +33,7 @@ export class AuthService {
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
 
-  constructor(private httpClient: HttpClient,
-              private logger: NGXLogger,
-              private router: Router) {
+  constructor(private httpClient: HttpClient) {
     this.init();
   }
 
@@ -104,35 +100,12 @@ export class AuthService {
     return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'});
   }
 
-  updateUser(userForm: any): Subject<boolean> {
-    const authResult = new Subject<boolean>();
-    this.httpClient.patch<UserDto>(this.userModifyUrl, userForm).subscribe(
-      data => {
-        this.currentUser = data;
-        this.authenticated.next(true);
-        authResult.next(true);
-        alert('User profile has been updated');
-      },
-      error => {
-        this.authenticated.next(false);
-        authResult.next(false);
-      }
-    );
-    return authResult;
+  updateUser(userForm: any): Observable<any> {
+    return this.httpClient.patch(this.userModifyUrl, userForm);
   }
 
-  deactivateUser(username: any): Subject<boolean> {
-    const authResult = new Subject<boolean>();
-    this.httpClient.delete<UserDto>(this.userModifyUrl, username).subscribe(
-      data => {
-        this.router.navigate(['/deactivate-user-complete']);
-      },
-      error => {
-        this.authenticated.next(false);
-        authResult.next(false);
-      }
-    );
-    return authResult;
+  deactivateUser(username: any): Observable<any> {
+    return this.httpClient.delete<UserDto>(this.userModifyUrl, username);
   }
 
 

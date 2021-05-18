@@ -28,7 +28,7 @@ export class UserFormComponent implements OnInit {
   countries: CountryDto[];
   countries$: Observable<CountryDto[]>;
   selectedCountry: CountryDto;
-  signUpErrors: any;
+  formErrors: any;
 
   @Input() userData: UserDto;
 
@@ -48,15 +48,29 @@ export class UserFormComponent implements OnInit {
   onSubmit(): void{
     if (!this.userData){
       this.userService.signUp(this.userForm.value).subscribe(
-        response => {
+        () => {
           this.router.navigate(['/signup-complete']);
         },
         error => {
           console.log(error.error);
-          this.signUpErrors = error.error;
+          this.formErrors = error.error;
         });
     } else {
-      this.userService.updateUser(this.userForm.value);
+      this.userService.updateUser(this.userForm.value).subscribe(
+        data => {
+          this.userService.currentUser.email = data.email;
+          this.userService.currentUser.first_name = data.first_name;
+          this.userService.currentUser.last_name = data.last_name;
+          this.userService.currentUser.organisation = data.organisation;
+          this.userService.currentUser.country = data.country;
+          this.userService.currentUser.orcid = data.orcid;
+          alert('User profile has been updated');
+        },
+        error => {
+          console.log(error.error);
+          this.formErrors = error.error;
+        }
+      );
     }
   }
 
@@ -82,7 +96,11 @@ export class UserFormComponent implements OnInit {
 
   deactivateAccount(): void{
     const username = this.userService.currentUser.username;
-    this.userService.deactivateUser(username);
+    this.userService.deactivateUser(username).subscribe(
+      () => {
+        this.router.navigate(['/deactivate-user-complete']);
+      }
+    );
   }
 
 }
