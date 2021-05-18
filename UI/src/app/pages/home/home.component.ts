@@ -3,15 +3,12 @@ import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {WebsiteGraphicsService} from '../../modules/core/services/global/website-graphics.service';
 import {Observable} from 'rxjs';
-import {PlotDto} from '../../modules/core/services/global/plot.dto';
 import {HttpParams} from '@angular/common/http';
 import {SafeUrl} from '@angular/platform-browser';
-import {SettingsDto} from "../../modules/core/services/global/settings.dto";
+import {HomepageImagesModel} from './homepage-images-model';
+import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
+import {Gallery} from 'angular-gallery';
 
-interface City {
-  name: string;
-  code: string;
-}
 const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
 
@@ -22,61 +19,97 @@ const logoUrlPrefix = '/static/images/logo/';
 })
 export class HomeComponent implements OnInit {
 
-  imageSource: string;
+  carousel_files = [{
+    plot: homeUrlPrefix + 'map_us_spearman.png',
+    link: '#',
+    description: 'Image: QA4SM'}, {
+    plot: homeUrlPrefix + 'smos.jpg',
+    link: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
+    description: 'Image: ESA'}, {
+    plot:  homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
+    link: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
+    description: 'Image: ESA'}];
 
-  carousel_files = [
-    //  Files
-    homeUrlPrefix + 'map_us_spearman.png',
-    homeUrlPrefix + 'smos.jpg',
-    homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
-    ];
-  carousel_links = [
-    // Links
-    'qa4sm.eu',
-    'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
-    'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
-    ];
-  carousel_desc = [
-    // Text
-    'Image: QA4SM',
-    'Image: ESA',
-    'Image: ESA',
-    ];
+  logo_files = [{
+    plot: logoUrlPrefix + 'logo_ffg.png',
+    link: 'https://www.ffg.at/',
+    description:'FFG'}, {
+    plot: logoUrlPrefix + 'logo_tuwien_geo.png',
+    link: 'https://www.geo.tuwien.ac.at/',
+    description:'GEO'}, {
+    plot: logoUrlPrefix + 'logo_awst.png',
+    link: 'https://www.awst.at/',
+    description:'AWST'}];
 
-  logos = [
-    logoUrlPrefix + 'logo_awst.png',
-    logoUrlPrefix + 'logo_tuwien_geo.png',
-    logoUrlPrefix + 'logo_ffg.png',
-  ]
+  workflow_diagram = [{
+    plot: homeUrlPrefix + 'qa4am_overview_diagram.png',
+    link: '', description: 'QA4SM workflow'}]
 
-  carousel_images$: Observable<PlotDto[]>;
-  settings$: Observable<SettingsDto[]>;
-  logos$: Observable<PlotDto[]>;
+  card_validate = [{
+    plot: homeUrlPrefix + 'validate.png',
+    link: '', description: 'Validate'}]
 
-  loginButtonDisabled: boolean = false;
+  card_validate_result = [{
+    plot: homeUrlPrefix + 'validation_result_list.png',
+    link: '', description: 'Results'}]
+
+  card_validate_details = [{
+    plot: homeUrlPrefix + 'validation_result_details.png',
+    link: '', description: 'Download and Visualise'}]
+
+  CarouselImages: HomepageImagesModel[];
+  logos: HomepageImagesModel[];
+  ImgWorkflowDiagram: HomepageImagesModel[];
+  ImgCardValidate: HomepageImagesModel[];
+  ImgCardValidateResult: HomepageImagesModel[];
+  ImgCardValidateDetails: HomepageImagesModel[];
+
+  settings$: Observable<any>;
+
+  user_logged_in: boolean;
 
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
-              public plotService: WebsiteGraphicsService) {
+              public plotService: WebsiteGraphicsService,
+              private gallery: Gallery) {
   }
 
   ngOnInit(): void {
-    this.authService.authenticated.subscribe(authenticated => this.loginButtonDisabled = authenticated);
+    this.authService.authenticated.subscribe(authenticated => this.user_logged_in = authenticated);
     this.settings$ = this.settingsService.getAllSettings();
-    this.carousel_images$ = this.getPictures(this.carousel_files);
-    this.logos$ = this.getPictures(this.logos);
+    this.CarouselImages = this.getPictures(this.carousel_files);
+    this.logos = this.getPictures(this.logo_files);
+    this.ImgWorkflowDiagram = this.getPictures(this.workflow_diagram);
+    this.ImgCardValidate = this.getPictures(this.card_validate);
+    this.ImgCardValidateResult = this.getPictures(this.card_validate_result);
+    this.ImgCardValidateDetails = this.getPictures(this.card_validate_details);
   }
 
-  getPictures(files: any): Observable<PlotDto[]> {
-    let params = new HttpParams();
-    files.forEach(file => {
-      params = params.append('file', file);
+  getPictures(images: any): HomepageImagesModel[]{
+    const model = [];
+    let plot: any;
+    images.forEach(image => {
+      const params = new HttpParams().set('file', image.plot);
+      plot = this.plotService.getSinglePlot(params);
+      model.push(new HomepageImagesModel(plot, image.link, image.description));
     });
-    return this.plotService.getPlots(params);
+    return model;
   }
 
-  getListOfPlots(listOfPlotDto: PlotDto[]): SafeUrl[]{
-    return this.plotService.sanitizeManyPlotUrls(listOfPlotDto);
+  getSanitizedPlot(plot: string): SafeUrl{
+    return this.plotService.sanitizePlotUrl(plot);
   }
 
+  showGallery(index: number = 0, imagesListObject): void {
+      const imagesList = [];
+      imagesListObject.forEach(image => {
+        imagesList.push({path: this.plotService.plotPrefix + image.plot});
+      });
+      const prop: any = {};
+      prop.component = CarouselComponent;
+      prop.images = imagesList;
+      prop.index = index;
+      prop.arrows = imagesList.length > 1;
+      this.gallery.load(prop);
+    }
 }

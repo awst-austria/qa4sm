@@ -1,32 +1,71 @@
-
+<link rel="stylesheet" href="home.component.scss">
 <main role="main">
-  <div *ngIf="carousel_images$|async as images" class="p-grid">
-    <div class="p-col-12 carousel slide">
-        <div class="carousel-caption">
-          <div class="text">
-            <h1>Quality Assurance for Soil Moisture</h1>
-            <h3 class="carousel-desc d-none d-sm-block">
-              Validation of satellite soil moisture products <br/>
-              against in-situ and model reference data
-            </h3>
-        </div>
-      </div>
-  <!--    value is Sanitized SafeUrl[], src is one url -->
-      <p-carousel [value]="getListOfPlots(images)" [circular]="true" [autoplayInterval]="5000" [numVisible]="1">
-        <ng-template let-image pTemplate="item">
-          <img class="carousel-img active"[src]="image"/>
-  <!--         <p>{{ image.reference }}</p>-->
+  <div class="p-grid">
+    <div class="p-col-12">
+      <div>
+      <p-carousel [value]="CarouselImages" [circular]="true" [autoplayInterval]="5000" [numVisible]="1" [numScroll]="1">
+          <ng-template let-image pTemplate="item">
+            <img *ngIf="(image.plot|async) as plot"
+                 [src]="getSanitizedPlot(plot.plot)"
+                 class="carousel-img">
+            <div class="image-attribution" >
+              <a href="{{ image.link }}">{{ image.description }}</a>
+            </div>
         </ng-template>
       </p-carousel>
+      </div>
+      <div class="carousel-caption">
+        <div class="text mb-3">
+          <h1>Quality Assurance for Soil Moisture</h1>
+          <h3 class="carousel-desc d-none d-sm-block">
+            Validation of satellite soil moisture products <br/>
+            against in-situ and model reference data
+          </h3>
+        </div>
+      <span *ngIf="user_logged_in else elseBlock">
+        <p>
+        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="#published-validations" role="button">See results</a>
+        <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
+        <a routerLink="/validate" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="#validate" role="button">Try it</a>
+        </p>
+      </span>
+      <ng-template #elseBlock>
+        <p>
+        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="#published-validations" role="button">See results</a>
+        <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
+        <a routerLink="/signup" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="#signup" role="button">Sign up</a>
+        <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
+        <a routerLink="/login" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="#login" role="button">Log in</a>
+        </p>
+      </ng-template>
+    </div>
     </div>
   </div>
-
 
   <hr class="featurette-divider">
 
   <div class="container-marketing">
     <div class="p-grid">
+      <div class="p-md-5">
+
+        <div *ngIf="settings$|async as settings">
+          <div class="card news card-body">
+            <h5 class="card-title">News</h5>
+            <div [innerHTML]=settings[0].news></div>
+          </div>
+        </div>
+      </div>
+
       <div class="p-md-7">
+
+        <div class="overflow">
+          <div *ngFor="let logo of logos">
+            <a *ngIf="(logo.plot|async) as plot" href="{{logo.link}}">
+              <img [src]="getSanitizedPlot(plot.plot)">
+            </a>
+          </div>
+        </div>
+
         <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
         The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
         <ul class="list">
@@ -37,20 +76,15 @@
         </ul>
         The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality control of soil moisture data products and provider users with <b>traceable validation results</b>.
         <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
-        <img class="scaled_image" src="assets/home_images/qa4am_overview_diagram.png" id="workflow" alt="QA4SM Workflow" style="max-width: 80%"/>
-      </div>
 
-      <div class="p-md-5">
-        <div *ngIf="logos$|async as logos "class="overflow">
-          <div *ngFor="let logo of getListOfPlots(logos)">
-            <a href="https://qa4sm.eu"><img [src]="logo"> </a>
-          </div>
-        </div>
-        <div *ngIf="settings$|async as settings">
-          <div class="card news card-body">
-              <h5 class="card-title">News</h5>
-              <div [innerHTML]=settings[0].news></div>
-          </div>
+        <div *ngFor="let workflow of ImgWorkflowDiagram">
+          <img *ngIf="(workflow.plot|async) as plot"
+            class="scaled_image"
+            [src]="getSanitizedPlot(plot.plot)"
+            (click)="showGallery(0, [plot])"
+            [alt]="workflow.description"
+            id="workflow"
+            style="max-width: 80%"/>
         </div>
       </div>
 
@@ -64,39 +98,63 @@
       <div class="card">
         <div class="card-body">
           <h4 class="text-center mt-0">Datasets and Settings</h4>
-          <p class="text-muted text-center" style="min-height: 3rem;">Allows specification of input datasets and settings for your validation</p>
-          <img class="scaled_image img-screen" id="serviceScreenshot1" alt="Validate" src="assets/home_images/validate.png"/>
+          <p class="text-muted text-center" style="min-height: 3rem;">
+            Allows specification of input datasets and settings for your validation
+          </p>
+
+          <div *ngFor="let validate of ImgCardValidate">
+            <img *ngIf="(validate.plot|async) as plot"
+                 class="scaled_image img-screen"
+                 [src]="getSanitizedPlot(plot.plot)"
+                 (click)="showGallery(0, [plot])"
+                 [alt]="validate.description"/>
+          </div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-body">
           <h4 class="text-center mt-0">Results</h4>
-          <p class="text-muted text-center" style="min-height: 3rem;">Provides a list of all validation results</p>
-          <img class="scaled_image img-screen" id="serviceScreenshot2" alt="Results" src="assets/home_images/validation_result_list.png"/>
-
+          <p class="text-muted text-center" style="min-height: 3rem;">
+            Provides a list of all validation results
+          </p>
+          <div *ngFor="let validate of ImgCardValidateResult">
+            <img *ngIf="(validate.plot|async) as plot"
+                 class="scaled_image img-screen"
+                 [src]="getSanitizedPlot(plot.plot)"
+                 (click)="showGallery(0, [plot])"
+                 [alt]="validate.description"/>
+          </div>
         </div>
       </div>
 
       <div class="card">
         <div class="card-body">
           <h4 class="text-center mt-0">Download and Visualize</h4>
-          <p class="text-muted text-center" style="min-height: 3rem;">Allows download of validation results in netCDF format and as graphics</p>
-          <img class="scaled_image img-screen" id="serviceScreenshot3" alt="Download and Visualise" src="assets/home_images/validation_result_list.png"/>
+          <p class="text-muted text-center" style="min-height: 3rem;">
+            Allows download of validation results in netCDF format and as graphics
+          </p>
+          <div *ngFor="let details of ImgCardValidateDetails">
+            <img *ngIf="(details.plot|async) as plot"
+                 class="scaled_image img-screen"
+                 [src]="getSanitizedPlot(plot.plot)"
+                 (click)="showGallery(0, [plot])"
+                 [alt]="details.description"/>
+          </div>
         </div>
       </div>
-    </div>
-    <div id="modalOverlay" class="modal">
-      <!-- The Close Button -->
-      <span class="modalClose">&times;</span>
-      <!-- Modal Content (The Image) -->
-      <img class="modal-content" id="modalImg">
-      <!-- Modal Caption (Image Text) -->
-      <div id="caption"></div>
     </div>
   </div>
   </div>
 </main>
+
+<footer class="container">
+  <p>
+    Created by <a href="https://www.geo.tuwien.ac.at/">TU Wien GEO</a>
+    and <a href="https://www.awst.at/">AWST</a>.
+    Hosted on <a href="https://www.eodc.eu/">EODC</a>.
+  </p>
+</footer>
 
 <qa-scroll-to-top></qa-scroll-to-top>
 
