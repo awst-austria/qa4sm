@@ -5,6 +5,7 @@ import {CountryDto} from '../../core/services/global/country.dto';
 import {UserDto} from '../../core/services/auth/user.dto';
 import {AuthService} from '../../core/services/auth/auth.service';
 import {Observable} from 'rxjs';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'qa-user-form',
@@ -14,24 +15,27 @@ import {Observable} from 'rxjs';
 export class UserFormComponent implements OnInit {
   userForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.maxLength(150)]],
-      password: ['', [Validators.required]],
+      password1: ['', [Validators.required]],
       password2: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       first_name: [''],
       last_name: [''],
       organisation: [''],
-      country: [null],
+      country: [''],
       orcid: [''],
+      terms_consent: ['', Validators.required]
   });
   countries: CountryDto[];
   countries$: Observable<CountryDto[]>;
   selectedCountry: CountryDto;
+  signUpErrors: any;
 
   @Input() userData: UserDto;
 
   constructor(private userFormService: LocalApiService,
               private formBuilder: FormBuilder,
-              private userService: AuthService) { }
+              private userService: AuthService,
+              private router: Router) { }
 
   ngOnInit(): void {
     // this.getListOfCountries();
@@ -43,7 +47,14 @@ export class UserFormComponent implements OnInit {
 
   onSubmit(): void{
     if (!this.userData){
-      this.userService.signUp(this.userForm.value);
+      this.userService.signUp(this.userForm.value).subscribe(
+        response => {
+          this.router.navigate(['/signup-complete']);
+        },
+        error => {
+          console.log(error.error);
+          this.signUpErrors = error.error;
+        });
     } else {
       this.userService.updateUser(this.userForm.value);
     }
@@ -59,11 +70,14 @@ export class UserFormComponent implements OnInit {
     this.userForm.controls.username.setValue(this.userData.username);
     this.userForm.controls.username.disable();
     this.userForm.controls.email.setValue(this.userData.email);
+    this.userForm.controls.password1.clearValidators();
+    this.userForm.controls.password2.clearValidators();
     this.userForm.controls.first_name.setValue(this.userData.first_name);
     this.userForm.controls.last_name.setValue(this.userData.last_name);
     this.userForm.controls.organisation.setValue(this.userData.organisation);
     this.userForm.controls.country.setValue(this.userData.country);
     this.userForm.controls.orcid.setValue(this.userData.orcid);
+    this.userForm.controls.terms_consent.setValue(true);
   }
 
   deactivateAccount(): void{

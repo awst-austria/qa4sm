@@ -11,16 +11,24 @@
                 class="pi pi-question-circle">
           </span>
         </span>
+        <div *ngIf="signUpErrors && signUpErrors.username"
+             class="alert">
+          <span *ngFor="let error of signUpErrors.username">{{error.message}}<br></span>
+        </div>
       </div>
 
       <div class="p-py-3">
         <span class="p-float-label">
-          <input class="form-field" id="password" type="password" pInputText formControlName="password">
+          <input class="form-field" id="password" type="password" pInputText formControlName="password1">
           <label for="password">Password</label>
           <span title="Your password can't be too similar to your other personal information.Your password must contain at least 8 characters. Your password can't be a commonly used password. Your password can't be entirely numeric."
                 class="pi pi-question-circle">
           </span>
         </span>
+        <div *ngIf="signUpErrors && signUpErrors.password1"
+             class="alert">
+          <span *ngFor="let error of signUpErrors.password1">{{error.message}}<br></span>
+        </div>
       </div>
 
       <div class="p-py-3">
@@ -31,6 +39,10 @@
                 class="pi pi-question-circle">
           </span>
         </span>
+        <div *ngIf="signUpErrors && signUpErrors.password2"
+             class="alert">
+          <span *ngFor="let error of signUpErrors.password2">{{error.message}}<br></span>
+        </div>
       </div>
 
       <div class="p-py-3">
@@ -41,6 +53,10 @@
                 class="pi pi-question-circle">
           </span>
         </span>
+        <div *ngIf="signUpErrors && signUpErrors.email"
+             class="alert">
+          <span *ngFor="let error of signUpErrors.email">{{error.message}}<br></span>
+        </div>
       </div>
 
       <div class="p-py-3">
@@ -67,7 +83,9 @@
         <span class="p-float-label">
           <input class="form-field" id="organisation" type="text" pInputText formControlName="organisation">
           <label for="organisation">Organisation</label>
-          <span class="pi pi-question-circle"></span>
+          <span title="Optional. The organisation (university, company, etc.) you work for or represent."
+                class="pi pi-question-circle">
+          </span>
         </span>
       </div>
 
@@ -82,7 +100,7 @@
                       placeholder=" ">
           </p-dropdown>
           <label>Country</label>
-          <span title="Optional. The organisation (university, company, etc.) you work for or represent."
+          <span title="Optional. The country where your organisation (or you) resides."
                 class="pi pi-question-circle">
           </span>
         </span>
@@ -92,11 +110,19 @@
         <span class="p-float-label">
           <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
           <label for="orcid">Orcid</label>
-          <span title="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used '
-                      'to identify you as the author if you publish results to zenodo through QA4SM."
+          <span title="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM."
                 class="pi pi-question-circle">
           </span>
         </span>
+        <div *ngIf="signUpErrors && signUpErrors.orcid"
+             class="alert">
+          <span *ngFor="let error of signUpErrors.orcid">{{error.message}}<br></span>
+        </div>
+      </div>
+
+      <div *ngIf="!userData" class="p-py-3">
+        <p-checkbox id="terms" formControlName="terms_consent"></p-checkbox>
+        <label for="terms"> I accept the <a [routerLink]="['/terms']">terms, conditions, and privacy policy</a>.</label>
       </div>
 
       <button *ngIf="!userData"
@@ -108,7 +134,8 @@
       <button *ngIf="userData"
               pButton
               type="submit"
-              label="Save">
+              label="Save"
+              [disabled]="!userForm.valid">
       </button>
 
 
