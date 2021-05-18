@@ -8,7 +8,7 @@ const countriesUrl: string = environment.API_URL + 'api/country-list';
 @Injectable({
   providedIn: 'root'
 })
-export class LocalApiService {
+export class UserFormService {
 
   constructor(private httpClient: HttpClient) { }
 

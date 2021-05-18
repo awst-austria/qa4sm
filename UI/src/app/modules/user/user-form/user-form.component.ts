@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
-import {LocalApiService} from '../../core/services/global/local-api.service';
+import {UserFormService} from '../../core/services/auth/user-form.service';
 import {CountryDto} from '../../core/services/global/country.dto';
 import {UserDto} from '../../core/services/auth/user.dto';
 import {AuthService} from '../../core/services/auth/auth.service';
@@ -30,7 +30,7 @@ export class UserFormComponent implements OnInit {
 
   @Input() userData: UserDto;
 
-  constructor(private localApiService: LocalApiService,
+  constructor(private localApiService: UserFormService,
               private formBuilder: FormBuilder,
               private userService: AuthService) { }
 
