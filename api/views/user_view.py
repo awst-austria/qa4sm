@@ -1,6 +1,7 @@
 from django.contrib.auth import logout
 from django.db import IntegrityError
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, QueryDict, JsonResponse
+from django.middleware.csrf import get_token
 from django_countries.serializer_fields import CountryField
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -8,6 +9,7 @@ from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
+from validator.forms import SignUpForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
 from validator.models import User
 
@@ -29,16 +31,27 @@ def users(request):
 def signup_post(request):
     if request.method == 'POST':
         new_user_data = request.data
-        try:
-            new_user = UserSerializer().create(new_user_data)
-            new_user.is_active = False
-            new_user.save()
-            send_new_user_signed_up(new_user)
-            response = 'New user registered'
-        except IntegrityError as e:
-            response = str(e)
+        user_data_dict = QueryDict(mutable=True)
+        user_data_dict.update({'csrfmiddlewaretoken': get_token(request)})
+        user_data_dict.update(new_user_data)
+        form = SignUpForm(user_data_dict)
+        if form.is_valid():
+            newuser = form.save(commit=False)
+            # new user should not be active by default, admin needs to confirm
+            newuser.is_active = False
+            newuser.save()
 
-    return HttpResponse(response, status=200)
+            # notify the admins
+            send_new_user_signed_up(newuser)
+            response = JsonResponse({'response': 'New user registered'}, status=200)
+        else:
+            errors = form.errors.get_json_data()
+            print(form.errors.values())
+            print(dir(form.errors))
+
+            response = JsonResponse(errors, status=400, safe=False)
+
+        return response
 
 
 @api_view(['PATCH', 'DELETE'])
