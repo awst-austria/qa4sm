@@ -41,20 +41,32 @@ def get_validation_configuration(request, **kwargs):
     try:
         val_run = ValidationRun.objects.get(pk=validation_run_id)
         val_run_dict = {}
-        val_run_dict['id'] = val_run.id
-        val_run_dict['scaling_ref'] = val_run.scaling_ref
+        val_run_dict['scale_to'] = val_run.scaling_ref
         val_run_dict['scaling_method'] = val_run.scaling_method
         val_run_dict['interval_from'] = val_run.interval_from
         val_run_dict['interval_to'] = val_run.interval_to
         val_run_dict['anomalies'] = val_run.anomalies
+        val_run_dict['anomalies_from'] = val_run.anomalies_from
+        val_run_dict['anomalies_to'] = val_run.anomalies_to
         val_run_dict['min_lat'] = val_run.min_lat
         val_run_dict['min_lon'] = val_run.min_lon
         val_run_dict['max_lat'] = val_run.max_lat
         val_run_dict['max_lon'] = val_run.max_lon
-        val_run_dict['anomalies_from'] = val_run.anomalies_from
-        val_run_dict['anomalies_to'] = val_run.anomalies_to
-        val_run_dict['tcol'] = val_run.tcol
-        val_run_dict['ref_dataset_config'] = val_run.reference_configuration_id
+
+        # val_run_dict['tcol'] = val_run.tcol
+
+        # Reference filters
+        filters = []
+        for data_filter in val_run.reference_configuration.filters:
+            filters.append(data_filter.id)
+
+        val_run_dict['ref_dataset_config'] = {
+            'dataset_id': val_run.reference_configuration.dataset.id,
+            'version_id': val_run.reference_configuration.version.id,
+            'variable_id': val_run.reference_configuration.variable.id,
+            'basic_filters': filters
+        }
+
         validation_run_serializer = ValidationRunSerializer(val_run)
 
         datasets = []
@@ -95,32 +107,6 @@ class DatasetConfigSerializer(serializers.Serializer):
     basic_filters = serializers.ListField(child=serializers.IntegerField(), required=True)
 
 
-# Spatial subsetting DTO and serializer
-class SpatialSubsetSerializer(serializers.Serializer):
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
-
-    min_lat = serializers.FloatField(required=False, default=34.0)
-    min_lon = serializers.FloatField(required=False, default=-11.2)
-    max_lat = serializers.FloatField(required=False, default=71.6)
-    max_lon = serializers.FloatField(required=False, default=48.3)
-
-
-# Validation period DTO and serializer
-class ValidationPeriodSerializer(serializers.Serializer):
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
-
-    interval_from = serializers.DateTimeField(required=False)
-    interval_to = serializers.DateTimeField(required=False)
-
-
 # Metrics DTO and serializer
 class MetricsSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
@@ -133,31 +119,6 @@ class MetricsSerializer(serializers.Serializer):
     value = serializers.BooleanField(required=True)
 
 
-# Anomalies DTO and serializer
-class AnomaliesSerializer(serializers.Serializer):
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
-
-    method = serializers.ChoiceField(choices=ValidationRun.ANOMALIES_METHODS, required=True)
-    anomalies_from = serializers.DateTimeField(required=False)
-    anomalies_to = serializers.DateTimeField(required=False)
-
-
-# Scaling DTO and serializer
-class ScalingSerializer(serializers.Serializer):
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
-
-    method = serializers.ChoiceField(choices=ValidationRun.SCALING_METHODS, required=True)
-    scale_to = serializers.ChoiceField(choices=ValidationRun.SCALE_TO_OPTIONS, required=True)
-
-
 class ValidationConfigurationSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         pass
@@ -167,16 +128,16 @@ class ValidationConfigurationSerializer(serializers.Serializer):
         with transaction.atomic():
             # prepare ValidationRun model
             new_val_run = ValidationRun(start_time=timezone.now())
-            new_val_run.interval_from = validated_data.get('validation_period').get('interval_from', None)
-            new_val_run.interval_to = validated_data.get('validation_period').get('interval_to', None)
-            new_val_run.anomalies = validated_data.get('anomalies').get('method')
-            new_val_run.anomalies_from = validated_data.get('anomalies').get('anomalies_from', None)
-            new_val_run.anomalies_to = validated_data.get('anomalies').get('anomalies_to', None)
-            new_val_run.min_lat = validated_data.get('spatial_subsetting').get('min_lat', None)
-            new_val_run.min_lon = validated_data.get('spatial_subsetting').get('min_lon', None)
-            new_val_run.max_lat = validated_data.get('spatial_subsetting').get('max_lat', None)
-            new_val_run.max_lon = validated_data.get('spatial_subsetting').get('max_lon', None)
-            new_val_run.scaling_method = validated_data.get('scaling').get('method', None)
+            new_val_run.interval_from = validated_data.get('interval_from', None)
+            new_val_run.interval_to = validated_data.get('interval_to', None)
+            new_val_run.anomalies = validated_data.get('anomalies_method')
+            new_val_run.anomalies_from = validated_data.get('anomalies_from', None)
+            new_val_run.anomalies_to = validated_data.get('anomalies_to', None)
+            new_val_run.min_lat = validated_data.get('min_lat', None)
+            new_val_run.min_lon = validated_data.get('min_lon', None)
+            new_val_run.max_lat = validated_data.get('max_lat', None)
+            new_val_run.max_lon = validated_data.get('max_lon', None)
+            new_val_run.scaling_method = validated_data.get('scaling_method', None)
 
             for metric in validated_data.get('metrics'):
                 if metric.get('id') == 'tcol':
@@ -205,17 +166,31 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 dataset_config_models.append(config_model)
 
             new_val_run.reference_configuration = dataset_config_models[0]
+            scale_to = validated_data.get('scaling_method', None)
+            if scale_to is not None:
+                if scale_to == ValidationRun.SCALE_TO_DATA:
+                    new_val_run.scaling_ref = dataset_config_models[1]
+                else:
+                    new_val_run.scaling_ref = dataset_config_models[0]
+
             new_val_run.save()
 
         return new_val_run
 
     dataset_configs = DatasetConfigSerializer(many=True, required=True)
     reference_config = DatasetConfigSerializer(required=True)
-    spatial_subsetting = SpatialSubsetSerializer(required=True)
-    validation_period = ValidationPeriodSerializer(required=True)
+    interval_from = serializers.DateTimeField(required=False)
+    interval_to = serializers.DateTimeField(required=False)
     metrics = MetricsSerializer(many=True, required=True)
-    anomalies = AnomaliesSerializer(required=True)
-    scaling = ScalingSerializer(required=True)
+    anomalies_method = serializers.ChoiceField(choices=ValidationRun.ANOMALIES_METHODS, required=True)
+    anomalies_from = serializers.DateTimeField(required=False)
+    anomalies_to = serializers.DateTimeField(required=False)
+    scaling_method = serializers.ChoiceField(choices=ValidationRun.SCALING_METHODS, required=True)
+    scale_to = serializers.ChoiceField(choices=ValidationRun.SCALE_TO_OPTIONS, required=True)
+    min_lat = serializers.FloatField(required=False, allow_null=True, default=-90.0)
+    min_lon = serializers.FloatField(required=False, allow_null=True, default=-180)
+    max_lat = serializers.FloatField(required=False, allow_null=True, default=90)
+    max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):

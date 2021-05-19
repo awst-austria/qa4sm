@@ -62,7 +62,7 @@ urlpatterns = [
     path('data-filter', data_filter, name='Dataset filters'),
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
-    path('run-validation', start_validation, name='Run new validation'),
+    path('validation-configuration', start_validation, name='Run new validation'),
     url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
     url(r'^data-filter/(?P<id>.+)$', data_filter_by_id),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
