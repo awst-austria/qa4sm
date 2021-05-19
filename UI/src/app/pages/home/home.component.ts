@@ -5,13 +5,16 @@ import {Observable} from 'rxjs';
 import {PlotDto} from '../../modules/core/services/global/plot.dto';
 import {HttpParams} from '@angular/common/http';
 import {SafeUrl} from '@angular/platform-browser';
+import {Router} from '@angular/router';
 
 interface City {
   name: string;
   code: string;
 }
+
 const homeUrlPrefix = '/static/images/home/';
-  @Component({
+
+@Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -27,11 +30,12 @@ export class HomeComponent implements OnInit {
   loginButtonDisabled: boolean = false;
 
   constructor(private authService: AuthService,
-              public plotService: WebsiteGraphicsService) {
+              public plotService: WebsiteGraphicsService,
+              private router: Router) {
   }
 
   ngOnInit(): void {
-    this. images$ = this.getPictures(this.landingPageImages);
+    this.images$ = this.getPictures(this.landingPageImages);
     this.authService.authenticated.subscribe(authenticated => this.loginButtonDisabled = authenticated);
   }
 
@@ -42,7 +46,12 @@ export class HomeComponent implements OnInit {
     });
     return this.plotService.getPlots(params);
   }
-  getListOfPlots(listOfPlotDto: PlotDto[]): SafeUrl[]{
+
+  getListOfPlots(listOfPlotDto: PlotDto[]): SafeUrl[] {
     return this.plotService.sanitizeManyPlotUrls(listOfPlotDto);
+  }
+
+  goToSignUp(): void {
+    this.router.navigate(['/signup']);
   }
 }
