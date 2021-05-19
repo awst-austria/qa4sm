@@ -63,7 +63,6 @@ def get_metric_names_and_associated_files(request):
     response = []
 
     for ind, key in enumerate(metrics):
-        print(ind)
         boxplot_file = ''
         boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
 
@@ -72,21 +71,23 @@ def get_metric_names_and_associated_files(request):
         independent_metrics = ['n_obs']
 
         if metrics[key] not in independent_metrics:
-            overview_files_names = ['overview_' + name_key + '_' + metrics[key] + '.png' for name_key in combis]
+            overview_plots = [{'file_name': 'overview_' + name_key + '_' + metrics[key] + '.png',
+                               'datasets': name_key} for name_key in combis]
         else:
-            overview_files_names = ['overview_' + metrics[key] + '.png']
+            overview_plots = [{'file_name': 'overview_' + metrics[key] + '.png', 'datasets': ''}]
 
         if boxplot_file_name in files:
             boxplot_file = file_path + boxplot_file_name
-        overview_files = [file_path + file for file in overview_files_names if file in files]
-
+        overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if file_dict['file_name'] in files]
+        datasets = [file_dict['datasets'] for file_dict in overview_plots if file_dict['file_name'] in files]
         metric_dict = {'ind': ind,
                        'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
                        'boxplot_file': boxplot_file,
-                       'overview_files': overview_files}
+                       'overview_plots': overview_files,
+                       'datasets': datasets}
         response.append(metric_dict)
-
+    #
     return JsonResponse(response, status=200, safe=False)
 
 
