@@ -3,6 +3,7 @@ import logging
 from os import path
 from re import sub as regex_sub
 import uuid
+import numpy as np
 
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
@@ -80,7 +81,7 @@ def _get_reference_reader(val_run):
         val_run.reference_configuration.dataset,
         val_run.reference_configuration.variable
     )
-    
+
     while(hasattr(ref_reader, 'cls')):
         ref_reader = ref_reader.cls
 
@@ -365,11 +366,23 @@ def run_validation(validation_id):
                                 validation_aborted = True
                                 __logger.debug('Validation got cancelled, dropping task {}: {}'.format(async_result.id, te))
 
-                if validation_aborted:
+                # in case there where no points with overlapping data within
+                # the validation period, results is an empty dictionary, and we
+                # count this job as error
+                if validation_aborted or not results:
                     validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 else:
                     results = pytesmo_to_qa4sm_results(results)
+
+                    # only count points where there was enough data as ok points
+                    # results is a dictionary with a single key
+                    # nobs = results[list(results.keys())[0]]["n_obs"]
+                    # ok_points = np.sum(nobs > 0)
+                    # error_points = len(nobs) - ok_points
+
                     check_and_store_results(async_result.id, results, run_dir)
+                    # validation_run.ok_points += ok_points
+                    # validation_run.error_points += error_points
                     validation_run.ok_points += num_gpis_from_job(job_table[async_result.id])
 
             except Exception as e:
@@ -423,10 +436,10 @@ def stop_running_validation(validation_id):
 
 def pytesmo_to_qa4sm_results(results):
     # each key is a tuple of ((ds1, col1), (ds2, col2))
-    # this adds all tuples to a single list, and then only 
+    # this adds all tuples to a single list, and then only
     # keeps unique entries
     qa4sm_key = tuple(sorted(set(sum(map(list, results.keys()), []))))
-    
+
     qa4sm_res = {qa4sm_key: {}}
     for key in results:
         for metric in results[key]:
@@ -435,7 +448,7 @@ def pytesmo_to_qa4sm_results(results):
             else:
                 datasets = list(map(lambda t: t[0], key))
                 if isinstance(metric, tuple):
-                    # happens only for triple collocation metrics, where the 
+                    # happens only for triple collocation metrics, where the
                     # metric key is a tuple of (metric, dataset)
                     if metric[1].startswith("0-"):
                         # triple collocation metrics for the reference should
