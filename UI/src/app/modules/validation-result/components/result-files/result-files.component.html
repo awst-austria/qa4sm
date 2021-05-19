@@ -20,14 +20,20 @@
                alt="Boxplot for {{metrics[indx].metric_pretty_name}}">
         </div>
         <div class="p-col">
-          <div  class="p-grid">
+          <div class="p-grid">
             <div *ngFor="let plot of overviewPlots; let ind = index"
-                 [ngClass]="{'p-col': overviewPlots.length === 1, 'p-col-10': overviewPlots.length === 2, 'p-col-6': overviewPlots.length > 2}">
-              <img  width="95%" height="95%"
+                 [ngClass]="{'image-container': true,
+                             'p-col': overviewPlots.length === 1,
+                             'p-col-10': overviewPlots.length === 2,
+                             'p-col-6': overviewPlots.length > 2}">
+              <span class="image-label">
+                {{metrics[indx].datasets[ind]}}
+              </span>
+              <img width="95%" height="95%"
                    [src]="sanitizePlotUrl(plot.plot)"
                    (click)="showGallery(ind, overviewPlots)"
                    [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length === 2, 'pcol6': overviewPlots.length > 2}"
-                    alt="An Overview map for {{metrics[indx].metric_pretty_name}}">
+                   alt="An Overview map for {{metrics[indx].metric_pretty_name}}">
             </div>
           </div>
         </div>
