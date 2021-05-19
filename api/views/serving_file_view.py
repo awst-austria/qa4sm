@@ -84,7 +84,7 @@ def get_metric_names_and_associated_files(request):
                        'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
                        'boxplot_file': boxplot_file,
-                       'overview_plots': overview_files,
+                       'overview_files': overview_files,
                        'datasets': datasets}
         response.append(metric_dict)
     #
