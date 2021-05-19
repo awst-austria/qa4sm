@@ -12,7 +12,7 @@ from validator.models import Dataset
 def dataset(request):
     datasets = Dataset.objects.all()
     serializer = DatasetSerializer(datasets, many=True)
-    print(serializer.data)
+    # print(serializer.data)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
@@ -21,7 +21,7 @@ def dataset(request):
 def dataset_by_id(request, **kwargs):
     ds = Dataset.objects.get(pk=kwargs['id'])
     serializer = DatasetSerializer(ds)
-    print(serializer.data)
+    # print(serializer.data)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
