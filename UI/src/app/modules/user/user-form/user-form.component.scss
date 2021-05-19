@@ -1,9 +1,11 @@
 .center{
   display: flex;
   justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 .center h1{
-  text-align: center;
+  text-align: left;
+  justify-content: center;
 }
 .form-field{
   width: 15rem;
@@ -16,4 +18,15 @@
 }
 button{
   width: 15rem;
+}
+div.alert{
+  margin-top: 1rem;
+}
+.alert{
+  background-color: #FF6C5C26;
+  color: #FF6C5C;
+  width: 15rem;
+  border: #FF6C5C30 solid 1px;
+  border-radius: 3px;
+  padding: 0.5rem;
 }
