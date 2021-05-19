@@ -26,7 +26,6 @@ export class WebsiteGraphicsService {
   sanitizeManyPlotUrls(plotObjectList: PlotDto[]): SafeUrl[]{
     const urlList = [];
     plotObjectList.forEach(plot => {
-      console.log(plot.plot);
       urlList.push(this.sanitizePlotUrl(plot.plot));
     });
     return urlList;
