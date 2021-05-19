@@ -1,4 +1,4 @@
 export class PlotDto{
-  constructor(private plot_name: string) {
+  constructor(public plot: string) {
   }
 }
