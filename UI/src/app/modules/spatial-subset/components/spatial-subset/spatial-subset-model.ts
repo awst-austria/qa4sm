@@ -1,4 +1,3 @@
-import {NewValidationRunSpatialSubsettingDto} from '../../../../pages/validate/service/new-validation-run-spatial-subsetting-dto';
 import {BehaviorSubject} from 'rxjs';
 
 export class SpatialSubsetModel {
@@ -8,7 +7,4 @@ export class SpatialSubsetModel {
               public minLon$: BehaviorSubject<number>) {
   }
 
-  public toNewValSpatialSubsettingDto(): NewValidationRunSpatialSubsettingDto {
-    return new NewValidationRunSpatialSubsettingDto(this.minLat$.getValue(), this.minLon$.getValue(), this.maxLat$.getValue(), this.maxLon$.getValue());
-  }
 }

@@ -12,15 +12,15 @@ import {ValidationPeriodModel} from '../../modules/validation-period/components/
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
-import {NewValidationRunDto} from './service/new-validation-run-dto';
-import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dto';
-import {NewValidationRunService} from './service/new-validation-run.service';
-import {NewValidationRunMetricDto} from './service/new-validation-run-metric-dto';
+import {ValidationRunConfigDto, ValidationRunDatasetConfigDto, ValidationRunMetricConfigDto} from './service/validation-run-config-dto';
+import {ValidationRunConfigService} from './service/validation-run-config.service';
+
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
+
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
 
@@ -53,12 +53,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
               private filterService: FilterService,
-              private newValidationService: NewValidationRunService,
+              private validationConfigService: ValidationRunConfigService,
               private validationRunService: ValidationrunService,
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute) {
-
   }
 
   ngAfterViewInit(): void {
@@ -66,10 +65,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+
     this.route.queryParams.subscribe(params => {
       if (params['validation_id']) {
-        this.validationRunService.getValidationRunById(params['validation_id']).subscribe(
-          valrun => console.log('Val run:', valrun)
+        this.validationConfigService.getValidationConfig(params['validation_id']).subscribe(
+          valrun => {
+            console.log('Val run:', valrun);
+            //this.modelFromValidationConfig(valrun)
+          }
         );
       } else {
         this.addDatasetToValidate();
@@ -77,8 +80,26 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
 
     });
+  }
+
+  private modelFromValidationConfig(config: ValidationRunConfigDto) {
+    config.dataset_configs.forEach(config => {
+      let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
+      this.validationModel.datasetConfigurations.push(model);
+      this.datasetService.getDatasetById(config.dataset_id).subscribe(dataset => {
+        model.datasetModel.selectedDataset = dataset;
+      });
+
+      this.versionService.getVersionById(config.version_id).subscribe(versionDto => {
+        model.datasetModel.selectedVersion = versionDto;
+      });
+
+      this.variableService.getVariableById(config.variable_id).subscribe(variableDto => {
+        model.datasetModel.selectedVariable = variableDto;
+      });
 
 
+    });
   }
 
   addDatasetToValidate() {
@@ -161,27 +182,35 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     //debug
 
     //prepare the dataset dtos (dataset, version, variable and filter settings)
-    let datasets: NewValRunDatasetConfigDto[] = [];
+    let datasets: ValidationRunDatasetConfigDto[] = [];
     this.validationModel.datasetConfigurations.forEach(datasetConfig => {
-      datasets.push(datasetConfig.toNewValRunDatasetConfigDto());
+      datasets.push(datasetConfig.toValRunDatasetConfigDto());
     });
 
     //prepare metrics
-    let metricDtos: NewValidationRunMetricDto[] = [];
+    let metricDtos: ValidationRunMetricConfigDto[] = [];
     this.validationModel.metrics.forEach(metric => {
-      metricDtos.push(metric.toNewValidationRunMetricDto());
+      metricDtos.push(metric.toValidationRunMetricDto());
     });
 
-    let newValidationDto = new NewValidationRunDto(
-      datasets,
-      this.validationModel.referenceConfigurations[0].toNewValRunDatasetConfigDto(),
-      this.validationModel.spatialSubsetModel.toNewValSpatialSubsettingDto(),
-      this.validationModel.validationPeriodModel.toNewValidationRunValidationPeriodDto(),
-      metricDtos,
-      this.validationModel.anomalies.toNewValidationRunAnomaliesDto(),
-      this.validationModel.scalingModel.toNewValidationRunScalingDto());
+    let newValidation: ValidationRunConfigDto = {
+      dataset_configs: datasets,
+      reference_config: this.validationModel.referenceConfigurations[0].toValRunDatasetConfigDto(),
+      interval_from: this.validationModel.validationPeriodModel.intervalFrom,
+      interval_to: this.validationModel.validationPeriodModel.intervalTo,
+      min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
+      min_lon: this.validationModel.spatialSubsetModel.minLon$.getValue(),
+      max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
+      max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
+      metrics: metricDtos,
+      anomalies_method: this.validationModel.anomalies.method,
+      anomalies_from: this.validationModel.anomalies.anomaliesFrom,
+      anomalies_to: this.validationModel.anomalies.anomaliesTo,
+      scaling_method: this.validationModel.scalingModel.id,
+      scale_to: this.validationModel.scalingModel.scaleTo.id
+    };
 
-    this.newValidationService.startValidation(newValidationDto).subscribe(
+    this.validationConfigService.startValidation(newValidation).subscribe(
       data => {
         this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
       },

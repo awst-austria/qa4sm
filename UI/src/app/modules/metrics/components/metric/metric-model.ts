@@ -1,4 +1,4 @@
-import {NewValidationRunMetricDto} from '../../../../pages/validate/service/new-validation-run-metric-dto';
+import {ValidationRunMetricConfigDto} from '../../../../pages/validate/service/validation-run-config-dto';
 
 export class MetricModel {
   constructor(public description: string,
@@ -8,7 +8,7 @@ export class MetricModel {
               public id: string) {
   }
 
-  toNewValidationRunMetricDto(): NewValidationRunMetricDto {
-    return new NewValidationRunMetricDto(this.id, this.value);
+  toValidationRunMetricDto(): ValidationRunMetricConfigDto {
+    return {id: this.id, value: this.value} as ValidationRunMetricConfigDto;
   }
 }
