@@ -1,7 +1,8 @@
 <!-- custom -->
+<div *ngIf="validationsSet$|async as validationSet">
 <div *ngIf="!published" class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
   <h1 class="jumbotron-heading">My validations</h1>
-  <p *ngIf="!validations" class="lead text-muted">
+  <p *ngIf="!validationSet.validations" class="lead text-muted">
     You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
     to start your own validation run.
   </p>
@@ -17,15 +18,15 @@
   </p>
 </div>
 <!-- Sorting -->
-<div *ngIf="validations" class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
+<div *ngIf="validationSet.validations" class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
   <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
 </div>
 
 <!-- Rows -->
 <div class="card-deck mb-3">
   <div class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
-    <div *ngFor="let valrun of validations  | paginate :
-        {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
+    <div *ngFor="let valrun of validationSet.validations  | paginate :
+        {itemsPerPage: limit, currentPage: page, totalItems: validationSet.length}">
 
       <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
       <br/>
@@ -60,4 +61,5 @@
 
 
   </div>
+</div>
 </div>
