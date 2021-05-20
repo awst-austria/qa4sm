@@ -10,7 +10,7 @@ import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {map} from 'rxjs/operators';
 import {PlotDto} from '../../../core/services/global/plot.dto';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {SafeUrl} from '@angular/platform-browser';
 
 @Component({
   selector: 'qa-result-files',
@@ -24,12 +24,11 @@ export class ResultFilesComponent implements OnInit {
   updatedMetrics$: Observable<any>;
   selectedMetrics: MetricsPlotsDto;
   indx = 0;
-  plotPrefix = 'data:image/png;base64,';
+  // plotPrefix = 'data:image/png;base64,';
 
   constructor(private validationService: ValidationrunService,
-              private plotService: WebsiteGraphicsService,
-              private gallery: Gallery,
-              private domSanitizer: DomSanitizer) {
+              public plotService: WebsiteGraphicsService,
+              private gallery: Gallery) {
   }
 
   ngOnInit(): void {
@@ -59,7 +58,8 @@ export class ResultFilesComponent implements OnInit {
   showGallery(index: number = 0, imagesListObject): void {
     const imagesList = [];
     imagesListObject.forEach(image => {
-      imagesList.push({path: this.plotPrefix + image.plot_name});
+      imagesList.push({path: this.plotService.plotPrefix + image.plot});
+
     });
     const prop: any = {};
     prop.component = CarouselComponent;
@@ -82,8 +82,9 @@ export class ResultFilesComponent implements OnInit {
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
-    return this.domSanitizer.bypassSecurityTrustUrl(this.plotPrefix + plotBase64);
+    return this.plotService.sanitizePlotUrl(plotBase64);
   }
+
 
 
 }
