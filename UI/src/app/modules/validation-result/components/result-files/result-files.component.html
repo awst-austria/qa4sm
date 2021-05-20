@@ -32,7 +32,7 @@
               <img width="95%" height="95%"
                    [src]="sanitizePlotUrl(plot.plot)"
                    (click)="showGallery(ind, overviewPlots)"
-                   [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length === 2, 'pcol6': overviewPlots.length > 2}"
+                   [ngClass]="{'result-plot':true, 'pcol': true}"
                    alt="An Overview map for {{metrics[indx].metric_pretty_name}}">
             </div>
           </div>
