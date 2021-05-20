@@ -5,7 +5,6 @@ import {HttpParamsModel} from '../../../core/services/validation-run/http-params
 import {Observable} from 'rxjs';
 import {ValidationSetDto} from '../../services/validation.set.dto';
 
-
 @Component({
   selector: 'qa-validation-page-paginated',
   templateUrl: './validation-page-paginated.component.html',
