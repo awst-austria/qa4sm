@@ -12,15 +12,6 @@
   position: relative;
 }
 
-//
-//.image-attribution {
-//  color: white;
-//  text-shadow: 0 0 .1rem black, 0 0 .5rem black;
-//  position: absolute;
-//  bottom: 8px;
-//  right: 16px;
-//  z-index: 200;
-//}
 .image-attribution {
   color: white;
   text-shadow: 0 0 .1rem black, 0 0 .5rem black;
@@ -29,20 +20,6 @@
   z-index: 200;
   margin-left: 0.5rem;
   width: 10%;
-
-}
-
-//.image-attribution {
-//  color: white;
-//  text-shadow: 0 0 .1rem black, 0 0 .5rem black;
-//  position: relative;
-//  z-index: 200;
-//  margin-left: 0.1rem;
-//  text-align: center;
-//}
-
-.carousel {
-  margin-bottom: 0.0rem;
 }
 
 .carousel-img>img {
@@ -55,10 +32,8 @@
   margin-bottom: 0.5rem;
 }
 
-
 .textbox>h3 {
   font-size: min(max(20px, 1.5vw), 30px);
-
 }
 
 .textbox>h1 {
