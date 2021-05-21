@@ -3808,20 +3808,23 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 .p-panel .p-panel-header {
   border: 1px solid #dee2e6;
   padding: 1rem 1.25rem;
-  background: #efefef;
-  color: #212529;
+  background: $base-color;
+  color: #ffffff;
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
+  height: 3rem;
+  font-size: 1.4rem;
 }
 
 .p-panel .p-panel-header .p-panel-title {
-  font-weight: 600;
+  font-weight: 400;
+  text-align: right;
 }
 
 .p-panel .p-panel-header .p-panel-header-icon {
   width: 2rem;
   height: 2rem;
-  color: #6c757d;
+  color: #ffffff;
   border: 0 none;
   background: transparent;
   border-radius: 50%;
@@ -3837,7 +3840,7 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 .p-panel .p-panel-header .p-panel-header-icon:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $base-color;
 }
 
 .p-panel.p-panel-toggleable .p-panel-header {
