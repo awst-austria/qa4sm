@@ -7,8 +7,9 @@
   margin-right: auto;
 }
 
-.banner {
-
+.carousel {
+  margin-bottom: 0.5rem;
+  position: relative;
 }
 
 //
@@ -51,12 +52,18 @@
 
 .carousel-img {
   min-width: 100%;
-  //max-height: 100%;
   margin-bottom: 0.5rem;
 }
 
-.carousel-caption>h1 {
+
+.textbox>h3 {
+  font-size: min(max(20px, 1.5vw), 30px);
+
+}
+
+.textbox>h1 {
   text-shadow: .15rem .15rem .15rem rgba(0, 0, 0, .5);
+  font-size: min(max(30px, 3vw), 40px);
 }
 
 .carousel-indicators{
@@ -65,15 +72,12 @@
 
 .carousel-caption {
   position: absolute;
-  right: 15%;
-  //bottom: 20px;
-  top: 150px;
-  left: 15%;
-  z-index: 1;
+  transform: translate(0, -30%);
+  display: inline-block;
   padding-top: 20px;
   padding-bottom: 20px;
   color: #fff;
-  text-align: center;
+  vertical-align: middle;
 }
 
 .carousel-desc {
@@ -133,11 +137,11 @@ svg text {
   margin: auto;
 }
 
-.text {
+.textbox {
   background: rgba(0, 0, 0, 0.5);
-  display: inline-block;
   align-self: center;
   padding: 10px;
+  display: inline-block;
 }
 
 .lead {
@@ -225,11 +229,5 @@ svg text {
 @media only screen and (max-width: 1000px){
   .modal-content {
     width: 100%;
-  }
-}
-
-@media only screen and (max-width: 700px) {
-  .mobile-hide {
-    display: none;
   }
 }
