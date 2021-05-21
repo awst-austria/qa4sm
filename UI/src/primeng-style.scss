@@ -10,7 +10,7 @@ $accordion-header-padding: 0.5rem 0.5rem;
 @charset "UTF-8";
 :root {
   --surface-a: #ffffff;
-  --surface-b: #efefef;
+  --surface-b: $base-color;
   --surface-c: #e9ecef;
   --surface-d: #dee2e6;
   --surface-e: #ffffff;
@@ -4642,10 +4642,11 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 
 .p-menubar {
   padding: 0.5rem 1rem;
-  background: #efefef;
-  color: rgba(0, 0, 0, 0.9);
+  background: $base-color;
+  color: #ffffff;
   border: 0 none;
   border-radius: 4px;
+  font-size: 1.25rem;
 }
 
 .p-menubar .p-menuitem-link {
@@ -4654,6 +4655,7 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border-radius: 0;
   transition: box-shadow 0.15s;
   user-select: none;
+  font-size: 1.1rem;
 }
 
 .p-menubar .p-menuitem-link .p-menuitem-text {
@@ -4693,51 +4695,66 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link {
   padding: 1rem;
+  margin-right: 1rem;
   color: rgba(0, 0, 0, 0.5);
   border-radius: 4px;
   transition: box-shadow 0.15s;
   user-select: none;
+  border: 0.1px solid #FFDB5C;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-menuitem-text {
-  color: rgba(0, 0, 0, 0.5);
+  color: #FFDB5C;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-menuitem-icon {
-  color: rgba(0, 0, 0, 0.5);
+  color: #FFDB5C;
   margin-right: 0.5rem;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-submenu-icon {
-  color: rgba(0, 0, 0, 0.5);
+  color: #FFDB5C;
   margin-left: 0.5rem;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):hover {
-  background: transparent;
+  background: #F8C100;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-text {
-  color: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+}
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):focus .p-menuitem-text {
+  color: #ffffff;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-icon {
-  color: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+}
+
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):focus .p-menuitem-icon {
+  color: #ffffff;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):hover .p-submenu-icon {
-  color: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+}
+
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):focus .p-submenu-icon {
+  color: #ffffff;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  //color: #ffffff;
+  box-shadow: inset 0 0 0 0.15rem #F8C100;
+  background-color: #F8C100;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem.p-menuitem-active > .p-menuitem-link,
 .p-menubar .p-menubar-root-list > .p-menuitem.p-menuitem-active > .p-menuitem-link:not(.p-disabled):hover {
-  background: transparent;
+  background: #F8C100;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem.p-menuitem-active > .p-menuitem-link .p-menuitem-text,
