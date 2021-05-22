@@ -41,10 +41,10 @@ def get_validation_configuration(request, **kwargs):
     try:
         val_run = ValidationRun.objects.get(pk=validation_run_id)
         val_run_dict = {}
-        val_run_dict['scale_to'] = val_run.scaling_ref
+
         val_run_dict['scaling_method'] = val_run.scaling_method
-        val_run_dict['interval_from'] = val_run.interval_from
-        val_run_dict['interval_to'] = val_run.interval_to
+        val_run_dict['interval_from'] = val_run.interval_from.date()
+        val_run_dict['interval_to'] = val_run.interval_to.date()
         val_run_dict['anomalies'] = val_run.anomalies
         val_run_dict['anomalies_from'] = val_run.anomalies_from
         val_run_dict['anomalies_to'] = val_run.anomalies_to
@@ -53,43 +53,45 @@ def get_validation_configuration(request, **kwargs):
         val_run_dict['max_lat'] = val_run.max_lat
         val_run_dict['max_lon'] = val_run.max_lon
 
+        if val_run.scaling_ref.id != val_run.reference_configuration.id:
+            val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
+        else:
+            val_run_dict['scale_to'] = ValidationRun.SCALE_TO_REF
+
         # val_run_dict['tcol'] = val_run.tcol
 
         # Reference filters
         filters = []
-        for data_filter in val_run.reference_configuration.filters:
+        for data_filter in val_run.reference_configuration.filters.all():
             filters.append(data_filter.id)
 
-        val_run_dict['ref_dataset_config'] = {
+        val_run_dict['reference_config'] = {
             'dataset_id': val_run.reference_configuration.dataset.id,
             'version_id': val_run.reference_configuration.version.id,
             'variable_id': val_run.reference_configuration.variable.id,
             'basic_filters': filters
         }
 
-        validation_run_serializer = ValidationRunSerializer(val_run)
-
         datasets = []
         val_run_dict['dataset_configs'] = datasets
         for ds in val_run.dataset_configurations.all():
-            ds_dict = {}
-            ds_dict['id'] = ds.id
-            ds_dict['dataset'] = ds.dataset_id
-            ds_dict['version'] = ds.version_id
-            ds_dict['variable'] = ds.variable_id
+            if val_run.reference_configuration_id == ds.id:
+                continue
+
+            ds_dict = {'dataset_id': ds.dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
             filters_list = []
             ds_dict['filters'] = filters_list
-            for filter in ds.filters.all():
-                filters_list.append(filter.id)
+            for data_filter in ds.filters.all():
+                filters_list.append(data_filter.id)
 
             param_filters_list = []
-            ds_dict['param_filters'] = param_filters_list
-            for filter in ds.parametrised_filters.all():
-                param_filters_list.append({'id': filter.filter.id, 'parameters': filter.parameters})
+            # ds_dict['param_filters'] = param_filters_list
+            # for filter in ds.parametrised_filters.all():
+            #     param_filters_list.append({'id': filter.filter.id, 'parameters': filter.parameters})
             datasets.append(ds_dict)
         # configs = ValidationConfigurationModelSerializer(validation_run.dataset_configurations.all(), many=True)
-        return JsonResponse({'val': val_run_dict, 'val2': datasets},
-                            status=status.HTTP_404_NOT_FOUND, safe=False)
+        return JsonResponse(val_run_dict,
+                            status=status.HTTP_200_OK, safe=False)
     except ObjectDoesNotExist:
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
