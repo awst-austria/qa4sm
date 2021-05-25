@@ -4,6 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connections
 from django.http import JsonResponse
 from django.utils import timezone
+from numpy.testing._private.parameterized import param
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -11,7 +12,7 @@ from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
-from validator.models import ValidationRun, DatasetConfiguration, DataFilter
+from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter
 from validator.validation import run_validation
 
 
@@ -43,11 +44,19 @@ def get_validation_configuration(request, **kwargs):
         val_run_dict = {}
 
         val_run_dict['scaling_method'] = val_run.scaling_method
-        val_run_dict['interval_from'] = val_run.interval_from.date()
-        val_run_dict['interval_to'] = val_run.interval_to.date()
-        val_run_dict['anomalies'] = val_run.anomalies
-        val_run_dict['anomalies_from'] = val_run.anomalies_from
-        val_run_dict['anomalies_to'] = val_run.anomalies_to
+        if val_run.interval_from is not None:
+            val_run_dict['interval_from'] = val_run.interval_from.date()
+        else:
+            val_run_dict['interval_from'] = None
+
+        if val_run.interval_to is not None:
+            val_run_dict['interval_to'] = val_run.interval_to.date()
+        else:
+            val_run_dict['interval_to'] = None
+
+        val_run_dict['anomalies_method'] = val_run.anomalies
+        val_run_dict['anomalies_from'] = val_run.anomalies_from.date()
+        val_run_dict['anomalies_to'] = val_run.anomalies_to.date()
         val_run_dict['min_lat'] = val_run.min_lat
         val_run_dict['min_lon'] = val_run.min_lon
         val_run_dict['max_lat'] = val_run.max_lat
@@ -58,20 +67,27 @@ def get_validation_configuration(request, **kwargs):
         else:
             val_run_dict['scale_to'] = ValidationRun.SCALE_TO_REF
 
-        # val_run_dict['tcol'] = val_run.tcol
+        metrics = [{'id': 'tcol', 'value': val_run.tcol}]
+        val_run_dict['metrics'] = metrics
 
         # Reference filters
-        filters = []
-        for data_filter in val_run.reference_configuration.filters.all():
-            filters.append(data_filter.id)
+        basic_filters = []
+        for basic_filter in val_run.reference_configuration.filters.all():
+            basic_filters.append(basic_filter.id)
+
+        parametrised_filters = []
+        for param_filter in ParametrisedFilter.objects.filter(dataset_config=val_run.reference_configuration):
+            parametrised_filters.append({'id': param_filter.id, 'parameters': param_filter.parameters})
 
         val_run_dict['reference_config'] = {
             'dataset_id': val_run.reference_configuration.dataset.id,
             'version_id': val_run.reference_configuration.version.id,
             'variable_id': val_run.reference_configuration.variable.id,
-            'basic_filters': filters
+            'basic_filters': basic_filters,
+            'parametrised_filters': parametrised_filters
         }
 
+        # dataset configs and filters
         datasets = []
         val_run_dict['dataset_configs'] = datasets
         for ds in val_run.dataset_configurations.all():
@@ -80,16 +96,17 @@ def get_validation_configuration(request, **kwargs):
 
             ds_dict = {'dataset_id': ds.dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
             filters_list = []
-            ds_dict['filters'] = filters_list
-            for data_filter in ds.filters.all():
-                filters_list.append(data_filter.id)
+            ds_dict['basic_filters'] = filters_list
+            for basic_filter in ds.filters.all():
+                filters_list.append(basic_filter.id)
 
-            param_filters_list = []
-            # ds_dict['param_filters'] = param_filters_list
-            # for filter in ds.parametrised_filters.all():
-            #     param_filters_list.append({'id': filter.filter.id, 'parameters': filter.parameters})
+            parametrised_filters = []
+            ds_dict['parametrised_filters'] = parametrised_filters
+            for param_filter in ParametrisedFilter.objects.filter(dataset_config=ds):
+                parametrised_filters.append({'id': param_filter.id, 'parameters': param_filter.parameters})
+
             datasets.append(ds_dict)
-        # configs = ValidationConfigurationModelSerializer(validation_run.dataset_configurations.all(), many=True)
+
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)
     except ObjectDoesNotExist:
@@ -185,8 +202,8 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     interval_to = serializers.DateTimeField(required=False)
     metrics = MetricsSerializer(many=True, required=True)
     anomalies_method = serializers.ChoiceField(choices=ValidationRun.ANOMALIES_METHODS, required=True)
-    anomalies_from = serializers.DateTimeField(required=False)
-    anomalies_to = serializers.DateTimeField(required=False)
+    anomalies_from = serializers.DateTimeField(required=False, allow_null=True)
+    anomalies_to = serializers.DateTimeField(required=False, allow_null=True)
     scaling_method = serializers.ChoiceField(choices=ValidationRun.SCALING_METHODS, required=True)
     scale_to = serializers.ChoiceField(choices=ValidationRun.SCALE_TO_OPTIONS, required=True)
     min_lat = serializers.FloatField(required=False, allow_null=True, default=-90.0)
