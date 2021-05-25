@@ -5,6 +5,7 @@ export class GlobalParamsDto {
               public site_url: string,
               public app_version: string,
               public expiry_period: string,
-              public warning_period: string,) {
+              public warning_period: string,
+              ) {
   }
 }

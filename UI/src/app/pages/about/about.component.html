@@ -11,13 +11,13 @@
         <tbody>
             <tr>
                 <td class="align-middle">
-                    <a *ngIf="logoTuWien$|async as logoTuWien" href="https://climers.geo.tuwien.ac.at/climers/projects/current-projects/qa4sm/" target="_blank"><img class="partner_logo" [src]="sanitizePlotUrl(logoTuWien[0].plot)"></a>
+                    <a *ngIf="logoTuWien$|async as logoTuWien" href="https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/" target="_blank"><img class="partner_logo" [src]="sanitizePlotUrl(logoTuWien[0].plot)"></a>
                 </td>
                 <td class="align-left">
                     <b>TU Wien (Vienna University of Technology)</b><br>
                     Department of Geodesy and Geoinformation<br>
                     Research Group Climate and Environmental Remote Sensing (CLIMERS)<br>
-                    Website: <a href="https://climers.geo.tuwien.ac.at/climers/projects/current-projects/qa4sm/">https://climers.geo.tuwien.ac.at/climers/projects/current-projects/qa4sm/</a><br>
+                    Website: <a href="https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/">https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/</a><br>
                     Contact: Wouter Dorigo (wouter.dorigo (at) tuwien.ac.at)<br>
                     Tasks: Scientific lead and research, dataset support
                 </td>
@@ -53,5 +53,6 @@
         QA4SM is open source software, licensed under an MIT license. <a href="https://github.com/awst-austria/qa4sm" target="_blank">It is available on GitHub.</a>
         This site uses <a class="font-weight-bold" href="https://github.com/awst-austria/qa4sm/releases/tag/v{{this.getAppVersion()}}" target="_blank">version {{this.getAppVersion()}}</a>.
     </p>
-
+<qa-scroll-to-top></qa-scroll-to-top>
 </div>
+
