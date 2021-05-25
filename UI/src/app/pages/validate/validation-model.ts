@@ -5,7 +5,7 @@ import {MetricModel} from '../../modules/metrics/components/metric/metric-model'
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ScalingModel} from '../../modules/scaling/components/scaling/scaling-model';
 
-export class ValidationModel{
+export class ValidationModel {
   // The reference configuration array should contain exactly one item.
   constructor(public datasetConfigurations: DatasetConfigModel[],
               public referenceConfigurations: DatasetConfigModel[],

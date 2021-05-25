@@ -1,5 +1,7 @@
+import {BehaviorSubject} from 'rxjs';
+
 export class ValidationPeriodModel {
-  constructor(public intervalFrom?: Date,
-              public intervalTo?: Date) {
+  constructor(public intervalFrom$: BehaviorSubject<Date>,
+              public intervalTo$: BehaviorSubject<Date>) {
   }
 }

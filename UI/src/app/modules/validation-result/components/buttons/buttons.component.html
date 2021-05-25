@@ -74,6 +74,14 @@
           Extend Life Span
         </button>
       </span>
+      <button class="dropdown-item"
+
+              title="Load validation settings"
+              (click)="router.navigateByUrl('/validate?validation_id='+validationRun.id)"
+      >
+        <span class="pi pi-refresh"></span>
+        Load validation settings
+      </button>
     </div>
   </div>
 <!--published validations page only-->

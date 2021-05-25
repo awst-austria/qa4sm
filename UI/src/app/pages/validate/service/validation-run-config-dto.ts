@@ -19,10 +19,17 @@ export interface ValidationRunDatasetConfigDto {
   dataset_id: number,
   version_id: number,
   variable_id: number,
-  basic_filters: number[]
+  basic_filters: number[],
+  parametrised_filters: ParametrisedFilterConfig[],
+
 }
 
 export interface ValidationRunMetricConfigDto {
   id: string,
   value: boolean
+}
+
+export interface ParametrisedFilterConfig {
+  id: string,
+  parameters: string,
 }

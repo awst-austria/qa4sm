@@ -1,7 +1,9 @@
+import {BehaviorSubject} from 'rxjs';
+
 export class AnomaliesModel {
-  constructor(public method: string,
+  constructor(public method$: BehaviorSubject<string>,
               public description: string,
-              public anomaliesFrom?: Date,
-              public anomaliesTo?: Date) {
+              public anomaliesFrom$: BehaviorSubject<Date>,
+              public anomaliesTo$: BehaviorSubject<Date>) {
   }
 }

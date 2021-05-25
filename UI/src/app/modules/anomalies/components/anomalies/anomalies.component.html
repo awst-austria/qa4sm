@@ -9,17 +9,18 @@
   <div class="p-grid">
     <div class="p-col-12">
       <div class="p-float-label p-m-2">
-        <p-dropdown id="anomaliesMethodSelector" (onChange)="selectedMethodChanged()"
+        <p-dropdown id="anomaliesMethodSelector"
                     [options]="availableAnomalyMethodModels"
-                    [(ngModel)]="selectedMethod"
+                    [ngModel]="selectedMethod$|async"
+                    (ngModelChange)="selectedMethod$.next($event)"
                     optionLabel="description"></p-dropdown>
         <label for="anomaliesMethodSelector">Method</label>
       </div>
     </div>
 
     <div class="p-col-12 p-sm-6">
-      <qa-anom-climatology *ngIf="selectedMethod.method==anomaliesClimatology"
-                           [anomaliesModel]="methodForValidation"></qa-anom-climatology>
+      <qa-anom-climatology *ngIf="((selectedMethod$|async).method$|async)==anomaliesClimatology"
+                           [anomaliesModel]="anomaliesModel"></qa-anom-climatology>
     </div>
   </div>
 </p-panel>

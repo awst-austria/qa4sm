@@ -1,6 +1,6 @@
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
-import {ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
+import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
 
 
 export class DatasetConfigModel {
@@ -20,11 +20,14 @@ export class DatasetConfigModel {
       }
     });
 
+    let parameterisedFilters: ParametrisedFilterConfig[] = [];
+
     let newValDatasetConfigDto: ValidationRunDatasetConfigDto = {
       dataset_id: this.datasetModel.selectedDataset.id,
       variable_id: this.datasetModel.selectedVariable.id,
       version_id: this.datasetModel.selectedVersion.id,
-      basic_filters: enabledBasicFilters
+      basic_filters: enabledBasicFilters,
+      parametrised_filters: parameterisedFilters
     };
 
     return newValDatasetConfigDto;

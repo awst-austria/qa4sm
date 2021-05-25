@@ -10,14 +10,14 @@ import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
 import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
-import {ANOMALIES_NONE, ANOMALIES_NONE_DESC} from '../../modules/anomalies/components/anomalies/anomalies.component';
-import {SCALING_METHOD_DEFAULT} from '../../modules/scaling/components/scaling/scaling.component';
+import {ANOMALIES_NONE, ANOMALIES_NONE_DESC, AnomaliesComponent} from '../../modules/anomalies/components/anomalies/anomalies.component';
+import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
 import {ValidationRunConfigDto, ValidationRunDatasetConfigDto, ValidationRunMetricConfigDto} from './service/validation-run-config-dto';
 import {ValidationRunConfigService} from './service/validation-run-config.service';
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 
@@ -32,6 +32,8 @@ const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either con
 })
 export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild(MapComponent) child: MapComponent;
+  @ViewChild(AnomaliesComponent) anomaliesChild: AnomaliesComponent;
+  @ViewChild(ScalingComponent) scalingChild: ScalingComponent;
 
   mapVisible: BehaviorSubject<Boolean> = new BehaviorSubject<Boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
@@ -42,9 +44,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null)),
-    new ValidationPeriodModel(),
+    new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
-    new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC),
+    new AnomaliesModel(new BehaviorSubject<string>(ANOMALIES_NONE), ANOMALIES_NONE_DESC, new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     SCALING_METHOD_DEFAULT);
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
@@ -71,7 +73,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.validationConfigService.getValidationConfig(params['validation_id']).subscribe(
           valrun => {
             console.log('Val run:', valrun);
-            //this.modelFromValidationConfig(valrun)
+            this.modelFromValidationConfig(valrun);
           }
         );
       } else {
@@ -83,23 +85,100 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private modelFromValidationConfig(config: ValidationRunConfigDto) {
-    config.dataset_configs.forEach(config => {
+
+    //Prepare dataset config
+    config.dataset_configs.forEach(datasetConfig => {
       let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
       this.validationModel.datasetConfigurations.push(model);
-      this.datasetService.getDatasetById(config.dataset_id).subscribe(dataset => {
+      this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
         model.datasetModel.selectedDataset = dataset;
+        this.loadFiltersForModel(model)//Load the available filters for the dataset
+          .subscribe(model => { //when it is loaded, set the values from the config
+            datasetConfig.basic_filters.forEach(basicFilterConfig => {
+              model.basicFilters.forEach(filter => {
+                if (basicFilterConfig == filter.filterDto.id) {
+                  filter.enabled = true;
+                }
+              });
+            });
+
+          });
       });
 
-      this.versionService.getVersionById(config.version_id).subscribe(versionDto => {
+      this.versionService.getVersionById(datasetConfig.version_id).subscribe(versionDto => {
         model.datasetModel.selectedVersion = versionDto;
       });
 
-      this.variableService.getVariableById(config.variable_id).subscribe(variableDto => {
+      this.variableService.getVariableById(datasetConfig.variable_id).subscribe(variableDto => {
         model.datasetModel.selectedVariable = variableDto;
       });
-
-
     });
+
+    //Prepare reference
+    let referenceModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
+    this.validationModel.referenceConfigurations.push(referenceModel);
+    this.datasetService.getDatasetById(config.reference_config.dataset_id).subscribe(dataset => {
+      referenceModel.datasetModel.selectedDataset = dataset;
+      this.loadFiltersForModel(referenceModel)
+        .subscribe(model => { //when it is loaded, set the values from the config
+          config.reference_config.basic_filters.forEach(basicFilterConfig => {
+            model.basicFilters.forEach(filter => {
+              if (basicFilterConfig == filter.filterDto.id) {
+                filter.enabled = true;
+              }
+            });
+          });
+        });
+    });
+
+    this.versionService.getVersionById(config.reference_config.version_id).subscribe(versionDto => {
+      referenceModel.datasetModel.selectedVersion = versionDto;
+    });
+
+    this.variableService.getVariableById(config.reference_config.variable_id).subscribe(variableDto => {
+      referenceModel.datasetModel.selectedVariable = variableDto;
+    });
+
+    //Spatial subset
+    this.validationModel.spatialSubsetModel.maxLon$.next(config.max_lon);
+    this.validationModel.spatialSubsetModel.maxLat$.next(config.max_lat);
+    this.validationModel.spatialSubsetModel.minLon$.next(config.min_lon);
+    this.validationModel.spatialSubsetModel.minLat$.next(config.min_lat);
+
+    //Temporal subset
+    if (config.interval_from != null) {
+      this.validationModel.validationPeriodModel.intervalFrom$.next(new Date(config.interval_from));
+    }
+
+    if (config.interval_to != null) {
+      this.validationModel.validationPeriodModel.intervalTo$.next(new Date(config.interval_to));
+    }
+
+    //Metrics
+    if (config.metrics) {
+      config.metrics.forEach(metricDto => {
+        this.validationModel.metrics.forEach(metricModel => {
+          if (metricModel.id == metricDto.id) {
+            metricModel.value$.next(metricDto.value);
+          }
+        });
+      });
+    }
+
+
+    //Anomalies
+    if (config.anomalies_method != null) {
+      this.anomaliesChild.setSelection(config.anomalies_method);
+      if (config.anomalies_from != null) {
+        this.validationModel.anomalies.anomaliesFrom$.next(new Date(config.anomalies_from));
+      }
+      if (config.anomalies_to != null) {
+        this.validationModel.anomalies.anomaliesTo$.next(new Date(config.anomalies_from));
+      }
+    }
+
+    //Scaling
+    this.scalingChild.setSelection(config.scaling_method, config.scale_to);
   }
 
   addDatasetToValidate() {
@@ -133,22 +212,28 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
 
       //and the filters
-      this.updateDatasetConfigFilters(model);
+      this.loadFiltersForModel(model);
     });
   }
 
-  private updateDatasetConfigFilters(model: DatasetConfigModel) {
+  private loadFiltersForModel(model: DatasetConfigModel): ReplaySubject<DatasetConfigModel> {
+    let updatedModel$ = new ReplaySubject<DatasetConfigModel>();
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
-      model.basicFilters = [];
-      model.parameterisedFilters = [];
-      filters.forEach(filter => {
-        if (filter.parameterised) {
-          model.parameterisedFilters.push(new FilterModel(filter, false, filter.default_parameter));
-        } else {
-          model.basicFilters.push(new FilterModel(filter, false, null));
-        }
+        model.basicFilters = [];
+        model.parameterisedFilters = [];
+        filters.forEach(filter => {
+          if (filter.parameterised) {
+            model.parameterisedFilters.push(new FilterModel(filter, false, filter.default_parameter));
+          } else {
+            model.basicFilters.push(new FilterModel(filter, false, null));
+          }
+        });
+        updatedModel$.next(model);
+      },
+      error => {
+        updatedModel$.error(error);
       });
-    });
+    return updatedModel$;
   }
 
   removeDataset(configModel: DatasetConfigModel) {
@@ -162,14 +247,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel) {
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel == datasetConfig) {
-        this.updateDatasetConfigFilters(config);
+        this.loadFiltersForModel(config);
       }
     });
     this.setDefaultValidationPeriod();
   }
 
   onReferenceChange() {
-    this.updateDatasetConfigFilters(this.validationModel.referenceConfigurations[0]);
+    this.loadFiltersForModel(this.validationModel.referenceConfigurations[0]);
     this.setDefaultValidationPeriod();
   }
 
@@ -196,18 +281,18 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     let newValidation: ValidationRunConfigDto = {
       dataset_configs: datasets,
       reference_config: this.validationModel.referenceConfigurations[0].toValRunDatasetConfigDto(),
-      interval_from: this.validationModel.validationPeriodModel.intervalFrom,
-      interval_to: this.validationModel.validationPeriodModel.intervalTo,
+      interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
+      interval_to: this.validationModel.validationPeriodModel.intervalTo$.getValue(),
       min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
       min_lon: this.validationModel.spatialSubsetModel.minLon$.getValue(),
       max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
       max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
       metrics: metricDtos,
-      anomalies_method: this.validationModel.anomalies.method,
-      anomalies_from: this.validationModel.anomalies.anomaliesFrom,
-      anomalies_to: this.validationModel.anomalies.anomaliesTo,
+      anomalies_method: this.validationModel.anomalies.method$.getValue(),
+      anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
+      anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
       scaling_method: this.validationModel.scalingModel.id,
-      scale_to: this.validationModel.scalingModel.scaleTo.id
+      scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
     };
 
     this.validationConfigService.startValidation(newValidation).subscribe(
@@ -243,8 +328,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       this.validationEnd = new Date(Math.min.apply(null, datesTo));
     }
 
-    this.validationModel.validationPeriodModel.intervalFrom = this.validationStart;
-    this.validationModel.validationPeriodModel.intervalTo = this.validationEnd;
+    this.validationModel.validationPeriodModel.intervalFrom$.next(this.validationStart);
+    this.validationModel.validationPeriodModel.intervalTo$.next(this.validationEnd);
   }
 
 }
