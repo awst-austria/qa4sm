@@ -2,7 +2,7 @@
 
 <main role="main">
   <div class="carousel">
-    <div *ngIf="CarouselImages as CarouselImages">
+    <div>
       <p-carousel [value]="CarouselImages" [circular]="true" [autoplayInterval]="5000"
                   [numVisible]="1" [numScroll]="1">
         <ng-template let-image pTemplate="item">
@@ -24,7 +24,7 @@
             against in-situ and model reference data
           </h3>
         </div>
-      <span *ngIf="user_logged_in else elseBlock">
+      <span *ngIf="userLoggedIn else elseBlock">
         <p>
         <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" href="#published-validations" role="button">See results</a>
         <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
