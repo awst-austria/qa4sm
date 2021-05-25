@@ -54,9 +54,17 @@ def get_validation_configuration(request, **kwargs):
         else:
             val_run_dict['interval_to'] = None
 
-        val_run_dict['anomalies_method'] = val_run.anomalies
-        val_run_dict['anomalies_from'] = val_run.anomalies_from.date()
-        val_run_dict['anomalies_to'] = val_run.anomalies_to.date()
+
+        if val_run.anomalies_from is not None:
+            val_run_dict['anomalies_from'] = val_run.anomalies_from.date()
+        else:
+            val_run_dict['anomalies_from'] = None
+
+        if val_run.anomalies_from is not None:
+            val_run_dict['anomalies_to'] = val_run.anomalies_to.date()
+        else:
+            val_run_dict['anomalies_to'] = None
+
         val_run_dict['min_lat'] = val_run.min_lat
         val_run_dict['min_lon'] = val_run.min_lon
         val_run_dict['max_lat'] = val_run.max_lat
