@@ -12,50 +12,60 @@ import {Gallery} from 'angular-gallery';
 const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
 
-  @Component({
+@Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
 
-  carousel_files = [{
+  carouselFiles = [{
     plot: homeUrlPrefix + 'map_us_spearman.png',
     link: '#',
-    description: 'Image: QA4SM'}, {
+    description: 'Image: QA4SM'
+  }, {
     plot: homeUrlPrefix + 'smos.jpg',
     link: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
-    description: 'Image: ESA'}, {
-    plot:  homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
+    description: 'Image: ESA'
+  }, {
+    plot: homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
     link: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
-    description: 'Image: ESA'}];
+    description: 'Image: ESA'
+  }];
 
-  logo_files = [{
+  logoFiles = [{
     plot: logoUrlPrefix + 'logo_ffg.png',
     link: 'https://www.ffg.at/',
-    description:'FFG'}, {
+    description: 'FFG'
+  }, {
     plot: logoUrlPrefix + 'logo_tuwien_geo.png',
     link: 'https://www.geo.tuwien.ac.at/',
-    description:'GEO'}, {
+    description: 'GEO'
+  }, {
     plot: logoUrlPrefix + 'logo_awst.png',
     link: 'https://www.awst.at/',
-    description:'AWST'}];
+    description: 'AWST'
+  }];
 
-  workflow_diagram = [{
+  workflowDiagram = [{
     plot: homeUrlPrefix + 'qa4am_overview_diagram.png',
-    link: '', description: 'QA4SM workflow'}]
+    link: '', description: 'QA4SM workflow'
+  }];
 
-  card_validate = [{
+  cardValidate = [{
     plot: homeUrlPrefix + 'validate.png',
-    link: '', description: 'Validate'}]
+    link: '', description: 'Validate'
+  }];
 
-  card_validate_result = [{
+  cardValidateResult = [{
     plot: homeUrlPrefix + 'validation_result_list.png',
-    link: '', description: 'Results'}]
+    link: '', description: 'Results'
+  }];
 
-  card_validate_details = [{
+  cardValidateDetails = [{
     plot: homeUrlPrefix + 'validation_result_details.png',
-    link: '', description: 'Download and Visualise'}]
+    link: '', description: 'Download and Visualise'
+  }];
 
   CarouselImages: HomepageImagesModel[];
   logos: HomepageImagesModel[];
@@ -66,7 +76,7 @@ export class HomeComponent implements OnInit {
 
   settings$: Observable<any>;
 
-  user_logged_in: boolean;
+  userLoggedIn: boolean;
 
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
@@ -75,17 +85,17 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.authenticated.subscribe(authenticated => this.user_logged_in = authenticated);
+    this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
     this.settings$ = this.settingsService.getAllSettings();
-    this.CarouselImages = this.getPictures(this.carousel_files);
-    this.logos = this.getPictures(this.logo_files);
-    this.ImgWorkflowDiagram = this.getPictures(this.workflow_diagram);
-    this.ImgCardValidate = this.getPictures(this.card_validate);
-    this.ImgCardValidateResult = this.getPictures(this.card_validate_result);
-    this.ImgCardValidateDetails = this.getPictures(this.card_validate_details);
+    this.CarouselImages = this.getPictures(this.carouselFiles);
+    this.logos = this.getPictures(this.logoFiles);
+    this.ImgWorkflowDiagram = this.getPictures(this.workflowDiagram);
+    this.ImgCardValidate = this.getPictures(this.cardValidate);
+    this.ImgCardValidateResult = this.getPictures(this.cardValidateResult);
+    this.ImgCardValidateDetails = this.getPictures(this.cardValidateDetails);
   }
 
-  getPictures(images: any): HomepageImagesModel[]{
+  getPictures(images: any): HomepageImagesModel[] {
     const model = [];
     let plot: any;
     images.forEach(image => {
@@ -96,20 +106,20 @@ export class HomeComponent implements OnInit {
     return model;
   }
 
-  getSanitizedPlot(plot: string): SafeUrl{
+  getSanitizedPlot(plot: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plot);
   }
 
   showGallery(index: number = 0, imagesListObject): void {
-      const imagesList = [];
-      imagesListObject.forEach(image => {
-        imagesList.push({path: this.plotService.plotPrefix + image.plot});
-      });
-      const prop: any = {};
-      prop.component = CarouselComponent;
-      prop.images = imagesList;
-      prop.index = index;
-      prop.arrows = imagesList.length > 1;
-      this.gallery.load(prop);
-    }
+    const imagesList = [];
+    imagesListObject.forEach(image => {
+      imagesList.push({path: this.plotService.plotPrefix + image.plot});
+    });
+    const prop: any = {};
+    prop.component = CarouselComponent;
+    prop.images = imagesList;
+    prop.index = index;
+    prop.arrows = imagesList.length > 1;
+    this.gallery.load(prop);
+  }
 }
