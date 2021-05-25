@@ -12,9 +12,6 @@ from validator.models import User
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def users(request):
-    if request.user.is_superuser:
-        print('super')
-
     user = User.objects.all()
     serializer = UserSerializer(user, many=True)
 

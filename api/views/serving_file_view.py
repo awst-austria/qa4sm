@@ -63,7 +63,6 @@ def get_metric_names_and_associated_files(request):
     response = []
 
     for ind, key in enumerate(metrics):
-        print(ind)
         boxplot_file = ''
         boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
 
