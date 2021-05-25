@@ -39,18 +39,14 @@ class TestLoginEndpoint(TestCase):
     def test_login(self):
 
         # Try to login with wrong password
-        response = self.client.post('/api/auth/',
+        response = self.client.post('/api/auth/login',
                                     {'username': self.auth_data['username'], 'password': 'wrong password'},
                                     format='json')
         assert response.status_code == 401
 
         # Try to login with correct password
-        response = self.client.post('/api/auth/',
+        response = self.client.post('/api/auth/login',
                                     {'username': self.auth_data['username'], 'password': self.auth_data['password']},
                                     format='json')
         # Http response status should be OK(200)
         assert response.status_code == 200
-
-        print(response.data['token'])
-
-    # payload = jwt.decode(token, settings.API_SECRET_KEY, algorithms=[settings.JWT_ALGORYTHM])
