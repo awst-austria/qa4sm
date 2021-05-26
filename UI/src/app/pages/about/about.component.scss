@@ -20,21 +20,7 @@
     float: right;
 }
 main {
-  text-align: left;
   max-width: 40rem;
-  width: 100%;
-  margin: auto;
-  font-family: $base-font;
-  line-height: 1.5rem;
-}
-a {
-  color: #4760E5;
-  text-decoration: none;
-}
-
-a:hover {
-  color: #213FE0;
-  text-decoration: underline;
 }
 
 #introduction{
@@ -43,33 +29,4 @@ a:hover {
 }
 #footer{
   text-align: justify;
-}
-
-.table{
-  width:100%;
-  margin-bottom:1rem;
-  color:#212529;
-  border-collapse: collapse !important;
-}
-
-.table td,.table th{
-  padding: .75rem;
-  vertical-align: top;
-  border-top: 1px solid #dee2e6;
-}
-
-.table thead th{
-  vertical-align: bottom;
-  border-bottom: 2px solid #dee2e6;
-}
-
-.table tbody+tbody{
-  border-top: 2px solid #dee2e6;
-}
-
-.align-middle{
-  vertical-align: middle!important;
-}
-.font-weight-bold {
-  font-weight: 700 !important;
 }
