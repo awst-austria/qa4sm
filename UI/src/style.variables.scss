@@ -69,6 +69,40 @@ h2 {
   border-top: 2px solid #dee2e6;
 }
 
+.table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+.table-bordered thead th,
+.table-bordered thead td {
+  border-bottom-width: 2px;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6 !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.table .thead-dark th {
+  color: #fff;
+  background-color: #00AAE3;
+  border-color: #454d55;
+}
+
+.table .thead-dark th {
+  color: #ffffff;
+  border-color: #dee2e6;
+}
+
 .align-middle{
   vertical-align: middle!important;
 }
