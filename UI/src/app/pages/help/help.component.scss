@@ -1,7 +1,67 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+@import "src/style.variables";
 
 .scaled_image {
   display: block;
   width: 100%;
   height: auto;
 }
+main{
+  text-align: left;
+  max-width: 40rem;
+  width: 100%;
+  margin: auto;
+  font-family: $base-font;
+  line-height: 1.5rem;
+}
+a {
+  color: #4760E5;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #213FE0;
+  text-decoration: underline;
+}
+
+h1, h2, .h3, .h4 {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+.h3 {
+  font-size: 1.75rem;
+}
+
+.h4 {
+  font-size: 1.5rem;
+}
+
+.scaled_image {
+  display: block;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.font-weight-normal {
+  font-weight: 400 !important;
+}
+div {
+  text-align: center;
+}
+img {
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+//.w3-round{
+//  align-content: center;
+//}
+
