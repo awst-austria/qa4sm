@@ -1,4 +1,4 @@
-<div *ngIf="datasetInfo$ | async as datasets" style="width: 100%; margin: auto; max-width: 85rem;">
+<main *ngIf="datasetInfo$ | async as datasets">
   <div *ngFor="let refFlag of [false, true]">
 
     <div *ngIf="refFlag; else elseRefFlag">
@@ -19,8 +19,7 @@
       </p>
     </ng-template>
 
-    <table id="table_{% if not refFlag %}datasets{% else %}references{% endif %}"
-           class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped">
       <thead class="thead-dark">
       <tr>
         <th scope="col" style="width: 10%">Dataset</th>
@@ -37,7 +36,7 @@
           <sup *ngIf="dataset.not_as_reference">*</sup></th>
         <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.detailed_description"></td>
         <td *ngIf="dataset.is_only_reference == refFlag">
-          <ul class="p-pl-0">
+          <ul class="p-pl-0 p-my-0">
             <li *ngFor="let version of dataset.versions; let ind=index" class="p-ml-2">
               <b> {{ version }}</b> <br>
               <span *ngIf="dataset.versionsHelpText[ind] != '-' && dataset.versionsHelpText[ind] !=''">
@@ -56,7 +55,7 @@
         <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.source_reference"></td>
         <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.citation"></td>
         <td *ngIf="dataset.is_only_reference == refFlag">
-          <ul class="p-pl-0">
+          <ul class="p-pl-0  p-my-0">
             <li *ngFor="let filter of dataset.filters; let ind = index" class="p-ml-2">
               {{filter}}: {{dataset.filtersHelpText[ind]}}
             </li>
@@ -69,4 +68,4 @@
     <br>
   </div>
   <qa-scroll-to-top></qa-scroll-to-top>
-</div>
+</main>

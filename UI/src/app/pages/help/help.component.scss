@@ -1,7 +1,30 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+@import "src/style.variables";
 
 .scaled_image {
   display: block;
   width: 100%;
   height: auto;
 }
+main{
+  max-width: 40rem;
+}
+
+.scaled_image {
+  display: block;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+div {
+  text-align: center;
+}
+
+img {
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+//.w3-round{
+//  align-content: center;
+//}
+
