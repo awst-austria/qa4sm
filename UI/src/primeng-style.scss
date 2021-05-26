@@ -4672,7 +4672,6 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border: 0 none;
   border-radius: 4px;
   font-size: 1.25rem;
-  z-index: 5;
 }
 
 .p-menubar .p-menuitem-link {
@@ -4682,6 +4681,7 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   transition: box-shadow 0.15s;
   user-select: none;
   font-size: 1rem;
+
 }
 
 .p-menubar .p-menuitem-link .p-menuitem-text {
