@@ -1,10 +1,11 @@
-<!--<main role="main">-->
+<main role="main">
   <div class="carousel">
     <div>
       <p-carousel [value]="CarouselImages" [circular]="true" [autoplayInterval]="5000"
                   [numVisible]="1" [numScroll]="1">
         <ng-template let-image pTemplate="item">
           <img *ngIf="(image.plot|async) as plot"
+               alt="{{image.link}}"
                [src]="getSanitizedPlot(plot.plot)"
                class="carousel-img">
           <div class="image-attribution">
@@ -15,27 +16,25 @@
     </div>
     <div>
       <div class="carousel-caption">
-        <div class="textbox mb-3">
+        <div class="textbox p-mb-3">
           <h1 class="carousel-desc">Quality Assurance for Soil Moisture</h1>
-          <h3 class="carousel-desc d-none d-sm-block">
+          <h3 class="carousel-desc d-sm-block">
             Validation of satellite soil moisture products <br/>
             against in-situ and model reference data
           </h3>
         </div>
       <span *ngIf="userLoggedIn else elseBlock">
-        <p>
-        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0"  role="button">See results</a>
-        <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
-        <a routerLink="/validate" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" role="button">Try it</a>
-        </p>
+        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0"  role="button">See results</a>
+        <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
+        <a routerLink="/validate" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">Try it</a>
       </span>
       <ng-template #elseBlock>
         <p>
-        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" role="button">See results</a>
-        <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
-        <a routerLink="/signup" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" role="button">Sign up</a>
-        <span class="mx-1 mx-md-3 carousel-desc d-none d-sm-inline">or</span>
-        <a routerLink="/login" style="width: 7em;" class="btn btn-lg btn-primary mb-1 mb-md-0" role="button">Log in</a>
+        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">See results</a>
+        <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
+        <a routerLink="/signup" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">Sign up</a>
+        <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
+        <a routerLink="/login" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">Log in</a>
         </p>
       </ng-template>
     </div>
@@ -58,7 +57,7 @@
         <div class="overflow">
           <div *ngFor="let logo of logos">
             <a *ngIf="(logo.plot|async) as plot" href="{{logo.link}}">
-              <img [src]="getSanitizedPlot(plot.plot)">
+              <img alt="{{logo.link}}" [src]="getSanitizedPlot(plot.plot)">
             </a>
           </div>
         </div>
@@ -90,7 +89,7 @@
   <div class="container-marketing p-grid p-justify-center">
     <div class="card-deck">
       <div class="card card-body">
-        <h4 class="text-center mt-0">Datasets and Settings</h4>
+        <h4 class="text-center p-mt-0">Datasets and Settings</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">
           Allows specification of input datasets and settings for your validation
         </p>
@@ -105,7 +104,7 @@
       </div>
 
       <div class="card card-body">
-        <h4 class="text-center mt-0">Results</h4>
+        <h4 class="text-center p-mt-0">Results</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">
           Provides a list of all validation results
         </p>
@@ -119,7 +118,7 @@
       </div>
 
       <div class="card card-body">
-        <h4 class="text-center mt-0">Download and Visualize</h4>
+        <h4 class="text-center p-mt-0">Download and Visualize</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">
           Allows download of validation results in netCDF format and as graphics
         </p>
@@ -133,7 +132,7 @@
       </div>
     </div>
   </div>
-<!--</main>-->
+</main>
 
 <footer class="container">
   <p>
