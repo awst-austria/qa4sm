@@ -936,7 +936,11 @@ class TestValidation(TestCase):
         ref_reader = val.validation._get_reference_reader(run)
 
         with pytest.raises(ValueError, match=r".*than.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
         ParametrisedFilter.objects.all().delete()
 
@@ -946,7 +950,11 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
         ParametrisedFilter.objects.all().delete()
 
@@ -955,7 +963,11 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
         ParametrisedFilter.objects.all().delete()
 
@@ -964,7 +976,11 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
     # test all combinations of datasets, versions, variables, and filters
     @pytest.mark.long_running
@@ -1047,7 +1063,11 @@ class TestValidation(TestCase):
 
                 ref_reader = val.validation._get_reference_reader(run)
 
-                total_points, jobs = val.create_jobs(run, ref_reader)
+                total_points, jobs = val.create_jobs(
+                    run,
+                    ref_reader,
+                    run.reference_configuration
+                )
                 print(version)
                 print(len(jobs))
                 print(total_points)

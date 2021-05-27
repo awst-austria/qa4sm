@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
+from typing import Union
 
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
 from validator.models import DataFilter
-from validator.validation.readers import create_reader
-from validator.validation.filters import setup_filtering
+
 
 # function to retrieve depth_from and depth_to from the database
 def get_depths_params(param_filters):
@@ -31,32 +31,32 @@ def get_depths_params(param_filters):
 
 # very basic geographic subsetting with only a bounding box. simple should also be quick :-)
 def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon):
-    if (min_lat is not None and min_lon is not None and max_lat is not None and max_lon is not None) :
+    if min_lat is not None and min_lon is not None and max_lat is not None and max_lon is not None:
 
         # shift back to "normal" coordinates if shifted to the right
-        if (min_lon > 180.0):
+        if min_lon > 180.0:
             shift = round(min_lon / 360.0) * 360.0
             min_lon -= shift
             max_lon -= shift
 
         # shift back to "normal" coordinates if shifted to the left
-        if (max_lon < -180.0):
+        if max_lon < -180.0:
             shift = round(max_lon / -360.0) * 360.0
             min_lon += shift
             max_lon += shift
 
-        ## handle special case of bounding box across antimeridian
-        if((max_lon > 180.0) or (min_lon < -180.0) ):
-            if(max_lon > 180.0):
+        # handle special case of bounding box across antimeridian
+        if (max_lon > 180.0) or (min_lon < -180.0):
+            if max_lon > 180.0:
                 new_min_lon = min_lon
                 new_max_lon = max_lon - 360.0
-            if(min_lon < -180.0):
+            if min_lon < -180.0:
                 new_min_lon = min_lon + 360.0
                 new_max_lon = max_lon
 
             index = np.where(((lats <= max_lat) & (lats >= min_lat) & (lons <= 180.0) & (lons >= new_min_lon)) |
                              ((lats <= max_lat) & (lats >= min_lat) & (lons <= new_max_lon) & (lons >= -180.0)))
-        ## handle "normal" case of bounding box not across antimeridian
+        # handle "normal" case of bounding box not across antimeridian
         else:
             index = np.where((lats <= max_lat) & (lats >= min_lat) & (lons <= max_lon) & (lons >= min_lon))
 
@@ -70,19 +70,53 @@ def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon)
 
     return gpis, lons, lats, index
 
-def create_jobs(validation_run, ref_reader):
-    jobs = []
+
+def create_jobs(
+        validation_run,
+        reader,
+        dataset_config,
+        return_points=True,
+) -> Union[tuple, list]:
+    """
+    Create jobs for validation run. The reference reader is passed here.
+
+    Parameters
+    ----------
+    validation_run: models.validation_run.ValidationRun object
+        Configuration of the run
+    reader: object
+        reader of the reference
+    dataset_config: models.dataset_configuration.DatasetConfiguration object
+        configuration of the dataset that the reader belongs to
+    return_points: bool, default is True
+        If True, return total_points
+
+    Returns
+    -------
+    jobs: list of tuples
+        each tuple has the shape (gpis, lons, lats). Optionally a list of metadata is included
+    total_points: int
+        n of validation points
+    """
+    if dataset_config is None:
+        raise ValueError(
+            "A dataset configuration has not been provided for the jobs generation"
+        )
+
     total_points = 0
 
     # if we've got data on a grid, process one cell at a time
-    if isinstance(ref_reader, GriddedBase):
-        cells = ref_reader.grid.get_cells()
+    if isinstance(reader, GriddedBase):
+        cells = reader.grid.get_cells()
 
         jobs = []
         for cell in cells:
-            gpis, lons, lats = ref_reader.grid.grid_points_for_cell(cell)
+            gpis, lons, lats = reader.grid.grid_points_for_cell(cell)
 
-            gpis, lons, lats, index = _geographic_subsetting(gpis, lons, lats, validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
+            gpis, lons, lats, index = _geographic_subsetting(
+                gpis, lons, lats, validation_run.min_lat,
+                validation_run.min_lon, validation_run.max_lat, validation_run.max_lon
+            )
 
             if isinstance(gpis, np.ma.MaskedArray):
                 gpis = gpis.compressed()
@@ -94,19 +128,21 @@ def create_jobs(validation_run, ref_reader):
                 total_points += len(gpis)
 
     # if we've got ISMN data, process one network at a time
-    elif isinstance(ref_reader, ISMN_Interface):
-        depth_from, depth_to = get_depths_params(validation_run.reference_configuration.parametrisedfilter_set.all())
+    elif isinstance(reader, ISMN_Interface):
+        depth_from, depth_to = get_depths_params(
+            dataset_config.parametrisedfilter_set.all()
+        )
 
-        ids = ref_reader.get_dataset_ids(
-            variable=validation_run.reference_configuration.variable.pretty_name,
+        ids = reader.get_dataset_ids(
+            variable=dataset_config.variable.pretty_name,
             min_depth=depth_from,
             max_depth=depth_to,
             groupby='network'
         )
 
-        def reshape_meta(meta):
+        def reshape_meta(metadata):
             reshaped = {}
-            for key, value in meta.items():
+            for key, value in metadata.items():
                 meta_value = value[0][0]
                 if isinstance(meta_value, pd.Timestamp):
                     meta_value = meta_value.to_numpy()
@@ -118,7 +154,7 @@ def create_jobs(validation_run, ref_reader):
         for network, net_ids in ids.items():
             lons, lats, meta_list = [], [], []
             for idx in net_ids:
-                meta = ref_reader.read_ts(idx, return_meta=True)[1]
+                meta = reader.read_ts(idx, return_meta=True)[1]
                 meta = reshape_meta(meta)
                 lons.append(meta['longitude'])
                 lats.append(meta['latitude'])
@@ -126,13 +162,87 @@ def create_jobs(validation_run, ref_reader):
             gpis = net_ids
             gpis, lons, lats = np.array(gpis), np.array(lons), np.array(lats)
 
-            gpis, lons, lats, index = _geographic_subsetting(gpis, lons, lats, validation_run.min_lat, validation_run.min_lon, validation_run.max_lat, validation_run.max_lon)
+            gpis, lons, lats, index = _geographic_subsetting(
+                gpis, lons, lats, validation_run.min_lat,
+                validation_run.min_lon, validation_run.max_lat, validation_run.max_lon
+            )
 
             if len(gpis) > 0:
                 jobs.append((gpis, lons, lats, meta_list))
                 total_points += len(gpis)
 
     else:
-        raise ValueError("Don't know how to get gridpoints and generate jobs for reader {}".format(ref_reader))
+        raise ValueError("Don't know how to get gridpoints and generate jobs for reader {}".format(reader))
+
+    if not return_points:
+        return jobs
 
     return total_points, jobs
+
+
+def create_upscaling_lut(
+        validation_run,
+        datasets,
+        ref_name
+) -> dict:
+    """
+    Create a lookup table that aggregates the non-reference measurement points falling under the same reference
+    pixel
+
+    Parameters
+    ----------
+    validation_run: models.validation_run.ValidationRun object
+        Configuration of the run
+    datasets : dict of dicts
+        :Keys: string, datasets names
+        :Values: dict, containing the following fields (see pytesmo DataManager for details):
+            * 'class'
+            *'columns'
+            *'args': list, optional
+            *'kwargs': dict, optional
+            *'grids_compatible': boolean, optional
+            *'use_lut': boolean, optional
+            *'lut_max_dist': float, optional
+    ref_name: str
+        Name of the reference dataset
+
+    Returns
+    -------
+    lut: dict
+        lookup table with shape {'other_dataset':{ref gpi: [other gpis]}}
+    """
+    ref_reader = datasets[ref_name]["class"]
+    # get grid of reference
+    while hasattr(ref_reader, 'cls'):
+        ref_reader = ref_reader.cls
+    ref_grid = ref_reader.grid
+
+    lut = {}
+    for other_name in datasets.keys():
+        other_config = None
+        for dataset_config in validation_run.dataset_configurations.all():
+            if dataset_config.dataset == other_name:
+                other_config = dataset_config
+        if not other_name == ref_name:
+            other_reader = datasets[other_name]["class"]
+            # get all 'other' points, divided in 'jobs'
+            other_points_jobs = create_jobs(
+                validation_run=validation_run,
+                reader=other_reader,
+                dataset_config=other_config,
+                return_points=False
+            )
+            other_lut = {}
+            # iterate from the side of the non-reference
+            for other_points in other_points_jobs:
+                gpis, lons, lats = other_points[0], other_points[1], other_points[2]
+                for gpi, lon, lat in zip(gpis, lons, lats):
+                    # list all non-ref points under the same ref gpi
+                    ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]  # todo: implement methods here to combine irregular grids
+                    if ref_gpi in other_lut.keys():
+                        other_lut[ref_gpi].append((gpi, lon, lat))
+                    else:
+                        other_lut[ref_gpi] = [(gpi, lon, lat)]
+                lut[other_name] = other_lut
+
+    return lut
