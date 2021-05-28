@@ -92,19 +92,21 @@
         </p-panel>
       </div>
 
+
+      <!--      Spatial subsetting-->
+      <div class="p-col-12">
+        <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
+      </div>
+
       <!--      Map-->
       <div class="p-col-12">
-        <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel">
+        <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel" collapsed="true">
           <qa-map class="map" #qwerty
                   [spatialSubset]="validationModel.spatialSubsetModel"
                   [center]="[-37.1,37.6]"
                   [zoom]="2.5"></qa-map>
         </p-panel>
 
-      </div>
-      <!--      Spatial subsetting-->
-      <div class="p-col-12">
-        <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
       </div>
 
       <!--      Validation period-->
