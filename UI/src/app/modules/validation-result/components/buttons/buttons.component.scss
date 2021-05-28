@@ -1,32 +1,6 @@
 @import "~bootstrap/dist/css/bootstrap.css";
 @import "src/styles";
 
-.btn-primary.edit_name_btn{
-  color: #000;
-  background-color: $edit-name-button-backgroud-color;
-  border-color: $edit-name-button-backgroud-color;
-  transform: scale(0.9);
-  width: 2rem;
-}
-.btn-primary.edit_name_btn:not(.disabled):hover{
-  color: $button-hover-color;
-  background-color: $edit-name-button-backgroud-color;
-  border-color: $edit-name-button-backgroud-color;
-  transform: scale(1.2);
-}
-.edit_name{
-  border: 1px solid #00AAE3;
-  border-radius: 4px;
-  position: relative;
-  padding: 3px;
-
-}
-.edit_name:focus{
-  border: 1px solid #00AAE3;
-  box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .3);
-  outline: none;
-}
-
 .dropdown {
   position: relative;
   background: none;
