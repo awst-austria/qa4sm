@@ -10,9 +10,12 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {AboutComponent} from './pages/about/about.component';
-import {TermsComponent} from "./pages/terms/terms.component";
+import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {HelpComponent} from './pages/help/help.component';
+import {SignupComponent} from './pages/signup/signup.component';
+import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
+import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
 
 
 const routes: Routes = [
@@ -28,6 +31,9 @@ const routes: Routes = [
   {path: 'help', component: HelpComponent},
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
+  {path: 'signup', component: SignupComponent},
+  {path: 'signup-complete', component: SignupCompleteComponent},
+  {path: 'deactivate-user-complete', component: DeactivateUserCompleteComponent},
   {path: '**', component: ErrorComponent}
 ];
 
