@@ -47,10 +47,14 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
-import { HelpComponent } from './pages/help/help.component';
+import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
 import {CoreModule} from './modules/core/core.module';
+import {SignupComponent} from './pages/signup/signup.component';
+import {UserModule} from './modules/user/user.module';
+import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
+import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
 
 
 @NgModule({
@@ -68,6 +72,9 @@ import {CoreModule} from './modules/core/core.module';
     TermsComponent,
     DatasetInfoComponent,
     HelpComponent,
+    SignupComponent,
+    SignupCompleteComponent,
+    DeactivateUserCompleteComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -102,7 +109,8 @@ import {CoreModule} from './modules/core/core.module';
     MapModule,
     IvyGalleryModule,
     NgxPageScrollModule,
-    CoreModule
+    CoreModule,
+    UserModule
 
   ],
   providers: [

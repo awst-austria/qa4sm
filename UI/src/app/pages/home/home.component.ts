@@ -5,12 +5,23 @@ import {WebsiteGraphicsService} from '../../modules/core/services/global/website
 import {Observable} from 'rxjs';
 import {HttpParams} from '@angular/common/http';
 import {SafeUrl} from '@angular/platform-browser';
+
+import {Router} from '@angular/router';
+
+interface City {
+  name: string;
+  code: string;
+}
+
+const homeUrlPrefix = '/static/images/home/';
+
 import {HomepageImagesModel} from './homepage-images-model';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
 
 const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
+
 
 @Component({
   selector: 'app-home',
@@ -121,5 +132,9 @@ export class HomeComponent implements OnInit {
     prop.index = index;
     prop.arrows = imagesList.length > 1;
     this.gallery.load(prop);
+  }
+
+  goToSignUp(): void {
+    this.router.navigate(['/signup']);
   }
 }
