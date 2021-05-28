@@ -66,22 +66,21 @@
           title="Change Name"
           (click)="toggleEditing()">
           <fa-icon [icon]="faIcons.faPencil"></fa-icon>
-<!--          <span class="pi pi-pencil"></span>-->
         </button>
         <span *ngIf="!hideElement">
-          <label for="new-name"></label>
+          <label for="new-name">Name: </label>
           <input id="new-name"
                  type="text"
                  value="{{validationRun.name_tag}}"
                  #newName
                  [ngClass]="{'edit_name': true}">
           <button
-            [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
+            [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn': true}"
             title="Save Name"
             (click)="saveName(validationRun.id, newName.value)">
             <span class="pi pi-save"></span></button>
           <button
-            [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
+            [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn': true}"
             title="Cancel"
             (click)="toggleEditing()">
             <span class="pi pi-ban"></span>
