@@ -6043,3 +6043,28 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border-top: 0 none;
 }
 
+.btn-action.p-button {
+  width: 2rem;
+}
+
+.btn-action.p-button, .btn-action-large.p-button{
+  font-size: 1rem;
+  height: 2rem;
+  margin-right: 0.2rem;
+  background-color: #4760E5;
+  border-color: #4760E5;
+}
+
+.btn-action.p-button:hover, .btn-action-large.p-button:hover{
+  background-color: #213FE0;
+  border-color: #213FE0;
+}
+
+.btn-action.p-button:focus, .btn-action-large.p-button:focus{
+  box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .5);
+}
+
+a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
+  color: white;
+  text-decoration: none;
+}
