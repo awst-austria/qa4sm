@@ -24,7 +24,7 @@ export class ValidationrunRowComponent implements OnInit {
 
   dateFormat = 'medium';
   timeZone = 'UTC';
-  faIcons = {faArchive: fas.faArchive};
+  faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
 
   constructor(private datasetConfigService: DatasetConfigurationService,

@@ -65,7 +65,8 @@
           [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
           title="Change Name"
           (click)="toggleEditing()">
-          <span class="pi pi-pencil"></span>
+          <fa-icon [icon]="faIcons.faPencil"></fa-icon>
+<!--          <span class="pi pi-pencil"></span>-->
         </button>
         <span *ngIf="!hideElement">
           <label for="new-name"></label>
