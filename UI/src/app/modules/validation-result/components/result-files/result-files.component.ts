@@ -44,7 +44,7 @@ export class ResultFilesComponent implements OnInit {
             ({
               ...metric,
               boxplotFile: this.getPlots([metric.boxplot_file]),
-              overviewFiles: this.getPlots(metric.overview_files)
+              overviewFiles: this.getPlots(metric.overview_files),
             })
         )
       )
