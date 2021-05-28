@@ -40,16 +40,27 @@
 
               <qa-basic-filter *ngFor="let filter of item.basicFilters; let filterIdx = index"
                                [filterModel]="filter"></qa-basic-filter>
-              <button pButton type="button" (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
+              <div style="width: 100%;text-align: right">
+              <button pButton type="button"
+                      (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
                       label="Remove dataset"
                       icon="pi pi-trash"
-                      class="p-button-danger" style="padding: 0.2rem;"></button>
+                      class="p-button-danger p-my-2"
+                      style="padding: 0.2rem;">
+              </button>
+              </div>
             </p-accordionTab>
 
           </p-accordion>
-          <button pButton type="button" label="Add dataset" icon="pi pi-plus-circle" (click)="addDatasetToValidate()"
-                  class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
-                  [disabled]="addDatasetButtonDisabled()"></button>
+          <button pButton
+                  type="button"
+                  label="Add dataset"
+                  icon="pi pi-plus-circle"
+                  (click)="addDatasetToValidate()"
+                  class="p-button-success p-my-2"
+                  style="padding: 0.2rem;"
+                  [disabled]="addDatasetButtonDisabled()">
+          </button>
 
         </p-panel>
       </div>

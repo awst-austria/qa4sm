@@ -3634,9 +3634,9 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 .p-accordion .p-accordion-header .p-accordion-header-link {
   padding: $accordion-header-padding;
   border: 1px solid #dee2e6;
-  color: #212529;
-  background: #efefef;
-  font-weight: 600;
+  color: #495057;
+  background: #EFEFEF;
+  font-weight: 500;
   border-radius: 4px;
   transition: box-shadow 0.15s;
 }
@@ -3652,23 +3652,27 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 }
 
 .p-accordion .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link {
-  background: #e9ecef;
+  background: #EFEFEF;
   border-color: #dee2e6;
-  color: #212529;
+  color: #495057;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .p-accordion .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
-  background: #efefef;
+  background: #EFEFEF;
   border-color: #dee2e6;
-  color: #212529;
+  color: #495057;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
 .p-accordion .p-accordion-header:not(.p-disabled).p-highlight:hover .p-accordion-header-link {
   border-color: #dee2e6;
-  background: #e9ecef;
-  color: #212529;
+  background: #EFEFEF;
+  color: #495057;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .p-accordion .p-accordion-content {
