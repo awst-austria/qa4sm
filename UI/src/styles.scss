@@ -191,14 +191,17 @@ h4, .h4 {
 }
 
 .btn-action {
-  width: 2.4em;
+  width: 2rem;
+  margin-top: 0.12rem;
+  margin-bottom: 0.12rem;
 }
 
 .btn-lg, .btn-group-lg > .btn {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.5rem;
   font-size: 1.25rem;
   line-height: 1.5;
   border-radius: 0.3rem;
+  text-align: center;
 }
 
 .btn-primary.edit_name_btn{
@@ -224,11 +227,15 @@ h4, .h4 {
   margin-left: 0.5rem;
   width: 1.3rem;
 }
-//.btn-primary.save_name_btn.result_page, .btn-primary.cancel_editing_btn.result_page{
-//  width: 2rem;
-//  margin-left: 0.3rem;
-//  transform: scale(1.5);
-//}
+
+.btn-sm, .btn-group-sm > .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  align-content: center;
+}
+
 
 .btn-primary.save_name_btn:not(.disabled):hover, .btn-primary.cancel_editing_btn:not(.disabled):hover{
   color: #4760E5;
