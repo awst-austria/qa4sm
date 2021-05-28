@@ -13,7 +13,6 @@ interface City {
   code: string;
 }
 
-const homeUrlPrefix = '/static/images/home/';
 
 import {HomepageImagesModel} from './homepage-images-model';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
