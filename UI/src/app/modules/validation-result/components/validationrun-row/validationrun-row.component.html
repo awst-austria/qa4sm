@@ -1,4 +1,4 @@
-<p-panel *ngIf="configurations$|async as configurations">
+<p-panel *ngIf="configurations$|async as configurations" class="validation-row">
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
@@ -115,7 +115,7 @@
       </span>
     </div>
     <!-- Status / Created   -->
-    <div class="p-col status pl-2">
+    <div class="p-col status pl-2 p-ml-3">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
@@ -129,7 +129,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="p-col-3">
+    <div class="p-col-3" style="max-width: 12rem">
       <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"></qa-buttons>
     </div>
 
