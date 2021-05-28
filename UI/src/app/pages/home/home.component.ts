@@ -92,7 +92,8 @@ export class HomeComponent implements OnInit {
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
               public plotService: WebsiteGraphicsService,
-              private gallery: Gallery) {
+              private gallery: Gallery,
+              private router: Router) {
   }
 
   ngOnInit(): void {
