@@ -23,11 +23,13 @@
             against in-situ and model reference data
           </h3>
         </div>
-      <span *ngIf="userLoggedIn else elseBlock">
+      <div *ngIf="userLoggedIn else elseBlock">
+        <p>
         <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0"  role="button">See results</a>
         <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
         <a routerLink="/validate" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">Try it</a>
-      </span>
+        </p>
+      </div>
       <ng-template #elseBlock>
         <p>
         <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">See results</a>
@@ -89,7 +91,7 @@
   <div class="container-marketing p-grid p-justify-center">
     <div class="card-deck">
       <div class="card card-body">
-        <h4 class="text-center p-mt-0">Datasets and Settings</h4>
+        <h4 class="text-center mt-0">Datasets and Settings</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">
           Allows specification of input datasets and settings for your validation
         </p>
