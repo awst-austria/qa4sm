@@ -3840,6 +3840,7 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border-top-left-radius: 4px;
   height: 3rem;
   font-size: 1.4rem;
+
 }
 
 .p-panel .p-panel-header .p-panel-title {
@@ -3876,7 +3877,7 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 }
 
 .p-panel .p-panel-content {
-  padding: 1.25rem;
+  padding: 1rem 1.25rem;
   border: 1px solid #dee2e6;
   background: #ffffff;
   color: #212529;
