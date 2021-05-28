@@ -1221,7 +1221,7 @@
       }
       // and here the same just for tcol, but make sure to remember the
       // original state
-      setTcLock("{{ val_form.initial_tcol|yesno:"true,false" }}");
+      setTcLock({{ val_form.initial_tcol|yesno:"true,false" }});
 
 
       if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){

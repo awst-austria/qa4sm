@@ -1,4 +1,5 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+//@import "~bootstrap/dist/css/bootstrap.css";
+@import "src/style.variables";
 
 .align-middle {
     width: 10%;
@@ -17,4 +18,15 @@
 #logo_ffg {
     height: 6rem;
     float: right;
+}
+main {
+  max-width: 40rem;
+}
+
+#introduction{
+  text-align: justify;
+  margin-bottom: 1rem;
+}
+#footer{
+  text-align: justify;
 }

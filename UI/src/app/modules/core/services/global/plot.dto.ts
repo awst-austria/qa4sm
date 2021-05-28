@@ -1,4 +1,6 @@
 export class PlotDto{
-  constructor(public plot: string) {
+  constructor(public plot: string
+  ) {
   }
 }
+

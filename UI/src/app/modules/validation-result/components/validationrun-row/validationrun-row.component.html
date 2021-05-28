@@ -1,12 +1,12 @@
-<p-panel>
+<p-panel *ngIf="configurations$|async as configurations">
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ validationRun.name_tag }}</h5>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
     <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
-                              href="{{this.getDoiPrefix()}}{{ model.validationRun.doi }}">{{ model.validationRun.doi }}</a>
+                              href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
     </h5>
   </ng-template>
   <!--  CUSTOM    -->
@@ -52,7 +52,7 @@
     <h5 class="my-0">
       <span *ngIf="hideElement"
             class=" font-weight-normal">
-        Name: {{ model.validationRun.name_tag }}
+        Name: {{ validationRun.name_tag }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
@@ -95,28 +95,31 @@
   <div class="p-grid mx-0 px-0 my-0">
     <div class="p-col">
       <strong>Data:</strong><br/>
-      <span *ngFor="let datasetRowModel of model.datasetRows">
-          {{(datasetRowModel.dataset$|async)?.pretty_name}},
-        {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
-        {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
+      <span *ngFor="let config of configurations">
+        <span *ngIf="config.id !== validationRun.reference_configuration">
+          {{config.dataset}},
+          {{config.version}},
+          {{config.variable}} <br>
         </span>
-
+      </span>
     </div>
     <!-- Reference -->
     <div class="p-col">
       <strong>Reference:</strong><br/>
-      <span>
-          {{(model.referenceRow.dataset$|async)?.pretty_name}},
-        {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
-        {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
+      <span *ngFor="let config of configurations">
+        <span *ngIf="config.id === validationRun.reference_configuration">
+          {{config.dataset}},
+          {{config.version}},
+          {{config.variable}} <br>
         </span>
+      </span>
     </div>
     <!-- Status / Created   -->
     <div class="p-col status pl-2">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
-        {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
+        {{ validationRun.start_time|date:"YYYY-MM-dd" }}
       </div>
       <!--    CUSTOM -->
       <div *ngIf="!published">
@@ -127,7 +130,7 @@
 
     <!-- Action Buttons -->
     <div class="p-col-3">
-      <qa-buttons [validationList]="true" [validationRun]="model.validationRun" [published]="published"></qa-buttons>
+      <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"></qa-buttons>
     </div>
 
 

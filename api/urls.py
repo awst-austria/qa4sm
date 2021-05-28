@@ -17,9 +17,11 @@ from api.views.validation_run_view import published_results, my_results, validat
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
-from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_file, \
-    get_metric_names_and_associated_files
+from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_files, \
+    get_metric_names_and_associated_files, get_graphic_file
 from api.views.local_api_view import get_list_of_countries
+from api.views.settings_view import settings
+
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -75,9 +77,12 @@ urlpatterns = [
     path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
     path('uptime-ping', uptime_ping),
     path('uptime-report', get_uptime),
-    path('get-graphic-file', get_graphic_file, name='Get graphic file'),
+    path('get-graphic-files', get_graphic_files, name='Get graphic file'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
     path('country-list', get_list_of_countries, name = 'List of countries'),
     path('sign-up', signup_post, name='Sign up'),
     path('user-modify', user_modify, name='User update'),
+    path('settings', settings, name="Settings"),
+    path('get-graphic-file', get_graphic_file, name='Get graphic file'),
+
 ]

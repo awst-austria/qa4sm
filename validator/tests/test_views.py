@@ -90,6 +90,10 @@ class TestViews(TransactionTestCase):
             'end_time': datetime.utcnow().replace(tzinfo=utc),
             'total_points': 30,
             'error_points': 5,
+            'anomalies': 'climatology',
+            'tcol': True,
+            'anomalies_from': datetime(1990, 1, 1, 0, 0, tzinfo=UTC),
+            'anomalies_to': datetime(2010, 12, 31, 23, 59, 59, tzinfo=UTC),
         }
         ## Create a test validation run with a specific id so that it can
         ## be accessed via a URL containing that id
@@ -845,7 +849,9 @@ class TestViews(TransactionTestCase):
         assert len(dc_form.initial["filters"]) == 1
         assert dc_form.initial["filters"][0].name == "FIL_ALL_VALID_RANGE"
         assert dc_form.initial["version"].short_name == "C3S_V201812"
+        assert dc_form.initial["version"].id == int(dc_form.initial_version)
         assert dc_form.initial["variable"].short_name == "C3S_sm"
+        assert dc_form.initial["variable"].id == int(dc_form.initial_variable)
         dc_form = dc_formset[1]
         assert dc_form.initial["dataset"].short_name == "SMOS"
         assert len(dc_form.initial["filters"]) == 2
@@ -857,14 +863,19 @@ class TestViews(TransactionTestCase):
         assert (
             ref_dc_form.initial["version"].short_name == "ISMN_V20180712_MINI"
         )
+        assert ref_dc_form.initial["version"].id == int(ref_dc_form.initial_version)
         assert (
             ref_dc_form.initial["variable"].short_name == "ISMN_soil_moisture"
         )
+        assert ref_dc_form.initial["variable"].id == int(ref_dc_form.initial_variable)
 
         # assert some settings
         assert val_form.initial["min_lat"] == -30
         assert val_form.initial["max_lat"] == 30
-
+        assert val_form.initial["tcol"] == val_form.initial_tcol == True
+        assert val_form.initial["anomalies"] == "climatology"
+        assert val_form.initial["anomalies_from"] == 1990
+        assert val_form.initial["anomalies_to"] == 2010
 
     def test_access_to_results(self):
         self.client.login(**self.credentials2)

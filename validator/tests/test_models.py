@@ -148,9 +148,9 @@ class TestModels(TestCase):
 
     def test_validation_run_output_dir_url(self):
         run = ValidationRun()
-        assert run.output_dir_url() is None
+        assert run.output_dir_url is None
         run.output_file = 'output/foobar.nc'
-        assert run.output_dir_url() is not None
+        assert run.output_dir_url is not None
 
     def test_validation_run_clean(self):
         run = ValidationRun()

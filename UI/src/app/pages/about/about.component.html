@@ -1,5 +1,5 @@
-<div style="text-align: left; max-width: 40rem; width: 100%; margin: auto;">
-    <div align="justify">
+<main>
+    <div id="introduction">
         <a *ngIf="logoFfg$|async as logoFfg" href="https://www.ffg.at/en"><img id="logo_ffg" [src]="sanitizePlotUrl(logoFfg[0].plot)"></a>
         The <b>QA4SM</b> project provides an operational online validation service for soil moisture products. It started
         in May 2018 and is supported by the <a href="https://www.ffg.at/en">Austrian Research Promotion Agency
@@ -7,17 +7,17 @@
         <a href="https://www.ffg.at/en/program/austrian-space-applications-programme-0">Austrian Space Application Programme</a>.
     </div>
 
-    <table class="table borderless">
+    <table class="table">
         <tbody>
             <tr>
                 <td class="align-middle">
-                    <a *ngIf="logoTuWien$|async as logoTuWien" href="https://climers.geo.tuwien.ac.at/climers/projects/current-projects/qa4sm/" target="_blank"><img class="partner_logo" [src]="sanitizePlotUrl(logoTuWien[0].plot)"></a>
+                    <a *ngIf="logoTuWien$|async as logoTuWien" href="https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/" target="_blank"><img class="partner_logo" [src]="sanitizePlotUrl(logoTuWien[0].plot)"></a>
                 </td>
-                <td class="align-left">
+                <td>
                     <b>TU Wien (Vienna University of Technology)</b><br>
                     Department of Geodesy and Geoinformation<br>
                     Research Group Climate and Environmental Remote Sensing (CLIMERS)<br>
-                    Website: <a href="https://climers.geo.tuwien.ac.at/climers/projects/current-projects/qa4sm/">https://climers.geo.tuwien.ac.at/climers/projects/current-projects/qa4sm/</a><br>
+                    Website: <a href="https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/">https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/</a><br>
                     Contact: Wouter Dorigo (wouter.dorigo (at) tuwien.ac.at)<br>
                     Tasks: Scientific lead and research, dataset support
                 </td>
@@ -26,7 +26,7 @@
                 <td class="align-middle">
                     <a *ngIf="logoAwst$|async as logoAwst" href="https://www.awst.at/" target="_blank"><img class="partner_logo" [src]="sanitizePlotUrl(logoAwst[0].plot)"></a>
                 </td>
-                <td class="align-left">
+                <td>
                     <b>AWST (Applied Science, Software and Technology)</b><br>
                     Website: <a href="https://www.awst.at">https://www.awst.at</a><br>
                     Contact: Alexander Boresch (boresch (at) awst.at)<br>
@@ -37,7 +37,7 @@
                 <td class="align-middle">
                     <a *ngIf="logoEodc$|async as logoEodc" href="https://www.eodc.eu/" target="_blank"><img class="partner_logo" [src]="sanitizePlotUrl(logoEodc[0].plot)"></a>
                 </td>
-                <td class="align-left">
+                <td>
                     <b>EODC (Earth Observation Data Centre)</b><br>
                     Website: <a href="https://www.eodc.eu/">https://www.eodc.eu</a><br>
                     Contact: Christoph Reimer (christoph.reimer (at) eodc.eu)<br>
@@ -49,9 +49,9 @@
 
     <hr class="featurette-divider">
 
-    <p align="justify">
+    <p id="footer">
         QA4SM is open source software, licensed under an MIT license. <a href="https://github.com/awst-austria/qa4sm" target="_blank">It is available on GitHub.</a>
         This site uses <a class="font-weight-bold" href="https://github.com/awst-austria/qa4sm/releases/tag/v{{this.getAppVersion()}}" target="_blank">version {{this.getAppVersion()}}</a>.
     </p>
-
-</div>
+<qa-scroll-to-top></qa-scroll-to-top>
+</main>

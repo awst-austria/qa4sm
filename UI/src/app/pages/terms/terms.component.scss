@@ -1,1 +1,5 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+@import "src/style.variables";
+
+main{
+  max-width: 40rem;
+}

@@ -1,7 +1,9 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {HttpParams} from '@angular/common/http';
+import {HttpParamsModel} from '../../../core/services/validation-run/http-params.model';
+import {Observable} from 'rxjs';
+import {ValidationSetDto} from '../../services/validation.set.dto';
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -12,7 +14,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   @Input() published: boolean;
 
   validations: ValidationrunDto[] = [];
-  numberOfValidations: number;
+  validationsSet$: Observable<ValidationSetDto>;
   page = 1;
   limit = 10;
   offset = 0;
@@ -25,22 +27,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   getValidationsAndItsNumber(published: boolean): void{
-    const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
-                        .set('order', String(this.order));
+    const params = new HttpParamsModel(this.offset, this.limit, this.order);
     if (!published){
-    this.validationrunService.getMyValidationruns(parameters).subscribe(
-      response => {
-        const {validations, length} = response;
-        this.validations = validations;
-        this.numberOfValidations = length;
-      });
+    this.validationsSet$ = this.validationrunService.getMyValidationruns(params);
     } else {
-      this.validationrunService.getPublishedValidationruns(parameters).subscribe(
-        response => {
-          const {validations, length} = response;
-          this.validations = validations;
-          this.numberOfValidations = length;
-        });
+      this.validationsSet$ = this.validationrunService.getPublishedValidationruns(params);
     }
   }
 
