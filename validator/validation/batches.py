@@ -1,12 +1,14 @@
 import numpy as np
 import pandas as pd
 from typing import Union
+import logging
 
 from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
 from validator.models import DataFilter
 
+__logger = logging.getLogger(__name__)
 
 # function to retrieve depth_from and depth_to from the database
 def get_depths_params(param_filters):
@@ -196,7 +198,7 @@ def create_upscaling_lut(
     datasets : dict of dicts
         :Keys: string, datasets names
         :Values: dict, containing the following fields (see pytesmo DataManager for details):
-            * 'class'
+            *'class'
             *'columns'
             *'args': list, optional
             *'kwargs': dict, optional
@@ -218,13 +220,17 @@ def create_upscaling_lut(
     ref_grid = ref_reader.grid
 
     lut = {}
-    for other_name in datasets.keys():
-        other_config = None
-        for dataset_config in validation_run.dataset_configurations.all():
-            if dataset_config.dataset == other_name:
-                other_config = dataset_config
-        if not other_name == ref_name:
+    # a bit of a kack to match dataset name and configuation
+    for other_name, other_config in zip(
+        datasets.keys(),
+        validation_run.dataset_configurations.all(),
+    ):
+        if other_name == ref_name:
+            continue
+        else:
             other_reader = datasets[other_name]["class"]
+            while hasattr(other_reader, 'cls'):
+                other_reader = other_reader.cls
             # get all 'other' points, divided in 'jobs'
             other_points_jobs = create_jobs(
                 validation_run=validation_run,
@@ -232,17 +238,26 @@ def create_upscaling_lut(
                 dataset_config=other_config,
                 return_points=False
             )
-            other_lut = {}
-            # iterate from the side of the non-reference
-            for other_points in other_points_jobs:
-                gpis, lons, lats = other_points[0], other_points[1], other_points[2]
-                for gpi, lon, lat in zip(gpis, lons, lats):
-                    # list all non-ref points under the same ref gpi
-                    ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]  # todo: implement methods here to combine irregular grids
-                    if ref_gpi in other_lut.keys():
-                        other_lut[ref_gpi].append((gpi, lon, lat))
-                    else:
-                        other_lut[ref_gpi] = [(gpi, lon, lat)]
-                lut[other_name] = other_lut
+            if not other_points_jobs:
+                __logger.debug(
+                    "There are no points to average in the selected dataset "
+                    "of {}. Check the filtering configuration".format(other_config.dataset)
+                )
+                # make sure there is always a key, even when no points are found
+                lut[other_name] = []
+            else:
+                # iterate from the side of the non-reference
+                for other_points in other_points_jobs:
+                    gpis, lons, lats = other_points[0], other_points[1], other_points[2]
+                    other_lut = {}
+                    for gpi, lon, lat in zip(gpis, lons, lats):
+                        # list all non-ref points under the same ref gpi
+                        ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]  # todo: implement methods here to combine irregular grids
+                        if ref_gpi in other_lut.keys():
+                            other_lut[ref_gpi].append((gpi, lon, lat))
+                        else:
+                            other_lut[ref_gpi] = [(gpi, lon, lat)]
+
+                    lut[other_name] = other_lut
 
     return lut

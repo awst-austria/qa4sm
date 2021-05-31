@@ -49,7 +49,15 @@ class ValidationRun(models.Model):
         (NO_ANOM, 'Do not calculate'),
         (MOVING_AVG_35_D, '35 day moving average'),
         (CLIMATOLOGY, 'Climatology'),
-        )
+    )
+
+    # upscaling options
+    NO_UPSCALE = "none"
+    AVERAGE = "average"
+    UPSCALING_METHODS = (
+        (NO_UPSCALE, 'Do not upscale point measurements'),
+        (AVERAGE, 'Average point measurements'),
+    )
 
     # fields
 
@@ -79,6 +87,9 @@ class ValidationRun(models.Model):
     # only applicable if anomalies with climatology is selected
     anomalies_from = models.DateTimeField(null=True, blank=True)
     anomalies_to = models.DateTimeField(null=True, blank=True)
+    # upscaling of ISMN point measurements
+    upscaling_method = models.CharField(max_length=20, choices=UPSCALING_METHODS, default=NO_UPSCALE)
+    temporal_stability = models.BooleanField(default=False)
 
     output_file = models.FileField(null=True, max_length=250, blank=True)
 

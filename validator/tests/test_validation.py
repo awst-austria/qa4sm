@@ -31,10 +31,11 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
-from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
+from validator.tests.auxiliary_functions import generate_default_validation, \
+    generate_default_validation_triple_coll, generate_ismn_nonref_validation
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
-from validator.validation.batches import _geographic_subsetting
+from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.views.results import _copy_validationrun
@@ -799,11 +800,128 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 9
+        assert new_run.total_points == 16
         assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+        assert new_run.ok_points == 16
         self.check_results(new_run)
         self.delete_run(new_run)
+
+    def test_c3s_validation_upscaling(self):
+        """Test a validation of CCIP with ISMN as non-reference, and upscaling option active"""
+        run = generate_ismn_nonref_validation()
+        run.user = self.testuser
+
+        # hawaii bounding box
+        run.min_lat = 18.625  # ll
+        run.min_lon = -156.375  # ll
+        run.max_lat = 20.375  # ur
+        run.max_lon = -154.625  # ur
+
+        # NOTE: ISMN non-reference points need to use one of the upscaling methods
+        run.upscaling_method = "average"
+
+        run.save()
+        run_id = run.id
+        # run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        assert new_run
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    def validation_upscaling_for_dataset(self, ds, version, variable):
+        run = generate_ismn_nonref_validation()
+        run.user = self.testuser
+
+        # NOTE: ISMN non-reference points need to use one of the upscaling methods
+        run.upscaling_method = "average"
+
+        # hawaii bounding box
+        run.min_lat = 18.625  # ll
+        run.min_lon = -156.375  # ll
+        run.max_lat = 20.375  # ur
+        run.max_lon = -154.625  # ur
+
+        # NOTE: ISMN non-reference points need to use one of the upscaling methods
+        run.upscaling = True
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=ds)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=version)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=variable)
+        run.save()
+        run_id = run.id
+        # run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        assert new_run
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    @pytest.mark.long_running
+    def test_all_datasets_validation_upscaling(self):
+        """Test a validation for each sat. dataset with ISMN as non-reference, and upscaling option active"""
+        all_datasets = [
+            (globals.CCI, globals.ESA_CCI_SM_P_V05_2, globals.ESA_CCI_SM_P_sm),
+            (globals.SMAP, globals.SMAP_V5_PM, globals.SMAP_soil_moisture),
+            (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
+            (globals.ERA5, globals.ERA5_20190613, globals.ERA5_sm),
+            (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1, globals.GLDAS_SoilMoi0_10cm_inst)
+        ]
+
+        for ds, version, variable in all_datasets:
+            self.validation_upscaling_for_dataset(ds, version, variable)
+
+    def test_validation_upscaling_lut(self):
+        """Test function for upscaling lut"""
+        run = generate_ismn_nonref_validation()
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name="C3S_V202012")
+        c3s_reader = val.create_reader(dataset, version)
+        dataset = Dataset.objects.get(short_name='ISMN')
+        version = DatasetVersion.objects.get(short_name="ISMN_V20180712_MINI")
+        variable = DataVariable.objects.get(short_name="ISMN_soil_moisture")
+        ismn_reader = val.create_reader(dataset, version)
+        datasets = {
+            "0-C3S": {"class": c3s_reader},
+            "1-ISMN": {"class": ismn_reader},
+        }
+
+        lut = create_upscaling_lut(
+            validation_run=run,
+            datasets=datasets,
+            ref_name="0-C3S"
+        )
+        assert list(lut.keys()) == ["1-ISMN"]
+        assert len(lut["1-ISMN"].values()) == 4
+
+        data_filters = [
+            DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
+            DataFilter.objects.get(name="FIL_ISMN_GOOD"),
+        ]
+
+        param_filters = [
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters="COSMOS"),
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
+        ]
+        msk_reader = val.setup_filtering(
+            ismn_reader,
+            data_filters,
+            param_filters,
+            dataset,
+            variable
+        )
+        datasets = {
+            "0-C3S": {"class": c3s_reader},
+            "1-ISMN": {"class": msk_reader},
+        }
+        lut = create_upscaling_lut(
+            validation_run=run,
+            datasets=datasets,
+            ref_name="0-C3S"
+        )
+        assert list(lut.keys()) == ["1-ISMN"]
+        assert lut["1-ISMN"] == []
 
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):

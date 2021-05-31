@@ -216,14 +216,26 @@ def create_pytesmo_validation(validation_run):
         enddate = validation_run.interval_to.astimezone(UTC).replace(tzinfo=None)
         period = [startdate, enddate]
 
-    # todo: implement this as validation option
-    averaging = False
-    upscale_params = None
-    if averaging:
+    upscale_parms = None
+    if validation_run.upscaling_method != "none":
+        __logger.debug(
+            "Upscaling option is active"
+        )
+        upscale_parms = {
+            "upscaling_method": validation_run.upscaling_method,
+            "temporal_stability": validation_run.temporal_stability,
+        }
         upscaling_lut = create_upscaling_lut(
             validation_run=validation_run,
             datasets=datasets,
-            ref_name=validation_run.reference_configuration.dataset
+            ref_name=ref_name,
+        )
+        upscale_parms["upscaling_lut"] = upscaling_lut
+        __logger.debug(
+            "Lookup table for non-reference datasets " + ", ".join(upscaling_lut.keys()) + " created"
+        )
+        __logger.debug(
+            "{}".format(upscaling_lut)
         )
 
     datamanager = DataManager(
@@ -231,6 +243,7 @@ def create_pytesmo_validation(validation_run):
         ref_name=ref_name,
         period=period,
         read_ts_names='read',
+        upscale_parms=upscale_parms,
     )
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
