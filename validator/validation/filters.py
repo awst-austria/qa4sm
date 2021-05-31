@@ -1,12 +1,10 @@
 import logging
 
 import pandas as pd
-from django.core.exceptions import ValidationError
+
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
-import numpy as np
-from validator.models import DataFilter
 
 __logger = logging.getLogger(__name__)
 
