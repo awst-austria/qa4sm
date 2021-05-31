@@ -55,8 +55,8 @@
         Name: {{ validationRun.name_tag }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
-            class="p-my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
-        <span class="no_name_change_info pi pi-question-circle help-icon"
+            class="p-my-0 font-weight-normal">{{validationRun.name_tag}}
+        <span class="pi pi-question-circle"
               title="Validation has been published. There is no possibility of changing its name.">
         </span>
       </span>
@@ -123,7 +123,7 @@
       </span>
     </div>
     <!-- Status / Created   -->
-    <div class="p-col status pl-2 p-ml-3">
+    <div class="p-col status p-pl-2 p-ml-3">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
