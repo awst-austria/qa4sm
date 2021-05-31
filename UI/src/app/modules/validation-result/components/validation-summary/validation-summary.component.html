@@ -5,12 +5,15 @@
         <h4 class="my-0 font-weight-normal">
           Summary:
           <span *ngIf="validationRun.is_unpublished && validationRun.isOwner">
-          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}</span>
+          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}} </span>
           <button
-            [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
+            pButton
+            type="button"
+            [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
             title="Change Name"
+            icon="faIcons.faPencil"
             (click)="toggleEditing()">
-            <span class="pi pi-pencil"></span>
+            <fa-icon [icon]="faIcons.faPencil"></fa-icon>
           </button>
           <span *ngIf="!hideElement">
             <label for="new-name"></label>
@@ -20,15 +23,20 @@
                    #newName
                    [ngClass]="{'edit_name': true}">
             <button
-              [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
+              pButton
+              type="button"
+              [ngClass]="{'btn-action save_name_btn result_page': true}"
               title="Save Name"
+              icon="pi pi-save"
               (click)="saveName(validationRun.id, newName.value)">
-              <span class="pi pi-save"></span></button>
+            </button>
             <button
-              [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
+              pButton
+              type="button"
+              [ngClass]="{'btn-action cancel_editing_btn result_page': true}"
               title="Cancel"
+              icon="pi pi-ban"
               (click)="toggleEditing()">
-              <span class="pi pi-ban"></span>
             </button>
           </span>
         </span>
