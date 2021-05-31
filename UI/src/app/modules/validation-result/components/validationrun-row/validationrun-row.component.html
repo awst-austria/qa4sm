@@ -42,20 +42,19 @@
       </span>
 
       <span class="font-weight-normal"> Started:
-
         {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}}
       </span>
 
     </h5>
   </ng-template>
-  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem">
+  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 15rem">
     <h5 class="p-my-0">
       <span *ngIf="hideElement"
             class=" font-weight-normal">
         Name: {{ validationRun.name_tag }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
-            class="p-my-0 font-weight-normal">{{validationRun.name_tag}}
+            class="p-my-0 font-weight-normal">
         <span class="pi pi-question-circle help-icon"
               title="Validation has been published. There is no possibility of changing its name.">
         </span>
