@@ -88,7 +88,7 @@ class ValidationRun(models.Model):
     anomalies_from = models.DateTimeField(null=True, blank=True)
     anomalies_to = models.DateTimeField(null=True, blank=True)
     # upscaling of ISMN point measurements
-    upscaling_method = models.CharField(max_length=20, choices=UPSCALING_METHODS, default=NO_UPSCALE)
+    upscaling_method = models.CharField(max_length=20, choices=UPSCALING_METHODS, default=NO_UPSCALE, blank=True)
     temporal_stability = models.BooleanField(default=False)
 
     output_file = models.FileField(null=True, max_length=250, blank=True)
