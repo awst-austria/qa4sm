@@ -4,6 +4,9 @@
 @import "style.variables";
 // Do not add bootstrap here because it interferes with primeng. Add it to the component's scss file where you want to use it.
 //@import "~bootstrap/dist/css/bootstrap.css";
+* {
+  font-family: $base-font;
+}
 
 main{
   text-align: left;
@@ -269,4 +272,42 @@ img {
   width: 100%;
   padding-right: 15px;
   padding-left: 15px;
+}
+
+.spinner-border {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  vertical-align: text-bottom;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  -webkit-animation: .75s linear infinite spinner-border;
+  animation: .75s linear infinite spinner-border;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner-border,
+  .spinner-grow {
+    -webkit-animation-duration: 1.5s;
+    animation-duration: 1.5s;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
