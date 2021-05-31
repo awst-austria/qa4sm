@@ -1,4 +1,4 @@
-<div *ngIf="trackedRuns$ | async as myCopiedRuns" class="container text-center p-mb-5 p-mt-4" style="max-width: 60rem;">
+<main *ngIf="trackedRuns$ | async as myCopiedRuns" class="container text-center p-mb-5 p-mt-4" style="max-width: 60rem;">
   <div *ngIf="myCopiedRuns.length != 0">
     <h1>Pinned validations</h1>
     <div class="p-mb-3">
@@ -14,5 +14,5 @@
       </div>
     </div>
   </div>
-</div>
+</main>
 
