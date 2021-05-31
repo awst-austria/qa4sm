@@ -10,6 +10,7 @@ from validator.models import DataFilter
 
 __logger = logging.getLogger(__name__)
 
+
 # function to retrieve depth_from and depth_to from the database
 def get_depths_params(param_filters):
     default_depth = DataFilter.objects.get(name='FIL_ISMN_DEPTH').default_parameter
