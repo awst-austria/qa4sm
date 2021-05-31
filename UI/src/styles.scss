@@ -246,6 +246,10 @@ img {
   .container, .container-sm, .container-md {
     max-width: 720px;
   }
+  .d-md-flex {
+    display: -ms-flexbox !important;
+    display: flex !important;
+  }
 }
 
 @media (min-width: 992px) {
@@ -307,4 +311,12 @@ img {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.help-icon{
+  font-size: 1.1rem;
+}
+.d-flex {
+  display: -ms-flexbox !important;
+  display: flex !important;
 }
