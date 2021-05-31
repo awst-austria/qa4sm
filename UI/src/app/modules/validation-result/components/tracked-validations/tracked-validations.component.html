@@ -1,16 +1,14 @@
-<div *ngIf="trackedRuns$ | async as myCopiedRuns" class="container text-center mb-5 mt-4" style="max-width: 60rem;">
+<div *ngIf="trackedRuns$ | async as myCopiedRuns" class="container text-center p-mb-5 p-mt-4" style="max-width: 60rem;">
   <div *ngIf="myCopiedRuns.length != 0">
-    <h1 class="jumbotron-heading">Pinned validations</h1>
-    <div class="card-deck mb-3">
-      <div class="col">
-        <div *ngFor="let valrun of myCopiedRuns" class="mx-0" id="attached_result_row_{{ valrun.id }}">
-          <div class="card-header att_val_container">
-            <h5 class="my-0">
-              <span class="font-weight-normal"><b>Validation: {{ valrun.name_tag }}</b></span>
-            </h5>
-            <div class="col-sm buttons">
-                <qa-buttons [tracked]="true" [validationList]="true" [validationRun]="valrun"></qa-buttons>
-            </div>
+    <h1>Pinned validations</h1>
+    <div class="p-mb-3">
+      <div *ngFor="let valrun of myCopiedRuns" class="p-mx-0" id="attached_result_row_{{ valrun.id }}">
+        <div class="p-grid att_val_container">
+          <div class="p-col" style="max-width: 48rem">
+            <h5 class="p-my-0"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
+          </div>
+          <div class="p-col-3" style="max-width: 12rem">
+            <qa-buttons [tracked]="true" [validationList]="true" [validationRun]="valrun"></qa-buttons>
           </div>
         </div>
       </div>
