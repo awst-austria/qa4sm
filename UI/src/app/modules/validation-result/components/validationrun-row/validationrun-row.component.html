@@ -62,7 +62,10 @@
       </span>
       <ng-template #elseUnpublished>
         <button
-          [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
+          pButton
+          type="button"
+          icon="faIcons.faPencil"
+          [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
           title="Change Name"
           (click)="toggleEditing()">
           <fa-icon [icon]="faIcons.faPencil"></fa-icon>
@@ -75,15 +78,20 @@
                  #newName
                  [ngClass]="{'edit_name': true}">
           <button
-            [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn': true}"
+            pButton
+            type="button"
+            icon="pi pi-save"
+            [ngClass]="{'btn-action save_name_btn': true}"
             title="Save Name"
             (click)="saveName(validationRun.id, newName.value)">
-            <span class="pi pi-save"></span></button>
+          </button>
           <button
-            [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn': true}"
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_editing_btn': true}"
             title="Cancel"
             (click)="toggleEditing()">
-            <span class="pi pi-ban"></span>
           </button>
         </span>
       </ng-template>

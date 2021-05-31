@@ -123,29 +123,7 @@ h4, .h4 {
   font-weight: 700 !important;
 }
 
-.btn-primary.edit_name_btn{
-  color: #ffffff;
-  background-color: $edit-name-button-backgroud-color;
-  border-color: $edit-name-button-backgroud-color;
-  transform: scale(0.9);
-  width: 2rem;
-}
 
-.btn-primary.edit_name_btn:not(.disabled):hover{
-  color: $button-hover-color;
-  background-color: $edit-name-button-backgroud-color;
-  border-color: $edit-name-button-backgroud-color;
-  transform: scale(1.2);
-}
-
-.btn-primary.save_name_btn, .btn-primary.cancel_editing_btn{
-  color: #fff;
-  background-color: #00AAE3;
-  border-color: #00AAE3;
-  padding: 0;
-  margin-left: 0.5rem;
-  width: 1.3rem;
-}
 
 //.btn-sm, .btn-group-sm > .btn {
 //  padding: 0.25rem 0.5rem;
@@ -166,7 +144,6 @@ h4, .h4 {
 //.btn-primary.save_name_btn.result_page:not(.disabled):hover, .btn-primary.cancel_editing_btn.result_page:not(.disabled):hover{
 //  transform: scale(1.7);
 //}
-
 .edit_name{
   border: 1px solid #00AAE3;
   border-radius: 4px;

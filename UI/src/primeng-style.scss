@@ -6069,3 +6069,34 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   color: white;
   text-decoration: none;
 }
+
+.edit_name_btn.p-button{
+  color: #ffffff;
+  background-color: $edit-name-button-backgroud-color;
+  border-color: $edit-name-button-backgroud-color;
+  transform: scale(0.9);
+  width: 2rem;
+
+}
+
+.edit_name_btn.p-button:not(.disabled):hover{
+  color: $button-hover-color;
+  background-color: $edit-name-button-backgroud-color;
+  border-color: $edit-name-button-backgroud-color;
+  transform: scale(1.2);
+}
+.save_name_btn.p-button, .cancel_editing_btn.p-button{
+  color: #fff;
+  background-color: #00AAE3;
+  border-color: #00AAE3;
+  padding: 0;
+  margin-left: 0.5rem;
+  width: 1.3rem;
+}
+
+.save_name_btn.p-button:not(.disabled):hover, .cancel_editing_btn.p-button:not(.disabled):hover{
+  color: #4760E5;
+  background-color: $base-color;
+  border-color: $base-color;
+  transform: scale(1.2);
+}
