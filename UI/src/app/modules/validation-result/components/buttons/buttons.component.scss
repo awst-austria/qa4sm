@@ -45,3 +45,7 @@ a.no-decorations{
   text-decoration: none;
 }
 
+.collapse:not(.show) {
+  display: none;
+}
+
