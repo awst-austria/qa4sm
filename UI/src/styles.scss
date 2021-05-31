@@ -4,9 +4,6 @@
 @import "style.variables";
 // Do not add bootstrap here because it interferes with primeng. Add it to the component's scss file where you want to use it.
 //@import "~bootstrap/dist/css/bootstrap.css";
-* {
-  font-family: $base-font;
-}
 
 main{
   text-align: left;
