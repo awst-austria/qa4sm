@@ -1,28 +1,29 @@
-from datetime import datetime
+import errno
 import fnmatch
 import logging
-from os import path
-import os, errno
-from re import IGNORECASE  # @UnresolvedImport
-from re import search as regex_search
+import os
 import shutil
 import time
+from datetime import datetime
+from os import path
+from re import IGNORECASE  # @UnresolvedImport
+from re import search as regex_search
 from zipfile import ZipFile
 
-from dateutil.tz import tzlocal
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
-
-User = get_user_model()
-from django.test import TestCase
-from django.test.utils import override_settings
 import netCDF4
-import pytest
-from pytz import UTC
-
 import numpy as np
 import pandas as pd
+import pytest
+from dateutil.tz import tzlocal
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django.test import TestCase
+from django.test.utils import override_settings
+from pytz import UTC
+
+import validator.validation as val
+from validator.models import CopiedValidations
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -30,17 +31,16 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
-from validator.models import CopiedValidations
+from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
-import validator.validation as val
 from validator.validation.batches import _geographic_subsetting
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-from validator.views.validation import _compare_validation_runs
 from validator.views.results import _copy_validationrun
-from django.shortcuts import get_object_or_404
-from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
+from validator.views.validation import _compare_validation_runs
+
+User = get_user_model()
 
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
