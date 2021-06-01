@@ -30,28 +30,31 @@
       <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
       <br/>
     </div>
-
     <!--    Pagination -->
     <pagination-template #p="paginationApi"
                          (pageChange)="handlePageChange($event)">
 
       <div class="p-text-center">
-        <ul class="custom-pagination custom-responsive custom-star-inserted" aria-label="Pagination">
+        <ul class="custom-pagination custom-responsive custom-star-inserted justify-content-center" aria-label="Pagination">
           <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
-            <a *ngIf="!p.isFirstPage()" (click)="p.previous()"> < </a>
+            <div *ngIf="!p.isFirstPage()" (click)="p.previous()"> <span class="pi pi-angle-left"></span> </div>
+            <div *ngIf="p.isFirstPage()" [class.disabled]="true"> <span class="pi pi-angle-left"></span> </div>
           </li>
 
           <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
-            <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value">
+            <div (click)="p.setCurrent(page.value)"
+                *ngIf="p.getCurrent() !== page.value"
+                 [class.current]="p.getCurrent() === page.value">
               <span>{{ page.label }}</span>
-            </a>
-            <div *ngIf="p.getCurrent() === page.value">
+            </div>
+            <div *ngIf="p.getCurrent() === page.value" [class.current]="p.getCurrent() === page.value">
               <span>{{ page.label }}</span>
             </div>
           </li>
 
           <li class="pagination-next" [class.disabled]="p.isLastPage()">
-            <a *ngIf="!p.isLastPage()" (click)="p.next()"> > </a>
+            <div *ngIf="!p.isLastPage()" (click)="p.next()"> <span class="pi pi-angle-right"></span> </div>
+            <div *ngIf="p.isLastPage()" [class.disabled]="true"> <span class="pi pi-angle-right"></span> </div>
           </li>
         </ul>
       </div>
