@@ -1,8 +1,11 @@
-@import "~bootstrap/dist/css/bootstrap.css";
 @import "../buttons/buttons.component.scss";
 li{
   word-break: break-word;
 }
 .expiry-icons{
   font-size: 1.1rem;
+}
+
+div.card-body{
+  padding-top: 0;
 }
