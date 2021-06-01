@@ -1,4 +1,8 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+@import "src/styles";
+
+*{
+  font-family: $base-font;
+}
 
 .pagination-previous,.pagination-next{
   display: inline-block;
