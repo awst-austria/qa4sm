@@ -30,7 +30,7 @@ export class ValidationSummaryComponent implements OnInit {
   scalingMethods = SCALING_CHOICES;
   hideElement = true;
 
-  faIcons = {faArchive: fas.faArchive};
+  faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,

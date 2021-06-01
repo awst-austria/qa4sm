@@ -3634,9 +3634,9 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 .p-accordion .p-accordion-header .p-accordion-header-link {
   padding: $accordion-header-padding;
   border: 1px solid #dee2e6;
-  color: #212529;
-  background: #efefef;
-  font-weight: 600;
+  color: #495057;
+  background: #EFEFEF;
+  font-weight: 500;
   border-radius: 4px;
   transition: box-shadow 0.15s;
 }
@@ -3652,23 +3652,27 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 }
 
 .p-accordion .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link {
-  background: #e9ecef;
+  background: #EFEFEF;
   border-color: #dee2e6;
-  color: #212529;
+  color: #495057;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .p-accordion .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
-  background: #efefef;
+  background: #EFEFEF;
   border-color: #dee2e6;
-  color: #212529;
+  color: #495057;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
 .p-accordion .p-accordion-header:not(.p-disabled).p-highlight:hover .p-accordion-header-link {
   border-color: #dee2e6;
-  background: #e9ecef;
-  color: #212529;
+  background: #EFEFEF;
+  color: #495057;
+  text-decoration: none;
+  font-weight: 600;
 }
 
 .p-accordion .p-accordion-content {
@@ -3829,12 +3833,12 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 
 .p-panel .p-panel-header {
   border: 1px solid #dee2e6;
-  padding: 1rem 1.25rem;
+  padding: $panel-header-padding;
   background: $base-color;
   color: #ffffff;
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
-  height: 3rem;
+  min-height: 3.2rem;
   font-size: 1.4rem;
 }
 
@@ -3872,7 +3876,7 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 }
 
 .p-panel .p-panel-content {
-  padding: 1.25rem;
+  padding: 1rem 1.25rem;
   border: 1px solid #dee2e6;
   background: #ffffff;
   color: #212529;
@@ -4672,6 +4676,7 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border: 0 none;
   border-radius: 4px;
   font-size: 1.25rem;
+  z-index: 5;
 }
 
 .p-menubar .p-menuitem-link {
@@ -6022,3 +6027,80 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
 }
 
 /* Customizations to the designer theme should be defined here */
+
+.validation-row .p-panel .p-panel-header{
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+.validation-row .p-panel .p-panel-header .p-panel-icons{
+  max-width: 30rem;
+  text-align: right;
+}
+
+.validation-row .p-panel .p-panel-content {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid #dee2e6;
+  background: #ffffff;
+  color: #212529;
+  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  border-top: 0 none;
+}
+
+.btn-action.p-button {
+  width: 2rem;
+}
+
+.btn-action.p-button, .btn-action-large.p-button{
+  font-size: 1rem;
+  height: 2rem;
+  margin-right: 0.2rem;
+  background-color: #4760E5;
+  border-color: #4760E5;
+}
+
+.btn-action.p-button:hover, .btn-action-large.p-button:hover{
+  background-color: #213FE0;
+  border-color: #213FE0;
+}
+
+.btn-action.p-button:focus, .btn-action-large.p-button:focus{
+  box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .5);
+}
+
+a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
+  color: white;
+  text-decoration: none;
+}
+
+.edit_name_btn.p-button{
+  color: #ffffff;
+  background-color: $edit-name-button-backgroud-color;
+  border-color: $edit-name-button-backgroud-color;
+  transform: scale(0.9);
+  width: 2rem;
+
+}
+
+.edit_name_btn.p-button:not(.disabled):hover{
+  color: $button-hover-color;
+  background-color: $edit-name-button-backgroud-color;
+  border-color: $edit-name-button-backgroud-color;
+  transform: scale(1.2);
+}
+.save_name_btn.p-button, .cancel_editing_btn.p-button{
+  color: #fff;
+  background-color: #00AAE3;
+  border-color: #00AAE3;
+  padding: 0;
+  margin-left: 0.5rem;
+  width: 1.3rem;
+}
+
+.save_name_btn.p-button:not(.disabled):hover, .cancel_editing_btn.p-button:not(.disabled):hover{
+  color: #4760E5;
+  background-color: $base-color;
+  border-color: $base-color;
+  transform: scale(1.2);
+}

@@ -1,9 +1,9 @@
-<div *ngIf="updatedMetrics$|async as metrics" class="p-grid no-gutters">
+<div *ngIf="updatedMetrics$|async as metrics" class="p-grid p-mx-0">
   <div *ngIf="metrics[indx].overviewFiles|async as overviewPlots" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center" style="width: 95%">
-          <h4 class="my-0 py-0 font-weight-normal">Result files</h4>
+          <h4 class="p-my-0 p-py-0 font-weight-normal">Result files</h4>
         </div>
       </ng-template>
       <ng-template pTemplate="icons">
@@ -39,14 +39,16 @@
         </div>
 
       </div>
+
       <div class="p-grid">
-        <div class="p-col-3 center p-mt-2">
-          <button type="button"
-                  style="width: 9rem;"
-                  class="btn btn-sm btn-primary"
+        <div class="p-col-3 px-0 center p-mt-3">
+          <button pButton
+                  type="button"
+                  icon="pi pi-download"
+                  class="btn-action-large"
+                  label="Download graphs"
                   title="Download graphs .zip"
                   (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
-            <span class="pi pi-download"></span> Download graphs
           </button>
         </div>
         <div class="p-col">
@@ -60,13 +62,15 @@
             </p-dropdown>
           </span>
         </div>
-        <div class="p-col-3 px-0 p-mt-2 center">
-          <button type="button"
-                  style="width: 9rem;"
-                  class="btn btn-sm btn-primary"
+        <div class="p-col-3 px-0 p-mt-3 center">
+          <button pButton
+                  type="button"
+                  class="btn-action-large"
+                  icon="faIcons.faFileDownload"
+                  label="Download NetCDF"
                   title="Download all results in NetCDF format"
                   (click)="downloadResultFile(validation.id, 'netCDF', validation.output_file_name)">
-            <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> Download NetCDF
+            <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
           </button>
         </div>
       </div>

@@ -1,4 +1,11 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+//@import "~bootstrap/dist/css/bootstrap.css";
+@import "src/style.variables";
+@import "src/styles";
+
+* {
+  font-family: $base-font;
+  line-height: 1.5rem;
+}
 
 .scaled_image {
   display: block;
@@ -35,11 +42,11 @@
   max-height: 100%;
 }
 
-.textbox>h3 {
+.textbox > h3 {
   font-size: min(max(20px, 1.5vw), 30px);
 }
 
-.textbox>h1 {
+.textbox > h1 {
   text-shadow: .15rem .15rem .15rem rgba(0, 0, 0, .5);
   font-size: min(max(30px, 3vw), 40px);
 }
@@ -56,6 +63,11 @@
   padding-bottom: 20px;
   color: #fff;
   vertical-align: middle;
+  right: 15%;
+  bottom: 20px;
+  left: 15%;
+  z-index: 10;
+  text-align: center;
 }
 
 .carousel-desc {
@@ -63,7 +75,8 @@
   z-index: 1;
 }
 
-.image-attribution>a {
+
+.image-attribution > a {
   color: #ffffff;
 }
 
@@ -113,6 +126,10 @@ svg text {
 .container-marketing {
   max-width:80rem;
   margin: auto;
+}
+
+.featurette-divider{
+  max-width:80rem;
 }
 
 .textbox {
@@ -173,7 +190,6 @@ svg text {
   height: 150px;
 }
 
-
 /* Add Animation - Zoom in the Modal */
 .modal-content, #caption {
   animation-name: zoom;
@@ -208,4 +224,29 @@ svg text {
   .modal-content {
     width: 100%;
   }
+}
+
+.container-marketing {
+  max-width:80rem;
+  margin: auto;
+}
+
+.news {
+  background-color: #CEEBF6;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.list li::before, .news li::before {
+  font-weight: 900;
+  content: "\203A";
+  float: left;
+  margin-left: -1em;
+  text-align: center;
+}
+
+.list li, .news li {
+  display: block;
 }

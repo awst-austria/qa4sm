@@ -17,6 +17,7 @@ import {TrackedValidationsComponent} from './components/tracked-validations/trac
 import {SummaryStatisticsComponent} from './components/summary-statistics/summary-statistics.component';
 import {ResultFilesComponent} from './components/result-files/result-files.component';
 import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
+import {ButtonModule} from 'primeng/button';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -45,7 +46,8 @@ import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
     DropdownModule,
     FormsModule,
     InputTextModule,
-    NgDompurifyModule
+    NgDompurifyModule,
+    ButtonModule
   ]
 })
 export class ValidationResultModule {
