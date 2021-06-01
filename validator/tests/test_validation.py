@@ -800,9 +800,6 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 16
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 16
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -827,6 +824,9 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
+        assert new_run.total_points == 16
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 16
         self.check_results(new_run)
         self.delete_run(new_run)
 
