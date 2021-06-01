@@ -6104,3 +6104,12 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   border-color: $base-color;
   transform: scale(1.2);
 }
+
+.dropdown-item.p-button{
+  width: 100%;
+  background-color: $dropdown-buttons-background;;
+}
+.dropdown-item.p-button:hover{
+  color: #212529;
+  background-color: rgba(248, 193, 0, .5);
+}

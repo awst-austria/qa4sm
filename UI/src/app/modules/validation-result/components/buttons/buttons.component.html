@@ -50,17 +50,22 @@
     </button>
     <div class="dropdown-content" style="text-align: left">
       <div *ngIf="validationRun.output_file">
-        <button class="dropdown-item"
+        <button pButton
+                type="button"
+                class="dropdown-item"
+                icon="pi pi-download"
+                label="Download Graphs"
                 (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id + '_graphs.zip')"
                 title="Download graphs .zip">
-          <span class="pi pi-download"></span>
-          Download Graphs
         </button>
-        <button class="dropdown-item"
+        <button pButton
+                type="button"
+                class="dropdown-item"
+                icon="faIcons.faFileDownload"
+                label="Download NetCDF File"
                 (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
                 title="Download validation run .nc file">
           <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
-          Download NetCDF File
         </button>
         <a class="no-decorations"
            routerLink="/validate/"
@@ -72,17 +77,22 @@
 
       <span *ngIf="validationRun.is_unpublished"
             [ngClass]="{'collapse': validationRun.publishing_in_progress}">
-        <button class="dropdown-item"
+        <button pButton
+                type="button"
+                class="dropdown-item"
                 title="Remove this validation run"
+                label="Delete Validation Run"
+                icon="pi pi-times"
                 (click)=deleteValidation(validationRun.id)>
-          <span class="pi pi-times"></span>
-          Delete Validation Run
         </button>
-        <button *ngIf="!validationRun.is_archived" class="dropdown-item"
+        <button *ngIf="!validationRun.is_archived"
+                pButton
+                type="button"
+                label="Extend Life Span"
+                icon="pi pi-calendar-plus"
+                class="dropdown-item"
                 title="Extend lifespan of this validation run"
                 (click)=extendResults(validationRun.id)>
-          <span class="pi pi-calendar-plus"></span>
-          Extend Life Span
         </button>
       </span>
     </div>
