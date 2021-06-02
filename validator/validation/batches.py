@@ -248,9 +248,9 @@ def create_upscaling_lut(
                 lut[other_name] = []
             else:
                 # iterate from the side of the non-reference
+                other_lut = {}
                 for other_points in other_points_jobs:
                     gpis, lons, lats = other_points[0], other_points[1], other_points[2]
-                    other_lut = {}
                     for gpi, lon, lat in zip(gpis, lons, lats):
                         # list all non-ref points under the same ref gpi
                         ref_gpi = ref_grid.find_nearest_gpi(lon, lat)[0]  # todo: implement methods here to combine irregular grids
@@ -259,6 +259,6 @@ def create_upscaling_lut(
                         else:
                             other_lut[ref_gpi] = [(gpi, lon, lat)]
 
-                    lut[other_name] = other_lut
+                lut[other_name] = other_lut
 
     return lut

@@ -804,7 +804,10 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
     def test_c3s_validation_upscaling(self):
-        """Test a validation of CCIP with ISMN as non-reference, and upscaling option active"""
+        """
+        Test a validation of CCIP with ISMN as non-reference, and upscaling option active. All ISMN points are averaged
+        and the results should produce 16 points (original c3s points); results are checked with `check_results`
+        """
         run = generate_ismn_nonref_validation()
         run.user = self.testuser
 
@@ -831,6 +834,10 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
     def validation_upscaling_for_dataset(self, ds, version, variable):
+        """
+        Generate a test with ISMN as non-reference dataset and the provided dataset, version, variable as reference.
+        Test that the results and the output file with the function `check_results`
+        """
         run = generate_ismn_nonref_validation()
         run.user = self.testuser
 
@@ -860,7 +867,10 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     def test_all_datasets_validation_upscaling(self):
-        """Test a validation for each sat. dataset with ISMN as non-reference, and upscaling option active"""
+        """
+        Test a validation for each sat. dataset with ISMN as non-reference, and upscaling option active. Test description
+        in the function `validation_upscaling_for_dataset`
+        """
         all_datasets = [
             (globals.CCI, globals.ESA_CCI_SM_P_V05_2, globals.ESA_CCI_SM_P_sm),
             (globals.SMAP, globals.SMAP_V5_PM, globals.SMAP_soil_moisture),
@@ -873,7 +883,12 @@ class TestValidation(TestCase):
             self.validation_upscaling_for_dataset(ds, version, variable)
 
     def test_validation_upscaling_lut(self):
-        """Test function for upscaling lut"""
+        """
+        Test the function `create_upscaling_lut` in validation/batched.py by checking that the lookup table
+        hase the expected dataset key and values to average. It also checks that when filters are applied to the
+        non-reference dataset, the collected points change; in this case, with filters "COSMOS" and depth 0.0-0.1,
+        no station in the ISMN is found
+        """
         run = generate_ismn_nonref_validation()
         dataset = Dataset.objects.get(short_name='C3S')
         version = DatasetVersion.objects.get(short_name="C3S_V202012")
@@ -893,7 +908,12 @@ class TestValidation(TestCase):
             ref_name="0-C3S"
         )
         assert list(lut.keys()) == ["1-ISMN"]
-        assert len(lut["1-ISMN"].values()) == 4
+        assert list(lut["1-ISMN"].values()) == [
+            [(2, -155.283, 20.0), (16, -155.333, 19.8), (21, -155.417, 19.767)],
+            [(5, -155.933, 19.533), (8, -155.933, 19.533)],
+            [(10, -155.583, 19.917), (15, -155.533, 19.95)],
+            [(13, -155.517, 20.1), (23, -155.6, 20.017)],
+        ]
 
         data_filters = [
             DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),

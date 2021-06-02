@@ -385,12 +385,12 @@ def run_validation(validation_id):
                     task_running = True
                     while task_running:  # regularly check if the validation has been cancelled in this loop, otherwise we wouldn't notice
                         try:
-                            results = async_result.get(
-                                timeout=10)  # this throws TimeoutError after waiting 10 secs or TaskRevokedError if revoked before starting
-                            # if we got here, the task is finished now
-                            task_running = False  # stop looping because task finished
-                            if celery_task_cancelled(
-                                    async_result.id):  # we can still have a cancelled validation that took less than 10 secs
+                            # this throws TimeoutError after waiting 10 secs or TaskRevokedError if revoked before starting
+                            results = async_result.get(timeout=10)
+                            # if we got here, the task is finished now; stop looping because task finished
+                            task_running = False
+                            # we can still have a cancelled validation that took less than 10 secs
+                            if celery_task_cancelled(async_result.id):
                                 validation_aborted = True
                             else:
                                 untrack_celery_task(async_result.id)
