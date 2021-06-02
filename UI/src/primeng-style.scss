@@ -6060,7 +6060,17 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border-color: #4760E5;
 }
 
-.btn-action.p-button:hover, .btn-action-large.p-button:hover{
+.btn-action-home.p-button{
+  width: 8rem;
+  height: 3rem;
+  font-size: 1.25rem;
+  margin-right: 0.2rem;
+  background-color: #4760E5;
+  border-color: #4760E5;
+  margin-bottom: 0.1rem;
+}
+
+.btn-action.p-button:hover, .btn-action-large.p-button:hover, .btn-action-home.p-button:hover{
   background-color: #213FE0;
   border-color: #213FE0;
 }

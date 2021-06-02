@@ -25,18 +25,43 @@
         </div>
       <div *ngIf="userLoggedIn else elseBlock">
         <p>
-        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0"  role="button">See results</a>
+        <a pButton
+           label="See results"
+           routerLink="/published-validations"
+           class="btn-action-home"
+           role="button">
+        </a>
         <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
-        <a routerLink="/validate" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">Try it</a>
+        <a pButton
+           label="Try it"
+           routerLink="/validate"
+           class="btn-action-home"
+           role="button">
+        </a>
         </p>
       </div>
       <ng-template #elseBlock>
         <p>
-        <a routerLink="/published-validations" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">See results</a>
+        <a pButton
+           label="See results"
+           routerLink="/published-validations"
+           class="btn-action-home"
+           role="button">
+        </a>
         <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
-        <a routerLink="/signup" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">Sign up</a>
-        <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
-        <a routerLink="/login" style="width: 7em;" class="btn btn-lg btn-primary p-mb-0" role="button">Log in</a>
+        <a pButton
+           label="Sign up"
+           routerLink="/signup"
+           class="btn-action-home"
+           role="button">
+        </a>
+        <span class="p-mx-3 carousel-desc d-sm-inline">or</span>
+        <a pButton
+           label="Log in"
+           routerLink="/login"
+           class="btn-action-home"
+           role="button">
+        </a>
         </p>
       </ng-template>
     </div>
