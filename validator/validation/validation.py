@@ -3,22 +3,18 @@ import logging
 from os import path
 from re import sub as regex_sub
 import uuid
-import numpy as np
 
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
 from django.urls.base import reverse
-from ismn.interface import ISMN_Interface
 from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
 from pytesmo.validation_framework.data_manager import DataManager
 from pytesmo.validation_framework.metric_calculators import (
-    IntercomparisonMetrics,
     get_dataset_names,
-    TCMetrics,
     PairwiseIntercomparisonMetrics,
     TripleCollocationMetrics,
 )
@@ -372,17 +368,8 @@ def run_validation(validation_id):
                 if validation_aborted or not results:
                     validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 else:
-                    results = pytesmo_to_qa4sm_results(results)
-
-                    # only count points where there was enough data as ok points
-                    # results is a dictionary with a single key
-                    # nobs = results[list(results.keys())[0]]["n_obs"]
-                    # ok_points = np.sum(nobs > 0)
-                    # error_points = len(nobs) - ok_points
-
+                    results = _pytesmo_to_qa4sm_results(results)
                     check_and_store_results(async_result.id, results, run_dir)
-                    # validation_run.ok_points += ok_points
-                    # validation_run.error_points += error_points
                     validation_run.ok_points += num_gpis_from_job(job_table[async_result.id])
 
             except Exception as e:
@@ -434,7 +421,26 @@ def stop_running_validation(validation_id):
         task.delete()
 
 
-def pytesmo_to_qa4sm_results(results):
+def _pytesmo_to_qa4sm_results(results: dict) -> dict:
+    """
+    Converts the new pytesmo results dictionary format to the old format that
+    is still used by QA4SM.
+
+    Parameters
+    ----------
+    results : dict
+        Each key in the dictionary is a tuple of ``((ds1, col1), (d2, col2))``,
+        and the values contain the respective results for this combination of
+        datasets/columns.
+
+    Returns
+    -------
+    qa4sm_results : dict
+        Dictionary in the format required by QA4SM. This involves merging the
+        different dictionary entries from `results` to a single dictionary and
+        renaming the metrics to avoid name clashes, using the naming convention
+        from the old metric calculators.
+    """
     # each key is a tuple of ((ds1, col1), (ds2, col2))
     # this adds all tuples to a single list, and then only
     # keeps unique entries
