@@ -1,4 +1,3 @@
-//@import "~bootstrap/dist/css/bootstrap.css";
 @import "src/style.variables";
 @import "src/styles";
 
@@ -75,6 +74,9 @@
   z-index: 1;
 }
 
+span.carousel-desc{
+  line-height: 3rem;
+}
 
 .image-attribution > a {
   color: #ffffff;
@@ -249,4 +251,9 @@ svg text {
 
 .list li, .news li {
   display: block;
+}
+
+a:hover{
+  color: white;
+  text-decoration: none;
 }
