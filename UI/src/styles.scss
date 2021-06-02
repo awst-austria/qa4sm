@@ -5,7 +5,11 @@
 // Do not add bootstrap here because it interferes with primeng. Add it to the component's scss file where you want to use it.
 //@import "~bootstrap/dist/css/bootstrap.css";
 
-main{
+main {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
   text-align: left;
   width: 100%;
   margin: auto;
@@ -35,7 +39,7 @@ h1, h2, h3, h4, h5, h6,
   line-height: 1.2;
 }
 
-h1, .h1{
+h1, .h1 {
   font-size: 2.5rem;
 }
 
@@ -63,25 +67,25 @@ h5, .h5 {
 }
 
 
-.table{
-  width:100%;
-  margin-bottom:1rem;
-  color:#212529;
+.table {
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
   border-collapse: collapse !important;
 }
 
-.table td,.table th{
+.table td, .table th {
   padding: .75rem;
   vertical-align: top;
   border-top: 1px solid #dee2e6;
 }
 
-.table thead th{
+.table thead th {
   vertical-align: bottom;
   border-bottom: 2px solid #dee2e6;
 }
 
-.table tbody+tbody{
+.table tbody + tbody {
   border-top: 2px solid #dee2e6;
 }
 
@@ -119,76 +123,28 @@ h5, .h5 {
   border-color: #dee2e6;
 }
 
-.align-middle{
-  vertical-align: middle!important;
+.align-middle {
+  vertical-align: middle !important;
 }
 
 .font-weight-bold {
   font-weight: 700 !important;
 }
 
-.edit_name{
+.edit_name {
   border: 1px solid #00AAE3;
   border-radius: 4px;
   position: relative;
   padding: 3px;
 
 }
-.edit_name:focus{
+
+.edit_name:focus {
   border: 1px solid #00AAE3;
   box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .3);
   outline: none;
 }
 
-@media (min-width: 576px) {
-  .col-sm {
-    -ms-flex-preferred-size: 0;
-    flex-basis: 0;
-    -ms-flex-positive: 1;
-    flex-grow: 1;
-    max-width: 100%;
-  }
-
-  .d-sm-none {
-    display: none !important;
-  }
-
-  .d-sm-inline {
-    display: inline !important;
-  }
-
-  .d-sm-block {
-    display: block !important;
-  }
-  .card-deck {
-    display: -ms-flexbox;
-    display: flex;
-    flex-flow: row wrap;
-    margin-right: -15px;
-    margin-left: -15px;
-  }
-  .card-deck .card {
-    -ms-flex: 1 0 0;
-    flex: 1 0 0;
-    margin-right: 15px;
-    margin-bottom: 0;
-    margin-left: 15px;
-  }
-
-  .container, .container-sm {
-    max-width: 540px;
-  }
-  .navbar-expand-sm > .container,
-  .navbar-expand-sm > .container-fluid, .navbar-expand-sm > .container-sm, .navbar-expand-sm > .container-md, .navbar-expand-sm > .container-lg, .navbar-expand-sm > .container-xl {
-    padding-right: 0;
-    padding-left: 0;
-  }
-  .navbar-expand-sm > .container,
-  .navbar-expand-sm > .container-fluid, .navbar-expand-sm > .container-sm, .navbar-expand-sm > .container-md, .navbar-expand-sm > .container-lg, .navbar-expand-sm > .container-xl {
-    -ms-flex-wrap: nowrap;
-    flex-wrap: nowrap;
-  }
-}
 
 .card {
   position: relative;
@@ -256,33 +212,13 @@ img {
   border-style: none;
 }
 
-@media (min-width: 768px) {
-  .container, .container-sm, .container-md {
-    max-width: 720px;
-  }
-  .d-md-flex {
-    display: -ms-flexbox !important;
-    display: flex !important;
-  }
-}
 
-@media (min-width: 992px) {
-  .container, .container-sm, .container-md, .container-lg {
-    max-width: 960px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .container, .container-sm, .container-md, .container-lg, .container-xl {
-    max-width: 1140px;
-  }
-}
 
 .hidden {
   visibility: hidden;
 }
 
-.col-sm{
+.col-sm {
   position: relative;
   width: 100%;
   padding-right: 15px;
@@ -307,13 +243,6 @@ img {
   border-width: 0.2em;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .spinner-border,
-  .spinner-grow {
-    -webkit-animation-duration: 1.5s;
-    animation-duration: 1.5s;
-  }
-}
 
 .sr-only {
   position: absolute;
@@ -327,9 +256,10 @@ img {
   border: 0;
 }
 
-.help-icon{
+.help-icon {
   font-size: 1.1rem;
 }
+
 .d-flex {
   display: -ms-flexbox !important;
   display: flex !important;
@@ -366,20 +296,111 @@ img {
   justify-content: space-between;
 }
 
+
+.navbar-expand > .container,
+.navbar-expand > .container-fluid, .navbar-expand > .container-sm, .navbar-expand > .container-md, .navbar-expand > .container-lg, .navbar-expand > .container-xl {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.navbar-expand > .container,
+.navbar-expand > .container-fluid, .navbar-expand > .container-sm, .navbar-expand > .container-md, .navbar-expand > .container-lg, .navbar-expand > .container-xl {
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+}
+
+
+// @media
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner-border,
+  .spinner-grow {
+    -webkit-animation-duration: 1.5s;
+    animation-duration: 1.5s;
+  }
+}
+
+@media (min-width: 576px) {
+  .col-sm {
+    -ms-flex-preferred-size: 0;
+    flex-basis: 0;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    max-width: 100%;
+  }
+
+  .d-sm-none {
+    display: none !important;
+  }
+
+  .d-sm-inline {
+    display: inline !important;
+  }
+
+  .d-sm-block {
+    display: block !important;
+  }
+  .card-deck {
+    display: -ms-flexbox;
+    display: flex;
+    flex-flow: row wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+  .card-deck .card {
+    -ms-flex: 1 0 0;
+    flex: 1 0 0;
+    margin-right: 15px;
+    margin-bottom: 0;
+    margin-left: 15px;
+  }
+
+  .container, .container-sm {
+    max-width: 540px;
+  }
+  .navbar-expand-sm > .container,
+  .navbar-expand-sm > .container-fluid, .navbar-expand-sm > .container-sm, .navbar-expand-sm > .container-md, .navbar-expand-sm > .container-lg, .navbar-expand-sm > .container-xl {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  .navbar-expand-sm > .container,
+  .navbar-expand-sm > .container-fluid, .navbar-expand-sm > .container-sm, .navbar-expand-sm > .container-md, .navbar-expand-sm > .container-lg, .navbar-expand-sm > .container-xl {
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+  }
+
+  table {
+    //background-color: red;
+    display: block;
+  }
+
+}
+
+
 @media (max-width: 767.98px) {
   .navbar-expand-md > .container,
   .navbar-expand-md > .container-fluid, .navbar-expand-md > .container-sm, .navbar-expand-md > .container-md, .navbar-expand-md > .container-lg, .navbar-expand-md > .container-xl {
     padding-right: 0;
     padding-left: 0;
   }
-}
 
-@media (max-width: 767.98px){
   .navbar-expand-md > .container,
   .navbar-expand-md > .container-fluid, .navbar-expand-md > .container-sm, .navbar-expand-md > .container-md, .navbar-expand-md > .container-lg, .navbar-expand-md > .container-xl {
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
   }
+
+}
+
+@media (min-width: 768px) {
+  .container, .container-sm, .container-md {
+    max-width: 720px;
+  }
+  .d-md-flex {
+    display: -ms-flexbox !important;
+    display: flex !important;
+  }
+
 }
 
 @media (max-width: 991.98px) {
@@ -388,6 +409,11 @@ img {
     padding-right: 0;
     padding-left: 0;
   }
+  //
+  //table {
+  //  display: block;
+  //}
+
 }
 
 @media (min-width: 992px) {
@@ -396,7 +422,13 @@ img {
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
   }
+
+  .container, .container-sm, .container-md, .container-lg {
+    max-width: 960px;
+  }
+
 }
+
 
 @media (max-width: 1199.98px) {
   .navbar-expand-xl > .container,
@@ -412,16 +444,11 @@ img {
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
   }
+
+  .container, .container-sm, .container-md, .container-lg, .container-xl {
+    max-width: 1140px;
+  }
+
 }
 
-.navbar-expand > .container,
-.navbar-expand > .container-fluid, .navbar-expand > .container-sm, .navbar-expand > .container-md, .navbar-expand > .container-lg, .navbar-expand > .container-xl {
-  padding-right: 0;
-  padding-left: 0;
-}
 
-.navbar-expand > .container,
-.navbar-expand > .container-fluid, .navbar-expand > .container-sm, .navbar-expand > .container-md, .navbar-expand > .container-lg, .navbar-expand > .container-xl {
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-}
