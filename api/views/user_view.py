@@ -60,7 +60,6 @@ def signup_post(request):
 @permission_classes([IsAuthenticated])
 def user_modify(request):
     # this one serves for both, updating and deactivating user
-    user = User.objects.get(username=request.user.username)
     if request.method == 'PATCH':
         new_user_data = _get_querydict_from_user_data(request, request.data)
         form = UserProfileForm(new_user_data, instance=request.user)
@@ -79,9 +78,7 @@ def user_modify(request):
             response = JsonResponse(form.data, status=200)
         else:
             errors = form.errors.get_json_data()
-            print(errors)
             response = JsonResponse(errors, status=400, safe=False)
-        # updated_user = UserSerializer().update(user, user_data)
         return response
     elif request.method == 'DELETE':
         request.user.is_active = False
