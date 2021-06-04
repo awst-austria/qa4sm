@@ -215,9 +215,6 @@ def create_upscaling_lut(
         lookup table with shape {'other_dataset':{ref gpi: [other gpis]}}
     """
     ref_reader = datasets[ref_name]["class"]
-    # get grid of reference
-    while hasattr(ref_reader, 'cls'):
-        ref_reader = ref_reader.cls
     ref_grid = ref_reader.grid
 
     lut = {}
