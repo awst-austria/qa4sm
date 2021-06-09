@@ -7,13 +7,16 @@ import {MetricsComparisonDto} from './metrics-comparison.dto';
 import {Validations2CompareModel} from '../components/validation-selector/validation-selection.model';
 import {ExtentModel} from '../components/spatial-extent/extent-model';
 import {PlotDto} from '../../core/services/global/plot.dto';
+import {ValidationrunService} from "../../core/services/validation-run/validationrun.service";
+import {DatasetConfigurationService} from "../../validation-result/services/dataset-configuration.service";
 
 const urlPrefix = environment.API_URL + 'api';
 const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
 const comparisonTableUrl: string = urlPrefix + '/table-comparison';
 const downloadComparisonTableUrl: string = urlPrefix + '/download-comparison-table';
 const metrics4ComparisonUrl: string = urlPrefix + '/metrics-for-comparison';
-// what do these do?
+const comparisonExtentImageUrl: string = urlPrefix + '/image-comparison'
+
 const csrfToken = '{{csrf_token}}';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
@@ -63,5 +66,9 @@ export class ComparisonService {
 
   getComparisonPlots(params: any): Observable<PlotDto[]> {
     return this.httpClient.get<PlotDto[]>(comparisonPlotsUrl, {params});
+  }
+
+  getComparisonExtentImage(params: any): Observable<PlotDto> {
+    return this.httpClient.get<PlotDto>(comparisonExtentImageUrl, {params})
   }
 }

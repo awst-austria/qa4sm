@@ -6,7 +6,16 @@ from rest_framework.permissions import IsAuthenticated
 import json
 
 from validator.models import ValidationRun
-from validator.validation import comparison_table, encoded_comparisonPlots, generate_comparison
+from validator.validation import comparison_table, encoded_comparisonPlots, generate_comparison, get_extent_image
+
+
+def get_validations(ids):
+    validation_runs = []
+    for val_id in ids:
+        validation = get_object_or_404(ValidationRun, id=val_id)
+        validation_runs.append(validation)
+
+    return validation_runs
 
 
 @api_view(['GET'])
@@ -17,11 +26,8 @@ def get_comparison_table(request):
     metric_list = request.query_params.getlist('metric_list', None)
     extent = request.query_params.get('extent', None)
     get_intersection = request.query_params.get('get_intersection', False)
-    validation_runs = []
-    for val_id in validation_ids:
-        validation = get_object_or_404(ValidationRun, id=val_id)
-        validation_runs.append(validation)
-        # resetting index added, otherwise there would be a row shift between the index column header and the header of the
+    validation_runs = get_validations(validation_ids)
+    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
     # rest of the columns when df rendered as html
     try:
         table = comparison_table(
@@ -45,12 +51,8 @@ def download_comparison_table(request):
     metric_list = request.query_params.getlist('metric_list', None)
     extent = request.query_params.get('extent', None)
     get_intersection = request.query_params.get('get_intersection', False)
-    print()
-    validation_runs = []
-    for val_id in validation_ids:
-        validation = get_object_or_404(ValidationRun, id=val_id)
-        validation_runs.append(validation)
-        # resetting index added, otherwise there would be a row shift between the index column header and the header of the
+    validation_runs = get_validations(validation_ids)
+    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
     # rest of the columns when df rendered as html
     try:
         table = comparison_table(
@@ -75,11 +77,7 @@ def get_comparison_metrics(request):
     """Get the metrics that are common to all validations"""
     validation_ids = request.query_params.getlist('ids', None)
     get_intersection = request.query_params.get('get_intersection', False)
-    print('Monika', get_intersection, json.loads(get_intersection))
-    validation_runs = []
-    for val_id in validation_ids:
-        validation = get_object_or_404(ValidationRun, id=val_id)
-        validation_runs.append(validation)
+    validation_runs = get_validations(validation_ids)
     try:
         comp = generate_comparison(validation_runs, get_intersection=json.loads(get_intersection))
         response = []
@@ -103,10 +101,7 @@ def get_comparison_plots_for_metric(request):
     metric = request.query_params.get('metric', None)
     extent = request.query_params.get('extent', None)
     get_intersection = request.query_params.get('get_intersection', False)
-    validation_runs = []
-    for val_id in validation_ids:
-        validation = get_object_or_404(ValidationRun, id=val_id)
-        validation_runs.append(validation)
+    validation_runs = get_validations(validation_ids)
 
     encoded_plots = []
     for plot_type in plot_types:
@@ -121,3 +116,18 @@ def get_comparison_plots_for_metric(request):
             encoded_plots.append({'plot': base64_plot})
 
     return JsonResponse(encoded_plots, status=200, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_spatial_extent(request):
+    """Get an image with the spatial extent of the comparison"""
+    get_intersection = request.query_params.get('get_intersection', False)
+    validation_ids = request.query_params.getlist('ids', None)
+    validation_runs = get_validations(validation_ids)
+
+    encoded_image = get_extent_image(
+        validation_runs=validation_runs,
+        get_intersection=json.loads(get_intersection)
+    )
+    return JsonResponse(encoded_image, status=200, safe=False)

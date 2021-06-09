@@ -108,8 +108,10 @@ def get_summary_statistics(request):
     # rest of the columns when df rendered as html
     inspection_table = get_inspection_table(validation).reset_index()
 
-    return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+    response = HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
                                                  index=False))
+
+    return response
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

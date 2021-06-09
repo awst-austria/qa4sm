@@ -1,0 +1,44 @@
+<div *ngIf="this.valResModels.length > 0" class="p-grid no-gutters">
+<!--  use different if condition-->
+  <div class="p-col-12">
+    <p-panel [toggleable]="true" [collapsed]="true">
+      <ng-template pTemplate="header">
+        <div class="text-center my-1" style="width: 92%">
+          <h4 class="my-0 font-weight-normal">Comparison summary</h4>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="icons">
+        <label class="mb-0" pTooltip="Expand this section to inspect a table with the metric-wise difference of the two datasets."
+               tooltipPosition="bottom">
+          <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+        </label>
+      </ng-template>
+      <!--  description of the comparison-->
+      <table id="comparison_table{% if {{isSingle}} %}_single{% else %}_double{% endif %}"
+             class="table table-bordered table-striped">
+        <thead *ngIf="!isSingle" class="thead-dark">
+        <tr>
+<!--          should really add another property in validationrundto to describe it-->
+          <th *ngFor="let validation of this.comparisonModel.selectedValidations; let ind = index"
+              scope="col" style="width: 10%">Description of validation {{ind}}: {{validation.id}}</th>
+        </tr>
+        </thead>
+        <thead *ngIf="isSingle" class="thead-dark">
+        <tr>
+          <th scope="col" style="width: 10%">Description of the selected validation: {{this.comparisonModel.selectedValidations[0].id}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td *ngFor="let validationModel of valResModels">
+            <qa-validation-summary [validationModel]="validationModel" [forComparison]="true"></qa-validation-summary>
+          </td>
+        </tr>
+        <tr *ngIf="!isSingle">
+          <td *ngFor="let validation of this.comparisonModel.selectedValidations; let ind = index"></td>
+        </tr>
+        </tbody>
+      </table>
+    </p-panel>
+  </div>
+</div>

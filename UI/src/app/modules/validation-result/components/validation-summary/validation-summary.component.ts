@@ -22,6 +22,7 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 export class ValidationSummaryComponent implements OnInit {
 
   @Input() validationModel: ValidationResultModel;
+  @Input() forComparison: boolean = false;
 
   configurations$: Observable<any>;
   validationRun$: Observable<any>;

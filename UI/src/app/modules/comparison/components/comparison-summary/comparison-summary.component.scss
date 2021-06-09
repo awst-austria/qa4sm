@@ -1,10 +1,10 @@
-@import "../../../validation-result/components/buttons/buttons.component.scss";
+@import "~bootstrap/dist/css/bootstrap.css";
 
 .pcol6:hover{
-  transform: scale(1.05);
+  transform: scale(2);
 }
 .pcol:hover{
-  transform: scale(1.05);
+  transform: scale(1.2);
 }
 .result-plot{
   border-color: #dddddd;

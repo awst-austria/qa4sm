@@ -1,0 +1,45 @@
+<div *ngIf="(extentImage$|async) as img" class="p-col-12">
+  <!--  <p-panel>-->
+  <p-panel [toggleable]="true" [collapsed]="false">
+    <ng-template pTemplate="header">
+      <div class="text-center my-1" style="width: 92%">
+        <h4 class="my-0 font-weight-normal">Selected validation extent</h4>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="icons">
+      <label class="mb-0"
+             pTooltip="Representation of the comparison spatial extent selected through the 'Spatial extent' dialogue."
+             tooltipPosition="bottom">
+        <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+      </label>
+    </ng-template>
+
+    <div class="p-col">
+      <div class="p-grid p-align-center">
+        <div ngClass='p-col'>
+          <img width="95%"
+               height="95%"
+               [src]=sanitizePlotUrl(img)
+               [ngClass]="{'result-plot':true, 'pcol6': true}"
+               alt="An overview of the selected comparison extent">
+        </div>
+      </div>
+    </div>
+
+
+    <!--  buttons  -->
+    <div class="p-grid">
+      <!--  Multiple file download  -->
+      <div class="p-col-3 center p-mt-2">
+        <button type="button"
+                style="width: 9rem;"
+                class="btn btn-sm btn-primary"
+                title="Download image"
+                (click)="downloadExtentImage()">
+          <span class="pi pi-download"></span> Download image</button>
+      </div>
+    </div>
+
+  </p-panel>
+  <!--  </p-panel>-->
+</div>

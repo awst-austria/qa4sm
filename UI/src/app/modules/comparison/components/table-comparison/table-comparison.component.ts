@@ -59,7 +59,6 @@ export class TableComparisonComponent implements OnInit {
     });
     // console.log(metricList)
     // console.log('parameters', parameters)
-    console.log('table', this.comparisonService.getComparisonTable(parameters));
     this.comparisonTable$ = this.comparisonService.getComparisonTable(parameters);
   }
 

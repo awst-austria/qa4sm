@@ -18,7 +18,7 @@ from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric,\
-    download_comparison_table, get_comparison_metrics
+    download_comparison_table, get_comparison_metrics, get_spatial_extent
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_file, \
     get_metric_names_and_associated_files
 
@@ -73,6 +73,7 @@ urlpatterns = [
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
     path('table-comparison', get_comparison_table, name='Comparison table'),
     path('plots-comparison', get_comparison_plots_for_metric, name='Comparison plots'),
+    path('image-comparison', get_spatial_extent, name='Extent image'),
     path('metrics-for-comparison', get_comparison_metrics, name='Comparison metrics'),
     path('download-comparison-table', download_comparison_table, name='Download comparison csv'),
     path('download-result', get_results, name='Download results'),

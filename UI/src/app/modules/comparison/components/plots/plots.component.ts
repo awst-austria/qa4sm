@@ -12,7 +12,7 @@ import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
 
 // types of plots to show up. Shouldn't be hardcoded
-const PLOT_TYPES = ['boxplot', 'correlation', 'mapplot'];
+const PLOT_TYPES = ['boxplot', 'mapplot'];
 
 @Component({
   selector: 'qa-plots',
@@ -39,7 +39,7 @@ export class PlotsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this. startComparison();
+    this.startComparison();
   }
 
   startComparison(): void {
@@ -80,7 +80,6 @@ export class PlotsComponent implements OnInit {
     const imagesList = [];
     imagesListObject.forEach(image => {
       imagesList.push({path: this.plotService.plotPrefix + image.plot});
-
     });
     const prop: any = {};
     prop.component = CarouselComponent;

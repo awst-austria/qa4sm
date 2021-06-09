@@ -296,3 +296,47 @@ def encoded_comparisonPlots(
 
     except ComparisonError:
         return "error encountered"
+
+
+def get_extent_image(
+        validation_runs:list,
+        extent:tuple=None,
+        get_intersection:bool=True,
+) -> str:
+    """
+    Creates an image encoding in base64 showing the selected comparison extent
+
+    Parameters
+    ----------
+    validation_runs: list
+        list of ValidationRun to be compared
+    extent : tuple, optional (default: None)
+        Area to subset the values for.
+        (min_lon, max_lon, min_lat, max_lat)
+    get_intersection: bool, default is True
+        Whether to get the intersection or union of the two spatial exents
+
+    Returns
+    -------
+    encoded: str
+        base64 encoding of the plot image
+    """
+    comparison = generate_comparison(
+        validation_runs=validation_runs,
+        extent=extent,
+        get_intersection=get_intersection
+    )
+    image = BytesIO()
+    try:
+        comparison.get_extent(
+            get_intersection=get_intersection,
+            visualize=True,
+            return_extent=False,
+        )
+        plt.savefig(image, format='png')
+        encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
+
+        return encoded
+
+    except ComparisonError:
+        return "error encountered"

@@ -17,27 +17,31 @@ import {CheckboxModule} from "primeng/checkbox";
 import { SpatialExtentComponent } from './components/spatial-extent/spatial-extent.component';
 import {NgDompurifyModule} from "@tinkoff/ng-dompurify";
 import { TableComparisonComponent } from './components/table-comparison/table-comparison.component';
+import { ComparisonSummaryComponent } from './components/comparison-summary/comparison-summary.component';
+import {ValidationResultModule} from "../validation-result/validation-result.module";
+import { ExtentVisualizationComponent } from './components/extent-visualization/extent-visualization.component';
 
 @NgModule({
-    declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent],
+  declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent, ComparisonSummaryComponent, ExtentVisualizationComponent, ExtentVisualizationComponent],
   exports: [
-    ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent
+    ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent, ComparisonSummaryComponent, ExtentVisualizationComponent, ExtentVisualizationComponent
   ],
-    imports: [
-        CommonModule,
-        PanelModule,
-        TooltipModule,
-        FontAwesomeModule,
-        NgxPaginationModule,
-        RouterModule,
-        DropdownModule,
-        FormsModule,
-        InputTextModule,
-        AccordionModule,
-        DatasetModule,
-        ButtonModule,
-        CheckboxModule,
-        NgDompurifyModule,
-    ]
+  imports: [
+    CommonModule,
+    PanelModule,
+    TooltipModule,
+    FontAwesomeModule,
+    NgxPaginationModule,
+    RouterModule,
+    DropdownModule,
+    FormsModule,
+    InputTextModule,
+    AccordionModule,
+    DatasetModule,
+    ButtonModule,
+    CheckboxModule,
+    NgDompurifyModule,
+    ValidationResultModule,
+  ]
 })
 export class ComparisonModule { }
