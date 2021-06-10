@@ -1,45 +1,78 @@
-<div *ngIf="(extentImage$|async) as img" class="p-col-12">
-  <!--  <p-panel>-->
-  <p-panel [toggleable]="true" [collapsed]="false">
-    <ng-template pTemplate="header">
-      <div class="text-center my-1" style="width: 92%">
-        <h4 class="my-0 font-weight-normal">Selected validation extent</h4>
-      </div>
-    </ng-template>
-    <ng-template pTemplate="icons">
-      <label class="mb-0"
-             pTooltip="Representation of the comparison spatial extent selected through the 'Spatial extent' dialogue."
-             tooltipPosition="bottom">
-        <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
-      </label>
-    </ng-template>
-
-    <div class="p-col">
-      <div class="p-grid p-align-center">
-        <div ngClass='p-col'>
-          <img width="95%"
-               height="95%"
-               [src]=sanitizePlotUrl(img)
-               [ngClass]="{'result-plot':true, 'pcol6': true}"
-               alt="An overview of the selected comparison extent">
+<div *ngIf="(extentImage$|async) as img">
+  <div *ngIf="img == 'Raise message to check box', else noError" class="p-col">
+    <p-panel>
+      <ng-template pTemplate="header">
+        <div class="text-center my-1" style="width: 92%">
+          <h4 class="my-0 font-weight-normal">Warning</h4>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="icons">
+        <label class="mb-0">
+          <span class="p-panel-header-icon pi pi-exclamation-triangle help-icon"></span>
+        </label>
+      </ng-template>
+      <div class="p-col">
+        <div class="pb-3">The selected validations have a non-overlapping extent, which means that there are no
+          common validation points. If you still want to perform the comparison, check the 'Include all points from the
+          selected validations' option in the 'Spatial extent' dialogue box. In this case, only a boxplot will be shown,
+          comparing the distribution of values in the two validations.
         </div>
       </div>
+    </p-panel>
+  </div>
+  <ng-template #noError>
+    <div class="p-col-12">
+      <p-panel [toggleable]="true" [collapsed]="false">
+        <ng-template pTemplate="header">
+          <div class="text-center my-1" style="width: 92%">
+            <h4 class="my-0 font-weight-normal">Selected comparison extent</h4>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="icons">
+          <label class="mb-0"
+                 pTooltip="Representation of the comparison spatial extent selected through the 'Spatial extent' dialogue box."
+                 tooltipPosition="bottom">
+            <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+          </label>
+        </ng-template>
+
+        <div class="p-col">
+          <div *ngIf="comparisonModel.getIntersection"
+            class="pb-3">The comparison is performed by considering only the reference grid points that are in the common spatial
+            extent of the two validations, as specified in the 'Spatial extent' dialogue box. To include all points, check the
+            box in the dialogue box.
+          </div>
+          <div *ngIf="!comparisonModel.getIntersection"
+               class="pb-3">The comparison is performed by considering all points belonging to the considered validations (this
+            is the only option when the validations belong to the same run, e.g. multiple non-reference datasets).
+          </div>
+          <div class="p-grid p-align-center">
+            <div ngClass='p-col'>
+              <img width="95%"
+                   height="95%"
+                   [src]=sanitizePlotUrl(img)
+                   [ngClass]="{'result-plot':true, 'pcol6': true}"
+                   alt="An overview of the selected comparison extent">
+            </div>
+          </div>
+        </div>
+
+
+        <!--  buttons  -->
+        <div class="p-grid">
+          <!--  Multiple file download  -->
+          <div class="p-col-3 center p-mt-2">
+            <button type="button"
+                    style="width: 9rem;"
+                    class="btn btn-sm btn-primary"
+                    title="Download image"
+                    (click)="downloadExtentImage()">
+              <span class="pi pi-download"></span> Download image</button>
+          </div>
+        </div>
+
+      </p-panel>
+      <!--  </p-panel>-->
     </div>
-
-
-    <!--  buttons  -->
-    <div class="p-grid">
-      <!--  Multiple file download  -->
-      <div class="p-col-3 center p-mt-2">
-        <button type="button"
-                style="width: 9rem;"
-                class="btn btn-sm btn-primary"
-                title="Download image"
-                (click)="downloadExtentImage()">
-          <span class="pi pi-download"></span> Download image</button>
-      </div>
-    </div>
-
-  </p-panel>
-  <!--  </p-panel>-->
+  </ng-template>
 </div>

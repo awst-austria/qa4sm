@@ -12,7 +12,6 @@ export class SpatialExtentComponent implements OnInit {
 
   @Input() extentModel: ExtentModel;
   @Input() disabled: boolean;
-
   @Output() ifChecked: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() {

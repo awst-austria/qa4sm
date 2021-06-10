@@ -130,6 +130,8 @@ def get_validations_for_comparison(request):
     # filter based on the number of non-reference datasets
     eligible4comparison = []
     for val in ref_filtered:
+        if val is None:
+            continue
         if val.dataset_configurations.count() == max_datasets:
             eligible4comparison.append(val)
 

@@ -8,7 +8,7 @@ from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from qa4sm_reader.plot_all import plot_all, get_img_stats
-from qa4sm_reader.comparing import QA4SMComparison, ComparisonError
+from qa4sm_reader.comparing import QA4SMComparison, ComparisonError, SpatialExtentError
 
 from django.conf import settings
 
@@ -321,17 +321,22 @@ def get_extent_image(
     encoded: str
         base64 encoding of the plot image
     """
-    comparison = generate_comparison(
-        validation_runs=validation_runs,
-        extent=extent,
-        get_intersection=get_intersection
-    )
+    try:
+        comparison = generate_comparison(
+            validation_runs=validation_runs,
+            extent=extent,
+            get_intersection=get_intersection
+        )
+    except SpatialExtentError:
+        return "Raise message to check box"
+
     image = BytesIO()
     try:
         comparison.get_extent(
             get_intersection=get_intersection,
             visualize=True,
             return_extent=False,
+            plot_points=True,
         )
         plt.savefig(image, format='png')
         encoded = base64.encodebytes(image.getvalue()).decode('utf-8')

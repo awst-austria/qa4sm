@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
-from qa4sm_reader.comparing import ComparisonError
+from qa4sm_reader.comparing import ComparisonError, SpatialExtentError
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 import json
@@ -125,9 +125,13 @@ def get_spatial_extent(request):
     get_intersection = request.query_params.get('get_intersection', False)
     validation_ids = request.query_params.getlist('ids', None)
     validation_runs = get_validations(validation_ids)
+    try:
+        encoded_image = get_extent_image(
+            validation_runs=validation_runs,
+            get_intersection=json.loads(get_intersection)
+        )
+    except SpatialExtentError as e:
+        response = HttpResponse(str(e))
 
-    encoded_image = get_extent_image(
-        validation_runs=validation_runs,
-        get_intersection=json.loads(get_intersection)
-    )
-    return JsonResponse(encoded_image, status=200, safe=False)
+    if not encoded_image == "error encountered":
+        return JsonResponse(encoded_image, status=200, safe=False)
