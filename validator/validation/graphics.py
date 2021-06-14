@@ -332,10 +332,8 @@ def get_extent_image(
 
     image = BytesIO()
     try:
-        comparison.get_extent(
-            get_intersection=get_intersection,
-            visualize=True,
-            return_extent=False,
+        comparison.visualize_extent(
+            intersection=get_intersection,
             plot_points=True,
         )
         plt.savefig(image, format='png')

@@ -18,7 +18,7 @@ from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric,\
-    download_comparison_table, get_comparison_metrics, get_spatial_extent
+    download_comparison_table, get_comparison_metrics, get_spatial_extent, download_extent_image
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_file, \
     get_metric_names_and_associated_files
 
@@ -83,6 +83,7 @@ urlpatterns = [
     path('uptime-report', get_uptime),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
-    path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison')
+    path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison'),
+    path('download-extent-image', download_extent_image, name='Download image with spatial extent'),
 ]
 

@@ -13,9 +13,9 @@
       </ng-template>
       <div class="p-col">
         <div class="pb-3">The selected validations have a non-overlapping extent, which means that there are no
-          common validation points. If you still want to perform the comparison, check the 'Include all points from the
-          selected validations' option in the 'Spatial extent' dialogue box. In this case, only a boxplot will be shown,
-          comparing the distribution of values in the two validations.
+          common validation points. If you wish to perform the comparison, check the 'Include all points from the
+          selected validations' option in the 'Spatial extent' dialogue box and re-run the comparison. In this case
+          a boxplot only will be shown, comparing the distribution of values in the two validations.
         </div>
       </div>
     </p-panel>
@@ -65,9 +65,9 @@
             <button type="button"
                     style="width: 9rem;"
                     class="btn btn-sm btn-primary"
-                    title="Download image"
-                    (click)="downloadExtentImage()">
-              <span class="pi pi-download"></span> Download image</button>
+                    title="Download the image as .png"
+                    (click)="downloadExtentImage(comparisonModel)">
+              <span class="pi pi-download"></span> Download image </button>
           </div>
         </div>
 

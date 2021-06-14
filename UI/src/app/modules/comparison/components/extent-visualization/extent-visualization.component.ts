@@ -63,7 +63,9 @@ export class ExtentVisualizationComponent implements OnInit {
     return this.plotService.sanitizePlotUrl(plotBase64);
   }
 
-  downloadExtentImage(): void {
+  downloadExtentImage(comparisonModel): void {
     // should provide a download of the comparison image
+    const ids = this.comparisonService.getValidationsIds(comparisonModel.selectedValidations);
+    this.comparisonService.downloadExtentImage(ids, comparisonModel.getIntersection);
   }
 }

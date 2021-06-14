@@ -15,7 +15,8 @@ const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
 const comparisonTableUrl: string = urlPrefix + '/table-comparison';
 const downloadComparisonTableUrl: string = urlPrefix + '/download-comparison-table';
 const metrics4ComparisonUrl: string = urlPrefix + '/metrics-for-comparison';
-const comparisonExtentImageUrl: string = urlPrefix + '/image-comparison'
+const comparisonExtentImageUrl: string = urlPrefix + '/image-comparison';
+const downloadExtentImageUrl: string = urlPrefix + '/download-extent-image';
 
 const csrfToken = '{{csrf_token}}';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -55,6 +56,11 @@ export class ComparisonService {
   getComparisonTable(params: any): Observable<any> {
     // create htm table in comparison page
     return this.httpClient.get(comparisonTableUrl, {params, headers, responseType: 'text'});
+  }
+
+  downloadExtentImage(ids: string[], getIntersection: boolean): void {
+    const fileUrl = `${downloadExtentImageUrl}?ids=${ids}&get_intersection=${getIntersection}`;
+    saveAs(fileUrl);
   }
 
   downloadComparisonTableCsv(ids: string, metricList: string[], getIntersection: boolean, extent: string): void {

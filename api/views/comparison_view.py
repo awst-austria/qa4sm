@@ -135,3 +135,25 @@ def get_spatial_extent(request):
 
     if not encoded_image == "error encountered":
         return JsonResponse(encoded_image, status=200, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def download_extent_image(request):
+    """Download a .png of the spatial extent image"""
+    get_intersection = request.query_params.get('get_intersection', False)
+    validation_ids = request.query_params.getlist('ids', None)
+    validation_runs = get_validations(validation_ids)
+    try:
+        encoded_image = get_extent_image(
+            validation_runs=validation_runs,
+            get_intersection=json.loads(get_intersection)
+        )
+    except SpatialExtentError as e:
+        response = HttpResponse(str(e))
+
+    if not encoded_image == "error encountered":
+        response = HttpResponse(content_type='image/png')
+        response['Content-Disposition'] = 'attachment; filename=Spatial_extent.png'
+
+    return response
