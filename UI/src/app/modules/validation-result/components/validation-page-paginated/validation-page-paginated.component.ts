@@ -1,9 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
-import {HttpParamsModel} from '../../../core/services/validation-run/http-params.model';
-import {Observable} from 'rxjs';
-import {ValidationSetDto} from '../../services/validation.set.dto';
+import {HttpParams} from '@angular/common/http';
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -14,7 +12,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   @Input() published: boolean;
 
   validations: ValidationrunDto[] = [];
-  validationsSet$: Observable<ValidationSetDto>;
+  numberOfValidations: number;
   page = 1;
   limit = 10;
   offset = 0;
@@ -23,15 +21,26 @@ export class ValidationPagePaginatedComponent implements OnInit {
   constructor(private validationrunService: ValidationrunService) { }
 
   ngOnInit(): void {
-    this.getValidationsAndItsNumber(this.published);
+    // this.getValidationsAndItsNumber(this.published);
   }
 
   getValidationsAndItsNumber(published: boolean): void{
-    const params = new HttpParamsModel(this.offset, this.limit, this.order);
+    const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
+      .set('order', String(this.order));
     if (!published){
-    this.validationsSet$ = this.validationrunService.getMyValidationruns(params);
+      this.validationrunService.getMyValidationruns(parameters).subscribe(
+        response => {
+          const {validations, length} = response;
+          this.validations = validations;
+          this.numberOfValidations = length;
+        });
     } else {
-      this.validationsSet$ = this.validationrunService.getPublishedValidationruns(params);
+      this.validationrunService.getPublishedValidationruns(parameters).subscribe(
+        response => {
+          const {validations, length} = response;
+          this.validations = validations;
+          this.numberOfValidations = length;
+        });
     }
   }
 

@@ -87,8 +87,11 @@ def generate_daily_report(date):
             covered_minutes = 1440.0
             report.end_time = end_time
 
-        uptime = ((covered_minutes - (missing_pings * UPTIME_PING_INTERVAL)) / covered_minutes) * 100
+        downtime = missing_pings * UPTIME_PING_INTERVAL
+        uptime = ((covered_minutes - downtime) / covered_minutes) * 100
+
         report.uptime_percentage = uptime
+        report.downtime_minutes = downtime
         report.save()
 
 
@@ -167,16 +170,25 @@ def generate_monthly_report(year, month):
                                                     period='DAILY').order_by('start_time')
 
         sum_percentage = 0
+        sum_downtime = 0
         daily_percentages = [0] * end_day
+        daily_downtimes = [-1] * end_day
         for report in daily_reports:
             if daily_percentages[report.start_time.day - 1] != 0:
                 __logger.error('Multiple daily reports found. Agent key: {0} Date: {1}'.format(report.agent_key,
                                                                                                report.start_time))
             else:
                 daily_percentages[report.start_time.day - 1] = report.uptime_percentage
+                daily_downtimes[report.start_time.day - 1] = report.downtime_minutes
 
         for i in daily_percentages:
             sum_percentage = sum_percentage + i
+
+        for i in daily_downtimes:
+            if i == -1:
+                sum_downtime = -1
+                break
+            sum_downtime = sum_downtime + i
 
         monthly_uptime = sum_percentage / end_day
         monthly_reports = UptimeReport.objects.filter(agent_key=agent.agent_key,
@@ -189,11 +201,13 @@ def generate_monthly_report(year, month):
                                           period='MONTHLY',
                                           updated=datetime.now(tz=pytz.UTC),
                                           uptime_percentage=monthly_uptime,
+                                          downtime_minutes=sum_downtime
                                           )
             monthly_report.save()
         elif monthly_reports.count() == 1:
             monthly_report = monthly_reports[0]
             monthly_report.uptime_percentage = monthly_uptime
+            monthly_report.downtime_minutes = sum_downtime
             monthly_report.updated = datetime.now(tz=pytz.UTC)
             monthly_report.save()
         else:

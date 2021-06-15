@@ -3,10 +3,11 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
-import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
 
+// const csrfToken = '{{csrf_token}}';
+// const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 @Injectable({
   providedIn: 'root'
 })
@@ -15,12 +16,24 @@ export class AuthService {
 
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
+  private signUpUrl = this.API_URL + 'api/sign-up';
+  private userModifyUrl = this.API_URL + 'api/user-modify';
 
-  emptyUser = {username: '', firstName: '', id: null, copied_runs: []};
+  emptyUser = {
+    username: '',
+    first_name: '',
+    id: null,
+    copied_runs: [],
+    email: '',
+    last_name: '',
+    organisation: '',
+    country: '',
+    orcid: ''
+  };
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
 
-  constructor(private httpClient: HttpClient, private logger: NGXLogger) {
+  constructor(private httpClient: HttpClient) {
     this.init();
   }
 
@@ -33,7 +46,6 @@ export class AuthService {
           this.authenticated.next(true);
         },
         error => {
-
         }
       );
   }
@@ -54,7 +66,7 @@ export class AuthService {
       .post<UserDto>(this.loginUrl, credentials)
       .subscribe(
         data => {
-          this.currentUser = this.emptyUser;
+          this.currentUser = data;
           this.authenticated.next(true);
           authResult.next(true);
         },
@@ -83,5 +95,18 @@ export class AuthService {
       );
     return logoutResult;
   }
+
+  signUp(userForm: any): Observable<any> {
+    return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'});
+  }
+
+  updateUser(userForm: any): Observable<any> {
+    return this.httpClient.patch(this.userModifyUrl, userForm);
+  }
+
+  deactivateUser(username: any): Observable<any> {
+    return this.httpClient.delete<UserDto>(this.userModifyUrl, username);
+  }
+
 
 }

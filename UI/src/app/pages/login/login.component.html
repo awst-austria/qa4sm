@@ -1,83 +1,36 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col">
+<main class="container-fluid">
+  <div class="center">
+    <div class="p-grid">
 
-    </div>
-    <div class="col-12 col-sm-8 col-md-4 col-lg-3 col-xl-2">
-      <form [formGroup]="loginForm" class="user-form text-center" (ngSubmit)="onSubmit()">
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+      <div class="p-col" style="max-width: 15rem">
+        <form [formGroup]="loginForm" class="text-center" (ngSubmit)="onSubmit()">
+          <h1 class="h3 p-mt-5 p-mb-0 font-weight-normal">Please sign in</h1>
 
-        <div class="p-fluid">
-          <span class="p-float-label p-mb-5 p-mt-6">
+          <div class="p-fluid">
+          <span class="p-float-label p-mb-5 p-mt-4">
             <input pInputText id="usernameInput" type="text" formControlName="username">
             <label for="usernameInput">Username</label>
           </span>
-        </div>
+          </div>
 
 
-        <div class="p-fluid">
+          <div class="p-fluid">
           <span class="p-float-label p-mb-5">
           <input pPassword type="password"
                  formControlName="password" [feedback]="false" id="passwordInput">
           <label for="passwordInput">Password</label>
         </span>
-        </div>
+          </div>
 
-        <button class="btn btn-lg btn-primary btn-block  m-1" type="submit">Sign in</button>
+          <button pButton
+                  type="submit"
+                  label="Sign in">
+          </button>
 
-        <div class="mt-3"><a href="{% url 'password_reset' %}" class="mt-5">Forgotten your password?</a></div>
-      </form>
-    </div>
-    <div class="col">
-
+          <div class="p-mt-3"><a href="{% url 'password_reset' %}" class="mt-5">Forgotten your password?</a></div>
+        </form>
+      </div>
     </div>
   </div>
-</div>
-
-
-<!--    <div class="col">-->
-
-<!--    </div>-->
-<!--    <div class="col-sm-12 col-md- col-xl-6">-->
-<!--        <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">-->
-<!--    </div>-->
-<!--    <div class="col">-->
-
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="row">-->
-<!--    <div class="col">-->
-<!--      <input type="text">-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</form>-->
-
-
-<!--<div class="p-grid">-->
-<!--  <div class="p-col-12">-->
-<!--    <div class="p-d-flex p-jc-center">-->
-
-<!--      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">-->
-<!--        <div class="p-d-flex p-jc-center p-my-4">-->
-<!--          <h2>Please sign in</h2>-->
-<!--        </div>-->
-<!--        <span class="p-float-label p-my-4">-->
-<!--              <input id="username-input" type="text" formControlName="username" pInputText>-->
-<!--              <label for="username-input">Username</label>-->
-<!--            </span>-->
-
-<!--        <span class="p-float-label p-my-4">-->
-<!--              <input id="password-input" type="password" [feedback]="false" formControlName="password" pPassword/>-->
-<!--              <label for="password-input">Password</label>-->
-<!--            </span>-->
-
-<!--        <div class="p-d-flex p-jc-center p-my-4">-->
-<!--          <p-button label="Sign in" type="submit" [disabled]="!loginForm.valid" class="p-jc-center"></p-button>-->
-<!--        </div>-->
-
-<!--      </form>-->
-
-<!--    </div>-->
-<!--  </div>-->
-<!--</div>-->
-
+  <qa-scroll-to-top></qa-scroll-to-top>
+</main>

@@ -1,18 +1,177 @@
-<div *ngIf="images$|async as images" class="p-grid">
-  <div class="p-col-12">
-    <p-carousel [value]="getListOfPlots(images)"  [circular]="true" [autoplayInterval]="3000">
-      <ng-template let-image pTemplate="item">
-        <img style="max-width:100%;max-height:100%;" [src]="image" />
-      </ng-template>
-    </p-carousel>
-  </div>
-  <div class="p-col-12">
-    <div class="p-d-flex p-jc-center ">
-      <p-button label="Sign up" styleClass="p-mr-2 "></p-button>
-      <p-button label="Sign in" styleClass="p-mr-2 " routerLink="/login" [disabled]="loginButtonDisabled"></p-button>
+<main role="main">
+  <div class="carousel">
+    <div>
+      <p-carousel [value]="CarouselImages" [circular]="true" [autoplayInterval]="5000"
+                  [numVisible]="1" [numScroll]="1">
+        <ng-template let-image pTemplate="item">
+          <img *ngIf="(image.plot|async) as plot"
+               alt="{{image.link}}"
+               [src]="getSanitizedPlot(plot.plot)"
+               class="carousel-img">
+          <div class="image-attribution">
+            <a href="{{ image.link }}">{{ image.description }}</a>
+          </div>
+        </ng-template>
+      </p-carousel>
     </div>
+    <div>
+      <div class="carousel-caption">
+        <div class="textbox p-mb-3">
+          <h1 class="carousel-desc">Quality Assurance for Soil Moisture</h1>
+          <h3 class="carousel-desc d-sm-block">
+            Validation of satellite soil moisture products <br/>
+            against in-situ and model reference data
+          </h3>
+        </div>
+      <div *ngIf="userLoggedIn else elseBlock">
+        <p>
+        <a pButton
+           label="See results"
+           routerLink="/published-validations"
+           class="btn-action-home"
+           role="button">
+        </a>
+        <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
+        <a pButton
+           label="Try it"
+           routerLink="/validate"
+           class="btn-action-home"
+           role="button">
+        </a>
+        </p>
+      </div>
+      <ng-template #elseBlock>
+        <p>
+        <a pButton
+           label="See results"
+           routerLink="/published-validations"
+           class="btn-action-home"
+           role="button">
+        </a>
+        <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
+        <a pButton
+           label="Sign up"
+           routerLink="/signup"
+           class="btn-action-home"
+           role="button">
+        </a>
+        <span class="p-mx-3 carousel-desc d-sm-inline">or</span>
+        <a pButton
+           label="Log in"
+           routerLink="/login"
+           class="btn-action-home"
+           role="button">
+        </a>
+        </p>
+      </ng-template>
+    </div>
+    </div>
+
   </div>
 
-</div>
+  <hr class="featurette-divider">
+
+  <div class="container-marketing p-grid">
+      <div class="p-md-5">
+        <div *ngIf="settings$|async as settings">
+          <div class="card news card-body">
+            <h5 class="card-title">News</h5>
+            <div [innerHTML]=settings[0].news></div>
+          </div>
+        </div>
+      </div>
+      <div class="p-md-7">
+        <div class="overflow">
+          <div *ngFor="let logo of logos">
+            <a *ngIf="(logo.plot|async) as plot" href="{{logo.link}}">
+              <img alt="{{logo.link}}" [src]="getSanitizedPlot(plot.plot)">
+            </a>
+          </div>
+        </div>
+        <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
+        The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
+        <ul class="list">
+          <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the <a href="https://ismn.geo.tuwien.ac.at/">international soil moisture network</a></li>
+          <li>A traceble and consistent methodology for all comparisons</li>
+          <li>Various filtering and scaling options to assess the impact of these on the validation results</li>
+          <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>
+        </ul>
+        The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality control of soil moisture data products and provider users with <b>traceable validation results</b>.
+        <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
+
+        <div *ngFor="let workflow of ImgWorkflowDiagram">
+          <img *ngIf="(workflow.plot|async) as plot"
+            class="scaled_image"
+            [src]="getSanitizedPlot(plot.plot)"
+            (click)="showGallery(0, [plot])"
+            [alt]="workflow.description"
+            id="workflow"
+            style="max-width: 80%"/>
+        </div>
+      </div>
+    </div>
+
+  <hr class="featurette-divider">
+
+  <div class="container-marketing p-grid p-justify-center">
+    <div class="card-deck">
+      <div class="card card-body">
+        <h4 class="text-center mt-0">Datasets and Settings</h4>
+        <p class="text-muted text-center" style="min-height: 3rem;">
+          Allows specification of input datasets and settings for your validation
+        </p>
+
+        <div *ngFor="let validate of ImgCardValidate">
+          <img *ngIf="(validate.plot|async) as plot"
+               class="scaled_image img-screen"
+               [src]="getSanitizedPlot(plot.plot)"
+               (click)="showGallery(0, [plot])"
+               [alt]="validate.description"/>
+        </div>
+      </div>
+
+      <div class="card card-body">
+        <h4 class="text-center p-mt-0">Results</h4>
+        <p class="text-muted text-center" style="min-height: 3rem;">
+          Provides a list of all validation results
+        </p>
+        <div *ngFor="let validate of ImgCardValidateResult">
+          <img *ngIf="(validate.plot|async) as plot"
+               class="scaled_image img-screen"
+               [src]="getSanitizedPlot(plot.plot)"
+               (click)="showGallery(0, [plot])"
+               [alt]="validate.description"/>
+        </div>
+      </div>
+
+      <div class="card card-body">
+        <h4 class="text-center p-mt-0">Download and Visualize</h4>
+        <p class="text-muted text-center" style="min-height: 3rem;">
+          Allows download of validation results in netCDF format and as graphics
+        </p>
+        <div *ngFor="let details of ImgCardValidateDetails">
+          <img *ngIf="(details.plot|async) as plot"
+               class="scaled_image img-screen"
+               [src]="getSanitizedPlot(plot.plot)"
+               (click)="showGallery(0, [plot])"
+               [alt]="details.description"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="container">
+  <p>
+    Created by <a href="https://www.geo.tuwien.ac.at/">TU Wien GEO</a>
+    and <a href="https://www.awst.at/">AWST</a>.
+    Hosted on <a href="https://www.eodc.eu/">EODC</a>.
+  </p>
+</footer>
+
+<qa-scroll-to-top></qa-scroll-to-top>
+
+
+
 
 

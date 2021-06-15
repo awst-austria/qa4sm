@@ -1,14 +1,11 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ValidationrunDto} from './validationrun.dto';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {ValidationSetDto} from '../../../validation-result/services/validation.set.dto';
 import {saveAs} from 'file-saver-es';
 import {MetricsPlotsDto} from './metrics-plots.dto';
-import {DataCache} from '../../tools/DataCache';
-import {shareReplay} from 'rxjs/operators';
-import {HttpParamsModel} from './http-params.model';
 
 const urlPrefix = environment.API_URL + 'api';
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
@@ -19,66 +16,31 @@ const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
-// const downloadResultsGraphsUrl: string = urlPrefix + '/get-graphic-file';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
-const CACHE_KEY_ALL_PUBLISHED_VALIDATIONS = -1;
-const CACHE_KEY_PUBLISHED_VALIDATIONS_PARAMS = -1;
-
-const CACHE_KEY_ALL_CUSTOM_VALIDATIONS = -1;
-const CACHE_KEY_CUSTOM_VALIDATIONS_PARAMS = -1;
 
 @Injectable({
   providedIn: 'root'
 })
 export class ValidationrunService {
 
-  // cache for validation arrays
-  publishedValidationsRequestCache = new DataCache<Observable<ValidationSetDto>>(5);
-  publishedValidationsParameters = new DataCache<HttpParamsModel>(5);
-
-  customValidationsRequestCache = new DataCache<Observable<ValidationSetDto>>(5);
-  customValidationsParameters = new DataCache<HttpParamsModel>(5);
-
-  singleValidationRequestCache = new DataCache<Observable<ValidationrunDto>>(5);
+  customValidationrun$: Observable<ValidationSetDto>;
+  publishedValidationrun$: Observable<ValidationSetDto>;
 
   constructor(private httpClient: HttpClient) {
   }
 
-  private compareTwoModels(instanceOne: any, instanceTwo: any): boolean {
-    // function for comparing two instances of the same model
-    return JSON.stringify(instanceOne) === JSON.stringify(instanceTwo);
+  getPublishedValidationruns(params: any): Observable<ValidationSetDto> {
+    this.publishedValidationrun$ = this.httpClient.get<ValidationSetDto>(publishedValidationRunUrl, {params});
+    return this.publishedValidationrun$;
   }
 
-  getPublishedValidationruns(parameters: HttpParamsModel): Observable<ValidationSetDto> {
-    if (this.publishedValidationsRequestCache.isCached(CACHE_KEY_ALL_PUBLISHED_VALIDATIONS) &&
-      this.compareTwoModels(parameters, this.publishedValidationsParameters.get(CACHE_KEY_PUBLISHED_VALIDATIONS_PARAMS))) {
-      return this.publishedValidationsRequestCache.get(CACHE_KEY_ALL_PUBLISHED_VALIDATIONS);
-    } else {
-      const params = new HttpParams().set('offset', String(parameters.offset)).set('limit', String(parameters.limit))
-        .set('order', String(parameters.order));
-      const validations$ = this.httpClient.get<ValidationSetDto>(publishedValidationRunUrl, {params}).pipe(shareReplay());
-      this.publishedValidationsRequestCache.push(CACHE_KEY_ALL_PUBLISHED_VALIDATIONS, validations$);
-      this.publishedValidationsParameters.push(CACHE_KEY_PUBLISHED_VALIDATIONS_PARAMS, parameters);
-      return validations$;
-    }
-  }
-
-  getMyValidationruns(parameters: HttpParamsModel): Observable<ValidationSetDto> {
-    if (this.customValidationsRequestCache.isCached(CACHE_KEY_ALL_CUSTOM_VALIDATIONS) &&
-      this.compareTwoModels(parameters, this.customValidationsParameters.get(CACHE_KEY_CUSTOM_VALIDATIONS_PARAMS))) {
-      return this.customValidationsRequestCache.get(CACHE_KEY_ALL_CUSTOM_VALIDATIONS);
-    } else {
-      const params = new HttpParams().set('offset', String(parameters.offset)).set('limit', String(parameters.limit))
-        .set('order', String(parameters.order));
-      const validations$ = this.httpClient.get<ValidationSetDto>(customValidationRunUrl, {params}).pipe(shareReplay());
-      this.customValidationsRequestCache.push(CACHE_KEY_ALL_CUSTOM_VALIDATIONS, validations$);
-      this.customValidationsParameters.push(CACHE_KEY_CUSTOM_VALIDATIONS_PARAMS, parameters);
-      return validations$;
-    }
+  getMyValidationruns(params: any): Observable<ValidationSetDto> {
+    this.customValidationrun$ = this.httpClient.get<ValidationSetDto>(customValidationRunUrl, {params});
+    return this.customValidationrun$;
   }
 
   getValidationRuns(): Observable<ValidationrunDto[]> {
@@ -86,17 +48,7 @@ export class ValidationrunService {
   }
 
   getValidationRunById(id: string): Observable<ValidationrunDto> {
-    // return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
-    if (this.singleValidationRequestCache.isCached(id)) {
-      return this.singleValidationRequestCache.get(id);
-    } else {
-      const getURL = validationRunsUrl + '/' + id;
-      const validationrun$ = this.httpClient.get<ValidationrunDto>(getURL).pipe(shareReplay());
-      this.singleValidationRequestCache.push(id, validationrun$);
-      return validationrun$;
-    }
-
-
+    return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
   }
 
   getCustomTrackedValidations(): Observable<ValidationrunDto[]> {

@@ -71,27 +71,30 @@ def get_metric_names_and_associated_files(request):
         independent_metrics = ['n_obs']
 
         if metrics[key] not in independent_metrics:
-            overview_files_names = ['overview_' + name_key + '_' + metrics[key] + '.png' for name_key in combis]
+            overview_plots = [{'file_name': 'overview_' + name_key + '_' + metrics[key] + '.png',
+                               'datasets': name_key} for name_key in combis]
         else:
-            overview_files_names = ['overview_' + metrics[key] + '.png']
+            overview_plots = [{'file_name': 'overview_' + metrics[key] + '.png', 'datasets': ''}]
 
         if boxplot_file_name in files:
             boxplot_file = file_path + boxplot_file_name
-        overview_files = [file_path + file for file in overview_files_names if file in files]
-
+        overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if file_dict['file_name'] in files]
+        datasets = [file_dict['datasets'] for file_dict in overview_plots if file_dict['file_name'] in files]
         metric_dict = {'ind': ind,
                        'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
                        'boxplot_file': boxplot_file,
-                       'overview_files': overview_files}
+                       'overview_files': overview_files,
+                       'datasets': datasets}
         response.append(metric_dict)
-
+    #
     return JsonResponse(response, status=200, safe=False)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_graphic_file(request):
+def get_graphic_files(request):
+    # Here we take a list of parameters 'file' and return a list of plots encoded to base64
     files = request.query_params.getlist('file', None)
     plots = []
     for file in files:
@@ -101,7 +104,21 @@ def get_graphic_file(request):
         image = File(open_file)
         name = base64.b64encode(image.read())
         open_file.close()
-        plots.append({'plot': str(name).lstrip("b'").rstrip("'")})
-
+        plots.append({'plot': name.decode('utf-8')})
     return JsonResponse(plots, safe=False)
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_graphic_file(request):
+    # Here we take only one file and return one plot;
+    # Sometimes it's just easier to read a single file, and this function is created not to refer to index 0 every time
+    file = request.query_params.get('file', None)
+    if '/static/' in file:
+        file = file.replace('/static/', os.path.join(settings.BASE_DIR, 'validator/static/'))
+    open_file = open(file, 'rb')
+    image = File(open_file)
+    name = base64.b64encode(image.read())
+    open_file.close()
+
+    return JsonResponse({'plot': name.decode('utf-8')}, safe=True)

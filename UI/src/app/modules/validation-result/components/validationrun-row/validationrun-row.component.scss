@@ -1,11 +1,30 @@
-@import "~bootstrap/dist/css/bootstrap.css";
-@import "../buttons/buttons.component.scss";
+@import "src/styles";
 .expiry-icons{
+  cursor: auto;
   font-size: 1.5rem;
   padding: 5px;
 }
 .status{
   max-width: 8rem;
+}
+
+h5 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin: 0;
+  max-width: 30rem;
+}
+
+*{
+  line-height: 1.5rem;
+}
+input{
+  font-size: 1.1rem;
+}
+
+a.doilink {
+  color: white;
+  text-decoration: none;
 }
 
 
