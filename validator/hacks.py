@@ -39,3 +39,8 @@ class TimezoneAdapter(object):
 #             warnings.warn('Dropping timezone information for data')
             data.index = data.index.tz_convert(None)
         return data
+
+    @property
+    def grid(self):
+        if hasattr(self.cls, "grid"):
+            return self.cls.grid
