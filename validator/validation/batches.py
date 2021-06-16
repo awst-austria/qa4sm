@@ -157,7 +157,7 @@ def create_jobs(
         for network, net_ids in ids.items():
             lons, lats, meta_list = [], [], []
             for idx in net_ids:
-                meta = ref_reader.read_metadata(idx, format="dict")
+                meta = reader.read_metadata(idx, format="dict")
                 meta = reshape_meta(meta)
                 lons.append(meta['longitude'])
                 lats.append(meta['latitude'])
