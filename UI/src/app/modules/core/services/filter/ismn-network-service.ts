@@ -11,7 +11,7 @@ const ismnNetworkUrl: string = environment.API_URL + 'api/ismn-network';
 @Injectable({
   providedIn: 'root'
 })
-export class IsmnNetworkServiceService {
+export class IsmnNetworkService {
 
   requestCache = new DataCache<Observable<IsmnNetworkDto[]>>(5);
 
