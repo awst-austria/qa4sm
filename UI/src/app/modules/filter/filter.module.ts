@@ -3,17 +3,23 @@ import {CommonModule} from '@angular/common';
 import {CheckboxModule} from 'primeng/checkbox';
 import {BasicFilterComponent} from './components/basic-filter/basic-filter.component';
 import {FormsModule} from '@angular/forms';
+import {IsmnNetworkFilterComponent} from './components/ismn-network-filter/ismn-network-filter.component';
+import {ButtonModule} from 'primeng/button';
+import {DialogModule} from 'primeng/dialog';
 
 
 @NgModule({
-  declarations: [BasicFilterComponent],
+  declarations: [BasicFilterComponent, IsmnNetworkFilterComponent],
   exports: [
-    BasicFilterComponent
+    BasicFilterComponent,
+    IsmnNetworkFilterComponent
   ],
   imports: [
     CommonModule,
     CheckboxModule,
-    FormsModule
+    FormsModule,
+    ButtonModule,
+    DialogModule
 
   ]
 })

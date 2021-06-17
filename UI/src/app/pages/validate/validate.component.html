@@ -98,7 +98,13 @@
                 (onExcludeMutual)="this.excludeFilter($event, validationModel.referenceConfigurations[0].basicFilters)"
                 (onIncludeMutual)="includeFilter($event, validationModel.referenceConfigurations[0].basicFilters, filter.enabled)">
               </qa-basic-filter>
+
             </ng-container>
+            <qa-ismn-network-filter
+              *ngIf="validationModel.referenceConfigurations[0].ismnNetworkFilter"
+              [filterModel]="validationModel.referenceConfigurations[0].ismnNetworkFilter"></qa-ismn-network-filter>
+            <qa-ismn-depth-filter
+              *ngIf="validationModel.referenceConfigurations[0].ismnDepthFilter"></qa-ismn-depth-filter>
           </div>
 
         </p-panel>
@@ -175,4 +181,3 @@
   </qa-existing-validation>
 </div>
 <qa-scroll-to-top></qa-scroll-to-top>
-

@@ -3,24 +3,16 @@ import {DatasetService} from '../../modules/core/services/dataset/dataset.servic
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
-import {DatasetConfigModel} from './dataset-config-model';
+import {DatasetConfigModel, ISMN_DEPTH_FILTER_ID, ISMN_NETWORK_FILTER_ID} from './dataset-config-model';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
 import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
-import {
-  ANOMALIES_NONE,
-  ANOMALIES_NONE_DESC,
-  AnomaliesComponent
-} from '../../modules/anomalies/components/anomalies/anomalies.component';
+import {ANOMALIES_NONE, ANOMALIES_NONE_DESC, AnomaliesComponent} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
-import {
-  ValidationRunConfigDto,
-  ValidationRunDatasetConfigDto,
-  ValidationRunMetricConfigDto
-} from './service/validation-run-config-dto';
+import {ValidationRunConfigDto, ValidationRunDatasetConfigDto, ValidationRunMetricConfigDto} from './service/validation-run-config-dto';
 import {ValidationRunConfigService} from './service/validation-run-config.service';
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
@@ -113,7 +105,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     //Prepare dataset config
     config.dataset_configs.forEach(datasetConfig => {
-      let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
+      let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null, null);
       this.validationModel.datasetConfigurations.push(model);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
         model.datasetModel.selectedDataset = dataset;
@@ -126,7 +118,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 }
               });
             });
-
           });
       });
 
@@ -140,7 +131,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
 
     //Prepare reference
-    let referenceModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
+    let referenceModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null, null);
     this.validationModel.referenceConfigurations.push(referenceModel);
     this.datasetService.getDatasetById(config.reference_config.dataset_id).subscribe(dataset => {
       referenceModel.datasetModel.selectedDataset = dataset;
@@ -249,7 +240,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string) {
-    let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
+    let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null,null);
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
@@ -267,7 +258,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         }
       );
 
-      // in the same time get the variables too
+      // at the same time get the variables too
       this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
         model.datasetModel.selectedVariable = variables[0];
       });
@@ -281,10 +272,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     let updatedModel$ = new ReplaySubject<DatasetConfigModel>();
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
         model.basicFilters = [];
-        model.parameterisedFilters = [];
         filters.forEach(filter => {
           if (filter.parameterised) {
-            model.parameterisedFilters.push(new FilterModel(filter, false, false, filter.default_parameter));
+            if (filter.id == ISMN_NETWORK_FILTER_ID) {
+              model.ismnNetworkFilter = new FilterModel(filter, false, false, filter.default_parameter);
+            } else if (filter.id == ISMN_DEPTH_FILTER_ID) {
+              model.ismnDepthFilter = new FilterModel(filter, false, false, filter.default_parameter);
+            }
           } else {
             model.basicFilters.push(new FilterModel(filter, false, false, null));
           }

@@ -2,11 +2,15 @@ import {DatasetComponentSelectionModel} from '../../modules/dataset/components/d
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
 
+export const ISMN_NETWORK_FILTER_ID = 18;
+export const ISMN_DEPTH_FILTER_ID = 24;
 
 export class DatasetConfigModel {
+
   constructor(public datasetModel: DatasetComponentSelectionModel,
               public basicFilters: FilterModel[],
-              public parameterisedFilters: FilterModel[]) {
+              public ismnNetworkFilter: FilterModel,
+              public ismnDepthFilter: FilterModel) {
   }
 
   /**

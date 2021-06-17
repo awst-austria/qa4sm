@@ -55,6 +55,7 @@ import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
+import {IsmnDepthFilterModule} from './modules/ismn-depth-filter/ismn-depth-filter.module';
 
 
 @NgModule({
@@ -110,7 +111,8 @@ import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/
     IvyGalleryModule,
     NgxPageScrollModule,
     CoreModule,
-    UserModule
+    UserModule,
+    IsmnDepthFilterModule
 
   ],
   providers: [
