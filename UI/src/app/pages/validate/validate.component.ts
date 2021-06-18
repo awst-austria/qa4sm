@@ -105,7 +105,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     //Prepare dataset config
     config.dataset_configs.forEach(datasetConfig => {
-      let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null, null);
+      let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, new BehaviorSubject(null), null);
       this.validationModel.datasetConfigurations.push(model);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
         model.datasetModel.selectedDataset = dataset;
@@ -131,7 +131,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
 
     //Prepare reference
-    let referenceModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null, null);
+    let referenceModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, new BehaviorSubject<FilterModel>(null), null);
     this.validationModel.referenceConfigurations.push(referenceModel);
     this.datasetService.getDatasetById(config.reference_config.dataset_id).subscribe(dataset => {
       referenceModel.datasetModel.selectedDataset = dataset;
@@ -240,7 +240,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string) {
-    let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null,null);
+    let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, new BehaviorSubject(null),null);
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
@@ -268,26 +268,34 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
   }
 
+
   private loadFiltersForModel(model: DatasetConfigModel): ReplaySubject<DatasetConfigModel> {
     let updatedModel$ = new ReplaySubject<DatasetConfigModel>();
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
         model.basicFilters = [];
+        model.ismnNetworkFilter$.next(null);
         filters.forEach(filter => {
           if (filter.parameterised) {
             if (filter.id == ISMN_NETWORK_FILTER_ID) {
-              model.ismnNetworkFilter = new FilterModel(filter, false, false, filter.default_parameter);
+              model.ismnNetworkFilter$.next(new FilterModel(filter, false,false, filter.default_parameter));
             } else if (filter.id == ISMN_DEPTH_FILTER_ID) {
-              model.ismnDepthFilter = new FilterModel(filter, false, false, filter.default_parameter);
+              if (model.ismnDepthFilter$) {
+                model.ismnDepthFilter$.next(new FilterModel(filter, false, false,filter.default_parameter));
+              } else {
+                model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(filter, false, false,filter.default_parameter));
+              }
             }
           } else {
             model.basicFilters.push(new FilterModel(filter, false, false, null));
           }
         });
+
         updatedModel$.next(model);
       },
       error => {
         updatedModel$.error(error);
       });
+
     return updatedModel$;
   }
 

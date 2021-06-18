@@ -5,11 +5,11 @@
 
     </p-checkbox>
 
-    <a (click)="cucc()"><i class="pi pi-cog" style="padding-left: 5px;cursor: pointer;"></i></a>
+    <a (click)="showNetworkSelector()"><i class="pi pi-cog" style="padding-left: 5px;cursor: pointer;"></i></a>
 
 
   </div>
 </div>
 <p-dialog header="Select network(s)" [(visible)]="networkSelectorVisible">
-  Content
+  <p-tree [value]="networkTree" selectionMode="checkbox"></p-tree>
 </p-dialog>

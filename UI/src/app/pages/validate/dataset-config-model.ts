@@ -1,6 +1,7 @@
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
+import {BehaviorSubject} from 'rxjs';
 
 export const ISMN_NETWORK_FILTER_ID = 18;
 export const ISMN_DEPTH_FILTER_ID = 24;
@@ -9,8 +10,8 @@ export class DatasetConfigModel {
 
   constructor(public datasetModel: DatasetComponentSelectionModel,
               public basicFilters: FilterModel[],
-              public ismnNetworkFilter: FilterModel,
-              public ismnDepthFilter: FilterModel) {
+              public ismnNetworkFilter$: BehaviorSubject<FilterModel>,
+              public ismnDepthFilter$: BehaviorSubject<FilterModel>) {
   }
 
   /**

@@ -6,6 +6,7 @@ import {FormsModule} from '@angular/forms';
 import {IsmnNetworkFilterComponent} from './components/ismn-network-filter/ismn-network-filter.component';
 import {ButtonModule} from 'primeng/button';
 import {DialogModule} from 'primeng/dialog';
+import {TreeModule} from 'primeng/tree';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import {DialogModule} from 'primeng/dialog';
     CheckboxModule,
     FormsModule,
     ButtonModule,
-    DialogModule
+    DialogModule,
+    TreeModule
 
   ]
 })
