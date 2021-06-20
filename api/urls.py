@@ -7,13 +7,14 @@ from api.views.data_filter_view import data_filter, data_parameterised_filter, d
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
 from api.views.dataset_version_view import dataset_version, dataset_version_by_id, dataset_version_by_dataset
 from api.views.dataset_view import dataset, dataset_by_id
+from api.views.ismn_network_view import get_ismn_networks
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
 from api.views.validation_config_view import start_validation, get_validation_configuration
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import signup_post, user_update, user_delete, users
-from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
+from api.views.validation_run_view import published_results, my_results, validation_run_by_id,  \
     custom_tracked_validation_runs, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
 from api.views.global_params_view import global_params
@@ -23,7 +24,6 @@ from api.views.serving_file_view import get_results, get_csv_with_statistics, ge
     get_metric_names_and_associated_files, get_graphic_file, get_summary_statistics
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import settings
-
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -88,7 +88,7 @@ urlpatterns = [
     path('uptime-report', get_uptime),
     path('get-graphic-files', get_graphic_files, name='Get graphic files'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
-    path('country-list', get_list_of_countries, name = 'List of countries'),
+    path('country-list', get_list_of_countries, name='List of countries'),
     path('sign-up', signup_post, name='Sign up'),
     path('user-update', user_update, name='User update'),
     path('user-delete', user_delete, name='User delete'),
@@ -97,4 +97,5 @@ urlpatterns = [
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
     url(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
+    path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
 ]

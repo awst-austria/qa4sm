@@ -9,6 +9,8 @@ class ISMNNetworks(models.Model):
     country = models.CharField(max_length=60)
     number_of_stations = models.IntegerField()
     versions = models.ManyToManyField(DatasetVersion, related_name='network_version')
+    station_info = models.CharField(max_length=50000)
+    station_info_short = models.CharField(max_length=50000)
 
     def __str__(self):
         return self.name
