@@ -54,6 +54,8 @@ def get_validation_configuration(request, **kwargs):
         else:
             val_run_dict['interval_to'] = None
 
+        if val_run.anomalies is not None:
+            val_run_dict['anomalies_method'] = val_run.anomalies
 
         if val_run.anomalies_from is not None:
             val_run_dict['anomalies_from'] = val_run.anomalies_from.date()
