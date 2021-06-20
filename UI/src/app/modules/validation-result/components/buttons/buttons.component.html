@@ -70,7 +70,7 @@
         <button pButton
                 routerLink="/validate/"
                 class="dropdown-item"
-                [queryParams]="{valrun_uuid: validationRun.id}"
+                [queryParams]="{validation_id: validationRun.id}"
                 title="Load validation settings"
                 label="Load Validation Settings"
                 icon="pi pi-replay">
@@ -100,7 +100,7 @@
       <button pButton
               routerLink="/validate/"
               class="dropdown-item"
-              [queryParams]="{valrun_uuid: validationRun.id}"
+              [queryParams]="{validation_id: validationRun.id}"
               title="Load validation settings"
               label="Load Validation Settings"
               icon="pi pi-replay">
@@ -112,7 +112,7 @@
     <button pButton
             routerLink="/validate/"
             class="dropdown-item"
-            [queryParams]="{valrun_uuid: validationRun.id}"
+            [queryParams]="{validation_id: validationRun.id}"
             title="Load validation settings"
             label="Load Validation Settings"
             icon="pi pi-replay">
@@ -226,7 +226,7 @@
        class="btn-action-large"
        label="Load settings"
        routerLink="/validate/"
-       [queryParams]="{valrun_uuid: validationRun.id}"
+       [queryParams]="{validation_id: validationRun.id}"
        title="Load settings">
       <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span></a>
 
@@ -249,7 +249,7 @@
          class="btn-action-large"
          label="Load settings"
          routerLink="/validate/"
-         [queryParams]="{valrun_uuid: validationRun.id}"
+         [queryParams]="{validation_id: validationRun.id}"
          title="Load settings">
         <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
       </a>
