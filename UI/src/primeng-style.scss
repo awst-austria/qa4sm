@@ -6124,3 +6124,55 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   background-color: rgba(248, 193, 0, .5);
 }
 
+@media screen and (min-width: 564px) and (max-width: 714.9px){
+  .btn-action.p-button {
+    width: 1.75rem;
+    height: 1.85rem;
+    margin-bottom: 0.2rem;
+  }
+
+  //.validation-row .p-panel .p-panel-header{
+  //  max-width: 30rem;
+  //}
+
+  .validation-row .p-panel .p-panel-header h5{
+    font-size: 1.25rem;
+    max-width: 50vw;
+  }
+
+  .p-panel .p-panel-header .p-panel-header-icon {
+    font-size: 1.2rem;
+    //width: 1.85rem;
+    //height: 1.85rem;
+  }
+
+  .edit_name_btn.p-button, .save_name_btn.p-button, .cancel_editing_btn.p-button{
+    width: 1.1rem;
+    font-size: 0.8rem;
+  }
+
+}
+
+@media screen and (max-width: 563.9px){
+  .validation-row .p-panel .p-panel-header h5{
+    font-size: 1.125rem;
+  }
+}
+
+
+@media screen and (max-width: 377.9px){
+  .btn-action.p-button {
+    width: 1.5rem;
+    height: 1.65rem;
+    margin-bottom: 0.2rem;
+  }
+}
+
+//@media screen and (max-width: 767.9px){
+//  div.p-grid{
+//    font-size: 0.875rem;
+//  }
+//  .status{
+//    max-width: 5rem;
+//  }
+//}
