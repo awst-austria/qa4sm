@@ -1,21 +1,40 @@
-<div class="custom-control custom-switch">
-    <input class="custom-control-input"
-           {% if widget.parameterised  %} id="{{ widget.attrs.id }}_checkbox" {% else %} id="{{ widget.attrs.id }}"  {% endif %}
-           value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}"
-        type="checkbox" {% include "django/forms/widgets/attrs.html" %} {% if widget.parameterised  %} checked disabled {% endif %}
-    >
-    {% if widget.parameterised  %}
-        <label class="custom-control-label" for="{{ widget.attrs.id }}_checkbox">{{ widget.label }}</label>
-        <input type="hidden" id="{{ widget.attrs.id }}" value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}">
-    {% else %}
-        <label class="custom-control-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
-    {% endif %}
+{% block content %}
+    <div class="custom-control custom-switch">
+        <input class="custom-control-input"
+               {% if widget.parameterised  %} id="{{ widget.attrs.id }}_checkbox" {% else %} id="{{ widget.attrs.id }}"  {% endif %}
+               value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}" onchange="mutually_exclude("{{widget.disable_filter}}")"
+            type="checkbox" {% include "django/forms/widgets/attrs.html" %} {% if widget.parameterised  %} checked disabled {% endif %}
+        >
+        {% if widget.parameterised  %}
+            <label class="custom-control-label" for="{{ widget.attrs.id }}_checkbox">{{ widget.label }}</label>
+            <input type="hidden" id="{{ widget.attrs.id }}" value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}">
+        {% else %}
+            <label class="custom-control-label" for="{{ widget.attrs.id }}">{{ widget.label }}</label>
+        {% endif %}
 
-    {% if widget.parameterised  %}
-        <a id="{{ widget.attrs.id }}_link" href="#{{ widget.dialog_name }}" data-toggle="modal" data-target="#{{ widget.dialog_name }}">select...</a>
-    {% endif %}
-    <span class="input-group-text fas fa-question-circle help-icon" title="{{ widget.help_text }}"></span>
-    {% if widget.parameterised  %}
-        <input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.initial_params }}" data-default_val="{{ widget.default_parameter }}" name="{{ widget.name }}_params">
-    {% endif %}
-</div>
+        {% if widget.parameterised  %}
+            <a id="{{ widget.attrs.id }}_link" href="#{{ widget.dialog_name }}" data-toggle="modal" data-target="#{{ widget.dialog_name }}">select...</a>
+        {% endif %}
+        <span class="input-group-text fas fa-question-circle help-icon" title="{{ widget.help_text }}"></span>
+        {% if widget.parameterised  %}
+            <input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.initial_params }}" data-default_val="{{ widget.default_parameter }}" name="{{ widget.name }}_params">
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+
+        function onchange(event) {
+
+        }
+
+        function mutually_exclude(mutually_exclusive) {
+            const filters = $("input[id*='filter']")
+                if (to_disable.value == true) {
+                    return "disabled"
+                }
+            to_disable.disable = "disabled"
+        }
+    </script>
+{% endblock %}
