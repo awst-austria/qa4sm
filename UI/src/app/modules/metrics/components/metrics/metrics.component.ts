@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MetricModel} from '../metric/metric-model';
 import {ValidationModel} from '../../../../pages/validate/validation-model';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'qa-metrics',
@@ -16,7 +17,7 @@ export class MetricsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.tripleCollocationMetrics = new MetricModel('Include Triple Collocation Metrics', 'Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.', false, false, 'tcol');
+    this.tripleCollocationMetrics = new MetricModel('Include Triple Collocation Metrics', 'Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.', new BehaviorSubject<boolean>(false), false, 'tcol');
     this.validationModel.metrics.push(this.tripleCollocationMetrics);
   }
 

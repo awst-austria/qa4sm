@@ -9,7 +9,7 @@ from api.views.dataset_view import dataset, dataset_by_id
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
-from api.views.start_validation_view import start_validation
+from api.views.validation_config_view import start_validation, get_validation_configuration
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import users, signup_post, user_modify
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs,\
@@ -65,7 +65,8 @@ urlpatterns = [
     path('data-filter', data_filter, name='Dataset filters'),
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
-    path('run-validation', start_validation, name='Run new validation'),
+    url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
+    path('validation-configuration', start_validation, name='Run new validation'),
     url(r'^data-filter/(?P<id>.+)$', data_filter_by_id),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),

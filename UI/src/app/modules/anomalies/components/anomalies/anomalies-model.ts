@@ -1,13 +1,9 @@
-import {NewValidationRunAnomaliesDto} from '../../../../pages/validate/service/new-validation-run-anomalies-dto';
+import {BehaviorSubject} from 'rxjs';
 
 export class AnomaliesModel {
-  constructor(public method: string,
+  constructor(public method$: BehaviorSubject<string>,
               public description: string,
-              public anomaliesFrom?: Date,
-              public anomaliesTo?: Date) {
-  }
-
-  public toNewValidationRunAnomaliesDto(): NewValidationRunAnomaliesDto {
-    return new NewValidationRunAnomaliesDto(this.method, this.anomaliesFrom, this.anomaliesTo);
+              public anomaliesFrom$: BehaviorSubject<Date>,
+              public anomaliesTo$: BehaviorSubject<Date>) {
   }
 }

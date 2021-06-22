@@ -1,6 +1,6 @@
 <!--Buttons shown on the validation list page (both custom and published)-->
 <div *ngIf="validationList" class="col-sm" style="text-align: right; max-width: 25rem">
-<!--  this one will be shown on custom validation page only due to given conditions-->
+  <!--  this one will be shown on custom validation page only due to given conditions-->
   <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
           pButton
           type="button"
@@ -10,7 +10,7 @@
           (click)="stopValidation(validationRun.id)">
     <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
   </button>
-<!--  both pages -->
+  <!--  both pages -->
   <a class="btn-action"
      pButton
      type="button"
@@ -19,7 +19,7 @@
      title="View results">
   </a>
 
-<!--custom validations only-->
+  <!--custom validations only-->
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
         [ngClass]="{'collapse': validationRun.publishing_in_progress}">
 
@@ -67,12 +67,14 @@
                 title="Download validation run .nc file">
           <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
         </button>
-        <a class="no-decorations"
-           routerLink="/validate/"
-           [queryParams]="{valrun_uuid: validationRun.id}"
-           title="Load validation settings">
-          <span class="dropdown-item"><fa-icon [icon]="faIcons.faRedo"></fa-icon> Load Validation Settings</span>
-        </a>
+        <button pButton
+                routerLink="/validate/"
+                class="dropdown-item"
+                [queryParams]="{validation_id: validationRun.id}"
+                title="Load validation settings"
+                label="Load Validation Settings"
+                icon="pi pi-replay">
+        </button>
       </div>
 
       <span *ngIf="validationRun.is_unpublished"
@@ -95,19 +97,26 @@
                 (click)=extendResults(validationRun.id)>
         </button>
       </span>
+      <button pButton
+              routerLink="/validate/"
+              class="dropdown-item"
+              [queryParams]="{validation_id: validationRun.id}"
+              title="Load validation settings"
+              label="Load Validation Settings"
+              icon="pi pi-replay">
+      </button>
     </div>
   </div>
-<!--published validations page only-->
+  <!--published validations page only-->
   <span *ngIf="published">
-    <a class="btn-action"
-       pButton
-       type="button"
-       icon="faIcons.faRedo"
-       routerLink="/validate/"
-       [queryParams]="{valrun_uuid: validationRun.id}"
-       title="Load validation settings">
-      <span><fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
-    </a>
+    <button pButton
+            routerLink="/validate/"
+            class="dropdown-item"
+            [queryParams]="{validation_id: validationRun.id}"
+            title="Load validation settings"
+            label="Load Validation Settings"
+            icon="pi pi-replay">
+      </button>
     <button *ngIf="isCurrentUser && isTrackedByTheUser"
             pButton
             type="button"
@@ -128,7 +137,7 @@
   </span>
 
 
-<!--  tracked validations on custom validations page-->
+  <!--  tracked validations on custom validations page-->
   <span *ngIf="validationRun.output_file && tracked">
     <button pButton
             type="button"
@@ -217,7 +226,7 @@
        class="btn-action-large"
        label="Load settings"
        routerLink="/validate/"
-       [queryParams]="{valrun_uuid: validationRun.id}"
+       [queryParams]="{validation_id: validationRun.id}"
        title="Load settings">
       <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span></a>
 
@@ -240,7 +249,7 @@
          class="btn-action-large"
          label="Load settings"
          routerLink="/validate/"
-         [queryParams]="{valrun_uuid: validationRun.id}"
+         [queryParams]="{validation_id: validationRun.id}"
          title="Load settings">
         <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
       </a>

@@ -11,17 +11,19 @@
       <div class="p-float-label p-m-2">
         <p-dropdown id="scalingMethodSelector" (onChange)="updateScalingModel()"
                     [options]="scalingModels"
-                    [(ngModel)]="selectedScalingModel"
+                    [ngModel]="selectedScalingModel|async"
+                    (ngModelChange)="selectedScalingModel.next($event)"
                     optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
         <label for="scalingMethodSelector">Method</label>
       </div>
     </div>
 
     <div class="p-col-12 p-sm-6">
-      <div class="p-float-label p-m-2" *ngIf="selectedScalingModel.id!=noScalingId">
+      <div class="p-float-label p-m-2" *ngIf="(selectedScalingModel|async).id!=noScalingId">
         <p-dropdown id="scalingReferenceSelector" (onChange)="updateScalingModel()"
                     [options]="scaleToModels"
-                    [(ngModel)]="selectedScalingModel.scaleTo"
+                    [ngModel]="selectedScaleToModel$|async"
+                    (ngModelChange)="selectedScaleToModel$.next($event)"
                     [disabled]="isScalingSelectorDisabled()"
                     optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
         <label for="scalingReferenceSelector">Scale To</label>

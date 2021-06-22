@@ -8,7 +8,7 @@ import {ValidationPeriodModel} from './validation-period-model';
 })
 export class ValidationPeriodComponent implements OnInit {
 
-  @Input() validationPeriodModel:ValidationPeriodModel;
+  @Input() validationPeriodModel: ValidationPeriodModel;
 
   constructor() { }
 
