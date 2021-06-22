@@ -122,7 +122,7 @@
       </span>
     </div>
     <!-- Status / Created   -->
-    <div class="p-col status pl-2 p-ml-3">
+    <div class="p-col status">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
@@ -136,7 +136,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="p-col-2" style="max-width: 12rem">
+    <div class="p-col-3" style="max-width: 10rem">
       <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"></qa-buttons>
     </div>
 

@@ -57,3 +57,10 @@ a.no-decorations{
   display: none;
 }
 
+
+@media screen and (max-width: 714.9px){
+  .col-sm{
+    padding: 0;
+    height: 100%;
+  }
+}
