@@ -98,11 +98,13 @@
     <img class="scaled_image mb-3" src="../../static/images/help/map_selection.png">
     <p>
         <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed. Accepted formats are: YYYY*MM*DD
-        or DD*MM*YYYY where * can be any of &quot;.&quot;, &quot;/&quot; or &quot;-&quot;. If you don't provide a period it will be
-        implicitly determined through temporal matching of the data and reference selected. For the time range covered by the various
-        datasets, see the <a href="{% url 'datasets' %}">datasets page</a>.
+        or DD*MM*YYYY where * can be any of &quot;.&quot;, &quot;/&quot; or &quot;-&quot;. It is also possible to choose a date from a calendar, available under the calendar button.
+        By default, the date range is determined through temporal matching of the data and reference selected.
+        If you leave validation period fields empty, the default date range will be used.  For the time range
+        covered by the various datasets, see the <a href="{% url 'datasets' %}">datasets page</a>.
     </p>
     <img class="scaled_image mb-3" src="../../static/images/help/validation_period.png">
+    <img class="scaled_image mb-3" src="../../static/images/help/calendar.png">
 
     <p>
         <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC). By default, QA4SM calculates validation
@@ -127,8 +129,8 @@
     <img class="scaled_image mb-3" src="../../static/images/help/scaling.png">
 
     <p>
-        <b>Step 11</b> - Optionally name your validation results to make it easier to identify it in
-        the list of all your validations.
+        <b>Step 11 [optional]</b> - Name your validation results to make it easier to identify it in the list of all your validations.
+        Note that it is possible to change the name later, unless the validation has been published.
     </p>
     <img class="scaled_image mb-3" src="../../static/images/help/name_your_validation.png">
 
