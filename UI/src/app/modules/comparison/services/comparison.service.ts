@@ -7,8 +7,6 @@ import {MetricsComparisonDto} from './metrics-comparison.dto';
 import {Validations2CompareModel} from '../components/validation-selector/validation-selection.model';
 import {ExtentModel} from '../components/spatial-extent/extent-model';
 import {PlotDto} from '../../core/services/global/plot.dto';
-import {ValidationrunService} from "../../core/services/validation-run/validationrun.service";
-import {DatasetConfigurationService} from "../../validation-result/services/dataset-configuration.service";
 
 const urlPrefix = environment.API_URL + 'api';
 const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';

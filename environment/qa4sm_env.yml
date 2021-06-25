@@ -148,6 +148,7 @@ dependencies:
     - ecmwf-models==0.7
     - esa-cci-sm==0.1.1
     - gldas==0.6.1
+    - h5netcdf
     - h5py==3.1.0
     - git+https://github.com/awst-austria/ismn.git
     - kombu==4.6.11

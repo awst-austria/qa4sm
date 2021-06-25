@@ -294,7 +294,7 @@ def encoded_comparisonPlots(
 
         return encoded
 
-    except ComparisonError:
+    except SpatialExtentError:
         return "error encountered"
 
 
