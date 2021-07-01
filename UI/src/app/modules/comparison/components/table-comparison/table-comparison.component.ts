@@ -3,6 +3,7 @@ import {ComparisonService} from '../../services/comparison.service';
 import {Observable} from 'rxjs';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
+import {debounceTime} from "rxjs/operators";
 
 @Component({
   selector: 'qa-table-comparison',
@@ -22,7 +23,7 @@ export class TableComparisonComponent implements OnInit {
 
   startComparison(): void {
     // start comparison on button click; updated recursively
-    this.comparisonService.currentComparisonModel.subscribe(comparison => {
+    this.comparisonService.currentComparisonModel.pipe(debounceTime(2000)).subscribe(comparison => {
       if (comparison.selectedValidations.length > 0) {
         this.getComparisonMetrics(comparison);
       }

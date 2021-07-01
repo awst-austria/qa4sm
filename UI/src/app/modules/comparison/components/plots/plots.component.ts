@@ -45,7 +45,7 @@ export class PlotsComponent implements OnInit {
 
   startComparison(): void {
     // start comparison on button click; updated recursively
-    this.comparisonService.currentComparisonModel.subscribe(comparison => {
+    this.comparisonService.currentComparisonModel.pipe(debounceTime(5000)).subscribe(comparison => {
       if (comparison.selectedValidations.length > 0) {
         this.comparisonModel = comparison;
         this.getComparisonMetrics(comparison);
