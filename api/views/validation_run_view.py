@@ -13,14 +13,12 @@ from validator.models import ValidationRun
 from validator.validation import get_inspection_table
 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def published_results(request):
-
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
-    order = request.query_params.get('order',None)
+    order = request.query_params.get('order', None)
 
     if order:
         val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
@@ -30,7 +28,7 @@ def published_results(request):
     if limit and offset:
         limit = int(limit)
         offset = int(offset)
-        serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+        serializer = ValidationRunSerializer(val_runs[offset:(offset + limit)], many=True)
     else:
         serializer = ValidationRunSerializer(val_runs, many=True)
 
@@ -56,7 +54,7 @@ def my_results(request):
     if limit and offset:
         limit = int(limit)
         offset = int(offset)
-        serializer = ValidationRunSerializer(val_runs[offset:(offset+limit)], many=True)
+        serializer = ValidationRunSerializer(val_runs[offset:(offset + limit)], many=True)
     else:
         serializer = ValidationRunSerializer(val_runs, many=True)
 
@@ -89,8 +87,8 @@ def validation_run_by_id(request, **kwargs):
 def custom_tracked_validation_runs(request):
     current_user = request.user
     # taking only tracked validationruns, i.e. those with the same copied and original validationrun
-    tracked_runs = current_user.copiedvalidations_set\
-        .annotate(is_tracked=ExpressionWrapper(Q(copied_run=F('original_run')), output_field=BooleanField()))\
+    tracked_runs = current_user.copiedvalidations_set \
+        .annotate(is_tracked=ExpressionWrapper(Q(copied_run=F('original_run')), output_field=BooleanField())) \
         .filter(is_tracked=True)
 
     # filtering copied runs by the tracked ones
@@ -110,7 +108,6 @@ def get_summary_statistics(request):
 
     return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
                                                  index=False))
-
 
 
 class ValidationRunSerializer(ModelSerializer):

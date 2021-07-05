@@ -16,13 +16,14 @@ import {HelpComponent} from './pages/help/help.component';
 import {SignupComponent} from './pages/signup/signup.component';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
+import {DatasetResolver} from './modules/core/services/dataset/dataset.resolver';
 
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
-  {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard]},
+  {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard], resolve: {datasets: DatasetResolver}},
   {path: 'validation-result/:validationId', component: ValidationResultComponent, canActivate: [AuthGuard]},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},

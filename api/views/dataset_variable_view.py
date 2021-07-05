@@ -32,7 +32,6 @@ def dataset_variable(request):
 def dataset_variable_by_id(request, **kwargs):
     ds = DataVariable.objects.get(pk=kwargs['id'])
     serializer = DatasetVariableSerializer(ds)
-    print(serializer.data)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 

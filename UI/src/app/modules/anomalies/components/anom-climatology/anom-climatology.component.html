@@ -2,7 +2,9 @@
   <div class="p-col-12 p-sm-6">
     <div class="p-float-label p-m-2">
       <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                  yearRange="1970:2100" [(ngModel)]="anomaliesModel.anomaliesFrom"></p-calendar>
+                  yearRange="1970:2100" [ngModel]="anomaliesModel.anomaliesFrom$|async"
+                  (ngModelChange)="anomaliesModel.anomaliesFrom$.next($event)"
+      ></p-calendar>
       <label for="fromDateInput">From</label>
     </div>
   </div>
@@ -10,7 +12,9 @@
   <div class="p-col-12 p-sm-6">
     <div class="p-float-label p-m-2">
       <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                  yearRange="1970:2100" [(ngModel)]="anomaliesModel.anomaliesTo"></p-calendar>
+                  yearRange="1970:2100"
+                  [ngModel]="anomaliesModel.anomaliesTo$|async"
+                  (ngModelChange)="anomaliesModel.anomaliesTo$.next($event)"></p-calendar>
       <label for="toDateInput">To</label>
     </div>
   </div>

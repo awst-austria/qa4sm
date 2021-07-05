@@ -10,7 +10,9 @@
     <div class="p-col-12 p-sm-6">
       <div class="p-float-label p-m-2">
         <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                    yearRange="1970:2100" [(ngModel)]="validationPeriodModel.intervalFrom"></p-calendar>
+                    yearRange="1970:2100"
+                    [ngModel]="(validationPeriodModel.intervalFrom$|async)"
+                    (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-calendar>
         <label for="fromDateInput">From</label>
       </div>
     </div>
@@ -18,7 +20,8 @@
     <div class="p-col-12 p-sm-6">
       <div class="p-float-label p-m-2">
         <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                    yearRange="1970:2100"  [(ngModel)]="validationPeriodModel.intervalTo"></p-calendar>
+                    yearRange="1970:2100" [ngModel]="(validationPeriodModel.intervalTo$|async)"
+                    (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-calendar>
         <label for="toDateInput">To</label>
       </div>
     </div>
