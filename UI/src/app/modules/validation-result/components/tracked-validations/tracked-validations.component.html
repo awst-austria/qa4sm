@@ -4,10 +4,10 @@
     <div class="p-mb-3">
       <div *ngFor="let valrun of myCopiedRuns" class="p-mx-0" id="attached_result_row_{{ valrun.id }}">
         <div class="p-grid att_val_container">
-          <div class="p-col" style="max-width: 48rem">
+          <div class="p-col pinned-validation" style="max-width: 48rem">
             <h5 class="p-my-0"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
           </div>
-          <div class="p-col-3" style="max-width: 12rem">
+          <div class="p-col-3 pinned-validation-buttons" style="max-width: 15rem; min-width: 12rem">
             <qa-buttons [tracked]="true" [validationList]="true" [validationRun]="valrun"></qa-buttons>
           </div>
         </div>
