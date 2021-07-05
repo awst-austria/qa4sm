@@ -111,10 +111,9 @@
   <span *ngIf="published">
     <button pButton
             routerLink="/validate/"
-            class="dropdown-item"
+            class="btn-action"
             [queryParams]="{validation_id: validationRun.id}"
             title="Load validation settings"
-            label="Load Validation Settings"
             icon="pi pi-replay">
       </button>
     <button *ngIf="isCurrentUser && isTrackedByTheUser"
