@@ -1,7 +1,9 @@
 <div class="center">
   <div>
-    <h1 *ngIf="!userData" class="h3 p-mb-3 font-weight-normal">Sign up</h1>
+    <div class="center">
+    <h1 *ngIf="!userData" class="h3 p-mb-3 font-weight-normal"> Sign up </h1>
     <h1 *ngIf="userData" class="h3 p-mb-3 font-weight-normal">User profile</h1>
+    </div>
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
       <div class="p-py-3">
         <span class="p-float-label">
@@ -120,7 +122,7 @@
         </div>
       </div>
 
-      <div *ngIf="!userData" class="p-py-3">
+      <div *ngIf="!userData" class="p-py-3" style="max-width: 15rem; line-height: 1.2rem">
         <p-checkbox id="terms" formControlName="terms_consent"></p-checkbox>
         <label for="terms"> I accept the <a [routerLink]="['/terms']">terms, conditions, and privacy policy</a>.</label>
       </div>
