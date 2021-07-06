@@ -109,14 +109,15 @@
   </div>
   <!--published validations page only-->
   <span *ngIf="published">
-    <button pButton
+    <button *ngIf="isLogged"
+            pButton
             routerLink="/validate/"
             class="btn-action"
             [queryParams]="{validation_id: validationRun.id}"
             title="Load validation settings"
             icon="pi pi-replay">
       </button>
-    <button *ngIf="isCurrentUser && isTrackedByTheUser"
+    <button *ngIf="isLogged && isTrackedByTheUser"
             pButton
             type="button"
             icon="pi pi-times"
@@ -124,7 +125,7 @@
             title="Remove this validation from your list"
             (click)="removeValidation(validationRun.id)">
     </button>
-    <button *ngIf="isCurrentUser && !isTrackedByTheUser"
+    <button *ngIf="isLogged && !isTrackedByTheUser"
             pButton
             type="button"
             icon="pi pi-plus"
@@ -153,7 +154,7 @@
             title="Download validation run .nc file">
       <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
     </button>
-    <button *ngIf="isCurrentUser"
+    <button *ngIf="isLogged"
             pButton
             type="button"
             icon="pi pi-times"
@@ -219,15 +220,15 @@
             data-target="#publishDialog">
     </button>
 
-    <a pButton
+    <a *ngIf="isLogged"
+       pButton
        type="button"
-       icon="faIcons.faRedo"
+       icon="pi pi-replay"
        class="btn-action-large"
        label="Load settings"
        routerLink="/validate/"
        [queryParams]="{validation_id: validationRun.id}"
-       title="Load settings">
-      <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span></a>
+       title="Load settings"></a>
 
     <div [ngClass]="{'collapse': !validationRun.publishing_in_progress}"
          style="float: right">
@@ -242,18 +243,18 @@
 
   <ng-template #elseSingleValidation>
     <div style="float: right;">
-      <a pButton
+      <a *ngIf="isLogged"
+         pButton
          type="button"
-         icon="faIcons.faRedo"
+         icon="pi pi-replay"
          class="btn-action-large"
          label="Load settings"
          routerLink="/validate/"
          [queryParams]="{validation_id: validationRun.id}"
          title="Load settings">
-        <span> <fa-icon [icon]="faIcons.faRedo"></fa-icon></span>
       </a>
 
-      <button *ngIf="isCurrentUser && isTrackedByTheUser"
+      <button *ngIf="isLogged && isTrackedByTheUser"
               pButton
               type="button"
               icon="pi pi-times"
@@ -263,7 +264,7 @@
               (click)="removeValidation(validationRun.id)">
       </button>
 
-      <button *ngIf="isCurrentUser && !isTrackedByTheUser"
+      <button *ngIf="isLogged && !isTrackedByTheUser"
               class="btn-action-large"
               pButton
               type="button"

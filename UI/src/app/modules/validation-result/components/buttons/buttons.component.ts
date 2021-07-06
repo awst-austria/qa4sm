@@ -22,10 +22,9 @@ export class ButtonsComponent implements OnInit {
 
   faIcons = {faArchive: fas.faArchive,
     faStop: fas.faStop,
-    faFileDownload: fas.faFileDownload,
-    faRedo: fas.faRedo};
+    faFileDownload: fas.faFileDownload};
 
-  isCurrentUser = true;
+  isLogged: boolean;
   isOwner: boolean;
   isTrackedByTheUser: boolean;
   status: string;
@@ -37,13 +36,9 @@ export class ButtonsComponent implements OnInit {
               public authService: AuthService) { }
 
   ngOnInit(): void {
+    this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
     this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
-  }
-
-  basicOnclick(validation: ValidationrunDto): void{
-  //  I'll remove this one, now it's just a function to check if buttons work
-    console.log(validation.id);
   }
 
   reloadMyValidations(): void{
