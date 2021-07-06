@@ -217,7 +217,8 @@
             label="Publish"
             title="Publish on Zenodo"
             data-toggle="modal"
-            data-target="#publishDialog">
+            data-target="#publishDialog"
+            (click)="open()">
     </button>
 
     <a *ngIf="isLogged"
