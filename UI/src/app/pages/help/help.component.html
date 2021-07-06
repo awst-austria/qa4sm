@@ -28,7 +28,7 @@
     <a routerLink="/datasets" pageScroll [pageScrollDuration]="1" href="#data">here</a>.
   </p>
   <div>
-    <img  *ngIf="datasetSelections$|async as plot" class="w3-round" [src]="sanitizePlotUrl(plot.plot)">
+    <img  *ngIf="datasetSelections$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 2 [optional]</b> - Choose the criteria by which you would like to filter this dataset.
@@ -56,7 +56,7 @@
     the performance of the compared satellite products.
   </p>
   <div>
-    <img  *ngIf="intercomparison$|async as plot" class="w3-round" [src]="sanitizePlotUrl(plot.plot)">
+    <img  *ngIf="intercomparison$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 4</b> - Choose the reference dataset you would like to use for the
@@ -64,7 +64,7 @@
     the dataset.
   </p>
   <div>
-    <img  *ngIf="referenceDatasetSelection$|async as plot" class="w3-round" [src]="sanitizePlotUrl(plot.plot)">
+    <img  *ngIf="referenceDatasetSelection$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 5 [optional]</b> - Choose the criteria by which you would like to filter the reference data prior to

@@ -10,9 +10,17 @@ import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
 import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
-import {ANOMALIES_NONE, ANOMALIES_NONE_DESC, AnomaliesComponent} from '../../modules/anomalies/components/anomalies/anomalies.component';
+import {
+  ANOMALIES_NONE,
+  ANOMALIES_NONE_DESC,
+  AnomaliesComponent
+} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
-import {ValidationRunConfigDto, ValidationRunDatasetConfigDto, ValidationRunMetricConfigDto} from './service/validation-run-config-dto';
+import {
+  ValidationRunConfigDto,
+  ValidationRunDatasetConfigDto,
+  ValidationRunMetricConfigDto
+} from './service/validation-run-config-dto';
 import {ValidationRunConfigService} from './service/validation-run-config.service';
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';

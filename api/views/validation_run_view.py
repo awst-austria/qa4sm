@@ -39,7 +39,7 @@ def published_results(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def my_results(request):
     current_user = request.user
     limit = request.query_params.get('limit', None)
@@ -64,7 +64,7 @@ def my_results(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def validation_runs(request, **kwargs):
     val_runs = ValidationRun.objects.all()
     serializer = ValidationRunSerializer(val_runs, many=True)
@@ -72,7 +72,7 @@ def validation_runs(request, **kwargs):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def validation_run_by_id(request, **kwargs):
     val_run = ValidationRun.objects.get(pk=kwargs['id'])
     if val_run is None:
@@ -83,7 +83,7 @@ def validation_run_by_id(request, **kwargs):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def custom_tracked_validation_runs(request):
     current_user = request.user
     # taking only tracked validationruns, i.e. those with the same copied and original validationrun
@@ -98,7 +98,7 @@ def custom_tracked_validation_runs(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_summary_statistics(request):
     validation_id = request.query_params.get('id', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
