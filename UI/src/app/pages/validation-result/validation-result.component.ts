@@ -11,7 +11,7 @@ import {ValidationResultModel} from './validation-result-model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ValidationResultComponent implements OnInit {
-  private validationId: string;
+  public validationId: string;
   public validationModel: ValidationResultModel;
 
   constructor(private route: ActivatedRoute,
