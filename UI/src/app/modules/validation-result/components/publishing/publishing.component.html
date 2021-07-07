@@ -1,12 +1,93 @@
 <ng-container *ngIf="display$ | async as display">
-  <section [class.open]="display === 'open'"
-           (click)="close()">
-    <div (click)="$event.stopPropagation()">
-      <button class="close"
-              type="button"
-              (click)="close()">X</button>
+  <div class="form-background" [class.open]="display === 'open'" (click)="close()">
+    <p-panel class="publishing-form" *ngIf="publishingForm$|async as publishingForm">
+      <div (click)="$event.stopPropagation()">
+        <button class="close"
+                type="button"
+                (click)="close()">X
+        </button>
+      </div>
+      <ng-template pTemplate="header">
+        <h4 class="my-0 font-weight-normal" id="publishDialogTitle">Publish results</h4>
+      </ng-template>
+      <div class="p-px-0 p-py-0">
+        <p class="p-my-0">
+          Please check the metadata your results will be published with. <br/>
+          If you want to permanently set your author details, you can do so on your <a routerLink="/user-profile">profile page</a>.
+        </p>
+      </div>
 
-      <h1>Hello World</h1>
-    </div>
-  </section>
+
+      <!--      <div class="modal" id="publishDialog" role="dialog" aria-labelledby="publishDialogTitle" aria-hidden="true">-->
+      <!--        <div class="modal-dialog modal-lg" role="document">-->
+      <!--          <div class="modal-content">-->
+
+      <!--            <form id="publishing_form">-->
+
+      <!--              <div class="modal-header">-->
+      <!--                <h4 class="my-0 font-weight-normal" id="publishDialogTitle">Publish results</h4>-->
+      <!--              </div>-->
+
+      <!--              <div class="modal-body">-->
+
+      <!--                <p>-->
+      <!--                  Please check the metadata your results will be published with. <br/>-->
+      <!--                  If you want to permanently set your author details, you can do so on your-->
+      <!--&lt;!&ndash;                  <a href="{% url 'user_profile' %}">profile page</a>.&ndash;&gt;-->
+      <!--                </p>-->
+
+      <!--                <div class="custom-invalid-feedback">-->
+      <!--                </div>-->
+      <!--                <div *ngIf="publishingForm$|async as publishingForm">-->
+      <!--                  {{publishingForm.title}}-->
+      <!--                </div>-->
+
+      <!--&lt;!&ndash;                {% for field in publishing_form.visible_fields %}&ndash;&gt;-->
+      <!--&lt;!&ndash;                <div class="row mb-2">&ndash;&gt;-->
+      <!--&lt;!&ndash;                  <div class="col">&ndash;&gt;-->
+      <!--&lt;!&ndash;                    <div class="input-group">&ndash;&gt;-->
+      <!--&lt;!&ndash;                      <div class="input-group-prepend">&ndash;&gt;-->
+      <!--&lt;!&ndash;                        <span class="input-group-text addon-w-pub">{{field.label}}</span>&ndash;&gt;-->
+      <!--&lt;!&ndash;                      </div>&ndash;&gt;-->
+
+      <!--&lt;!&ndash;                      {% render_field field class="form-control" title=field.help_text %}&ndash;&gt;-->
+
+      <!--&lt;!&ndash;                      {% if field.help_text %}&ndash;&gt;-->
+      <!--&lt;!&ndash;                      <div class="input-group-append">&ndash;&gt;-->
+      <!--&lt;!&ndash;                        <span class="input-group-text fas fa-question-circle" title="{{ field.help_text }}"></span>&ndash;&gt;-->
+      <!--&lt;!&ndash;                      </div>&ndash;&gt;-->
+      <!--&lt;!&ndash;                      {% endif %}&ndash;&gt;-->
+      <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+
+      <!--&lt;!&ndash;                    {% for error in field.errors %}&ndash;&gt;-->
+      <!--&lt;!&ndash;                    <div class="custom-invalid-feedback">&ndash;&gt;-->
+      <!--&lt;!&ndash;                      {{ error }}&ndash;&gt;-->
+      <!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+      <!--&lt;!&ndash;                    {% endfor %}&ndash;&gt;-->
+      <!--&lt;!&ndash;                  </div>&ndash;&gt;-->
+      <!--&lt;!&ndash;                </div>&ndash;&gt;-->
+      <!--&lt;!&ndash;                {% endfor %}&ndash;&gt;-->
+
+      <!--                <p class="mt-3 mb-0">-->
+      <!--                  <b>Please note:</b>-->
+      <!--                  Publishing the result can't be undone and you won't be able to delete the result nor change its metadata (including the validation name) later.<br/>-->
+      <!--                  Publishing can take a few minutes, please be patient.-->
+      <!--                </p>-->
+      <!--              </div>-->
+
+      <!--              <div class="modal-footer">-->
+      <!--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>-->
+      <!--                <button class="btn btn-primary" title="Publish on Zenodo" type="button" (click)="publish()">Publish now!</button>-->
+      <!--              </div>-->
+
+      <!--&lt;!&ndash;              {% endwith %}&ndash;&gt;-->
+
+      <!--            </form>-->
+
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+    </p-panel>
+  </div>
 </ng-container>
