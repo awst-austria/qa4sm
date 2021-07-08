@@ -44,6 +44,13 @@ export class PublishingComponent implements OnInit {
   }
   getPublishingForm(): void{
     const params = new HttpParams().set('id', this.validationId);
-    this.publishingForm$ = this.validationrunService.getPublishingFormData(params);
+    this.validationrunService.getPublishingFormData(params).subscribe(data => {
+      this.publishingForm.controls.title.setValue(data.title);
+      this.publishingForm.controls.description.setValue(data.description);
+      this.publishingForm.controls.keywords.setValue(data.keywords);
+      this.publishingForm.controls.name.setValue(data.name);
+      this.publishingForm.controls.affiliation.setValue(data.affiliation);
+      this.publishingForm.controls.orcid.setValue(data.orcid);
+    });
   }
 }
