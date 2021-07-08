@@ -9,7 +9,7 @@ import {ValidationPagePaginatedComponent} from './components/validation-page-pag
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
 import {ButtonsComponent} from './components/buttons/buttons.component';
 import {InputTextModule} from 'primeng/inputtext';
@@ -39,19 +39,20 @@ import {PublishingComponent} from './components/publishing/publishing.component'
     ResultFilesComponent,
     PublishingComponent,
   ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    NgxPaginationModule,
-    RouterModule,
-    DropdownModule,
-    FormsModule,
-    InputTextModule,
-    NgDompurifyModule,
-    ButtonModule
-  ]
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        NgxPaginationModule,
+        RouterModule,
+        DropdownModule,
+        FormsModule,
+        InputTextModule,
+        NgDompurifyModule,
+        ButtonModule,
+        ReactiveFormsModule
+    ]
 })
 export class ValidationResultModule {
 }
