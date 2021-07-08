@@ -4,6 +4,6 @@ export class PublishingFormDto{
               public keywords: string,
               public name: string,
               public affiliation: string,
-              public ORCID: string) {
+              public orcid: string) {
   }
 }
