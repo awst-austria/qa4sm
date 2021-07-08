@@ -2,15 +2,10 @@
   visibility: hidden;
   opacity: 0;
   position: fixed;
-
   height: 100%;
   width: 100%;
-
-  //background: white;
   padding: 64px;
-
   border-radius: 8px;
-
   box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
 
   &.open {
@@ -28,24 +23,16 @@
   z-index: 1050;
   overflow-y: hidden;
 }
+
 .publishing-form {
-  /* let it scroll */
-  //overflow: auto;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  //
   height: 75%;
   width: 55%;
-  //
-  //background: white;
-  //padding: 64px;
-  //
-  //border-radius: 8px;
-  //
-  //box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
 }
+
 button.close {
   background: none;
   color: white;
@@ -82,6 +69,7 @@ input {
   width: 18%;
   height: 3rem;
 }
+
 .help-field{
   color: white;
   background-color: #00AAE3;
@@ -92,6 +80,7 @@ input {
   justify-content: center;
   align-items: center;
 }
+
 #cancel-button{
   color: white;
   background-color: #6c757d;
@@ -99,6 +88,7 @@ input {
   font-size: 1rem;
   margin: 0.25rem;
 }
+
 #submit-button{
   color: white;
   background-color: #4760E5;
