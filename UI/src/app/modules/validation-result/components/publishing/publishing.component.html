@@ -1,14 +1,14 @@
 <ng-container *ngIf="display$ | async as display">
   <div class="form-background" [class.open]="display === 'open'" (click)="close()">
     <p-panel class="publishing-form" (click)="$event.stopPropagation()">
-      <div (click)="$event.stopPropagation()">
-        <button class="close"
-                type="button"
-                (click)="close()">X
-        </button>
-      </div>
       <ng-template pTemplate="header">
         <h4 class="my-0 font-weight-normal" id="publishDialogTitle">Publish results</h4>
+      </ng-template>
+      <ng-template pTemplate="icons">
+        <button class="close"
+                type="button"
+                (click)="close()"><b>X</b>
+        </button>
       </ng-template>
       <div class="p-px-0 p-py-0">
         <p class="p-my-0">

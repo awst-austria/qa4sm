@@ -30,35 +30,33 @@
 }
 .publishing-form {
   /* let it scroll */
-  overflow: auto;
+  //overflow: auto;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
+  //
   height: 75%;
   width: 55%;
-
-  background: white;
-  padding: 64px;
-
-  border-radius: 8px;
-
-  box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
+  //
+  //background: white;
+  //padding: 64px;
+  //
+  //border-radius: 8px;
+  //
+  //box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.1);
 }
 button.close {
   background: none;
-  color: black;
+  color: white;
   border: none;
   font: inherit;
   cursor: pointer;
-  outline: none;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-
+  font-size: 1rem;
   padding: 16px;
+}
+button.close:hover{
+  transform: scale(1.2);
 }
 .label {
   font-size: 1rem;
