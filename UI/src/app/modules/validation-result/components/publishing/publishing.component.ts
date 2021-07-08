@@ -47,7 +47,6 @@ export class PublishingComponent implements OnInit {
         window.location.reload();
       },
       error => {
-        console.log(error.error);
         this.formErrors = error.error;
       });
   }
