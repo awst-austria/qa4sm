@@ -52,7 +52,6 @@ export class UserFormComponent implements OnInit {
           this.router.navigate(['/signup-complete']);
         },
         error => {
-          console.log(error.error);
           this.formErrors = error.error;
         });
     } else {
@@ -67,7 +66,6 @@ export class UserFormComponent implements OnInit {
           alert('User profile has been updated');
         },
         error => {
-          console.log(error.error);
           this.formErrors = error.error;
         }
       );
