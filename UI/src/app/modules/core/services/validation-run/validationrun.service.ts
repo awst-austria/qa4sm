@@ -114,7 +114,7 @@ export class ValidationrunService {
   publishResults(validationId: string, publishingData: any): Observable<any> {
     const publishUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {publish: true, publishing_form: publishingData};
-    return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
+    return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'json'});
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void {
