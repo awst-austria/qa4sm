@@ -64,6 +64,11 @@
             class="pi pi-question-circle p-col-1 help-field">
           </span>
         </div>
+        <div *ngIf="formErrors && formErrors.keywords"
+             class="alert">
+          <span *ngFor="let error of formErrors.keywords">{{error.message}}<br></span>
+        </div>
+
 
         <div class="p-py-2 p-grid">
         <span class="label p-col-2">
@@ -95,6 +100,10 @@
                 class="pi pi-question-circle p-col-1 help-field">
           </span>
 
+        </div>
+        <div *ngIf="formErrors && formErrors.orcid"
+             class="alert">
+          <span *ngFor="let error of formErrors.orcid">{{error.message}}<br></span>
         </div>
         <b>Please note:</b>
         Publishing the result can't be undone and you won't be able to delete the result nor change its metadata
