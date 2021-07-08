@@ -23,10 +23,10 @@
             <label for="title">Title</label>
           </span>
           <textarea class="form-field p-col"
-                 id="title"
-                 type="text"
-                 pInputText
-                 formControlName="title">
+                    id="title"
+                    type="text"
+                    pInputText
+                    formControlName="title">
           </textarea>
           <span title="Title of the Zenodo entry"
                 class="pi pi-question-circle p-col-1 help-field">
@@ -101,6 +101,19 @@
         (including the validation name) later.<br/>
         Publishing can take a few minutes, please be patient.
 
+        <div style="text-align: right">
+          <button pButton
+                  id="cancel-button"
+                  (click)="close()"
+                  label="Cancel">
+          </button>
+          <button pButton
+                  id="submit-button"
+                  type="submit"
+                  label="Publish now!"
+                  [disabled]="!publishingForm.valid">
+          </button>
+        </div>
       </form>
 
 
