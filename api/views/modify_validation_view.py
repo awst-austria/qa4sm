@@ -107,19 +107,25 @@ def modify_result(request, result_uuid):
             # check that the publication parameters are valid
             pub_form = PublishingForm(data=publishing_form, validation=val_run)
             if not pub_form.is_valid():
+                errors = pub_form.errors.get_json_data()
+                print(errors)
+                response = JsonResponse(errors, status=400, safe=False)
                 # if not, send back an updated publication form with errors set and http code 420 (picked up in javascript)
-                return render(request, 'validator/publishing_dialog.html',
-                              {'publishing_form': pub_form, 'val': val_run}, status=420)
+                return response
 
             try:
-                get_doi_for_validation(val_run, pub_form.pub_metadata)
+                # get_doi_for_validation(val_run, pub_form.pub_metadata)
+                print('ha ha')
             except Exception as e:
                 m = getattr(e, 'message', repr(e))
-                return HttpResponse(m, status=400)
+                response = JsonResponse({'response': m}, status=400)
+                return response
 
-            return HttpResponse("Published.", status=200)
+            response = JsonResponse({'response': 'Published'}, status=200)
+            return response
 
-        return HttpResponse("Wrong action parameter.", status=400)
+        response = JsonResponse({'response': 'Wrong action parameter.'}, status=400)
+        return response
 
     elif request.method == 'POST':
         post_params = request.data
