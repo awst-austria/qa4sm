@@ -105,11 +105,16 @@ export class ValidationrunService {
   saveResults(validationId: string, newName: string): void {
     const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {save_name: true, new_name: newName};
-    console.log(data);
     this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'json'}).subscribe(
       () => {
       });
 
+  }
+
+  publishResults(validationId: string, publishingData: any): Observable<any> {
+    const publishUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const data = {publish: true, publishing_form: publishingData};
+    return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void {

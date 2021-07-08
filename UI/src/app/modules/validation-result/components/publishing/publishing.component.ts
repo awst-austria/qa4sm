@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Observable} from 'rxjs';
 import {ModalWindowService} from '../../../core/services/global/modal-window.service';
-import {PublishingFormDto} from '../../../core/services/validation-run/publishing-form.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'qa-publishing',
@@ -12,7 +12,7 @@ import {FormBuilder, Validators} from '@angular/forms';
   styleUrls: ['./publishing.component.scss']
 })
 export class PublishingComponent implements OnInit {
-  publishingForm$: Observable<PublishingFormDto>;
+  formErrors: any;
   display$: Observable<'open' | 'close'>;
   @Input() validationId: string;
 
@@ -29,6 +29,7 @@ export class PublishingComponent implements OnInit {
     private modalService: ModalWindowService,
     private validationrunService: ValidationrunService,
     private formBuilder: FormBuilder,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -40,7 +41,15 @@ export class PublishingComponent implements OnInit {
     // this.publishingOn.emit(false);
   }
   publish(): void{
-    console.log('Monika');
+    this.validationrunService.publishResults(this.validationId, this.publishingForm.value).subscribe(
+      () => {
+        this.close();
+        window.location.reload();
+      },
+      error => {
+        console.log(error.error);
+        this.formErrors = error.error;
+      });
   }
   getPublishingForm(): void{
     const params = new HttpParams().set('id', this.validationId);
