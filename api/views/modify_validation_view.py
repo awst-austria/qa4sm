@@ -114,8 +114,7 @@ def modify_result(request, result_uuid):
                 return response
 
             try:
-                # get_doi_for_validation(val_run, pub_form.pub_metadata)
-                print('ha ha')
+                get_doi_for_validation(val_run, pub_form.pub_metadata)
             except Exception as e:
                 m = getattr(e, 'message', repr(e))
                 response = JsonResponse({'response': m}, status=400)
