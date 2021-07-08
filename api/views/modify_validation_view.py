@@ -64,7 +64,6 @@ def modify_result(request, result_uuid):
         patch_params = request.data
         patch_params_keys = patch_params.keys()
 
-
         if 'save_name' in patch_params_keys:
             ## check that our validation's name can be changed'; it can't if it already has a DOI
             if (not val_run.is_unpublished):
@@ -99,13 +98,14 @@ def modify_result(request, result_uuid):
 
         if 'publish' in patch_params_keys:
             publish = patch_params['publish']
+            publishing_form = patch_params['publishing_form']
 
             # check we've got the action set correctly
-            if publish != 'true':
+            if type(publish) != bool:
                 return HttpResponse("Wrong action parameter.", status=400)
 
             # check that the publication parameters are valid
-            pub_form = PublishingForm(data=patch_params, validation=val_run)
+            pub_form = PublishingForm(data=publishing_form, validation=val_run)
             if not pub_form.is_valid():
                 # if not, send back an updated publication form with errors set and http code 420 (picked up in javascript)
                 return render(request, 'validator/publishing_dialog.html',
