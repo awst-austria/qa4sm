@@ -38,7 +38,6 @@ export class PublishingComponent implements OnInit {
   }
   close(): void{
     this.modalService.close();
-    // this.publishingOn.emit(false);
   }
   publish(): void{
     this.validationrunService.publishResults(this.validationId, this.publishingForm.value).subscribe(
@@ -47,6 +46,7 @@ export class PublishingComponent implements OnInit {
         window.location.reload();
       },
       error => {
+        // refreshing the window so that error messages shows up
         this.modalService.open();
         this.formErrors = error.error;
       });
@@ -63,6 +63,7 @@ export class PublishingComponent implements OnInit {
     },
     error => {},
       () =>
+      //  here I refresh the window, so the submit button is not disabled
       {this.modalService.open();
       });
   }
