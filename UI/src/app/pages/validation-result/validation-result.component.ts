@@ -32,7 +32,6 @@ export class ValidationResultComponent implements OnInit {
     });
     this.modalWindowService.watch().subscribe(state => {
       this.isPublishingWindowOpen = state === 'open';
-      console.log(state === 'open');
     });
   }
 
