@@ -31,7 +31,7 @@
   </div>
 </div>
   <!-- Custom modal setup -->
-  <qa-publishing [validationId]="validationId"></qa-publishing>
+  <qa-publishing *ngIf="isPublishingWindowOpen" [validationId]="validationId"></qa-publishing>
 <!--  <div id="modal-container" class="hidden"></div>-->
 <!--  <div id="overlay" (click)="removeModal()" class="hidden"></div>-->
 </main>
