@@ -1,4 +1,4 @@
-<main>
+<main [ngClass]="{'non-scrollable': isPublishingWindowOpen}">
 <div class="p-grid">
   <div class="p-col-12">
     <div *ngIf="(validationModel.validationRun|async) as validationRun" class="p-d-flex p-jc-center">
