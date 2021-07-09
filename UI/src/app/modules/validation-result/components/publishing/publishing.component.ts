@@ -47,6 +47,7 @@ export class PublishingComponent implements OnInit {
         window.location.reload();
       },
       error => {
+        this.modalService.open();
         this.formErrors = error.error;
       });
   }
@@ -59,6 +60,10 @@ export class PublishingComponent implements OnInit {
       this.publishingForm.controls.name.setValue(data.name);
       this.publishingForm.controls.affiliation.setValue(data.affiliation);
       this.publishingForm.controls.orcid.setValue(data.orcid);
-    });
+    },
+    error => {},
+      () =>
+      {this.modalService.open();
+      });
   }
 }
