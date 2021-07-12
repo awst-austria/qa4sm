@@ -28,7 +28,7 @@ const logoUrlPrefix = '/static/images/logo/';
 })
 export class HomeComponent implements OnInit {
 
-  carouselFiles = [{
+  public carouselFiles = [{
     plot: homeUrlPrefix + 'map_us_spearman.png',
     link: '#',
     description: 'Image: QA4SM'
