@@ -503,7 +503,10 @@ def _pytesmo_to_qa4sm_results(results: dict) -> dict:
     qa4sm_res = {qa4sm_key: {}}
     for key in results:
         for metric in results[key]:
-            if metric in ["gpi", "n_obs", "lat", "lon"]:
+            # static 'metrics' (e.g. metadata, geoinfo) are not related to datasets
+            statics = ["gpi", "n_obs", "lat", "lon"]
+            statics.extend(METADATA_TEMPLATE["ismn_ref"])
+            if metric in statics:
                 new_key = metric
             else:
                 datasets = list(map(lambda t: t[0], key))
