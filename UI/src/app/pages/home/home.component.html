@@ -4,10 +4,20 @@
       <p-carousel [value]="CarouselImages" [circular]="true" [autoplayInterval]="5000"
                   [numVisible]="1" [numScroll]="1">
         <ng-template let-image pTemplate="item" >
-          <img *ngIf="(image.plot|async) as plot"
+          <img alt="{{image.link}}"
+               [src]="image.plot"
+               class="carousel-img">
+<!--        <ng-template let-image pTemplate="item" >-->
+<!--          <img *ngIf="(image.plot|async) as plot"-->
+<!--               alt="{{image.link}}"-->
+<!--               [src]="getSanitizedPlot(plot.plot)"-->
+<!--               class="carousel-img">-->
+
+<!--           <img *ngIf="(image.plot|async) as plot"
                alt="{{image.link}}"
                [src]="getSanitizedPlot(plot.plot)"
-               class="carousel-img">
+               class="carousel-img"> -->
+
 <!--          <div *ngIf="(image.plot|async) as plot" style="height: 400px">-->
 <!--            <div  [ngStyle]="{'background-image': getBackgroundUrl(plot.plot)}" style="height: 100%">-->
 <!--&lt;!&ndash;              {{getSanitizedPlot(plot.plot)}}&ndash;&gt;-->
