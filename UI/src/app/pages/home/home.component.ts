@@ -28,7 +28,7 @@ const logoUrlPrefix = '/static/images/logo/';
 })
 export class HomeComponent implements OnInit {
 
-  carouselFiles = [{
+  public carouselFiles = [{
     plot: homeUrlPrefix + 'map_us_spearman.png',
     link: '#',
     description: 'Image: QA4SM'
@@ -115,12 +115,6 @@ export class HomeComponent implements OnInit {
       model.push(new HomepageImagesModel(plot, image.link, image.description));
     });
     return model;
-  }
-
-  getBackgroundUrl(plot: string): string{
-    const plotPrefix = 'data:image/png;base64,';
-    const newName = plotPrefix + plot;
-    return `url('${newName} ')`;
   }
 
   getSanitizedPlot(plot: string): SafeUrl {
