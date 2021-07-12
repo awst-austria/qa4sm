@@ -4,19 +4,18 @@ import {SettingsService} from '../../modules/core/services/global/settings.servi
 import {WebsiteGraphicsService} from '../../modules/core/services/global/website-graphics.service';
 import {Observable} from 'rxjs';
 import {HttpParams} from '@angular/common/http';
-import {SafeUrl} from '@angular/platform-browser';
+import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 
 import {Router} from '@angular/router';
+import {HomepageImagesModel} from './homepage-images-model';
+import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
+import {Gallery} from 'angular-gallery';
 
 interface City {
   name: string;
   code: string;
 }
 
-
-import {HomepageImagesModel} from './homepage-images-model';
-import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
-import {Gallery} from 'angular-gallery';
 
 const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
@@ -92,7 +91,8 @@ export class HomeComponent implements OnInit {
               private settingsService: SettingsService,
               public plotService: WebsiteGraphicsService,
               private gallery: Gallery,
-              private router: Router) {
+              private router: Router,
+              private domSanitizer: DomSanitizer) {
   }
 
   ngOnInit(): void {
@@ -115,6 +115,12 @@ export class HomeComponent implements OnInit {
       model.push(new HomepageImagesModel(plot, image.link, image.description));
     });
     return model;
+  }
+
+  getBackgroundUrl(plot: string): string{
+    const plotPrefix = 'data:image/png;base64,';
+    const newName = plotPrefix + plot;
+    return `url('${newName} ')`;
   }
 
   getSanitizedPlot(plot: string): SafeUrl {
