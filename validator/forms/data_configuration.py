@@ -53,6 +53,11 @@ class DatasetConfigurationForm(forms.ModelForm):
         else:
             self.fields["dataset"].queryset = Dataset.objects.filter(is_only_reference=is_reference)
 
+        for key in ["dataset", "version", "variable"]:
+            self.fields[key].initial = self.get_initial_for_field(
+                self.fields[key], key
+            )
+
         # This translates the initial filter list to a string of filter ids
         # separated by an underscore. This string is passed to the ajax call
         # `ajax_change_dataset` in validate.html, and then further passed to
@@ -83,7 +88,7 @@ class DatasetConfigurationForm(forms.ModelForm):
         else:
             self.initial_version = ""
         if "variable" in self.initial:
-            self.initial_variable = str(self.initial["version"].id)
+            self.initial_variable = str(self.initial["variable"].id)
         else:
             self.initial_variable = ""
 

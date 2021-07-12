@@ -51,11 +51,9 @@ def generate_all_graphs(validation_run, outfolder):
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         for pngfile in fnb + fnm:
-            print(pngfile)
             arcname = path.basename(pngfile)
             myzip.write(pngfile, arcname=arcname)
         for svgfile in fnb_svg + fnm_svg:
-            print(svgfile)
             arcname = path.basename(svgfile)
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)

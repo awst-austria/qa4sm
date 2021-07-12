@@ -50,10 +50,14 @@ def get_uptime(request):
 
         uptime_report = get_report(period=period_param,
                                    date=start_date)
-        uptime_resp = 'None'
+        uptime_percentage = 'None'
+        downtime_minutes = 'None'
         if uptime_report is not None:
-            uptime_resp = uptime_report.uptime_percentage
-        return JsonResponse(uptime_resp, status=200, safe=False)
+            uptime_percentage = uptime_report.uptime_percentage
+            downtime_minutes = uptime_report.downtime_minutes
+
+        resp = {'uptime_percentage': uptime_percentage, 'downtime_minutes': downtime_minutes}
+        return JsonResponse(resp, status=200, safe=False)
     except Exception as e:
         __logger.warning(e)
         return HttpResponse("Invalid request", status=400)
