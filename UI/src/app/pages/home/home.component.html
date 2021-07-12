@@ -1,7 +1,7 @@
 <main role="main">
   <div class="carousel">
     <div>
-      <p-carousel [value]="CarouselImages" [circular]="true" [autoplayInterval]="5000"
+      <p-carousel [value]="carouselFiles" [circular]="true" [autoplayInterval]="5000"
                   [numVisible]="1" [numScroll]="1">
         <ng-template let-image pTemplate="item" >
           <img *ngIf="(image.plot|async) as plot"
