@@ -117,6 +117,12 @@ export class HomeComponent implements OnInit {
     return model;
   }
 
+  getBackgroundUrl(plot: string): string{
+    const plotPrefix = 'data:image/png;base64,';
+    const newName = plotPrefix + plot;
+    return `url('${newName} ')`;
+  }
+
   getSanitizedPlot(plot: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plot);
   }
