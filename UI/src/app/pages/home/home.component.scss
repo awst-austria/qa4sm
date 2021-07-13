@@ -12,6 +12,8 @@ main{
 .scaled_image {
   display: block;
   max-width: 100%;
+  width: 100%;
+  height: 100%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -33,6 +35,8 @@ main{
   min-width: 100%;
   min-height: 100%;
   margin-bottom: 0.5rem;
+  width: 1900px;
+  height: 400px;
   max-width: 100%;
   max-height: 100%;
 }
@@ -208,3 +212,13 @@ a:hover {
   //  width: 7.5rem;
   //}
 }
+//
+//.logo{
+//  //min-width: 10%;
+//  //min-height: 10%;
+//  margin-bottom: 0.5rem;
+//  width: 20%;
+//  height: 60px;
+//  //max-width: 20%;
+//  //max-height: 10%;
+//}
