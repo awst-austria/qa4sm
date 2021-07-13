@@ -29,7 +29,7 @@ const logoUrlPrefix = '/static/images/logo/';
 export class HomeComponent implements OnInit {
 
   public carouselFiles = [{
-    plot: homeUrlPrefix + 'map_us_spearman.png',
+    plot: homeUrlPrefix + 'map_us_spearman.jpg',
     link: '#',
     description: 'Image: QA4SM'
   }, {
@@ -117,11 +117,14 @@ export class HomeComponent implements OnInit {
     return model;
   }
 
-  getBackgroundUrl(plot: string): string{
-    const plotPrefix = 'data:image/png;base64,';
-    const newName = plotPrefix + plot;
-    return `url('${newName} ')`;
+  getSafeUrl(url): SafeUrl{
+    return this.domSanitizer.bypassSecurityTrustUrl(url);
   }
+  // getBackgroundUrl(plot: string): string{
+  //   const plotPrefix = 'data:image/png;base64,';
+  //   const newName = plotPrefix + plot;
+  //   return `url('${newName} ')`;
+  // }
 
   getSanitizedPlot(plot: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plot);
