@@ -1,4 +1,4 @@
-<main>
+<main [ngClass]="{'non-scrollable': isPublishingWindowOpen}">
 <div class="p-grid">
   <div class="p-col-12">
     <div *ngIf="(validationModel.validationRun|async) as validationRun" class="p-d-flex p-jc-center">
@@ -30,4 +30,8 @@
     </div>
   </div>
 </div>
+  <!-- Custom modal setup -->
+  <qa-publishing *ngIf="isPublishingWindowOpen" [validationId]="validationId"></qa-publishing>
+<!--  <div id="modal-container" class="hidden"></div>-->
+<!--  <div id="overlay" (click)="removeModal()" class="hidden"></div>-->
 </main>

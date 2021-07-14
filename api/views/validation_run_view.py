@@ -9,6 +9,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.permissions import IsAuthenticated
 
 from api.views.auxiliary_functions import get_fields_as_list
+from validator.forms import PublishingForm
 from validator.models import ValidationRun
 from validator.validation import get_inspection_table
 
@@ -108,6 +109,16 @@ def get_summary_statistics(request):
 
     return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
                                                  index=False))
+
+
+@api_view(['GET'])
+def get_publishing_form(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    # validation = ValidationRun.objects.all()[0]
+    publishing_form = PublishingForm(validation=validation)
+    print(publishing_form.data)
+    return JsonResponse(publishing_form.data, status=200)
 
 
 class ValidationRunSerializer(ModelSerializer):
