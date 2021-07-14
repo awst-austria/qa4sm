@@ -28,7 +28,7 @@
                 class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
                 title="This validation is still running."></span>
 
-          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}">
+          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}" rel="noreferrer">
             <span *ngIf="validationRun.doi" class="p-panel-header-icon pi pi-book expiry-icons"
                   title="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
             </span>
