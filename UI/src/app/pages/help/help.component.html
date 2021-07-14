@@ -1,5 +1,4 @@
 <main>
-  <a id="top"></a>
   <h1 class="h3 p-mb-3 font-weight-normal">Go to section</h1>
   <p>
     <a pageScroll [pageScrollDuration]="1" href="#validation">Validate Page</a><br/>
@@ -9,8 +8,7 @@
     <a pageScroll [pageScrollDuration]="1" href="#published">Published Validations Page</a><br/>
   </p>
 
-  <a id="validation"></a>
-  <h1 class="h3 p-mb-3 font-weight-normal">Validate Page</h1>
+  <h1 id="validation" class="h3 p-mb-3 font-weight-normal">Validate Page</h1>
 
   <p>
     The validate page is subdivided into areas for the various validation parameters. Each area has
@@ -18,24 +16,24 @@
     use the +/- icon to fold up or fold down the area.
   </p>
   <div>
-    <img *ngIf="menuMinus$|async as plot" class="p-px-5 p-mx-5" [src]="sanitizePlotUrl(plot.plot)">
-    <img *ngIf="menuPlus$|async as plot" class="p-px-5 p-mx-5" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="menu-minus" *ngIf="menuMinus$|async as plot" class="p-px-5 p-mx-5" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="menu-plus" *ngIf="menuPlus$|async as plot" class="p-px-5 p-mx-5" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
   <p>
     <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
-    and one of the soil moisture variables provided in the dataset. All the supported datasets are listed
-    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1" href="#data">here</a>.
+    and one of the soil moisture variables provided in the dataset. All the supported datasets are listed on
+    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">datasets page here</a>.
   </p>
   <div>
-    <img  *ngIf="datasetSelections$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="dataset selection" *ngIf="datasetSelections$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 2 [optional]</b> - Choose the criteria by which you would like to filter this dataset.
     The filters available depend on the data contained within the chosen dataset. For example,
     you can filter the C3S data to include only data with no inconsistencies detected (flag = 0).
     Details of the filter options provided for each dataset are given on the
-    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1" href="#data">supported datasets page</a>. You can also
+    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">supported datasets page</a>. You can also
     hover your mouse pointer over the question mark next to a filter to get a short explanation.
   </p>
   <p>
@@ -56,7 +54,7 @@
     the performance of the compared satellite products.
   </p>
   <div>
-    <img  *ngIf="intercomparison$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="intercomparison" *ngIf="intercomparison$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 4</b> - Choose the reference dataset you would like to use for the
@@ -64,7 +62,7 @@
     the dataset.
   </p>
   <div>
-    <img  *ngIf="referenceDatasetSelection$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="reference dataset" *ngIf="referenceDatasetSelection$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 5 [optional]</b> - Choose the criteria by which you would like to filter the reference data prior to
@@ -91,7 +89,7 @@
     </li>
   </ul>
   <div>
-    <img  *ngIf="anomalies$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="anomalies" *ngIf="anomalies$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 7 [optional]</b> - Chose the geographic area over which the validation should be performed. You can either
@@ -102,8 +100,8 @@
     If you don't specify an area, a global validation will be done.
   </p>
   <div>
-    <img  *ngIf="spatialSubsetting$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
-    <img  *ngIf="mapSelection$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="spatial subsetting" *ngIf="spatialSubsetting$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="map selection" *ngIf="mapSelection$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed. Accepted formats
@@ -112,10 +110,10 @@
     will be
     implicitly determined through temporal matching of the data and reference selected. For the time range covered by
     the various
-    datasets, see the <a routerLink="/datasets" pageScroll [pageScrollDuration]="1" href="#data">datasets page</a>.
+    datasets, see the <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">datasets page</a>.
   </p>
   <div>
-    <img  *ngIf="validationPeriod$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="validation period" *ngIf="validationPeriod$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC). By default, QA4SM calculates validation
@@ -128,7 +126,7 @@
     independent datasets should be used.
   </p>
   <div>
-    <img  *ngIf="tca$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="triple collocation" *ngIf="tca$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
   <p>
@@ -140,7 +138,7 @@
     other dataset for better comparability.
   </p>
   <div>
-    <img  *ngIf="scaling$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="scaling" *ngIf="scaling$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
   <p>
@@ -148,7 +146,7 @@
     the list of all your validations.
   </p>
   <div>
-    <img  *ngIf="nameYourValidation$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="name your validation" *ngIf="nameYourValidation$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     <b>Step 12</b> - Run the validation process. You'll be notified via e-mail once it's
@@ -156,18 +154,17 @@
     the validation to run. The email will contain a link to your results.
   </p>
   <div>
-    <img  *ngIf="validateButton$|async as plot" class="w3-round" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="validation button" *ngIf="validateButton$|async as plot" class="w3-round" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
 
-  <a id="results_list"></a>
-  <h1 id="help3" class="h3 p-mb-3 font-weight-normal">My Validations - Results List Page</h1>
+  <h1 id="results_list" class="h3 p-mb-3 font-weight-normal">My Validations - Results List Page</h1>
 
   <p>
     The list shows all your validations, including the currently running ones, sorted by date (latest first).
   </p>
   <div>
-    <img  *ngIf="myValidations$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="my validations" *ngIf="myValidations$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
   <p>
@@ -253,18 +250,17 @@
     </li>
   </ul>
   <div>
-    <img  *ngIf="myValidations$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="my validations" *ngIf="myValidations$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
-  <a id="results"></a>
-  <h1 class="h3 p-mb-3 font-weight-normal">Validation Results Page</h1>
+  <h1 id="results" class="h3 p-mb-3 font-weight-normal">Validation Results Page</h1>
 
   <p>
     Once the validation process is finished, you can see a summary of the validation run
     on the results page.
   </p>
   <div>
-    <img  *ngIf="resultsOverview$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="results overview" *ngIf="resultsOverview$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
   <p>
     The buttons at the bottom of the result overview have the following effects:
@@ -295,8 +291,8 @@
     </li>
     <li>
       <span class="pi pi-book"></span> <span class="font-weight-bold"> Publish</span> will publish the result NetCDF
-      file to <a target="_blank" href="https://zenodo.org/">Zenodo</a>. This means the results can be cited
-      with a <a target="_blank" href="https://www.doi.org/">DOI</a>. See section
+      file to <a target="_blank" href="https://zenodo.org/" rel="'noreferrer">Zenodo</a>. This means the results can be cited
+      with a <a target="_blank" href="https://www.doi.org/" rel="'noreferrer">DOI</a>. See section
       <a pageScroll [pageScrollDuration]="1" href="#publication">Publication</a> for details.
     </li>
   </ul>
@@ -389,26 +385,25 @@
     map can be selected with the drop-down button on the right.
     <br/>
     You can also download a zipfile of all the plots in png and svg (vector) format by clicking on the <i>Download all
-    graphs</i> button, and the result <a target="_blank" href="https://www.unidata.ucar.edu/software/netcdf/">NetCDF</a>
+    graphs</i> button, and the result <a target="_blank" href="https://www.unidata.ucar.edu/software/netcdf/" rel="'noreferrer">NetCDF</a>
     file
     with all metrics with the <i>Download results in NetCDF</i> button.<br/>
   </p>
-  <a id="results_graph"></a>
-  <div>
-    <img  *ngIf="resultsGraphs$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+
+  <div id="results_graph">
+    <img alt="results graphs" *ngIf="resultsGraphs$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
-  <a id="publication"></a>
-  <h2 class="h4 p-mb-3 font-weight-normal">Publication</h2>
+  <h2 id="publication" class="h4 p-mb-3 font-weight-normal">Publication</h2>
 
   <p>
     This feature allows you to publish the result NetCDF file of your validation to
-    <a target="_blank" href="https://zenodo.org/">Zenodo</a> under your own name but without creating your own
-    Zenodo account. This gives you a <a target="_blank" href="https://www.doi.org/">DOI</a> for your results,
+    <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> under your own name but without creating your own
+    Zenodo account. This gives you a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a> for your results,
     which you can cite in your publications to give your readers open access to your data.
   </p>
   <div>
-    <img  *ngIf="publicationDialog$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="publication dialog" *ngIf="publicationDialog$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
   </div>
 
   <p>
@@ -419,7 +414,7 @@
         results</span>.<br/>
     Note that we require 'qa4sm' to be one of the keywords, and that Title, Description, Keywords, and
     Name are mandatory fields. You don't need to give an affiliation or
-    <a href="https://orcid.org/" target="_blank">ORCID</a>, though. Changes you make to your
+    <a href="https://orcid.org/" target="_blank" rel="'noreferrer">ORCID</a>, though. Changes you make to your
     author details will <span class="font-weight-bold">not</span> be stored to your user profile - for that, please
     got to the Profile page.<br/>
     The upload can take a few minutes, please be patient. If it should fail, please try
@@ -433,7 +428,7 @@
     project but with your name as the author. Zenodo is a separate website run at CERN over which the QA4SM team
     has no control.<br/>
     <span class="font-weight-bold">Assigning a DOI to a result also means that it cannot easily be unpublished or
-        deleted - see also <a href="https://help.zenodo.org/" target="_blank">Zenodo's FAQ</a>.</span><br/>
+        deleted - see also <a href="https://help.zenodo.org/" target="_blank" rel="noreferrer">Zenodo's FAQ</a>.</span><br/>
 
     If you prefer to use your own Zenodo account, you can of course do so - the QA4SM publication feature is just
     for convenience. Just download the NetCDF result file and upload it yourself through Zenodo's submission process
@@ -443,13 +438,12 @@
 
   </p>
 
-  <a id="published"></a>
-  <h1 id="help4" class="h3 p-mb-3 font-weight-normal">Published Validations Page</h1>
+  <h1 id="published" class="h3 p-mb-3 font-weight-normal">Published Validations Page</h1>
 
   <p>
     The list shows validations on the QA4SM service that have been published to
-    <a target="_blank" href="https://zenodo.org/">Zenodo</a> by their owners. This means the results can be cited
-    with a <a target="_blank" href="https://www.doi.org/">DOI</a>.
+    <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> by their owners. This means the results can be cited
+    with a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
   </p>
 
   <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so
