@@ -2,9 +2,8 @@
     <div class="custom-control custom-switch">
         <input class="custom-control-input"
                {% if widget.parameterised  %} id="{{ widget.attrs.id }}_checkbox" {% else %} id="{{ widget.attrs.id }}"  {% endif %}
-               value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}" onchange="mutually_exclude("{{widget.disable_filter}}")"
-            type="checkbox" {% include "django/forms/widgets/attrs.html" %} {% if widget.parameterised  %} checked disabled {% endif %}
-        >
+               value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}" to_disable="{{ widget.disable_filter }}" onclick="mutually_exclude(this)"
+               type="checkbox" {% include "django/forms/widgets/attrs.html" %} {% if widget.parameterised  %} checked disabled {% endif %}>
         {% if widget.parameterised  %}
             <label class="custom-control-label" for="{{ widget.attrs.id }}_checkbox">{{ widget.label }}</label>
             <input type="hidden" id="{{ widget.attrs.id }}" value="{{ widget.value|stringformat:'s' }}" name="{{ widget.name }}">
@@ -19,22 +18,24 @@
         {% if widget.parameterised  %}
             <input type="hidden" id="{{ widget.attrs.id }}_params" value="{{ widget.initial_params }}" data-default_val="{{ widget.default_parameter }}" name="{{ widget.name }}_params">
         {% endif %}
+
     </div>
 {% endblock %}
 
 {% block javascript %}
     <script type="text/javascript">
 
-        function onchange(event) {
-
-        }
-
-        function mutually_exclude(mutually_exclusive) {
-            const filters = $("input[id*='filter']")
-                if (to_disable.value == true) {
-                    return "disabled"
+        function mutually_exclude(checkbox) {
+            const disable_value = checkbox.getAttribute("to_disable")
+            // var groupId = checkbox.id.replace(/filter_dataset$/, group)
+            // console.log()
+            for (other_checkbox of $("input[id*='filter']")) {
+                if (other_checkbox.value === disable_value) {
+                    var newDisabledValue = checkbox.checked;
+                    other_checkbox.disabled = newDisabledValue;
                 }
-            to_disable.disable = "disabled"
+            }
         }
+
     </script>
 {% endblock %}
