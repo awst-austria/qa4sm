@@ -1,7 +1,7 @@
 <main>
     <div id="introduction">
-        <a *ngIf="logoFfg$|async as logoFfg" href="https://www.ffg.at/en" rel="noreferrer">
-          <img alt="FFG logo" id="logo_ffg" [src]="sanitizePlotUrl(logoFfg[0].plot)"></a>
+        <a href="https://www.ffg.at/en" rel="noreferrer">
+          <img alt="FFG logo" id="logo_ffg" [src]="logoFfg"></a>
         The <b>QA4SM</b> project provides an operational online validation service for soil moisture products. It started
         in May 2018 and is supported by the <a href="https://www.ffg.at/en">Austrian Research Promotion Agency
         (Österreichische Forschungsförderungsgesellschaft, FFG)</a> in the
@@ -12,11 +12,11 @@
         <tbody>
             <tr>
                 <td class="align-middle">
-                    <a *ngIf="logoTuWien$|async as logoTuWien"
+                    <a
                        href="https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/"
                        target="_blank"
                        rel="noreferrer">
-                      <img alt="TUWien logo" class="partner_logo" [src]="sanitizePlotUrl(logoTuWien[0].plot)" style="width: 6.3rem"></a>
+                      <img alt="TUWien logo" class="partner_logo" [src]="logoTuWien" style="width: 6.3rem"></a>
                 </td>
                 <td>
                     <b>TU Wien (Vienna University of Technology)</b><br>
@@ -29,8 +29,9 @@
             </tr>
             <tr>
                 <td class="align-middle">
-                    <a *ngIf="logoAwst$|async as logoAwst" href="https://www.awst.at/" target="_blank" rel="noreferrer">
-                      <img alt="AWST logo" class="partner_logo" [src]="sanitizePlotUrl(logoAwst[0].plot)" style="width: 5.1rem"></a>
+
+                    <a href="https://www.awst.at/" target="_blank" rel="noreferrer">
+                      <img alt="AWST logo" class="partner_logo" [src]="logoAwst" style="width: 5.1rem"></a>
                 </td>
                 <td>
                     <b>AWST (Applied Science, Software and Technology)</b><br>
@@ -41,8 +42,8 @@
             </tr>
             <tr>
                 <td class="align-middle">
-                    <a *ngIf="logoEodc$|async as logoEodc" href="https://www.eodc.eu/" target="_blank" rel="noreferrer">
-                      <img alt="EODC logo" class="partner_logo" [src]="sanitizePlotUrl(logoEodc[0].plot)" style="width: 4.5rem"></a>
+                    <a href="https://www.eodc.eu/" target="_blank" rel="noreferrer">
+                      <img alt="EODC logo" class="partner_logo" [src]="logoEodc" style="width: 4.5rem"></a>
                 </td>
                 <td>
                     <b>EODC (Earth Observation Data Centre)</b><br>

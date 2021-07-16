@@ -7,27 +7,9 @@
           <img alt="{{image.link}}"
                [src]="image.plot"
                class="carousel-img">
-<!--        <ng-template let-image pTemplate="item" >-->
-<!--          <img *ngIf="(image.plot|async) as plot"-->
-<!--               alt="{{image.link}}"-->
-<!--               [src]="getSanitizedPlot(plot.plot)"-->
-<!--               class="carousel-img">-->
-
-<!--           <img *ngIf="(image.plot|async) as plot"
-               alt="{{image.link}}"
-               [src]="getSanitizedPlot(plot.plot)"
-               class="carousel-img"> -->
-
-<!--          <div *ngIf="(image.plot|async) as plot" style="height: 400px">-->
-<!--            <div  [ngStyle]="{'background-image': getBackgroundUrl(plot.plot)}" style="height: 100%">-->
-<!--&lt;!&ndash;              {{getSanitizedPlot(plot.plot)}}&ndash;&gt;-->
-<!--            </div>-->
-<!--          </div>-->
-
           <div class="image-attribution">
             <a href="{{ image.link }}">{{ image.description }}</a>
           </div>
-          <!--          </div>-->
         </ng-template>
       </p-carousel>
     </div>
@@ -99,9 +81,9 @@
     </div>
     <div class="p-md-7">
       <div class="overflow">
-        <div *ngFor="let logo of logos">
-          <a *ngIf="(logo.plot|async) as plot" href="{{logo.link}}">
-            <img alt="{{logo.link}}" [src]="getSanitizedPlot(plot.plot)">
+        <div *ngFor="let logo of logoFiles">
+          <a href="{{logo.link}}">
+            <img alt="{{logo.link}}" [src]="logo.plot">
           </a>
         </div>
       </div>
@@ -118,12 +100,11 @@
       control of soil moisture data products and provider users with <b>traceable validation results</b>.
       <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
 
-      <div *ngFor="let workflow of ImgWorkflowDiagram">
-        <img *ngIf="(workflow.plot|async) as plot"
-             class="scaled_image"
-             [src]="getSanitizedPlot(plot.plot)"
-             (click)="showGallery(0, [plot])"
-             [alt]="workflow.description"
+      <div >
+        <img class="scaled_image"
+             [src]="workflowDiagram[0].plot"
+             (click)="showGallery(0, workflowDiagram)"
+             [alt]="workflowDiagram[0].description"
              id="workflow"
              style="max-width: 80%"/>
       </div>
@@ -140,12 +121,11 @@
           Allows specification of input datasets and settings for your validation
         </p>
 
-        <div *ngFor="let validate of ImgCardValidate">
-          <img *ngIf="(validate.plot|async) as plot"
-               class="scaled_image img-screen"
-               [src]="getSanitizedPlot(plot.plot)"
-               (click)="showGallery(0, [plot])"
-               [alt]="validate.description"/>
+        <div>
+          <img class="scaled_image img-screen"
+               [src]="cardValidate[0].plot"
+               (click)="showGallery(0, cardValidate)"
+               [alt]="cardValidate[0].description"/>
         </div>
       </div>
 
@@ -154,12 +134,12 @@
         <p class="text-muted text-center" style="min-height: 3rem;">
           Provides a list of all validation results
         </p>
-        <div *ngFor="let validate of ImgCardValidateResult">
-          <img *ngIf="(validate.plot|async) as plot"
+        <div>
+          <img
                class="scaled_image img-screen"
-               [src]="getSanitizedPlot(plot.plot)"
-               (click)="showGallery(0, [plot])"
-               [alt]="validate.description"/>
+               [src]="cardValidateResult[0].plot"
+               (click)="showGallery(0, cardValidateResult)"
+               [alt]="cardValidateResult[0].description"/>
         </div>
       </div>
 
@@ -168,12 +148,12 @@
         <p class="text-muted text-center" style="min-height: 3rem;">
           Allows download of validation results in netCDF format and as graphics
         </p>
-        <div *ngFor="let details of ImgCardValidateDetails">
-          <img *ngIf="(details.plot|async) as plot"
+        <div>
+          <img
                class="scaled_image img-screen"
-               [src]="getSanitizedPlot(plot.plot)"
-               (click)="showGallery(0, [plot])"
-               [alt]="details.description"/>
+               [src]="cardValidateDetails[0].plot"
+               (click)="showGallery(0, cardValidateDetails)"
+               [alt]="cardValidateDetails[0].description"/>
         </div>
       </div>
     </div>
