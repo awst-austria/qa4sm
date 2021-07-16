@@ -27,8 +27,6 @@
 
         function mutually_exclude(checkbox) {
             const disable_value = checkbox.getAttribute("to_disable")
-            // var groupId = checkbox.id.replace(/filter_dataset$/, group)
-            // console.log()
             for (other_checkbox of $("input[id*='filter']")) {
                 if (other_checkbox.value === disable_value) {
                     var newDisabledValue = checkbox.checked;
