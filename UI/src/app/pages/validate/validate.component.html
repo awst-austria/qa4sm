@@ -39,7 +39,7 @@
 
 
               <qa-basic-filter *ngFor="let filter of item.basicFilters; let filterIdx = index"
-                               [filterModel]="filter"></qa-basic-filter>
+                               [filterModel]="filter" (onExcludeMutual)="excludeFilter($event)"></qa-basic-filter>
               <div style="width: 100%;text-align: right">
               <button pButton type="button"
                       (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"

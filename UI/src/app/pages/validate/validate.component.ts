@@ -266,6 +266,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.setDefaultValidationPeriod();
   }
 
+  excludeFilter(toExclude: number) {
+    // should reload the filters while excluding the ones specified in the event
+    // this.loadFiltersForModel()
+  }
 
   addDatasetButtonDisabled(): boolean {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
