@@ -16,8 +16,8 @@
     use the +/- icon to fold up or fold down the area.
   </p>
   <div>
-    <img alt="menu-minus" *ngIf="menuMinus$|async as plot" class="p-px-5 p-mx-5" [src]="sanitizePlotUrl(plot.plot)">
-    <img alt="menu-plus" *ngIf="menuPlus$|async as plot" class="p-px-5 p-mx-5" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="menu-minus" class="p-px-5 p-mx-5" [src]="menuMinus">
+    <img alt="menu-plus" class="p-px-5 p-mx-5" [src]="menuPlus">
   </div>
 
   <p>
@@ -26,7 +26,7 @@
     <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">datasets page here</a>.
   </p>
   <div>
-    <img alt="dataset selection" *ngIf="datasetSelections$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="dataset selection" class="scaled_image" [src]="datasetSelections">
   </div>
   <p>
     <b>Step 2 [optional]</b> - Choose the criteria by which you would like to filter this dataset.
@@ -54,7 +54,7 @@
     the performance of the compared satellite products.
   </p>
   <div>
-    <img alt="intercomparison" *ngIf="intercomparison$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="intercomparison" class="scaled_image" [src]="intercomparison">
   </div>
   <p>
     <b>Step 4</b> - Choose the reference dataset you would like to use for the
@@ -62,7 +62,7 @@
     the dataset.
   </p>
   <div>
-    <img alt="reference dataset" *ngIf="referenceDatasetSelection$|async as plot" class="scaled_image" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="reference dataset" class="scaled_image" [src]="referenceDatasetSelection">
   </div>
   <p>
     <b>Step 5 [optional]</b> - Choose the criteria by which you would like to filter the reference data prior to
@@ -89,7 +89,7 @@
     </li>
   </ul>
   <div>
-    <img alt="anomalies" *ngIf="anomalies$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="anomalies" class="scaled_image p-mb-3" [src]="anomalies">
   </div>
   <p>
     <b>Step 7 [optional]</b> - Chose the geographic area over which the validation should be performed. You can either
@@ -100,8 +100,8 @@
     If you don't specify an area, a global validation will be done.
   </p>
   <div>
-    <img alt="spatial subsetting" *ngIf="spatialSubsetting$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
-    <img alt="map selection" *ngIf="mapSelection$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="spatial subsetting" class="scaled_image p-mb-3" [src]="spatialSubsetting">
+    <img alt="map selection" class="scaled_image p-mb-3" [src]="mapSelection">
   </div>
   <p>
     <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed. Accepted formats
@@ -113,7 +113,7 @@
     datasets, see the <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">datasets page</a>.
   </p>
   <div>
-    <img alt="validation period" *ngIf="validationPeriod$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="validation period" class="scaled_image p-mb-3" [src]="validationPeriod">
   </div>
   <p>
     <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC). By default, QA4SM calculates validation
@@ -126,7 +126,7 @@
     independent datasets should be used.
   </p>
   <div>
-    <img alt="triple collocation" *ngIf="tca$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="triple collocation" class="scaled_image p-mb-3" [src]="tca">
   </div>
 
   <p>
@@ -138,7 +138,7 @@
     other dataset for better comparability.
   </p>
   <div>
-    <img alt="scaling" *ngIf="scaling$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="scaling" class="scaled_image p-mb-3" [src]="scaling">
   </div>
 
   <p>
@@ -146,7 +146,7 @@
     the list of all your validations.
   </p>
   <div>
-    <img alt="name your validation" *ngIf="nameYourValidation$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="name your validation" class="scaled_image p-mb-3" [src]="nameYourValidation">
   </div>
   <p>
     <b>Step 12</b> - Run the validation process. You'll be notified via e-mail once it's
@@ -154,7 +154,7 @@
     the validation to run. The email will contain a link to your results.
   </p>
   <div>
-    <img alt="validation button" *ngIf="validateButton$|async as plot" class="w3-round" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="validation button" class="w3-round" [src]="validateButton">
   </div>
 
 
@@ -164,7 +164,7 @@
     The list shows all your validations, including the currently running ones, sorted by date (latest first).
   </p>
   <div>
-    <img alt="my validations" *ngIf="myValidations$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">
   </div>
 
   <p>
@@ -250,7 +250,7 @@
     </li>
   </ul>
   <div>
-    <img alt="my validations" *ngIf="myValidations$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">
   </div>
 
   <h1 id="results" class="h3 p-mb-3 font-weight-normal">Validation Results Page</h1>
@@ -260,7 +260,7 @@
     on the results page.
   </p>
   <div>
-    <img alt="results overview" *ngIf="resultsOverview$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="results overview" class="scaled_image p-mb-3" [src]="resultsOverview">
   </div>
   <p>
     The buttons at the bottom of the result overview have the following effects:
@@ -391,7 +391,7 @@
   </p>
 
   <div id="results_graph">
-    <img alt="results graphs" *ngIf="resultsGraphs$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="results graphs" class="scaled_image p-mb-3" [src]="resultsGraphs">
   </div>
 
   <h2 id="publication" class="h4 p-mb-3 font-weight-normal">Publication</h2>
@@ -403,7 +403,7 @@
     which you can cite in your publications to give your readers open access to your data.
   </p>
   <div>
-    <img alt="publication dialog" *ngIf="publicationDialog$|async as plot" class="scaled_image p-mb-3" [src]="sanitizePlotUrl(plot.plot)">
+    <img alt="publication dialog" class="scaled_image p-mb-3" [src]="publicationDialog">
   </div>
 
   <p>
