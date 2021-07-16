@@ -18,25 +18,6 @@ export class HelpComponent implements OnInit {
     faRedo: fas.faRedo
   };
 
-
-  // menuMinus$: Observable<PlotDto>;
-  // menuPlus$: Observable<PlotDto>;
-  // datasetSelections$: Observable<PlotDto>;
-  // intercomparison$: Observable<PlotDto>;
-  // referenceDatasetSelection$: Observable<PlotDto>;
-  // anomalies$: Observable<PlotDto>;
-  // spatialSubsetting$: Observable<PlotDto>;
-  // mapSelection$: Observable<PlotDto>;
-  // validationPeriod$: Observable<PlotDto>;
-  // tca$: Observable<PlotDto>;
-  // scaling$: Observable<PlotDto>;
-  // nameYourValidation$: Observable<PlotDto>;
-  // validateButton$: Observable<PlotDto>;
-  // myValidations$: Observable<PlotDto>;
-  // resultsOverview$: Observable<PlotDto>;
-  // resultsGraphs$: Observable<PlotDto>;
-  // publicationDialog$: Observable<PlotDto>;
-
   menuMinus: string;
   menuPlus: string;
   datasetSelections: string;
