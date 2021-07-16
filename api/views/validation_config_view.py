@@ -43,7 +43,7 @@ def get_validation_configuration(request, **kwargs):
         val_run = ValidationRun.objects.get(pk=validation_run_id)
         val_run_dict = {}
 
-        val_run_dict['scaling_method'] = val_run.scaling_method
+
         if val_run.interval_from is not None:
             val_run_dict['interval_from'] = val_run.interval_from.date()
         else:
@@ -72,10 +72,12 @@ def get_validation_configuration(request, **kwargs):
         val_run_dict['max_lat'] = val_run.max_lat
         val_run_dict['max_lon'] = val_run.max_lon
 
-        if val_run.scaling_ref.id != val_run.reference_configuration.id:
-            val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
-        else:
+        val_run_dict['scaling_method'] = val_run.scaling_method
+        if val_run.scaling_method is not None or val_run.scaling_method != 'none':
             val_run_dict['scale_to'] = ValidationRun.SCALE_TO_REF
+            if val_run.scaling_ref is not None:
+                if val_run.scaling_ref.id != val_run.reference_configuration.id:
+                    val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
 
         metrics = [{'id': 'tcol', 'value': val_run.tcol}]
         val_run_dict['metrics'] = metrics

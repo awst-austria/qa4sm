@@ -97,14 +97,6 @@
                 (click)=extendResults(validationRun.id)>
         </button>
       </span>
-      <button pButton
-              routerLink="/validate/"
-              class="dropdown-item"
-              [queryParams]="{validation_id: validationRun.id}"
-              title="Load validation settings"
-              label="Load Validation Settings"
-              icon="pi pi-replay">
-      </button>
     </div>
   </div>
   <!--published validations page only-->
@@ -217,7 +209,8 @@
             label="Publish"
             title="Publish on Zenodo"
             data-toggle="modal"
-            data-target="#publishDialog">
+            data-target="#publishDialog"
+            (click)="open()">
     </button>
 
     <a *ngIf="isLogged"

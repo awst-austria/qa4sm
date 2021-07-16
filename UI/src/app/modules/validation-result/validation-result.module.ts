@@ -9,7 +9,7 @@ import {ValidationPagePaginatedComponent} from './components/validation-page-pag
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
 import {ButtonsComponent} from './components/buttons/buttons.component';
 import {InputTextModule} from 'primeng/inputtext';
@@ -18,6 +18,7 @@ import {SummaryStatisticsComponent} from './components/summary-statistics/summar
 import {ResultFilesComponent} from './components/result-files/result-files.component';
 import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
 import {ButtonModule} from 'primeng/button';
+import {PublishingComponent} from './components/publishing/publishing.component';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -27,7 +28,8 @@ import {ButtonModule} from 'primeng/button';
     ButtonsComponent,
     TrackedValidationsComponent,
     SummaryStatisticsComponent,
-    ResultFilesComponent],
+    ResultFilesComponent,
+    PublishingComponent],
   exports: [
     ValidationrunRowComponent,
     ValidationPagePaginatedComponent,
@@ -35,20 +37,22 @@ import {ButtonModule} from 'primeng/button';
     TrackedValidationsComponent,
     SummaryStatisticsComponent,
     ResultFilesComponent,
+    PublishingComponent,
   ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    NgxPaginationModule,
-    RouterModule,
-    DropdownModule,
-    FormsModule,
-    InputTextModule,
-    NgDompurifyModule,
-    ButtonModule
-  ]
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        NgxPaginationModule,
+        RouterModule,
+        DropdownModule,
+        FormsModule,
+        InputTextModule,
+        NgDompurifyModule,
+        ButtonModule,
+        ReactiveFormsModule
+    ]
 })
 export class ValidationResultModule {
 }

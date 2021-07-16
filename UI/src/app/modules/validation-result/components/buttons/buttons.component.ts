@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 
 
 @Component({
@@ -33,7 +34,8 @@ export class ButtonsComponent implements OnInit {
   constructor(private httpClient: HttpClient,
               private router: Router,
               private validationService: ValidationrunService,
-              public authService: AuthService) { }
+              public authService: AuthService,
+              private modalService: ModalWindowService ) { }
 
   ngOnInit(): void {
     this.isLogged = this.authService.currentUser.id != null;
@@ -83,4 +85,7 @@ export class ButtonsComponent implements OnInit {
     window.location.reload();
   }
 
+  open(): void{
+    this.modalService.open();
+  }
 }
