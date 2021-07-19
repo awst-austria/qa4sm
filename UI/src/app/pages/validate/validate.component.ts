@@ -266,9 +266,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.setDefaultValidationPeriod();
   }
 
-  excludeFilter(toExclude: number) {
-    // should reload the filters while excluding the ones specified in the event
-    // this.loadFiltersForModel()
+  excludeFilter(toExclude: number, basicFilters: any) {
+    // Exclude the filter if mutual is selected
+    basicFilters.forEach(filter => {
+      if (filter.filterDto.id === toExclude){
+        filter.enabled = false;
+      }
+    });
   }
 
   addDatasetButtonDisabled(): boolean {
