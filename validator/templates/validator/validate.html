@@ -584,7 +584,7 @@
 
 
     <script type="text/javascript">
-        var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
+        var southWest = L.latLng(-10, -36), northEast = L.latLng(10, 36), bounds = L.latLngBounds(southWest, northEast);
         var map = L.map('spatialFilterMap', { maxBounds: bounds });
         var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
@@ -713,7 +713,7 @@
                     } else{
                         $('#id_target_hidden_input_version').val('');
                     };
-                    start_ajax_to_set_valiadtion_period();
+                    start_ajax_to_set_version_dependent_settings();
                 }
             });
         }
@@ -739,6 +739,10 @@
                 success: function (return_data) {
                   var intervals_from = return_data['intervals_from'];
                   var intervals_to = return_data['intervals_to'];
+                  let min_lon = return_data['min_lon'];
+                  let max_lon = return_data['max_lon'];
+                  let min_lat = return_data['min_lat'];
+                  let max_lat = return_data['max_lat'];
                   // calling functions given in the functions list
                   ind = 0
                   for (func in funcs_set){
@@ -746,10 +750,10 @@
                     param_list = get_list_of_params(arguments[0], args_names[ind]);
                     funcs_set[func](param_list);
                     ind++;
-                  };
+                  }
                 }
             });
-          };
+          }
 
          function get_list_of_params(args, args_names){
             /**
@@ -761,9 +765,9 @@
             for (arg_name in args_names){
               var name = args_names[arg_name];
               param_list.push(args[name]);
-            };
+            }
             return param_list
-          };
+          }
 
           function find_current_ids(){
             // Finds all selects which have 'version' in name attribute
@@ -773,10 +777,10 @@
               var version_id = parseInt(versions_list[ind].value);
               if (!isNaN(version_id)){
                 ids_list.push(version_id)
-              };
-            };
+              }
+            }
             return ids_list;
-          };
+          }
 //=========================== Time range related functions =====================================================
           function convert_date_to_string(date){
             // Converts date from Date() constructor to date format YYYY-MM-DD
@@ -819,12 +823,82 @@
             $('#id_interval_to').val(min_date_to_str);
           }
 
-          function start_ajax_to_set_valiadtion_period(){
+          function start_ajax_to_set_version_dependent_settings(){
             var versionIds = find_current_ids();
             ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
+            ajax_take_versions_info(versionIds, [compare_and_set_map_boundaries], [['min_lon', 'max_lon', 'min_lat', 'max_lat']]);
           }
 //================================================================================
-      
+        function compare_and_set_map_boundaries(params){
+              // console.log(params)
+            min_map_lon = -360
+            max_map_lon = 360
+            min_map_lat = -90
+            max_map_lat = 90
+
+            if (params[0] != null){
+                min_map_lon = params[0]
+            }
+            if(params[1] != null){
+                max_map_lon = params[1]
+            }
+            if(params[2] != null){
+                min_map_lat = params[2]
+            }
+            if(params[3] != null){
+                max_map_lat = params[3]
+            }
+            bounds = L.latLngBounds(L.latLng(min_map_lat, min_map_lon), L.latLng(max_map_lat, max_map_lon))
+            map.setMaxBounds(bounds);
+            check_spatial_subsetting()
+          }
+
+       function check_spatial_subsetting(){
+           let min_lon_selector =  $('#id_min_lon')
+           let max_lon_selector =  $('#id_max_lon')
+           let min_lat_selector =  $('#id_min_lat')
+           let max_lat_selector =  $('#id_max_lat')
+
+           let max_map_lon = map.options.maxBounds._northEast.lng
+           let min_map_lon = map.options.maxBounds._southWest.lng
+           let min_map_lat = map.options.maxBounds._southWest.lat
+           let max_map_lat = map.options.maxBounds._northEast.lat
+           console.log(max_map_lon, min_map_lon, max_map_lat, min_map_lat)
+
+           if (min_map_lon > min_lon_selector.val() || max_map_lon < max_lon_selector.val() || min_map_lat > min_lat_selector.val() || max_map_lat < max_lat_selector.val()){
+               if (min_map_lon > min_lon_selector.val()){
+                   min_lon_selector.val(min_map_lon)
+               }
+               if (max_map_lon < max_lon_selector.val()){
+                   max_lon_selector.val(max_map_lon)
+               }
+               if ( min_map_lat > min_lat_selector.val()){
+                   min_lat_selector.val(min_map_lat)
+               }
+               if (max_map_lat < max_lat_selector.val()){
+                   max_lat_selector.val(max_map_lat)
+               }
+
+               let message = 'The chosen spatial subsetting is bigger than the one covered by chosen datasets. Bounds corrected to fit available subsetting'
+               alert(message)
+           }
+       }
+
+       $('#id_min_lon').on('change', function(event){
+           check_spatial_subsetting()
+       })
+       $('#id_max_lon').on('change', function(event){
+            check_spatial_subsetting()
+       })
+       $('#id_min_lat').on('change', function(event){
+            check_spatial_subsetting()
+       })
+       $('#id_max_lat').on('change', function(event){
+            check_spatial_subsetting()
+       })
+
+//================================================================================
+
         function change_tab_name() {
             var datasetName = $(this).find('option:selected').text();
             var tabId = '#' + $(this).attr('id').replace(/dataset$/, 'tab');
@@ -833,7 +907,7 @@
 
         {% for dc_form in dc_formset.forms %}
             $("#{{ dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(change_tab_name).change(); // last change() to call change on pageload
-            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_valiadtion_period)
+            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_version_dependent_settings)
         {% endfor %}
 
         function get_version_id(){
@@ -850,7 +924,7 @@
 
 
         $("#{{ ref_dc_form.dataset.auto_id }}").change(ajax_change_dataset).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_valiadtion_period)
+        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_version_dependent_settings)
 
 
     </script>
@@ -1095,7 +1169,7 @@
 
         $('#remove_dc_form').click(function() {
             removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
-            start_ajax_to_set_valiadtion_period();
+            start_ajax_to_set_version_dependent_settings();
         });
 
         function set_after(first_element_selector, second_element_selector){

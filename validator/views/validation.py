@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 import logging
 from multiprocessing import Process
@@ -412,6 +413,10 @@ def ajax_get_version_info(request):
         return HttpResponseBadRequest("Not a valid dataset version")
     intervals_from = []
     intervals_to = []
+    min_lats = []
+    max_lats = []
+    min_lons = []
+    max_lons = []
     for version in versions:
         if 'ISMN' in version.short_name:
             time_from = val_globals.START_TIME
@@ -419,12 +424,42 @@ def ajax_get_version_info(request):
         else:
             time_from = version.time_range_start
             time_to = version.time_range_end
+        if version.geographical_range:
+            min_lats.append(version.geographical_range['min_lat'])
+            max_lats.append(version.geographical_range['max_lat'])
+            min_lons.append(version.geographical_range['min_lon'])
+            max_lons.append(version.geographical_range['max_lon'])
         intervals_from.append(time_from)
         intervals_to.append(time_to)
 
+    if len(min_lons) != 0:
+        min_lon = max(min_lons)
+    else:
+        min_lon = None
+
+    if len(max_lons) != 0:
+        max_lon = min(max_lons)
+    else:
+        max_lon = None
+
+    if len(min_lats) != 0:
+        min_lat = max(min_lats)
+    else:
+        min_lat = None
+
+    if len(max_lats) != 0:
+        max_lat = min(max_lats)
+    else:
+        max_lat = None
+
+
     response_data = {
         'intervals_from': intervals_from,
-        'intervals_to' : intervals_to
+        'intervals_to' : intervals_to,
+        'min_lon': min_lon,
+        'max_lon': max_lon,
+        'min_lat': min_lat,
+        'max_lat': max_lat
         }
     return JsonResponse(response_data)
 
