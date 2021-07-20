@@ -7,6 +7,7 @@ class DataFilter(models.Model):
     parameterised = models.BooleanField(default=False)
     dialog_name = models.CharField(max_length=30, null=True, blank=True)
     default_parameter = models.TextField(null=True, blank=True)
+    disable_filter = models.IntegerField(null=True)
 
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration
