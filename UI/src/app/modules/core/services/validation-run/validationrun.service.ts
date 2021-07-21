@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ValidationrunDto} from './validationrun.dto';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {ValidationSetDto} from '../../../validation-result/services/validation.set.dto';
 import {saveAs} from 'file-saver-es';
@@ -28,7 +28,8 @@ const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
   providedIn: 'root'
 })
 export class ValidationrunService {
-
+  private refresh: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  doRefresh = this.refresh.asObservable();
   customValidationrun$: Observable<ValidationSetDto>;
   publishedValidationrun$: Observable<ValidationSetDto>;
 
@@ -85,6 +86,7 @@ export class ValidationrunService {
     const archiveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'}).subscribe(
       () => {
+        location.reload();
       });
   }
 
@@ -160,5 +162,12 @@ export class ValidationrunService {
     return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params});
   }
 
+  // waitForRefreshing(): Observable<boolean> {
+  //   return
+  // }
+
+  refreshComponent(): void{
+    this.refresh.next(true);
+  }
 
 }

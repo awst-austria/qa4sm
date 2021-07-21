@@ -64,7 +64,6 @@ export class ButtonsComponent implements OnInit {
 
   archiveResults(validationId: string, archive: boolean): void{
     this.validationService.archiveResults(validationId, archive);
-    window.location.reload();
   }
 
   extendResults(validationId: string): void{
