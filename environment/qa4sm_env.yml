@@ -148,8 +148,9 @@ dependencies:
     - ecmwf-models==0.7
     - esa-cci-sm==0.1.1
     - gldas==0.6.1
+    - h5netcdf
     - h5py==3.1.0
-    - git+https://github.com/awst-austria/ismn.git
+    - ismn==1.0.1
     - kombu==4.6.11
     - llvmlite==0.34.0
     - lxml==4.6.1
@@ -162,11 +163,11 @@ dependencies:
     - pygeobase==0.4.0
     - pygeogrids==0.3.0
     - pynetcf==0.2.2
-    - pytesmo==0.10.0
+    - pytesmo==0.11.3
     - pytest-cov==2.10.1
     - pytest-django==4.1.0
     - pytest-mpl==0.12
-    - git+https://github.com/pstradio/qa4sm-reader.git@validation_comparison_optimized
+    - qa4sm-reader==0.4.4.2
     - redis==3.5.3
     - repurpose==0.8
     - seaborn==0.11.0

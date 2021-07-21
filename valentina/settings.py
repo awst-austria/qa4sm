@@ -28,7 +28,7 @@ ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environm
 
 ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 
-# Expected ping frequency in minutes
+# Expected ping frequency in minutes. !Do not change this unless you fully understand the code that use this property!
 UPTIME_PING_INTERVAL = 5
 
 # Application definition

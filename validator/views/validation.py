@@ -326,6 +326,12 @@ def validation(request):
                 valrun_initial_values[field] = (
                     valrun_initial_values[field].strftime("%Y-%m-%d")
                 )
+            if field.startswith("anomalies_") and isinstance(valrun_initial_values[field], str):
+                # the fields anomalies_from and anomalies_to take an integer
+                # year instead of a string datetime
+                valrun_initial_values[field] = int(
+                    valrun_initial_values[field][0:4]
+                )
 
     if request.method == "POST":
         if Settings.load().maintenance_mode:

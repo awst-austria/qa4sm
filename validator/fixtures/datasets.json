@@ -62,9 +62,9 @@
             "pretty_name": "H-SAF ASCAT SSM CDR",
             "help_text": "ASCAT dataset from the EUMETSAT H-SAF portal",
             "storage_path": "testdata/input_data/ASCAT",
-            "detailed_description": "The ASCAT dataset from the EUMETSAT H-SAF portal provides global daily soil moisture observations on a discrete global grid (DGG) with a spatial resolution of 25 km. Observations are provided from the ASCAT instrument on-board both Metop-A and Metop-B (<a target=\"_blank\" href=\"http://hsaf.meteoam.it/description-h25-h108-h111.php\">more information</a>).",
-            "source_reference": "The data can be downloaded from the <a target=\"_blank\" href=\"http://hsaf.meteoam.it/description-h25-h108-h111.php\">product homepage</a>.",
-            "citation": "See section 5.2 of <a target=\"_blank\" href=\"http://hsaf.meteoam.it/documents/PUM/SSM_ASCAT_DR_PUM_v0.6.pdf\">this document</a>",
+            "detailed_description": "The ASCAT dataset from the EUMETSAT H-SAF portal provides global daily soil moisture observations on a discrete global grid (DGG) with a 12.5 km sampling. Observations are provided from the ASCAT instrument on-board both Metop-A and Metop-B.",
+            "source_reference": "The data can be downloaded from the <a target=\"_blank\" href=\"http://hsaf.meteoam.it/Products/ProductsList?type=soil_moisture\">product homepage</a>.",
+            "citation": "See <a target=\"_blank\" href=\"http://doi.org/10.15770/EUM_SAF_H_0005\">here</a>",
             "is_only_reference": false,
             "versions": [
                 3
@@ -91,8 +91,8 @@
             "help_text": "In-situ soil moisture data from over 2600 monitoring stations worldwide",
             "storage_path": "testdata/input_data/ISMN",
             "detailed_description": "The ISMN provides in-situ soil moisture data from over 2600 monitoring stations worldwide. The data is harmonised and quality controlled to ensure the highest quality data is provided through the portal. Data is provided from 1952 to present day (<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/\">more information</a>).",
-            "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/data-access/\"> here</a>.",
-            "citation": "<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/terms-and-conditions/\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\">readme (v20180830)</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\">readme (v20190222)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20210131_Readme.txt\">readme (v20210131)</a>",
+            "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://ismn.earth/en/\"> here</a>.",
+            "citation": "<a target=\"_blank\" href=\"https://ismn.earth/en/terms-and-conditions/\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\">readme (v20180830)</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\">readme (v20190222)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20210131_Readme.txt\">readme (v20210131)</a>",
             "is_only_reference": true,
             "versions": [
                 5,
@@ -206,9 +206,9 @@
             "pretty_name": "ERA5",
             "help_text": "Global reanalysis product by ECMWF",
             "storage_path": "testdata/input_data/ERA5",
-            "detailed_description": "ERA5 is a global reanalysis product provided by ECMWF. It provides global, sub-daily simulations of variables for land, atmosphere and ocean waves. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5 Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.25\u00b0 Lat. * 0.25\u00b0 Lon were converted into a time series format via daily averages. The ERA5 dataset starts in 1979. The version number used in QA4SM indicates the date when the original data was downloaded. For more details about ERA5 please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation\">ECMWF Confluence - ERA5 Documentation</a>",
-            "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation#ERA5datadocumentation-HowtodownloadERA5\"> ECMWF Confluence - ERA5 Download</a>",
-            "citation": "<a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/What+is+ERA5\">Click here</a>",
+            "detailed_description": "ERA5 is a global reanalysis product provided by ECMWF. It provides global, sub-daily simulations of variables for land, atmosphere and ocean waves. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5 Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.25\u00b0 Lat. * 0.25\u00b0 Lon were converted into a time series format via daily averages. The ERA5 dataset starts in 1979. The version number used in QA4SM indicates the date when the original data was downloaded. For more details about ERA5 please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation\">ECMWF Confluence - ERA5 Documentation</a>",
+            "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://doi.org/10.24381/cds.e2161bac\"> ERA5 Download</a>",
+            "citation": "See <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/How+to+acknowledge%2C+cite+and+reference+data+published+on+the+Climate+Data+Store\">here</a> and <a target=\"_blank\" href=\"https://doi.org/10.1002/qj.3803\">here</a> ",
             "is_only_reference": false,
             "versions": [
                 15
@@ -230,9 +230,9 @@
             "pretty_name": "ERA5-Land",
             "help_text": "Land component of the ECMWF ERA5 climate reanalysis",
             "storage_path": "testdata/input_data/ERA5_LAND",
-            "detailed_description": "ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5-Land Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.1\u00b0 Lat. * 0.1\u00b0 Lon were converted into a time series format from daily averages. ERA5-Land is available from January 2001 onward. The Soil Temperature variable (stl1) is used to mask Soil Moisture (swvl1) under frozen conditions if selected. The version number used in QA4SM indicates the date when the original data was downloaded. For more details please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5+data+documentation\">ECMWF Confluence - ERA5-Land Documentation</a>",
-            "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=form\"> Copernicus Climate Data Store Confluence - ERA5-Land Download</a>",
-            "citation": "<a target=\"_blank\" href=\"https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview\">Click here</a>",
+            "detailed_description": "ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. The downloaded original 6-hourly (starting at 0:00 UTC) images of ERA5-Land Volumetric Soil Moisture and Soil Temperature with a spatial resolution of 0.1\u00b0 Lat. * 0.1\u00b0 Lon were converted into a time series format from daily averages. ERA5-Land is available from January 2001 onward. The Soil Temperature variable (stl1) is used to mask Soil Moisture (swvl1) under frozen conditions if selected. The version number used in QA4SM indicates the date when the original data was downloaded. For more details please see <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5%3A+data+documentation\">ECMWF Confluence - ERA5-Land Documentation</a>",
+            "source_reference": "Data is freely available with a CDS account. See <a target=\"_blank\" href=\"https://doi.org/10.24381/cds.e2161bac\"> Copernicus Climate Data Store Confluence - ERA5-Land Download</a>",
+            "citation": "<a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/How+to+acknowledge%2C+cite+and+reference+data+published+on+the+Climate+Data+Store\">Click here</a>",
             "is_only_reference": false,
             "versions": [
                 16

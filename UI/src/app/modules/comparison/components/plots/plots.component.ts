@@ -10,6 +10,7 @@ import {WebsiteGraphicsService} from '../../../core/services/global/website-grap
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
+import {debounceTime} from "rxjs/operators";
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'mapplot'];
@@ -44,7 +45,7 @@ export class PlotsComponent implements OnInit {
 
   startComparison(): void {
     // start comparison on button click; updated recursively
-    this.comparisonService.currentComparisonModel.subscribe(comparison => {
+    this.comparisonService.currentComparisonModel.pipe(debounceTime(5000)).subscribe(comparison => {
       if (comparison.selectedValidations.length > 0) {
         this.comparisonModel = comparison;
         this.getComparisonMetrics(comparison);
@@ -62,7 +63,8 @@ export class PlotsComponent implements OnInit {
       params = params.append('ids', id);
     });
     this.comparisonMetrics = [];
-    this.comparisonService.getMetrics4Comparison(params).subscribe(response => {
+    this.comparisonService.getMetrics4Comparison(params).subscribe(
+      response => {
       if (response && response.length > 1) {
         response.forEach(metric => {
           this.comparisonMetrics.push(
