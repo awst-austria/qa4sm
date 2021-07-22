@@ -127,8 +127,9 @@ export class ValidationrunService {
     return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params});
   }
 
-  refreshComponent(validationId: string): void{
-    this.refresh.next(validationId);
+  refreshComponent(validationIdOrPage: string): void{
+    // here we can give or validation id or the word 'page' if entire page should be reloaded (e.g. when a validation is removed)
+    this.refresh.next(validationIdOrPage);
   }
 
 }
