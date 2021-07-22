@@ -109,25 +109,16 @@ export class ValidationrunService {
     saveAs(fileUrl, fileName);
   }
 
-  addValidation(validationId: string): void {
+  addValidation(validationId: string): Observable<any> {
     const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {add_validation: true};
-    this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      response => {
-        alert(response);
-      }
-    );
+    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
 
-  removeValidation(validationId: string): void {
-    if (!confirm('Do you really want to remove this validation from your list?')) {
-      return;
-    }
+  removeValidation(validationId: string): Observable<any> {
     const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {remove_validation: true};
-    this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      response => alert(response)
-    );
+    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
 
   getSummaryStatistics(params: any): Observable<any> {

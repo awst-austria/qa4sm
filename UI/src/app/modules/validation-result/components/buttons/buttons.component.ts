@@ -89,13 +89,27 @@ export class ButtonsComponent implements OnInit {
   }
 
   addValidation(validationId: string): void{
-    this.validationService.addValidation(validationId);
-    window.location.reload();
+    this.validationService.addValidation(validationId).subscribe(
+        response => {
+          alert(response);
+          this.validationService.refreshComponent(validationId);
+          this.doRefresh.emit(true);
+        }
+      );
   }
 
   removeValidation(validationId: string): void{
-    this.validationService.removeValidation(validationId);
-    window.location.reload();
+    if (!confirm('Do you really want to remove this validation from your list?')) {
+      return;
+    }
+    this.validationService.removeValidation(validationId).subscribe(
+      response => {
+        alert(response);
+        this.validationService.refreshComponent(validationId);
+        this.doRefresh.emit(true);
+      }
+    );
+
   }
 
   open(): void{
