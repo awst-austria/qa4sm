@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
 import {combineLatest, Observable} from 'rxjs';
@@ -22,6 +22,7 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 export class ValidationSummaryComponent implements OnInit {
 
   @Input() validationModel: ValidationResultModel;
+  @Output() doRefresh = new EventEmitter();
 
   configurations$: Observable<any>;
   validationRun$: Observable<any>;
@@ -120,8 +121,11 @@ export class ValidationSummaryComponent implements OnInit {
     this.hideElement = !this.hideElement;
   }
   saveName(validationId: string, newName: string): void{
-    this.validationService.saveResults(validationId, newName);
-    window.location.reload();
+    this.validationService.saveResults(validationId, newName).subscribe(
+      () => {
+        this.doRefresh.emit(true);
+      });
+
   }
 
   refresh(dorefresh: boolean): void{

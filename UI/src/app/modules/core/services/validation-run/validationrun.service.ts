@@ -84,12 +84,10 @@ export class ValidationrunService {
     return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'});
   }
 
-  saveResults(validationId: string, newName: string): void {
+  saveResults(validationId: string, newName: string): Observable<any> {
     const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {save_name: true, new_name: newName};
-    this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'json'}).subscribe(
-      () => {
-      });
+    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
 
   }
 
