@@ -83,18 +83,10 @@ export class ValidationrunService {
     return this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'});
   }
 
-  extendResults(validationId: string): void {
-    if (!confirm('Do you want to extend the lifespan of this result?')) {
-      return;
-    }
+  extendResults(validationId: string): Observable<any> {
     const extendUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const extend = true;
-    this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      (response) => {
-        const newExpiry = new Date(response);
-        alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString());
-        location.reload();
-      });
+    return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'});
   }
 
   saveResults(validationId: string, newName: string): void {

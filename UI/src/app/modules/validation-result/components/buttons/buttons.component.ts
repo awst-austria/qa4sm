@@ -75,7 +75,13 @@ export class ButtonsComponent implements OnInit {
   }
 
   extendResults(validationId: string): void{
-    this.validationService.extendResults(validationId);
+    if (!confirm('Do you want to extend the lifespan of this result?')) {
+      return;
+    }
+    this.validationService.extendResults(validationId).subscribe(() => {
+      this.validationService.refreshComponent(validationId);
+      this.doRefresh.emit(true);
+    });
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void{
