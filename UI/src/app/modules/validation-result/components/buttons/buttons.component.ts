@@ -91,11 +91,11 @@ export class ButtonsComponent implements OnInit {
   addValidation(validationId: string): void{
     this.validationService.addValidation(validationId).subscribe(
         response => {
-          alert(response);
           this.validationService.refreshComponent(validationId);
           this.doRefresh.emit(true);
-        }
-      );
+          alert(response);
+        });
+    this.authService.init();
   }
 
   removeValidation(validationId: string): void{
@@ -104,12 +104,11 @@ export class ButtonsComponent implements OnInit {
     }
     this.validationService.removeValidation(validationId).subscribe(
       response => {
-        alert(response);
         this.validationService.refreshComponent(validationId);
         this.doRefresh.emit(true);
-      }
-    );
-
+        alert(response);
+      });
+    this.authService.init();
   }
 
   open(): void{
