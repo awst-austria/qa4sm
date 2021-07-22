@@ -58,14 +58,9 @@ export class ValidationrunService {
     return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl);
   }
 
-  deleteValidation(validationId: string): void {
-    if (!confirm('Do you really want to delete the result?')) {
-      return;
-    }
+  deleteValidation(validationId: string): Observable<any> {
     const deleteUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    this.httpClient.delete(deleteUrl, {headers}).subscribe(
-      () => {
-      });
+    return this.httpClient.delete(deleteUrl, {headers});
   }
 
   stopValidation(validationId: string): Observable<any> {

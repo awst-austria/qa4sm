@@ -12,6 +12,7 @@ import {GlobalParamsService} from '../../../core/services/global/global-params.s
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -40,7 +41,8 @@ export class ValidationSummaryComponent implements OnInit {
               private filterService: FilterService,
               private globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService,
-              private authService: AuthService) { }
+              private authService: AuthService,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.updateConfig();
@@ -129,8 +131,11 @@ export class ValidationSummaryComponent implements OnInit {
   }
 
   refresh(dorefresh: boolean): void{
+    console.log(dorefresh);
     if (dorefresh){
       this.ngOnInit();
+    } else {
+      this.router.navigate(['/my-validations']);
     }
   }
 }

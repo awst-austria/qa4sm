@@ -44,17 +44,16 @@ export class ButtonsComponent implements OnInit {
     this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
   }
 
-  reloadMyValidations(): void{
-    const targetUrl = '/my-validations';
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-    this.router.onSameUrlNavigation = 'reload';
-    this.router.navigate([targetUrl]);
-  }
-
 
   deleteValidation(validationId: string): void{
-    this.validationService.deleteValidation(validationId);
-    this.reloadMyValidations();
+    if (!confirm('Do you really want to delete the result?')) {
+      return;
+    }
+    this.validationService.deleteValidation(validationId).subscribe(
+      () => {
+        this.validationService.refreshComponent('page');
+        this.doRefresh.emit(false);
+      });
 
   }
 

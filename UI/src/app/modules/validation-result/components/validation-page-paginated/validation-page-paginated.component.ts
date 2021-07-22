@@ -22,8 +22,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   ngOnInit(): void {
     this.validationrunService.doRefresh.subscribe(value => {
-        if (value){
+        if (value && value !== 'page'){
           this.updateData(value);
+        } else if (value && value === 'page'){
+          this.refreshPage();
         }
     });
   }
@@ -65,4 +67,16 @@ export class ValidationPagePaginatedComponent implements OnInit {
         this.validations[indexOfValidation] = data;
       });
   }
+
+  refreshPage(): void{
+    const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
+      .set('order', String(this.order));
+    this.validationrunService.getMyValidationruns(parameters).subscribe(
+      response => {
+        const {validations, length} = response;
+        this.validations = validations;
+        this.numberOfValidations = length;
+      });
+  }
+
 }
