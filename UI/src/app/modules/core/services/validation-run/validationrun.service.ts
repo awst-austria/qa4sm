@@ -29,6 +29,7 @@ const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 })
 export class ValidationrunService {
   private refresh: BehaviorSubject<string> = new BehaviorSubject('');
+
   doRefresh = this.refresh.asObservable();
   customValidationrun$: Observable<ValidationSetDto>;
   publishedValidationrun$: Observable<ValidationSetDto>;
