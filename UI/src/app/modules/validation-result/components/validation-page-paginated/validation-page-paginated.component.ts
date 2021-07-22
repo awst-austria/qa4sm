@@ -21,7 +21,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
   constructor(private validationrunService: ValidationrunService) { }
 
   ngOnInit(): void {
-    // this.getValidationsAndItsNumber(this.published);
+    this.validationrunService.doRefresh.subscribe(value => {
+        if (value){
+          this.updateData(value);
+        }
+    });
   }
 
   getValidationsAndItsNumber(published: boolean): void{
@@ -55,4 +59,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.getValidationsAndItsNumber(this.published);
   }
 
+  updateData(validationId: string): void{
+      const indexOfValidation = this.validations.findIndex(validation => validation.id === validationId);
+      this.validationrunService.getValidationRunById(validationId).subscribe(data => {
+        this.validations[indexOfValidation] = data;
+      });
+  }
 }
