@@ -176,7 +176,7 @@
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons [validationList]="false" [validationRun]="validationRun"></qa-buttons>
+      <qa-buttons [validationList]="false" [validationRun]="validationRun" (doRefresh)="refresh($event)"></qa-buttons>
     </div>
   </p-panel>
 </main>

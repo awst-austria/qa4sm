@@ -123,4 +123,10 @@ export class ValidationSummaryComponent implements OnInit {
     this.validationService.saveResults(validationId, newName);
     window.location.reload();
   }
+
+  refresh(dorefresh: boolean): void{
+    if (dorefresh){
+      this.ngOnInit();
+    }
+  }
 }
