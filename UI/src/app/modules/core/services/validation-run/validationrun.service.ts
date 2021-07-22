@@ -28,7 +28,7 @@ const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
   providedIn: 'root'
 })
 export class ValidationrunService {
-  private refresh: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  private refresh: BehaviorSubject<string> = new BehaviorSubject('');
   doRefresh = this.refresh.asObservable();
   customValidationrun$: Observable<ValidationSetDto>;
   publishedValidationrun$: Observable<ValidationSetDto>;
@@ -78,16 +78,9 @@ export class ValidationrunService {
       });
   }
 
-  archiveResults(validationId: string, archive: boolean): void {
-    if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
-      + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
-      return;
-    }
+  archiveResults(validationId: string, archive: boolean): Observable<any> {
     const archiveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'}).subscribe(
-      () => {
-        location.reload();
-      });
+    return this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'});
   }
 
   extendResults(validationId: string): void {
@@ -162,12 +155,8 @@ export class ValidationrunService {
     return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params});
   }
 
-  // waitForRefreshing(): Observable<boolean> {
-  //   return
-  // }
-
-  refreshComponent(): void{
-    this.refresh.next(true);
+  refreshComponent(validationId: string): void{
+    this.refresh.next(validationId);
   }
 
 }

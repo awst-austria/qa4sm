@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {HttpClient} from '@angular/common/http';
@@ -20,6 +20,7 @@ export class ButtonsComponent implements OnInit {
   @Input() published: boolean;
   @Input() validationList: boolean;
   @Input() tracked: boolean;
+  @Output() doRefresh = new EventEmitter();
 
   faIcons = {faArchive: fas.faArchive,
     faStop: fas.faStop,
@@ -63,7 +64,14 @@ export class ButtonsComponent implements OnInit {
   }
 
   archiveResults(validationId: string, archive: boolean): void{
-    this.validationService.archiveResults(validationId, archive);
+    if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
+      + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
+      return;
+    }
+    this.validationService.archiveResults(validationId, archive).subscribe(() => {
+      this.validationService.refreshComponent(validationId);
+      this.doRefresh.emit(true);
+    });
   }
 
   extendResults(validationId: string): void{
