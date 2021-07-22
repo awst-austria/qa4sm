@@ -68,14 +68,9 @@ export class ValidationrunService {
       });
   }
 
-  stopValidation(validationId: string): void {
-    if (!confirm('Do you really want to stop the validation?')) {
-      return;
-    }
+  stopValidation(validationId: string): Observable<any> {
     const stopUrl = stopValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    this.httpClient.delete(stopUrl, {headers}).subscribe(
-      () => {
-      });
+    return this.httpClient.delete(stopUrl, {headers});
   }
 
   archiveResults(validationId: string, archive: boolean): Observable<any> {

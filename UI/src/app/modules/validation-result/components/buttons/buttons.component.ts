@@ -59,8 +59,13 @@ export class ButtonsComponent implements OnInit {
   }
 
   stopValidation(validationId: string): void{
-    this.validationService.stopValidation(validationId);
-    this.reloadMyValidations();
+    if (!confirm('Do you really want to stop the validation?')) {
+      return;
+    }
+    this.validationService.stopValidation(validationId).subscribe(
+      () => {
+        this.validationService.refreshComponent(validationId);
+      });
   }
 
   archiveResults(validationId: string, archive: boolean): void{
