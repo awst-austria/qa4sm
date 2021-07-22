@@ -35,4 +35,8 @@ export class ValidationResultComponent implements OnInit {
     });
   }
 
+  update(): void{
+    this.validationModel.validationRun = this.validationRunService.getValidationRunById(this.validationId);
+  }
+
 }
