@@ -41,13 +41,13 @@
               <qa-basic-filter *ngFor="let filter of item.basicFilters; let filterIdx = index"
                                [filterModel]="filter"></qa-basic-filter>
               <div style="width: 100%;text-align: right">
-              <button pButton type="button"
-                      (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
-                      label="Remove dataset"
-                      icon="pi pi-trash"
-                      class="p-button-danger p-my-2"
-                      style="padding: 0.2rem;">
-              </button>
+                <button pButton type="button"
+                        (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
+                        label="Remove dataset"
+                        icon="pi pi-trash"
+                        class="p-button-danger p-my-2"
+                        style="padding: 0.2rem;">
+                </button>
               </div>
             </p-accordionTab>
 
@@ -109,7 +109,6 @@
       </div>
 
 
-
       <!--      Validation period-->
       <div class="p-col-12">
         <qa-validation-period [validationPeriodModel]="validationModel.validationPeriodModel"></qa-validation-period>
@@ -128,6 +127,19 @@
       <!--      Scaling-->
       <div class="p-col-12">
         <qa-scaling [validationModel]="validationModel"></qa-scaling>
+      </div>
+
+      <!-- Name -->
+      <div class="p-col-12">
+        <div class="p-grid p-px-2">
+            <span class="label p-col-1">
+              <label for="name">Name</label>
+            </span>
+          <input class="form-field p-col" id="name" type="text" pInputText>
+          <span title="You can optionally name the validation to make it easier to identify in your list of validations."
+                class="pi pi-question-circle p-col-1 help-field">
+          </span>
+        </div>
       </div>
 
       <div class="p-col-12">
