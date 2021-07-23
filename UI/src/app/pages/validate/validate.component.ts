@@ -55,7 +55,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
     new AnomaliesModel(new BehaviorSubject<string>(ANOMALIES_NONE), ANOMALIES_NONE_DESC, new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
-    SCALING_METHOD_DEFAULT);
+    SCALING_METHOD_DEFAULT,
+    new BehaviorSubject<string>(''));
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
 
@@ -187,6 +188,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     //Scaling
     this.scalingChild.setSelection(config.scaling_method, config.scale_to);
+
+    // Name
+    this.validationModel.nameTag$.next(config.name_tag);
   }
 
   addDatasetToValidate() {
@@ -300,6 +304,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
       scaling_method: this.validationModel.scalingModel.id,
       scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
+      name_tag: this.validationModel.nameTag$.getValue()
     };
 
     this.validationConfigService.startValidation(newValidation).subscribe(

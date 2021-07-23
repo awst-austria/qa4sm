@@ -10,9 +10,10 @@ export interface ValidationRunConfigDto {
   metrics: ValidationRunMetricConfigDto[],
   anomalies_method: string,
   anomalies_from?: Date,
-  anomalies_to?: Date
+  anomalies_to?: Date,
   scaling_method: string,
-  scale_to: string
+  scale_to: string,
+  name_tag: string,
 }
 
 export interface ValidationRunDatasetConfigDto {

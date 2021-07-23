@@ -135,7 +135,12 @@
             <span class="label p-col-1">
               <label for="name">Name</label>
             </span>
-          <input class="form-field p-col" id="name" type="text" pInputText>
+          <input class="form-field p-col"
+                 id="name"
+                 type="text"
+                 pInputText
+                 [ngModel]="validationModel.nameTag$|async"
+                 (ngModelChange)="validationModel.nameTag$.next($event)">
           <span title="You can optionally name the validation to make it easier to identify in your list of validations."
                 class="pi pi-question-circle p-col-1 help-field">
           </span>
