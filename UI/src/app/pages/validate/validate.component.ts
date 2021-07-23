@@ -190,20 +190,19 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   addDatasetToValidate() {
-    this.addDataset(this.validationModel.datasetConfigurations);
+    this.addDataset(this.validationModel.datasetConfigurations, 'C3S');
   }
 
   addReferenceDataset() {
-    this.addDataset(this.validationModel.referenceConfigurations);
+    this.addDataset(this.validationModel.referenceConfigurations, 'ISMN');
   }
 
-  private addDataset(targetArray: DatasetConfigModel[]) {
-
+  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string) {
     let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
-      model.datasetModel.selectedDataset = datasets[0];
+      model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === defaultDatasetName);
 
       //then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
@@ -316,19 +315,29 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   setDefaultValidationPeriod(): void {
     const datesFrom = [];
     const datesTo = [];
-    this.validationModel.datasetConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
-        datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
-        datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
-      }
-    });
 
-    this.validationModel.referenceConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
-        datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
-        datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
-      }
-    });
+    if (this.validationModel.datasetConfigurations.length > 0){
+      this.validationModel.datasetConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_start) {
+          datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
+        }
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_end) {
+          datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
+        }
+      });
+    }
+
+    if (this.validationModel.referenceConfigurations.length > 0){
+      this.validationModel.referenceConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_start ) {
+          datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
+        }
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_end) {
+          datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
+        }
+      });
+    }
+
     if (datesFrom.length !== 0) {
       this.validationStart = new Date(Math.max.apply(null, datesFrom));
     }
