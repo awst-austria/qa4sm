@@ -25,9 +25,10 @@ import {ValidationRunConfigService} from './service/validation-run-config.servic
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject, ReplaySubject} from 'rxjs';
+import {BehaviorSubject, of, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
+import {delay} from 'rxjs/operators';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
@@ -81,11 +82,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       if (params['validation_id']) {
         this.validationConfigService.getValidationConfig(params['validation_id']).subscribe(
           valrun => {
-            console.log('Val run:', valrun);
+            // console.log('Val run:', valrun);
             this.modelFromValidationConfig(valrun);
           }
         );
       } else {
+        of({}).pipe(delay(0)).subscribe(() => {
+          this.setDefaultGeographicalRange();
+        });
         this.addDatasetToValidate();
         this.addReferenceDataset();
       }
@@ -214,7 +218,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         },
         () => {
         },
-        () => this.setDefaultValidationPeriod()
+        () => {
+          this.setDefaultValidationPeriod();
+          this.setLimitationsOnGeographicalRange();
+        }
       );
 
       // in the same time get the variables too
@@ -253,6 +260,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       this.validationModel.datasetConfigurations.splice(toBeRemoved, 1);
     }
     this.setDefaultValidationPeriod();
+    this.setLimitationsOnGeographicalRange();
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel) {
@@ -262,11 +270,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
     this.setDefaultValidationPeriod();
+    this.setLimitationsOnGeographicalRange();
   }
 
   onReferenceChange() {
     this.loadFiltersForModel(this.validationModel.referenceConfigurations[0]);
     this.setDefaultValidationPeriod();
+    this.setLimitationsOnGeographicalRange();
   }
 
 
@@ -317,6 +327,58 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
   }
 
+  setDefaultGeographicalRange(): void{
+    this.validationModel.spatialSubsetModel.maxLon$.next(48.3);
+    this.validationModel.spatialSubsetModel.minLon$.next(-11.2);
+    this.validationModel.spatialSubsetModel.maxLat$.next(71.6);
+    this.validationModel.spatialSubsetModel.minLat$.next(34.0);
+  }
+
+  setLimitationsOnGeographicalRange(): void{
+    // this.setDefaultGeographicalRange();
+    const maxLons = [];
+    const minLons = [];
+    const maxLats = [];
+    const minLats = [];
+
+    if (this.validationModel.datasetConfigurations.length > 0){
+      this.validationModel.datasetConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.geographical_range) {
+          maxLons.push(config.datasetModel.selectedVersion.geographical_range.max_lon);
+          minLons.push(config.datasetModel.selectedVersion.geographical_range.min_lon);
+          maxLats.push(config.datasetModel.selectedVersion.geographical_range.max_lat);
+          minLats.push(config.datasetModel.selectedVersion.geographical_range.min_lat);
+        }
+      });
+    }
+
+    if (this.validationModel.referenceConfigurations.length > 0){
+      this.validationModel.referenceConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.geographical_range) {
+          maxLons.push(config.datasetModel.selectedVersion.geographical_range.max_lon);
+          minLons.push(config.datasetModel.selectedVersion.geographical_range.min_lon);
+          maxLats.push(config.datasetModel.selectedVersion.geographical_range.max_lat);
+          minLats.push(config.datasetModel.selectedVersion.geographical_range.min_lat);
+        }
+      });
+    }
+
+    if (maxLons.length !== 0){
+      this.validationModel.spatialSubsetModel.maxLon$.next(Math.max(...maxLons));
+    }
+
+    if (minLons.length !== 0){
+      this.validationModel.spatialSubsetModel.minLon$.next(Math.max(...minLons));
+    }
+
+    if (maxLats.length !== 0){
+      this.validationModel.spatialSubsetModel.maxLat$.next(Math.max(...maxLats));
+    }
+
+    if (minLats.length !== 0){
+      this.validationModel.spatialSubsetModel.minLat$.next(Math.max(...minLats));
+    }
+  }
   setDefaultValidationPeriod(): void {
     const datesFrom = [];
     const datesTo = [];
