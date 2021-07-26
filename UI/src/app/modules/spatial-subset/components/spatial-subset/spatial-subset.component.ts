@@ -9,6 +9,7 @@ import {SpatialSubsetModel} from './spatial-subset-model';
 export class SpatialSubsetComponent implements OnInit {
 
   @Input() subsetModel: SpatialSubsetModel;
+  @Input() spatialSubsettingLimited: boolean;
 
   constructor() {
   }
@@ -21,6 +22,12 @@ export class SpatialSubsetComponent implements OnInit {
     this.subsetModel.maxLon$.next(null);
     this.subsetModel.minLat$.next(null);
     this.subsetModel.minLon$.next(null);
+  }
+
+  checkVal(value: number): any{
+    if (this.spatialSubsettingLimited){
+      return value;
+    }
   }
 
 }
