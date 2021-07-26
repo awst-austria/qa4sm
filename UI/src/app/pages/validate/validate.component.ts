@@ -28,6 +28,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
+import {getValueInRange} from "@ng-bootstrap/ng-bootstrap/util/util";
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
@@ -189,6 +190,37 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.scalingChild.setSelection(config.scaling_method, config.scale_to);
   }
 
+  includeFilter(toInclude: string, basicFilters: any, enabled: boolean): void {
+    // Simultaneously include/exclude all filters that are mutually inclusive (e.g. flag==0 and flag!=1, flag!=2)
+    const to_include_ids = [];
+    toInclude.split(',').forEach(
+      id => to_include_ids.push(parseInt(id))
+    );
+    basicFilters.forEach(filter => {
+      if (to_include_ids.includes(filter.filterDto.id)){
+        filter.enabled = enabled;
+        filter.readonly = enabled;
+      }
+    });
+  }
+
+  isIncluded(id: number, basicFilters: any): boolean {
+    let itDoes = false;
+    basicFilters.forEach(filter => {
+      const to_include_ids = [];
+      const to_include = filter.filterDto.to_include;
+      if (to_include !== null) {
+        to_include.split(',').forEach(
+          id => to_include_ids.push(parseInt(id))
+        );
+      }
+      if (to_include_ids.includes(id)) {
+        itDoes = true
+      }
+    })
+    return itDoes
+  }
+
   addDatasetToValidate() {
     this.addDataset(this.validationModel.datasetConfigurations);
   }
@@ -231,9 +263,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         model.parameterisedFilters = [];
         filters.forEach(filter => {
           if (filter.parameterised) {
-            model.parameterisedFilters.push(new FilterModel(filter, false, filter.default_parameter));
+            model.parameterisedFilters.push(new FilterModel(filter, false, false, filter.default_parameter));
           } else {
-            model.basicFilters.push(new FilterModel(filter, false, null));
+            model.basicFilters.push(new FilterModel(filter, false, false, null));
           }
         });
         updatedModel$.next(model);

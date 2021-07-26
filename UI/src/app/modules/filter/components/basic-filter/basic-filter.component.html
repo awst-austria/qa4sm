@@ -1,6 +1,7 @@
 <div class="p-grid no-gutters">
   <div class="p-col-12">
     <p-checkbox [label]="filterModel.filterDto.description" [(ngModel)]="filterModel.enabled"
-                [binary]="true"></p-checkbox>
+                [disabled]="filterModel.readonly"
+                [binary]="true" (onChange)="include_filters($event)"></p-checkbox>
   </div>
 </div>

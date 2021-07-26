@@ -38,8 +38,20 @@
                           [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
 
-              <qa-basic-filter *ngFor="let filter of item.basicFilters; let filterIdx = index"
-                               [filterModel]="filter"></qa-basic-filter>
+              <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
+                <qa-basic-filter
+                  *ngIf="isIncluded(filter.filterDto.id, item.basicFilters); else isNot"
+                  [ngStyle]="{'margin-left': '10%'}"
+                  [filterModel]="filter"
+                  (onIncludeMutual)="includeFilter($event, item.basicFilters, filter.enabled)">
+                </qa-basic-filter>
+                <ng-template #isNot>
+                  <qa-basic-filter
+                    [filterModel]="filter"
+                    (onIncludeMutual)="includeFilter($event, item.basicFilters, filter.enabled)">
+                  </qa-basic-filter>
+                </ng-template>
+              </ng-container>
               <div style="width: 100%;text-align: right">
               <button pButton type="button"
                       (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
