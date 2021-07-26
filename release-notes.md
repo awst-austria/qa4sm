@@ -1,3 +1,9 @@
+QA4SM v1.6.1 - Release notes 2021-07-26
+=======================================================
+# Updates
+1. Handling mutually exclusive filters added
+
+
 QA4SM v1.6.0 - Release notes 2021-07-13
 =======================================================
 
