@@ -60,6 +60,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     new BehaviorSubject<string>(''));
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
+  spatialSubsettingLimited = false;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -363,6 +364,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
+    this.spatialSubsettingLimited = maxLons.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0;
     if (maxLons.length !== 0){
       this.validationModel.spatialSubsetModel.maxLon$.next(Math.max(...maxLons));
     }
