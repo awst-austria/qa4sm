@@ -365,7 +365,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
-    this.validationModel.spatialSubsetModel.limited$.next(0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0);
+    const condition = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0
+    this.validationModel.spatialSubsetModel.limited$.next(condition);
+
     if (maxLons.length !== 0){
       this.validationModel.spatialSubsetModel.maxLon$.next(Math.max(...maxLons));
     }
@@ -381,6 +383,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (minLats.length !== 0){
       this.validationModel.spatialSubsetModel.minLat$.next(Math.max(...minLats));
     }
+
+    if (condition){
+      alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+        'Bounds corrected to fit available subsetting');
+    }
+
   }
   setDefaultValidationPeriod(): void {
     const datesFrom = [];

@@ -163,7 +163,8 @@ export class BoundingBoxControl extends Control {
         }
 
         this.updateBoundingBox();
-        console.log(this.map.getLayers().getArray());
+        alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+          'Bounds have been corrected to fit available subsetting');
       }
 
 
