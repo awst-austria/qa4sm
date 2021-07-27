@@ -24,7 +24,7 @@ export class SpatialSubsetComponent implements OnInit {
   }
 
   checkVal(value: number): any{
-    if (this.subsetModel.limited$){
+    if (this.subsetModel.limited$.getValue()){
       return value;
     }
   }
