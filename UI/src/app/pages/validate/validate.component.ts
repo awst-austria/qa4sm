@@ -52,7 +52,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null)),
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<boolean>(false)),
     new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
     new AnomaliesModel(new BehaviorSubject<string>(ANOMALIES_NONE), ANOMALIES_NONE_DESC, new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
@@ -364,7 +365,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
-    this.spatialSubsettingLimited = maxLons.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0;
+    this.validationModel.spatialSubsetModel.limited$.next(0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0);
     if (maxLons.length !== 0){
       this.validationModel.spatialSubsetModel.maxLon$.next(Math.max(...maxLons));
     }
