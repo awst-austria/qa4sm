@@ -9,7 +9,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -22,7 +23,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -35,7 +37,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": "4,5"
+            "to_include": "4,5",
+            "disable_filter": null
         }
     },
     {
@@ -48,7 +51,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -61,7 +65,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -74,7 +79,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": 7
         }
     },
     {
@@ -87,7 +93,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": 6
         }
     },
     {
@@ -100,7 +107,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -108,12 +116,13 @@
         "pk": 10,
         "fields": {
             "name": "FIL_ASCAT_METOP_A",
-            "description": "Metop-A observations",
+            "description": "Metop-A observations only",
             "help_text": "sat_id flag is metop-a",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": 11
         }
     },
     {
@@ -121,12 +130,13 @@
         "pk": 11,
         "fields": {
             "name": "FIL_ASCAT_METOP_B",
-            "description": "Metop-B observations",
+            "description": "Metop-B observations only",
             "help_text": "sat_id flag is metop-b",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": 10
         }
     },
     {
@@ -139,7 +149,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -152,7 +163,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -165,7 +177,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -178,7 +191,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": "19,20,21,22,23"
+            "to_include": "19,20,21,22,23",
+            "disable_filter": null
         }
     },
     {
@@ -191,7 +205,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -204,7 +219,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -217,7 +233,8 @@
             "parameterised": true,
             "dialog_name": "ismn_networks",
             "default_parameter": "AMMA-CATCH,BIEBRZA_S-1,BNZ-LTER,CARBOAFRICA,COSMOS,CTP_SMTMN,DAHRA,FLUXNET-AMERIFLUX,FMI,FR_Aqui,HOBE,iRON,LAB-net,MySMNet,OZNET,PBO_H2O,REMEDHUS,RISMA,RSMN,SCAN,SMOSMANIA,TERENO,USCRN,WEGENERNET,WSMN",
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -230,7 +247,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -243,7 +261,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -256,7 +275,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -269,7 +289,8 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
     {
@@ -282,10 +303,11 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     },
-        {
+    {
         "model": "validator.datafilter",
         "pk": 24,
         "fields": {
@@ -295,7 +317,8 @@
             "parameterised": true,
             "dialog_name": "ismn_depth",
             "default_parameter": "0.00,0.10",
-            "to_include": null
+            "to_include": null,
+            "disable_filter": null
         }
     }
 ]

@@ -60,7 +60,8 @@ class DataFilterSerializer(ModelSerializer):
                   'parameterised',
                   'dialog_name',
                   'default_parameter',
-                  'to_include'
+                  'to_include',
+                  'disable_filter'
                   ]
 
 

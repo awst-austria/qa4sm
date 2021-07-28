@@ -42,9 +42,11 @@
                 <qa-basic-filter
                   [ngClass]="isIncluded(filter.filterDto.id, item.basicFilters) == true ? 'ml-1' : ''"
                   [filterModel]="filter"
-                  (onIncludeMutual)="includeFilter($event, item.basicFilters, filter.enabled)">
+                  (onExcludeMutual)="this.excludeFilter($event, item.basicFilters)"
+                  (onIncludeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
                 </qa-basic-filter>
               </ng-container>
+
               <div style="width: 100%;text-align: right">
                 <button pButton type="button"
                         (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
@@ -93,6 +95,7 @@
               <qa-basic-filter
                 [ngClass]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters) == true ? 'ml-1' : ''"
                 [filterModel]="filter"
+                (onExcludeMutual)="this.excludeFilter($event, validationModel.referenceConfigurations[0].basicFilters)"
                 (onIncludeMutual)="includeFilter($event, validationModel.referenceConfigurations[0].basicFilters, filter.enabled)">
               </qa-basic-filter>
             </ng-container>
