@@ -16,7 +16,7 @@
            style="max-width: 60rem;">
         <h1 class="text-center">Validation Results</h1>
         <div class="p-col-12">
-          <qa-validation-summary [validationModel]="validationModel"></qa-validation-summary>
+          <qa-validation-summary [validationModel]="validationModel" (doRefresh)="update()"></qa-validation-summary>
         </div>
         <div *ngIf="validationRun.progress === 100 && validationRun.output_file"  class="p-col-12">
           <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"></qa-summary-statistics>

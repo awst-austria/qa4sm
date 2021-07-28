@@ -53,13 +53,13 @@
                 </ng-template>
               </ng-container>
               <div style="width: 100%;text-align: right">
-              <button pButton type="button"
-                      (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
-                      label="Remove dataset"
-                      icon="pi pi-trash"
-                      class="p-button-danger p-my-2"
-                      style="padding: 0.2rem;">
-              </button>
+                <button pButton type="button"
+                        (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
+                        label="Remove dataset"
+                        icon="pi pi-trash"
+                        class="p-button-danger p-my-2"
+                        style="padding: 0.2rem;">
+                </button>
               </div>
             </p-accordionTab>
 
@@ -109,7 +109,7 @@
         <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel" collapsed="true">
           <qa-map class="map" #qwerty
                   [spatialSubset]="validationModel.spatialSubsetModel"
-                  [center]="[-37.1,37.6]"
+                  [center]="[10, 52.5]"
                   [zoom]="2.5"></qa-map>
         </p-panel>
 
@@ -119,7 +119,6 @@
       <div class="p-col-12">
         <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
       </div>
-
 
 
       <!--      Validation period-->
@@ -140,6 +139,24 @@
       <!--      Scaling-->
       <div class="p-col-12">
         <qa-scaling [validationModel]="validationModel"></qa-scaling>
+      </div>
+
+      <!-- Name -->
+      <div class="p-col-12">
+        <div class="p-grid p-px-2">
+            <span class="label p-col-1">
+              <label for="name">Name</label>
+            </span>
+          <input class="form-field p-col"
+                 id="name"
+                 type="text"
+                 pInputText
+                 [ngModel]="validationModel.nameTag$|async"
+                 (ngModelChange)="validationModel.nameTag$.next($event)">
+          <span title="You can optionally name the validation to make it easier to identify in your list of validations."
+                class="pi pi-question-circle p-col-1 help-field">
+          </span>
+        </div>
       </div>
 
       <div class="p-col-12">

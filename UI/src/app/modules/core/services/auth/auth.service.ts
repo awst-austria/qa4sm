@@ -37,7 +37,7 @@ export class AuthService {
     this.init();
   }
 
-  private init() {
+  public init() {
     this.httpClient
       .get<UserDto>(this.loginUrl)
       .subscribe(

@@ -25,10 +25,10 @@ import {ValidationRunConfigService} from './service/validation-run-config.servic
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject, ReplaySubject} from 'rxjs';
+import {BehaviorSubject, of, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
-import {getValueInRange} from "@ng-bootstrap/ng-bootstrap/util/util";
+import {delay} from 'rxjs/operators';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
@@ -52,13 +52,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null)),
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<boolean>(false)),
     new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
     new AnomaliesModel(new BehaviorSubject<string>(ANOMALIES_NONE), ANOMALIES_NONE_DESC, new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
-    SCALING_METHOD_DEFAULT);
+    SCALING_METHOD_DEFAULT,
+    new BehaviorSubject<string>(''));
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
+  spatialSubsettingLimited = false;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -81,11 +84,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       if (params['validation_id']) {
         this.validationConfigService.getValidationConfig(params['validation_id']).subscribe(
           valrun => {
-            console.log('Val run:', valrun);
+            // console.log('Val run:', valrun);
             this.modelFromValidationConfig(valrun);
           }
         );
       } else {
+        of({}).pipe(delay(0)).subscribe(() => {
+          this.setDefaultGeographicalRange();
+        });
         this.addDatasetToValidate();
         this.addReferenceDataset();
       }
@@ -188,6 +194,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     //Scaling
     this.scalingChild.setSelection(config.scaling_method, config.scale_to);
+
+    // Name
+    this.validationModel.nameTag$.next(config.name_tag);
   }
 
   includeFilter(toInclude: string, basicFilters: any, enabled: boolean): void {
@@ -222,20 +231,19 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   addDatasetToValidate() {
-    this.addDataset(this.validationModel.datasetConfigurations);
+    this.addDataset(this.validationModel.datasetConfigurations, 'C3S');
   }
 
   addReferenceDataset() {
-    this.addDataset(this.validationModel.referenceConfigurations);
+    this.addDataset(this.validationModel.referenceConfigurations, 'ISMN');
   }
 
-  private addDataset(targetArray: DatasetConfigModel[]) {
-
+  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string) {
     let model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, null);
     targetArray.push(model);
     //get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
-      model.datasetModel.selectedDataset = datasets[0];
+      model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === defaultDatasetName);
 
       //then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
@@ -243,7 +251,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         },
         () => {
         },
-        () => this.setDefaultValidationPeriod()
+        () => {
+          this.setDefaultValidationPeriod();
+          this.setLimitationsOnGeographicalRange();
+        }
       );
 
       // in the same time get the variables too
@@ -282,6 +293,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       this.validationModel.datasetConfigurations.splice(toBeRemoved, 1);
     }
     this.setDefaultValidationPeriod();
+    this.setLimitationsOnGeographicalRange();
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel) {
@@ -291,11 +303,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
     this.setDefaultValidationPeriod();
+    this.setLimitationsOnGeographicalRange();
   }
 
   onReferenceChange() {
     this.loadFiltersForModel(this.validationModel.referenceConfigurations[0]);
     this.setDefaultValidationPeriod();
+    this.setLimitationsOnGeographicalRange();
   }
 
 
@@ -333,6 +347,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
       scaling_method: this.validationModel.scalingModel.id,
       scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
+      name_tag: this.validationModel.nameTag$.getValue()
     };
 
     this.validationConfigService.startValidation(newValidation).subscribe(
@@ -345,22 +360,93 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
   }
 
+  setDefaultGeographicalRange(): void{
+    this.validationModel.spatialSubsetModel.maxLon$.next(48.3);
+    this.validationModel.spatialSubsetModel.minLon$.next(-11.2);
+    this.validationModel.spatialSubsetModel.maxLat$.next(71.6);
+    this.validationModel.spatialSubsetModel.minLat$.next(34.0);
+  }
+
+  setLimitationsOnGeographicalRange(): void{
+    // this.setDefaultGeographicalRange();
+    const maxLons = [];
+    const minLons = [];
+    const maxLats = [];
+    const minLats = [];
+
+    if (this.validationModel.datasetConfigurations.length > 0){
+      this.validationModel.datasetConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.geographical_range) {
+          maxLons.push(config.datasetModel.selectedVersion.geographical_range.max_lon);
+          minLons.push(config.datasetModel.selectedVersion.geographical_range.min_lon);
+          maxLats.push(config.datasetModel.selectedVersion.geographical_range.max_lat);
+          minLats.push(config.datasetModel.selectedVersion.geographical_range.min_lat);
+        }
+      });
+    }
+
+    if (this.validationModel.referenceConfigurations.length > 0){
+      this.validationModel.referenceConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.geographical_range) {
+          maxLons.push(config.datasetModel.selectedVersion.geographical_range.max_lon);
+          minLons.push(config.datasetModel.selectedVersion.geographical_range.min_lon);
+          maxLats.push(config.datasetModel.selectedVersion.geographical_range.max_lat);
+          minLats.push(config.datasetModel.selectedVersion.geographical_range.min_lat);
+        }
+      });
+    }
+
+    const condition = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0
+    this.validationModel.spatialSubsetModel.limited$.next(condition);
+
+    if (maxLons.length !== 0){
+      this.validationModel.spatialSubsetModel.maxLon$.next(Math.max(...maxLons));
+    }
+
+    if (minLons.length !== 0){
+      this.validationModel.spatialSubsetModel.minLon$.next(Math.max(...minLons));
+    }
+
+    if (maxLats.length !== 0){
+      this.validationModel.spatialSubsetModel.maxLat$.next(Math.max(...maxLats));
+    }
+
+    if (minLats.length !== 0){
+      this.validationModel.spatialSubsetModel.minLat$.next(Math.max(...minLats));
+    }
+
+    if (condition){
+      alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+        'Bounds corrected to fit available subsetting');
+    }
+
+  }
   setDefaultValidationPeriod(): void {
     const datesFrom = [];
     const datesTo = [];
-    this.validationModel.datasetConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
-        datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
-        datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
-      }
-    });
 
-    this.validationModel.referenceConfigurations.forEach(config => {
-      if (config.datasetModel.selectedVersion.time_range_start && config.datasetModel.selectedVersion.time_range_end) {
-        datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
-        datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
-      }
-    });
+    if (this.validationModel.datasetConfigurations.length > 0){
+      this.validationModel.datasetConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_start) {
+          datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
+        }
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_end) {
+          datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
+        }
+      });
+    }
+
+    if (this.validationModel.referenceConfigurations.length > 0){
+      this.validationModel.referenceConfigurations.forEach(config => {
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_start ) {
+          datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
+        }
+        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_end) {
+          datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
+        }
+      });
+    }
+
     if (datesFrom.length !== 0) {
       this.validationStart = new Date(Math.max.apply(null, datesFrom));
     }

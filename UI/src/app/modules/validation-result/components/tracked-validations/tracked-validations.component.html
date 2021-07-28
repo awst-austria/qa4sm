@@ -8,7 +8,7 @@
             <h5 class="p-my-0"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
           </div>
           <div class="p-col-3 pinned-validation-buttons" style="max-width: 15rem; min-width: 12rem">
-            <qa-buttons [tracked]="true" [validationList]="true" [validationRun]="valrun"></qa-buttons>
+            <qa-buttons [tracked]="true" [validationList]="true" [validationRun]="valrun" (doRefresh)="refresh()"></qa-buttons>
           </div>
         </div>
       </div>

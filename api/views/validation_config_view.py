@@ -20,6 +20,7 @@ from validator.validation import run_validation
 @permission_classes([IsAuthenticated])
 def start_validation(request):
     ser = ValidationConfigurationSerializer(data=request.data)
+    print(ser)
     ser.is_valid(raise_exception=True)
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
@@ -43,6 +44,7 @@ def get_validation_configuration(request, **kwargs):
         val_run = ValidationRun.objects.get(pk=validation_run_id)
         val_run_dict = {}
 
+        val_run_dict['name_tag'] = val_run.name_tag;
 
         if val_run.interval_from is not None:
             val_run_dict['interval_from'] = val_run.interval_from.date()
@@ -169,6 +171,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             new_val_run.max_lat = validated_data.get('max_lat', None)
             new_val_run.max_lon = validated_data.get('max_lon', None)
             new_val_run.scaling_method = validated_data.get('scaling_method', None)
+            new_val_run.name_tag = validated_data.get('name_tag', None)
 
             for metric in validated_data.get('metrics'):
                 if metric.get('id') == 'tcol':
@@ -222,6 +225,8 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     min_lon = serializers.FloatField(required=False, allow_null=True, default=-180)
     max_lat = serializers.FloatField(required=False, allow_null=True, default=90)
     max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
+    name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
+
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):

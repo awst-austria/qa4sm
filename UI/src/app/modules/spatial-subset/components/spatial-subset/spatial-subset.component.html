@@ -22,6 +22,7 @@
 
               <p-inputNumber id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLat$|async"
+                             [min]="checkVal(subsetModel.minLat$|async)"
                              (ngModelChange)="subsetModel.minLat$.next($event)"></p-inputNumber>
 
               <label for="minLatInput">Lat</label>
@@ -34,6 +35,7 @@
             <div class="p-float-label ">
               <p-inputNumber id="minLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLon$|async"
+                             [min]="checkVal(subsetModel.minLon$|async)"
                              (ngModelChange)="subsetModel.minLon$.next($event)"></p-inputNumber>
 
               <label for="minLonInput">Lon</label>
@@ -66,6 +68,7 @@
 
               <p-inputNumber id="maxLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="(subsetModel.maxLat$|async)"
+                             [max]="checkVal(subsetModel.maxLat$|async)"
                              (ngModelChange)="subsetModel.maxLat$.next($event)"></p-inputNumber>
 
               <label for="maxLatInput">Lat</label>
@@ -77,6 +80,7 @@
             <div class="p-float-label ">
               <p-inputNumber id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.maxLon$|async"
+                             [max]="checkVal(subsetModel.maxLon$|async)"
                              (ngModelChange)="subsetModel.maxLon$.next($event)"></p-inputNumber>
 
               <label for="maxLonInput">Lon</label>
