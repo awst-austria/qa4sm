@@ -150,14 +150,17 @@
       <div class="p-col-12">
         <div>
           <div class="p-d-flex p-jc-center">
-            <p-button label="Validate" (onClick)="startValidation()"></p-button>
+            <p-button label="Validate" (onClick)="startValidation(true)"></p-button>
           </div>
         </div>
       </div>
 
     </div>
   </div>
-  <qa-existing-validation *ngIf="isExistingValidationWindowOpen"></qa-existing-validation>
+  <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
+                          [isThereValidation]="isThereValidation"
+                          (startValidation)="startValidation(false)">
+  </qa-existing-validation>
 </div>
 <qa-scroll-to-top></qa-scroll-to-top>
 

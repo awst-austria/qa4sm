@@ -29,6 +29,7 @@ import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
+import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
@@ -60,6 +61,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     new BehaviorSubject<string>(''));
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
+  isThereValidation: ExistingValidationDto;
   public isExistingValidationWindowOpen: boolean;
 
 
@@ -281,7 +283,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
   }
 
-  public startValidation() {
+  public startValidation(checkForExistingValidation: boolean) {
     //debug
 
     //prepare the dataset dtos (dataset, version, variable and filter settings)
@@ -314,13 +316,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       name_tag: this.validationModel.nameTag$.getValue()
     };
 
-    this.validationConfigService.startValidation(newValidation, true).subscribe(
+    this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
 
       data => {
         if (data.id){
           this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
         } else if (data.is_there_validation){
-          // confirm('There exists a validation with the same results. You can use it');
+          this.isThereValidation = data;
           this.modalWindowService.open();
         }
 
