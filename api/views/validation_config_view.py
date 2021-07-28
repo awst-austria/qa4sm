@@ -228,6 +228,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
 
 
+
 class ValidationConfigurationModelSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
