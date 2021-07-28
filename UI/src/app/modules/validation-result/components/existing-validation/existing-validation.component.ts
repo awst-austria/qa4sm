@@ -12,6 +12,8 @@ import {Router} from '@angular/router';
   styleUrls: ['./existing-validation.component.scss']
 })
 export class ExistingValidationComponent implements OnInit {
+  dateFormat = 'medium';
+  timeZone = 'UTC';
   display$: Observable<'open' | 'close'>;
   @Input() isThereValidation: ExistingValidationDto;
   @Output() startValidation = new EventEmitter<boolean>();

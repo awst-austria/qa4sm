@@ -12,17 +12,17 @@
       </ng-template>
       <div *ngIf="foundValidation|async as validation">
         <div *ngIf="isThereValidation.is_published">
-          There exists a published validation with exactly the same settings, run on {{validation.start_time}}. <br>
+          There exists a published validation with exactly the same settings, run on {{validation.start_time|date: dateFormat :timeZone}}. <br>
           You can run your own validation and wait for the results or you can use the existing one.<br>
           You can also close this window and change some settings.<br>
           What would you like to do?
         </div>
         <div *ngIf="isThereValidation.belongs_to_user && !isThereValidation.is_published">
-          You have already run a validation with exactly the same settings on {{validation.start_time}}. <br>
+          You have already run a validation with exactly the same settings on {{validation.start_time|date: dateFormat :timeZone}}. <br>
           You can run it again or use the existing one. <br>
         </div>
         <div *ngIf="!isThereValidation.belongs_to_user && !isThereValidation.is_published">
-          There exists a validation with exactly the same settings, run on {{validation.start_time}}. <br>
+          There exists a validation with exactly the same settings, run on {{validation.start_time|date: dateFormat :timeZone}}. <br>
           You can run your own validation and wait for the results or you can use the existing one.<br>
         </div>
         <div class="p-m-3 buttons">
