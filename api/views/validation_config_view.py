@@ -185,16 +185,16 @@ def start_validation(request):
     ser.is_valid(raise_exception=True)
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
+    new_val_run.save()
     comparison_pub = _compare_validation_runs(new_val_run, existing_runs, request.user)
+    connections.close_all()
     # print(comparison_pub, comparison_pub['is_there_validation'])
     if check_for_existing_validation == 'true' and comparison_pub['is_there_validation']:
+        new_val_run.delete()
         response = JsonResponse(comparison_pub, status=status.HTTP_200_OK, safe=False)
         return response
-    new_val_run.save()
-
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
-    connections.close_all()
 
     p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
     p.start()
