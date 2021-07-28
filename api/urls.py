@@ -13,7 +13,7 @@ from api.views.validation_config_view import start_validation, get_validation_co
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import users, signup_post, user_modify
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs, \
-    custom_tracked_validation_runs, get_summary_statistics, get_publishing_form
+    custom_tracked_validation_runs, get_summary_statistics, get_publishing_form, copy_validation_results
 from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
@@ -86,4 +86,5 @@ urlpatterns = [
     path('settings', settings, name="Settings"),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('publishing-form', get_publishing_form, name='Get publishing form'),
+    path('copy-validation', copy_validation_results, name='Copy validation results'),
 ]
