@@ -218,10 +218,13 @@ def get_publishing_form(request):
 
 @api_view(['GET'])
 def copy_validation_results(request):
-    validation_id = request.query_params.get('id', None)
+    validation_id = request.query_params.get('validation_id', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
+    current_user = request.user
 
-    return HttpResponse('done', status=200)
+    new_validation = _copy_validationrun(validation, current_user)
+
+    return JsonResponse(new_validation, status=200)
 
 
 class ValidationRunSerializer(ModelSerializer):
