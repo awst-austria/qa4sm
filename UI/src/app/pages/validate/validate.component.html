@@ -8,7 +8,7 @@
 <!--<qa-map class="map"-->
 <!--        [center]="[-483281,6904172]"-->
 <!--        [zoom]="8.5"></qa-map>-->
-<div class="p-grid no-gutters">
+<div class="p-grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
   <div class="
     p-col-12
     p-md-10 p-md-offset-1

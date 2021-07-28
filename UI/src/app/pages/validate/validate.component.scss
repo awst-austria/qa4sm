@@ -17,6 +17,11 @@
   align-items: center;
   min-width: 5rem;
 }
+.non-scrollable{
+  position: fixed;
+  overflow-y: hidden;
+}
+
 
 .help-field{
   color: white;
