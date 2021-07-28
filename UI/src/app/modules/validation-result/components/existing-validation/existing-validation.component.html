@@ -1,0 +1,16 @@
+<ng-container *ngIf="display$ | async as display">
+  <div class="form-background" [class.open]="display === 'open'" (click)="close()">
+    <p-panel class="publishing-form" (click)="$event.stopPropagation()">
+      <ng-template pTemplate="header">
+        <h4 class="my-0 font-weight-normal" id="publishDialogTitle">There exists a validation</h4>
+      </ng-template>
+      <ng-template pTemplate="icons">
+        <button class="close"
+                type="button"
+                (click)="close()"><b>X</b>
+        </button>
+      </ng-template>
+    </p-panel>
+  </div>
+</ng-container>
+
