@@ -41,7 +41,7 @@
               <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
                 <qa-basic-filter
                   *ngIf="isIncluded(filter.filterDto.id, item.basicFilters); else isNot"
-                  [ngStyle]="{'margin-left': '10%'}"
+                  class = "ml-1"
                   [filterModel]="filter"
                   (onIncludeMutual)="includeFilter($event, item.basicFilters, filter.enabled)">
                 </qa-basic-filter>
