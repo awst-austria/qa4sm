@@ -225,7 +225,8 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     min_lon = serializers.FloatField(required=False, allow_null=True, default=-180)
     max_lat = serializers.FloatField(required=False, allow_null=True, default=90)
     max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
-    name_tag = serializers.CharField(required=False, allow_null=True, max_length=80)
+    name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
+
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):
