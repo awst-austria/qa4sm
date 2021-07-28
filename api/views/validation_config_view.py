@@ -178,15 +178,18 @@ def _compare_validation_runs(new_run, runs_set, user):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def start_validation(request):
+    check_for_existing_validation = request.query_params.get('check_for_existing_validation', None)
     existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file=''). \
         order_by(Case(When(user=request.user, then=0), default=1), '-start_time')
     ser = ValidationConfigurationSerializer(data=request.data)
-    print(ser)
     ser.is_valid(raise_exception=True)
-    # comparison_pub = _compare_validation_runs(ser, existing_runs, request.user)
-    # print(comparison_pub)
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
+    comparison_pub = _compare_validation_runs(new_val_run, existing_runs, request.user)
+    # print(comparison_pub, comparison_pub['is_there_validation'])
+    if check_for_existing_validation == 'true' and comparison_pub['is_there_validation']:
+        response = JsonResponse(comparison_pub, status=status.HTTP_200_OK, safe=False)
+        return response
     new_val_run.save()
 
     # need to close all db connections before forking, see
