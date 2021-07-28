@@ -281,6 +281,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.setLimitationsOnGeographicalRange();
   }
 
+  excludeFilter(toExclude: number, basicFilters: any) {
+    // Exclude the filter if mutual is selected
+    basicFilters.forEach(filter => {
+      if (filter.filterDto.id === toExclude){
+        filter.enabled = false;
+      }
+    });
+  }
 
   addDatasetButtonDisabled(): boolean {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
