@@ -24,13 +24,16 @@
   overflow-y: hidden;
 }
 
-.publishing-form {
+.existing-validation-window {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 1.2rem;
+  line-height: 1.5rem;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   height: 75%;
-  width: 55%;
+  width: 40%;
 }
 
 button.close {
@@ -57,53 +60,6 @@ button.close:hover{
   display: flex;
   align-items: center;
 }
-
-textarea{
-  min-height: 3rem;
-}
-.form-field{
-  border-radius: 0;
-}
-
-input {
-  width: 18%;
-  height: 3rem;
-}
-
-.help-field{
-  color: white;
-  background-color: #00AAE3;
-  min-height: 3rem;
-  border-radius: 0 5px 5px 0;
-  font-size: 1.1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#cancel-button{
-  color: white;
-  background-color: #6c757d;
-  border-color: #6c757d;
-  font-size: 1rem;
-  margin: 0.25rem;
-}
-
-#submit-button{
-  color: white;
-  background-color: #4760E5;
-  border-color: #4760E5;
-  font-size: 1rem;
-  margin: 0.25rem;
-}
-
-.alert{
-  background-color: #FF6C5C26;
-  color: #FF6C5C;
-  width: 100%;
-  height: 3rem;
-  border: #FF6C5C30 solid 1px;
-  border-radius: 3px;
-  padding: 0.5rem;
-  margin: 0.5rem;
+.buttons{
+  text-align: right;
 }

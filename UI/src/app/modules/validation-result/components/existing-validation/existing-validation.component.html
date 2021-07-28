@@ -1,6 +1,6 @@
 <ng-container *ngIf="display$ | async as display">
   <div class="form-background" [class.open]="display === 'open'" (click)="close()">
-    <p-panel class="publishing-form" (click)="$event.stopPropagation()">
+    <p-panel class="existing-validation-window" (click)="$event.stopPropagation()">
       <ng-template pTemplate="header">
         <h4 class="my-0 font-weight-normal" id="publishDialogTitle">There exists a validation</h4>
       </ng-template>
@@ -25,19 +25,22 @@
           There exists a validation with exactly the same settings, run on {{validation.start_time}}. <br>
           You can run your own validation and wait for the results or you can use the existing one.<br>
         </div>
+        <div class="p-m-3 buttons">
+          <button pButton
+                  type="button"
+                  class="btn-action-large"
+                  label="See the existing validation"
+                  (click)="useAnExistingValidation(validation)">
+          </button>
+          <button pButton
+                  type="button"
+                  class="btn-action-large"
+                  label="Run your own validation"
+                  (click)="runOwnValidation()">
+          </button>
 
-        <button pButton
-                type="button"
-                class="btn-action-large"
-                label="See the existing validation"
-                (click)="useAnExistingValidation(validation)">
-        </button>
-        <button pButton
-                type="button"
-                class="btn-action-large"
-                label="Run your own validation"
-                (click)="runOwnValidation()">
-        </button>
+        </div>
+
       </div>
 
     </p-panel>
