@@ -236,6 +236,15 @@
 
   <ng-template #elseSingleValidation>
     <div style="float: right;">
+      <button *ngIf="isLogged && validationRun.is_unpublished" pButton
+              type="button"
+              icon="pi pi-times"
+              class="btn-action-large"
+              title="If you copy this validation, it will be added to the list of your validations and you will have a full controll over it."
+              label="Copy"
+              (click)="copy(validationRun.id)">
+      </button>
+
       <a *ngIf="isLogged"
          pButton
          type="button"
@@ -263,7 +272,7 @@
               type="button"
               icon="pi pi-plus"
               label="Track"
-              title="Track this validation"
+              title="Tracking results gives a quick access to it, however, if the results is removed by the owner, you will loose access to it."
               (click)="addValidation(validationRun.id)">
       </button>
 

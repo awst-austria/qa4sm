@@ -18,6 +18,7 @@ const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
 const publishingFormURL: string = urlPrefix + '/publishing-form';
+const copyValidationUrl: string = urlPrefix + '/copy-validation';
 
 const csrfToken = '{{csrf_token}}';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
@@ -130,6 +131,10 @@ export class ValidationrunService {
   refreshComponent(validationIdOrPage: string): void{
     // here we can give or validation id or the word 'page' if entire page should be reloaded (e.g. when a validation is removed)
     this.refresh.next(validationIdOrPage);
+  }
+
+  copyValidation(params: any): Observable<any>{
+    return this.httpClient.get(copyValidationUrl, {params});
   }
 
 }
