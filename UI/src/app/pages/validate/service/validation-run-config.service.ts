@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../../../environments/environment';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {ValidationRunConfigDto} from './validation-run-config-dto';
 import {ValidationrunDto} from '../../../modules/core/services/validation-run/validationrun.dto';
 import {Observable} from 'rxjs';
@@ -20,8 +20,9 @@ export class ValidationRunConfigService {
 
   }
 
-  public startValidation(newValidationConfiguration: ValidationRunConfigDto): Observable<ValidationrunDto> {
-    return this.httpClient.post<ValidationrunDto>(runValidationUrl, newValidationConfiguration);
+  public startValidation(newValidationConfiguration: ValidationRunConfigDto, checkForExistingValidation: boolean): Observable<any> {
+    const params = new HttpParams().set('check_for_existing_validation', String(checkForExistingValidation));
+    return this.httpClient.post<ValidationrunDto>(runValidationUrl, newValidationConfiguration, {params});
   }
 
   public getValidationConfig(validationRunId: string): Observable<ValidationRunConfigDto> {

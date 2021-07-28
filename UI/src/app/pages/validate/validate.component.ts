@@ -28,6 +28,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
+import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
@@ -59,6 +60,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     new BehaviorSubject<string>(''));
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
+  public isExistingValidationWindowOpen: boolean;
+
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -68,7 +71,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private validationRunService: ValidationrunService,
               private toastService: ToastService,
               private router: Router,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private modalWindowService: ModalWindowService) {
   }
 
   ngAfterViewInit(): void {
@@ -76,6 +80,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.modalWindowService.watch().subscribe(state => {
+      this.isExistingValidationWindowOpen = state === 'open';
+    });
 
     this.route.queryParams.subscribe(params => {
       if (params['validation_id']) {
@@ -307,9 +314,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       name_tag: this.validationModel.nameTag$.getValue()
     };
 
-    this.validationConfigService.startValidation(newValidation).subscribe(
+    this.validationConfigService.startValidation(newValidation, true).subscribe(
+
       data => {
-        this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
+        if (data.id){
+          this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
+        } else if (data.is_there_validation){
+          // confirm('There exists a validation with the same results. You can use it');
+          this.modalWindowService.open();
+        }
+
       },
       error => {
         this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
