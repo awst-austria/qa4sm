@@ -7,6 +7,7 @@ import {MetricsComparisonDto} from './metrics-comparison.dto';
 import {Validations2CompareModel} from '../components/validation-selector/validation-selection.model';
 import {ExtentModel} from '../components/spatial-extent/extent-model';
 import {PlotDto} from '../../core/services/global/plot.dto';
+import {saveAs} from 'file-saver-es';
 
 const urlPrefix = environment.API_URL + 'api';
 const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
@@ -58,6 +59,7 @@ export class ComparisonService {
 
   downloadExtentImage(ids: string[], getIntersection: boolean): void {
     const fileUrl = `${downloadExtentImageUrl}?ids=${ids}&get_intersection=${getIntersection}`;
+    console.log(fileUrl)
     saveAs(fileUrl);
   }
 
@@ -65,6 +67,7 @@ export class ComparisonService {
     // download comparison table
     const fileUrl = `${downloadComparisonTableUrl}?ids=${ids}&metric_list=${metricList}
     &get_intersection=${getIntersection}&extent=${extent}`;
+    console.log(fileUrl)
     saveAs(fileUrl);
   }
 

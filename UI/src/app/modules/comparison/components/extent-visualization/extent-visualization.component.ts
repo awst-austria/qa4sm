@@ -67,5 +67,6 @@ export class ExtentVisualizationComponent implements OnInit {
     // should provide a download of the comparison image
     const ids = this.comparisonService.getValidationsIds(comparisonModel.selectedValidations);
     this.comparisonService.downloadExtentImage(ids, comparisonModel.getIntersection);
+    console.log(this.comparisonService.downloadExtentImage(ids, comparisonModel.getIntersection))
   }
 }
