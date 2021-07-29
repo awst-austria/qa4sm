@@ -1,11 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Validations2CompareModel} from "../validation-selector/validation-selection.model";
 import {HttpParams} from "@angular/common/http";
 import {DomSanitizer, SafeUrl} from "@angular/platform-browser";
 import {ExtentModel} from "../spatial-extent/extent-model";
 import {ValidationResultModel} from "../../../../pages/validation-result/validation-result-model";
 import {Observable} from "rxjs";
-import {PlotDto} from "../../../core/services/global/plot.dto";
 import {ValidationrunService} from "../../../core/services/validation-run/validationrun.service";
 import {DatasetConfigurationService} from "../../../validation-result/services/dataset-configuration.service";
 import {ComparisonService} from "../../services/comparison.service";
@@ -23,7 +22,7 @@ export class ExtentVisualizationComponent implements OnInit {
   );
   isSingle: boolean = true;
   valResModels: ValidationResultModel[] = [];
-  extentImage$: Observable<PlotDto>;
+  extentImage$: Observable<string>;
 
   constructor(private validationRunService: ValidationrunService,
               private datasetConfigurationService: DatasetConfigurationService,
@@ -56,7 +55,6 @@ export class ExtentVisualizationComponent implements OnInit {
       parameters = parameters.append('ids', id);
     });
     this.extentImage$ = this.comparisonService.getComparisonExtentImage(parameters);
-    // console.log('img', this.extentImage$);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
