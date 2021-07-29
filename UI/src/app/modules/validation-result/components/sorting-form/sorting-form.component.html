@@ -1,14 +1,15 @@
 <div>
   <div class="p-grid">
     <div style="max-width: 6rem" class="p-col-2 p-mt-2">
-        <span id="sorting_form"> Sort By: </span>
+      <span id="sorting_form"> Sort By: </span>
     </div>
     <div class="p-col">
       <div class="box">
         <p-dropdown id="sortingChoiceSelector" (onChange)="onSortingChange()"
                     [options]="sortingChoicesModels"
                     [(ngModel)]="selectedChoicesModel"
-                    optionLabel="displayName" [style]="{'width': '100%'}">
+                    optionLabel="displayName"
+                    [style]="{'width': '100%'}">
         </p-dropdown>
       </div>
     </div>
@@ -18,7 +19,8 @@
                     [options]="orderChoicesModels"
                     [(ngModel)]="selectedOrderModel"
                     optionLabel="direction"
-                    [style]="{'width': '100%'}"></p-dropdown>
+                    [style]="{'width': '100%'}">
+        </p-dropdown>
       </div>
     </div>
   </div>

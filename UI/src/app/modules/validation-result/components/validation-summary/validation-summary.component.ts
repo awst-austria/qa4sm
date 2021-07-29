@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
 import {combineLatest, Observable} from 'rxjs';
@@ -12,6 +12,7 @@ import {GlobalParamsService} from '../../../core/services/global/global-params.s
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -23,6 +24,7 @@ export class ValidationSummaryComponent implements OnInit {
 
   @Input() validationModel: ValidationResultModel;
   @Input() forComparison: boolean = false;
+  @Output() doRefresh = new EventEmitter();
 
   configurations$: Observable<any>;
   validationRun$: Observable<any>;
@@ -31,7 +33,7 @@ export class ValidationSummaryComponent implements OnInit {
   scalingMethods = SCALING_CHOICES;
   hideElement = true;
 
-  faIcons = {faArchive: fas.faArchive};
+  faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -40,7 +42,8 @@ export class ValidationSummaryComponent implements OnInit {
               private filterService: FilterService,
               private globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService,
-              private authService: AuthService) { }
+              private authService: AuthService,
+              private router: Router) { }
 
   ngOnInit(): void {
     this.updateConfig();
@@ -121,7 +124,19 @@ export class ValidationSummaryComponent implements OnInit {
     this.hideElement = !this.hideElement;
   }
   saveName(validationId: string, newName: string): void{
-    this.validationService.saveResults(validationId, newName);
-    window.location.reload();
+    this.validationService.saveResults(validationId, newName).subscribe(
+      () => {
+        this.doRefresh.emit(true);
+      });
+
+  }
+
+  refresh(dorefresh: boolean): void{
+    console.log(dorefresh);
+    if (dorefresh){
+      this.ngOnInit();
+    } else {
+      this.router.navigate(['/my-validations']);
+    }
   }
 }

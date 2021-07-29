@@ -8,7 +8,7 @@
 <!--<qa-map class="map"-->
 <!--        [center]="[-483281,6904172]"-->
 <!--        [zoom]="8.5"></qa-map>-->
-<div class="p-grid no-gutters">
+<div class="p-grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
   <div class="
     p-col-12
     p-md-10 p-md-offset-1
@@ -38,18 +38,37 @@
                           [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
 
-              <qa-basic-filter *ngFor="let filter of item.basicFilters; let filterIdx = index"
-                               [filterModel]="filter"></qa-basic-filter>
-              <button pButton type="button" (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
-                      label="Remove dataset"
-                      icon="pi pi-trash"
-                      class="p-button-danger" style="padding: 0.2rem;"></button>
+              <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
+                <qa-basic-filter
+                  [ngClass]="isIncluded(filter.filterDto.id, item.basicFilters) == true ? 'ml-1' : ''"
+                  [filterModel]="filter"
+                  (onExcludeMutual)="this.excludeFilter($event, item.basicFilters)"
+                  (onIncludeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
+                </qa-basic-filter>
+              </ng-container>
+
+              <div style="width: 100%;text-align: right">
+                <button pButton type="button"
+                        (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
+                        label="Remove dataset"
+                        icon="pi pi-trash"
+                        class="p-button-danger p-my-2"
+                        style="padding: 0.2rem;">
+                </button>
+              </div>
             </p-accordionTab>
 
           </p-accordion>
-          <button pButton type="button" label="Add validation" icon="pi pi-plus-circle" (click)="addDatasetToValidate()"
-                  class="p-button-success mt-2 mb-2" style="padding: 0.2rem;"
-                  [disabled]="addDatasetButtonDisabled()"></button>
+
+          <button pButton
+                  type="button"
+                  label="Add dataset"
+                  icon="pi pi-plus-circle"
+                  (click)="addDatasetToValidate()"
+                  class="p-button-success p-my-2"
+                  style="padding: 0.2rem;"
+                  [disabled]="addDatasetButtonDisabled()">
+          </button>
 
         </p-panel>
       </div>
@@ -73,9 +92,14 @@
               [selectionModel]="validationModel.referenceConfigurations[0].datasetModel"
               (changeDataset)="onReferenceChange()"></qa-dataset>
 
-            <qa-basic-filter
-              *ngFor="let filter of validationModel.referenceConfigurations[0].basicFilters; let i = index"
-              [filterModel]="filter"></qa-basic-filter>
+            <ng-container *ngFor="let filter of validationModel.referenceConfigurations[0].basicFilters; let i = index">
+              <qa-basic-filter
+                [ngClass]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters) == true ? 'ml-1' : ''"
+                [filterModel]="filter"
+                (onExcludeMutual)="this.excludeFilter($event, validationModel.referenceConfigurations[0].basicFilters)"
+                (onIncludeMutual)="includeFilter($event, validationModel.referenceConfigurations[0].basicFilters, filter.enabled)">
+              </qa-basic-filter>
+            </ng-container>
           </div>
 
         </p-panel>
@@ -83,18 +107,20 @@
 
       <!--      Map-->
       <div class="p-col-12">
-        <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel">
+        <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel" collapsed="true">
           <qa-map class="map" #qwerty
                   [spatialSubset]="validationModel.spatialSubsetModel"
-                  [center]="[-37.1,37.6]"
+                  [center]="[10, 52.5]"
                   [zoom]="2.5"></qa-map>
         </p-panel>
 
       </div>
+
       <!--      Spatial subsetting-->
       <div class="p-col-12">
         <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
       </div>
+
 
       <!--      Validation period-->
       <div class="p-col-12">
@@ -108,7 +134,7 @@
 
       <!--      Anomalies-->
       <div class="p-col-12">
-        <qa-anomalies [methodForValidation]="validationModel.anomalies"></qa-anomalies>
+        <qa-anomalies [anomaliesModel]="validationModel.anomalies"></qa-anomalies>
       </div>
 
       <!--      Scaling-->
@@ -116,15 +142,38 @@
         <qa-scaling [validationModel]="validationModel"></qa-scaling>
       </div>
 
+      <!-- Name -->
+      <div class="p-col-12">
+        <div class="p-grid p-px-2">
+            <span class="label p-col-1">
+              <label for="name">Name</label>
+            </span>
+          <input class="form-field p-col"
+                 id="name"
+                 type="text"
+                 pInputText
+                 [ngModel]="validationModel.nameTag$|async"
+                 (ngModelChange)="validationModel.nameTag$.next($event)">
+          <span title="You can optionally name the validation to make it easier to identify in your list of validations."
+                class="pi pi-question-circle p-col-1 help-field">
+          </span>
+        </div>
+      </div>
+
       <div class="p-col-12">
         <div>
           <div class="p-d-flex p-jc-center">
-            <p-button label="Validate" (onClick)="startValidation()"></p-button>
+            <p-button label="Validate" (onClick)="startValidation(true)"></p-button>
           </div>
         </div>
       </div>
 
     </div>
   </div>
+  <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
+                          [isThereValidation]="isThereValidation"
+                          (startValidation)="startValidation(false)">
+  </qa-existing-validation>
 </div>
 <qa-scroll-to-top></qa-scroll-to-top>
+

@@ -49,11 +49,15 @@ import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
 import {ComparisonModule} from './modules/comparison/comparison.module';
-import { HelpComponent } from './pages/help/help.component';
+import {ValidationSelectorComponent} from "./modules/comparison/components/validation-selector/validation-selector.component";
+import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
 import {CoreModule} from './modules/core/core.module';
-import {ValidationSelectorComponent} from "./modules/comparison/components/validation-selector/validation-selector.component";
+import {SignupComponent} from './pages/signup/signup.component';
+import {UserModule} from './modules/user/user.module';
+import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
+import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
 
 
 @NgModule({
@@ -72,7 +76,9 @@ import {ValidationSelectorComponent} from "./modules/comparison/components/valid
     DatasetInfoComponent,
     ComparisonComponent,
     HelpComponent,
-
+    SignupComponent,
+    SignupCompleteComponent,
+    DeactivateUserCompleteComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -109,6 +115,7 @@ import {ValidationSelectorComponent} from "./modules/comparison/components/valid
     IvyGalleryModule,
     NgxPageScrollModule,
     CoreModule,
+    UserModule
 
   ],
   providers: [

@@ -1,10 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 
 
 @Component({
@@ -19,13 +20,13 @@ export class ButtonsComponent implements OnInit {
   @Input() published: boolean;
   @Input() validationList: boolean;
   @Input() tracked: boolean;
+  @Output() doRefresh = new EventEmitter();
 
   faIcons = {faArchive: fas.faArchive,
     faStop: fas.faStop,
-    faFileDownload: fas.faFileDownload,
-    faRedo: fas.faRedo};
+    faFileDownload: fas.faFileDownload};
 
-  isCurrentUser = true;
+  isLogged: boolean;
   isOwner: boolean;
   isTrackedByTheUser: boolean;
   status: string;
@@ -34,44 +35,57 @@ export class ButtonsComponent implements OnInit {
   constructor(private httpClient: HttpClient,
               private router: Router,
               private validationService: ValidationrunService,
-              public authService: AuthService) { }
+              public authService: AuthService,
+              private modalService: ModalWindowService ) { }
 
   ngOnInit(): void {
+    this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
     this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
   }
 
-  basicOnclick(validation: ValidationrunDto): void{
-  //  I'll remove this one, now it's just a function to check if buttons work
-    console.log(validation.id);
-  }
-
-  reloadMyValidations(): void{
-    const targetUrl = '/my-validations';
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-    this.router.onSameUrlNavigation = 'reload';
-    this.router.navigate([targetUrl]);
-  }
-
 
   deleteValidation(validationId: string): void{
-    this.validationService.deleteValidation(validationId);
-    this.reloadMyValidations();
+    if (!confirm('Do you really want to delete the result?')) {
+      return;
+    }
+    this.validationService.deleteValidation(validationId).subscribe(
+      () => {
+        this.validationService.refreshComponent('page');
+        this.doRefresh.emit(false);
+      });
 
   }
 
   stopValidation(validationId: string): void{
-    this.validationService.stopValidation(validationId);
-    this.reloadMyValidations();
+    if (!confirm('Do you really want to stop the validation?')) {
+      return;
+    }
+    this.validationService.stopValidation(validationId).subscribe(
+      () => {
+        this.validationService.refreshComponent(validationId);
+      });
   }
 
   archiveResults(validationId: string, archive: boolean): void{
-    this.validationService.archiveResults(validationId, archive);
-    window.location.reload();
+    if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
+      + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
+      return;
+    }
+    this.validationService.archiveResults(validationId, archive).subscribe(() => {
+      this.validationService.refreshComponent(validationId);
+      this.doRefresh.emit(true);
+    });
   }
 
   extendResults(validationId: string): void{
-    this.validationService.extendResults(validationId);
+    if (!confirm('Do you want to extend the lifespan of this result?')) {
+      return;
+    }
+    this.validationService.extendResults(validationId).subscribe(() => {
+      this.validationService.refreshComponent(validationId);
+      this.doRefresh.emit(true);
+    });
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void{
@@ -79,13 +93,41 @@ export class ButtonsComponent implements OnInit {
   }
 
   addValidation(validationId: string): void{
-    this.validationService.addValidation(validationId);
-    window.location.reload();
+    this.validationService.addValidation(validationId).subscribe(
+        response => {
+          this.validationService.refreshComponent(validationId);
+          this.doRefresh.emit(true);
+          alert(response);
+        });
+    this.authService.init();
   }
 
   removeValidation(validationId: string): void{
-    this.validationService.removeValidation(validationId);
-    window.location.reload();
+    if (!confirm('Do you really want to remove this validation from your list?')) {
+      return;
+    }
+    this.validationService.removeValidation(validationId).subscribe(
+      response => {
+        this.validationService.refreshComponent(validationId);
+        this.doRefresh.emit(true);
+        alert(response);
+      });
+    this.authService.init();
   }
 
+  open(): void{
+    this.modalService.open();
+  }
+
+  copy(validationId: string): void{
+    let newId: string;
+    const params = new HttpParams().set('validation_id', validationId);
+    this.validationService.copyValidation(params).subscribe(data => {
+      newId = data.run_id;
+      alert('This validation will be copied and add to the list of your validations.');
+      this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
+        this.router.navigate([`validation-result/${newId}`]);
+      });
+    });
+  }
 }

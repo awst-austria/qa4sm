@@ -1,4 +1,4 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+@import "src/styles";
 
 .align-middle {
     width: 10%;
@@ -10,11 +10,19 @@
     vertical-align: middle;
 }
 
-.borderless td, .borderless th {
-    border: none;
-}
-
 #logo_ffg {
     height: 6rem;
+    width: 13rem;
     float: right;
+}
+main {
+  max-width: 40rem;
+}
+
+#introduction{
+  text-align: justify;
+  margin-bottom: 1rem;
+}
+#footer{
+  text-align: justify;
 }

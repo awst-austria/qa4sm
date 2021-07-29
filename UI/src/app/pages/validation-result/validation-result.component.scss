@@ -1,1 +1,5 @@
-@import "~bootstrap/dist/css/bootstrap.css";
+.non-scrollable{
+  position: fixed;
+  overflow-y: hidden;
+}
+

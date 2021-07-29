@@ -1,17 +1,17 @@
-<p-panel>
+<p-panel *ngIf="configurations$|async as configurations" class="validation-row">
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ model.validationRun.name_tag }}</h5>
+    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ validationRun.name_tag }}</h5>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
-    <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
-                              href="{{this.getDoiPrefix()}}{{ model.validationRun.doi }}">{{ model.validationRun.doi }}</a>
+    <h5 class="p-my-0"> DOI: <a class="doilink" target="_blank"
+                              href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
     </h5>
   </ng-template>
   <!--  CUSTOM    -->
   <ng-template *ngIf="!published" pTemplate="header">
-    <h5 class="my-0">
+    <h5 class="p-my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
           <span *ngIf="validationRun.is_near_expiry" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
@@ -28,7 +28,7 @@
                 class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
                 title="This validation is still running."></span>
 
-          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}">
+          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}" rel="noreferrer">
             <span *ngIf="validationRun.doi" class="p-panel-header-icon pi pi-book expiry-icons"
                   title="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
             </span>
@@ -42,48 +42,55 @@
       </span>
 
       <span class="font-weight-normal"> Started:
-
         {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}}
       </span>
 
     </h5>
   </ng-template>
-  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem">
-    <h5 class="my-0">
+  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 15rem">
+    <h5 class="p-my-0">
       <span *ngIf="hideElement"
             class=" font-weight-normal">
-        Name: {{ model.validationRun.name_tag }}
+        Name: {{ validationRun.name_tag }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
-            class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
-        <span class="no_name_change_info pi pi-question-circle help-icon"
+            class="p-my-0 font-weight-normal">
+        <span class="pi pi-question-circle help-icon"
               title="Validation has been published. There is no possibility of changing its name.">
         </span>
       </span>
       <ng-template #elseUnpublished>
         <button
-          [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
+          pButton
+          type="button"
+          icon="faIcons.faPencil"
+          [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
           title="Change Name"
           (click)="toggleEditing()">
-          <span class="pi pi-pencil"></span>
+          <fa-icon [icon]="faIcons.faPencil"></fa-icon>
         </button>
         <span *ngIf="!hideElement">
-          <label for="new-name"></label>
+          <label for="new-name">Name: </label>
           <input id="new-name"
                  type="text"
                  value="{{validationRun.name_tag}}"
                  #newName
                  [ngClass]="{'edit_name': true}">
           <button
-            [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
+            pButton
+            type="button"
+            icon="pi pi-save"
+            [ngClass]="{'btn-action save_name_btn': true}"
             title="Save Name"
             (click)="saveName(validationRun.id, newName.value)">
-            <span class="pi pi-save"></span></button>
+          </button>
           <button
-            [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_editing_btn': true}"
             title="Cancel"
             (click)="toggleEditing()">
-            <span class="pi pi-ban"></span>
           </button>
         </span>
       </ng-template>
@@ -92,31 +99,34 @@
 
   <!-- Body -->
   <!-- Datasets -->
-  <div class="p-grid mx-0 px-0 my-0">
+  <div class="p-grid p-mx-0 p-px-0 p-my-0">
     <div class="p-col">
       <strong>Data:</strong><br/>
-      <span *ngFor="let datasetRowModel of model.datasetRows">
-          {{(datasetRowModel.dataset$|async)?.pretty_name}},
-        {{(datasetRowModel.datasetVersion$|async)?.pretty_name}},
-        {{(datasetRowModel.datasetVariable$|async)?.pretty_name}} <br>
+      <span *ngFor="let config of configurations">
+        <span *ngIf="config.id !== validationRun.reference_configuration">
+          {{config.dataset}},
+          {{config.version}},
+          {{config.variable}} <br>
         </span>
-
+      </span>
     </div>
     <!-- Reference -->
     <div class="p-col">
       <strong>Reference:</strong><br/>
-      <span>
-          {{(model.referenceRow.dataset$|async)?.pretty_name}},
-        {{(model.referenceRow.datasetVersion$|async)?.pretty_name}},
-        {{(model.referenceRow.datasetVariable$|async)?.pretty_name}}
+      <span *ngFor="let config of configurations">
+        <span *ngIf="config.id === validationRun.reference_configuration">
+          {{config.dataset}},
+          {{config.version}},
+          {{config.variable}} <br>
         </span>
+      </span>
     </div>
     <!-- Status / Created   -->
-    <div class="p-col status pl-2">
+    <div class="p-col status">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
-        {{ model.validationRun.start_time|date:"YYYY-MM-dd" }}
+        {{ validationRun.start_time|date:"YYYY-MM-dd" }}
       </div>
       <!--    CUSTOM -->
       <div *ngIf="!published">
@@ -126,8 +136,8 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="p-col-3">
-      <qa-buttons [validationList]="true" [validationRun]="model.validationRun" [published]="published"></qa-buttons>
+    <div class="p-col-3" style="max-width: 10rem">
+      <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"></qa-buttons>
     </div>
 
 

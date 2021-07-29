@@ -45,4 +45,5 @@ class DatasetVersionSerializer(ModelSerializer):
                   'help_text',
                   'time_range_start',
                   'time_range_end',
+                  'geographical_range'
                   ]

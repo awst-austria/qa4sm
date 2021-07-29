@@ -10,18 +10,22 @@ import {UserProfileComponent} from './pages/user-profile/user-profile.component'
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {AboutComponent} from './pages/about/about.component';
-import {TermsComponent} from "./pages/terms/terms.component";
+import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component'
 import {HelpComponent} from './pages/help/help.component';
+import {SignupComponent} from './pages/signup/signup.component';
+import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
+import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
+import {DatasetResolver} from './modules/core/services/dataset/dataset.resolver';
 
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
-  {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard]},
-  {path: 'validation-result/:validationId', component: ValidationResultComponent, canActivate: [AuthGuard]},
+  {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard], resolve: {datasets: DatasetResolver}},
+  {path: 'validation-result/:validationId', component: ValidationResultComponent},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},
@@ -30,6 +34,9 @@ const routes: Routes = [
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
   {path: 'comparison', component: ComparisonComponent},
+  {path: 'signup', component: SignupComponent},
+  {path: 'signup-complete', component: SignupCompleteComponent},
+  {path: 'deactivate-user-complete', component: DeactivateUserCompleteComponent},
   {path: '**', component: ErrorComponent}
 ];
 

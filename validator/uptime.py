@@ -12,10 +12,6 @@ from datetime import datetime, timedelta
 __logger = logging.getLogger(__name__)
 
 
-def scheduled_task():
-    print('Scheduled task. {0}'.format(datetime.now()))
-
-
 def generate_daily_report(date):
     """
     Takes the UptimePing table as input and generates a daily report for the date. Reports are stored

@@ -1,6 +1,6 @@
 <!-- custom -->
 <div *ngIf="!published" class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
-  <h1 class="jumbotron-heading">My validations</h1>
+  <h1>My validations</h1>
   <p *ngIf="!validations" class="lead text-muted">
     You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
     to start your own validation run.
@@ -9,11 +9,11 @@
 
 <!-- published -->
 <div *ngIf="published" class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
-  <h1 class="jumbotron-heading">Published validations</h1>
+  <h1>Published validations</h1>
   <p class="lead text-muted">
-    The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/">Zenodo</a>
+    The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a>
     and
-    can be referenced with a <a target="_blank" href="https://www.doi.org/">DOI</a>.
+    can be referenced with a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
   </p>
 </div>
 <!-- Sorting -->
@@ -22,7 +22,7 @@
 </div>
 
 <!-- Rows -->
-<div class="card-deck mb-3">
+<div class="card-deck p-mb-3">
   <div class="container p-mb-5 p-mt-4" style="max-width: 60rem;">
     <div *ngFor="let valrun of validations  | paginate :
         {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
@@ -30,28 +30,31 @@
       <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
       <br/>
     </div>
-
     <!--    Pagination -->
     <pagination-template #p="paginationApi"
                          (pageChange)="handlePageChange($event)">
 
       <div class="p-text-center">
-        <ul class="custom-pagination custom-responsive custom-star-inserted" aria-label="Pagination">
+        <ul class="custom-pagination custom-responsive custom-star-inserted justify-content-center" aria-label="Pagination">
           <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
-            <a *ngIf="!p.isFirstPage()" (click)="p.previous()"> < </a>
+            <div *ngIf="!p.isFirstPage()" (click)="p.previous()"> <span class="pi pi-angle-left"></span> </div>
+            <div *ngIf="p.isFirstPage()" [class.disabled]="true"> <span class="pi pi-angle-left"></span> </div>
           </li>
 
           <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
-            <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value">
+            <div (click)="p.setCurrent(page.value)"
+                *ngIf="p.getCurrent() !== page.value"
+                 [class.current]="p.getCurrent() === page.value">
               <span>{{ page.label }}</span>
-            </a>
-            <div *ngIf="p.getCurrent() === page.value">
+            </div>
+            <div *ngIf="p.getCurrent() === page.value" [class.current]="p.getCurrent() === page.value">
               <span>{{ page.label }}</span>
             </div>
           </li>
 
           <li class="pagination-next" [class.disabled]="p.isLastPage()">
-            <a *ngIf="!p.isLastPage()" (click)="p.next()"> > </a>
+            <div *ngIf="!p.isLastPage()" (click)="p.next()"> <span class="pi pi-angle-right"></span> </div>
+            <div *ngIf="p.isLastPage()" [class.disabled]="true"> <span class="pi pi-angle-right"></span> </div>
           </li>
         </ul>
       </div>
