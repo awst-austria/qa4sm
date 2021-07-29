@@ -122,7 +122,7 @@
             type="button"
             icon="pi pi-plus"
             class="btn-action"
-            title="Track this validation"
+            title="Pin this validation"
             (click)="addValidation(validationRun.id)"
             onclick="">
     </button>
@@ -236,6 +236,15 @@
 
   <ng-template #elseSingleValidation>
     <div style="float: right;">
+      <button *ngIf="isLogged && validationRun.is_unpublished" pButton
+              type="button"
+              icon="pi pi-copy"
+              class="btn-action-large"
+              title="If you copy this validation, it will be added to the list of your validations with all the result files. You will have a full control over the copy."
+              label="Copy validation"
+              (click)="copy(validationRun.id)">
+      </button>
+
       <a *ngIf="isLogged"
          pButton
          type="button"
@@ -247,23 +256,23 @@
          title="Load settings">
       </a>
 
-      <button *ngIf="isLogged && isTrackedByTheUser"
+      <button *ngIf="isLogged && isTrackedByTheUser && !validationRun.is_unpublished"
               pButton
               type="button"
               icon="pi pi-times"
               class="btn-action-large"
-              label="Untrack"
+              label="Unpin"
               title="Remove this validation from your list"
               (click)="removeValidation(validationRun.id)">
       </button>
 
-      <button *ngIf="isLogged && !isTrackedByTheUser"
+      <button *ngIf="isLogged && !isTrackedByTheUser && !validationRun.is_unpublished"
               class="btn-action-large"
               pButton
               type="button"
               icon="pi pi-plus"
-              label="Track"
-              title="Track this validation"
+              label="Pin"
+              title="Pinning results gives a quick access to it, however, if the results is removed by the owner, you will loose access to it."
               (click)="addValidation(validationRun.id)">
       </button>
 

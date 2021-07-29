@@ -1,5 +1,5 @@
 <div *ngIf="updatedMetrics$|async as metrics" class="p-grid p-mx-0">
-  <div *ngIf="metrics[indx].overviewFiles|async as overviewPlots" class="p-col-12">
+  <div *ngIf="metrics[indx] && metrics[indx].overviewFiles|async as overviewPlots" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center" style="width: 95%">

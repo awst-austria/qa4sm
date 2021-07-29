@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
@@ -117,5 +117,17 @@ export class ButtonsComponent implements OnInit {
 
   open(): void{
     this.modalService.open();
+  }
+
+  copy(validationId: string): void{
+    let newId: string;
+    const params = new HttpParams().set('validation_id', validationId);
+    this.validationService.copyValidation(params).subscribe(data => {
+      newId = data.run_id;
+      alert('This validation will be copied and add to the list of your validations.');
+      this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
+        this.router.navigate([`validation-result/${newId}`]);
+      });
+    });
   }
 }

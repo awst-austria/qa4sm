@@ -19,6 +19,7 @@ import {ResultFilesComponent} from './components/result-files/result-files.compo
 import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
 import {ButtonModule} from 'primeng/button';
 import {PublishingComponent} from './components/publishing/publishing.component';
+import {ExistingValidationComponent} from './components/existing-validation/existing-validation.component';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -29,16 +30,18 @@ import {PublishingComponent} from './components/publishing/publishing.component'
     TrackedValidationsComponent,
     SummaryStatisticsComponent,
     ResultFilesComponent,
-    PublishingComponent],
-  exports: [
-    ValidationrunRowComponent,
-    ValidationPagePaginatedComponent,
-    ValidationSummaryComponent,
-    TrackedValidationsComponent,
-    SummaryStatisticsComponent,
-    ResultFilesComponent,
     PublishingComponent,
-  ],
+    ExistingValidationComponent],
+    exports: [
+        ValidationrunRowComponent,
+        ValidationPagePaginatedComponent,
+        ValidationSummaryComponent,
+        TrackedValidationsComponent,
+        SummaryStatisticsComponent,
+        ResultFilesComponent,
+        PublishingComponent,
+        ExistingValidationComponent,
+    ],
     imports: [
         CommonModule,
         PanelModule,
