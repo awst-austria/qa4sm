@@ -4,7 +4,7 @@ import {Coordinate} from 'ol/coordinate';
 import {Attribution} from 'ol/control';
 import Projection from 'ol/proj/Projection';
 import {register} from 'ol/proj/proj4';
-import {get as GetProjection} from 'ol/proj';
+import {get as GetProjection, transform} from 'ol/proj';
 import {Extent} from 'ol/extent';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
@@ -51,7 +51,7 @@ export class MapComponent implements AfterViewInit {
     this.projection = GetProjection(mapProjectionString);
     this.projection.setExtent(this.extent);
     this.view = new View({
-      center: this.center,
+      center: transform(this.center, 'EPSG:4326', 'EPSG:3857'),
       zoom: this.zoom,
       projection: this.projection,
       // extent: [-572513.341856, 5211017.966314, 916327.095083, 6636950.728974]
@@ -62,7 +62,7 @@ export class MapComponent implements AfterViewInit {
       })],
       target: 'map',
       // controls: DefaultControls({attribution: false}).extend([new MyControl(),new Attribution({collapsible: true,})]),
-      controls: [new Attribution({collapsible: true,})],
+      controls: [new Attribution({collapsible: true})],
       view: this.view,
     });
     this.Map.addControl(new BoundingBoxControl(this.Map, this.spatialSubset, this.zone));

@@ -138,10 +138,35 @@ export class BoundingBoxControl extends Control {
         'EPSG:4326');
 
       //then update the model.
-      this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
-      this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
-      this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
-      this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
+      if (!this.boundingBox.limited$.getValue()){
+        this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
+        this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
+        this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
+        this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
+      } else{
+
+        if (this.currentSelectedCoordinates[0] > this.boundingBox.minLon$.getValue()
+          && this.currentSelectedCoordinates[0] < this.boundingBox.maxLon$.getValue()){
+          this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
+        }
+        if (this.currentSelectedCoordinates[1] > this.boundingBox.minLat$.getValue()
+          && this.currentSelectedCoordinates[1] < this.boundingBox.maxLat$.getValue()){
+          this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
+        }
+        if (this.currentSelectedCoordinates[2] < this.boundingBox.maxLon$.getValue()
+          && this.currentSelectedCoordinates[2]  > this.boundingBox.minLon$.getValue()){
+          this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
+        }
+        if (this.currentSelectedCoordinates[3] < this.boundingBox.maxLat$.getValue()
+        && this.currentSelectedCoordinates[3] > this.boundingBox.minLat$.getValue()){
+          this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
+        }
+
+        this.updateBoundingBox();
+        alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+          'Bounds have been corrected to fit available subsetting');
+      }
+
 
       this.getMap().removeInteraction(this.bboxDraw);
       this.bboxDraw = null;
