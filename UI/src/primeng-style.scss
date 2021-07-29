@@ -6124,6 +6124,12 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   color: #212529;
   background-color: rgba(248, 193, 0, .5);
 }
+.dataframe thead th{
+  text-align: center;
+}
+.dataframe td:first-child{
+  font-weight: bold;
+}
 
 @media screen and (min-width: 564px) and (max-width: 714.9px){
   .btn-action.p-button {
