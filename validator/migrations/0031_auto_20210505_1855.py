@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0031_auto_20210505_1855'),
+        ('validator', '0030_uptimereport_agent_key'),
     ]
 
     operations = [
