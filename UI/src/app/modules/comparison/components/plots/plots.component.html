@@ -33,12 +33,14 @@
       <div class="p-grid">
       <!--  Multiple file download  -->
         <div class="p-col-3 center p-mt-2">
-          <button type="button"
-                  style="width: 9rem;"
-                  class="btn btn-sm btn-primary"
+          <button pButton
+                  type="button"
+                  class="btn-action-large"
                   title="Download graphs .zip"
+                  label="Download graphs"
+                  icon="pi pi-download"
                   (click)="downloadResultFiles()">
-            <span class="pi pi-download"></span> Download graphs</button>
+          </button>
         </div>
       <!--   Metric selector  -->
         <div class="p-col">
