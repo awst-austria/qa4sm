@@ -36,7 +36,7 @@ def get_comparison_table(request):
                 extent=extent,
                 get_intersection=json.loads(get_intersection)
             ).reset_index()
-        response = HttpResponse(table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+        response = HttpResponse(table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped', 'comparison'],
                                       index=False))
     except ComparisonError as e:
         response = HttpResponse(str(e))
