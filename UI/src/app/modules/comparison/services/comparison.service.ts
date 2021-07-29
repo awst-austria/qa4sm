@@ -72,7 +72,7 @@ export class ComparisonService {
     return this.httpClient.get<PlotDto[]>(comparisonPlotsUrl, {params});
   }
 
-  getComparisonExtentImage(params: any): Observable<PlotDto> {
-    return this.httpClient.get<PlotDto>(comparisonExtentImageUrl, {params})
+  getComparisonExtentImage(params: any): Observable<string> {
+    return this.httpClient.get<string>(comparisonExtentImageUrl, {params});
   }
 }
