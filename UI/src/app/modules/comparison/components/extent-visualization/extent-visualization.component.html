@@ -37,14 +37,14 @@
         </ng-template>
 
         <div class="p-col">
-          <div *ngIf="comparisonModel.getIntersection"
-            class="pb-3">The comparison is performed by considering only the reference grid points that are in the common spatial
-            extent of the two validations, as specified in the 'Spatial extent' dialogue box. To include all points, check the
-            box in the dialogue box.
-          </div>
-          <div *ngIf="!comparisonModel.getIntersection"
-               class="pb-3">The comparison is performed by considering all points belonging to the considered validations (this
-            is the only option when the validations belong to the same run, e.g. multiple non-reference datasets).
+          <div class="pb-3">
+            {{ this.intersectionText ?
+            "The comparison is performed by considering only the reference grid points that are in the common " +
+            "spatial extent of the two validations, as specified in the 'Spatial extent' dialogue box. To include all " +
+            "points, check the box in the dialogue box." :
+            "The comparison is performed by considering all points belonging to the considered validations (this " +
+            "is the only option when the validations belong to the same run, e.g. multiple non-reference datasets)."
+            }}
           </div>
           <div class="p-grid p-align-center">
             <div ngClass='p-col'>

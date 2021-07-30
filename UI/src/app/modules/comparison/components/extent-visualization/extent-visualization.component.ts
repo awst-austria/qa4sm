@@ -24,6 +24,7 @@ export class ExtentVisualizationComponent implements OnInit {
   isSingle: boolean = true;
   valResModels: ValidationResultModel[] = [];
   extentImage$: Observable<PlotDto>;
+  intersectionText: boolean
 
   constructor(private validationRunService: ValidationrunService,
               private datasetConfigurationService: DatasetConfigurationService,
@@ -42,6 +43,7 @@ export class ExtentVisualizationComponent implements OnInit {
       if (comparison.selectedValidations.length > 0) {
         this.comparisonModel = comparison;
         this.getExtentImage(comparison);
+        this.intersectionText = this.comparisonModel.getIntersection
       }
     });
   }
