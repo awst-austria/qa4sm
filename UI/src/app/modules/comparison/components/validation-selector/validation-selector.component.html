@@ -82,10 +82,12 @@
         </p-accordionTab>
 
           <button *ngFor="let item of this.comparisonModel.selectedValidations"
-                  pButton type="button" (click)="removeValidation(item)"
+                  pButton
+                  type="button"
+                  (click)="removeValidation(item)"
                   [label]="'Remove: ' + (item.id)"
                   icon="pi pi-trash"
-                  class="p-button-danger" style="padding: 0.2rem;">
+                  class="p-button-danger p-mt-2" style="padding: 0.2rem;">
           </button>
       </p-accordion>
 
