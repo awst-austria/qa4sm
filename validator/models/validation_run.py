@@ -205,15 +205,16 @@ class ValidationRun(models.Model):
     @property
     def comparison_label(self):
         configs = DatasetConfiguration.objects.filter(validation = self.id)
-        print(self.reference_configuration)
-        datasets = [' '+conf.dataset.short_name for conf in configs if conf.id != self.reference_configuration.id]
+        datasets = [conf.dataset.short_name+', ' for conf in configs if conf.id != self.reference_configuration.id]
         t = self.start_time
         minute = str(t.minute)
         if t.minute < 10:
             minute = '0' + minute
-        label = 'Date: '+str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(t.hour) + ':' + minute +', Non-reference-dataset:'
+        label = 'Validation date: '+str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(t.hour) + ':' + minute +', Non-reference-dataset: '
         for dataset in datasets:
             label += dataset
+        label = label.strip(', ')
+        print(label)
         return label
 
 
