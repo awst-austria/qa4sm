@@ -144,6 +144,7 @@ export class ValidationSelectorComponent implements OnInit {
     const toBeRemoved = this.comparisonModel.selectedValidations.indexOf(target);
     this.comparisonModel.selectedValidations.splice(toBeRemoved, 1);
     this.comparisonModel.getIntersection = this.checkOverlapping();
+    this.comparisonService.sendComparisonModel(this.comparisonModel);
   }
 
   checkOverlapping(): boolean {

@@ -18,6 +18,7 @@
     <div class="container mb-5 mt-4"
          style="max-width: 60rem;">
       <!--       summary of the selected comparison  -->
+      <div  *ngIf="showComparisonResults">
       <qa-comparison-summary></qa-comparison-summary>
 <!--        visualize the validation extent-->
       <qa-extent-visualization></qa-extent-visualization>
@@ -25,6 +26,7 @@
       <qa-table-comparison></qa-table-comparison>
     <!--  plots section  -->
       <qa-plots></qa-plots>
+      </div>
     </div>
   </div>
 </div>

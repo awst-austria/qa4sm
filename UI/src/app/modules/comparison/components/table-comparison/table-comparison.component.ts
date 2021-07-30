@@ -3,7 +3,7 @@ import {ComparisonService} from '../../services/comparison.service';
 import {Observable} from 'rxjs';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
-import {debounceTime} from "rxjs/operators";
+import {debounceTime} from 'rxjs/operators';
 
 @Component({
   selector: 'qa-table-comparison',

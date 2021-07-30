@@ -10,7 +10,7 @@ import {WebsiteGraphicsService} from '../../../core/services/global/website-grap
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
-import {debounceTime} from "rxjs/operators";
+import {debounceTime} from 'rxjs/operators';
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'mapplot'];

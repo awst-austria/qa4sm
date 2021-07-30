@@ -167,7 +167,7 @@ dependencies:
     - pytest-cov==2.10.1
     - pytest-django==4.1.0
     - pytest-mpl==0.12
-    - git+https://github.com/pstradio/qa4sm-reader.git@validation_comparison
+    - qa4sm-reader==0.5
     - redis==3.5.3
     - repurpose==0.8
     - seaborn==0.11.0

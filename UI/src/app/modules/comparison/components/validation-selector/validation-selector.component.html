@@ -66,7 +66,7 @@
                 <p-dropdown id="validationSelector"
                             [options]="validations4Comparison"
                             [(ngModel)]="this.selectedValidation"
-                            optionLabel="id"
+                            optionLabel="comparison_label"
                             [style]="{'width':'100%'}"></p-dropdown>
 
                 <label *ngIf="selectedDatasetModel[0]" for="validationSelector">{{selectValidationLabel}}</label>
@@ -82,10 +82,12 @@
         </p-accordionTab>
 
           <button *ngFor="let item of this.comparisonModel.selectedValidations"
-                  pButton type="button" (click)="removeValidation(item)"
+                  pButton
+                  type="button"
+                  (click)="removeValidation(item)"
                   [label]="'Remove: ' + (item.id)"
                   icon="pi pi-trash"
-                  class="p-button-danger" style="padding: 0.2rem;">
+                  class="p-button-danger p-mt-2" style="padding: 0.2rem;">
           </button>
       </p-accordion>
 
