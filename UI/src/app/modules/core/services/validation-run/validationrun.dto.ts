@@ -8,6 +8,7 @@ export class ValidationrunDto{
               public total_points: number,
               public error_points: number,
               public progress: number,
+              public dataset_configurations: number[],
               public reference_configuration: number,
               public scaling_ref: number,
               public scaling_method: string,
