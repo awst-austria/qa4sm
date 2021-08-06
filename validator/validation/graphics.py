@@ -300,7 +300,8 @@ def get_extent_image(
         validation_runs:list,
         extent:tuple=None,
         get_intersection:bool=True,
-) -> str:
+        encoded:bool=True,
+):
     """
     Creates an image encoding in base64 showing the selected comparison extent
 
@@ -313,6 +314,8 @@ def get_extent_image(
         (min_lon, max_lon, min_lat, max_lat)
     get_intersection: bool, default is True
         Whether to get the intersection or union of the two spatial exents
+    encoded: bool, default is True
+        Whether to encode the image that is returned
 
     Returns
     -------
@@ -335,9 +338,12 @@ def get_extent_image(
             plot_points=True,
         )
         plt.savefig(image, format='png')
-        encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
+        # import pdb; pdb.set_trace()
+        if encoded:
+            encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
+            return encoded
 
-        return encoded
+        return image
 
     except ComparisonError:
         return "error encountered"

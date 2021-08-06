@@ -59,7 +59,6 @@ export class ComparisonService {
 
   downloadExtentImage(ids: string[], getIntersection: boolean): void {
     const fileUrl = `${downloadExtentImageUrl}?ids=${ids}&get_intersection=${getIntersection}`;
-    console.log(fileUrl)
     saveAs(fileUrl);
   }
 
