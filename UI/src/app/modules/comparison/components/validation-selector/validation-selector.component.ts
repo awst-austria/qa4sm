@@ -65,33 +65,20 @@ export class ValidationSelectorComponent implements OnInit {
       // then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
         model.datasetModel.selectedVersion = versions[0];
-
-        const parameters = new HttpParams()
-          .set('ref_dataset', String(datasets[0].short_name))
-          .set('ref_version', String(versions[0].short_name));
-        // console.log(parameters);
-
-        this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
-          // console.log(validations);
-          // console.log(response);
-          this.validations4Comparison = response;
-          if (response) {
-            this.selectedValidation = response[0];  // problem initializing this
-            this.selectValidationLabel = 'Select a validation';
-          } else {
-            this.selectValidationLabel = 'There are no validations with given settings';
-          }
-        });
+        this.getValidations4comparison(String( model.datasetModel.selectedDataset.short_name),
+          String(model.datasetModel.selectedVersion.short_name));
       });
     });
   }
 
-  getValidations4comparison(): void {
-    // return validations available for comparison, given dataset and version
-    // console.log('the dataset selection is:', this.checkbox2NonReferenceNumber(this.multipleNonReference))
+  getValidations4comparison(refDataset?, refVersion?): void{
+    if (!refDataset && !refVersion){
+      refDataset = String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name);
+      refVersion = String(this.selectedDatasetModel[0].datasetModel.selectedVersion.short_name);
+    }
     const parameters = new HttpParams()
-      .set('ref_dataset', String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name))
-      .set('ref_version', String(this.selectedDatasetModel[0].datasetModel.selectedVersion.short_name))
+      .set('ref_dataset', refDataset)
+      .set('ref_version', refVersion)
       // number of non-reference datasets
       .set('max_datasets', String(this.checkbox2NonReferenceNumber()));
     // console.log(parameters);
@@ -106,6 +93,7 @@ export class ValidationSelectorComponent implements OnInit {
         this.selectValidationLabel = 'There are no validations available';
       }
     });
+
   }
 
   multipleNonReferenceChange(): void {
