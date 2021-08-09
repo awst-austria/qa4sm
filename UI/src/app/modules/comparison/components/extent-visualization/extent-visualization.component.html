@@ -1,5 +1,5 @@
-<div *ngIf="(extentImage$|async) as img">
-  <div *ngIf="img == 'Raise message to check box', else noError" class="p-col">
+<div *ngIf="(extentImage$|async) as img" class="p-grid no-gutters">
+  <div *ngIf="img == 'Raise message to check box', else noError" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">

@@ -1,5 +1,6 @@
-<div *ngIf="(metricPlots$|async) as plots" class="p-col-12">
-<!--  <p-panel>-->
+<div *ngIf="(metricPlots$|async) as plots" class="p-grid no-gutters">
+  <div class="p-col-12">
+    <!--  <p-panel>-->
     <p-panel [toggleable]="true" [collapsed]="false">
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">
@@ -18,12 +19,12 @@
       <div class="p-col">
         <div class="p-grid p-align-center">
           <div *ngFor="let comparisonplot of plots; let ind = index" class='p-col'>
-              <img width="95%"
-                   height="95%"
-                   [src]=sanitizePlotUrl(comparisonplot.plot)
-                   (click)="showGallery(ind, plots)"
-                   [ngClass]="{'result-plot':true, 'pcol6': true}"
-                   alt="An Overview map for {{selectedMetric.metric_pretty_name}}">
+            <img width="95%"
+                 height="95%"
+                 [src]=sanitizePlotUrl(comparisonplot.plot)
+                 (click)="showGallery(ind, plots)"
+                 [ngClass]="{'result-plot':true, 'pcol6': true}"
+                 alt="An Overview map for {{selectedMetric.metric_pretty_name}}">
           </div>
         </div>
       </div>
@@ -31,7 +32,7 @@
 
       <!--  buttons  -->
       <div class="p-grid">
-      <!--  Multiple file download  -->
+        <!--  Multiple file download  -->
         <div class="p-col-3 center p-mt-2">
           <button pButton
                   type="button"
@@ -42,7 +43,7 @@
                   (click)="downloadResultFiles()">
           </button>
         </div>
-      <!--   Metric selector  -->
+        <!--   Metric selector  -->
         <div class="p-col">
         <span class="p-float-label p-mb-4 p-mt-3">
           <p-dropdown id="metricSelector"
@@ -58,6 +59,7 @@
       </div>
 
     </p-panel>
-<!--  </p-panel>-->
+    <!--  </p-panel>-->
+  </div>
 </div>
 
