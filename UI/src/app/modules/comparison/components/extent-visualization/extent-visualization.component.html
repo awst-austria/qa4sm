@@ -52,6 +52,7 @@
                    height="95%"
                    [src]=sanitizePlotUrl(img)
                    [ngClass]="{'result-plot':true, 'pcol6': true}"
+                   (click)="showImage(img)"
                    alt="An overview of the selected comparison extent">
             </div>
           </div>

@@ -8,6 +8,8 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
+import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
+import {Gallery} from 'angular-gallery';
 
 @Component({
   selector: 'qa-extent-visualization',
@@ -20,14 +22,15 @@ export class ExtentVisualizationComponent implements OnInit {
     [], new ExtentModel(true).getIntersection,
   );
 
-  intersectionText: boolean
+  intersectionText: boolean;
   extentImage$: Observable<string>;
 
   constructor(private validationRunService: ValidationrunService,
               private datasetConfigurationService: DatasetConfigurationService,
               private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
-              private plotService: WebsiteGraphicsService) {
+              private plotService: WebsiteGraphicsService,
+              private gallery: Gallery) {
   }
 
   ngOnInit(): void {
@@ -40,7 +43,7 @@ export class ExtentVisualizationComponent implements OnInit {
       if (comparison.selectedValidations.length > 0) {
         this.comparisonModel = comparison;
         this.getExtentImage(comparison);
-        this.intersectionText = this.comparisonModel.getIntersection
+        this.intersectionText = this.comparisonModel.getIntersection;
       }
     });
   }
@@ -65,6 +68,18 @@ export class ExtentVisualizationComponent implements OnInit {
     // should provide a download of the comparison image
     const ids = this.comparisonService.getValidationsIds(comparisonModel.selectedValidations);
     this.comparisonService.downloadExtentImage(ids, comparisonModel.getIntersection);
-    console.log(this.comparisonService.downloadExtentImage(ids, comparisonModel.getIntersection))
+    console.log(this.comparisonService.downloadExtentImage(ids, comparisonModel.getIntersection));
   }
+
+  showImage(image): void {
+    const sanitizedImage = this.sanitizePlotUrl(image);
+    const imagesList = [{path: sanitizedImage}];
+    const prop: any = {};
+    prop.component = CarouselComponent;
+    prop.images = imagesList;
+    prop.index = 0;
+    prop.arrows = imagesList.length > 1;
+    this.gallery.load(prop);
+  }
+
 }
