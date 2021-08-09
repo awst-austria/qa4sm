@@ -16,13 +16,13 @@
       <!--  description of the comparison-->
       <table id="comparison_table{% if {{isSingle}} %}_single{% else %}_double{% endif %}"
              class="table table-bordered table-striped">
-        <thead *ngIf="!isSingle" class="thead-dark">
-        <tr>
-<!--          should really add another property in validationrundto to describe it-->
-          <th *ngFor="let validation of this.comparisonModel.selectedValidations; let ind = index"
-              scope="col" style="width: 10%">Description of validation {{ind}}: {{validation.id}}</th>
-        </tr>
-        </thead>
+<!--        <thead *ngIf="!isSingle">-->
+<!--        <tr>-->
+<!--&lt;!&ndash;          should really add another property in validationrundto to describe it&ndash;&gt;-->
+<!--          <th *ngFor="let validation of this.comparisonModel.selectedValidations; let ind = index"-->
+<!--              scope="col" style="width: 10%">Description of validation {{ind}}: {{validation.id}}</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
         <thead *ngIf="isSingle" class="thead-dark">
         <tr>
           <th scope="col" style="width: 10%">Description of the selected validation: {{this.comparisonModel.selectedValidations[0].id}}</th>
