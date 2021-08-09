@@ -149,18 +149,18 @@
         </ng-template>
         <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
-        <div *ngIf="!forComparison">
-          <li>Processing took {{ validationRun.runTime }} minutes (wall time).</li>
+<!--        <div *ngIf="!forComparison">-->
+          <li  *ngIf="!forComparison">Processing took {{ validationRun.runTime }} minutes (wall time).</li>
 
           <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
           <ng-template #elseProgress>
-            <li [ngClass]="{'alert-danger': validationRun.errorRate > 0}">
+            <li *ngIf="!forComparison" [ngClass]="{'alert-danger': validationRun.errorRate > 0}">
               {{validationRun.errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
               of {{ validationRun.total_points }}) of the processed locations (grid points) produced errors during
               calculation.
             </li>
           </ng-template>
-          <li *ngIf="validationRun.expiry_date && getCurrentUser() === validationRun.user">
+          <li *ngIf="validationRun.expiry_date && getCurrentUser() === validationRun.user && !forComparison">
             <span *ngIf="validationRun.is_near_expiry">
               <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
               This validation will SOON be automatically removed during cleanup
@@ -174,18 +174,18 @@
             </span>
 
           </li>
-          <li *ngIf="validationRun.is_archived && validationRun.is_unpublished">
+          <li *ngIf="validationRun.is_archived && validationRun.is_unpublished && !forComparison">
                 <span
                   class="p-panel-header-icon pi pi- expiry-icons">
                   <fa-icon [icon]="faIcons.faArchive"></fa-icon>
                 </span>
             This validation has been archived. It will NOT be automatically removed during cleanup.
           </li>
-          <li *ngIf="validationRun.doi">
+          <li *ngIf="validationRun.doi && !forComparison">
             <span class="pi pi-book"></span> This result was published on zenodo with DOI
             <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
           </li>
-        </div>
+<!--        </div>-->
       </ul>
       <qa-buttons *ngIf="!forComparison" [validationList]="false" [validationRun]="validationRun" (doRefresh)="refresh($event)"></qa-buttons>
     </div>
