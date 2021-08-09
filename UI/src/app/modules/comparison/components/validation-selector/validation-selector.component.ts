@@ -40,7 +40,6 @@ export class ValidationSelectorComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // console.log(this.multipleNonReference)
     // this.comparisonModel = new Validations2CompareModel();
     this.comparisonService.currentComparisonModel.subscribe(model => this.comparisonModel = model);
     this.addDatasetToSelection();
@@ -81,7 +80,6 @@ export class ValidationSelectorComponent implements OnInit {
       .set('ref_version', refVersion)
       // number of non-reference datasets
       .set('max_datasets', String(this.checkbox2NonReferenceNumber()));
-    // console.log(parameters);
     this.selectValidationLabel = 'Wait for validations to be loaded';
     this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
       if (response){
@@ -115,20 +113,19 @@ export class ValidationSelectorComponent implements OnInit {
     if (this.multipleNonReference){
       return this.comparisonModel.selectedValidations.length >= 1;
     }
+
     // if not
-    return this.comparisonModel.selectedValidations.length >= N_MAX_VALIDATIONS;
+    return !(this.comparisonModel.selectedValidations.length < N_MAX_VALIDATIONS && this.validations4Comparison.length > 0);
   }
 
   addValidation2Comparison(): void {
     // should add the selected validation in the comparisonModel
-    // console.log('selected validation', this.selectedValidation)
     this.comparisonModel.selectedValidations.push(this.selectedValidation);
     this.comparisonModel.getIntersection = this.checkOverlapping();
   }
 
   removeValidation(target: ValidationrunDto): void {
     // should remove the selected validation from the comparisonModel
-    // console.log(this.comparisonModel.selectedValidations)
     const toBeRemoved = this.comparisonModel.selectedValidations.indexOf(target);
     this.comparisonModel.selectedValidations.splice(toBeRemoved, 1);
     this.comparisonModel.getIntersection = this.checkOverlapping();
@@ -152,7 +149,6 @@ export class ValidationSelectorComponent implements OnInit {
     if (this.multipleNonReference) {
       return true;
     } else {
-      // console.log('overlapping', this.checkOverlapping())
      return !this.checkOverlapping();
     }
   }
