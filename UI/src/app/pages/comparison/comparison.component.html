@@ -1,32 +1,34 @@
 <!-- custom -->
-<div class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
-  <h1 class="jumbotron-heading">Validation comparison</h1>
-  <p class="lead text-muted">
-    Compare results from your validations or published ones.
-  </p>
-</div>
+<main>
+  <div class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
+    <h1 class="jumbotron-heading">Validation comparison</h1>
+    <p class="lead text-muted">
+      Compare results from your validations or published ones.
+    </p>
+  </div>
 
-<div class="p-grid no-gutters">
-  <div class="
+  <div class="p-grid no-gutters">
+    <div class="
     p-col-12
     p-md-10 p-md-offset-1
     p-lg-10 p-lg-offset-1
     p-xl-8 p-xl-offset-2">
 
-  <!--   validations selection   -->
-    <qa-validation-selector></qa-validation-selector>
-    <div class="container mb-5 mt-4"
-         style="max-width: 60rem;">
-      <!--       summary of the selected comparison  -->
-      <div  *ngIf="showComparisonResults">
-      <qa-comparison-summary></qa-comparison-summary>
-<!--        visualize the validation extent-->
-      <qa-extent-visualization></qa-extent-visualization>
-    <!--  table section  -->
-      <qa-table-comparison></qa-table-comparison>
-    <!--  plots section  -->
-      <qa-plots></qa-plots>
+      <!--   validations selection   -->
+      <qa-validation-selector></qa-validation-selector>
+      <div class="container mb-5 mt-4"
+           style="max-width: 60rem;">
+        <!--       summary of the selected comparison  -->
+        <div *ngIf="showComparisonResults">
+          <qa-comparison-summary></qa-comparison-summary>
+          <!--        visualize the validation extent-->
+          <qa-extent-visualization></qa-extent-visualization>
+          <!--  table section  -->
+          <qa-table-comparison></qa-table-comparison>
+          <!--  plots section  -->
+          <qa-plots></qa-plots>
+        </div>
       </div>
     </div>
   </div>
-</div>
+</main>
