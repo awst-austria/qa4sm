@@ -1,7 +1,10 @@
 <main class="p-grid p-mx-0">
   <p-panel *ngIf="validationRun$ | async as validationRun" class="p-col-12">
-    <div *ngIf="!forComparison">
-      <ng-template pTemplate="header">
+<!--    <div *ngIf="!forComparison">-->
+    <ng-template  *ngIf="forComparison" pTemplate="header">
+      Description of validation: {{validationRun.id}}
+    </ng-template>
+      <ng-template *ngIf="!forComparison" pTemplate="header">
         <div class="text-center" style="width:100%">
           <h4 class="p-my-0 font-weight-normal">
             Summary:
@@ -64,7 +67,7 @@
           </h4>
         </div>
       </ng-template>
-    </div>
+<!--    </div>-->
     <div *ngIf="configurations$| async as configurations" class="card-body">
       <ul>
         <li>Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
