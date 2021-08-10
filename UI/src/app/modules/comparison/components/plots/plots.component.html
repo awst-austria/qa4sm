@@ -17,14 +17,26 @@
       </ng-template>
 
       <div class="p-col">
-        <div class="p-grid p-align-center">
+        <div class="p-grid center">
           <div *ngFor="let comparisonplot of plots; let ind = index" class='p-col'>
             <img width="95%"
                  height="95%"
                  [src]=sanitizePlotUrl(comparisonplot.plot)
                  (click)="showGallery(ind, plots)"
-                 [ngClass]="{'result-plot':true, 'pcol6': true}"
+                 [ngClass]="{'result-plot': true, 'pcol6': true, 'small-size': plots.length == 1}"
                  alt="An Overview map for {{selectedMetric.metric_pretty_name}}">
+              <!--  Download buttons for each plot -->
+              <div class="p-py-3 p-pl-2" style="text-align: left">
+                <a class="btn-action-large"
+                   pButton
+                   type="button"
+                   icon="pi pi-download"
+                   [href]=sanitizePlotUrl(comparisonplot.plot)
+                   download="plot{{ind}}_{{selectedMetric.metric_pretty_name}}.png"
+                   label="Download image"
+                   title="Download the image as .png">
+                </a>
+              </div>
           </div>
         </div>
       </div>
@@ -33,19 +45,19 @@
       <!--  buttons  -->
       <div class="p-grid">
         <!--  Multiple file download  -->
-        <div class="p-col-3 center p-mt-2">
-          <button pButton
-                  type="button"
-                  class="btn-action-large"
-                  title="Download graphs .zip"
-                  label="Download graphs"
-                  icon="pi pi-download"
-                  (click)="downloadResultFiles()">
-          </button>
-        </div>
+<!--        <div class="p-col-3 center p-mt-2">-->
+<!--          <button pButton-->
+<!--                  type="button"-->
+<!--                  class="btn-action-large"-->
+<!--                  title="Download graphs .zip"-->
+<!--                  label="Download graphs"-->
+<!--                  icon="pi pi-download"-->
+<!--                  (click)="downloadResultFiles()">-->
+<!--          </button>-->
+<!--        </div>-->
         <!--   Metric selector  -->
-        <div class="p-col">
-        <span class="p-float-label p-mb-4 p-mt-3">
+        <div class="p-col p-mt-4">
+        <span class="p-float-label p-mt-4 p-mt-4">
           <p-dropdown id="metricSelector"
                       [options]="this.comparisonMetrics"
                       [(ngModel)]="selectedMetric"
