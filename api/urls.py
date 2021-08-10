@@ -19,7 +19,7 @@ from api.views.dataset_configuration_view import dataset_configuration
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric,\
-    download_comparison_table, get_comparison_metrics, get_spatial_extent, download_extent_image
+    download_comparison_table, get_comparison_metrics, get_spatial_extent
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_files, \
     get_metric_names_and_associated_files, get_graphic_file
 from api.views.local_api_view import get_list_of_countries
@@ -88,7 +88,6 @@ urlpatterns = [
     path('get-graphic-files', get_graphic_files, name='Get graphic file'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
     path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison'),
-    path('download-extent-image', download_extent_image, name='Download image with spatial extent'),
     path('country-list', get_list_of_countries, name = 'List of countries'),
     path('sign-up', signup_post, name='Sign up'),
     path('user-modify', user_modify, name='User update'),
