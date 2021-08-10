@@ -62,7 +62,7 @@ export class TableComparisonComponent implements OnInit {
     const metricList = this.comparisonParameters.getAll('metric_list');
     const getIntersection = this.comparisonParameters.get('get_intersection') === 'true';
     // I don't know where extent comes from so I leave it empty, but not null, because null is considered
-    // by python as value and passed further
+    // by python as value and passed further and causes errors :(
     const extent = '';
     this.comparisonService.downloadComparisonTableCsv(
       ids, metricList, getIntersection, extent
