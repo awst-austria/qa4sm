@@ -65,17 +65,17 @@ export class PlotsComponent implements OnInit {
     this.comparisonMetrics = [];
     this.comparisonService.getMetrics4Comparison(params).subscribe(
       response => {
-      if (response && response.length > 1) {
-        response.forEach(metric => {
-          this.comparisonMetrics.push(
-            new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
-        });
-        this.selectedMetric = this.comparisonMetrics[0];
-        this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
-      } else {
-        this.metricsErrorMessage = response[0].message; // this message can be shown somewhere so users know what is wrong
-      }
-    });
+        if (response && response.length > 1) {
+          response.forEach(metric => {
+            this.comparisonMetrics.push(
+              new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
+          });
+          this.selectedMetric = this.comparisonMetrics[0];
+          this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
+        } else {
+          this.metricsErrorMessage = response[0].message; // this message can be shown somewhere so users know what is wrong
+        }
+      });
   }
 
   showGallery(index: number = 0, imagesListObject): void {
@@ -111,12 +111,8 @@ export class PlotsComponent implements OnInit {
     return this.plotService.sanitizePlotUrl(plotBase64);
   }
 
-  onMetricChange(): void{
+  onMetricChange(): void {
     this.getComparisonPlots(this.selectedMetric.metric_query_name, this.comparisonModel);
-  }
-
-  downloadResultFiles(): void {
-    // download all the shown images as .png
   }
 
 }
