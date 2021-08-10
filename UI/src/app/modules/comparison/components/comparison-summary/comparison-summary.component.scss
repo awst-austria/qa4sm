@@ -1,5 +1,3 @@
-@import "~bootstrap/dist/css/bootstrap.css";
-
 .pcol6:hover{
   transform: scale(2);
 }
@@ -18,4 +16,15 @@
 }
 .center{
   text-align: center;
+}
+.table{
+  border: none;
+}
+td {
+  padding: 0;
+  background-color: white;
+}
+
+.table td, .table th {
+  border-top: none;
 }
