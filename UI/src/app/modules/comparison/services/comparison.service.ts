@@ -65,7 +65,12 @@ export class ComparisonService {
     metricList.forEach(metric => {
       params += `metric_list=${metric}&`;
     });
-    params += `get_intersection=${String(getIntersection)}&extent=${extent}`;
+    params += `get_intersection=${String(getIntersection)}`;
+    // for now I leave here if because I don't know where the param comes from and we can not pass null, because python
+    // treats it as an actual value
+    if (extent){
+      params += `&extent=${extent}`;
+    }
     const fileUrl = `${downloadComparisonTableUrl}${params}`;
     console.log(fileUrl);
     saveAs(fileUrl);
