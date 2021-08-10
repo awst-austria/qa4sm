@@ -13,6 +13,7 @@ import {debounceTime} from 'rxjs/operators';
 export class TableComparisonComponent implements OnInit {
 
   comparisonTable$: Observable<string>;
+  comparisonParameters: HttpParams;
 
   constructor(private comparisonService: ComparisonService) {
   }
@@ -42,31 +43,29 @@ export class TableComparisonComponent implements OnInit {
     this.comparisonService.getMetrics4Comparison(parameters).subscribe(response => {
       if (response) {
         response.forEach(metric => {
-          comparisonMetrics.push(metric.metric_query_name);
+          // comparisonMetrics.push(metric.metric_query_name);
+          parameters = parameters.append('metric_list', metric.metric_query_name);
         });
-        this.getComparisonTable(comparisonMetrics, comparisonModel);
+        this.comparisonParameters = parameters;
+        this.getComparisonTable(parameters);
       }
     });
   }
 
-  getComparisonTable(metricList: string[], comparisonModel: Validations2CompareModel): void {
-    const ids = this.comparisonService.getValidationsIds(comparisonModel.selectedValidations);
-    let parameters = new HttpParams().set('get_intersection', comparisonModel.getIntersection.toString());
-    ids.forEach(id => {
-      parameters = parameters.append('ids', id);
-    });
-    metricList.forEach(metric => {
-      parameters = parameters.append('metric_list', metric);
-    });
-    // console.log(metricList)
-    // console.log('parameters', parameters)
+  getComparisonTable(parameters): void{
     this.comparisonTable$ = this.comparisonService.getComparisonTable(parameters);
   }
 
   getComparisonTableAsCsv(): void {
     // button to make download
+    const ids = this.comparisonParameters.getAll('ids');
+    const metricList = this.comparisonParameters.getAll('metric_list');
+    const getIntersection = this.comparisonParameters.get('get_intersection') === 'true';
+    // I don't know where extent comes from so I leave it empty, but not null, because null is considered
+    // by python as value and passed further
+    const extent = '';
     this.comparisonService.downloadComparisonTableCsv(
-      null, null, null, null
+      ids, metricList, getIntersection, extent
     );
   }
 }

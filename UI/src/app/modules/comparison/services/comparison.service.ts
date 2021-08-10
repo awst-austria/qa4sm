@@ -56,10 +56,17 @@ export class ComparisonService {
     return this.httpClient.get(comparisonTableUrl, {params, headers, responseType: 'text'});
   }
 
-  downloadComparisonTableCsv(ids: string, metricList: string[], getIntersection: boolean, extent: string): void {
+  downloadComparisonTableCsv(ids: string[], metricList: string[], getIntersection: boolean, extent: string): void {
     // download comparison table
-    const fileUrl = `${downloadComparisonTableUrl}?ids=${ids}&metric_list=${metricList}
-    &get_intersection=${getIntersection}&extent=${extent}`;
+    let params = '?';
+    ids.forEach(id => {
+      params += `ids=${id}&`;
+    });
+    metricList.forEach(metric => {
+      params += `metric_list=${metric}&`;
+    });
+    params += `get_intersection=${String(getIntersection)}&extent=${extent}`;
+    const fileUrl = `${downloadComparisonTableUrl}${params}`;
     console.log(fileUrl);
     saveAs(fileUrl);
   }
