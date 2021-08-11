@@ -19,8 +19,10 @@
       <div class="container mb-5 mt-4"
            style="max-width: 60rem;">
         <!--       summary of the selected comparison  -->
-        <div *ngIf="showComparisonResults" class="comparison-result-container p-text-center">
-          <h3 class="p-my-3">Validation comparison results</h3>
+        <div *ngIf="showComparisonResults" class="comparison-result-container">
+          <div  class="p-text-center">
+            <h3 class="p-my-3">Validation comparison results</h3>
+          </div>
           <qa-comparison-summary></qa-comparison-summary>
           <!--        visualize the validation extent-->
           <qa-extent-visualization></qa-extent-visualization>
