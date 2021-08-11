@@ -15,13 +15,11 @@ export class ComparisonComponent implements OnInit {
   ngOnInit(): void {
     this.comparisonService.currentComparisonModel.subscribe(comparison => {
       this.comparisonModel = comparison;
-      console.log(this.comparisonModel);
       if (this.comparisonModel.selectedValidations.length !== 0){
         const cond1 = comparison.selectedValidations[0].dataset_configurations.length > 2
           && this.comparisonModel.selectedValidations.length === 1;
         const cond2 = comparison.selectedValidations[0].dataset_configurations.length === 2
           && this.comparisonModel.selectedValidations.length === 2;
-        console.log('cond1: ', cond1, 'cond2: ', cond2);
         this.showComparisonResults = cond1 || cond2;
       } else {
         this.showComparisonResults = false;
