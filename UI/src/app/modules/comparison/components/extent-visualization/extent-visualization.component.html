@@ -1,3 +1,6 @@
+<div *ngIf="!(extentImage$|async)" class="p-grid no-gutters">
+  <span class="pi pi-spin pi-spinner" title="This component is still loading"></span>
+</div>
 <div *ngIf="(extentImage$|async) as img" class="p-grid no-gutters">
   <div *ngIf="img == 'Raise message to check box', else noError" class="p-col-12">
     <p-panel>
@@ -22,7 +25,7 @@
   </div>
   <ng-template #noError>
     <div class="p-col-12">
-      <p-panel [toggleable]="true" [collapsed]="false">
+      <p-panel [toggleable]="true" [collapsed]="true">
         <ng-template pTemplate="header">
           <div class="text-center my-1" style="width: 92%">
             <h4 class="my-0 font-weight-normal">Selected comparison extent</h4>
@@ -80,3 +83,4 @@
     </div>
   </ng-template>
 </div>
+

@@ -1,3 +1,6 @@
+<div *ngIf="!(comparisonTable$|async)" class="p-grid no-gutters">
+  <span class="pi pi-spin pi-spinner" title="This component is still loading"></span>
+</div>
 <div *ngIf="(comparisonTable$|async) as table" class="p-grid no-gutters">
   <div class="p-col-12">
     <p-panel [toggleable]="true" [collapsed]="true">
@@ -32,3 +35,4 @@
     </p-panel>
   </div>
 </div>
+
