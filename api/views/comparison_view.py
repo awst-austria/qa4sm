@@ -100,17 +100,23 @@ def get_comparison_plots_for_metric(request):
 
     encoded_plots = []
     for plot_type in plot_types:
-        base64_plot = encoded_comparisonPlots(
-            validation_runs=validation_runs,
-            plot_type=plot_type,
-            metric=metric,
-            extent=extent,
-            get_intersection=json.loads(get_intersection)
-        )
+        try:
+            base64_plot = encoded_comparisonPlots(
+                validation_runs=validation_runs,
+                plot_type=plot_type,
+                metric=metric,
+                extent=extent,
+                get_intersection=json.loads(get_intersection)
+            )
+        except:
+            # TODO: Pietro, please check what kind of errors can be encountered here and add them to the exceptions along with an appropriate message
+            response = [{'message': 'Something went wrong'}]
+
         if not base64_plot == "error encountered":
             encoded_plots.append({'plot': base64_plot})
+            response = encoded_plots
 
-    return JsonResponse(encoded_plots, status=200, safe=False)
+    return JsonResponse(response, status=200, safe=False)
 
 
 @api_view(['GET'])
@@ -126,7 +132,9 @@ def get_spatial_extent(request):
             get_intersection=json.loads(get_intersection)
         )
     except SpatialExtentError as e:
-        response = HttpResponse(str(e))
+        response = JsonResponse([{'message': str(e)}], status=200, safe=False)
 
     if not encoded_image == "error encountered":
-        return JsonResponse(encoded_image, status=200, safe=False)
+        response = JsonResponse(encoded_image, status=200, safe=False)
+
+    return response
