@@ -1,5 +1,5 @@
-<div *ngIf="!(metricPlots$|async)" class="center">
-  <span class="pi pi-spin pi-spinner loading-spinner" title="This component is still loading"></span>
+<div *ngIf="!(metricPlots$|async)" class="text-center">
+  <span class="pi pi-spinner loading-spinner" title="This component is still loading"></span>
 </div>
 <div *ngIf="(metricPlots$|async) as plots" class="p-grid no-gutters">
   <div class="p-col-12">

@@ -1,5 +1,5 @@
-<div *ngIf="!(extentImage$|async)" class="p-grid no-gutters">
-  <span class="pi pi-spin pi-spinner" title="This component is still loading"></span>
+<div *ngIf="!(extentImage$|async)" class="text-center">
+  <span class="pi pi-spinner loading-spinner" title="This component is still loading"></span>
 </div>
 <div *ngIf="(extentImage$|async) as img" class="p-grid no-gutters">
   <div *ngIf="img == 'Raise message to check box', else noError" class="p-col-12">
