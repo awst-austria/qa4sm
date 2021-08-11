@@ -27,7 +27,11 @@
                 5,
                 6,
                 7
-            ]
+            ],
+            "resolution": {
+                "value": 0.25,
+                "unit": "deg"
+            }
         }
     },
     {
@@ -51,7 +55,11 @@
             ],
             "filters": [
                 1
-            ]
+            ],
+            "resolution": {
+                "value": 36,
+                "unit": "km"
+            }
         }
     },
     {
@@ -79,7 +87,11 @@
                 12,
                 13,
                 14
-            ]
+            ],
+            "resolution": {
+                "value": 12.5,
+                "unit": "km"
+            }
         }
     },
     {
@@ -107,7 +119,8 @@
                 2,
                 18,
                 24
-            ]
+            ],
+            "resolution": null
         }
     },
     {
@@ -134,7 +147,11 @@
             "filters": [
                 1,
                 9
-            ]
+            ],
+            "resolution": {
+                "value": 0.25,
+                "unit": "deg"
+            }
         }
     },
     {
@@ -166,7 +183,11 @@
                 5,
                 6,
                 7
-            ]
+            ],
+            "resolution": {
+                "value": 0.25,
+                "unit": "deg"
+            }
         }
     },
     {
@@ -195,7 +216,11 @@
                 21,
                 22,
                 23
-            ]
+            ],
+            "resolution": {
+                "value": 25,
+                "unit": "km"
+            }
         }
     },
     {
@@ -219,7 +244,11 @@
             "filters": [
                 1,
                 16
-            ]
+            ],
+            "resolution": {
+                "value": 0.25,
+                "unit": "deg"
+            }
         }
     },
     {
@@ -243,7 +272,11 @@
             "filters": [
                 1,
                 17
-            ]
+            ],
+            "resolution": {
+                "value": 0.1,
+                "unit": "deg"
+            }
         }
     },
     {
@@ -273,7 +306,11 @@
                 5,
                 6,
                 7
-            ]
+            ],
+            "resolution": {
+                "value": 0.25,
+                "unit": "deg"
+            }
         }
     },
     {
@@ -303,7 +340,11 @@
                 5,
                 6,
                 7
-            ]
+            ],
+            "resolution": {
+                "value": 0.25,
+                "unit": "deg"
+            }
         }
     }
 ]

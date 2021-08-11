@@ -22,6 +22,7 @@ class Dataset(models.Model):
     variables = models.ManyToManyField(DataVariable, related_name='variables')
 
     filters = models.ManyToManyField(DataFilter, related_name='filters')
+    resolution = models.JSONField(null=True)
     
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration
