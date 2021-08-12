@@ -42,21 +42,22 @@ def send_val_done_notification(val_run):
 def send_val_expiry_notification(val_run):
         __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_run.id, val_run.user))
 
-        url = settings.SITE_URL + '/login/?next=' + reverse('result', kwargs={'result_uuid': val_run.id})
+        if val_run.user is not None:
+            url = settings.SITE_URL + '/login/?next=' + reverse('result', kwargs={'result_uuid': val_run.id})
 
-        dataset_name = "{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id)
+            dataset_name = "{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id)
 
-        subject = '[QA4SM] Validation expiring soon'
-        body = 'Dear {} {},\n\nyour validation {} will expire soon.\nIt will be deleted automatically on {} if you take no further action.\nIf you want to extend the validation\'s lifetime or archive it, please visit\n{}\n(you will need to log in)\n\nBest regards,\nQA4SM team'.format(
-            val_run.user.first_name,
-            val_run.user.last_name,
-            dataset_name,
-            val_run.expiry_date.strftime("%Y-%m-%d %H:%M"),
-            url)
+            subject = '[QA4SM] Validation expiring soon'
+            body = 'Dear {} {},\n\nyour validation {} will expire soon.\nIt will be deleted automatically on {} if you take no further action.\nIf you want to extend the validation\'s lifetime or archive it, please visit\n{}\n(you will need to log in)\n\nBest regards,\nQA4SM team'.format(
+                val_run.user.first_name,
+                val_run.user.last_name,
+                dataset_name,
+                val_run.expiry_date.strftime("%Y-%m-%d %H:%M"),
+                url)
 
-        _send_email(recipients=[val_run.user.email],
-                    subject=subject,
-                    body=body)
+            _send_email(recipients=[val_run.user.email],
+                        subject=subject,
+                        body=body)
 
         val_run.expiry_notified = True
         val_run.save()
