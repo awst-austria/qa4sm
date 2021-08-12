@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from django.conf import settings
 from validator.mailer import send_val_expiry_notification
-from validator.models import ValidationRun
+from validator.models import ValidationRun, CeleryTask
 
 
 class Command(BaseCommand):
@@ -23,7 +23,6 @@ class Command(BaseCommand):
         for validation in validations:
             ## notify user about upcoming expiry if not already done
             if ((validation.is_near_expiry) and (not validation.expiry_notified)):
-
                 ## if already a quarter of the warning period has passed without a notification being sent (could happen when service is down),
                 ## extend the validation so that the user gets the full warning period
                 if timezone.now() + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS/4) > validation.expiry_date:
@@ -37,6 +36,9 @@ class Command(BaseCommand):
             ## if validation is expired and user was notified, get rid of it
             elif (validation.is_expired and validation.expiry_notified):
                 vid = str(validation.id)
+                celery_tasks = CeleryTask.objects.filter(validation_id = validation.id)
+                for task in celery_tasks:
+                    task.delete()
                 validation.delete()
                 cleaned_up.append(vid)
 
