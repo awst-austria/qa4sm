@@ -15,7 +15,9 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        validations = ValidationRun.objects.filter(end_time__isnull=False) ## no, you can't filter for is_expired because it isn't in the database. but you can exclude running validations
+        good_validations = ValidationRun.objects.filter(end_time__isnull=False) ## no, you can't filter for is_expired because it isn't in the database. but you can exclude running validations
+        canceled_validations = ValidationRun.objects.filter(progress=-1)
+        validations = good_validations.union(canceled_validations)
         cleaned_up = []
         notified = []
         for validation in validations:
