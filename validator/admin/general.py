@@ -6,6 +6,7 @@ from validator.admin import CustomUserAdmin
 from validator.admin import SystemSettingsAdmin
 from validator.admin import ValidationRunAdmin
 from validator.admin import StatisticsAdmin
+from validator.admin import SendEmailToUsers
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -24,4 +25,4 @@ admin.site.register(Dataset)
 admin.site.register(DatasetVersion)
 admin.site.register(DataVariable)
 admin.site.register(Statistics, StatisticsAdmin)
-admin.site.register(Email)
+admin.site.register(Email, SendEmailToUsers)
