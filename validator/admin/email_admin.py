@@ -1,14 +1,21 @@
 import logging
 
-from django.urls import path
+from django.shortcuts import redirect
 
 from validator.models import Email
 from django.contrib.admin import ModelAdmin
-from django.shortcuts import render
 
-def bulk_send_email_to_users(modeladmin, request, quesryset):
-    for user in quesryset:
-        print(user)
+def bulk_send_email_to_users(modeladmin, request, queryset):
+    recipients = [user.email for user in queryset if user.email is not '']
+    new_email = Email(subject='', content='')
+    new_email.save()
+    for user in queryset:
+        new_email.send_to.add(user.id)
+        new_email.save()
+    print(recipients)
+    redirect_to = f'/admin/validator/email/{new_email.id}/change'
+    return redirect(redirect_to)
+
 bulk_send_email_to_users.short_description = 'Send an email to the chosen users'
 
 
@@ -27,15 +34,3 @@ class EmailAdmin(ModelAdmin):
             form.instance.send_email()
             form.instance.sent = True
             form.instance.save()
-    # def get_urls(self):
-    #     urls = super(EmailAdmin, self).get_urls()
-    #     new_urls = [
-    #         path('send-email', self.admin_site.admin_view(self.send_email), name='send-email')
-    #     ]
-    #
-    #     return new_urls + urls
-
-    # def send_email(self, request):
-    #     # here I'll create a send email form
-    #     context = self.admin_site.each_context(request)
-    #     return render(request, 'admin/send_email.html')
