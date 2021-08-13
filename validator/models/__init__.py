@@ -14,5 +14,5 @@ from .networks import ISMNNetworks
 from .uptime_ping import UptimePing
 from .uptime_agent import UptimeAgent
 from .uptime_report import UptimeReport
-from .emails import Emails
+from .email import Email
 
