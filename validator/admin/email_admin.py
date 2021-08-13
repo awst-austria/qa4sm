@@ -23,9 +23,10 @@ class EmailAdmin(ModelAdmin):
 
     def save_related(self, request, form, formsets, change):
         super(EmailAdmin, self).save_related(request, form, formsets, change)
-        if form.instance.send_this_email:
+        if form.instance.send_this_email and not form.instance.sent:
             form.instance.send_email()
             form.instance.sent = True
+            form.instance.save()
     # def get_urls(self):
     #     urls = super(EmailAdmin, self).get_urls()
     #     new_urls = [
