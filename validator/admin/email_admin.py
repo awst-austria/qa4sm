@@ -13,7 +13,7 @@ def bulk_send_email_to_users(modeladmin, request, queryset):
         new_email.send_to.add(user.id)
         new_email.save()
     print(recipients)
-    redirect_to = f'/admin/validator/email/{new_email.id}/change'
+    redirect_to = f'/admin/validator/email/{new_email.pk}/change'
     return redirect(redirect_to)
 
 bulk_send_email_to_users.short_description = 'Send an email to the chosen users'
