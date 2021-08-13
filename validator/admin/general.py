@@ -13,6 +13,7 @@ from validator.models import DatasetVersion
 from validator.models import Settings
 from validator.models import ValidationRun
 from validator.models import Statistics
+from validator.models import Email
 
 
 admin.site.register(Settings, SystemSettingsAdmin)
@@ -23,3 +24,4 @@ admin.site.register(Dataset)
 admin.site.register(DatasetVersion)
 admin.site.register(DataVariable)
 admin.site.register(Statistics, StatisticsAdmin)
+admin.site.register(Email)
