@@ -12,14 +12,14 @@ def bulk_send_email_to_users(modeladmin, request, quesryset):
 bulk_send_email_to_users.short_description = 'Send an email to the chosen users'
 
 
-class SendEmailToUsers(ModelAdmin):
+class EmailAdmin(ModelAdmin):
     __logger = logging.getLogger(__name__)
     model = Email
 
     list_display = ('date', 'content')
 
     def __init__(self, model, admin_site):
-        super(SendEmailToUsers, self).__init__(model, admin_site)
+        super(EmailAdmin, self).__init__(model, admin_site)
 
     # def get_urls(self):
     #     urls = super(SendEmailToUsers, self).get_urls()
