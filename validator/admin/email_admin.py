@@ -23,7 +23,7 @@ class EmailAdmin(ModelAdmin):
     __logger = logging.getLogger(__name__)
     model = Email
     fields = ('send_to', 'subject','content', 'date', 'send_this_email' )
-    list_display = ('date', 'subject','content')
+    list_display = ('date', 'subject','content', 'sent')
 
     def __init__(self, model, admin_site):
         super(EmailAdmin, self).__init__(model, admin_site)
