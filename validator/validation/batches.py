@@ -7,6 +7,7 @@ from ismn.interface import ISMN_Interface
 from pygeobase.io_base import GriddedBase
 
 from validator.models import DataFilter
+from validator.validation import globals
 
 __logger = logging.getLogger(__name__)
 
@@ -144,12 +145,16 @@ def create_jobs(
         )
 
         def reshape_meta(metadata):
+            # reshape metadata disctionary to facilitate use
             reshaped = {}
             for key, value in metadata.items():
                 meta_value = value[0][0]
                 if isinstance(meta_value, pd.Timestamp):
                     meta_value = meta_value.to_numpy()
                 reshaped[key] = meta_value
+            # parse information on the measuring depth from the instument metadata
+            reshaped[globals.MEASURE_DEPTH_FROM] = metadata[globals.INSTRUMENT_META][0][1]
+            reshaped[globals.MEASURE_DEPTH_TO] = metadata[globals.INSTRUMENT_META][0][2]
 
             return reshaped
 
