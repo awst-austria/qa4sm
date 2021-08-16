@@ -108,7 +108,7 @@ def send_user_status_changed(user, activate):
             )
 
         if activate:
-            url = settings.SITE_URL + reverse('login')
+            url = settings.SITE_URL + reverse('api-login')
             body += '\nYou can now log in here: {}'.format(
                 url)
 
