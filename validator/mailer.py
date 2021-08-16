@@ -10,7 +10,7 @@ __logger = logging.getLogger(__name__)
 def send_val_done_notification(val_run):
         __logger.info('Sending mail about validation {} to user {}...'.format(val_run.id, val_run.user))
 
-        url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': val_run.id})
+        url = settings.SITE_URL + f'ui/validation-result/result_uuid={val_run.id}'
 
         # enumerate datasets with "and" and Oxford comma.
         dataset_string = ''
