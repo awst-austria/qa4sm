@@ -42,7 +42,7 @@ def send_val_done_notification(val_run):
 def send_val_expiry_notification(val_run):
         __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_run.id, val_run.user))
 
-        url = settings.SITE_URL + '/login/?next=' + reverse('result', kwargs={'result_uuid': val_run.id})
+        url = settings.SITE_URL + '/login/?next=' + f'ui/validation-result/result_uuid={val_run.id}'
 
         dataset_name = "{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id)
 
