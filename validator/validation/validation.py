@@ -89,7 +89,7 @@ def save_validation_config(validation_run):
 
         ds.qa4sm_version = settings.APP_VERSION
         ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
-        ds.url = settings.SITE_URL + get_angular_url('result')
+        ds.url = settings.SITE_URL + get_angular_url('result', validation_run.id)
         if(validation_run.interval_from is None):
             ds.val_interval_from="N/A"
         else:
