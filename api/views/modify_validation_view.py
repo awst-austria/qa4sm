@@ -10,8 +10,8 @@ from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from rest_framework import status
 
-from validator.views.results import _copy_validationrun
-
+# from validator.views.results import _copy_validationrun
+from api.views.validation_run_view import _copy_validationrun
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
