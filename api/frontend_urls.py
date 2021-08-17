@@ -39,4 +39,4 @@ def get_angular_url(url_name, parameter=None):
     else:
         searched_path = searched_element['path']
 
-    return 'ui/' + searched_path
+    return '/ui/' + searched_path
