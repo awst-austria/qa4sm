@@ -31,6 +31,7 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
+from api.frontend_urls import get_angular_url
 
 
 __logger = logging.getLogger(__name__)
@@ -88,7 +89,7 @@ def save_validation_config(validation_run):
 
         ds.qa4sm_version = settings.APP_VERSION
         ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
-        ds.url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': validation_run.id})
+        ds.url = settings.SITE_URL + get_angular_url('result')
         if(validation_run.interval_from is None):
             ds.val_interval_from="N/A"
         else:
