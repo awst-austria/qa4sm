@@ -169,7 +169,7 @@ class TestAdmin(TestCase):
         orig_mm = settings.maintenance_mode
 
         url = reverse('admin:system-settings')
-        validation_url = reverse('validation')
+        validation_url = 'ui/validate/' #reverse('validation')
 
         # switch on maint mode
         maint_params = { 'maintenance_mode': True, }
