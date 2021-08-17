@@ -22,12 +22,12 @@ def data_filter(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def data_filter_by_id(request, **kwargs):
-    dataset_filter = DataFilter.objects.get(pk=kwargs['id'])
-    serializer = DataFilterSerializer(dataset_filter)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def data_filter_by_id(request, **kwargs):
+#     dataset_filter = DataFilter.objects.get(pk=kwargs['id'])
+#     serializer = DataFilterSerializer(dataset_filter)
+#     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
@@ -42,12 +42,12 @@ def data_parameterised_filter(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def data_parameterised_filter_by_id(request, **kwargs):
-    param_filters = ParametrisedFilter.objects.get(id=kwargs['id'])
-    serilizer = ParameterisedFilterSerializer(param_filters)
-    return JsonResponse(serilizer.data, status=status.HTTP_200_OK, safe=False)
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def data_parameterised_filter_by_id(request, **kwargs):
+#     param_filters = ParametrisedFilter.objects.get(id=kwargs['id'])
+#     serilizer = ParameterisedFilterSerializer(param_filters)
+#     return JsonResponse(serilizer.data, status=status.HTTP_200_OK, safe=False)
 
 
 class DataFilterSerializer(ModelSerializer):

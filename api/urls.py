@@ -1,8 +1,8 @@
 from django.conf.urls import url
 from django.urls import path
 
-from api.views.data_filter_view import data_filter, data_filter_by_id, data_parameterised_filter_by_id, \
-    data_parameterised_filter
+from api.views.data_filter_view import data_filter,data_parameterised_filter
+# from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id
 from api.views.dataset_version_view import dataset_version, dataset_version_by_id
 from api.views.dataset_view import dataset, dataset_by_id
@@ -62,14 +62,14 @@ urlpatterns = [
     path('validation-runs', validation_runs, name='All validation runs (results)'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
-    path('data-filter', data_filter, name='Dataset filters'),
+    path('data-filter', data_filter, name='Dataset filters'),  # checked
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
     url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
     path('validation-configuration', start_validation, name='Run new validation'),
-    url(r'^data-filter/(?P<id>.+)$', data_filter_by_id),
-    path('param-filter', data_parameterised_filter, name='Parameterised filter'),
-    url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),
+    # url(r'^data-filter/(?P<id>.+)$', data_filter_by_id),  # checked / not used
+    path('param-filter', data_parameterised_filter, name='Parameterised filter'),  # checked
+    # url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),  # checked, not used
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
