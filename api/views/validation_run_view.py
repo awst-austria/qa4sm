@@ -21,6 +21,7 @@ from shutil import copy2
 from dateutil.tz import tzlocal
 from django.conf import settings
 from django.urls.base import reverse
+from api.frontend_urls import get_angular_url
 
 
 def _copy_validationrun(run_to_copy, new_user):
@@ -99,7 +100,7 @@ def _copy_validationrun(run_to_copy, new_user):
                     file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
 
                     # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
-                    new_url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': run_to_copy.id})
+                    new_url = settings.SITE_URL + get_angular_url('result')
                     file.setncattr('url', new_url)
                     file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
                     file.close()
