@@ -37,8 +37,8 @@ import validator.validation as val
 from validator.validation.batches import _geographic_subsetting
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-from validator.views.validation import _compare_validation_runs
-from validator.views.results import _copy_validationrun
+from api.views.validation_config_view import _compare_validation_runs
+from api.views.validation_run_view import _copy_validationrun
 from django.shortcuts import get_object_or_404
 from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
 
