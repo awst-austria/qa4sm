@@ -3,6 +3,7 @@ import logging
 from django.core.mail import send_mail
 from django.urls.base import reverse
 from django.conf import settings
+from api.frontend_urls import get_angular_url
 
 
 __logger = logging.getLogger(__name__)
@@ -10,7 +11,7 @@ __logger = logging.getLogger(__name__)
 def send_val_done_notification(val_run):
         __logger.info('Sending mail about validation {} to user {}...'.format(val_run.id, val_run.user))
 
-        url = settings.SITE_URL + f'ui/validation-result/result_uuid={val_run.id}'
+        url = settings.SITE_URL + get_angular_url('result')
 
         # enumerate datasets with "and" and Oxford comma.
         dataset_string = ''
