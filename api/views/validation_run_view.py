@@ -100,7 +100,7 @@ def _copy_validationrun(run_to_copy, new_user):
                     file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
 
                     # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
-                    new_url = settings.SITE_URL + get_angular_url('result')
+                    new_url = settings.SITE_URL + get_angular_url('result', run_id)
                     file.setncattr('url', new_url)
                     file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
                     file.close()
