@@ -16,6 +16,7 @@ from validator.models import DatasetVersion
 from validator.models import Settings
 from validator.models import ValidationRun
 from validator.validation import globals
+from api.frontend_urls import get_angular_url
 
 
 @shared_task(bind=True)
@@ -169,7 +170,7 @@ class TestAdmin(TestCase):
         orig_mm = settings.maintenance_mode
 
         url = reverse('admin:system-settings')
-        validation_url = 'ui/validate/' #reverse('validation')
+        validation_url = get_angular_url('validate')
 
         # switch on maint mode
         maint_params = { 'maintenance_mode': True, }
