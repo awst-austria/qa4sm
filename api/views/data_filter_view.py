@@ -10,11 +10,14 @@ from validator.models import Dataset, DataFilter, DatasetConfiguration, Parametr
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_filter(request):
+    """
+    Here we can take all the filters or filters assigned to the particular dataset only.
+    """
     dataset_id = request.query_params.get('dataset', None)
-    # # get single dataset
+    # get filters assigned to a single dataset
     if dataset_id:
-        data_filters = Dataset.objects.get(id=dataset_id).filters
-    # get all datasets
+        data_filters = Dataset.objects.get(id=int(dataset_id)).filters
+    # get all filters
     else:
         data_filters = DataFilter.objects.all()
 
@@ -33,11 +36,19 @@ def data_filter(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_parameterised_filter(request):
+
+    """
+    Here we take the list of parameterized filters assigned to the particular configuration or
+    list of all the parameterised filters applied to the existing validation.
+    It's NOT a list od parameterised filters defined in the fixture! That one would be defined as:
+    DataFilter.objects.filter(parameterised = True).
+    """
     config_id = request.query_params.get('config', None)
     if config_id:
         param_filters = DatasetConfiguration.objects.get(id=config_id).parametrisedfilter_set.all()
     else:
         param_filters = ParametrisedFilter.objects.all()
+
     serializer = ParameterisedFilterSerializer(param_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
