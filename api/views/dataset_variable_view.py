@@ -27,14 +27,6 @@ def dataset_variable(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def dataset_variable_by_id(request, **kwargs):
-    ds = DataVariable.objects.get(pk=kwargs['id'])
-    serializer = DatasetVariableSerializer(ds)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-
-
 class DatasetVariableSerializer(ModelSerializer):
     class Meta:
         model = DataVariable
