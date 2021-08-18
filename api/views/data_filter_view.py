@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -45,7 +46,7 @@ def data_parameterised_filter(request):
     """
     config_id = request.query_params.get('config', None)
     if config_id:
-        param_filters = DatasetConfiguration.objects.get(id=config_id).parametrisedfilter_set.all()
+        param_filters = get_object_or_404(DatasetConfiguration, pk=config_id).parametrisedfilter_set.all()
     else:
         param_filters = ParametrisedFilter.objects.all()
 
