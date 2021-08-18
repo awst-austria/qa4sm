@@ -14,13 +14,13 @@ def dataset_configuration(request):
     # config_id = request.query_params.get('config_id', None) # we don't need this are we are not using it in the front-end part
     if validation_id:
         configs = DatasetConfiguration.objects.filter(validation_id=validation_id)
-        serializer = ConfigurationSerializer(configs, many=True)
+        # serializer = ConfigurationSerializer(configs, many=True)
     # elif config_id:
     #     config = DatasetConfiguration.objects.get(id = config_id)
     #     serializer = ConfigurationSerializer(config)
     else:
         configs = DatasetConfiguration.objects.all()
-        serializer = ConfigurationSerializer(configs, many=True)
+    serializer = ConfigurationSerializer(configs, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
