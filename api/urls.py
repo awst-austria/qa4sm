@@ -3,7 +3,7 @@ from django.urls import path
 
 from api.views.data_filter_view import data_filter,data_parameterised_filter
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
-from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id
+from api.views.dataset_variable_view import dataset_variable
 from api.views.dataset_version_view import dataset_version, dataset_version_by_id
 from api.views.dataset_view import dataset, dataset_by_id
 from api.views.login_view import api_login
@@ -56,8 +56,7 @@ urlpatterns = [
     url(r'^dataset/(?P<id>.+)$', dataset_by_id),
     path('dataset-version', dataset_version, name='Dataset versions'),
     url(r'^dataset-version/(?P<id>.+)$', dataset_version_by_id),
-    path('dataset-variable', dataset_variable, name='Dataset variables'),
-    url(r'^dataset-variable/(?P<id>.+)$', dataset_variable_by_id),
+    path('dataset-variable', dataset_variable, name='Dataset variables'), # checked
     path('published-results', published_results, name='Published results'),
     path('validation-runs', validation_runs, name='All validation runs (results)'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id),
@@ -67,9 +66,7 @@ urlpatterns = [
     path('my-results', my_results, name='My results'),
     url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
     path('validation-configuration', start_validation, name='Run new validation'),
-    # url(r'^data-filter/(?P<id>.+)$', data_filter_by_id),  # checked / not used
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),  # checked
-    # url(r'^param-filter/(?P<id>.+)$', data_parameterised_filter_by_id),  # checked, not used
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
