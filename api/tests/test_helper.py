@@ -123,10 +123,10 @@ def default_parameterized_validation(user, tcol=False):
 
     return run
 
-    ## delete output of test validations, clean up after ourselves
+
 def delete_run(run):
+    # delete output of test validations, clean up after ourselves
     ncfile = run.output_file.path
-    print(ncfile)
     outdir = os.path.dirname(ncfile)
     assert os.path.isfile(ncfile)
     run.delete()
