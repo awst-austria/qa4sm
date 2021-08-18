@@ -11,13 +11,8 @@ from validator.models import DatasetConfiguration
 @permission_classes([AllowAny])
 def dataset_configuration(request):
     validation_id = request.query_params.get('validationrun', None)
-    # config_id = request.query_params.get('config_id', None) # we don't need this are we are not using it in the front-end part
     if validation_id:
         configs = DatasetConfiguration.objects.filter(validation_id=validation_id)
-        # serializer = ConfigurationSerializer(configs, many=True)
-    # elif config_id:
-    #     config = DatasetConfiguration.objects.get(id = config_id)
-    #     serializer = ConfigurationSerializer(config)
     else:
         configs = DatasetConfiguration.objects.all()
     serializer = ConfigurationSerializer(configs, many=True)

@@ -34,20 +34,6 @@ export class DatasetConfigurationService {
     return this.getConfigByValidationrun(CACHE_VAL_ID);
   }
 
-  // getConfigById(configId: number): Observable<DatasetConfigurationDto> {
-  //   let request;
-  //   if (configId === CACHE_CONFIG_ID) {
-  //     request = this.httpClient.get<DatasetConfigurationDto[]>(CONFIGURATION_URL).pipe(shareReplay());
-  //   } else {
-  //     let params = new HttpParams().set('config_id', String(configId));
-  //     request = this.httpClient.get<DatasetConfigurationDto>(CONFIGURATION_URL, {params: params}).pipe(shareReplay());
-  //   }
-  //   let cacheItem = new ConfigurationCacheItem(new Date(), request);
-  //   this.requestCacheNumber.set(configId, cacheItem);
-  //
-  //   return request;
-  // }
-
   getConfigByValidationrun(validationrunId: string): Observable<DatasetConfigurationDto[]> {
     let request;
     if (validationrunId === CACHE_VAL_ID) {
