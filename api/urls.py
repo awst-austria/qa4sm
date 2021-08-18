@@ -61,7 +61,7 @@ urlpatterns = [
     path('published-results', published_results, name='Published results'),
     path('validation-runs', validation_runs, name='All validation runs (results)'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id),
-    path('dataset-configuration', dataset_configuration, name='Configuration'),
+    path('dataset-configuration', dataset_configuration, name='Configuration'), # checked
     path('data-filter', data_filter, name='Dataset filters'),  # checked
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
