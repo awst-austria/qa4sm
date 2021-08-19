@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -14,11 +15,11 @@ def dataset_variable(request):
     variable_id = request.query_params.get('variable_id', None)
 
     if variable_id:
-        variable = DataVariable.objects.get(id=variable_id)
+        variable = get_object_or_404(DataVariable, id=variable_id)
         serializer = DatasetVariableSerializer(variable)
     else:
         if dataset_id:
-            variables = Dataset.objects.get(id=dataset_id).variables
+            variables = get_object_or_404(Dataset, id=dataset_id).variables
         else:
             variables = DataVariable.objects.all()
 
