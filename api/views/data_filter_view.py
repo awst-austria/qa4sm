@@ -16,9 +16,10 @@ def data_filter(request):
     serializer = DataFilterSerializer(data_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def data_filter_by_dataset(request,  **kwargs):
+def data_filter_by_dataset(request, **kwargs):
     # Here we can take all the filters or filters assigned to the particular dataset only.
     data_filters = get_object_or_404(Dataset, id=kwargs['dataset_id']).filters
     serializer = DataFilterSerializer(data_filters, many=True)
@@ -28,7 +29,6 @@ def data_filter_by_dataset(request,  **kwargs):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_parameterised_filter(request):
-
     """
     Here we take the list of all the parameterised filters applied to the existing validation.
     It's NOT a list od parameterised filters defined in the fixture! That one would be defined as:
