@@ -39,7 +39,7 @@ export class DatasetVariableService {
     if (this.arrayRequestCache.isCached(datasetId)) {
       return this.arrayRequestCache.get(datasetId);
     } else {
-      const getUrl = DATASET_VARIABLE_URL + '/' + datasetId;
+      const getUrl = DATASET_VARIABLE_URL + '-by-dataset/' + datasetId;
       let datasetVariables$ = this.httpClient.get<DatasetVariableDto[]>(getUrl).pipe(shareReplay());
       this.arrayRequestCache.push(datasetId, datasetVariables$);
       return datasetVariables$;

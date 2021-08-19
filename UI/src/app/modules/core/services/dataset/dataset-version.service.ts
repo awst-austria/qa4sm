@@ -37,8 +37,8 @@ export class DatasetVersionService {
     if (this.arrayRequestCache.isCached(datasetId)) {
       return this.arrayRequestCache.get(datasetId);
     } else {
-      const params = new HttpParams().set('dataset', String(datasetId));
-      const datasetVariables$ = this.httpClient.get<DatasetVersionDto[]>(DATASET_VERSION_URL, {params}).pipe(shareReplay());
+      const getUrl = DATASET_VERSION_URL + '-by-dataset/' + datasetId;
+      const datasetVariables$ = this.httpClient.get<DatasetVersionDto[]>(getUrl).pipe(shareReplay());
       this.arrayRequestCache.push(datasetId, datasetVariables$);
       return datasetVariables$;
     }
