@@ -18,6 +18,9 @@ class TestDatasetConfigurationView(TestCase):
         self.client.login(**self.auth_data)
 
     def test_dataset_configuration(self):
+        # Within this test I test both views: dataset_configuration and dataset_configuration_by_dataset,
+        # it's done this way to avoid running a new validation twice
+
         # here I need a validation to check if there are actually any configurations
         run = default_parameterized_validation(self.test_user)
         run.save()
@@ -29,13 +32,15 @@ class TestDatasetConfigurationView(TestCase):
         assert len(
             response.json()) == 2  # there should be 2, because there was only one validation with 2 datasets used
 
-        response = self.client.get(f'/api/dataset-configuration?validationrun={run_id}')
+        response = self.client.get(f'/api/dataset-configuration/{run_id}')
         assert response.status_code == 200
         assert len(response.json()) == 2  # there should be 2, there are 2 datasets in this validation
 
         # non-existing validation
-        response = self.client.get(f'/api/dataset-configuration?validationrun=1')
-        assert response.status_code == 500
+        wrong_id = 'f0000000-a000-b000-c000-d00000000000'
+        response = self.client.get(f'/api/dataset-configuration/{wrong_id}')
+        assert response.status_code == 200
+        assert len(response.json()) == 0
 
         # now I log out the user to check if I can still get the data (assertion as above)
         self.client.logout()
