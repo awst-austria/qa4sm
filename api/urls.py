@@ -5,7 +5,7 @@ from api.views.data_filter_view import data_filter, data_parameterised_filter, d
     # data_parameterised_filter_by_config
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
-from api.views.dataset_version_view import dataset_version
+from api.views.dataset_version_view import dataset_version, dataset_version_by_id, dataset_version_by_dataset
 from api.views.dataset_view import dataset, dataset_by_id
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
@@ -56,9 +56,11 @@ urlpatterns = [
     path('dataset', dataset, name='Datasets'),
     url(r'^dataset/(?P<id>.+)$', dataset_by_id),
     path('dataset-version', dataset_version, name='Dataset versions'), # checked
+    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id, name='Dataset versions'), # checked
+    url(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset versions'), # checked
     path('dataset-variable', dataset_variable, name='Dataset variables'), # checked
-    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id, name='Dataset variable by id'),
-    url(r'^dataset-variable/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset variable by dataset'),
+    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id, name='Dataset variable by id'), # checked
+    url(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset variable by dataset'),
     path('published-results', published_results, name='Published results'),
     path('validation-runs', validation_runs, name='All validation runs (results)'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id),
