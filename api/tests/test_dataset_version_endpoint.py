@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 from api.tests.test_helper import *
 
 
-class TestDatasetVersionView(TestCase):
+class TestDatasetVersionEndpoint(TestCase):
     __logger = logging.getLogger(__name__)
     databases = '__all__'
     allow_database_queries = True

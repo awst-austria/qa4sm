@@ -6,7 +6,7 @@ from api.tests.test_helper import *
 from django.conf import settings
 
 
-class TestLocalApiView(TestCase):
+class TestLocalApiEndpoint(TestCase):
     __logger = logging.getLogger(__name__)
 
     def setUp(self):
