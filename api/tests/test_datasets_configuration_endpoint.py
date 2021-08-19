@@ -4,9 +4,10 @@ import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
+from django.test.testcases import TransactionTestCase
 
 
-class TestDatasetConfigurationEndpoint(TestCase):
+class TestDatasetConfigurationEndpoint(TransactionTestCase):
     __logger = logging.getLogger(__name__)
     databases = '__all__'
     allow_database_queries = True
