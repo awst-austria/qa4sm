@@ -64,6 +64,9 @@ class TestDataFilterView(TestCase):
         response = self.client.get(f'/api/param-filter?config={new_run_ref_config.id}')
         assert response.status_code == 200
         assert len(response.json()) == 2  # there will be only 2, as there are 2 assigned to this particular config
+        assert response.json()[0]['parameters'] == 'SCAN'
+        assert response.json()[1]['parameters'] == '0.0,0.1'
+
 
         # checking for non-existing config
         response = self.client.get(f'/api/param-filter?config={100}')
@@ -78,6 +81,8 @@ class TestDataFilterView(TestCase):
         response = self.client.get(f'/api/param-filter?config={new_run_ref_config.id}')
         assert response.status_code == 200
         assert len(response.json()) == 2
+        assert response.json()[0]['parameters'] == 'SCAN'
+        assert response.json()[1]['parameters'] == '0.0,0.1'
 
         # cleaning up
         delete_run(new_run)
