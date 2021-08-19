@@ -10,11 +10,14 @@ from validator.models import DatasetConfiguration
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_configuration(request):
-    validation_id = request.query_params.get('validationrun', None)
-    if validation_id:
-        configs = DatasetConfiguration.objects.filter(validation_id=validation_id)
-    else:
-        configs = DatasetConfiguration.objects.all()
+    configs = DatasetConfiguration.objects.all()
+    serializer = ConfigurationSerializer(configs, many=True)
+
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+def dataset_configuration_by_dataset(request, **kwargs):
+    configs = DatasetConfiguration.objects.filter(validation_id=kwargs['id'])
     serializer = ConfigurationSerializer(configs, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
