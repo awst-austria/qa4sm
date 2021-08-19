@@ -14,9 +14,9 @@ const CACHE_KEY_ALL_VERSIONS = -1;
 })
 export class DatasetVersionService {
 
-  //cache for dataset version arrays
+  // cache for dataset version arrays
   arrayRequestCache = new DataCache<Observable<DatasetVersionDto[]>>(5);
-  //cache for single dataset version dtos
+  // cache for single dataset version dtos
   singleRequestCache = new DataCache<Observable<DatasetVersionDto>>(5);
 
 
@@ -27,7 +27,7 @@ export class DatasetVersionService {
     if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_VERSIONS)) {
       return this.arrayRequestCache.get(CACHE_KEY_ALL_VERSIONS);
     } else {
-      let datasetVersions$ = this.httpClient.get<DatasetVersionDto[]>(DATASET_VERSION_URL).pipe(shareReplay());
+      const datasetVersions$ = this.httpClient.get<DatasetVersionDto[]>(DATASET_VERSION_URL).pipe(shareReplay());
       this.arrayRequestCache.push(CACHE_KEY_ALL_VERSIONS, datasetVersions$);
       return datasetVersions$;
     }
@@ -37,8 +37,8 @@ export class DatasetVersionService {
     if (this.arrayRequestCache.isCached(datasetId)) {
       return this.arrayRequestCache.get(datasetId);
     } else {
-      let params = new HttpParams().set('dataset', String(datasetId));
-      let datasetVariables$ = this.httpClient.get<DatasetVersionDto[]>(DATASET_VERSION_URL, {params: params}).pipe(shareReplay());
+      const params = new HttpParams().set('dataset', String(datasetId));
+      const datasetVariables$ = this.httpClient.get<DatasetVersionDto[]>(DATASET_VERSION_URL, {params}).pipe(shareReplay());
       this.arrayRequestCache.push(datasetId, datasetVariables$);
       return datasetVariables$;
     }
@@ -48,8 +48,8 @@ export class DatasetVersionService {
     if (this.singleRequestCache.isCached(versionId)) {
       return this.singleRequestCache.get(versionId);
     } else {
-      let getURL = DATASET_VERSION_URL + '/' + versionId;
-      let datasetVersion$ = this.httpClient.get<DatasetVersionDto>(getURL).pipe(shareReplay());
+      const params = new HttpParams().set('version_id', String(versionId));
+      const datasetVersion$ = this.httpClient.get<DatasetVersionDto>(DATASET_VERSION_URL, {params}).pipe(shareReplay());
       this.singleRequestCache.push(versionId, datasetVersion$);
       return datasetVersion$;
     }
