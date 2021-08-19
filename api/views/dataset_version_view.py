@@ -28,14 +28,6 @@ def dataset_version(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def dataset_version_by_id(request, **kwargs):
-    ds = DatasetVersion.objects.get(pk=kwargs['id'])
-    serializer = DatasetVersionSerializer(ds)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-
-
 class DatasetVersionSerializer(ModelSerializer):
     class Meta:
         model = DatasetVersion

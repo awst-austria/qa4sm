@@ -4,7 +4,7 @@ from django.urls import path
 from api.views.data_filter_view import data_filter,data_parameterised_filter
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable
-from api.views.dataset_version_view import dataset_version, dataset_version_by_id
+from api.views.dataset_version_view import dataset_version
 from api.views.dataset_view import dataset, dataset_by_id
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
@@ -54,8 +54,7 @@ urlpatterns = [
     path('auth/logout', api_logout, name='api-logout'),
     path('dataset', dataset, name='Datasets'),
     url(r'^dataset/(?P<id>.+)$', dataset_by_id),
-    path('dataset-version', dataset_version, name='Dataset versions'),
-    url(r'^dataset-version/(?P<id>.+)$', dataset_version_by_id),
+    path('dataset-version', dataset_version, name='Dataset versions'), # checked
     path('dataset-variable', dataset_variable, name='Dataset variables'), # checked
     path('published-results', published_results, name='Published results'),
     path('validation-runs', validation_runs, name='All validation runs (results)'),
