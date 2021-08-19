@@ -9,9 +9,7 @@ import {ParameterisedFilterDto} from './parameterised-filter.dto';
 
 
 const dataFilterUrl: string = environment.API_URL + 'api/data-filter';
-const dataFilterByDataset: string = environment.API_URL + 'api/data-filter-by-dataset';
 const dataParameterisedFilterUrl: string = environment.API_URL + 'api/param-filter';
-const dataParameterisedFilterByConfigUrl: string = environment.API_URL + 'api/param-filter-by-config';
 const CACHE_KEY_ALL_FILTERS = -1;
 
 
@@ -46,7 +44,7 @@ export class FilterService {
       return this.arrayRequestCache.get(datasetId);
     } else {
       // let params = new HttpParams().set('dataset', String(datasetId));
-      let getUrl = dataFilterByDataset + '/' + datasetId;
+      let getUrl = dataFilterUrl + '/' + datasetId;
       let filters$ = this.httpClient.get<FilterDto[]>(getUrl).pipe(shareReplay());
       this.arrayRequestCache.push(datasetId, filters$);
       return filters$;
