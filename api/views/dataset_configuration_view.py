@@ -17,7 +17,7 @@ def dataset_configuration(request):
 
 
 def dataset_configuration_by_dataset(request, **kwargs):
-    configs = DatasetConfiguration.objects.filter(validation_id=kwargs['id'])
+    configs = DatasetConfiguration.objects.filter(validation_id=kwargs['dataset_id'])
     serializer = ConfigurationSerializer(configs, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
