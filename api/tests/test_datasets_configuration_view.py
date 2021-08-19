@@ -7,7 +7,6 @@ from api.tests.test_helper import *
 
 
 class TestDatasetConfigurationView(TestCase):
-
     __logger = logging.getLogger(__name__)
     databases = '__all__'
     allow_database_queries = True
@@ -27,11 +26,12 @@ class TestDatasetConfigurationView(TestCase):
 
         response = self.client.get('/api/dataset-configuration')
         assert response.status_code == 200
-        assert len(response.json()) == 2 # there should be 2, because there was only one validation with 2 datasets used
+        assert len(
+            response.json()) == 2  # there should be 2, because there was only one validation with 2 datasets used
 
         response = self.client.get(f'/api/dataset-configuration?validationrun={run_id}')
         assert response.status_code == 200
-        assert len(response.json()) == 2 # there should be 2, there are 2 datasets in this validation
+        assert len(response.json()) == 2  # there should be 2, there are 2 datasets in this validation
 
         # non-existing validation
         response = self.client.get(f'/api/dataset-configuration?validationrun=1')
@@ -43,9 +43,4 @@ class TestDatasetConfigurationView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 2
 
-        response = self.client.get(f'/api/dataset-configuration?validationrun={run_id}')
-        assert response.status_code == 200
-        assert len(response.json()) == 2
-
         delete_run(ValidationRun.objects.get(pk=run_id))
-

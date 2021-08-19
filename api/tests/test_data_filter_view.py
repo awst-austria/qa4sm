@@ -7,7 +7,6 @@ from api.tests.test_helper import *
 
 
 class TestDataFilterView(TestCase):
-
     __logger = logging.getLogger(__name__)
     databases = '__all__'
     allow_database_queries = True
@@ -27,7 +26,7 @@ class TestDataFilterView(TestCase):
         assert len(response.json()) == 23
 
         # check filters for C3S (id = 1)
-        dataset_id = 1 #
+        dataset_id = 1  #
         response = self.client.get(f'/api/data-filter?dataset={dataset_id}')
         assert response.status_code == 200
         assert len(response.json()) == 6
@@ -39,12 +38,6 @@ class TestDataFilterView(TestCase):
         assert response.status_code == 200
         # currently we have 23 filters, for some reason we don't have a filter with id = 8
         assert len(response.json()) == 23
-
-        # check filters for C3S (id = 1)
-        dataset_id = 1 #
-        response = self.client.get(f'/api/data-filter?dataset={dataset_id}')
-        assert response.status_code == 200
-        assert len(response.json()) == 6
 
     def test_data_parameterized_filters(self):
         # here I need a validation to check if there are actually parameterised filters
@@ -58,7 +51,8 @@ class TestDataFilterView(TestCase):
         # all filters
         response = self.client.get('/api/param-filter')
         assert response.status_code == 200
-        assert len(response.json()) == 2 # there will be only 2, as there has been only one validation run with 2 param filters applied
+        assert len(
+            response.json()) == 2  # there will be only 2, as there has been only one validation run with 2 param filters applied
 
         # filters assigned to the particular config
         response = self.client.get(f'/api/param-filter?config={new_run_ref_config.id}')
@@ -66,7 +60,6 @@ class TestDataFilterView(TestCase):
         assert len(response.json()) == 2  # there will be only 2, as there are 2 assigned to this particular config
         assert response.json()[0]['parameters'] == 'SCAN'
         assert response.json()[1]['parameters'] == '0.0,0.1'
-
 
         # checking for non-existing config
         response = self.client.get(f'/api/param-filter?config={100}')
@@ -78,12 +71,5 @@ class TestDataFilterView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 2
 
-        response = self.client.get(f'/api/param-filter?config={new_run_ref_config.id}')
-        assert response.status_code == 200
-        assert len(response.json()) == 2
-        assert response.json()[0]['parameters'] == 'SCAN'
-        assert response.json()[1]['parameters'] == '0.0,0.1'
-
         # cleaning up
         delete_run(new_run)
-
