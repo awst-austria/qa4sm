@@ -152,5 +152,27 @@
             "min_value": 0.0,
             "max_value": 1.0
         }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 15,
+        "fields": {
+            "short_name": "CGLS_SSM",
+            "pretty_name": "CGLS_SSM",
+            "help_text": "-",
+            "min_value": 0.0,
+            "max_value": 100.0
+        }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 16,
+        "fields": {
+            "short_name": "CGLS_SWI",
+            "pretty_name": "CGLS_SWI",
+            "help_text": "-",
+            "min_value": 0.0,
+            "max_value": 100.0
+        }
     }
 ]

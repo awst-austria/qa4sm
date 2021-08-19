@@ -346,5 +346,52 @@
                 "unit": "deg"
             }
         }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 12,
+        "fields": {
+            "short_name": "CGLS_CSAR_SSM1km",
+            "pretty_name": "CGLS SSM 1km",
+            "help_text": "Copernicus Global Land Service Sentinel 1 Surface Soil Moisture (1km)",
+            "storage_path": "testdata/input_data/CGLS_CSAR_SSM1km",
+            "detailed_description": "The Surface Soil Moisture 1 km (SSM1km) data is retrieved from Sentinel-1 radar backscatter images, acquired in Interferometric Wade Swath (IW) mode and VV-polarization.",
+            "source_reference": "Data is available <a target=\"_blank\" href=\"https://land.copernicus.eu/global/products/ssm/\"> here</a>.",
+            "citation": "<a target=\"_blank\" href=\"https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_ATBD_SSM1km-V1_I1.20.pdf\">ATBD</a>",
+            "is_only_reference": false,
+            "versions": [
+                35
+            ],
+            "variables": [
+                15
+            ],
+            "filters": [
+                1
+            ]
+        }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 13,
+        "fields": {
+            "short_name": "CGLS_SCATSAR_SWI1km",
+            "pretty_name": "CGLS SWI 1km",
+            "help_text": "Copernicus Global Land Service Sentinel 1 / ASCAT Soil Water Index (1km)",
+            "storage_path": "testdata/input_data/CGLS_SCATSAR_SWI1km",
+            "detailed_description": "The data are derived using a data fusion approach from microwave radar data observed by the Metop A/B/C ASCAT and the Sentinel 1 A/B CSAR satellite sensors, named SCATSAR (Scatterometer-Synthetic Aperture Radar) algorithm",
+            "source_reference": "Data is available <a target=\"_blank\" href=\"https://land.copernicus.eu/global/products/swi/\"> here</a>.",
+            "citation": "<a target=\"_blank\" href=\"https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_ATBD_SWI1km-V1_I1.20.pdf\">ATBD</a>",
+            "is_only_reference": false,
+            "versions": [
+                36
+            ],
+            "variables": [
+                16
+            ],
+            "filters": [
+                1
+            ]
+        }
     }
+
 ]
