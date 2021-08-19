@@ -27,11 +27,13 @@ class TestDatasetConfigurationView(TestCase):
         run_id = run.id
         val.run_validation(run_id)
 
+        # dataset_configuration view
         response = self.client.get('/api/dataset-configuration')
         assert response.status_code == 200
         assert len(
             response.json()) == 2  # there should be 2, because there was only one validation with 2 datasets used
 
+        # dataset_configuration_by_dataset
         response = self.client.get(f'/api/dataset-configuration/{run_id}')
         assert response.status_code == 200
         assert len(response.json()) == 2  # there should be 2, there are 2 datasets in this validation
