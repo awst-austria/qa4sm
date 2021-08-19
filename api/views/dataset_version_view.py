@@ -8,7 +8,6 @@ from rest_framework.serializers import ModelSerializer
 from validator.models import DatasetVersion, Dataset
 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version(request):
