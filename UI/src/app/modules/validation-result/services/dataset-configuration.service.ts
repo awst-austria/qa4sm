@@ -7,7 +7,6 @@ import {shareReplay} from 'rxjs/operators';
 import {DataCache} from '../../core/tools/DataCache';
 
 const CONFIGURATION_URL: string = environment.API_URL + 'api/dataset-configuration';
-const CONFIGURATION_BY_DATASET_URL: string = environment.API_URL + 'api/dataset-configuration-by-dataset';
 const CACHE_KEY_ALL_CONFIGS = -1;
 
 export class ConfigurationCacheItem {
@@ -36,7 +35,7 @@ export class DatasetConfigurationService {
   }
 
   getConfigByValidationrun(validationrunId: string): Observable<DatasetConfigurationDto[]> {
-    const getUrl = CONFIGURATION_BY_DATASET_URL + '/' + validationrunId;
+    const getUrl = CONFIGURATION_URL + '/' + validationrunId;
     return this.httpClient.get<DatasetConfigurationDto[]>(getUrl);
 
   }
