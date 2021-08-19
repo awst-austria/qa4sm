@@ -23,6 +23,7 @@ def data_filter_by_dataset(request,  **kwargs):
     serializer = DataFilterSerializer(data_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_parameterised_filter(request):
@@ -35,13 +36,6 @@ def data_parameterised_filter(request):
     param_filters = ParametrisedFilter.objects.all()
     serializer = ParameterisedFilterSerializer(param_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-
-#
-# def data_parameterised_filter_by_config(request,  **kwargs):
-#     # Here parameterized filters assigned to the particular configuration are taken
-#     param_filters = get_object_or_404(DatasetConfiguration, pk=kwargs['id']).parametrisedfilter_set.all()
-#     serializer = ParameterisedFilterSerializer(param_filters, many=True)
-#     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 class DataFilterSerializer(ModelSerializer):
