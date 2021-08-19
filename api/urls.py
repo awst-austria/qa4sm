@@ -4,7 +4,7 @@ from django.urls import path
 from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_dataset
     # data_parameterised_filter_by_config
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
-from api.views.dataset_variable_view import dataset_variable
+from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
 from api.views.dataset_version_view import dataset_version
 from api.views.dataset_view import dataset, dataset_by_id
 from api.views.login_view import api_login
@@ -15,7 +15,7 @@ from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import users, signup_post, user_modify
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs, \
     custom_tracked_validation_runs, get_summary_statistics, get_publishing_form, copy_validation_results
-from api.views.dataset_configuration_view import dataset_configuration
+from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_files, \
@@ -57,18 +57,20 @@ urlpatterns = [
     url(r'^dataset/(?P<id>.+)$', dataset_by_id),
     path('dataset-version', dataset_version, name='Dataset versions'), # checked
     path('dataset-variable', dataset_variable, name='Dataset variables'), # checked
+    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id, name='Dataset variable by id'),
+    url(r'^dataset-variable/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset variable by dataset'),
     path('published-results', published_results, name='Published results'),
     path('validation-runs', validation_runs, name='All validation runs (results)'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id),
     path('dataset-configuration', dataset_configuration, name='Configuration'), # checked
+    url(r'^dataset-configuration/(?P<dataset_id>.+)$', dataset_configuration_by_dataset, name='Configuration'), # checked
     path('data-filter', data_filter, name='Dataset filters'),  # checked
-    url(r'^data-filter-by-dataset/(?P<id>.+)$', data_filter_by_dataset), # checked
+    url(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset), # checked
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
     url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
     path('validation-configuration', start_validation, name='Run new validation'),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),  # checked
-    # url(r'^param-filter-by-config/(?P<id>.+)$', data_parameterised_filter_by_config, name='Parameterised filter by config'),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
