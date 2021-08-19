@@ -51,7 +51,7 @@ urlpatterns = [
     url(r'^test$', users),
     url(r'^path_test/(?P<username>.+)$', path_var_get),
     path('user', users, name='Users'),
-    path('auth/login', api_login, name='api-login'),
+    path('auth/login', api_login, name='api-login'), # checked
     path('auth/logout', api_logout, name='api-logout'),
     path('dataset', dataset, name='Datasets'),
     url(r'^dataset/(?P<id>.+)$', dataset_by_id),
@@ -68,7 +68,7 @@ urlpatterns = [
     url(r'^dataset-configuration/(?P<dataset_id>.+)$', dataset_configuration_by_dataset, name='Configuration'), # checked
     path('data-filter', data_filter, name='Dataset filters'),  # checked
     url(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset), # checked
-    path('globals', global_params, name='Global context'),
+    path('globals', global_params, name='Global context'), # checked
     path('my-results', my_results, name='My results'),
     url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
     path('validation-configuration', start_validation, name='Run new validation'),
@@ -83,7 +83,7 @@ urlpatterns = [
     path('uptime-report', get_uptime),
     path('get-graphic-files', get_graphic_files, name='Get graphic file'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
-    path('country-list', get_list_of_countries, name = 'List of countries'),
+    path('country-list', get_list_of_countries, name = 'List of countries'), #checked
     path('sign-up', signup_post, name='Sign up'),
     path('user-modify', user_modify, name='User update'),
     path('settings', settings, name="Settings"),
