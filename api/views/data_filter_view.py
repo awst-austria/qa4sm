@@ -16,7 +16,8 @@ def data_filter(request):
     serializer = DataFilterSerializer(data_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
-
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def data_filter_by_dataset(request,  **kwargs):
     # Here we can take all the filters or filters assigned to the particular dataset only.
     data_filters = get_object_or_404(Dataset, id=kwargs['dataset_id']).filters

@@ -17,6 +17,8 @@ def dataset_variable(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def dataset_variable_by_id(request, **kwargs):
     variable = get_object_or_404(DataVariable, id=kwargs['variable_id'])
     serializer = DatasetVariableSerializer(variable)
@@ -24,6 +26,8 @@ def dataset_variable_by_id(request, **kwargs):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def dataset_variable_by_dataset(request, **kwargs):
     variables = get_object_or_404(Dataset, id=kwargs['dataset_id']).variables
     serializer = DatasetVariableSerializer(variables, many=True)

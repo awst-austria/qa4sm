@@ -17,12 +17,16 @@ def dataset_version(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def dataset_version_by_id(request, **kwargs):
     version = get_object_or_404(DatasetVersion, id=kwargs['version_id'])
     serializer = DatasetVersionSerializer(version)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def dataset_version_by_dataset(request, **kwargs):
     versions = get_object_or_404(Dataset, id=kwargs['dataset_id']).versions
     serializer = DatasetVersionSerializer(versions, many=True)
