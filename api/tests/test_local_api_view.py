@@ -1,6 +1,7 @@
 import logging
 
 from django.test import TestCase
+from django.urls import reverse
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
 from django.conf import settings
@@ -15,11 +16,12 @@ class TestLocalApiView(TestCase):
         self.client.login(**self.auth_data)
 
     def test_get_list_of_countries(self):
-        response = self.client.get('/api/country-list')
+        country_list_url = reverse('List of countries')
+        response = self.client.get(country_list_url)
         assert response.status_code == 200
 
         self.client.logout()
-        response = self.client.get('/api/country-list')
+        response = self.client.get(country_list_url)
         assert response.status_code == 200
 
 
