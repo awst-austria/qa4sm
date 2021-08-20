@@ -1,13 +1,14 @@
 import logging
 
 import pytest
-
+from django.test.utils import override_settings
 import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
 
-
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestDatasetConfigurationView(TestCase):
     __logger = logging.getLogger(__name__)
     # databases = '__all__'
