@@ -11,8 +11,6 @@ from api.tests.test_helper import *
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestDatasetConfigurationView(TestCase):
     __logger = logging.getLogger(__name__)
-    # databases = '__all__'
-    # allow_database_queries = True
     fixtures = ['datasets', 'filters', 'versions', 'variables']
 
     def setUp(self):
@@ -20,10 +18,6 @@ class TestDatasetConfigurationView(TestCase):
         self.client = APIClient()
         self.client.login(**self.auth_data)
 
-    @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_dataset_configuration(self):
         # Within this test I test both views: dataset_configuration and dataset_configuration_by_dataset,
         # it's done this way to avoid running a new validation twice

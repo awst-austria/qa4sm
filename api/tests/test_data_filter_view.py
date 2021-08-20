@@ -47,10 +47,6 @@ class TestDataFilterView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 6
 
-    @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_data_parameterized_filters(self):
         # here I need a validation to check if there are actually parameterised filters
         run = default_parameterized_validation(self.test_user)
