@@ -1,6 +1,6 @@
 import logging
 import time
-
+from django.test.utils import override_settings
 from django.urls import reverse
 
 import validator.validation as val
@@ -15,6 +15,8 @@ from validator.models import ValidationRun
 User = get_user_model()
 
 
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestModifyValidationView(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
     __logger = logging.getLogger(__name__)
