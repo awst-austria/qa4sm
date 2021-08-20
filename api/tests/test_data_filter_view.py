@@ -1,4 +1,3 @@
-import errno
 import logging
 
 import pytest
@@ -14,12 +13,6 @@ from api.tests.test_helper import *
 class TestDataFilterView(TestCase):
     __logger = logging.getLogger(__name__)
     fixtures = ['datasets', 'filters', 'versions', 'variables']
-
-    # try:
-    #     os.makedirs(val.OUTPUT_FOLDER)
-    # except OSError as e:
-    #     if e.errno != errno.EEXIST:
-    #         raise
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()

@@ -1,12 +1,11 @@
 import logging
 
+import pytest
+
 import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
-from django.test.testcases import TransactionTestCase
-from validator.tests.testutils import set_dataset_paths
-import errno
 
 
 class TestDatasetConfigurationView(TestCase):
@@ -20,14 +19,10 @@ class TestDatasetConfigurationView(TestCase):
         self.client = APIClient()
         self.client.login(**self.auth_data)
 
-        # try:
-        #     os.makedirs(val.OUTPUT_FOLDER)
-        # except OSError as e:
-        #     if e.errno != errno.EEXIST:
-        #         raise
-        #
-        # set_dataset_paths()
-
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_dataset_configuration(self):
         # Within this test I test both views: dataset_configuration and dataset_configuration_by_dataset,
         # it's done this way to avoid running a new validation twice
