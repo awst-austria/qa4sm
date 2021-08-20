@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
-from rest_framework.permissions import IsAuthenticated
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.forms import PublishingForm
@@ -20,7 +19,6 @@ from validator.validation.globals import OUTPUT_FOLDER
 from shutil import copy2
 from dateutil.tz import tzlocal
 from django.conf import settings
-from django.urls.base import reverse
 from api.frontend_urls import get_angular_url
 
 
