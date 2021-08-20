@@ -1,6 +1,7 @@
 import logging
 
 from django.test import TestCase
+from django.urls import reverse
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
 from django.conf import settings
@@ -15,7 +16,7 @@ class TestGlobalParamsView(TestCase):
         self.client.login(**self.auth_data)
 
     def test_global_params(self):
-        response = self.client.get('/api/globals')
+        response = self.client.get(reverse('Global context'))
         data = response.json()
         assert response.status_code == 200
         assert data['admin_mail'] == settings.EMAIL_FROM.replace('@', ' (at) ')
