@@ -1,6 +1,5 @@
 import logging
 
-import pytest
 from django.test.utils import override_settings
 import validator.validation as val
 from django.test import TestCase
