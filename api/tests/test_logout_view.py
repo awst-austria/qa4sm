@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from django.urls import reverse
 from rest_framework.test import APIClient
 
 # Include an appropriate `Authorization:` header on all requests.
@@ -21,8 +22,9 @@ class TestLogoutView(TestCase):
         self.client.login(**self.auth_data)
 
     def test_logout(self):
-        response = self.client.post('/api/auth/logout')
+        logout_url = reverse('api-logout')
+        response = self.client.post(logout_url)
         assert response.status_code == 200
         # logged-out so now the status code should be 403, because this endpoint is restricted
-        response = self.client.post('/api/auth/logout')
+        response = self.client.post(logout_url)
         assert response.status_code == 403
