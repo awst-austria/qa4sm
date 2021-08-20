@@ -5,9 +5,11 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
 from django.test.testcases import TransactionTestCase
+from validator.tests.testutils import set_dataset_paths
+import errno
 
 
-class TestDatasetConfigurationView(TransactionTestCase):
+class TestDatasetConfigurationView(TestCase):
     __logger = logging.getLogger(__name__)
     databases = '__all__'
     allow_database_queries = True
@@ -17,6 +19,14 @@ class TestDatasetConfigurationView(TransactionTestCase):
         self.auth_data, self.test_user = create_test_user()
         self.client = APIClient()
         self.client.login(**self.auth_data)
+
+        # try:
+        #     os.makedirs(val.OUTPUT_FOLDER)
+        # except OSError as e:
+        #     if e.errno != errno.EEXIST:
+        #         raise
+        #
+        # set_dataset_paths()
 
     def test_dataset_configuration(self):
         # Within this test I test both views: dataset_configuration and dataset_configuration_by_dataset,

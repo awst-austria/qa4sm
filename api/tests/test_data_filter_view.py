@@ -1,3 +1,4 @@
+import errno
 import logging
 
 import validator.validation as val
@@ -6,11 +7,22 @@ from rest_framework.test import APIClient
 from api.tests.test_helper import *
 from django.test.testcases import TransactionTestCase
 
-class TestDataFilterView(TransactionTestCase):
+from validator.tests.testutils import set_dataset_paths
+
+
+class TestDataFilterView(TestCase):
     __logger = logging.getLogger(__name__)
     databases = '__all__'
     allow_database_queries = True
     fixtures = ['datasets', 'filters', 'versions', 'variables']
+
+    # try:
+    #     os.makedirs(val.OUTPUT_FOLDER)
+    # except OSError as e:
+    #     if e.errno != errno.EEXIST:
+    #         raise
+    #
+    # set_dataset_paths()
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()
