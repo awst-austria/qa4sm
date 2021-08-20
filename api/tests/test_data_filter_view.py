@@ -1,27 +1,35 @@
 import errno
 import logging
 
+import pytest
+from django.test.utils import override_settings
 import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
+from api.tests.testutils import *
 from django.test.testcases import TransactionTestCase
 
-from validator.tests.testutils import set_dataset_paths
+# from api.tests.testutils import set_dataset_paths
 
 
+
+# @pytest.mark.django_db
+
+# pytestmark = pytest.mark.django_db
+
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestDataFilterView(TestCase):
     __logger = logging.getLogger(__name__)
-    databases = '__all__'
-    allow_database_queries = True
     fixtures = ['datasets', 'filters', 'versions', 'variables']
 
-    # try:
-    #     os.makedirs(val.OUTPUT_FOLDER)
-    # except OSError as e:
-    #     if e.errno != errno.EEXIST:
-    #         raise
-    #
+    try:
+        os.makedirs(val.OUTPUT_FOLDER)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+
     # set_dataset_paths()
 
     def setUp(self):
@@ -57,6 +65,10 @@ class TestDataFilterView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 6
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
     def test_data_parameterized_filters(self):
         # here I need a validation to check if there are actually parameterised filters
         run = default_parameterized_validation(self.test_user)
