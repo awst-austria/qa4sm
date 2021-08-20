@@ -2,6 +2,8 @@ import logging
 
 import pytest
 from django.test.utils import override_settings
+from django.urls import reverse
+
 import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
@@ -21,7 +23,8 @@ class TestDataFilterView(TestCase):
 
     def test_data_filter(self):
         # all filters
-        response = self.client.get('/api/data-filter')
+        data_filter_url = reverse('Dataset filters')
+        response = self.client.get(data_filter_url)
 
         assert response.status_code == 200
         # currently we have 23 filters, for some reason we don't have a filter with id = 8
@@ -30,24 +33,26 @@ class TestDataFilterView(TestCase):
         # log out to check if it still works
         self.client.logout()
 
-        response = self.client.get('/api/data-filter')
+        response = self.client.get(data_filter_url)
         assert response.status_code == 200
         assert len(response.json()) == 23
 
     def test_data_filter_by_dataset(self):
+        data_filter_url = reverse('Dataset filters')
         # check filters for C3S (id = 1)
         dataset_id = 1  #
-        response = self.client.get(f'/api/data-filter/{dataset_id}')
+        response = self.client.get(f'{data_filter_url}/{dataset_id}')
         assert response.status_code == 200
         assert len(response.json()) == 6
 
         # log out to check if it still works
         self.client.logout()
-        response = self.client.get(f'/api/data-filter/{dataset_id}')
+        response = self.client.get(f'{data_filter_url}/{dataset_id}')
         assert response.status_code == 200
         assert len(response.json()) == 6
 
     def test_data_parameterized_filters(self):
+        param_filter_url = reverse('Parameterised filter')
         # here I need a validation to check if there are actually parameterised filters
         run = default_parameterized_validation(self.test_user)
         run.save()
@@ -56,14 +61,14 @@ class TestDataFilterView(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         # all filters
-        response = self.client.get('/api/param-filter')
+        response = self.client.get(param_filter_url)
         assert response.status_code == 200
         # there will be only 2, as there has been only one validation run with 2 param filters applied
         assert len(response.json()) == 2
 
         # now I log out the user to check if I can still get the data (assertion as above)
         self.client.logout()
-        response = self.client.get('/api/param-filter')
+        response = self.client.get(param_filter_url)
         assert response.status_code == 200
         assert len(response.json()) == 2
 
