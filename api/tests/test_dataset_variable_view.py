@@ -7,8 +7,6 @@ from api.tests.test_helper import *
 
 class TestDatasetVariableView(TestCase):
     __logger = logging.getLogger(__name__)
-    databases = '__all__'
-    allow_database_queries = True
     fixtures = ['datasets', 'filters', 'versions', 'variables']
 
     def setUp(self):
