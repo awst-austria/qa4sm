@@ -55,12 +55,12 @@ urlpatterns = [
     path('auth/logout', api_logout, name='api-logout'),
     path('dataset', dataset, name='Datasets'),
     url(r'^dataset/(?P<id>.+)$', dataset_by_id),
-    path('dataset-version', dataset_version, name='Dataset versions'), # checked
-    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id, name='Dataset versions'), # checked
-    url(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset versions'), # checked
-    path('dataset-variable', dataset_variable, name='Dataset variables'), # checked
-    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id, name='Dataset variable by id'), # checked
-    url(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset variable by dataset'),
+    path('dataset-version', dataset_version, name='Dataset version'), # checked
+    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id), # checked
+    url(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset version by dataset'), # checked
+    path('dataset-variable', dataset_variable, name='Dataset variable'), # checked
+    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id), # checked
+    url(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset_variable_by_dataset'),
     path('published-results', published_results, name='Published results'),
     path('validation-runs', validation_runs, name='All validation runs (results)'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id),
@@ -73,8 +73,8 @@ urlpatterns = [
     url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
     path('validation-configuration', start_validation, name='Run new validation'),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),  # checked
-    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
-    path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),
+    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),  # checked
+    path('modify-validation/<uuid:result_uuid>/', modify_result, name='Result'),  # checked
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
     path('download-result', get_results, name='Download results'),
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
