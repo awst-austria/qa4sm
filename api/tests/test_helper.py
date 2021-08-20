@@ -7,6 +7,9 @@ from validator.models import Dataset, DatasetVersion, DatasetConfiguration, Vali
 from dateutil.tz import tzlocal
 from datetime import datetime
 from pytz import UTC
+
+from validator.validation import OUTPUT_FOLDER
+
 User = get_user_model()
 
 
@@ -31,6 +34,29 @@ def create_test_user():
     test_user.save()
     print(test_user)
     return auth_data, test_user
+
+
+def create_alternative_user():
+    alternative_data = {
+        'username': 'cheating_cheater',
+        'password': 'cheatingalldaylong'
+    }
+
+    alternative_user_data = {
+        'username': alternative_data['username'],
+        'password': alternative_data['password'],
+        'email': 'cheater@awst.at',
+        'first_name': 'Chuck',
+        'last_name': 'Norris',
+        'organisation': 'Texas Rangers',
+        'country': 'US',
+        'orcid': '0000-0002-1825-0097',
+    }
+
+    User.objects.filter(email=alternative_user_data['email']).delete()
+    test_user = User.objects.create_user(**alternative_user_data)
+    test_user.save()
+    return alternative_user_data, test_user
 
 
 def generate_default_validation():
@@ -126,8 +152,12 @@ def default_parameterized_validation(user, tcol=False):
 
 def delete_run(run):
     # delete output of test validations, clean up after ourselves
-    ncfile = run.output_file.path
-    outdir = os.path.dirname(ncfile)
-    assert os.path.isfile(ncfile)
+    try:
+        ncfile = run.output_file.path
+        outdir = os.path.dirname(ncfile)
+        assert os.path.isfile(ncfile)
+    except ValueError:
+        # if there is no file assign to the validation it will no remove the empty
+        outdir = os.path.join(OUTPUT_FOLDER, str(run.id))
     run.delete()
     assert not os.path.exists(outdir)
