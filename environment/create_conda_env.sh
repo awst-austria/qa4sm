@@ -71,7 +71,7 @@ fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
 
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest==5.4.3 pip matplotlib pyproj django pyresample pygrib cartopy xarray
+conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest==5.4.3 pip matplotlib pyproj django pyresample pygrib cartopy xarray dask
 source activate $PYTHON_ENV_DIR
 
 pip uninstall --yes shapely
@@ -100,6 +100,7 @@ pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 pip install ismn
 pip install requests
+pip install git+https://github.com/awst-austria/qa4sm-preprocessing@master
 pip install qa4sm-reader>=0.3.4
 
 cd $TEMP_DIR

@@ -8,14 +8,19 @@ from gldas.interface import GLDASTs
 from ismn.interface import ISMN_Interface
 from smap_io.interface import SMAPTs
 from smos.smos_ic.interface import SMOSTs
+from pynetcf.time_series import GriddedNcTs
 
-from validator.hacks import TimezoneAdapter
+from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
+
 from validator.validation import globals
 from validator.validation.util import first_file_in
 
+def create_reader(dataset, version) -> GriddedNcTs:
+    """
+    Create basic readers (without any adapters / filters) for a dataset version
+    """
 
-def create_reader(dataset, version):
-    reader = None
+    reader = None  # reader class, inherits pynetcf time series module
 
     folder_name = path.join(dataset.storage_path, version.short_name)
 
@@ -42,8 +47,9 @@ def create_reader(dataset, version):
         ascat_data_folder = path.join(folder_name, 'data')
         ascat_grid_path = first_file_in(path.join(folder_name, 'grid'), '.nc')
         fn_format = "{:04d}"
-        reader = AscatNc(path=ascat_data_folder, fn_format=fn_format, grid_filename=ascat_grid_path,
-                         static_layer_path=None, ioclass_kws={'read_bulk':True})
+        reader = AscatNc(path=ascat_data_folder, fn_format=fn_format,
+                         grid_filename=ascat_grid_path, static_layer_path=None,
+                         ioclass_kws={'read_bulk':True})
 
     if dataset.short_name == globals.SMOS:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk':True})
@@ -54,9 +60,14 @@ def create_reader(dataset, version):
     if dataset.short_name == globals.ERA5_LAND:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})
 
+    if dataset.short_name == globals.CGLS_SCATSAR_SWI1km:
+        reader = S1CglsTs(folder_name, parameters='SWI_005')  # placeholder param
+
+    if dataset.short_name == globals.CGLS_CSAR_SSM1km:
+        reader = S1CglsTs(folder_name, parameters='ssm')
+
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))
 
-    reader = TimezoneAdapter(reader)
 
     return reader

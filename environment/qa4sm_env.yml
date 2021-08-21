@@ -127,6 +127,7 @@ dependencies:
   - zipp=3.4.0
   - zlib=1.2.11
   - zstd=1.4.5
+  - dask
   - pip:
     - amqp==2.6.1
     - ascat==1.1.2
@@ -188,3 +189,4 @@ dependencies:
     - trollsift==0.2.1
     - uritemplate==3.0.1
     - vine==1.3.0
+    - git+https://github.com/awst-austria/qa4sm-preprocessing@master
