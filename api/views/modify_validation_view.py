@@ -1,4 +1,3 @@
-from django.http import QueryDict
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -27,21 +26,36 @@ def stop_validation(request, result_uuid):
     return HttpResponse(status=405)  # if we're not DELETEing, send back "Method not Allowed"
 
 
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def change_name(request, result_uuid):
+    val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+
+    if val_run.user != request.user:
+        return HttpResponse(status=403)
+
+    patch_params = request.data
+    patch_params_keys = patch_params.keys()
+
+    if 'save_name' in patch_params_keys:
+        # check that our validation's name can be changed'; it can't if it already has a DOI
+        if not val_run.is_unpublished:
+            return HttpResponse('Validation has been published', status=405)
+
+        save_mode = patch_params['save_name']
+
+        if save_mode == 'False':
+            return HttpResponse("Wrong action parameter.", status=400)
+
+        val_run.name_tag = patch_params['new_name']
+        val_run.save()
+
+        return HttpResponse("Changed.", status=200)
+
 @api_view(['POST', 'GET', 'DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def modify_result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
-    current_user = request.user
-
-    # copied_runs = current_user.copiedvalidations_set.all() if current_user.username else CopiedValidations.objects.none()
-    # is_copied = val_run.id in copied_runs.values_list('copied_run', flat=True)
-
-    # if is_copied and val_run.doi == '':
-    #     original_start = copied_runs.get(copied_run=val_run).original_run.start_time
-    #     original_end = copied_runs.get(copied_run=val_run).original_run.end_time
-    # else:
-    #     original_start = None
-    #     original_end = None
 
     if request.method == 'DELETE':
         ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
@@ -55,29 +69,29 @@ def modify_result(request, result_uuid):
         val_run.delete()
         return HttpResponse(status=status.HTTP_200_OK)
 
-    elif (request.method == 'PATCH'):
-        ## make sure only the owner of a validation can change it (others are allowed to GET it, though)
+    elif request.method == 'PATCH':
+        # make sure only the owner of a validation can change it (others are allowed to GET it, though)
 
-        if (val_run.user != request.user):
-            return HttpResponse(status=403)
-
-        patch_params = request.data
-        patch_params_keys = patch_params.keys()
-
-        if 'save_name' in patch_params_keys:
-            ## check that our validation's name can be changed'; it can't if it already has a DOI
-            if (not val_run.is_unpublished):
-                return HttpResponse('Validation has been published', status=405)
-
-            save_mode = patch_params['save_name']
-
-            if not save_mode:
-                return HttpResponse("Wrong action parameter.", status=400)
-
-            val_run.name_tag = patch_params['new_name']
-            val_run.save()
-
-            return HttpResponse("Changed.", status=200)
+        # if val_run.user != request.user:
+        #     return HttpResponse(status=403)
+        #
+        # patch_params = request.data
+        # patch_params_keys = patch_params.keys()
+        #
+        # if 'save_name' in patch_params_keys:
+        #     # check that our validation's name can be changed'; it can't if it already has a DOI
+        #     if not val_run.is_unpublished:
+        #         return HttpResponse('Validation has been published', status=405)
+        #
+        #     save_mode = patch_params['save_name']
+        #
+        #     if save_mode == 'False':
+        #         return HttpResponse("Wrong action parameter.", status=400)
+        #
+        #     val_run.name_tag = patch_params['new_name']
+        #     val_run.save()
+        #
+        #     return HttpResponse("Changed.", status=200)
 
         if 'archive' in patch_params_keys:
             archive_mode = patch_params['archive']
@@ -90,6 +104,10 @@ def modify_result(request, result_uuid):
 
         if 'extend' in patch_params_keys:
             extend = patch_params['extend']
+
+            if not val_run.is_unpublished:
+                return HttpResponse('Validation has been published', status=405)
+
             if type(extend) != bool or not extend:
                 return HttpResponse("Wrong action parameter.", status=400)
 

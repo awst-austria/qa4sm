@@ -17,7 +17,7 @@ from api.views.validation_run_view import published_results, my_results, validat
     custom_tracked_validation_runs, get_summary_statistics, get_publishing_form, copy_validation_results
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
 from api.views.global_params_view import global_params
-from api.views.modify_validation_view import stop_validation, modify_result
+from api.views.modify_validation_view import stop_validation, modify_result, change_name
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_files, \
     get_metric_names_and_associated_files, get_graphic_file
 from api.views.local_api_view import get_list_of_countries
@@ -75,6 +75,7 @@ urlpatterns = [
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),  # checked
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),  # checked
     path('modify-validation/<uuid:result_uuid>/', modify_result, name='Modify result'),  # checked
+    path('change-validation-name/<uuid:result_uuid>/', change_name, name='Change name'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
     path('download-result', get_results, name='Download results'),
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
