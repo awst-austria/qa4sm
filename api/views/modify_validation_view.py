@@ -94,6 +94,48 @@ def extend_result(request, result_uuid):
     return HttpResponse(val_run.expiry_date, status=200)
 
 
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def publish_result(request, result_uuid):
+    val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+
+    if val_run.user != request.user:
+        return HttpResponse(status=403)
+
+    if not val_run.is_unpublished:
+        return HttpResponse('Validation has been published', status=405)
+
+    patch_params = request.data
+
+
+    publish = patch_params['publish']
+    publishing_form = patch_params['publishing_form']
+
+    # check we've got the action set correctly
+    if type(publish) != bool:
+        return HttpResponse("Wrong action parameter.", status=400)
+
+    # check that the publication parameters are valid
+    pub_form = PublishingForm(data=publishing_form, validation=val_run)
+    if not pub_form.is_valid():
+        errors = pub_form.errors.get_json_data()
+        response = JsonResponse(errors, status=400, safe=False)
+        # if not, send back an updated publication form with errors set and http code 420 (picked up in javascript)
+        return response
+
+    try:
+        get_doi_for_validation(val_run, pub_form.pub_metadata)
+    except Exception as e:
+        m = getattr(e, 'message', repr(e))
+        response = JsonResponse({'response': m}, status=400)
+        return response
+
+    response = JsonResponse({'response': 'Published'}, status=200)
+    return response
+
+
+
+
 @api_view(['POST', 'GET', 'DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def modify_result(request, result_uuid):
