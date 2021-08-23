@@ -171,44 +171,18 @@ def remove_validation(request, result_uuid):
     return response
 
 
-@api_view(['POST', 'GET', 'DELETE', 'PATCH'])
+@api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def modify_result(request, result_uuid):
+def delete_result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
 
-    if request.method == 'DELETE':
-        ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
-        if(val_run.user != request.user):
-            return HttpResponse(status = status.HTTP_403_FORBIDDEN)
+    ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
+    if(val_run.user != request.user):
+        return HttpResponse(status = status.HTTP_403_FORBIDDEN)
 
-        ## check that our validation can be deleted; it can't if it already has a DOI
-        if(not val_run.is_unpublished):
-            return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED) #405
+    ## check that our validation can be deleted; it can't if it already has a DOI
+    if(not val_run.is_unpublished):
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED) #405
 
-        val_run.delete()
-        return HttpResponse(status=status.HTTP_200_OK)
-
-    # elif request.method == 'POST':
-    #     post_params = request.data
-    #     post_params_keys = post_params.keys()
-    #
-    #     user = request.user
-    #     if 'add_validation' in post_params_keys and post_params['add_validation']:
-    #         if val_run not in user.copied_runs.all():
-    #             valrun_user = CopiedValidations(used_by_user=user, original_run=val_run, copied_run=val_run)
-    #             valrun_user.save()
-    #             response = HttpResponse("Validation added to your list", status=200)
-    #         else:
-    #             response = HttpResponse("You have already added this validation to your list", status=200)
-    #     elif 'remove_validation' in post_params_keys and post_params['remove_validation']:
-    #         user.copied_runs.remove(val_run)
-    #         response = HttpResponse("Validation has been removed from your list", status=200)
-    #
-    #     elif 'copy_validation' in post_params and post_params['copy_validation'] == 'true':
-    #         resp = _copy_validationrun(val_run, request.user)
-    #         response = JsonResponse(resp)
-    #
-    #     else:
-    #         response = HttpResponse("Wrong action parameter.", status=400)
-    #
-    #     return response
+    val_run.delete()
+    return HttpResponse(status=status.HTTP_200_OK)
