@@ -308,13 +308,13 @@
             "help_text": "CGLS Sentinel1 SSM 1km (TIF) product",
             "time_range_start": "2014-10-03",
             "time_range_end": "2020-08-31",
-            "geographical_range":
-            {
+            "geographical_range":            {
                 "min_lat": 35.004464285714285,
                 "max_lat": 71.99553571427731,
                 "min_lon": -10.995535714285714,
                 "max_lon": 49.99553571428398
             }
+
         }
     },
     {
@@ -326,13 +326,14 @@
             "help_text": "CGLS S1/ASCAT SWI 1km (TIF) product",
             "time_range_start": "2015-01-01",
             "time_range_end": "2020-07-31",
-            "geographical_range":
-            {
+            "geographical_range":            {
                 "min_lat": 35.004464285714285,
                 "max_lat": 71.99553571427731,
                 "min_lon": -10.995535714285714,
                 "max_lon": 49.99553571428398
             }
+
+
         }
     }
 ]
