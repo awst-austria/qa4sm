@@ -1,17 +1,16 @@
-import json
 import logging
 import time
 from django.test.utils import override_settings
 from django.urls import reverse
 
 import validator.validation as val
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APIClient
 
 # Include an appropriate `Authorization:` header on all requests.
 from api.tests.test_helper import *
 from validator.models import ValidationRun
+from dateutil import parser
 
 User = get_user_model()
 
@@ -29,8 +28,6 @@ class TestModifyValidationView(TestCase):
         self.client.login(**self.auth_data)
         # creating an alternative user for some tests
         self.alt_data, self.alt_test_user = create_alternative_user()
-        self.alternative_client = APIClient()
-
         # start a new validation, which will be used by some tests below
         self.run = default_parameterized_validation(self.test_user)
         self.run.save()
@@ -68,7 +65,7 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 403
         #
         # log in as another user and check the access
-        self.alternative_client.login(**self.alt_data)
+        self.client.login(**self.alt_data)
         response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
         assert response.status_code == 403
 
@@ -115,7 +112,7 @@ class TestModifyValidationView(TestCase):
         # log out the owner and log in other user
         self.client.logout()
 
-        self.alternative_client.login(**self.alt_data)
+        self.client.login(**self.alt_data)
         body = {'save_name': True, 'new_name': 'some_other_name'}
         response = self.client.patch(change_name_url, body,  format='json')
 
@@ -125,7 +122,7 @@ class TestModifyValidationView(TestCase):
     def test_archive_result(self):
         archive_url = reverse('Archive results', kwargs={'result_uuid': self.run_id})
 
-        # everything ok, I want to archive
+        # everything ok, I want to archive ========================================================================
         body = {'archive': True}
         response = self.client.patch(archive_url, body,  format='json')
 
@@ -133,7 +130,7 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
         assert new_run.is_archived is True
 
-        # everything still ok, now I want to unarchive
+        # everything still ok, now I want to un-archive ==========================================================
         body = {'archive': False}
         response = self.client.patch(archive_url, body,  format='json')
 
@@ -141,7 +138,7 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
         assert new_run.is_archived is False
 
-        # not valid parameter
+        # not valid parameter ==========================================================
         body = {'archive': 'some_not_valid_parameter'}
         response = self.client.patch(archive_url, body,  format='json')
 
@@ -149,7 +146,7 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 400
         assert new_run.is_archived is False  # nothing has changed
 
-        # not valid method
+        # not valid method ==========================================================
         body = {'archive': True}
         response = self.client.get(archive_url, body,  format='json')  # should be patch
 
@@ -157,9 +154,20 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 405
         assert new_run.is_archived is False  # nothing has changed
 
-        # log out and log in another user to check if only owners should be able to change validations
+        # you can't modify a published validation ==========================================================
+        new_run.doi = '1010101010101'
+        new_run.save()
+
+        body = {'archive': True}
+        response = self.client.patch(archive_url, body,  format='json')
+        assert response.status_code == 405
+
+        new_run.doi = ''
+        new_run.save()
+
+        # log out and log in another user to check if only owners should be able to change validations ===============
         self.client.logout()
-        self.alternative_client.login(**self.alt_data)
+        self.client.login(**self.alt_data)
 
         body = {'archive': True}
         response = self.client.patch(archive_url, body,  format='json')
@@ -167,3 +175,49 @@ class TestModifyValidationView(TestCase):
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 403
         assert new_run.is_archived is False  # nothing has changed
+
+    def test_extend_result(self):
+        extend_result_url = reverse('Extend results', kwargs={'result_uuid': self.run_id})
+
+        # everything ok ==============================================================
+        body = {'extend': True}
+        response = self.client.patch(extend_result_url, body,  format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        new_expiry_date = parser.parse(response.content)
+
+        assert response.status_code == 200
+        assert new_expiry_date is not None
+        assert new_run.expiry_date == new_expiry_date
+
+        # invalid expiry extension ==================================================
+        body = {'extend': False}
+        response = self.client.patch(extend_result_url, body,  format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+
+        assert response.status_code == 400
+        assert new_run.expiry_date == new_expiry_date # nothing has changed
+
+        # published validation =======================================================
+        new_run.doi = '1010101019110'
+        new_run.save()
+
+        body = {'extend': True}
+        response = self.client.patch(extend_result_url, body,  format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 405
+        assert new_run.expiry_date == new_expiry_date  # nothing has changed
+
+        new_run.doi = ''
+        new_run.save()
+
+        # wrong user =================================================================
+        self.client.logout() # log out
+        self.client.login(**self.alt_data) # log in as another one
+
+        body = {'extend': True}
+        response = self.client.patch(extend_result_url, body,  format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 403
+        assert new_run.expiry_date == new_expiry_date  # nothing has changed
+
+
