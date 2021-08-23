@@ -53,6 +53,26 @@ def change_name(request, result_uuid):
 
         return HttpResponse("Changed.", status=200)
 
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def archive_results(request, result_uuid):
+    val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+
+    if val_run.user != request.user:
+        return HttpResponse(status=403)
+    #
+    patch_params = request.data
+    patch_params_keys = patch_params.keys()
+
+    archive_mode = patch_params['archive']
+
+    if not type(archive_mode) is bool:
+        return HttpResponse("Wrong action parameter.", status=400)
+
+    val_run.archive(unarchive=(not archive_mode))
+    return HttpResponse("Changed.", status=200)
+
 @api_view(['POST', 'GET', 'DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def modify_result(request, result_uuid):
@@ -73,11 +93,11 @@ def modify_result(request, result_uuid):
     elif request.method == 'PATCH':
         # make sure only the owner of a validation can change it (others are allowed to GET it, though)
 
-        # if val_run.user != request.user:
-        #     return HttpResponse(status=403)
+        if val_run.user != request.user:
+            return HttpResponse(status=403)
         #
-        # patch_params = request.data
-        # patch_params_keys = patch_params.keys()
+        patch_params = request.data
+        patch_params_keys = patch_params.keys()
         #
         # if 'save_name' in patch_params_keys:
         #     # check that our validation's name can be changed'; it can't if it already has a DOI
@@ -94,14 +114,14 @@ def modify_result(request, result_uuid):
         #
         #     return HttpResponse("Changed.", status=200)
 
-        if 'archive' in patch_params_keys:
-            archive_mode = patch_params['archive']
-
-            if not type(archive_mode) is bool:
-                return HttpResponse("Wrong action parameter.", status=400)
-
-            val_run.archive(unarchive=(not archive_mode))
-            return HttpResponse("Changed.", status=200)
+        # if 'archive' in patch_params_keys:
+        #     archive_mode = patch_params['archive']
+        #
+        #     if not type(archive_mode) is bool:
+        #         return HttpResponse("Wrong action parameter.", status=400)
+        #
+        #     val_run.archive(unarchive=(not archive_mode))
+        #     return HttpResponse("Changed.", status=200)
 
         if 'extend' in patch_params_keys:
             extend = patch_params['extend']
