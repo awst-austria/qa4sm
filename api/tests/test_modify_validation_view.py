@@ -31,7 +31,7 @@ class TestModifyValidationView(TestCase):
         self.alternative_client = APIClient()
 
     def test_stop_validation(self):
-        # start a new validation
+        # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
         run = default_parameterized_validation(self.test_user, tcol=True)
         run.save()
         run_id = run.id
@@ -43,7 +43,7 @@ class TestModifyValidationView(TestCase):
         # the validation has just started so the progress must be below 100
         assert new_run.progress < 100
 
-        # now let's try out cancelling the validation in it's various forms...
+        # now let's try out cancelling the validation
         response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
         assert response.status_code == 200
 
