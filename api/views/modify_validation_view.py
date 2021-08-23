@@ -34,24 +34,19 @@ def change_name(request, result_uuid):
     if val_run.user != request.user:
         return HttpResponse(status=403)
 
+    if not val_run.is_unpublished:
+        return HttpResponse('Validation has been published', status=405)
+
     patch_params = request.data
-    patch_params_keys = patch_params.keys()
+    save_mode = patch_params['save_name']
 
-    if 'save_name' in patch_params_keys:
-        # check that our validation's name can be changed'; it can't if it already has a DOI
-        if not val_run.is_unpublished:
-            return HttpResponse('Validation has been published', status=405)
+    if save_mode != 'True':
+        return HttpResponse("Wrong action parameter.", status=400)
 
-        save_mode = patch_params['save_name']
-        print(save_mode)
+    val_run.name_tag = patch_params['new_name']
+    val_run.save()
 
-        if save_mode != 'True':
-            return HttpResponse("Wrong action parameter.", status=400)
-
-        val_run.name_tag = patch_params['new_name']
-        val_run.save()
-
-        return HttpResponse("Changed.", status=200)
+    return HttpResponse("Changed.", status=200)
 
 
 @api_view(['PATCH'])
@@ -61,10 +56,11 @@ def archive_results(request, result_uuid):
 
     if val_run.user != request.user:
         return HttpResponse(status=403)
-    #
-    patch_params = request.data
-    patch_params_keys = patch_params.keys()
 
+    if not val_run.is_unpublished:
+        return HttpResponse('Validation has been published', status=405)
+
+    patch_params = request.data
     archive_mode = patch_params['archive']
 
     if not type(archive_mode) is bool:
@@ -72,6 +68,31 @@ def archive_results(request, result_uuid):
 
     val_run.archive(unarchive=(not archive_mode))
     return HttpResponse("Changed.", status=200)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def extend_results(request, result_uuid):
+    val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+
+    if val_run.user != request.user:
+        return HttpResponse(status=403)
+
+    if not val_run.is_unpublished:
+        return HttpResponse('Validation has been published', status=405)
+
+    patch_params = request.data
+    extend = patch_params['extend']
+
+    if not val_run.is_unpublished:
+        return HttpResponse('Validation has been published', status=405)
+
+    if type(extend) != bool or not extend:
+        return HttpResponse("Wrong action parameter.", status=400)
+
+    val_run.extend_lifespan()
+    return HttpResponse(val_run.expiry_date, status=200)
+
 
 @api_view(['POST', 'GET', 'DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
@@ -123,17 +144,17 @@ def modify_result(request, result_uuid):
         #     val_run.archive(unarchive=(not archive_mode))
         #     return HttpResponse("Changed.", status=200)
 
-        if 'extend' in patch_params_keys:
-            extend = patch_params['extend']
-
-            if not val_run.is_unpublished:
-                return HttpResponse('Validation has been published', status=405)
-
-            if type(extend) != bool or not extend:
-                return HttpResponse("Wrong action parameter.", status=400)
-
-            val_run.extend_lifespan()
-            return HttpResponse(val_run.expiry_date, status=200)
+        # if 'extend' in patch_params_keys:
+        #     extend = patch_params['extend']
+        #
+        #     if not val_run.is_unpublished:
+        #         return HttpResponse('Validation has been published', status=405)
+        #
+        #     if type(extend) != bool or not extend:
+        #         return HttpResponse("Wrong action parameter.", status=400)
+        #
+        #     val_run.extend_lifespan()
+        #     return HttpResponse(val_run.expiry_date, status=200)
 
         if 'publish' in patch_params_keys:
             publish = patch_params['publish']
