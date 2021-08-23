@@ -30,6 +30,12 @@ class TestModifyValidationView(TestCase):
         self.alt_data, self.alt_test_user = create_alternative_user()
         self.alternative_client = APIClient()
 
+        # start a new validation, which will be used by some tests below
+        self.run = default_parameterized_validation(self.test_user)
+        self.run.save()
+        self.run_id = self.run.id
+        val.run_validation(self.run_id)
+
     def test_stop_validation(self):
         # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
         run = default_parameterized_validation(self.test_user, tcol=True)
@@ -72,31 +78,21 @@ class TestModifyValidationView(TestCase):
         assert new_run.progress <= 0
         delete_run(new_run)
 
-    def test_modify_result(self):
-        # start a new validation
-        run = default_parameterized_validation(self.test_user)
-        run.save()
-        run_id = run.id
-        val.run_validation(run_id)
-
-        modify_result_url = reverse('Modify result', kwargs={'result_uuid': run_id})
-
-        # start with PATCH method (DELETE will be later, so there is no need to run the validation twice)
-
-        # ================== SAVE NAME =======================
+    def test_change_name(self):
+        change_name_url = reverse('Change name', kwargs={'result_uuid': self.run_id})
         # everything ok
         body = {'save_name': True, 'new_name': 'validation_new_name'}
-        response = self.client.patch(modify_result_url, body)
+        response = self.client.patch(change_name_url, body)
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+        new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 200
         assert new_run.name_tag == 'validation_new_name'
 
         # save_name == False
         body = {'save_name': False, 'new_name': 'wrong_name'}
-        response = self.client.patch(modify_result_url, body)
+        response = self.client.patch(change_name_url, body)
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+        new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 400 # status 400
         assert new_run.name_tag == 'validation_new_name' # name has not been changed
 
@@ -106,7 +102,7 @@ class TestModifyValidationView(TestCase):
         new_run.save()
 
         body = {'save_name': True, 'new_name': 'some_other_name'}
-        response = self.client.patch(modify_result_url, body)
+        response = self.client.patch(change_name_url, body)
 
         assert response.status_code == 405 # status 405
         assert new_run.name_tag == 'validation_new_name' # name has not been changed
@@ -120,9 +116,19 @@ class TestModifyValidationView(TestCase):
 
         self.alternative_client.login(**self.alt_data)
         body = {'save_name': True, 'new_name': 'some_other_name'}
-        response = self.client.patch(modify_result_url, body)
+        response = self.client.patch(change_name_url, body)
 
         assert response.status_code == 403  # status 403
         assert new_run.name_tag == 'validation_new_name' # name has not been changed
+
+    # def test_modify_result(self):
+    #
+    #
+    #     modify_result_url = reverse('Modify result', kwargs={'result_uuid': run_id})
+    #
+    #     # start with PATCH method (DELETE will be later, so there is no need to run the validation twice)
+    #
+    #     # ================== SAVE NAME =======================
+
 
 
