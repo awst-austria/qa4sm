@@ -40,7 +40,7 @@ def change_name(request, result_uuid):
     patch_params = request.data
     save_mode = patch_params['save_name']
 
-    if save_mode != 'True':
+    if not save_mode:
         return HttpResponse("Wrong action parameter.", status=400)
 
     val_run.name_tag = patch_params['new_name']
