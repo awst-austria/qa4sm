@@ -85,9 +85,6 @@ def extend_result(request, result_uuid):
     patch_params = request.data
     extend = patch_params['extend']
 
-    if not val_run.is_unpublished:
-        return HttpResponse('Validation has been published', status=405)
-
     if type(extend) != bool or not extend:
         return HttpResponse("Wrong action parameter.", status=400)
 
@@ -107,7 +104,6 @@ def publish_result(request, result_uuid):
         return HttpResponse('Validation has been published', status=405)
 
     patch_params = request.data
-
 
     publish = patch_params['publish']
     publishing_form = patch_params['publishing_form']
