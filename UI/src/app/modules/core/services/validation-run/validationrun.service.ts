@@ -21,6 +21,7 @@ const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 
 const csrfToken = '{{csrf_token}}';
+const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -81,10 +82,10 @@ export class ValidationrunService {
     return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'});
   }
 
-  saveResults(validationId: string, newName: string): Observable<any> {
-    const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  saveResultsName(validationId: string, newName: string): Observable<any> {
+    const saveUrl = changeNameUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {save_name: true, new_name: newName};
-    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
+    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
 
   }
 

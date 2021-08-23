@@ -88,7 +88,7 @@ export class ValidationrunRowComponent implements OnInit {
     this.hideElement = !this.hideElement;
   }
   saveName(validationId: string, newName: string): void{
-    this.validationService.saveResults(validationId, newName).subscribe(
+    this.validationService.saveResultsName(validationId, newName).subscribe(
       () => {
         this.validationService.refreshComponent(validationId);
       });
