@@ -72,3 +72,57 @@ class TestModifyValidationView(TestCase):
         assert new_run.progress <= 0
         delete_run(new_run)
 
+    def test_modify_result(self):
+        # start a new validation
+        run = default_parameterized_validation(self.test_user)
+        run.save()
+        run_id = run.id
+        val.run_validation(run_id)
+
+        modify_result_url = reverse('Modify result', kwargs={'result_uuid': run_id})
+
+        # start with PATCH method (DELETE will be later, so there is no need to run the validation twice)
+
+        # ================== SAVE NAME =======================
+        # everything ok
+        body = {'save_name': True, 'new_name': 'validation_new_name'}
+        response = self.client.patch(modify_result_url, body)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        assert response.status_code == 200
+        assert new_run.name_tag == 'validation_new_name'
+
+        # save_name == False
+        body = {'save_name': False, 'new_name': 'wrong_name'}
+        response = self.client.patch(modify_result_url, body)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        assert response.status_code == 400 # status 400
+        assert new_run.name_tag == 'validation_new_name' # name has not been changed
+
+        # "published" validation
+        new_run.doi = '1000101010101010'
+        new_run.archive = True
+        new_run.save()
+
+        body = {'save_name': True, 'new_name': 'some_other_name'}
+        response = self.client.patch(modify_result_url, body)
+
+        assert response.status_code == 405 # status 405
+        assert new_run.name_tag == 'validation_new_name' # name has not been changed
+
+        # getting back to former settings
+        new_run.doi = ''
+        new_run.archive = False
+
+        # log out the owner and log in other user
+        self.client.logout()
+
+        self.alternative_client.login(**self.alt_data)
+        body = {'save_name': True, 'new_name': 'some_other_name'}
+        response = self.client.patch(modify_result_url, body)
+
+        assert response.status_code == 403  # status 403
+        assert new_run.name_tag == 'validation_new_name' # name has not been changed
+
+
