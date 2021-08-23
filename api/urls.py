@@ -18,7 +18,7 @@ from api.views.validation_run_view import published_results, my_results, validat
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, modify_result, change_name, archive_result, \
-    extend_result, publish_result, add_validation, remove_validation
+    extend_result, publish_result, add_validation, remove_validation, copy_validation
 from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_files, \
     get_metric_names_and_associated_files, get_graphic_file
 from api.views.local_api_view import get_list_of_countries
@@ -81,7 +81,8 @@ urlpatterns = [
     path('extend-result/<uuid:result_uuid>/', extend_result, name='Extend results'), # checked
     path('publish-result/<uuid:result_uuid>/', publish_result, name='Publish results'), # checked
     path('add-validation/<uuid:result_uuid>/', add_validation, name='Add validation'), # checked
-    path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Add validation'), # checked
+    path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Remove validation'), # checked
+    path('copy-validation/<uuid:result_uuid>/', copy_validation, name='Copy validation'), # checked
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
     path('download-result', get_results, name='Download results'),
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
