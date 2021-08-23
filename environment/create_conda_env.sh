@@ -100,8 +100,7 @@ pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 pip install ismn
 pip install requests
-pip install git+https://github.com/awst-austria/qa4sm-preprocessing@master
-pip install qa4sm-reader>=0.3.4
+pip install "qa4sm-reader>=0.3.4,<0.5"
 
 cd $TEMP_DIR
 

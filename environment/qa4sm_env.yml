@@ -169,7 +169,7 @@ dependencies:
     - psycopg2-binary==2.8.6
     - pyct==0.4.8
     - pygeobase==0.4.0
-    - pygeogrids==0.3.0
+    - pygeogrids==0.4.1
     - pynetcf==0.2.2
     - pytesmo==0.12.0
     - pytest-cov==2.10.1

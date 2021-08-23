@@ -262,6 +262,7 @@ class TestValidation(TestCase):
         "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
     @pytest.mark.filterwarnings(
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+    @pytest.mark.long_running
     def test_validation_hires_with_radius(self):
         radii = [0, 10000, None]
         # radius:
