@@ -155,6 +155,22 @@ def add_validation(request, result_uuid):
     return response
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_validation(request, result_uuid):
+    val_run = get_object_or_404(ValidationRun, pk=result_uuid)
+    post_params = request.data
+
+    user = request.user
+    if post_params['remove_validation']:
+            user.copied_runs.remove(val_run)
+            response = HttpResponse("Validation has been removed from your list", status=200)
+    else:
+        response = HttpResponse("Wrong action parameter.", status=400)
+
+    return response
+
+
 @api_view(['POST', 'GET', 'DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def modify_result(request, result_uuid):
