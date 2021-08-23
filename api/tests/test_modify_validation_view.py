@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from django.test.utils import override_settings
@@ -82,7 +83,7 @@ class TestModifyValidationView(TestCase):
         change_name_url = reverse('Change name', kwargs={'result_uuid': self.run_id})
         # everything ok
         body = {'save_name': True, 'new_name': 'validation_new_name'}
-        response = self.client.patch(change_name_url, body)
+        response = self.client.patch(change_name_url, body,  format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 200
@@ -90,10 +91,10 @@ class TestModifyValidationView(TestCase):
 
         # save_name == False
         body = {'save_name': False, 'new_name': 'wrong_name'}
-        response = self.client.patch(change_name_url, body)
+        response = self.client.patch(change_name_url, body,  format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
-        assert response.status_code == 400 # status 400
+        assert response.status_code == 400  # status 400
         assert new_run.name_tag == 'validation_new_name' # name has not been changed
 
         # "published" validation
@@ -102,9 +103,9 @@ class TestModifyValidationView(TestCase):
         new_run.save()
 
         body = {'save_name': True, 'new_name': 'some_other_name'}
-        response = self.client.patch(change_name_url, body)
+        response = self.client.patch(change_name_url, body,  format='json')
 
-        assert response.status_code == 405 # status 405
+        assert response.status_code == 405   # status 405
         assert new_run.name_tag == 'validation_new_name' # name has not been changed
 
         # getting back to former settings
@@ -116,7 +117,7 @@ class TestModifyValidationView(TestCase):
 
         self.alternative_client.login(**self.alt_data)
         body = {'save_name': True, 'new_name': 'some_other_name'}
-        response = self.client.patch(change_name_url, body)
+        response = self.client.patch(change_name_url, body,  format='json')
 
         assert response.status_code == 403  # status 403
         assert new_run.name_tag == 'validation_new_name' # name has not been changed
