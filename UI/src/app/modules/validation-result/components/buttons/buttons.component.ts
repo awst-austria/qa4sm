@@ -72,7 +72,7 @@ export class ButtonsComponent implements OnInit {
       + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
       return;
     }
-    this.validationService.archiveResults(validationId, archive).subscribe(() => {
+    this.validationService.archiveResult(validationId, archive).subscribe(() => {
       this.validationService.refreshComponent(validationId);
       this.doRefresh.emit(true);
     });
@@ -82,7 +82,7 @@ export class ButtonsComponent implements OnInit {
     if (!confirm('Do you want to extend the lifespan of this result?')) {
       return;
     }
-    this.validationService.extendResults(validationId).subscribe(() => {
+    this.validationService.extendResult(validationId).subscribe(() => {
       this.validationService.refreshComponent(validationId);
       this.doRefresh.emit(true);
     });

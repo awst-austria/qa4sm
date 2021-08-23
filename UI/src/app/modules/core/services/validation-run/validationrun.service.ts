@@ -22,7 +22,8 @@ const copyValidationUrl: string = urlPrefix + '/copy-validation';
 
 const csrfToken = '{{csrf_token}}';
 const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
-const archiveResultUrl = urlPrefix + '/archive-results/00000000-0000-0000-0000-000000000000';
+const archiveResultUrl = urlPrefix + '/archive-result/00000000-0000-0000-0000-000000000000';
+const extendResultUrl = urlPrefix + '/extend-result/00000000-0000-0000-0000-000000000000';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -72,13 +73,13 @@ export class ValidationrunService {
     return this.httpClient.delete(stopUrl, {headers});
   }
 
-  archiveResults(validationId: string, archive: boolean): Observable<any> {
+  archiveResult(validationId: string, archive: boolean): Observable<any> {
     const archiveUrl = archiveResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     return this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'});
   }
 
-  extendResults(validationId: string): Observable<any> {
-    const extendUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  extendResult(validationId: string): Observable<any> {
+    const extendUrl = extendResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const extend = true;
     return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'});
   }
