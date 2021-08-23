@@ -43,8 +43,9 @@ def change_name(request, result_uuid):
             return HttpResponse('Validation has been published', status=405)
 
         save_mode = patch_params['save_name']
+        print(save_mode)
 
-        if save_mode == 'False':
+        if save_mode != 'True':
             return HttpResponse("Wrong action parameter.", status=400)
 
         val_run.name_tag = patch_params['new_name']
