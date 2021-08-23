@@ -12,6 +12,7 @@ from rest_framework import status
 # from validator.views.results import _copy_validationrun
 from api.views.validation_run_view import _copy_validationrun
 
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def stop_validation(request, result_uuid):
@@ -23,7 +24,7 @@ def stop_validation(request, result_uuid):
         stop_running_validation(result_uuid)
         return HttpResponse(status=200)
 
-    return HttpResponse(status=405)  # if we're not DELETEing, send back "Method not Allowed"
+    return HttpResponse(status=405)  # if we're not DELETing, send back "Method not Allowed"
 
 
 @api_view(['PATCH'])
