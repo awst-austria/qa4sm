@@ -171,23 +171,6 @@ def remove_validation(request, result_uuid):
     return response
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def copy_validation(request, result_uuid):
-    val_run = get_object_or_404(ValidationRun, pk=result_uuid)
-    post_params = request.data
-
-    user = request.user
-    if post_params['copy_validation'] == 'true':
-            resp = _copy_validationrun(val_run, request.user)
-            response = JsonResponse(resp)
-    else:
-        response = HttpResponse("Wrong action parameter.", status=400)
-
-    return response
-
-
-
 @api_view(['POST', 'GET', 'DELETE', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def modify_result(request, result_uuid):

@@ -82,7 +82,6 @@ urlpatterns = [
     path('publish-result/<uuid:result_uuid>/', publish_result, name='Publish results'), # checked
     path('add-validation/<uuid:result_uuid>/', add_validation, name='Add validation'), # checked
     path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Remove validation'), # checked
-    path('copy-validation/<uuid:result_uuid>/', copy_validation, name='Copy validation'), # checked
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
     path('download-result', get_results, name='Download results'),
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
