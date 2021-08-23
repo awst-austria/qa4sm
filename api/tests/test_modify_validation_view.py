@@ -1,5 +1,7 @@
 import logging
 import time
+
+import pytest
 from django.test.utils import override_settings
 from django.urls import reverse
 
@@ -9,8 +11,10 @@ from rest_framework.test import APIClient
 
 # Include an appropriate `Authorization:` header on all requests.
 from api.tests.test_helper import *
+from validator.forms import PublishingForm
 from validator.models import ValidationRun
 from dateutil import parser
+from django.utils.http import urlencode
 
 User = get_user_model()
 
@@ -29,14 +33,14 @@ class TestModifyValidationView(TestCase):
         # creating an alternative user for some tests
         self.alt_data, self.alt_test_user = create_alternative_user()
         # start a new validation, which will be used by some tests below
-        self.run = default_parameterized_validation(self.test_user)
+        self.run = default_parameterized_validation_to_be_run(self.test_user)
         self.run.save()
         self.run_id = self.run.id
-        val.run_validation(self.run_id)
+        # val.run_validation(self.run_id)
 
     def test_stop_validation(self):
         # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
-        run = default_parameterized_validation(self.test_user, tcol=True)
+        run = default_parameterized_validation_to_be_run(self.test_user, tcol=True)
         run.save()
         run_id = run.id
         val.run_validation(run_id)
@@ -220,4 +224,20 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 403
         assert new_run.expiry_date == new_expiry_date  # nothing has changed
 
+    # @pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
+    @override_settings(DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions")
+    def test_publish_result(self):
+        infile = 'testdata/output_data/c3s_era5land.nc'
 
+        url = reverse('Publish result', kwargs={'result_uuid': self.run_id})
+
+        # use the publishing form to convert the validation metadata to a dict
+        metadata = PublishingForm()._formdata_from_validation(self.r)
+
+        # shouldn't work because of incorrect parameter
+        metadata['publish'] = 'asdf'
+        response = self.client.patch(url, urlencode(metadata))
+        self.__logger.debug("{} {}".format(response.status_code, response.content))
+
+        assert response.status_code == 400
+        assert response.content_type is not None

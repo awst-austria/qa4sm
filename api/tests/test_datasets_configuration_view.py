@@ -24,7 +24,7 @@ class TestDatasetConfigurationView(TestCase):
         # it's done this way to avoid running a new validation twice
 
         # here I need a validation to check if there are actually any configurations
-        run = default_parameterized_validation(self.test_user)
+        run = default_parameterized_validation_to_be_run(self.test_user)
         run.save()
         run_id = run.id
         val.run_validation(run_id)

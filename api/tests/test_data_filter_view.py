@@ -54,7 +54,7 @@ class TestDataFilterView(TestCase):
     def test_data_parameterized_filters(self):
         param_filter_url = reverse('Parameterised filter')
         # here I need a validation to check if there are actually parameterised filters
-        run = default_parameterized_validation(self.test_user)
+        run = default_parameterized_validation_to_be_run(self.test_user)
         run.save()
         run_id = run.id
         val.run_validation(run_id)

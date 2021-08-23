@@ -119,7 +119,7 @@ def generate_default_validation_triple_coll():
     return run
 
 
-def default_parameterized_validation(user, tcol=False):
+def default_parameterized_validation_to_be_run(user, tcol=False):
     if not tcol:
         run = generate_default_validation()
     else:
