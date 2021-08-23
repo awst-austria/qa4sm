@@ -99,7 +99,7 @@ class TestModifyValidationView(TestCase):
 
         # "published" validation
         new_run.doi = '1000101010101010'
-        new_run.archive = True
+        new_run.is_archived = True
         new_run.save()
 
         body = {'save_name': True, 'new_name': 'some_other_name'}
@@ -110,7 +110,7 @@ class TestModifyValidationView(TestCase):
 
         # getting back to former settings
         new_run.doi = ''
-        new_run.archive = False
+        new_run.is_archived = False
 
         # log out the owner and log in other user
         self.client.logout()
@@ -122,14 +122,48 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 403  # status 403
         assert new_run.name_tag == 'validation_new_name' # name has not been changed
 
-    # def test_modify_result(self):
-    #
-    #
-    #     modify_result_url = reverse('Modify result', kwargs={'result_uuid': run_id})
-    #
-    #     # start with PATCH method (DELETE will be later, so there is no need to run the validation twice)
-    #
-    #     # ================== SAVE NAME =======================
+    def test_archive_result(self):
+        archive_url = reverse('Archive results', kwargs={'result_uuid': self.run_id})
 
+        # everything ok, I want to archive
+        body = {'archive': True}
+        response = self.client.patch(archive_url, body,  format='json')
 
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 200
+        assert new_run.is_archived is True
 
+        # everything still ok, now I want to unarchive
+        body = {'archive': False}
+        response = self.client.patch(archive_url, body,  format='json')
+
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 200
+        assert new_run.is_archived is False
+
+        # not valid parameter
+        body = {'archive': 'some_not_valid_parameter'}
+        response = self.client.patch(archive_url, body,  format='json')
+
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 400
+        assert new_run.is_archived is False  # nothing has changed
+
+        # not valid method
+        body = {'archive': True}
+        response = self.client.get(archive_url, body,  format='json')  # should be patch
+
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 405
+        assert new_run.is_archived is False  # nothing has changed
+
+        # log out and log in another user to check if only owners should be able to change validations
+        self.client.logout()
+        self.alternative_client.login(**self.alt_data)
+
+        body = {'archive': True}
+        response = self.client.patch(archive_url, body,  format='json')
+
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 403
+        assert new_run.is_archived is False  # nothing has changed
