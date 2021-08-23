@@ -51,7 +51,7 @@ def change_name(request, result_uuid):
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
-def archive_results(request, result_uuid):
+def archive_result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
 
     if val_run.user != request.user:
@@ -72,7 +72,7 @@ def archive_results(request, result_uuid):
 
 @api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
-def extend_results(request, result_uuid):
+def extend_result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
 
     if val_run.user != request.user:
