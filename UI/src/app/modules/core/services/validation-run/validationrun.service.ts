@@ -25,6 +25,7 @@ const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-00
 const archiveResultUrl = urlPrefix + '/archive-result/00000000-0000-0000-0000-000000000000';
 const extendResultUrl = urlPrefix + '/extend-result/00000000-0000-0000-0000-000000000000';
 const publishResultUrl = urlPrefix + '/publish-result/00000000-0000-0000-0000-000000000000';
+const addValidationUrl = urlPrefix + '/add-validation/00000000-0000-0000-0000-000000000000';
 const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -104,7 +105,7 @@ export class ValidationrunService {
   }
 
   addValidation(validationId: string): Observable<any> {
-    const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const addUrl = addValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {add_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
