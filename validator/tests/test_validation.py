@@ -31,8 +31,12 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
-from validator.tests.auxiliary_functions import generate_default_validation, \
-    generate_default_validation_triple_coll, generate_ismn_nonref_validation
+from validator.tests.auxiliary_functions import (
+    generate_default_validation,
+    generate_default_validation_triple_coll,
+    generate_ismn_nonref_validation,
+    generate_default_validation_hires,
+)
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
@@ -253,6 +257,60 @@ class TestValidation(TestCase):
         assert os.path.isfile(ncfile)
         run.delete()
         assert not os.path.exists(outdir)
+
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+    def test_validation_hires(self):
+        run = generate_default_validation_hires()
+        run.user = self.testuser
+
+        #run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.BETA_SCALING # cdf matching
+
+        run.interval_from = datetime(2015, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+
+        run.save()
+
+        for config in run.dataset_configurations.all():
+            if config == run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+                pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_AREA_AVG"),
+                                             parameters="10000",
+                                             dataset_config=config)
+                pfilter.save()
+
+            config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'),
+                                     parameters='SCAN',
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"),
+                                     parameters="0.0,0.1",
+                                     dataset_config=run.reference_configuration)
+        pfilter.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 9
+
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results

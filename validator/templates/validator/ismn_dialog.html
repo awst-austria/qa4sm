@@ -106,6 +106,47 @@
 </div>
 
 
+<div class="modal" id="radius_select" role="dialog" aria-labelledby="radius_select_title" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 30rem;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="my-0 font-weight-normal" id="radius_select_title">Select radius</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="modal-body overflow-auto depth" style="max-height: 60vh;">
+
+                <style type="text/css">
+                    .ismn_label { display:inline-block; }
+                    .ismn_indent { margin-left: 1rem; }
+                </style>
+
+                <p>
+                    Select the radius around each reference point in which <br/>
+                    all points of this data set will be averaged.<br/>
+                </p>
+
+                <div>
+                    <div></div>
+                    <label for="radius">Radius [m]: </label>
+                    <input class="radius_select form-control" id="radius" value="" type="number" name="radius" step="1" min="1" max="100000">
+                </div>
+
+            </div>
+
+            <input type="hidden" id="id_target_hidden_input_radius" value="" name="target_hidden_input_radius" data-default=''>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="radius_button" type="button" onclick="setRadius(this);$('#radius_select').modal('hide');"
+                        class="btn btn-primary">Use radius</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <!--====================================== Java Script Codes ==================================================== -->
 <script type="text/javascript">
     // Remark: I use below hide-element-approach instead of detach or remove it, so everytime we use somehow:
@@ -184,123 +225,146 @@
         }
     }
 
-        function get_network_info(networks_info){
-            // var networks_info = ajax_take_network_info(); // taking info about network
-            var continents = Object.keys(networks_info) // taking keys-continents
+    function get_network_info(networks_info){
+        // var networks_info = ajax_take_network_info(); // taking info about network
+        var continents = Object.keys(networks_info) // taking keys-continents
 
-            // cleaning html in case this function is called more than once
-            verify_html_element('continent_container')
-            verify_html_element('collapse_continent')
+        // cleaning html in case this function is called more than once
+        verify_html_element('continent_container')
+        verify_html_element('collapse_continent')
 
-           // taking basic html for continent
-            var basic_continent_container = $('.continent_container')
-            var basic_continent_collapse = $('.collapse_continent')
+       // taking basic html for continent
+        var basic_continent_container = $('.continent_container')
+        var basic_continent_collapse = $('.collapse_continent')
 
-           //iteration over continents - to sort networks according to continents
-           $.each(continents, function(ind, continent){
-                var networks = networks_info[continent];
-                var continent_name = continent.replace(/ /g, '') //removing spaces from Americas :);
+       //iteration over continents - to sort networks according to continents
+       $.each(continents, function(ind, continent){
+            var networks = networks_info[continent];
+            var continent_name = continent.replace(/ /g, '') //removing spaces from Americas :);
 
-                //creating new values
-                var new_onclick = `$('#id_collapse_${continent_name}').collapse('toggle')`;
-                var new_id = 'id_continent_' + continent_name;
+            //creating new values
+            var new_onclick = `$('#id_collapse_${continent_name}').collapse('toggle')`;
+            var new_id = 'id_continent_' + continent_name;
 
-                //getting basic html patterns
-                var new_continent_container = basic_continent_container.clone(true, true);
-                var new_continent_collapse = basic_continent_collapse.clone(true, true);
-                var basic_network_container = new_continent_collapse.find('.row');
+            //getting basic html patterns
+            var new_continent_container = basic_continent_container.clone(true, true);
+            var new_continent_collapse = basic_continent_collapse.clone(true, true);
+            var basic_network_container = new_continent_collapse.find('.row');
 
-                // setting approprate attributes
-                new_continent_container.find('input').attr('id', new_id);
-                new_continent_container.find('input').attr('value', continent_name);
-                new_continent_container.find('input').attr('name', 'continent_' + continent_name);
-                new_continent_container.find('label').attr('for', new_id);
-                new_continent_container.find('div.ismn_label').text(continent);
-                new_continent_container.find('div.ismn_label').attr('onclick', new_onclick);
-                new_continent_collapse.attr('id', 'id_collapse_' + continent_name);
+            // setting approprate attributes
+            new_continent_container.find('input').attr('id', new_id);
+            new_continent_container.find('input').attr('value', continent_name);
+            new_continent_container.find('input').attr('name', 'continent_' + continent_name);
+            new_continent_container.find('label').attr('for', new_id);
+            new_continent_container.find('div.ismn_label').text(continent);
+            new_continent_container.find('div.ismn_label').attr('onclick', new_onclick);
+            new_continent_collapse.attr('id', 'id_collapse_' + continent_name);
 
-                // inserting new elements
-                $(basic_continent_container).before(new_continent_container);
-                $(basic_continent_container).before(new_continent_collapse);
+            // inserting new elements
+            $(basic_continent_container).before(new_continent_container);
+            $(basic_continent_container).before(new_continent_collapse);
 
-                //for each continent networks are listed here
-                $.each(networks, function(ind, val){
-                    var new_network = basic_network_container.clone(true, true);
-                    new_network.find('input').attr('id', 'id_'+val[0]);
-                    new_network.find('input').attr('value', val[0]);
-                    new_network.find('input').attr('name', val[0]);
-                    new_network.find('label').attr('for', 'id_'+val[0]);
-                    new_network.find('label').text(val[0]);
-                    new_network.find('div.country').text(val[1]);
-                    new_network.find('.col-1').text(val[2]);
+            //for each continent networks are listed here
+            $.each(networks, function(ind, val){
+                var new_network = basic_network_container.clone(true, true);
+                new_network.find('input').attr('id', 'id_'+val[0]);
+                new_network.find('input').attr('value', val[0]);
+                new_network.find('input').attr('name', val[0]);
+                new_network.find('label').attr('for', 'id_'+val[0]);
+                new_network.find('label').text(val[0]);
+                new_network.find('div.country').text(val[1]);
+                new_network.find('.col-1').text(val[2]);
 
-                    // inserting new network
-                    $(basic_network_container).before(new_network);
+                // inserting new network
+                $(basic_network_container).before(new_network);
 
-                })
-                // switching off the basic html pattern
-                toggle_children_class(basic_network_container, 'd-none');
-           })
+            })
+            // switching off the basic html pattern
+            toggle_children_class(basic_network_container, 'd-none');
+       })
 
-           // switching off basic html patterns
-           toggle_children_class(basic_continent_container, 'd-none');
-           toggle_children_class(basic_continent_collapse, 'd-none');
-        }
+       // switching off basic html patterns
+       toggle_children_class(basic_continent_container, 'd-none');
+       toggle_children_class(basic_continent_collapse, 'd-none');
+    }
 
-        function filter_networks(e){
-          var callerId = e.relatedTarget.id;
-          var hiddenId = callerId.replace(/_link$/, '_params');
-          var ismnDialog = $(e.currentTarget);
+    function filter_networks(e){
+      var callerId = e.relatedTarget.id;
+      var hiddenId = callerId.replace(/_link$/, '_params');
+      var ismnDialog = $(e.currentTarget);
 
-          ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
-          var preselectedNetworks = $('#' + hiddenId).val();
-            // some text manipulation: clean string from whitespace and separation based on comas
-          preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
-          var netList = preselectedNetworks.split(',');
+      ismnDialog.find('#id_target_hidden_input').val(hiddenId); // remember where the selected networks need to go
+      var preselectedNetworks = $('#' + hiddenId).val();
+        // some text manipulation: clean string from whitespace and separation based on comas
+      preselectedNetworks = preselectedNetworks.replace(/[ ]+,[ ]+/, ',').replace(/(^[ ]+|[ ]+$)/, '');
+      var netList = preselectedNetworks.split(',');
 
-          // reset dialog:
-          ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
-          ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
+      // reset dialog:
+      ismnDialog.find('input:checkbox.continent').prop("checked", true); // enable continents
+      ismnDialog.find('input:checkbox.network').prop("checked", false); // disable networks
 
-          for (var net of netList) { // check the preselected networks
-              ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
+      for (var net of netList) { // check the preselected networks
+          ismnDialog.find('input:checkbox[name='+ net +']').prop( "checked", true );
+      }
+
+      // if there is a continent without any network chosen by default it should be switched off
+      $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
+          var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
+
+          // here I'm checking if there is at least one network checked by default:
+          var cond = networks.is(function(indx, network){return $(network).prop('checked')})
+
+          // if not then the continent also should be unchecked
+          if(!cond){
+              $(element).prop('checked', false);
           }
+      });
+    }
 
-          // if there is a continent without any network chosen by default it should be switched off
-          $.each(ismnDialog.find('input:checkbox.continent').not('.d-none'), function(ind, element){
-              var networks = $(element).closest('.continent_container').next().find('input:checkbox.network').not('.d-none');
-
-              // here I'm checking if there is at least one network checked by default:
-              var cond = networks.is(function(indx, network){return $(network).prop('checked')})
-
-              // if not then the continent also should be unchecked
-              if(!cond){
-                  $(element).prop('checked', false);
-              }
-          });
-        }
-
-        function ajax_take_network_info(e) {
-            //using ajax to read the network info according to its version
-            var url = $("#validation_form").attr("version-options-url");
-            var versionId = $('#id_target_hidden_input_version').val();
-            $.ajax({
-                url: url,
-                data: {'version_id': versionId},
-                success: function (return_data) {
-                    data = return_data['network']
-                    get_network_info(data)
-                    filter_networks(e)
-                }
-            });
-
-        }
+    function ajax_take_network_info(e) {
+        //using ajax to read the network info according to its version
+        var url = $("#validation_form").attr("version-options-url");
+        var versionId = $('#id_target_hidden_input_version').val();
+        $.ajax({
+            url: url,
+            data: {'version_id': versionId},
+            success: function (return_data) {
+                data = return_data['network']
+                get_network_info(data)
+                filter_networks(e)
+            }
+        });
+    }
 
 
     $('#ismn_networks').on('show.bs.modal', function(e) { // happens when dialog is activated
         ajax_take_network_info(e)
     });
+// ------------------------ Radius param filter -------------------------------------- //
 
+    function setRadius(source) {
+        var radiusDialog = $(source).closest('#radius_select');
+        var hiddenId = radiusDialog.find('#id_target_hidden_input_radius').val();
+        // taking default values from the hidden field
+        var radiusCheckbox = $('#'+hiddenId).siblings('input:checkbox');
+        var radius = $('#radius').val();
+        radiusCheckbox.prop('checked', true);
+        $('#'+hiddenId).val(radius);
+        $('#radius_select').modal('hide'); // closing the window
+    }
+
+
+    function getDefaultRadius(e){
+        var default_val = getDefaultParams(e, '#id_target_hidden_input_radius')
+        var radius = default_val.split(',')
+        $('#radius').val(parseInt(radius[0]))
+        radius = $('#radius').val()
+        return radius
+    }
+
+    $('#radius_select').on('show.bs.modal', function(e){
+        getDefaultRadius(e)
+    });
 
 // ------------------------ ISMN Depths -------------------------------------- //
     function setISMNDepth(source) {

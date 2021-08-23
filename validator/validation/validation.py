@@ -394,7 +394,8 @@ def run_validation(validation_id):
         async_results = []
         job_table = {}
         for j in jobs:
-            celery_job = execute_job.apply_async(args=[validation_id, j], queue=validation_run.user.username)
+            celery_job = execute_job.apply_async(args=[validation_id, j],
+                                                 queue=validation_run.user.username)
             async_results.append(celery_job)
             job_table[celery_job.id] = j
             track_celery_task(validation_run, celery_job.id)
