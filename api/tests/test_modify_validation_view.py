@@ -59,7 +59,8 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
 
         # let's try canceling non existing validation
-        response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': 'f0000000-a000-b000-c000-d00000000000'}))
+        response = self.client.delete(
+            reverse('Stop validation', kwargs={'result_uuid': 'f0000000-a000-b000-c000-d00000000000'}))
         assert response.status_code == 404
 
         # let's try to submit wrong method
@@ -87,7 +88,7 @@ class TestModifyValidationView(TestCase):
         change_name_url = reverse('Change name', kwargs={'result_uuid': self.run_id})
         # everything ok
         body = {'save_name': True, 'new_name': 'validation_new_name'}
-        response = self.client.patch(change_name_url, body,  format='json')
+        response = self.client.patch(change_name_url, body, format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 200
@@ -95,17 +96,17 @@ class TestModifyValidationView(TestCase):
 
         # wrong id
         body = {'save_name': True, 'new_name': 'validation_new_name'}
-        response = self.client.patch(reverse('Change name', kwargs={'result_uuid': self.wrong_id}), body,  format='json')
+        response = self.client.patch(reverse('Change name', kwargs={'result_uuid': self.wrong_id}), body, format='json')
         assert response.status_code == 404
         assert new_run.name_tag == 'validation_new_name'
 
         # save_name == False
         body = {'save_name': False, 'new_name': 'wrong_name'}
-        response = self.client.patch(change_name_url, body,  format='json')
+        response = self.client.patch(change_name_url, body, format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 400  # status 400
-        assert new_run.name_tag == 'validation_new_name' # name has not been changed
+        assert new_run.name_tag == 'validation_new_name'  # name has not been changed
 
         # "published" validation
         new_run.doi = '1000101010101010'
@@ -113,10 +114,10 @@ class TestModifyValidationView(TestCase):
         new_run.save()
 
         body = {'save_name': True, 'new_name': 'some_other_name'}
-        response = self.client.patch(change_name_url, body,  format='json')
+        response = self.client.patch(change_name_url, body, format='json')
 
-        assert response.status_code == 405   # status 405
-        assert new_run.name_tag == 'validation_new_name' # name has not been changed
+        assert response.status_code == 405  # status 405
+        assert new_run.name_tag == 'validation_new_name'  # name has not been changed
 
         # getting back to former settings
         new_run.doi = ''
@@ -125,17 +126,17 @@ class TestModifyValidationView(TestCase):
         # log out the owner and log in other user
         self.client.login(**self.alt_data)
         body = {'save_name': True, 'new_name': 'some_other_name'}
-        response = self.client.patch(change_name_url, body,  format='json')
+        response = self.client.patch(change_name_url, body, format='json')
 
         assert response.status_code == 403  # status 403
-        assert new_run.name_tag == 'validation_new_name' # name has not been changed
+        assert new_run.name_tag == 'validation_new_name'  # name has not been changed
 
     def test_archive_result(self):
         archive_url = reverse('Archive results', kwargs={'result_uuid': self.run_id})
 
         # everything ok, I want to archive ========================================================================
         body = {'archive': True}
-        response = self.client.patch(archive_url, body,  format='json')
+        response = self.client.patch(archive_url, body, format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 200
@@ -143,7 +144,7 @@ class TestModifyValidationView(TestCase):
 
         # everything still ok, now I want to un-archive ==========================================================
         body = {'archive': False}
-        response = self.client.patch(archive_url, body,  format='json')
+        response = self.client.patch(archive_url, body, format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 200
@@ -151,13 +152,14 @@ class TestModifyValidationView(TestCase):
 
         # wrong id =====================================================================
         body = {'archive': False}
-        response = self.client.patch(reverse('Archive results', kwargs={'result_uuid': self.wrong_id}), body,  format='json')
+        response = self.client.patch(reverse('Archive results', kwargs={'result_uuid': self.wrong_id}), body,
+                                     format='json')
         assert response.status_code == 404
         assert new_run.is_archived is False
 
         # not valid parameter ==========================================================
         body = {'archive': 'some_not_valid_parameter'}
-        response = self.client.patch(archive_url, body,  format='json')
+        response = self.client.patch(archive_url, body, format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 400
@@ -165,7 +167,7 @@ class TestModifyValidationView(TestCase):
 
         # not valid method ==========================================================
         body = {'archive': True}
-        response = self.client.get(archive_url, body,  format='json')  # should be patch
+        response = self.client.get(archive_url, body, format='json')  # should be patch
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 405
@@ -176,7 +178,7 @@ class TestModifyValidationView(TestCase):
         new_run.save()
 
         body = {'archive': True}
-        response = self.client.patch(archive_url, body,  format='json')
+        response = self.client.patch(archive_url, body, format='json')
         assert response.status_code == 405
 
         new_run.doi = ''
@@ -186,7 +188,7 @@ class TestModifyValidationView(TestCase):
         self.client.login(**self.alt_data)
 
         body = {'archive': True}
-        response = self.client.patch(archive_url, body,  format='json')
+        response = self.client.patch(archive_url, body, format='json')
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 403
@@ -197,7 +199,7 @@ class TestModifyValidationView(TestCase):
 
         # everything ok ==============================================================
         body = {'extend': True}
-        response = self.client.patch(extend_result_url, body,  format='json')
+        response = self.client.patch(extend_result_url, body, format='json')
         new_run = ValidationRun.objects.get(pk=self.run_id)
         new_expiry_date = parser.parse(response.content)
 
@@ -207,26 +209,27 @@ class TestModifyValidationView(TestCase):
 
         # invalid expiry extension ==================================================
         body = {'extend': False}
-        response = self.client.patch(extend_result_url, body,  format='json')
+        response = self.client.patch(extend_result_url, body, format='json')
         new_run = ValidationRun.objects.get(pk=self.run_id)
 
         assert response.status_code == 400
-        assert new_run.expiry_date == new_expiry_date # nothing has changed
+        assert new_run.expiry_date == new_expiry_date  # nothing has changed
 
         # wrong id ===================================================================
         body = {'extend': True}
-        response = self.client.patch(reverse('Extend results', kwargs={'result_uuid': self.wrong_id}), body,  format='json')
+        response = self.client.patch(reverse('Extend results', kwargs={'result_uuid': self.wrong_id}), body,
+                                     format='json')
         new_run = ValidationRun.objects.get(pk=self.run_id)
 
         assert response.status_code == 404
-        assert new_run.expiry_date == new_expiry_date # nothing has changed
+        assert new_run.expiry_date == new_expiry_date  # nothing has changed
 
         # published validation =======================================================
         new_run.doi = '1010101019110'
         new_run.save()
 
         body = {'extend': True}
-        response = self.client.patch(extend_result_url, body,  format='json')
+        response = self.client.patch(extend_result_url, body, format='json')
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 405
         assert new_run.expiry_date == new_expiry_date  # nothing has changed
@@ -235,10 +238,10 @@ class TestModifyValidationView(TestCase):
         new_run.save()
 
         # wrong user =================================================================
-        self.client.login(**self.alt_data) # log in as another one
+        self.client.login(**self.alt_data)  # log in as another one
 
         body = {'extend': True}
-        response = self.client.patch(extend_result_url, body,  format='json')
+        response = self.client.patch(extend_result_url, body, format='json')
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 403
         assert new_run.expiry_date == new_expiry_date  # nothing has changed
@@ -262,7 +265,8 @@ class TestModifyValidationView(TestCase):
 
         # wrong id ==============================================================
         body = {'publish': True, 'publishing_form': publishing_form}
-        response = self.client.patch(reverse('Publish result', kwargs={'result_uuid': self.wrong_id}), body, format='json')
+        response = self.client.patch(reverse('Publish result', kwargs={'result_uuid': self.wrong_id}), body,
+                                     format='json')
         new_run = ValidationRun.objects.get(pk=self.run_id)
 
         assert response.status_code == 404
@@ -371,19 +375,39 @@ class TestModifyValidationView(TestCase):
     def test_add_validation(self):
         add_validation_url = reverse('Add validation', kwargs={'result_uuid': self.run_id})
 
-        # everything ok
+        # everything ok =========================================================================
         body = {'add_validation': True}
-        response = self.client.post(add_validation_url, body,  format='json')
-        print(response)
+        response = self.client.post(add_validation_url, body, format='json')
 
-        new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 200
         assert len(self.test_user.copied_runs.all()) == 1
 
-        # wrong method
+        # wrong method =========================================================================
         body = {'add_validation': True}
-        response = self.client.patch(add_validation_url, body,  format='json')
-        print(response)
+        response = self.client.patch(add_validation_url, body, format='json')
 
         assert response.status_code == 405
         assert len(self.test_user.copied_runs.all()) == 1
+
+        # wrong id =========================================================================
+        body = {'add_validation': True}
+        response = self.client.post(reverse('Add validation', kwargs={'result_uuid': self.wrong_id}), body,
+                                    format='json')
+
+        assert response.status_code == 404
+        assert len(self.test_user.copied_runs.all()) == 1
+
+        # wrong parameter =========================================================================
+        body = {'add_validation': False}
+        response = self.client.post(add_validation_url, body, format='json')
+
+        assert response.status_code == 400
+        assert len(self.test_user.copied_runs.all()) == 1
+
+        # trying to add it the second time, it doesn't raise an error but does not add it second time ==============
+        body = {'add_validation': True}
+        response = self.client.post(add_validation_url, body, format='json')
+
+        assert response.status_code == 200
+        assert len(self.test_user.copied_runs.all()) == 1 # still one, the validation is already there
+
