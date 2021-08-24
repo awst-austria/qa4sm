@@ -1,5 +1,7 @@
 import logging
+import shutil
 import time
+from os import path
 
 import pytest
 from django.test.utils import override_settings
@@ -9,12 +11,12 @@ import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-# Include an appropriate `Authorization:` header on all requests.
 from api.tests.test_helper import *
 from validator.forms import PublishingForm
 from validator.models import ValidationRun
 from dateutil import parser
-from django.utils.http import urlencode
+
+from validator.validation import mkdir_if_not_exists, set_outfile
 
 User = get_user_model()
 
@@ -33,9 +35,10 @@ class TestModifyValidationView(TestCase):
         # creating an alternative user for some tests
         self.alt_data, self.alt_test_user = create_alternative_user()
         # start a new validation, which will be used by some tests below
-        self.run = default_parameterized_validation_to_be_run(self.test_user)
+        self.run = create_default_validation_without_running(self.test_user)
         self.run.save()
         self.run_id = self.run.id
+        self.wrong_id = 'f0000000-a000-b000-c000-d00000000000'
         # val.run_validation(self.run_id)
 
     def test_stop_validation(self):
@@ -90,6 +93,12 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
         assert new_run.name_tag == 'validation_new_name'
 
+        # wrong id
+        body = {'save_name': True, 'new_name': 'validation_new_name'}
+        response = self.client.patch(reverse('Change name', kwargs={'result_uuid': self.wrong_id}), body,  format='json')
+        assert response.status_code == 404
+        assert new_run.name_tag == 'validation_new_name'
+
         # save_name == False
         body = {'save_name': False, 'new_name': 'wrong_name'}
         response = self.client.patch(change_name_url, body,  format='json')
@@ -114,8 +123,6 @@ class TestModifyValidationView(TestCase):
         new_run.is_archived = False
 
         # log out the owner and log in other user
-        self.client.logout()
-
         self.client.login(**self.alt_data)
         body = {'save_name': True, 'new_name': 'some_other_name'}
         response = self.client.patch(change_name_url, body,  format='json')
@@ -140,6 +147,12 @@ class TestModifyValidationView(TestCase):
 
         new_run = ValidationRun.objects.get(pk=self.run_id)
         assert response.status_code == 200
+        assert new_run.is_archived is False
+
+        # wrong id =====================================================================
+        body = {'archive': False}
+        response = self.client.patch(reverse('Archive results', kwargs={'result_uuid': self.wrong_id}), body,  format='json')
+        assert response.status_code == 404
         assert new_run.is_archived is False
 
         # not valid parameter ==========================================================
@@ -170,7 +183,6 @@ class TestModifyValidationView(TestCase):
         new_run.save()
 
         # log out and log in another user to check if only owners should be able to change validations ===============
-        self.client.logout()
         self.client.login(**self.alt_data)
 
         body = {'archive': True}
@@ -201,6 +213,14 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 400
         assert new_run.expiry_date == new_expiry_date # nothing has changed
 
+        # wrong id ===================================================================
+        body = {'extend': True}
+        response = self.client.patch(reverse('Extend results', kwargs={'result_uuid': self.wrong_id}), body,  format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+
+        assert response.status_code == 404
+        assert new_run.expiry_date == new_expiry_date # nothing has changed
+
         # published validation =======================================================
         new_run.doi = '1010101019110'
         new_run.save()
@@ -215,7 +235,6 @@ class TestModifyValidationView(TestCase):
         new_run.save()
 
         # wrong user =================================================================
-        self.client.logout() # log out
         self.client.login(**self.alt_data) # log in as another one
 
         body = {'extend': True}
@@ -224,20 +243,147 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 403
         assert new_run.expiry_date == new_expiry_date  # nothing has changed
 
-    # @pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
+    @pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
     @override_settings(DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions")
     def test_publish_result(self):
         infile = 'testdata/output_data/c3s_era5land.nc'
 
-        url = reverse('Publish result', kwargs={'result_uuid': self.run_id})
-
+        publish_result_url = reverse('Publish result', kwargs={'result_uuid': self.run_id})
         # use the publishing form to convert the validation metadata to a dict
-        metadata = PublishingForm()._formdata_from_validation(self.r)
+        publishing_form = PublishingForm()._formdata_from_validation(self.run)
 
-        # shouldn't work because of incorrect parameter
-        metadata['publish'] = 'asdf'
-        response = self.client.patch(url, urlencode(metadata))
-        self.__logger.debug("{} {}".format(response.status_code, response.content))
+        # shouldn't work because of incorrect parameter 'publish' ========================================
+        body = {'publish': False, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
 
         assert response.status_code == 400
-        assert response.content_type is not None
+        assert new_run.is_unpublished
+
+        # wrong id ==============================================================
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(reverse('Publish result', kwargs={'result_uuid': self.wrong_id}), body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+
+        assert response.status_code == 404
+        assert new_run.is_unpublished
+
+        # wrong user =============================================================
+        self.client.login(**self.alt_data)
+
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+
+        assert response.status_code == 403
+        assert new_run.is_unpublished
+
+        # log in the author again
+        self.client.login(**self.auth_data)
+
+        # shouldn't work because input metadata is not valid =================================================
+        original_orcid = publishing_form['orcid']
+        original_keywords = publishing_form['keywords']
+
+        # wrong orcid
+        publishing_form['orcid'] = 'this is no orcid'
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+
+        assert response.status_code == 400
+        assert new_run.is_unpublished
+
+        # good orcid, wrong keywords
+        publishing_form['orcid'] = original_orcid
+        publishing_form['keywords'] = publishing_form['keywords'].replace('qa4sm', '')
+
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+
+        assert response.status_code == 400
+        assert new_run.is_unpublished
+
+        # good keywords, missing file
+        publishing_form['keywords'] = original_keywords
+
+        # remove file path from validation
+        self.run.output_file = None
+        self.run.save()
+
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run.id)
+
+        assert response.status_code == 400
+        assert new_run.is_unpublished
+        assert new_run.output_file == ''
+
+        # set valid output file for validation
+        run_dir = path.join(OUTPUT_FOLDER, str(self.run_id))
+        mkdir_if_not_exists(run_dir)
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
+        set_outfile(self.run, run_dir)
+        self.run.save()
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+
+        assert new_run.output_file != ''
+
+        # simulate that publishing is already in progress
+        self.run.publishing_in_progress = True
+        self.run.save()
+
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run.id)
+
+        assert response.status_code == 400
+        assert new_run.is_unpublished
+
+        # remove in progress flag
+        self.run.publishing_in_progress = False
+        self.run.save()
+
+        # check if it works if the validation has been already published
+        self.run.doi = '191012912039'
+        self.run.save()
+
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run.id)
+
+        assert response.status_code == 405
+        assert not new_run.is_unpublished
+
+        # 'un-publish' validation
+        self.run.doi = ''
+        self.run.save()
+
+        # now it should work
+        body = {'publish': True, 'publishing_form': publishing_form}
+        response = self.client.patch(publish_result_url, body, format='json')
+        new_run = ValidationRun.objects.get(pk=self.run.id)
+
+        assert response.status_code == 200
+        assert not new_run.is_unpublished
+
+    def test_add_validation(self):
+        add_validation_url = reverse('Add validation', kwargs={'result_uuid': self.run_id})
+
+        # everything ok
+        body = {'add_validation': True}
+        response = self.client.post(add_validation_url, body,  format='json')
+        print(response)
+
+        new_run = ValidationRun.objects.get(pk=self.run_id)
+        assert response.status_code == 200
+        assert len(self.test_user.copied_runs.all()) == 1
+
+        # wrong method
+        body = {'add_validation': True}
+        response = self.client.patch(add_validation_url, body,  format='json')
+        print(response)
+
+        assert response.status_code == 405
+        assert len(self.test_user.copied_runs.all()) == 1
