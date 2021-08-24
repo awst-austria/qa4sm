@@ -409,14 +409,24 @@ class TestModifyValidationView(TestCase):
         response = self.client.post(add_validation_url, body, format='json')
 
         assert response.status_code == 200
-        assert len(self.test_user.copied_runs.all()) == 1 # still one, the validation is already there
+        assert len(self.test_user.copied_runs.all()) == 1  # still one, the validation is already there
+
+        # trying to add as another user - should be possible ==============
+        self.client.login(**self.alt_data)
+
+        body = {'add_validation': True}
+        response = self.client.post(add_validation_url, body, format='json')
+
+        assert response.status_code == 200
+        assert len(self.test_user.copied_runs.all()) == 1  # should be one
 
     def test_remove_validation(self):
+        add_validation_url = reverse('Add validation', kwargs={'result_uuid': self.run_id})
         remove_validation_url = reverse('Remove validation', kwargs={'result_uuid': self.run_id})
 
         # first a validation has to be added
         body = {'add_validation': True}
-        self.client.post(reverse('Add validation', kwargs={'result_uuid': self.run_id}), body, format='json')
+        self.client.post(add_validation_url, body, format='json')
 
         # wrong method =========================================================================
         body = {'remove_validation': True}
@@ -452,3 +462,56 @@ class TestModifyValidationView(TestCase):
         response = self.client.post(remove_validation_url, body, format='json')
 
         assert response.status_code == 200
+
+        # another user
+        self.client.login(**self.alt_data)
+
+        body = {'add_validation': True}
+        self.client.post(add_validation_url, body, format='json')
+
+        body = {'remove_validation': True}
+        response = self.client.post(remove_validation_url, body, format='json')
+
+        assert response.status_code == 200
+        assert len(self.test_user.copied_runs.all()) == 0
+
+    def test_delete_result(self):
+        delete_validation_url = reverse('Delete validation', kwargs={'result_uuid': self.run_id})
+
+        # published validation - can not be removed
+        self.run.doi = '19282843'
+        self.run.save()
+
+        response = self.client.delete(delete_validation_url)
+
+        assert response.status_code == 405
+        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+
+        self.run.doi = ''
+        self.run.save()
+
+        # someone else's validation
+        self.client.login(**self.alt_data)
+        response = self.client.delete(delete_validation_url)
+
+        assert response.status_code == 403
+        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+
+        # non-existing validation
+        self.client.login(**self.auth_data)  # getting back to the right user
+        response = self.client.delete(reverse('Delete validation', kwargs={'result_uuid': self.wrong_id}))
+
+        assert response.status_code == 404
+        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+
+        # wrong method
+        response = self.client.post(delete_validation_url)
+
+        assert response.status_code == 405
+        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+
+        # finally should work
+        response = self.client.delete(delete_validation_url)
+
+        assert response.status_code == 200
+        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 0  # not there anymore
