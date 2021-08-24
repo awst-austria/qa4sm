@@ -101,6 +101,7 @@ pip install pytesmo
 pip install ismn
 pip install requests
 pip install "qa4sm-reader>=0.3.4,<0.5"
+pip install qa4sm-preprocessing
 
 cd $TEMP_DIR
 
