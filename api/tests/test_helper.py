@@ -5,9 +5,9 @@ from django.contrib.auth import get_user_model
 from validator.models import Dataset, DatasetVersion, DatasetConfiguration, ValidationRun, DataVariable, DataFilter, \
     ParametrisedFilter
 from dateutil.tz import tzlocal
-from datetime import datetime
+from datetime import datetime, timedelta
 from pytz import UTC
-
+from pytz import utc
 from validator.validation import OUTPUT_FOLDER
 
 User = get_user_model()
@@ -149,6 +149,20 @@ def default_parameterized_validation_to_be_run(user, tcol=False):
 
     return run
 
+
+def create_default_validation_without_running(user, tcol=False):
+    run = default_parameterized_validation_to_be_run(user, tcol)
+    run.start_time = datetime.utcnow().replace(tzinfo=utc) - timedelta(hours=1)
+    run.end_time = datetime.utcnow().replace(tzinfo=utc)
+    run.total_points = 30
+    run.error_points = 5
+    run.anomalies = 'climatology'
+    run.anomalies_from = datetime(1990, 1, 1, 0, 0, tzinfo=UTC)
+    run.anomalies_to = datetime(2010, 12, 31, 23, 59, 59, tzinfo=UTC)
+    run.output_file.name = str(run.id) + '/foobar.nc'
+    run.save()
+
+    return run
 
 def delete_run(run):
     # delete output of test validations, clean up after ourselves
