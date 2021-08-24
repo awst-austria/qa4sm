@@ -411,3 +411,44 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
         assert len(self.test_user.copied_runs.all()) == 1 # still one, the validation is already there
 
+    def test_remove_validation(self):
+        remove_validation_url = reverse('Remove validation', kwargs={'result_uuid': self.run_id})
+
+        # first a validation has to be added
+        body = {'add_validation': True}
+        self.client.post(reverse('Add validation', kwargs={'result_uuid': self.run_id}), body, format='json')
+
+        # wrong method =========================================================================
+        body = {'remove_validation': True}
+        response = self.client.patch(remove_validation_url, body, format='json')
+
+        assert response.status_code == 405
+        assert len(self.test_user.copied_runs.all()) == 1
+
+        # wrong id =========================================================================
+        body = {'remove_validation': True}
+        response = self.client.post(reverse('Remove validation', kwargs={'result_uuid': self.wrong_id}), body,
+                                    format='json')
+
+        assert response.status_code == 404
+        assert len(self.test_user.copied_runs.all()) == 1
+
+        # wrong parameter =========================================================================
+        body = {'remove_validation': False}
+        response = self.client.post(remove_validation_url, body, format='json')
+
+        assert response.status_code == 400
+        assert len(self.test_user.copied_runs.all()) == 1
+
+        # everything ok =========================================================================
+        body = {'remove_validation': True}
+        response = self.client.post(remove_validation_url, body, format='json')
+
+        assert response.status_code == 200
+        assert len(self.test_user.copied_runs.all()) == 0
+
+        # trying to remove it the second time, it doesn't raise an error ============================
+        body = {'remove_validation': True}
+        response = self.client.post(remove_validation_url, body, format='json')
+
+        assert response.status_code == 200
