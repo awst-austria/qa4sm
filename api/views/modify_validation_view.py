@@ -109,7 +109,7 @@ def publish_result(request, result_uuid):
     publishing_form = patch_params['publishing_form']
 
     # check we've got the action set correctly
-    if type(publish) != bool:
+    if type(publish) != bool or not publish:
         return HttpResponse("Wrong action parameter.", status=400)
 
     # check that the publication parameters are valid
