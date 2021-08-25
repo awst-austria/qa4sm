@@ -27,8 +27,11 @@ def get_results(request):
     file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
     if file_type == 'netCDF':
         filename = file_path + validation.output_file_name
-    else:
+    elif file_path == 'graphics':
         filename = file_path + 'graphs.zip'
+    else:
+        return HttpResponse('No file type given', status=404)
+
     file_wrapper = FileWrapper(open(filename, 'rb'))
     file_mimetype = mimetypes.guess_type(filename)
     response = HttpResponse(file_wrapper, content_type=file_mimetype)
