@@ -23,11 +23,12 @@ from validator.validation import get_inspection_table, get_dataset_combis_and_me
 def get_results(request):
     validation_id = request.query_params.get('validationId', None)
     file_type = request.query_params.get('fileType', None)
+    print('halo halo', file_type == 'graphics')
     validation = get_object_or_404(ValidationRun, pk=validation_id)
     file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
     if file_type == 'netCDF':
         filename = file_path + validation.output_file_name
-    elif file_path == 'graphics':
+    elif file_type == 'graphics':
         filename = file_path + 'graphs.zip'
     else:
         return HttpResponse('No file type given', status=404)
