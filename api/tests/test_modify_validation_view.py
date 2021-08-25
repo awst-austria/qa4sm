@@ -39,7 +39,6 @@ class TestModifyValidationView(TestCase):
         self.run.save()
         self.run_id = self.run.id
         self.wrong_id = 'f0000000-a000-b000-c000-d00000000000'
-        # val.run_validation(self.run_id)
 
     def test_stop_validation(self):
         # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
