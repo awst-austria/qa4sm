@@ -21,6 +21,9 @@ class TestDataFilterView(TestCase):
         self.client = APIClient()
         self.client.login(**self.auth_data)
 
+        self.run = create_default_validation_without_running(self.test_user)
+        self.run.save()
+
     def test_data_filter(self):
         # all filters
         data_filter_url = reverse('Dataset filters')
@@ -54,11 +57,11 @@ class TestDataFilterView(TestCase):
     def test_data_parameterized_filters(self):
         param_filter_url = reverse('Parameterised filter')
         # here I need a validation to check if there are actually parameterised filters
-        run = default_parameterized_validation_to_be_run(self.test_user)
-        run.save()
-        run_id = run.id
-        val.run_validation(run_id)
-        new_run = ValidationRun.objects.get(pk=run_id)
+        # run = default_parameterized_validation_to_be_run(self.test_user)
+        # run.save()
+        # run_id = run.id
+        val.run_validation(self.run_id)
+        new_run = ValidationRun.objects.get(pk=self.run.id)
 
         # all filters
         response = self.client.get(param_filter_url)
@@ -72,5 +75,3 @@ class TestDataFilterView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 2
 
-        # cleaning up
-        delete_run(new_run)

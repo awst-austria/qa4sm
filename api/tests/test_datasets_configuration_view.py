@@ -19,15 +19,11 @@ class TestDatasetConfigurationView(TestCase):
         self.client = APIClient()
         self.client.login(**self.auth_data)
 
+        self.run = create_default_validation_without_running(self.test_user)
+        self.run.save()
+
     def test_dataset_configuration(self):
         # Within this test I test both views: dataset_configuration and dataset_configuration_by_dataset,
-        # it's done this way to avoid running a new validation twice
-
-        # here I need a validation to check if there are actually any configurations
-        run = default_parameterized_validation_to_be_run(self.test_user)
-        run.save()
-        run_id = run.id
-        val.run_validation(run_id)
 
         dataset_configuration_url = reverse('Configuration')
         # dataset_configuration view
@@ -37,7 +33,7 @@ class TestDatasetConfigurationView(TestCase):
             response.json()) == 2  # there should be 2, because there was only one validation with 2 datasets used
 
         # dataset_configuration_by_dataset
-        response = self.client.get(f'{dataset_configuration_url}/{run_id}')
+        response = self.client.get(f'{dataset_configuration_url}/{self.run.id}')
         assert response.status_code == 200
         assert len(response.json()) == 2  # there should be 2, there are 2 datasets in this validation
 
@@ -53,4 +49,3 @@ class TestDatasetConfigurationView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 2
 
-        delete_run(ValidationRun.objects.get(pk=run_id))
