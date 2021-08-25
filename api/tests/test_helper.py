@@ -164,6 +164,7 @@ def create_default_validation_without_running(user, tcol=False):
 
     return run
 
+
 def delete_run(run):
     # delete output of test validations, clean up after ourselves
     try:
