@@ -49,3 +49,6 @@ class TestDatasetConfigurationView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 2
 
+        response = self.client.get(f'{dataset_configuration_url}/{self.run.id}')
+        assert response.status_code == 200
+        assert len(response.json()) == 2  # there should be 2, there are 2 datasets in this validation
