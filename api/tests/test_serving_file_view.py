@@ -1,12 +1,8 @@
-import io
 import logging
 import shutil
 import time
-from os import path
 
-import pytest
 from django.conf import settings
-from django.test.utils import override_settings
 from django.urls import reverse
 
 import validator.validation as val
@@ -14,10 +10,6 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from api.tests.test_helper import *
-from validator.forms import PublishingForm
-from validator.models import ValidationRun
-from dateutil import parser
-import netCDF4 as nc
 from validator.validation import mkdir_if_not_exists, set_outfile
 
 User = get_user_model()
