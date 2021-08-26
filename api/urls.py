@@ -12,7 +12,7 @@ from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
 from api.views.validation_config_view import start_validation, get_validation_configuration
 from api.views.uptime_view import uptime_ping, get_uptime
-from api.views.user_view import users, signup_post, user_modify
+from api.views.user_view import signup_post, user_update, user_delete, users
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs, \
     custom_tracked_validation_runs, get_summary_statistics, get_publishing_form, copy_validation_results
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
@@ -49,9 +49,8 @@ urlpatterns = [
     #   GOOD:  path('my-new-endpoint', my_new_view, name='fancy stuff'),
     #   WRONG: path('my-new-endpoint/', my_new_view, name='fancy stuff'),
     #
-    url(r'^test$', users),
+    url(r'^test$', users), # are we using this one somehow?
     url(r'^path_test/(?P<username>.+)$', path_var_get),
-    path('user', users, name='Users'),
     path('auth/login', api_login, name='api-login'), # checked
     path('auth/logout', api_logout, name='api-logout'),
     path('dataset', dataset, name='Datasets'),
@@ -92,7 +91,8 @@ urlpatterns = [
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'), # checked
     path('country-list', get_list_of_countries, name = 'List of countries'), # checked
     path('sign-up', signup_post, name='Sign up'),
-    path('user-modify', user_modify, name='User update'),
+    path('user-update', user_update, name='User update'),
+    path('user-delete', user_delete, name='User delete'),
     path('settings', settings, name="Settings"),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),  # checked
     path('publishing-form', get_publishing_form, name='Get publishing form'),

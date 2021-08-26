@@ -22,6 +22,7 @@ def _get_querydict_from_user_data(request, userdata):
     return user_data_dict
 
 
+# this view is used only for a test path, the question is if we should use it
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def users(request):
@@ -53,37 +54,41 @@ def signup_post(request):
         return response
 
 
-@api_view(['PATCH', 'DELETE'])
+@api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
-def user_modify(request):
+def user_update(request):
     # this one serves for both, updating and deactivating user
-    if request.method == 'PATCH':
-        new_user_data = _get_querydict_from_user_data(request, request.data)
-        form = UserProfileForm(new_user_data, instance=request.user)
-        if form.is_valid():
-            current_password_hash = request.user.password
-            newuser = form.save(commit=False)
+    # if request.method == 'PATCH':
+    new_user_data = _get_querydict_from_user_data(request, request.data)
+    form = UserProfileForm(new_user_data, instance=request.user)
+    if form.is_valid():
+        current_password_hash = request.user.password
+        newuser = form.save(commit=False)
 
-            if form.cleaned_data['password1'] == '':
-                newuser.password = current_password_hash
+        if form.cleaned_data['password1'] == '':
+            newuser.password = current_password_hash
 
-            newuser.save()
-            update_session_auth_hash(request, newuser)
-            keys_to_remove = ['password1', 'password2', 'csrfmiddlewaretoken', 'terms_consent']
-            for key in keys_to_remove:
-                del form.data[key]
-            response = JsonResponse(form.data, status=200)
-        else:
-            errors = form.errors.get_json_data()
-            response = JsonResponse(errors, status=400, safe=False)
-        return response
-    elif request.method == 'DELETE':
-        request.user.is_active = False
-        request.user.save()
-        send_user_account_removal_request(request.user)
-        send_user_status_changed(request.user, False)
-        logout(request)
-        return HttpResponse(status=200)
+        newuser.save()
+        update_session_auth_hash(request, newuser)
+        keys_to_remove = ['password1', 'password2', 'csrfmiddlewaretoken', 'terms_consent']
+        for key in keys_to_remove:
+            del form.data[key]
+        response = JsonResponse(form.data, status=200)
+    else:
+        errors = form.errors.get_json_data()
+        response = JsonResponse(errors, status=400, safe=False)
+    return response
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def user_delete(request):
+    request.user.is_active = False
+    request.user.save()
+    send_user_account_removal_request(request.user)
+    send_user_status_changed(request.user, False)
+    logout(request)
+    return HttpResponse(status=200)
 
 
 class UserSerializer(ModelSerializer):
