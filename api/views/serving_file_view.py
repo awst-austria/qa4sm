@@ -66,8 +66,17 @@ def get_csv_with_statistics(request):
 def get_metric_names_and_associated_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
-    files = os.listdir(file_path)
+    try:
+        file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+    except AttributeError:
+        return JsonResponse({'message': 'Given validation has no output directory assigned'}, status=404)
+
+    try:
+        files = os.listdir(file_path)
+        if len(files) == 0:
+            return JsonResponse({'message': 'There are no files in the given directory'}, status=404)
+    except FileNotFoundError as e:
+        return JsonResponse({'message': str(e)}, status=404)
 
     pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
     combis = OrderedDict(sorted({**pairs, **triples}.items()))
