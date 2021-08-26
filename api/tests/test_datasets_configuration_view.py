@@ -3,7 +3,6 @@ import logging
 from django.test.utils import override_settings
 from django.urls import reverse
 
-import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
