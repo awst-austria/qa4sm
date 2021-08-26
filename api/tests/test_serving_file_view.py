@@ -36,10 +36,10 @@ class TestServingFileView(TestCase):
         self.run.save()
         self.run_id = self.run.id
         self.wrong_id = 'f0000000-a000-b000-c000-d00000000000'
-
-    def test_get_results(self):
         val.run_validation(self.run_id)
         time.sleep(5)
+
+    def test_get_results(self):
         get_results_url = reverse('Download results')
         # finished_run = ValidationRun.objects.get(pk=self.run_id)
 
@@ -82,5 +82,25 @@ class TestServingFileView(TestCase):
         response = self.client.get(get_results_url+f'?validationId={self.wrong_id}&fileType=graphics')
         assert response.status_code == 404
 
+    def test_get_csv_with_statistics(self):
+        get_csv_url = reverse('Download statistics csv')
 
+        # everything ok
+        response = self.client.get(get_csv_url+f'?validationId={self.run_id}')
+        assert response.status_code == 200
+        assert 'Stats_summary.csv' in response.get('Content-Disposition')
 
+        # wrong ID
+        response = self.client.get(get_csv_url+f'?validationId={self.wrong_id}')
+        assert response.status_code == 404
+
+        # log out the user and check one more time
+        self.client.logout()
+        # everything ok
+        response = self.client.get(get_csv_url+f'?validationId={self.run_id}')
+        assert response.status_code == 200
+        assert 'Stats_summary.csv' in response.get('Content-Disposition')
+
+        # wrong ID
+        response = self.client.get(get_csv_url+f'?validationId={self.wrong_id}')
+        assert response.status_code == 404
