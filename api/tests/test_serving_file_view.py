@@ -185,3 +185,78 @@ class TestServingFileView(TestCase):
         # it doesn't make sense to check it here
 
         delete_run(self.run)
+
+    def test_get_graphic_files(self):
+        get_graphic_files_url = reverse('Get graphic files')
+
+        # no file names provided
+        response = self.client.get(get_graphic_files_url)
+
+        assert response.status_code == 404
+        assert response.json()['message'] == 'No file names given'
+
+        # get static graphic_files
+        files = ['/static/images/home/smos.jpg', '/static/images/logo/logo_awst.png']
+        new_url = get_graphic_files_url + '?'
+        for file_name in files:
+            new_url += 'file=' + file_name + '&'
+        new_url = new_url.rstrip('&')
+
+        response = self.client.get(new_url)
+        assert response.status_code == 200
+        assert len(response.json()) == 2
+
+        # try to get only one file
+        file = '/static/images/home/smos.jpg'
+
+        response = self.client.get(get_graphic_files_url+f'?file={file}')
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        assert type(response.json()) == list
+
+        # log out the user, should work also for any user
+        self.client.logout()
+
+        response = self.client.get(new_url)
+        assert response.status_code == 200
+        assert len(response.json()) == 2
+
+
+    def test_get_graphic_file(self):
+        get_graphic_file_url = reverse('Get graphic file')
+
+        # no file names provided
+        response = self.client.get(get_graphic_file_url)
+
+        assert response.status_code == 404
+        assert response.json()['message'] == 'No file name given'
+
+        # get static graphic_file
+        file = '/static/images/home/smos.jpg'
+
+        response = self.client.get(get_graphic_file_url+f'?file={file}')
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        # try to get many files
+        files = ['/static/images/home/smos.jpg', '/static/images/logo/logo_awst.png']
+        new_url = get_graphic_file_url + '?'
+        for file_name in files:
+            new_url += 'file=' + file_name + '&'
+        new_url = new_url.rstrip('&')
+
+        # still should work, but only the first file will be returned
+        response = self.client.get(new_url)
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        assert type(response.json()) == dict
+
+        # log out the user, should work also for any user
+        self.client.logout()
+
+        response = self.client.get(get_graphic_file_url+f'?file={file}')
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+
+
