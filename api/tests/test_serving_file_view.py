@@ -5,6 +5,7 @@ import time
 from os import path
 
 import pytest
+from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 
@@ -26,7 +27,7 @@ def get_ncfile_name(validation):
     file_name_parts = []
     for ind, dataset_config in enumerate(validation.dataset_configurations.all()):
         file_name_parts.append(str(ind) + '-' + dataset_config.dataset.short_name + '.' + dataset_config.variable.pretty_name)
-    return ' with '.join(file_name_parts)
+    return ' with '.join(file_name_parts) + '.nc'
 
 
 class TestServingFileView(TestCase):
@@ -104,6 +105,8 @@ class TestServingFileView(TestCase):
         response = self.client.get(get_results_url+f'?validationId={self.wrong_id}&fileType=graphics')
         assert response.status_code == 404
 
+        delete_run(self.run)
+
     def test_get_csv_with_statistics(self):
         get_csv_url = reverse('Download statistics csv')
 
@@ -130,10 +133,55 @@ class TestServingFileView(TestCase):
         response = self.client.get(get_csv_url+f'?validationId={self.wrong_id}')
         assert response.status_code == 404
 
+        delete_run(self.run)
+
     def test_get_metric_names_and_associated_files(self):
         get_metric_url = reverse('Get metric and plots names')
 
+        # checking a validation without output file assigned
+        response = self.client.get(get_metric_url+f'?validationId={self.run_id}')
+        assert response.status_code == 404
+        assert response.json()['message'] == 'Given validation has no output directory assigned'
+
+        # assigning an output file - doesn't matter if the name is right, it's needed to create a directory
+        self.run.output_file = str(self.run_id) + '/' + get_ncfile_name(self.run)
+        self.run.save()
+
+        # checking what happens if there is an output file but no directory
+        response = self.client.get(get_metric_url+f'?validationId={self.run_id}')
+        assert response.status_code == 404
+        assert 'No such file or directory' in response.json()['message']
+
+        # create this root and leave it empty
+        file_path = self.run.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+        mkdir_if_not_exists(file_path)
+
+        # check what happens if there is an empty directory
+        response = self.client.get(get_metric_url+f'?validationId={self.run_id}')
+        print(response.json())
+        assert response.status_code == 404
+        assert response.json()['message'] == 'There are no files in the given directory'
+
+        # removing the path
+        if os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+
+        # cleaning output
+        self.run.output_file = ''
+        self.run.save()
+
+        # looking for a non-existing validation
+        response = self.client.get(get_metric_url+f'?validationId={self.wrong_id}')
+        assert response.status_code == 404
+
+        # running the validation to have appropriate files
+        val.run_validation(self.run_id)
+        time.sleep(5)
+
+        # now everything should be ok
         response = self.client.get(get_metric_url+f'?validationId={self.run_id}')
         assert response.status_code == 200
         assert response.json()  # checking only if it's not empty; length depends on the number of metrics we use so
         # it doesn't make sense to check it here
+
+        delete_run(self.run)
