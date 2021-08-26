@@ -83,18 +83,18 @@ urlpatterns = [
     path('add-validation/<uuid:result_uuid>/', add_validation, name='Add validation'), # checked
     path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Remove validation'), # checked
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
-    path('download-result', get_results, name='Download results'),
+    path('download-result', get_results, name='Download results'), # checked
     path('summary-statistics', get_summary_statistics, name='Summary statistics'),
     path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
     path('uptime-ping', uptime_ping),
     path('uptime-report', get_uptime),
-    path('get-graphic-files', get_graphic_files, name='Get graphic file'),
-    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
-    path('country-list', get_list_of_countries, name = 'List of countries'), #checked
+    path('get-graphic-files', get_graphic_files, name='Get graphic files'), # checked
+    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'), # checked
+    path('country-list', get_list_of_countries, name = 'List of countries'), # checked
     path('sign-up', signup_post, name='Sign up'),
     path('user-modify', user_modify, name='User update'),
     path('settings', settings, name="Settings"),
-    path('get-graphic-file', get_graphic_file, name='Get graphic file'),
+    path('get-graphic-file', get_graphic_file, name='Get graphic file'),  # checked
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
 ]
