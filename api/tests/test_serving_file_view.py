@@ -22,6 +22,13 @@ from validator.validation import mkdir_if_not_exists, set_outfile
 User = get_user_model()
 
 
+def get_ncfile_name(validation):
+    file_name_parts = []
+    for ind, dataset_config in enumerate(validation.dataset_configurations.all()):
+        file_name_parts.append(str(ind) + '-' + dataset_config.dataset.short_name + '.' + dataset_config.variable.pretty_name)
+    return ' with '.join(file_name_parts)
+
+
 class TestServingFileView(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
     __logger = logging.getLogger(__name__)
@@ -36,13 +43,28 @@ class TestServingFileView(TestCase):
         self.run.save()
         self.run_id = self.run.id
         self.wrong_id = 'f0000000-a000-b000-c000-d00000000000'
-        val.run_validation(self.run_id)
-        time.sleep(5)
 
     def test_get_results(self):
         get_results_url = reverse('Download results')
-        # finished_run = ValidationRun.objects.get(pk=self.run_id)
 
+        # check what happens if there are no files produced
+        response = self.client.get(get_results_url + f'?validationId={self.run_id}&fileType=netCDF')
+        assert response.status_code == 404
+        assert response.content.decode('UTF-8') == 'Given validation has no output directory assigned'
+
+        self.run.output_file = str(self.run_id) + '/' + get_ncfile_name(self.run)
+        self.run.save()
+
+        response = self.client.get(get_results_url + f'?validationId={self.run_id}&fileType=netCDF')
+        assert response.status_code == 404
+        assert 'No such file or directory' in response.content.decode('UTF-8')
+
+        self.run.output_file = ''
+        self.run.save()
+
+        # run the validation and generate files
+        val.run_validation(self.run_id)
+        time.sleep(5)
         # get netCDF
         response = self.client.get(get_results_url+f'?validationId={self.run_id}&fileType=netCDF')
         assert response.status_code == 200
@@ -104,3 +126,11 @@ class TestServingFileView(TestCase):
         # wrong ID
         response = self.client.get(get_csv_url+f'?validationId={self.wrong_id}')
         assert response.status_code == 404
+
+    def test_get_metric_names_and_associated_files(self):
+        get_metric_url = reverse('Get metric and plots names')
+
+        response = self.client.get(get_metric_url+f'?validationId={self.run_id}')
+        assert response.status_code == 200
+        assert response.json()  # checking only if it's not empty; length depends on the number of metrics we use so
+        # it doesn't make sense to check it here

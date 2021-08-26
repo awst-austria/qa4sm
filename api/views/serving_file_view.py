@@ -23,9 +23,13 @@ from validator.validation import get_inspection_table, get_dataset_combis_and_me
 def get_results(request):
     validation_id = request.query_params.get('validationId', None)
     file_type = request.query_params.get('fileType', None)
-    print('halo halo', file_type == 'graphics')
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+
+    try:
+        file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+    except AttributeError:
+        return HttpResponse('Given validation has no output directory assigned', status=404)
+
     if file_type == 'netCDF':
         filename = file_path + validation.output_file_name
     elif file_type == 'graphics':
@@ -33,7 +37,11 @@ def get_results(request):
     else:
         return HttpResponse('No file type given', status=404)
 
-    file_wrapper = FileWrapper(open(filename, 'rb'))
+    try:
+        file_wrapper = FileWrapper(open(filename, 'rb'))
+    except FileNotFoundError as e:
+        return HttpResponse(e, status=404)
+
     file_mimetype = mimetypes.guess_type(filename)
     response = HttpResponse(file_wrapper, content_type=file_mimetype)
     return response
