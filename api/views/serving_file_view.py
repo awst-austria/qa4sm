@@ -118,6 +118,8 @@ def get_metric_names_and_associated_files(request):
 def get_graphic_files(request):
     # Here we take a list of parameters 'file' and return a list of plots encoded to base64
     files = request.query_params.getlist('file', None)
+    if not files:
+        return JsonResponse({'message': 'No file names given'}, status=404, safe=False)
     plots = []
     for file in files:
         if '/static/' in file:
@@ -136,6 +138,8 @@ def get_graphic_file(request):
     # Here we take only one file and return one plot;
     # Sometimes it's just easier to read a single file, and this function is created not to refer to index 0 every time
     file = request.query_params.get('file', None)
+    if not file:
+        return JsonResponse({'message': 'No file name given'}, status=404, safe=False)
     if '/static/' in file:
         file = file.replace('/static/', os.path.join(settings.BASE_DIR, 'validator/static/'))
     open_file = open(file, 'rb')
