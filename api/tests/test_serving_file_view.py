@@ -107,6 +107,9 @@ class TestServingFileView(TestCase):
     def test_get_csv_with_statistics(self):
         get_csv_url = reverse('Download statistics csv')
 
+        val.run_validation(self.run_id)
+        time.sleep(5)
+
         # everything ok
         response = self.client.get(get_csv_url+f'?validationId={self.run_id}')
         assert response.status_code == 200
