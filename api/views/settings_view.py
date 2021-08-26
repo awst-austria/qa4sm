@@ -9,11 +9,12 @@ from validator.models import Settings
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def settings(request):
-    settings = Settings.objects.all()
-    serializer = SettingsSerializer(settings, many=True)
+    settings_model = Settings.objects.all()
+    serializer = SettingsSerializer(settings_model, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK,
                         safe=False)
+
 
 class SettingsSerializer(ModelSerializer):
     class Meta:
