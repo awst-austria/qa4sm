@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {DatasetVersionDto} from './dataset-version.dto';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {shareReplay} from 'rxjs/operators';
 import {DataCache} from '../../tools/DataCache';
 
@@ -48,8 +48,8 @@ export class DatasetVersionService {
     if (this.singleRequestCache.isCached(versionId)) {
       return this.singleRequestCache.get(versionId);
     } else {
-      const params = new HttpParams().set('version_id', String(versionId));
-      const datasetVersion$ = this.httpClient.get<DatasetVersionDto>(DATASET_VERSION_URL, {params}).pipe(shareReplay());
+      const getURL = DATASET_VERSION_URL + '/' + versionId;
+      const datasetVersion$ = this.httpClient.get<DatasetVersionDto>(getURL).pipe(shareReplay());
       this.singleRequestCache.push(versionId, datasetVersion$);
       return datasetVersion$;
     }
