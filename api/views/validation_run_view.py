@@ -1,5 +1,3 @@
-import os
-import netCDF4
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 from django.http import JsonResponse, HttpResponse
@@ -64,14 +62,6 @@ def my_results(request):
     response = {'validations': serializer.data, 'length': len(val_runs)}
 
     return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def validation_runs(request, **kwargs):
-    val_runs = ValidationRun.objects.all()
-    serializer = ValidationRunSerializer(val_runs, many=True)
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])

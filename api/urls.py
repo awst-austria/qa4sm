@@ -13,7 +13,7 @@ from api.views.path_var_test_endpoint import path_var_get
 from api.views.validation_config_view import start_validation, get_validation_configuration
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import signup_post, user_update, user_delete, users
-from api.views.validation_run_view import published_results, my_results, validation_run_by_id, validation_runs, \
+from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
     custom_tracked_validation_runs, get_summary_statistics, get_publishing_form, copy_validation_results
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
 from api.views.global_params_view import global_params
@@ -53,16 +53,15 @@ urlpatterns = [
     url(r'^path_test/(?P<username>.+)$', path_var_get),
     path('auth/login', api_login, name='api-login'), # checked
     path('auth/logout', api_logout, name='api-logout'),
-    path('dataset', dataset, name='Datasets'),
-    url(r'^dataset/(?P<id>.+)$', dataset_by_id),
-    path('dataset-version', dataset_version, name='Dataset version'), # checked
-    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id), # checked
+    path('dataset', dataset, name='Datasets'),  # checked
+    url(r'^dataset/(?P<id>.+)$', dataset_by_id),  # checked
+    path('dataset-version', dataset_version, name='Dataset version'),  # checked
+    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id),  # checked
     url(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset version by dataset'), # checked
     path('dataset-variable', dataset_variable, name='Dataset variable'), # checked
     url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id), # checked
     url(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset_variable_by_dataset'),
     path('published-results', published_results, name='Published results'),
-    path('validation-runs', validation_runs, name='All validation runs (results)'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id),
     path('dataset-configuration', dataset_configuration, name='Configuration'), # checked
     url(r'^dataset-configuration/(?P<dataset_id>.+)$', dataset_configuration_by_dataset, name='Configuration'), # checked
@@ -71,7 +70,7 @@ urlpatterns = [
     path('globals', global_params, name='Global context'), # checked
     path('my-results', my_results, name='My results'),
     url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
-    path('validation-configuration', start_validation, name='Run new validation'),
+    path('validation-configuration', start_validation, name='Run new validation'), # checked
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),  # checked
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),  # checked
     path('delete-validation/<uuid:result_uuid>/', delete_result, name='Delete validation'),  # checked
@@ -90,9 +89,9 @@ urlpatterns = [
     path('get-graphic-files', get_graphic_files, name='Get graphic files'), # checked
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'), # checked
     path('country-list', get_list_of_countries, name = 'List of countries'), # checked
-    path('sign-up', signup_post, name='Sign up'),
+    path('sign-up', signup_post, name='Sign up'), # checked
     path('user-update', user_update, name='User update'),
-    path('user-delete', user_delete, name='User delete'),
+    path('user-delete', user_delete, name='User delete'), #checked
     path('settings', settings, name="Settings"),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),  # checked
     path('publishing-form', get_publishing_form, name='Get publishing form'),
