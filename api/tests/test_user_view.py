@@ -21,10 +21,6 @@ class TestUserView(TestCase):
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()
         self.client = APIClient()
-        # self.client.login(**self.auth_data)
-
-        # self.run = create_default_validation_without_running(self.test_user)
-        # self.run.save()
 
     def test_signup_post(self):
         signup_url = reverse('Sign up')
@@ -233,7 +229,7 @@ class TestUserView(TestCase):
             'username': self.auth_data['username'],
             'password1': '',
             'password2': '',
-            'email': 'geralt@awst.at',
+            'email': '',
             'first_name': '',
             'last_name': '',
             'organisation': '',
@@ -251,7 +247,7 @@ class TestUserView(TestCase):
             'username': self.auth_data['username'],
             'password1': '',
             'password2': '',
-            'email': '',
+            'email': 'geralt@awst.at',
             'first_name': '',
             'last_name': '',
             'organisation': '',
@@ -264,3 +260,18 @@ class TestUserView(TestCase):
         assert response.status_code == 400
         assert User.objects.get(username=self.auth_data['username']).orcid == ''  # still the same email
 
+    def test_user_delete(self):
+        user_delete_url = reverse('User delete')
+        # log in
+        self.client.login(**self.auth_data)
+        # check if the user is active
+        assert self.test_user.is_active
+        # send delete request
+        response = self.client.delete(user_delete_url)
+        # refresh the user
+        self.test_user.refresh_from_db()
+
+        assert response.status_code == 200
+        assert not self.test_user.is_active  # user is not active anymore
+        assert not self.client.login(**self.auth_data)  # and they can not login
+        assert User.objects.get(username=self.auth_data['username']) # but the account still exists
