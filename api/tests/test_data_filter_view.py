@@ -22,6 +22,7 @@ class TestDataFilterView(TestCase):
 
         self.run = create_default_validation_without_running(self.test_user)
         self.run.save()
+        self.run_id = self.run.id
 
     def test_data_filter(self):
         # all filters
@@ -55,12 +56,8 @@ class TestDataFilterView(TestCase):
 
     def test_data_parameterized_filters(self):
         param_filter_url = reverse('Parameterised filter')
-        # here I need a validation to check if there are actually parameterised filters
-        # run = default_parameterized_validation_to_be_run(self.test_user)
-        # run.save()
-        # run_id = run.id
+
         val.run_validation(self.run_id)
-        new_run = ValidationRun.objects.get(pk=self.run.id)
 
         # all filters
         response = self.client.get(param_filter_url)
