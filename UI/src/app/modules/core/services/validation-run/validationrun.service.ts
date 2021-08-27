@@ -54,10 +54,6 @@ export class ValidationrunService {
     return this.customValidationrun$;
   }
 
-  getValidationRuns(): Observable<ValidationrunDto[]> {
-    return this.httpClient.get<ValidationrunDto[]>(validationRunsUrl);
-  }
-
   getValidationRunById(id: string): Observable<ValidationrunDto> {
     return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
   }
