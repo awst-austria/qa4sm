@@ -1,3 +1,5 @@
+import os
+import netCDF4
 from datetime import datetime
 import logging
 from os import path
@@ -22,7 +24,7 @@ import pytz
 
 from valentina.celery import app
 from validator.mailer import send_val_done_notification
-from validator.models import CeleryTask, DatasetConfiguration
+from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs
 from validator.validation.filters import setup_filtering
@@ -32,6 +34,7 @@ from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 from api.frontend_urls import get_angular_url
+from shutil import copy2
 
 
 __logger = logging.getLogger(__name__)
@@ -564,4 +567,91 @@ def compare_validation_runs(new_run, runs_set, user):
         'belongs_to_user': old_user == user,
         'is_published': is_published
         }
+    return response
+
+
+def copy_validationrun(run_to_copy, new_user):
+    # checking if the new validation belongs to the same user:
+    if run_to_copy.user == new_user:
+        run_id = run_to_copy.id
+        # belongs_to_user = True
+    else:
+        # copying validation
+        valrun_user = CopiedValidations(used_by_user=new_user, original_run=run_to_copy)
+        valrun_user.save()
+
+        # old info which is needed then
+        old_scaling_ref_id = run_to_copy.scaling_ref_id
+        old_val_id = str(run_to_copy.id)
+
+        dataset_conf = run_to_copy.dataset_configurations.all()
+
+        run_to_copy.user = new_user
+        run_to_copy.id = None
+        run_to_copy.start_time = datetime.now(tzlocal())
+        run_to_copy.end_time = datetime.now(tzlocal())
+        run_to_copy.save()
+        run_id = run_to_copy.id
+
+        # adding the copied validation to the copied validation list
+        valrun_user.copied_run = run_to_copy
+        valrun_user.save()
+
+        # new configuration
+        for conf in dataset_conf:
+            old_id = conf.id
+            old_filters = conf.filters.all()
+            old_param_filters = conf.parametrisedfilter_set.all()
+
+            # setting new scaling reference id
+            if old_id == old_scaling_ref_id:
+                run_to_copy.scaling_ref_id = conf.id
+
+            new_conf = conf
+            new_conf.pk = None
+            new_conf.validation = run_to_copy
+            new_conf.save()
+
+            # setting filters
+            new_conf.filters.set(old_filters)
+            if len(old_param_filters) != 0:
+                for param_filter in old_param_filters:
+                    param_filter.id = None
+                    param_filter.dataset_config = new_conf
+                    param_filter.save()
+
+        # the reference configuration is always the last one:
+        try:
+            run_to_copy.reference_configuration_id = conf.id
+            run_to_copy.save()
+        except:
+            pass
+
+        # copying files
+        # new directory -> creating if doesn't exist
+        new_dir = os.path.join(OUTPUT_FOLDER, str(run_id))
+        mkdir_if_not_exists(new_dir)
+        # old directory and all files there
+        old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
+        old_files = os.listdir(old_dir)
+
+        if len(old_files) != 0:
+            for file_name in old_files:
+                new_file = new_dir + '/' + file_name
+                old_file = old_dir + '/' + file_name
+                copy2(old_file, new_file)
+                if '.nc' in new_file:
+                    run_to_copy.output_file = str(run_id) + '/' + file_name
+                    run_to_copy.save()
+                    file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
+
+                    # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
+                    new_url = settings.SITE_URL + get_angular_url('result', run_id)
+                    file.setncattr('url', new_url)
+                    file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
+                    file.close()
+
+    response = {
+        'run_id': run_id,
+    }
     return response

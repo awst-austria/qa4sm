@@ -13,7 +13,7 @@ from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from validator.validation.validation import compare_validation_runs
+from validator.validation.validation import compare_validation_runs, copy_validationrun
 
 User = get_user_model()
 from django.test import TestCase
@@ -39,7 +39,6 @@ import validator.validation as val
 from validator.validation.batches import _geographic_subsetting
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-from api.views.validation_run_view import _copy_validationrun
 from django.shortcuts import get_object_or_404
 from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
 
@@ -1615,7 +1614,7 @@ class TestValidation(TestCase):
         run_id = run.id
         val.run_validation(run_id)
         new_run = get_object_or_404(ValidationRun, pk=run_id)
-        copied_run_info = _copy_validationrun(new_run, self.testuser)
+        copied_run_info = copy_validationrun(new_run, self.testuser)
         assert copied_run_info['run_id'] == run_id
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
@@ -1629,7 +1628,7 @@ class TestValidation(TestCase):
         assert not comparison['belongs_to_user']
         assert not comparison['is_published']
 
-        copied_run_info = _copy_validationrun(new_run, self.testuser2)
+        copied_run_info = copy_validationrun(new_run, self.testuser2)
         assert copied_run_info['run_id'] != run.id
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
@@ -1648,7 +1647,7 @@ class TestValidation(TestCase):
 
         # copying again, so to check CopiedValidations model
         new_run = get_object_or_404(ValidationRun, pk=run_id)
-        _copy_validationrun(new_run, self.testuser2)
+        copy_validationrun(new_run, self.testuser2)
 
         # checking if saving to CopiedValidations model is correct (should be 2, because the first validation was
         # returned the same, and only the second and the third one were copied:
