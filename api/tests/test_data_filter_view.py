@@ -1,6 +1,5 @@
 import logging
 
-from django.test.utils import override_settings
 from django.urls import reverse
 
 import validator.validation as val
@@ -9,8 +8,6 @@ from rest_framework.test import APIClient
 from api.tests.test_helper import *
 
 
-@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
-                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestDataFilterView(TestCase):
     __logger = logging.getLogger(__name__)
     fixtures = ['datasets', 'filters', 'versions', 'variables']
