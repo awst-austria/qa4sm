@@ -22,11 +22,11 @@ import pytz
 
 from valentina.celery import app
 from validator.mailer import send_val_done_notification
-from validator.models import CeleryTask
+from validator.models import CeleryTask, DatasetConfiguration
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -395,6 +395,7 @@ def run_validation(validation_id):
 
     return validation_run
 
+
 def stop_running_validation(validation_id):
     __logger.info("Stopping validation {} ".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
@@ -406,3 +407,161 @@ def stop_running_validation(validation_id):
     for task in celery_tasks:
         app.control.revoke(task.celery_task_id)  # @UndefinedVariable
         task.delete()
+
+
+def _compare_param_filters(new_param_filters, old_param_filters):
+    """
+    Checking if parametrised filters are the same for given configuration, checks till finds the first failure
+    or till the end of the list.
+
+    If lengths of queries do not agree then return False.
+    """
+    if len(new_param_filters) != len(old_param_filters):
+        return False
+    else:
+        ind = 0
+        max_ind = len(new_param_filters)
+        is_the_same = True
+        while ind < max_ind and new_param_filters[ind].parameters == old_param_filters[ind].parameters:
+            ind += 1
+        if ind != len(new_param_filters):
+            is_the_same = False
+
+    return is_the_same
+
+
+def _compare_filters(new_dataset, old_dataset):
+    """
+    Checking if filters are the same for given configuration, checks till finds the first failure or till the end
+     of the list. If filters are the same, then parameterised filters are checked.
+
+    If lengths of queries do not agree then return False.
+    """
+
+    new_run_filters = new_dataset.filters.all().order_by('name')
+    old_run_filters = old_dataset.filters.all().order_by('name')
+    new_filts_len = len(new_run_filters)
+    old_filts_len = len(old_run_filters)
+
+    if new_filts_len != old_filts_len:
+        return False
+    elif new_filts_len == old_filts_len == 0:
+        is_the_same = True
+        new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
+        if len(new_param_filters) != 0:
+            old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
+            is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
+        return is_the_same
+    else:
+        filt_ind = 0
+        max_filt_ind = new_filts_len
+
+        while filt_ind < max_filt_ind and new_run_filters[filt_ind] == old_run_filters[filt_ind]:
+            filt_ind += 1
+
+        if filt_ind == max_filt_ind:
+            is_the_same = True
+            new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
+            if len(new_param_filters) != 0:
+                old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
+                is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
+        else:
+            is_the_same = False
+    return is_the_same
+
+
+def _compare_datasets(new_run_config, old_run_config):
+    """
+    Takes queries of dataset configurations and compare datasets one by one. If names and versions agree,
+    checks filters.
+
+    Runs till the first failure or til the end of the configuration list.
+    If lengths of queries do not agree then return False.
+    """
+    new_len = len(new_run_config)
+
+    if len(old_run_config) != new_len:
+        return False
+    else:
+        ds_fields = DS_FIELDS
+        max_ds_ind = len(ds_fields)
+        the_same = True
+        conf_ind = 0
+
+        while conf_ind < new_len and the_same:
+            ds_ind = 0
+            new_dataset = new_run_config[conf_ind]
+            old_dataset = old_run_config[conf_ind]
+            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
+                ds_ind += 1
+            if ds_ind == max_ds_ind:
+                the_same = _compare_filters(new_dataset, old_dataset)
+            else:
+                the_same = False
+            conf_ind += 1
+    return the_same
+
+
+def _check_scaling_method(new_run, old_run):
+    """
+    It takes two validation runs and compares scaling method together with the scaling reference dataset.
+
+    """
+    new_run_sm = new_run.scaling_method
+    if new_run_sm != old_run.scaling_method:
+        return False
+    else:
+        if new_run_sm != 'none':
+            try:
+                new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
+                run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
+                if new_scal_ref != run_scal_ref:
+                    return False
+            except:
+                return False
+    return True
+
+
+def compare_validation_runs(new_run, runs_set, user):
+    """
+    Compares two validation runs. It takes a new_run and checks the query given by runs_set according to parameters
+    given in the vr_fileds. If all fields agree it checks datasets configurations.
+
+    It works till the first found validation run or till the end of the list.
+
+    Returns a dict:
+         {
+        'is_there_validation': is_the_same,
+        'val_id': val_id
+        }
+        where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
+    """
+    vr_fields = VR_FIELDS
+    is_the_same = False # set to False because it looks for the first found validation run
+    is_published = False
+    old_user = None
+    max_vr_ind = len(vr_fields)
+    max_run_ind = len(runs_set)
+    run_ind = 0
+    while not is_the_same and run_ind < max_run_ind:
+        run = runs_set[run_ind]
+        ind = 0
+        while ind < max_vr_ind and getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]):
+            ind += 1
+        if ind == max_vr_ind and _check_scaling_method(new_run, run):
+            new_run_config = DatasetConfiguration.objects.filter(validation=new_run).order_by('dataset')
+            old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
+            is_the_same = _compare_datasets(new_run_config, old_run_config)
+            val_id = run.id
+            is_published = run.doi != ''
+            old_user = run.user
+        run_ind += 1
+
+    val_id = None if not is_the_same else val_id
+    response = {
+        'is_there_validation': is_the_same,
+        'val_id': val_id,
+        'belongs_to_user': old_user == user,
+        'is_published': is_published
+        }
+    return response
