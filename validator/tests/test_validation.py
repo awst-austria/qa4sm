@@ -13,7 +13,7 @@ from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from validator.validation.validation import _compare_validation_runs
+from validator.validation.validation import compare_validation_runs
 
 User = get_user_model()
 from django.test import TestCase
@@ -39,7 +39,6 @@ import validator.validation as val
 from validator.validation.batches import _geographic_subsetting
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-from api.views.validation_config_view import compare_validation_runs
 from api.views.validation_run_view import _copy_validationrun
 from django.shortcuts import get_object_or_404
 from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
