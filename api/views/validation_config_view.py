@@ -28,7 +28,6 @@ def start_validation(request):
     new_val_run.user = request.user
     new_val_run.save()
 
-    connections.close_all()
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 
@@ -42,6 +41,7 @@ def start_validation(request):
             response = JsonResponse(comparison_pub, status=status.HTTP_200_OK, safe=False)
             return response
 
+    connections.close_all()
     p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
     p.start()
     serializer = ValidationRunSerializer(new_val_run)
