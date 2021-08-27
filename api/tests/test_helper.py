@@ -31,8 +31,8 @@ def create_test_user():
     }
     User.objects.filter(email=user_data['email']).delete()
     test_user = User.objects.create_user(**user_data)
+    test_user.is_active = True
     test_user.save()
-    print(test_user)
     return auth_data, test_user
 
 
