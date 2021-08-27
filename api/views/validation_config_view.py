@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connections
 from django.http import JsonResponse
 from django.utils import timezone
-from numpy.testing._private.parameterized import param
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -21,23 +20,27 @@ from validator.validation.validation import compare_validation_runs
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def start_validation(request):
-    check_for_existing_validation = request.query_params.get('check_for_existing_validation', None)
-    existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file=''). \
-        order_by(Case(When(user=request.user, then=0), default=1), '-start_time')
+    check_for_existing_validation = request.query_params.get('check_for_existing_validation', False)
+
     ser = ValidationConfigurationSerializer(data=request.data)
     ser.is_valid(raise_exception=True)
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
     new_val_run.save()
-    comparison_pub = compare_validation_runs(new_val_run, existing_runs, request.user)
+
     connections.close_all()
-    # print(comparison_pub, comparison_pub['is_there_validation'])
-    if check_for_existing_validation == 'true' and comparison_pub['is_there_validation']:
-        new_val_run.delete()
-        response = JsonResponse(comparison_pub, status=status.HTTP_200_OK, safe=False)
-        return response
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
+
+    if check_for_existing_validation == 'true':
+        existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file=''). \
+            order_by(Case(When(user=request.user, then=0), default=1), '-start_time')
+        comparison_pub = compare_validation_runs(new_val_run, existing_runs, request.user)
+
+        if comparison_pub['is_there_validation']:
+            new_val_run.delete()
+            response = JsonResponse(comparison_pub, status=status.HTTP_200_OK, safe=False)
+            return response
 
     p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
     p.start()
