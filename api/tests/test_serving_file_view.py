@@ -11,7 +11,7 @@ from rest_framework.test import APIClient
 
 from api.tests.test_helper import *
 from validator.validation import mkdir_if_not_exists, set_outfile
-
+from django.test.utils import override_settings
 User = get_user_model()
 
 
@@ -22,6 +22,8 @@ def get_ncfile_name(validation):
     return ' with '.join(file_name_parts) + '.nc'
 
 
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestServingFileView(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
     __logger = logging.getLogger(__name__)
