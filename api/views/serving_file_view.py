@@ -148,3 +148,16 @@ def get_graphic_file(request):
     open_file.close()
 
     return JsonResponse({'plot': name.decode('utf-8')}, safe=True)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_summary_statistics(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
+    # rest of the columns when df rendered as html
+    inspection_table = get_inspection_table(validation).reset_index()
+
+    return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+                                                 index=False))
