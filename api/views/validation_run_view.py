@@ -4,7 +4,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
@@ -53,17 +53,28 @@ def published_results(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def my_results(request):
     current_user = request.user
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
     order = request.query_params.get('order', None)
+    order_list = ['name_tag',
+                  '-name_tag',
+                  'start_time',
+                  '-start_time',
+                  'progress',
+                  '-progress',
+                  'reference_configuration_id__dataset__pretty_name',
+                  '-reference_configuration_id__dataset__pretty_name'
+                  ]
 
-    if order:
+    if order and order in order_list:
         val_runs = ValidationRun.objects.filter(user=current_user).order_by(order)
-    else:
+    elif not order:
         val_runs = ValidationRun.objects.filter(user=current_user)
+    else:
+        return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
     if limit and offset:
         limit = int(limit)
