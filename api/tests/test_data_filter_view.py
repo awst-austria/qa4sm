@@ -1,8 +1,6 @@
 import logging
 
 from django.urls import reverse
-
-import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
@@ -53,8 +51,6 @@ class TestDataFilterView(TestCase):
 
     def test_data_parameterized_filters(self):
         param_filter_url = reverse('Parameterised filter')
-
-        val.run_validation(self.run_id)
 
         # all filters
         response = self.client.get(param_filter_url)
