@@ -142,6 +142,12 @@ class TestValidationRunView(TestCase):
         assert response.status_code == 200
         assert response.json()['name_tag'] == 'A validation'
 
+        # take validation as an anonymous client
+        self.client.logout()
+        response = self.client.get(reverse(validation_run_by_id_url_name, kwargs={'id': self.run.id}))
+        assert response.status_code == 200
+        assert response.json()['name_tag'] == 'B validation'
+
         # try to take non-existing validation:
         response = self.client.get(reverse(validation_run_by_id_url_name, kwargs={'id': self.wrong_id}))
         assert response.status_code == 404
