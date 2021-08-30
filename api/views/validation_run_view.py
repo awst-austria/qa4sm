@@ -37,6 +37,8 @@ def published_results(request):
     else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
+    # both limit and offset are send as string, so the simple if limit and offset condition can be used,
+    # if they were sent as numbers there would be a problem because they both can be 0
     if limit and offset:
         limit = int(limit)
         offset = int(offset)
