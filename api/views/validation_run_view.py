@@ -91,7 +91,7 @@ def my_results(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def validation_run_by_id(request, **kwargs):
-    val_run = ValidationRun.objects.get(pk=kwargs['id'])
+    val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
     if val_run is None:
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
