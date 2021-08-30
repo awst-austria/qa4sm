@@ -187,10 +187,13 @@ def delete_result(request, result_uuid):
 def get_publishing_form(request):
     validation_id = request.query_params.get('id', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
-    # validation = ValidationRun.objects.all()[0]
-    publishing_form = PublishingForm(validation=validation)
-    print(publishing_form.data)
-    return JsonResponse(publishing_form.data, status=200)
+    if request.user == validation.user:
+        publishing_form = PublishingForm(validation=validation)
+        response = JsonResponse(publishing_form.data, status=200)
+    else:
+        response = JsonResponse({'message': 'Validation does not belong to the current user'}, status=403)
+
+    return response
 
 
 @api_view(['GET'])
