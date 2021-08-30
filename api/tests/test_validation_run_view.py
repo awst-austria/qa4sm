@@ -16,7 +16,6 @@ class TestValidationRunView(TestCase):
         self.auth_data, self.test_user = create_test_user()
         self.second_user_data, self.second_test_user = create_alternative_user()
 
-
         self.client = APIClient()
         self.client.login(**self.auth_data)
 
@@ -45,12 +44,20 @@ class TestValidationRunView(TestCase):
         assert response.json()['validations'][0]['name_tag'] == 'B validation'
         assert response.json()['validations'][1]['name_tag'] == 'A validation'
 
-
         # introducing limit and offset
-        response = self.client.get(published_results_url+f'?limit=1&offset=0')
+        response = self.client.get(published_results_url + f'?limit=1&offset=0')
         assert response.status_code == 200
         assert len(response.json()['validations']) == 1  # now there should be only one taken
         assert response.json()['validations'][0]['name_tag'] == 'B validation'
+
+        response = self.client.get(published_results_url + f'?limit=0&offset=0')
+        assert response.status_code == 200
+        assert len(response.json()['validations']) == 0  # no validations are taken
+
+        response = self.client.get(published_results_url + f'?limit=1&offset=100')
+        assert response.status_code == 200
+        assert len(response.json()['validations']) == 0  # no validations are taken, because offset is bigger than the
+        # validation number
 
         # introducing order - name_tag
         response = self.client.get(published_results_url + f'?order=name_tag')
@@ -69,6 +76,53 @@ class TestValidationRunView(TestCase):
         assert response.status_code == 400
         assert response.json()['message'] == 'Not appropriate order given'
 
+        # logging out and checking access
+        self.client.logout()
 
+        # getting all the existing results
+        response = self.client.get(published_results_url)
+        assert response.status_code == 200
+        assert len(response.json()['validations']) == 2
+        assert response.json()['validations'][0]['name_tag'] == 'B validation'
+        assert response.json()['validations'][1]['name_tag'] == 'A validation'
 
+    def test_my_results(self):
+        my_results_url = reverse('My results')
 
+        # getting all the existing results
+        response = self.client.get(my_results_url)
+        assert response.status_code == 200
+        assert len(response.json()['validations']) == 1 # only one because the second one doesn't belong to the logged in user
+        # this order should be the right one, because the B validation was created first
+        assert response.json()['validations'][0]['name_tag'] == 'B validation'
+
+        # introducing limit and offset
+        response = self.client.get(my_results_url + f'?limit=1&offset=0')
+        assert response.status_code == 200
+        assert len(response.json()['validations']) == 1  # still one
+        assert response.json()['validations'][0]['name_tag'] == 'B validation'
+
+        response = self.client.get(my_results_url + f'?limit=0&offset=0')
+        assert response.status_code == 200
+        assert len(response.json()['validations']) == 0  # no validations are taken
+
+        response = self.client.get(my_results_url + f'?limit=1&offset=100')
+        assert response.status_code == 200
+        assert len(response.json()['validations']) == 0  # no validations are taken, because offset is bigger than the
+
+        # introducing order - name_tag
+        response = self.client.get(my_results_url + f'?order=name_tag')
+        assert response.status_code == 200
+        assert response.json()['validations'][0]['name_tag'] == 'B validation'
+
+        # introducing non existing tag for order
+        response = self.client.get(my_results_url + f'?order=-name')
+        assert response.status_code == 400
+        assert response.json()['message'] == 'Not appropriate order given'
+
+        # logging out and checking access
+        self.client.logout()
+
+        # getting all the existing results
+        response = self.client.get(my_results_url)
+        assert response.status_code == 403 # no one should have an access to my list
