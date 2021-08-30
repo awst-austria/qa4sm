@@ -40,6 +40,9 @@ class TestModifyValidationView(TestCase):
         self.run_id = self.run.id
         self.wrong_id = 'f0000000-a000-b000-c000-d00000000000'
 
+        self.run_2 = create_default_validation_without_running(self.alt_test_user, tcol=True)
+        self.run_2.save()
+
     def test_stop_validation(self):
         # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
         run = default_parameterized_validation_to_be_run(self.test_user, tcol=True)
@@ -537,4 +540,28 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 403
         assert response.json()['message'] == 'Validation does not belong to the current user'
 
+    def test_copy_validation_results(self):
+        copy_validation_url = reverse('Copy validation results')
+
+        # everything is ok
+        response = self.client.get(copy_validation_url + f'?validation_id={self.run_2.id}')
+        assert response.status_code == 200
+        assert response.json()['run_id'] != self.run_2.id # copied validation has different id
+        assert ValidationRun.objects.get(pk=response.json()['run_id']).user == self.test_user
+        assert self.run_2.user == self.alt_test_user # and the user of the validation being copied has not changed
+
+        # non existing validation
+        response = self.client.get(copy_validation_url + f'?validation_id={self.wrong_id}')
+        assert response.status_code == 404
+
+        # I can copy also my own validation - not possible from the UI though
+        response = self.client.get(copy_validation_url + f'?validation_id={self.run.id}')
+        assert response.status_code == 200
+        assert response.json()['run_id'] != self.run.id # copied validation has different id
+        assert ValidationRun.objects.get(pk=response.json()['run_id']).user == self.test_user
+
+        # not possible to copy if a user is not logged in
+        self.client.logout()
+        response = self.client.get(copy_validation_url + f'?validation_id={self.run_2.id}')
+        assert response.status_code == 403
 
