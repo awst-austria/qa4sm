@@ -2,10 +2,11 @@ import logging
 
 from django.urls import reverse
 
-import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
+from validator.models import CopiedValidations
+from validator.validation.validation import copy_validationrun
 
 
 class TestValidationRunView(TestCase):
@@ -151,6 +152,52 @@ class TestValidationRunView(TestCase):
         # try to take non-existing validation:
         response = self.client.get(reverse(validation_run_by_id_url_name, kwargs={'id': self.wrong_id}))
         assert response.status_code == 404
+
+    def test_custom_tracked_validation_runs(self):
+        tracked_validations_url = reverse('Tracked custom run')
+
+        # should work, but there are no tracked validations so it will be 0
+        response = self.client.get(tracked_validations_url)
+        assert response.status_code == 200
+        assert len(response.json()) == 0
+
+        tracked_val = CopiedValidations(used_by_user=self.test_user, original_run=self.run_2, copied_run=self.run_2)
+        tracked_val.save()
+
+        # Now, the logged in user tracks a validation:
+        response = self.client.get(tracked_validations_url)
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        # now the second user also tracks a validation
+        tracked_val = CopiedValidations(used_by_user=self.second_test_user, original_run=self.run, copied_run=self.run)
+        tracked_val.save()
+        # so there are two validations in the CopiedValidation table
+        assert len(CopiedValidations.objects.all()) == 2
+        # but the logged in user can see only his tracked validation
+        response = self.client.get(tracked_validations_url)
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        # print('Monika', self.run_2.user, self.run.user, self.second_test_user)
+        # # now I copy validation to check if the view returns only the ones that are tracked
+        # copied_val = copy_validationrun(self.run_2, self.test_user)
+        # print('Monika', self.run_2.user, self.run.user, self.second_test_user)
+
+        # # now CopiedValidation table should contain 3 instances
+        # assert len(CopiedValidations.objects.all()) == 3
+        #
+        # # but the copy validation should not be found as a tracked one
+        # response = self.client.get(tracked_validations_url)
+        # # print('Monika', response.json())
+        # assert response.status_code == 200
+        # assert len(response.json()) == 1
+
+        # now I log out to check if the view is available only for logged in users
+        self.client.logout()
+        response = self.client.get(tracked_validations_url)
+        assert response.status_code == 403
+
 
 
 
