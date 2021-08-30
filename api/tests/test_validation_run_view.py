@@ -27,6 +27,8 @@ class TestValidationRunView(TestCase):
         self.run_2.name_tag = 'A validation'
         self.run_2.save()
 
+        self.wrong_id = 'f0000000-a000-b000-c000-d00000000000'
+
     def test_published_results(self):
         published_results_url = reverse('Published results')
 
@@ -126,3 +128,25 @@ class TestValidationRunView(TestCase):
         # getting all the existing results
         response = self.client.get(my_results_url)
         assert response.status_code == 403 # no one should have an access to my list
+
+    def test_validation_run_by_id(self):
+        validation_run_by_id_url_name = 'Validation run by id' #+ f'id={self.run.id}'
+
+        # take the validation that belongs to the current user:
+        response = self.client.get(reverse(validation_run_by_id_url_name, kwargs={'id': self.run.id}))
+        assert response.status_code == 200
+        assert response.json()['name_tag'] == 'B validation'
+
+        # take the validation that belongs to the other user (it should be possible):
+        response = self.client.get(reverse(validation_run_by_id_url_name, kwargs={'id': self.run_2.id}))
+        assert response.status_code == 200
+        assert response.json()['name_tag'] == 'A validation'
+
+        # try to take non-existing validation:
+        response = self.client.get(reverse(validation_run_by_id_url_name, kwargs={'id': self.wrong_id}))
+        assert response.status_code == 404
+
+
+
+
+
