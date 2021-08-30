@@ -8,7 +8,7 @@ from validator.validation.validation import stop_running_validation
 from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-
+from validator.validation.validation import copy_validationrun
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -180,3 +180,26 @@ def delete_result(request, result_uuid):
 
     val_run.delete()
     return HttpResponse(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_publishing_form(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    # validation = ValidationRun.objects.all()[0]
+    publishing_form = PublishingForm(validation=validation)
+    print(publishing_form.data)
+    return JsonResponse(publishing_form.data, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def copy_validation_results(request):
+    validation_id = request.query_params.get('validation_id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    current_user = request.user
+
+    new_validation = copy_validationrun(validation, current_user)
+
+    return JsonResponse(new_validation, status=200)

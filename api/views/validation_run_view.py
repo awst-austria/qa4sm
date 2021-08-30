@@ -11,7 +11,7 @@ from api.views.auxiliary_functions import get_fields_as_list
 from validator.forms import PublishingForm
 from validator.models import ValidationRun
 from validator.validation import get_inspection_table
-from validator.validation.validation import copy_validationrun
+
 
 
 @api_view(['GET'])
@@ -100,14 +100,13 @@ def validation_run_by_id(request, **kwargs):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def custom_tracked_validation_runs(request):
     current_user = request.user
     # taking only tracked validationruns, i.e. those with the same copied and original validationrun
     tracked_runs = current_user.copiedvalidations_set \
         .annotate(is_tracked=ExpressionWrapper(Q(copied_run=F('original_run')), output_field=BooleanField())) \
         .filter(is_tracked=True)
-
     # filtering copied runs by the tracked ones
     val_runs = current_user.copied_runs.filter(id__in=tracked_runs.values_list('original_run', flat=True))
     serializer = ValidationRunSerializer(val_runs, many=True)
@@ -127,25 +126,7 @@ def get_summary_statistics(request):
                                                  index=False))
 
 
-@api_view(['GET'])
-def get_publishing_form(request):
-    validation_id = request.query_params.get('id', None)
-    validation = get_object_or_404(ValidationRun, id=validation_id)
-    # validation = ValidationRun.objects.all()[0]
-    publishing_form = PublishingForm(validation=validation)
-    print(publishing_form.data)
-    return JsonResponse(publishing_form.data, status=200)
 
-
-@api_view(['GET'])
-def copy_validation_results(request):
-    validation_id = request.query_params.get('validation_id', None)
-    validation = get_object_or_404(ValidationRun, id=validation_id)
-    current_user = request.user
-
-    new_validation = copy_validationrun(validation, current_user)
-
-    return JsonResponse(new_validation, status=200)
 
 
 class ValidationRunSerializer(ModelSerializer):
