@@ -514,3 +514,27 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 200
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 0  # not there anymore
+
+    def test_get_publishing_form(self):
+        get_publishing_form_url = reverse('Get publishing form')
+
+        response = self.client.get(get_publishing_form_url + f'?id={self.run_id}')
+        assert response.status_code == 200
+        assert 'qa4sm' in response.json()['keywords']
+        assert response.json()['name'] == self.test_user.last_name + ', ' + self.test_user.first_name
+
+        # wrong validation id
+        response = self.client.get(get_publishing_form_url + f'?id={self.wrong_id}')
+        assert response.status_code == 404
+
+        # logged out user
+        self.client.logout()
+        response = self.client.get(get_publishing_form_url + f'?id={self.run_id}')
+        assert response.status_code == 403
+
+        self.client.login(**self.alt_data)
+        response = self.client.get(get_publishing_form_url + f'?id={self.run_id}')
+        assert response.status_code == 403
+        assert response.json()['message'] == 'Validation does not belong to the current user'
+
+
