@@ -252,5 +252,29 @@ class TestServingFileView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 1
 
+    def test_get_summary_statistics(self):
+        summary_statistics_url = reverse('Summary statistics')
+
+        val.run_validation(self.run_id)
+        time.sleep(5)
+
+        # everything ok:
+        response = self.client.get(summary_statistics_url + f'?id={self.run_id}')
+        assert response.status_code == 200
+        assert 'table' in response.content.decode('UTF-8')
+
+        # wrong id:
+        response = self.client.get(summary_statistics_url + f'?id={self.wrong_id}')
+        assert response.status_code == 404
+
+        # logged out user
+        self.client.logout()
+
+        # everything should be ok:
+        response = self.client.get(summary_statistics_url + f'?id={self.run_id}')
+        assert response.status_code == 200
+        assert 'table' in response.content.decode('UTF-8')
+
+
 
 
