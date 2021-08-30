@@ -633,23 +633,24 @@ def copy_validationrun(run_to_copy, new_user):
         mkdir_if_not_exists(new_dir)
         # old directory and all files there
         old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
-        old_files = os.listdir(old_dir)
 
-        if len(old_files) != 0:
-            for file_name in old_files:
-                new_file = new_dir + '/' + file_name
-                old_file = old_dir + '/' + file_name
-                copy2(old_file, new_file)
-                if '.nc' in new_file:
-                    run_to_copy.output_file = str(run_id) + '/' + file_name
-                    run_to_copy.save()
-                    file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
+        if os.path.isdir(old_dir):
+            old_files = os.listdir(old_dir)
+            if len(old_files) != 0:
+                for file_name in old_files:
+                    new_file = new_dir + '/' + file_name
+                    old_file = old_dir + '/' + file_name
+                    copy2(old_file, new_file)
+                    if '.nc' in new_file:
+                        run_to_copy.output_file = str(run_id) + '/' + file_name
+                        run_to_copy.save()
+                        file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
 
-                    # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
-                    new_url = settings.SITE_URL + get_angular_url('result', run_id)
-                    file.setncattr('url', new_url)
-                    file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
-                    file.close()
+                        # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
+                        new_url = settings.SITE_URL + get_angular_url('result', run_id)
+                        file.setncattr('url', new_url)
+                        file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
+                        file.close()
 
     response = {
         'run_id': run_id,
