@@ -37,28 +37,37 @@ class TestValidationRunView(TestCase):
         self.run_2.doi = '108645/12434'
         self.run_2.save()
 
+        # getting all the existing results
         response = self.client.get(published_results_url)
         assert response.status_code == 200
         assert len(response.json()['validations']) == 2
+        # this order should be the right one, because the B validation was created first
+        assert response.json()['validations'][0]['name_tag'] == 'B validation'
+        assert response.json()['validations'][1]['name_tag'] == 'A validation'
+
 
         # introducing limit and offset
         response = self.client.get(published_results_url+f'?limit=1&offset=0')
         assert response.status_code == 200
-        assert len(response.json()['validations']) == 1 # now there should be only one taken
+        assert len(response.json()['validations']) == 1  # now there should be only one taken
+        assert response.json()['validations'][0]['name_tag'] == 'B validation'
 
-        # introducing order
+        # introducing order - name_tag
+        response = self.client.get(published_results_url + f'?order=name_tag')
+        assert response.status_code == 200
+        assert response.json()['validations'][0]['name_tag'] == 'A validation'
+        assert response.json()['validations'][1]['name_tag'] == 'B validation'
+
+        # changing the order
         response = self.client.get(published_results_url + f'?order=-name_tag')
-        print(response.json()['validations'])
         assert response.status_code == 200
         assert response.json()['validations'][0]['name_tag'] == 'B validation'
         assert response.json()['validations'][1]['name_tag'] == 'A validation'
 
-        # changing the order
-        response = self.client.get(published_results_url + f'?order=name_tag')
-        print(response.json()['validations'])
-        assert response.status_code == 200
-        assert response.json()['validations'][0]['name_tag'] == 'A validation'
-        assert response.json()['validations'][1]['name_tag'] == 'B validation'
+        # introducing non existing tag for order
+        response = self.client.get(published_results_url + f'?order=-name')
+        assert response.status_code == 400
+        assert response.json()['message'] == 'Not appropriate order given'
 
 
 
