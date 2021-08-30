@@ -20,11 +20,22 @@ def published_results(request):
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
     order = request.query_params.get('order', None)
+    order_list = ['name_tag',
+                  '-name_tag',
+                  'start_time',
+                  '-start_time',
+                  'progress',
+                  '-progress',
+                  'reference_configuration_id__dataset__pretty_name',
+                  '-reference_configuration_id__dataset__pretty_name'
+                  ]
 
-    if order:
+    if order and order in order_list:
         val_runs = ValidationRun.objects.exclude(doi='').order_by(order)
-    else:
+    elif not order:
         val_runs = ValidationRun.objects.exclude(doi='')
+    else:
+        return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
     if limit and offset:
         limit = int(limit)
