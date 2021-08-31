@@ -11,8 +11,6 @@ from django.test.utils import override_settings
 User = get_user_model()
 
 
-@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
-                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidationConfigView(TransactionTestCase):
     # This re-inits the database for every test, see
     # https://docs.djangoproject.com/en/2.0/topics/testing/overview/#test-case-serialized-rollback
