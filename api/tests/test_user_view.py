@@ -1,17 +1,10 @@
 import logging
-import shutil
-import time
-
-from django.conf import settings
 from django.urls import reverse
 
-import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 
 from api.tests.test_helper import *
-from validator.validation import mkdir_if_not_exists, set_outfile
-
 User = get_user_model()
 
 
