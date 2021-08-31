@@ -1,18 +1,10 @@
 import logging
-import shutil
-import time
-
-from django.conf import settings
-from django.db import transaction
 from django.urls import reverse
 
-import validator.validation as val
 from django.test.testcases import TransactionTestCase
 from rest_framework.test import APIClient
 
 from api.tests.test_helper import *
-from validator.validation import mkdir_if_not_exists, set_outfile
-from django.test.utils import override_settings
 from validator.validation import globals
 
 User = get_user_model()
