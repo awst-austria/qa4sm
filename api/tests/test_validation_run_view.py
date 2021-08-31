@@ -157,6 +157,7 @@ class TestValidationRunView(TestCase):
         tracked_validations_url = reverse('Tracked custom run')
 
         # should work, but there are no tracked validations so it will be 0
+
         response = self.client.get(tracked_validations_url)
         assert response.status_code == 200
         assert len(response.json()) == 0
@@ -179,19 +180,17 @@ class TestValidationRunView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 1
 
-        # print('Monika', self.run_2.user, self.run.user, self.second_test_user)
-        # # now I copy validation to check if the view returns only the ones that are tracked
-        # copied_val = copy_validationrun(self.run_2, self.test_user)
-        # print('Monika', self.run_2.user, self.run.user, self.second_test_user)
+        # now I copy validation to check if the view returns only the ones that are tracked
+        copy_validationrun(ValidationRun.objects.get(pk=self.run_2.id), self.test_user)
 
         # # now CopiedValidation table should contain 3 instances
-        # assert len(CopiedValidations.objects.all()) == 3
+        assert len(CopiedValidations.objects.all()) == 3
         #
-        # # but the copy validation should not be found as a tracked one
-        # response = self.client.get(tracked_validations_url)
-        # # print('Monika', response.json())
-        # assert response.status_code == 200
-        # assert len(response.json()) == 1
+        # but the copy validation should not be found as a tracked one
+        response = self.client.get(tracked_validations_url)
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        assert response.json()[0]['id'] == str(self.run_2.id)
 
         # now I log out to check if the view is available only for logged in users
         self.client.logout()
