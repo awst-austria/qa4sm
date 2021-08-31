@@ -107,15 +107,10 @@ def custom_tracked_validation_runs(request):
     tracked_runs = current_user.copiedvalidations_set \
         .annotate(is_tracked=ExpressionWrapper(Q(copied_run=F('original_run')), output_field=BooleanField())) \
         .filter(is_tracked=True)
-    # filtering copied runs by the tracked ones
-    val_runs = current_user.copied_runs.filter(id__in=tracked_runs.values_list('original_run', flat=True))
+    # filtering runs by the tracked ones
+    val_runs = ValidationRun.objects.filter(id__in=tracked_runs.values_list('original_run', flat=True))
     serializer = ValidationRunSerializer(val_runs, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-
-
-
-
-
 
 
 class ValidationRunSerializer(ModelSerializer):
