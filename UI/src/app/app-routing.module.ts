@@ -33,7 +33,7 @@ const routes: Routes = [
   {path: 'help', component: HelpComponent},
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
-  {path: 'comparison', component: ComparisonComponent},
+  {path: 'comparison', component: ComparisonComponent, canActivate: [AuthGuard]},
   {path: 'signup', component: SignupComponent},
   {path: 'signup-complete', component: SignupCompleteComponent},
   {path: 'deactivate-user-complete', component: DeactivateUserCompleteComponent},
