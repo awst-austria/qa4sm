@@ -51,49 +51,49 @@ urlpatterns = [
     #
     url(r'^test$', users), # are we using this one somehow?
     url(r'^path_test/(?P<username>.+)$', path_var_get),
-    path('auth/login', api_login, name='api-login'), # checked
-    path('auth/logout', api_logout, name='api-logout'), # checked
-    path('dataset', dataset, name='Datasets'),  # checked
-    url(r'^dataset/(?P<id>.+)$', dataset_by_id),  # checked
-    path('dataset-version', dataset_version, name='Dataset version'),  # checked
-    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id),  # checked
-    url(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset version by dataset'), # checked
-    path('dataset-variable', dataset_variable, name='Dataset variable'), # checked
-    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id), # checked
+    path('auth/login', api_login, name='api-login'),
+    path('auth/logout', api_logout, name='api-logout'),
+    path('dataset', dataset, name='Datasets'),
+    url(r'^dataset/(?P<id>.+)$', dataset_by_id),
+    path('dataset-version', dataset_version, name='Dataset version'),
+    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id),
+    url(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset version by dataset'),
+    path('dataset-variable', dataset_variable, name='Dataset variable'),
+    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id),
     url(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset_variable_by_dataset'),
-    path('published-results', published_results, name='Published results'),# checked
+    path('published-results', published_results, name='Published results'),
     url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
-    path('dataset-configuration', dataset_configuration, name='Configuration'), # checked
-    url(r'^dataset-configuration/(?P<dataset_id>.+)$', dataset_configuration_by_dataset, name='Configuration'), # checked
-    path('data-filter', data_filter, name='Dataset filters'),  # checked
-    url(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset), # checked
-    path('globals', global_params, name='Global context'), # checked
-    path('my-results', my_results, name='My results'), # checked
-    url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration),
-    path('validation-configuration', start_validation, name='Run new validation'), # checked
-    path('param-filter', data_parameterised_filter, name='Parameterised filter'),  # checked
-    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),  # checked
-    path('delete-validation/<uuid:result_uuid>/', delete_result, name='Delete validation'),  # checked
-    path('change-validation-name/<uuid:result_uuid>/', change_name, name='Change name'), # checked
-    path('archive-result/<uuid:result_uuid>/', archive_result, name='Archive results'), # checked
-    path('extend-result/<uuid:result_uuid>/', extend_result, name='Extend results'), # checked
-    path('publish-result/<uuid:result_uuid>/', publish_result, name='Publish result'), # checked
-    path('add-validation/<uuid:result_uuid>/', add_validation, name='Add validation'), # checked
-    path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Remove validation'), # checked
+    path('dataset-configuration', dataset_configuration, name='Configuration'),
+    url(r'^dataset-configuration/(?P<dataset_id>.+)$', dataset_configuration_by_dataset, name='Configuration'),
+    path('data-filter', data_filter, name='Dataset filters'),
+    url(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset),
+    path('globals', global_params, name='Global context'),
+    path('my-results', my_results, name='My results'),
+    url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
+    path('validation-configuration', start_validation, name='Run new validation'),
+    path('param-filter', data_parameterised_filter, name='Parameterised filter'),
+    path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
+    path('delete-validation/<uuid:result_uuid>/', delete_result, name='Delete validation'),
+    path('change-validation-name/<uuid:result_uuid>/', change_name, name='Change name'),
+    path('archive-result/<uuid:result_uuid>/', archive_result, name='Archive results'),
+    path('extend-result/<uuid:result_uuid>/', extend_result, name='Extend results'),
+    path('publish-result/<uuid:result_uuid>/', publish_result, name='Publish result'),
+    path('add-validation/<uuid:result_uuid>/', add_validation, name='Add validation'),
+    path('remove-validation/<uuid:result_uuid>/', remove_validation, name='Remove validation'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Tracked custom run'),
-    path('download-result', get_results, name='Download results'), # checked
-    path('summary-statistics', get_summary_statistics, name='Summary statistics'), # checked
+    path('download-result', get_results, name='Download results'),
+    path('summary-statistics', get_summary_statistics, name='Summary statistics'),
     path('download-statistics-csv', get_csv_with_statistics, name='Download statistics csv'),
     path('uptime-ping', uptime_ping),
     path('uptime-report', get_uptime),
-    path('get-graphic-files', get_graphic_files, name='Get graphic files'), # checked
-    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'), # checked
-    path('country-list', get_list_of_countries, name = 'List of countries'), # checked
-    path('sign-up', signup_post, name='Sign up'), # checked
+    path('get-graphic-files', get_graphic_files, name='Get graphic files'),
+    path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
+    path('country-list', get_list_of_countries, name = 'List of countries'),
+    path('sign-up', signup_post, name='Sign up'),
     path('user-update', user_update, name='User update'),
-    path('user-delete', user_delete, name='User delete'), #checked
+    path('user-delete', user_delete, name='User delete'),
     path('settings', settings, name="Settings"),
-    path('get-graphic-file', get_graphic_file, name='Get graphic file'),  # checked
+    path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
 ]
