@@ -282,18 +282,15 @@ def encoded_comparisonPlots(
         get_intersection=get_intersection
     )
     image = BytesIO()
-    try:
-        comparison.wrapper(
-            method=plot_type,
-            metric=metric
-        )
-        plt.savefig(image, format='png')
-        encoded = base64.b64encode(image.getvalue()).decode('utf-8')
 
-        return encoded
+    comparison.wrapper(
+        method=plot_type,
+        metric=metric
+    )
+    plt.savefig(image, format='png')
+    encoded = base64.b64encode(image.getvalue()).decode('utf-8')
 
-    except SpatialExtentError:
-        return "error encountered"
+    return encoded
 
 
 def get_extent_image(
@@ -338,7 +335,6 @@ def get_extent_image(
             plot_points=True,
         )
         plt.savefig(image, format='png')
-        # import pdb; pdb.set_trace()
         if encoded:
             encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
             return encoded

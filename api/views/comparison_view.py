@@ -34,7 +34,7 @@ def get_table(request):
             ).reset_index()
         return table
 
-    except ComparisonError as e:
+    except (SpatialExtentError, ComparisonError) as e:
         return str(e)
 
 
@@ -60,6 +60,7 @@ def download_comparison_table(request):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=Comparison_summary.csv'
         table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
+
     except AttributeError as e:
         response = HttpResponse(str(e))
 
@@ -81,7 +82,7 @@ def get_comparison_metrics(request):
                            'metric_pretty_name': pretty_name}
             response.append(metric_dict)
 
-    except ComparisonError as e:
+    except (SpatialExtentError, ComparisonError) as e:
         response = [{'message': str(e)}]
 
     return JsonResponse(response, status=200, safe=False)
@@ -108,15 +109,13 @@ def get_comparison_plots_for_metric(request):
                 extent=extent,
                 get_intersection=json.loads(get_intersection)
             )
-        except:
-            # TODO: Pietro, please check what kind of errors can be encountered here and add them to the exceptions along with an appropriate message
-            response = [{'message': 'Something went wrong'}]
 
-        if not base64_plot == "error encountered":
             encoded_plots.append({'plot': base64_plot})
-            response = encoded_plots
 
-    return JsonResponse(response, status=200, safe=False)
+        except (SpatialExtentError, ComparisonError) as e:
+            return JsonResponse([{'message': str(e)}], status=200, safe=False)
+
+    return JsonResponse(encoded_plots, status=200, safe=False)
 
 
 @api_view(['GET'])
@@ -132,9 +131,7 @@ def get_spatial_extent(request):
             get_intersection=json.loads(get_intersection)
         )
     except SpatialExtentError as e:
-        response = JsonResponse([{'message': str(e)}], status=200, safe=False)
+        return JsonResponse([{'message': str(e)}], status=200, safe=False)
 
     if not encoded_image == "error encountered":
-        response = JsonResponse(encoded_image, status=200, safe=False)
-
-    return response
+        return JsonResponse(encoded_image, status=200, safe=False)
