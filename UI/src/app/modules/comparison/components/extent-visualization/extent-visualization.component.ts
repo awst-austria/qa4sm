@@ -24,7 +24,6 @@ export class ExtentVisualizationComponent implements OnInit {
   );
 
   intersectionText: boolean;
-  extentImage$: Observable<string>;
   loadingSpinner$: Observable<'open' | 'close'>;
   img: string;
 
@@ -65,7 +64,6 @@ export class ExtentVisualizationComponent implements OnInit {
     this.comparisonService.getComparisonExtentImage(parameters).subscribe(data => {
       this.img = data;
     });
-    // this.extentImage$ = this.comparisonService.getComparisonExtentImage(parameters);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
