@@ -57,7 +57,6 @@ import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
-import {LoadingInterceptor} from './modules/core/interceptors/loading.interceptor';
 
 
 @NgModule({
@@ -122,11 +121,6 @@ import {LoadingInterceptor} from './modules/core/interceptors/loading.intercepto
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpTokenInterceptor,
-      multi: true
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: LoadingInterceptor,
       multi: true
     },
     MessageService
