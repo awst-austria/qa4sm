@@ -10,6 +10,7 @@ import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
+import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 
 @Component({
   selector: 'qa-extent-visualization',
@@ -24,16 +25,20 @@ export class ExtentVisualizationComponent implements OnInit {
 
   intersectionText: boolean;
   extentImage$: Observable<string>;
+  loadingSpinner$: Observable<'open' | 'close'>;
+  img: string;
 
   constructor(private validationRunService: ValidationrunService,
               private datasetConfigurationService: DatasetConfigurationService,
               private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
               private plotService: WebsiteGraphicsService,
-              private gallery: Gallery) {
+              private gallery: Gallery,
+              private modalService: ModalWindowService) {
   }
 
   ngOnInit(): void {
+    this.loadingSpinner$ = this.modalService.watch();
     this.startComparison();
   }
 
@@ -57,7 +62,10 @@ export class ExtentVisualizationComponent implements OnInit {
     ids.forEach(id => {
       parameters = parameters.append('ids', id);
     });
-    this.extentImage$ = this.comparisonService.getComparisonExtentImage(parameters);
+    this.comparisonService.getComparisonExtentImage(parameters).subscribe(data => {
+      this.img = data;
+    });
+    // this.extentImage$ = this.comparisonService.getComparisonExtentImage(parameters);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
