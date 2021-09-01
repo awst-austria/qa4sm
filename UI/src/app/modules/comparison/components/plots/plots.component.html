@@ -1,7 +1,8 @@
-<div *ngIf="!(metricPlots$|async)" class="text-center">
-  <span class="pi pi-spinner loading-spinner" title="This component is still loading"></span>
+<div  *ngIf="showLoadingSpinner" class="text-center">
+  <qa-loading-spinner></qa-loading-spinner>
 </div>
-<div *ngIf="(metricPlots$|async) as plots" class="p-grid no-gutters">
+<div *ngIf="!showLoadingSpinner" class="p-grid no-gutters">
+<!--<div *ngIf="(metricPlots$|async) as plots" class="p-grid no-gutters">-->
   <div class="p-col-12">
     <!--  <p-panel>-->
     <p-panel [toggleable]="true" [collapsed]="false">

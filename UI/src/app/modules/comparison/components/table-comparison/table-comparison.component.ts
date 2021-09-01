@@ -1,10 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {ComparisonService} from '../../services/comparison.service';
-import {Observable} from 'rxjs';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {debounceTime} from 'rxjs/operators';
-import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 
 @Component({
   selector: 'qa-table-comparison',
@@ -13,17 +11,14 @@ import {ModalWindowService} from '../../../core/services/global/modal-window.ser
 })
 export class TableComparisonComponent implements OnInit {
 
-  comparisonTable$: Observable<string>;
   comparisonParameters: HttpParams;
-  loadingSpinner$: Observable<'open' | 'close'>;
   table: string;
+  showLoadingSpinner = true;
 
-  constructor(private comparisonService: ComparisonService,
-              private modalService: ModalWindowService) {
+  constructor(private comparisonService: ComparisonService) {
   }
 
   ngOnInit(): void {
-    this.loadingSpinner$ = this.modalService.watch();
     this.startComparison();
   }
 
@@ -59,7 +54,10 @@ export class TableComparisonComponent implements OnInit {
 
   getComparisonTable(parameters): void{
     this.comparisonService.getComparisonTable(parameters).subscribe(data => {
-      this.table = data;
+      if (data){
+        this.table = data;
+        this.showLoadingSpinner = false;
+      }
     });
   }
 

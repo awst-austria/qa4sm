@@ -3,14 +3,12 @@ import {Validations2CompareModel} from '../validation-selector/validation-select
 import {HttpParams} from '@angular/common/http';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {ExtentModel} from '../spatial-extent/extent-model';
-import {Observable} from 'rxjs';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
-import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 
 @Component({
   selector: 'qa-extent-visualization',
@@ -24,7 +22,7 @@ export class ExtentVisualizationComponent implements OnInit {
   );
 
   intersectionText: boolean;
-  loadingSpinner$: Observable<'open' | 'close'>;
+  showLoadingSpinner = true;
   img: string;
 
   constructor(private validationRunService: ValidationrunService,
@@ -32,12 +30,10 @@ export class ExtentVisualizationComponent implements OnInit {
               private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
               private plotService: WebsiteGraphicsService,
-              private gallery: Gallery,
-              private modalService: ModalWindowService) {
+              private gallery: Gallery) {
   }
 
   ngOnInit(): void {
-    this.loadingSpinner$ = this.modalService.watch();
     this.startComparison();
   }
 
@@ -62,7 +58,10 @@ export class ExtentVisualizationComponent implements OnInit {
       parameters = parameters.append('ids', id);
     });
     this.comparisonService.getComparisonExtentImage(parameters).subscribe(data => {
-      this.img = data;
+      if (data) {
+        this.img = data;
+        this.showLoadingSpinner = false;
+      }
     });
   }
 

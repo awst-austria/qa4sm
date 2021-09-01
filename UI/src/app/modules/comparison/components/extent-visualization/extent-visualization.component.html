@@ -1,8 +1,8 @@
-<div  *ngIf="(loadingSpinner$|async) as spinner" class="text-center">
-  <qa-loading-spinner *ngIf="spinner === 'open'"></qa-loading-spinner>
+<div  *ngIf="showLoadingSpinner" class="text-center">
+  <qa-loading-spinner></qa-loading-spinner>
 </div>
 
-<div class="p-grid no-gutters">
+<div *ngIf="!showLoadingSpinner" class="p-grid no-gutters">
   <div *ngIf="img == 'Raise message to check box', else noError" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">
