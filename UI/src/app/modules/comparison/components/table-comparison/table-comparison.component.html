@@ -1,7 +1,8 @@
-<div *ngIf="!(comparisonTable$|async)" class="text-center">
-  <span class="pi pi-spinner loading-spinner" title="This component is still loading"></span>
+<div  *ngIf="(loadingSpinner$|async) as spinner" class="text-center">
+  <qa-loading-spinner *ngIf="spinner === 'open'"></qa-loading-spinner>
 </div>
-<div *ngIf="(comparisonTable$|async) as table" class="p-grid no-gutters">
+<div class="p-grid no-gutters">
+<!--<div *ngIf="(comparisonTable$|async) as table" class="p-grid no-gutters">-->
   <div class="p-col-12">
     <p-panel [toggleable]="true" [collapsed]="true">
       <ng-template pTemplate="header">
