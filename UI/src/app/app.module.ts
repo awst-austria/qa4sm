@@ -49,7 +49,6 @@ import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
 import {ComparisonModule} from './modules/comparison/comparison.module';
-import {ValidationSelectorComponent} from "./modules/comparison/components/validation-selector/validation-selector.component";
 import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
@@ -58,6 +57,7 @@ import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
+import {LoadingInterceptor} from './modules/core/interceptors/loading.interceptor';
 
 
 @NgModule({
@@ -122,6 +122,11 @@ import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpTokenInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: LoadingInterceptor,
       multi: true
     },
     MessageService
