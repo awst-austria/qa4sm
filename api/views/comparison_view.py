@@ -112,8 +112,13 @@ def get_comparison_plots_for_metric(request):
 
             encoded_plots.append({'plot': base64_plot})
 
-        except (SpatialExtentError, ComparisonError) as e:
-            return JsonResponse([{'message': str(e)}], status=200, safe=False)
+        except (SpatialExtentError, ComparisonError):
+            continue
+
+    if not encoded_plots:
+        return JsonResponse([{'message': str("No plot could be produced from the selected comparison")}],
+         status=200, safe=False
+         )
 
     return JsonResponse(encoded_plots, status=200, safe=False)
 
