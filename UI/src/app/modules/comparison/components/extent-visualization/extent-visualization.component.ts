@@ -3,7 +3,6 @@ import {Validations2CompareModel} from '../validation-selector/validation-select
 import {HttpParams} from '@angular/common/http';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {ExtentModel} from '../spatial-extent/extent-model';
-import {Observable} from 'rxjs';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
@@ -23,7 +22,8 @@ export class ExtentVisualizationComponent implements OnInit {
   );
 
   intersectionText: boolean;
-  extentImage$: Observable<string>;
+  showLoadingSpinner = true;
+  img: string;
 
   constructor(private validationRunService: ValidationrunService,
               private datasetConfigurationService: DatasetConfigurationService,
@@ -57,7 +57,12 @@ export class ExtentVisualizationComponent implements OnInit {
     ids.forEach(id => {
       parameters = parameters.append('ids', id);
     });
-    this.extentImage$ = this.comparisonService.getComparisonExtentImage(parameters);
+    this.comparisonService.getComparisonExtentImage(parameters).subscribe(data => {
+      if (data) {
+        this.img = data;
+        this.showLoadingSpinner = false;
+      }
+    });
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {

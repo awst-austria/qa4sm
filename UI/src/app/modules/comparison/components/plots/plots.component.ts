@@ -4,7 +4,6 @@ import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {MetricsComparisonDto} from '../../services/metrics-comparison.dto';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
-import {Observable} from 'rxjs';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {ExtentModel} from '../spatial-extent/extent-model';
@@ -29,9 +28,9 @@ export class PlotsComponent implements OnInit {
   // metrics to show the table/plots for
   comparisonMetrics: MetricsComparisonDto[] = [];
   selectedMetric: MetricsComparisonDto;
-  // metric-relative plots
-  metricPlots$: Observable<PlotDto[]>;
   metricsErrorMessage: string;
+  showLoadingSpinner = true;
+  plots: PlotDto[];
 
   constructor(private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
@@ -104,7 +103,12 @@ export class PlotsComponent implements OnInit {
     PLOT_TYPES.forEach(plotType => {
       parameters = parameters.append('plot_types', plotType);
     });
-    this.metricPlots$ = this.comparisonService.getComparisonPlots(parameters);
+    this.comparisonService.getComparisonPlots(parameters).subscribe(data => {
+      if (data){
+        this.plots = data;
+        this.showLoadingSpinner = false;
+      }
+    });
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {

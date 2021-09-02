@@ -49,7 +49,6 @@ import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
 import {ComparisonModule} from './modules/comparison/comparison.module';
-import {ValidationSelectorComponent} from "./modules/comparison/components/validation-selector/validation-selector.component";
 import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';

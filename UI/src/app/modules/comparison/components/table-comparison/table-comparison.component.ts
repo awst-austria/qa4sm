@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {ComparisonService} from '../../services/comparison.service';
-import {Observable} from 'rxjs';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {debounceTime} from 'rxjs/operators';
@@ -12,8 +11,9 @@ import {debounceTime} from 'rxjs/operators';
 })
 export class TableComparisonComponent implements OnInit {
 
-  comparisonTable$: Observable<string>;
   comparisonParameters: HttpParams;
+  table: string;
+  showLoadingSpinner = true;
 
   constructor(private comparisonService: ComparisonService) {
   }
@@ -53,7 +53,12 @@ export class TableComparisonComponent implements OnInit {
   }
 
   getComparisonTable(parameters): void{
-    this.comparisonTable$ = this.comparisonService.getComparisonTable(parameters);
+    this.comparisonService.getComparisonTable(parameters).subscribe(data => {
+      if (data){
+        this.table = data;
+        this.showLoadingSpinner = false;
+      }
+    });
   }
 
   getComparisonTableAsCsv(): void {
