@@ -24,7 +24,7 @@
       <span *ngIf="!validationRun.expiry_date">
           <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
                 title="This validation was cancelled."></span>
-          <span *ngIf="!validationRun.end_time && validationRun.progress <= 100"
+          <span *ngIf="!validationRun.end_time && validationRun.progress === 0"
                 class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
                 title="This validation is still running."></span>
 
