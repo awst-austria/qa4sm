@@ -3,6 +3,7 @@ import logging
 from django.core.mail import send_mail
 from django.urls.base import reverse
 from django.conf import settings
+from api.frontend_urls import get_angular_url
 
 
 __logger = logging.getLogger(__name__)
@@ -10,7 +11,7 @@ __logger = logging.getLogger(__name__)
 def send_val_done_notification(val_run):
         __logger.info('Sending mail about validation {} to user {}...'.format(val_run.id, val_run.user))
 
-        url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': val_run.id})
+        url = settings.SITE_URL + get_angular_url('result', val_run.id)
 
         # enumerate datasets with "and" and Oxford comma.
         dataset_string = ''
@@ -42,7 +43,7 @@ def send_val_done_notification(val_run):
 def send_val_expiry_notification(val_run):
         __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_run.id, val_run.user))
 
-        url = settings.SITE_URL + '/login/?next=' + reverse('result', kwargs={'result_uuid': val_run.id})
+        url = settings.SITE_URL + '/login/?next=' + get_angular_url('result', val_run.id)
 
         dataset_name = "{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id)
 
@@ -108,7 +109,7 @@ def send_user_status_changed(user, activate):
             )
 
         if activate:
-            url = settings.SITE_URL + reverse('login')
+            url = settings.SITE_URL + get_angular_url('login')
             body += '\nYou can now log in here: {}'.format(
                 url)
 

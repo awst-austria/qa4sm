@@ -24,12 +24,24 @@ def get_results(request):
     validation_id = request.query_params.get('validationId', None)
     file_type = request.query_params.get('fileType', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+
+    try:
+        file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+    except AttributeError:
+        return HttpResponse('Given validation has no output directory assigned', status=404)
+
     if file_type == 'netCDF':
         filename = file_path + validation.output_file_name
-    else:
+    elif file_type == 'graphics':
         filename = file_path + 'graphs.zip'
-    file_wrapper = FileWrapper(open(filename, 'rb'))
+    else:
+        return HttpResponse('No file type given', status=404)
+
+    try:
+        file_wrapper = FileWrapper(open(filename, 'rb'))
+    except FileNotFoundError as e:
+        return HttpResponse(e, status=404)
+
     file_mimetype = mimetypes.guess_type(filename)
     response = HttpResponse(file_wrapper, content_type=file_mimetype)
     return response
@@ -54,8 +66,17 @@ def get_csv_with_statistics(request):
 def get_metric_names_and_associated_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
-    files = os.listdir(file_path)
+    try:
+        file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+    except AttributeError:
+        return JsonResponse({'message': 'Given validation has no output directory assigned'}, status=404)
+
+    try:
+        files = os.listdir(file_path)
+        if len(files) == 0:
+            return JsonResponse({'message': 'There are no files in the given directory'}, status=404)
+    except FileNotFoundError as e:
+        return JsonResponse({'message': str(e)}, status=404)
 
     pairs, triples, metrics, ref0_config = get_dataset_combis_and_metrics_from_files(validation)
     combis = OrderedDict(sorted({**pairs, **triples}.items()))
@@ -97,6 +118,8 @@ def get_metric_names_and_associated_files(request):
 def get_graphic_files(request):
     # Here we take a list of parameters 'file' and return a list of plots encoded to base64
     files = request.query_params.getlist('file', None)
+    if not files:
+        return JsonResponse({'message': 'No file names given'}, status=404, safe=False)
     plots = []
     for file in files:
         if '/static/' in file:
@@ -115,6 +138,8 @@ def get_graphic_file(request):
     # Here we take only one file and return one plot;
     # Sometimes it's just easier to read a single file, and this function is created not to refer to index 0 every time
     file = request.query_params.get('file', None)
+    if not file:
+        return JsonResponse({'message': 'No file name given'}, status=404, safe=False)
     if '/static/' in file:
         file = file.replace('/static/', os.path.join(settings.BASE_DIR, 'validator/static/'))
     open_file = open(file, 'rb')
@@ -123,3 +148,16 @@ def get_graphic_file(request):
     open_file.close()
 
     return JsonResponse({'plot': name.decode('utf-8')}, safe=True)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_summary_statistics(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
+    # rest of the columns when df rendered as html
+    inspection_table = get_inspection_table(validation).reset_index()
+
+    return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+                                                 index=False))

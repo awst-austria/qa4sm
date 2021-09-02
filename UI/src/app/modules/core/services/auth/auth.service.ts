@@ -17,7 +17,8 @@ export class AuthService {
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
   private signUpUrl = this.API_URL + 'api/sign-up';
-  private userModifyUrl = this.API_URL + 'api/user-modify';
+  private userUpdateUrl = this.API_URL + 'api/user-update';
+  private userDeleteUrl = this.API_URL + 'api/user-delete';
 
   emptyUser = {
     username: '',
@@ -101,11 +102,11 @@ export class AuthService {
   }
 
   updateUser(userForm: any): Observable<any> {
-    return this.httpClient.patch(this.userModifyUrl, userForm);
+    return this.httpClient.patch(this.userUpdateUrl, userForm);
   }
 
   deactivateUser(username: any): Observable<any> {
-    return this.httpClient.delete<UserDto>(this.userModifyUrl, username);
+    return this.httpClient.delete<UserDto>(this.userDeleteUrl, username);
   }
 
 

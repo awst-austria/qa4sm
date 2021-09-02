@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connections
 from django.http import JsonResponse
 from django.utils import timezone
-from numpy.testing._private.parameterized import param
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -14,188 +13,35 @@ from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter
 from validator.validation import run_validation
-import validator.validation.globals as val_globals
 from django.db.models import Case, When
-
-def _compare_param_filters(new_param_filters, old_param_filters):
-    """
-    Checking if parametrised filters are the same for given configuration, checks till finds the first failure
-    or till the end of the list.
-
-    If lengths of queries do not agree then return False.
-    """
-    if len(new_param_filters) != len(old_param_filters):
-        return False
-    else:
-        ind = 0
-        max_ind = len(new_param_filters)
-        is_the_same = True
-        while ind < max_ind and new_param_filters[ind].parameters == old_param_filters[ind].parameters:
-            ind += 1
-        if ind != len(new_param_filters):
-            is_the_same = False
-
-    return is_the_same
-
-
-def _compare_filters(new_dataset, old_dataset):
-    """
-    Checking if filters are the same for given configuration, checks till finds the first failure or till the end
-     of the list. If filters are the same, then parameterised filters are checked.
-
-    If lengths of queries do not agree then return False.
-    """
-
-    new_run_filters = new_dataset.filters.all().order_by('name')
-    old_run_filters = old_dataset.filters.all().order_by('name')
-    new_filts_len = len(new_run_filters)
-    old_filts_len = len(old_run_filters)
-
-    if new_filts_len != old_filts_len:
-        return False
-    elif new_filts_len == old_filts_len == 0:
-        is_the_same = True
-        new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
-        if len(new_param_filters) != 0:
-            old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
-            is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
-        return is_the_same
-    else:
-        filt_ind = 0
-        max_filt_ind = new_filts_len
-
-        while filt_ind < max_filt_ind and new_run_filters[filt_ind] == old_run_filters[filt_ind]:
-            filt_ind += 1
-
-        if filt_ind == max_filt_ind:
-            is_the_same = True
-            new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
-            if len(new_param_filters) != 0:
-                old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
-                is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
-        else:
-            is_the_same = False
-    return is_the_same
-
-
-def _compare_datasets(new_run_config, old_run_config):
-    """
-    Takes queries of dataset configurations and compare datasets one by one. If names and versions agree,
-    checks filters.
-
-    Runs till the first failure or til the end of the configuration list.
-    If lengths of queries do not agree then return False.
-    """
-    new_len = len(new_run_config)
-
-    if len(old_run_config) != new_len:
-        return False
-    else:
-        ds_fields = val_globals.DS_FIELDS
-        max_ds_ind = len(ds_fields)
-        the_same = True
-        conf_ind = 0
-
-        while conf_ind < new_len and the_same:
-            ds_ind = 0
-            new_dataset = new_run_config[conf_ind]
-            old_dataset = old_run_config[conf_ind]
-            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
-                ds_ind += 1
-            if ds_ind == max_ds_ind:
-                the_same = _compare_filters(new_dataset, old_dataset)
-            else:
-                the_same = False
-            conf_ind += 1
-    return the_same
-
-
-def _check_scaling_method(new_run, old_run):
-    """
-    It takes two validation runs and compares scaling method together with the scaling reference dataset.
-
-    """
-    new_run_sm = new_run.scaling_method
-    if new_run_sm != old_run.scaling_method:
-        return False
-    else:
-        if new_run_sm != 'none':
-            try:
-                new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
-                run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
-                if new_scal_ref != run_scal_ref:
-                    return False
-            except:
-                return False
-    return True
-
-
-def _compare_validation_runs(new_run, runs_set, user):
-    """
-    Compares two validation runs. It takes a new_run and checks the query given by runs_set according to parameters
-    given in the vr_fileds. If all fields agree it checks datasets configurations.
-
-    It works till the first found validation run or till the end of the list.
-
-    Returns a dict:
-         {
-        'is_there_validation': is_the_same,
-        'val_id': val_id
-        }
-        where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
-    """
-    vr_fields = val_globals.VR_FIELDS
-    is_the_same = False # set to False because it looks for the first found validation run
-    is_published = False
-    old_user = None
-    max_vr_ind = len(vr_fields)
-    max_run_ind = len(runs_set)
-    run_ind = 0
-    while not is_the_same and run_ind < max_run_ind:
-        run = runs_set[run_ind]
-        ind = 0
-        while ind < max_vr_ind and getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]):
-            ind += 1
-        if ind == max_vr_ind and _check_scaling_method(new_run, run):
-            new_run_config = DatasetConfiguration.objects.filter(validation=new_run).order_by('dataset')
-            old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
-            is_the_same = _compare_datasets(new_run_config, old_run_config)
-            val_id = run.id
-            is_published = run.doi != ''
-            old_user = run.user
-        run_ind += 1
-
-    val_id = None if not is_the_same else val_id
-    response = {
-        'is_there_validation': is_the_same,
-        'val_id': val_id,
-        'belongs_to_user': old_user == user,
-        'is_published': is_published
-        }
-    return response
+from validator.validation.validation import compare_validation_runs
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def start_validation(request):
-    check_for_existing_validation = request.query_params.get('check_for_existing_validation', None)
-    existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file=''). \
-        order_by(Case(When(user=request.user, then=0), default=1), '-start_time')
+    check_for_existing_validation = request.query_params.get('check_for_existing_validation', False)
+
     ser = ValidationConfigurationSerializer(data=request.data)
     ser.is_valid(raise_exception=True)
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
     new_val_run.save()
-    comparison_pub = _compare_validation_runs(new_val_run, existing_runs, request.user)
-    connections.close_all()
-    # print(comparison_pub, comparison_pub['is_there_validation'])
-    if check_for_existing_validation == 'true' and comparison_pub['is_there_validation']:
-        new_val_run.delete()
-        response = JsonResponse(comparison_pub, status=status.HTTP_200_OK, safe=False)
-        return response
+
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 
+    if check_for_existing_validation == 'true':
+        existing_runs = ValidationRun.objects.filter(progress=100).exclude(output_file=''). \
+            order_by(Case(When(user=request.user, then=0), default=1), '-start_time')
+        comparison_pub = compare_validation_runs(new_val_run, existing_runs, request.user)
+
+        if comparison_pub['is_there_validation']:
+            new_val_run.delete()
+            response = JsonResponse(comparison_pub, status=status.HTTP_200_OK, safe=False)
+            return response
+
+    connections.close_all()
     p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
     p.start()
     serializer = ValidationRunSerializer(new_val_run)

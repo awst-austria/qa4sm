@@ -1,3 +1,5 @@
+import os
+import netCDF4
 from datetime import datetime
 import logging
 from os import path
@@ -22,15 +24,17 @@ import pytz
 
 from valentina.celery import app
 from validator.mailer import send_val_done_notification
-from validator.models import CeleryTask
+from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
+from api.frontend_urls import get_angular_url
+from shutil import copy2
 
 
 __logger = logging.getLogger(__name__)
@@ -88,7 +92,7 @@ def save_validation_config(validation_run):
 
         ds.qa4sm_version = settings.APP_VERSION
         ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
-        ds.url = settings.SITE_URL + reverse('result', kwargs={'result_uuid': validation_run.id})
+        ds.url = settings.SITE_URL + get_angular_url('result', validation_run.id)
         if(validation_run.interval_from is None):
             ds.val_interval_from="N/A"
         else:
@@ -394,6 +398,7 @@ def run_validation(validation_id):
 
     return validation_run
 
+
 def stop_running_validation(validation_id):
     __logger.info("Stopping validation {} ".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
@@ -405,3 +410,249 @@ def stop_running_validation(validation_id):
     for task in celery_tasks:
         app.control.revoke(task.celery_task_id)  # @UndefinedVariable
         task.delete()
+
+
+def _compare_param_filters(new_param_filters, old_param_filters):
+    """
+    Checking if parametrised filters are the same for given configuration, checks till finds the first failure
+    or till the end of the list.
+
+    If lengths of queries do not agree then return False.
+    """
+    if len(new_param_filters) != len(old_param_filters):
+        return False
+    else:
+        ind = 0
+        max_ind = len(new_param_filters)
+        is_the_same = True
+        while ind < max_ind and new_param_filters[ind].parameters == old_param_filters[ind].parameters:
+            ind += 1
+        if ind != len(new_param_filters):
+            is_the_same = False
+
+    return is_the_same
+
+
+def _compare_filters(new_dataset, old_dataset):
+    """
+    Checking if filters are the same for given configuration, checks till finds the first failure or till the end
+     of the list. If filters are the same, then parameterised filters are checked.
+
+    If lengths of queries do not agree then return False.
+    """
+
+    new_run_filters = new_dataset.filters.all().order_by('name')
+    old_run_filters = old_dataset.filters.all().order_by('name')
+    new_filts_len = len(new_run_filters)
+    old_filts_len = len(old_run_filters)
+
+    if new_filts_len != old_filts_len:
+        return False
+    elif new_filts_len == old_filts_len == 0:
+        is_the_same = True
+        new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
+        if len(new_param_filters) != 0:
+            old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
+            is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
+        return is_the_same
+    else:
+        filt_ind = 0
+        max_filt_ind = new_filts_len
+
+        while filt_ind < max_filt_ind and new_run_filters[filt_ind] == old_run_filters[filt_ind]:
+            filt_ind += 1
+
+        if filt_ind == max_filt_ind:
+            is_the_same = True
+            new_param_filters = new_dataset.parametrisedfilter_set.all().order_by('filter_id')
+            if len(new_param_filters) != 0:
+                old_param_filters = old_dataset.parametrisedfilter_set.all().order_by('filter_id')
+                is_the_same = _compare_param_filters(new_param_filters, old_param_filters)
+        else:
+            is_the_same = False
+    return is_the_same
+
+
+def _compare_datasets(new_run_config, old_run_config):
+    """
+    Takes queries of dataset configurations and compare datasets one by one. If names and versions agree,
+    checks filters.
+
+    Runs till the first failure or til the end of the configuration list.
+    If lengths of queries do not agree then return False.
+    """
+    new_len = len(new_run_config)
+
+    if len(old_run_config) != new_len:
+        return False
+    else:
+        ds_fields = DS_FIELDS
+        max_ds_ind = len(ds_fields)
+        the_same = True
+        conf_ind = 0
+
+        while conf_ind < new_len and the_same:
+            ds_ind = 0
+            new_dataset = new_run_config[conf_ind]
+            old_dataset = old_run_config[conf_ind]
+            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
+                ds_ind += 1
+            if ds_ind == max_ds_ind:
+                the_same = _compare_filters(new_dataset, old_dataset)
+            else:
+                the_same = False
+            conf_ind += 1
+    return the_same
+
+
+def _check_scaling_method(new_run, old_run):
+    """
+    It takes two validation runs and compares scaling method together with the scaling reference dataset.
+
+    """
+    new_run_sm = new_run.scaling_method
+    if new_run_sm != old_run.scaling_method:
+        return False
+    else:
+        if new_run_sm != 'none':
+            try:
+                new_scal_ref = DatasetConfiguration.objects.get(pk=new_run.scaling_ref_id).dataset
+                run_scal_ref = DatasetConfiguration.objects.get(pk=old_run.scaling_ref_id).dataset
+                if new_scal_ref != run_scal_ref:
+                    return False
+            except:
+                return False
+    return True
+
+
+def compare_validation_runs(new_run, runs_set, user):
+    """
+    Compares two validation runs. It takes a new_run and checks the query given by runs_set according to parameters
+    given in the vr_fileds. If all fields agree it checks datasets configurations.
+
+    It works till the first found validation run or till the end of the list.
+
+    Returns a dict:
+         {
+        'is_there_validation': is_the_same,
+        'val_id': val_id
+        }
+        where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
+    """
+    vr_fields = VR_FIELDS
+    is_the_same = False # set to False because it looks for the first found validation run
+    is_published = False
+    old_user = None
+    max_vr_ind = len(vr_fields)
+    max_run_ind = len(runs_set)
+    run_ind = 0
+    while not is_the_same and run_ind < max_run_ind:
+        run = runs_set[run_ind]
+        ind = 0
+        while ind < max_vr_ind and getattr(run, vr_fields[ind]) == getattr(new_run, vr_fields[ind]):
+            ind += 1
+        if ind == max_vr_ind and _check_scaling_method(new_run, run):
+            new_run_config = DatasetConfiguration.objects.filter(validation=new_run).order_by('dataset')
+            old_run_config = DatasetConfiguration.objects.filter(validation=run).order_by('dataset')
+            is_the_same = _compare_datasets(new_run_config, old_run_config)
+            val_id = run.id
+            is_published = run.doi != ''
+            old_user = run.user
+        run_ind += 1
+
+    val_id = None if not is_the_same else val_id
+    response = {
+        'is_there_validation': is_the_same,
+        'val_id': val_id,
+        'belongs_to_user': old_user == user,
+        'is_published': is_published
+        }
+    return response
+
+
+def copy_validationrun(run_to_copy, new_user):
+    # checking if the new validation belongs to the same user:
+    if run_to_copy.user == new_user:
+        run_id = run_to_copy.id
+        # belongs_to_user = True
+    else:
+        # copying validation
+        valrun_user = CopiedValidations(used_by_user=new_user, original_run=run_to_copy)
+        valrun_user.save()
+
+        # old info which is needed then
+        old_scaling_ref_id = run_to_copy.scaling_ref_id
+        old_val_id = str(run_to_copy.id)
+
+        dataset_conf = run_to_copy.dataset_configurations.all()
+
+        run_to_copy.user = new_user
+        run_to_copy.id = None
+        run_to_copy.start_time = datetime.now(tzlocal())
+        run_to_copy.end_time = datetime.now(tzlocal())
+        run_to_copy.save()
+        run_id = run_to_copy.id
+
+        # adding the copied validation to the copied validation list
+        valrun_user.copied_run = run_to_copy
+        valrun_user.save()
+
+        # new configuration
+        for conf in dataset_conf:
+            old_id = conf.id
+            old_filters = conf.filters.all()
+            old_param_filters = conf.parametrisedfilter_set.all()
+
+            # setting new scaling reference id
+            if old_id == old_scaling_ref_id:
+                run_to_copy.scaling_ref_id = conf.id
+
+            new_conf = conf
+            new_conf.pk = None
+            new_conf.validation = run_to_copy
+            new_conf.save()
+
+            # setting filters
+            new_conf.filters.set(old_filters)
+            if len(old_param_filters) != 0:
+                for param_filter in old_param_filters:
+                    param_filter.id = None
+                    param_filter.dataset_config = new_conf
+                    param_filter.save()
+
+        # the reference configuration is always the last one:
+        try:
+            run_to_copy.reference_configuration_id = conf.id
+            run_to_copy.save()
+        except:
+            pass
+
+        # copying files
+        # new directory -> creating if doesn't exist
+        new_dir = os.path.join(OUTPUT_FOLDER, str(run_id))
+        mkdir_if_not_exists(new_dir)
+        # old directory and all files there
+        old_dir = os.path.join(OUTPUT_FOLDER, old_val_id)
+
+        if os.path.isdir(old_dir):
+            old_files = os.listdir(old_dir)
+            if len(old_files) != 0:
+                for file_name in old_files:
+                    new_file = new_dir + '/' + file_name
+                    old_file = old_dir + '/' + file_name
+                    copy2(old_file, new_file)
+                    if '.nc' in new_file:
+                        run_to_copy.output_file = str(run_id) + '/' + file_name
+                        run_to_copy.save()
+                        file = netCDF4.Dataset(new_file, mode='a', format="NETCDF4")
+
+                        # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
+                        new_url = settings.SITE_URL + get_angular_url('result', run_id)
+                        file.setncattr('url', new_url)
+                        file.setncattr('date_copied', run_to_copy.start_time.strftime('%Y-%m-%d %H:%M'))
+                        file.close()
+
+    response = {
+        'run_id': run_id,
+    }
+    return response
