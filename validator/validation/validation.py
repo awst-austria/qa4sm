@@ -425,6 +425,11 @@ def run_validation(validation_id):
                 validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 __logger.exception(
                     'Celery could not execute the job. Job ID: {} Error: {}'.format(async_result.id, async_result.info))
+                # forgetting task doesn't remove it, so cleaning has to be added here
+                if celery_task_cancelled(async_result.id):
+                    validation_aborted = True
+                else:
+                    untrack_celery_task(async_result.id)
             finally:
                 # whether finished or cancelled or failed, forget about this task now
                 async_result.forget()
