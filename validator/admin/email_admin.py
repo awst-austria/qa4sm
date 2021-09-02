@@ -22,7 +22,7 @@ bulk_send_email_to_users.short_description = 'Send an email to the chosen users'
 class EmailAdmin(ModelAdmin):
     __logger = logging.getLogger(__name__)
     model = Email
-    fields = ('send_to', 'subject','content', 'date', 'send_this_email' )
+    fields = ('send_to', 'subject', 'content', 'send_this_email' )
     list_display = ('date', 'subject','content', 'sent')
 
     def __init__(self, model, admin_site):
