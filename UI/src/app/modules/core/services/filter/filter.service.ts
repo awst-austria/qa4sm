@@ -43,21 +43,11 @@ export class FilterService {
     if (this.arrayRequestCache.isCached(datasetId)) {
       return this.arrayRequestCache.get(datasetId);
     } else {
-      let params = new HttpParams().set('dataset', String(datasetId));
-      let filters$ = this.httpClient.get<FilterDto[]>(dataFilterUrl, {params: params}).pipe(shareReplay());
+      // let params = new HttpParams().set('dataset', String(datasetId));
+      let getUrl = dataFilterUrl + '/' + datasetId;
+      let filters$ = this.httpClient.get<FilterDto[]>(getUrl).pipe(shareReplay());
       this.arrayRequestCache.push(datasetId, filters$);
       return filters$;
-    }
-  }
-
-  getFilterById(filterId: number): Observable<FilterDto> {
-    if (this.singleRequestCache.isCached(filterId)) {
-      return this.singleRequestCache.get(filterId);
-    } else {
-      const getURL = dataFilterUrl + '/' + filterId;
-      const filter$ = this.httpClient.get<FilterDto>(getURL).pipe(shareReplay());
-      this.singleRequestCache.push(filterId, filter$);
-      return filter$;
     }
   }
 
@@ -71,27 +61,6 @@ export class FilterService {
     }
   }
 
-  getParameterisedFilterByConfig(configId: number): Observable<ParameterisedFilterDto[]> {
-    if (this.arrayRequestCacheParam.isCached(configId)) {
-      return this.arrayRequestCacheParam.get(configId);
-    } else {
-      const params = new HttpParams().set('config', String(configId));
-      const paramFilters$ = this.httpClient.get<ParameterisedFilterDto[]>(dataParameterisedFilterUrl, {params}).pipe(shareReplay());
-      this.arrayRequestCacheParam.push(configId, paramFilters$);
-      return paramFilters$;
-    }
-  }
-
-  getParameterisedFilterById(paramFilterId: number): Observable<ParameterisedFilterDto> {
-    if (this.singleRequestCacheParam.isCached(paramFilterId)) {
-      return this.singleRequestCacheParam.get(paramFilterId);
-    } else {
-      const getURL = dataParameterisedFilterUrl + '/' + paramFilterId;
-      const paramFilter$ = this.httpClient.get<ParameterisedFilterDto>(getURL).pipe(shareReplay());
-      this.singleRequestCacheParam.push(paramFilterId, paramFilter$);
-      return paramFilter$;
-    }
-  }
 
 }
 

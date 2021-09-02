@@ -1,9 +1,9 @@
+import os
 from datetime import timedelta
 from os import path
 from re import sub as regex_sub
 from shutil import rmtree
 import uuid
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -14,6 +14,8 @@ from django.utils import timezone
 
 from validator.models import DatasetConfiguration, User, CopiedValidations
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
+
+
 
 
 class ValidationRun(models.Model):
@@ -221,7 +223,15 @@ class ValidationRun(models.Model):
 # delete model output directory on disk when model is deleted
 @receiver(post_delete, sender=ValidationRun)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
+    # I know external modules should be imported at the very beginning of the file, but in this case it doesn't work,
+    # I haven't found a solution for that, so I import it here
+    from validator.validation.globals import OUTPUT_FOLDER
     if instance.output_file:
         rundir = path.dirname(instance.output_file.path)
         if path.isdir(rundir):
             rmtree(rundir)
+    else:
+        # this part has to be added, otherwise, when a validation is canceled an empty directory remains
+        outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
+        if os.path.isdir(outdir):
+            rmtree(outdir)

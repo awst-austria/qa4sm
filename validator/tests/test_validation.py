@@ -17,7 +17,10 @@ import pytest
 from dateutil.tz import tzlocal
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
+
+from validator.validation.validation import compare_validation_runs, copy_validationrun
+
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
@@ -38,11 +41,11 @@ from validator.validation import globals
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-from validator.views.results import _copy_validationrun
 from validator.views.validation import _compare_validation_runs
+from django.shortcuts import get_object_or_404
+from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
 
 User = get_user_model()
-
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -1479,7 +1482,7 @@ class TestValidation(TestCase):
                 run.anomalies_to = time_intervals_to
             run.scaling_method = scaling_methods[i]
             run.save()
-            is_there_one = _compare_validation_runs(run, published_runs, user)
+            is_there_one = compare_validation_runs(run, published_runs, user)
 
             assert is_there_one['is_there_validation']
             assert is_there_one['val_id'] == run_ids[i]
@@ -1501,7 +1504,7 @@ class TestValidation(TestCase):
         run.scaling_method = scaling_methods[0]
         run.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # getting back to good coordinates
@@ -1511,26 +1514,26 @@ class TestValidation(TestCase):
         run.max_lon = self.hawaii_coordinates[3]
 
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
         assert is_there_one['val_id'] == run_ids[0]
 
         # spoiling time span:
         run.interval_from = datetime(1990, 1, 1, tzinfo=UTC)
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         run.interval_from = time_intervals_from
         run.interval_to = datetime(2000, 1, 1, tzinfo=UTC)
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # time span restored
         run.interval_to = time_intervals_to
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
         assert is_there_one['val_id'] == run_ids[0]
 
@@ -1538,14 +1541,14 @@ class TestValidation(TestCase):
         # scaling method at the same time):
         run.anomalies = anomalies_methods[1][0]
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         run.anomalies = anomalies_methods[0][0]
         # there is no run with scaling method LINREG
         run.scaling_method = ValidationRun.LINREG
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # restoring existing validation
@@ -1554,26 +1557,26 @@ class TestValidation(TestCase):
         run.anomalies_from = time_intervals_from
         run.anomalies_to = time_intervals_to
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
         assert is_there_one['val_id'] == run_ids[2]
 
         # messing up with anomalies time interval:
         run.anomalies_from = datetime(1990, 1, 1, tzinfo=UTC)
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         run.anomalies_from = time_intervals_from
         run.anomalies_to = datetime(1990, 1, 1, tzinfo=UTC)
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # getting back to appropriate settings
         run.anomalies_to = time_intervals_to
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
 
         # getting back to settings of the run with filters set adding filters for the run
@@ -1582,7 +1585,7 @@ class TestValidation(TestCase):
         run.anomalies_from = None
         run.anomalies_to = None
         run.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
 
         # adding filters
@@ -1602,7 +1605,7 @@ class TestValidation(TestCase):
         new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
                                          dataset_config=run.reference_configuration)
         new_pfilter.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
 
         assert is_there_one['is_there_validation']
         assert is_there_one['val_id'] == run_filt_id
@@ -1615,7 +1618,7 @@ class TestValidation(TestCase):
             if new_config.dataset.short_name == globals.C3S:
                 new_config.filters.add(c3s_filter)
                 new_config.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
 
         assert not is_there_one['is_there_validation']
 
@@ -1623,7 +1626,7 @@ class TestValidation(TestCase):
         for new_config in run.dataset_configurations.all():
             if new_config.dataset.short_name == globals.C3S:
                 new_config.filters.remove(c3s_filter)
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
 
         # removing ismn filter:
@@ -1632,7 +1635,7 @@ class TestValidation(TestCase):
             if new_config.dataset.short_name == globals.ISMN:
                 new_config.filters.remove(ismn_filter)
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # restoring the filter:
@@ -1640,7 +1643,7 @@ class TestValidation(TestCase):
             if new_config.dataset.short_name == globals.ISMN:
                 new_config.filters.add(ismn_filter)
             new_config.save()
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
 
         # messing up with parameterised filters:
@@ -1650,7 +1653,7 @@ class TestValidation(TestCase):
                 pf.parameters = 'SCAN,OZNET'
                 pf.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
@@ -1658,7 +1661,7 @@ class TestValidation(TestCase):
                 pf.parameters = 'OZNET'
                 pf.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # restoring networks
@@ -1667,7 +1670,7 @@ class TestValidation(TestCase):
                 pf.parameters = 'SCAN'
                 pf.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
 
         # with depths
@@ -1676,7 +1679,7 @@ class TestValidation(TestCase):
                 pf.parameters = '0.10,0.20'
                 pf.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # restoring depths
@@ -1685,7 +1688,7 @@ class TestValidation(TestCase):
                 pf.parameters = '0.0,0.1'
                 pf.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
 
         # adding a new dataset:
@@ -1696,12 +1699,12 @@ class TestValidation(TestCase):
         data_c.variable = DataVariable.objects.get(short_name='ASCAT_sm')
         data_c.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         data_c.delete()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
 
         # checking scaling reference:
@@ -1709,7 +1712,7 @@ class TestValidation(TestCase):
         run.scaling_ref = new_ref
         run.save()
 
-        is_there_one = _compare_validation_runs(run, published_runs, user)
+        is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         # ================== tcols ====================================
@@ -1725,7 +1728,7 @@ class TestValidation(TestCase):
         run_tcol.anomalies = anomalies_methods[0][0]
         run_tcol.scaling_method = scaling_methods[0]
         run_tcol.save()
-        is_there_one = _compare_validation_runs(run_tcol, published_runs, user)
+        is_there_one = compare_validation_runs(run_tcol, published_runs, user)
 
         assert is_there_one['is_there_validation']
         assert is_there_one['val_id'] == run_tcol_id
@@ -1734,7 +1737,7 @@ class TestValidation(TestCase):
         run_tcol.tcol = False
         run_tcol.save()
 
-        is_there_one = _compare_validation_runs(run_tcol, published_runs, user)
+        is_there_one = compare_validation_runs(run_tcol, published_runs, user)
         assert not is_there_one['is_there_validation']
 
         ValidationRun.objects.all().delete()
@@ -1768,12 +1771,12 @@ class TestValidation(TestCase):
         run_id = run.id
         val.run_validation(run_id)
         new_run = get_object_or_404(ValidationRun, pk=run_id)
-        copied_run_info = _copy_validationrun(new_run, self.testuser)
+        copied_run_info = copy_validationrun(new_run, self.testuser)
         assert copied_run_info['run_id'] == run_id
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
         copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
-        comparison = _compare_validation_runs(copied_run, validations, copied_run.user)
+        comparison = compare_validation_runs(copied_run, validations, copied_run.user)
 
         # the query validations will be empty so 'is_there_validation' == False, 'val_id' == None, '
         # 'belongs_to_user'==False, 'is_published' == False
@@ -1782,12 +1785,12 @@ class TestValidation(TestCase):
         assert not comparison['belongs_to_user']
         assert not comparison['is_published']
 
-        copied_run_info = _copy_validationrun(new_run, self.testuser2)
+        copied_run_info = copy_validationrun(new_run, self.testuser2)
         assert copied_run_info['run_id'] != run.id
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
         copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
-        comparison = _compare_validation_runs(copied_run, validations, copied_run.user)
+        comparison = compare_validation_runs(copied_run, validations, copied_run.user)
 
         assert comparison['is_there_validation']
         assert comparison['val_id'] == run.id
@@ -1801,7 +1804,7 @@ class TestValidation(TestCase):
 
         # copying again, so to check CopiedValidations model
         new_run = get_object_or_404(ValidationRun, pk=run_id)
-        _copy_validationrun(new_run, self.testuser2)
+        copy_validationrun(new_run, self.testuser2)
 
         # checking if saving to CopiedValidations model is correct (should be 2, because the first validation was
         # returned the same, and only the second and the third one were copied:

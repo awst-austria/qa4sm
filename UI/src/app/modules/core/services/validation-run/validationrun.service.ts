@@ -22,7 +22,13 @@ const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 
 const csrfToken = '{{csrf_token}}';
-const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
+const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
+const archiveResultUrl = urlPrefix + '/archive-result/00000000-0000-0000-0000-000000000000';
+const extendResultUrl = urlPrefix + '/extend-result/00000000-0000-0000-0000-000000000000';
+const publishResultUrl = urlPrefix + '/publish-result/00000000-0000-0000-0000-000000000000';
+const addValidationUrl = urlPrefix + '/add-validation/00000000-0000-0000-0000-000000000000';
+const removeValidationUrl = urlPrefix + '/remove-validation/00000000-0000-0000-0000-000000000000';
+const deleteResultUrl = urlPrefix + '/delete-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
@@ -49,10 +55,6 @@ export class ValidationrunService {
     return this.customValidationrun$;
   }
 
-  getValidationRuns(): Observable<ValidationrunDto[]> {
-    return this.httpClient.get<ValidationrunDto[]>(validationRunsUrl);
-  }
-
   getValidationRunById(id: string): Observable<ValidationrunDto> {
     return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
   }
@@ -66,7 +68,7 @@ export class ValidationrunService {
   }
 
   deleteValidation(validationId: string): Observable<any> {
-    const deleteUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const deleteUrl = deleteResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     return this.httpClient.delete(deleteUrl, {headers});
   }
 
@@ -75,26 +77,26 @@ export class ValidationrunService {
     return this.httpClient.delete(stopUrl, {headers});
   }
 
-  archiveResults(validationId: string, archive: boolean): Observable<any> {
-    const archiveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  archiveResult(validationId: string, archive: boolean): Observable<any> {
+    const archiveUrl = archiveResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     return this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'});
   }
 
-  extendResults(validationId: string): Observable<any> {
-    const extendUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  extendResult(validationId: string): Observable<any> {
+    const extendUrl = extendResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const extend = true;
     return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'});
   }
 
-  saveResults(validationId: string, newName: string): Observable<any> {
-    const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  saveResultsName(validationId: string, newName: string): Observable<any> {
+    const saveUrl = changeNameUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {save_name: true, new_name: newName};
-    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
+    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
 
   }
 
   publishResults(validationId: string, publishingData: any): Observable<any> {
-    const publishUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const publishUrl = publishResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {publish: true, publishing_form: publishingData};
     return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'json'});
   }
@@ -105,13 +107,13 @@ export class ValidationrunService {
   }
 
   addValidation(validationId: string): Observable<any> {
-    const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const addUrl = addValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {add_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
 
   removeValidation(validationId: string): Observable<any> {
-    const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const addUrl = removeValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {remove_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
