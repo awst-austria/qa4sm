@@ -20,6 +20,7 @@ class Command(BaseCommand):
         validations = good_validations.union(canceled_validations)
         cleaned_up = []
         notified = []
+        validations_near_expiring = []
         for validation in validations:
             ## notify user about upcoming expiry if not already done
             if ((validation.is_near_expiry) and (not validation.expiry_notified)):
@@ -28,8 +29,7 @@ class Command(BaseCommand):
                 if timezone.now() + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS/4) > validation.expiry_date:
                     validation.last_extended = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS)
                     validation.save()
-
-                send_val_expiry_notification(validation)
+                validations_near_expiring.append(validation)
                 notified.append(str(validation.id))
                 continue
 
@@ -41,5 +41,8 @@ class Command(BaseCommand):
                     task.delete()
                 validation.delete()
                 cleaned_up.append(vid)
+
+        if len(validations_near_expiring) != 0:
+            send_val_expiry_notification(validations_near_expiring)
 
         self.stdout.write(self.style.SUCCESS('Notified validations: {}\nAuto-cleaned validations: {}'.format(notified, cleaned_up)))
