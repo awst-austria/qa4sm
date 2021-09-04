@@ -10,7 +10,7 @@ Updating dependency versions can be done at any time during the development but 
 
 ## Dependency version management
 
-1. Create a new environment, e.g. with the `environment/recreate_environment_file.sh` script or by updating single python packages in `environment/qa4sm_env.yml`.
+1. Create a new environment, e.g. with the `environment/create_conda_env.sh` (if it doesn't work try with `sudo`) script or by updating single python packages in `environment/qa4sm_env.yml`.
 2. Activate the new environment `conda activate new_env` (if the path has not been changed: new_env = /var/lib/qa4sm-conda).
 3. Test for regressions/problems by running all integration/unit tests with `pytest -m ""` and fix all issues (in particular those coming from updated dependencies).
 4. Test for regressions manually by inspecting all pages and all major functionality of the webapp.
