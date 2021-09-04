@@ -42,7 +42,6 @@ def send_val_done_notification(val_run):
 
 
 def send_val_expiry_notification(val_runs):
-    print('Monika', val_runs, len(val_runs))
     val_ids = ', '.join([str(val.id) for val in val_runs])
     user = val_runs[0].user
     __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_ids, user))
