@@ -63,7 +63,8 @@ def send_val_expiry_notification(val_runs):
         if len(val_runs) == 1:
             body = 'Dear {} {},\n\nyour validation {} will expire soon.\nIt will be deleted automatically on {} ' \
                   'if you take no further action.\nIf you want to extend the validation\'s lifetime or archive it,' \
-                  ' please visit\n{}\n(you will need to log in).\n\nBest regards,\nQA4SM team'.format(
+                  ' please visit\n{}\n(you will need to log in).\nPlease note that archived and published validations' \
+                   ' are not subjected to deletion.\n\nBest regards,\nQA4SM team'.format(
                     user.first_name,
                     user.last_name,
                     val_names[0],
@@ -71,8 +72,10 @@ def send_val_expiry_notification(val_runs):
                     urls[0])
         else:
             body = 'Dear {} {},\n\nyour validations:\n{}\nwill expire soon.\nThey will be deleted automatically on:' \
-                   '\n{}\nif you take no further action.\nIf you want to extend the validation\' lifetime or archive them, ' \
-                   'please visit\n{}\n(you will need to log in).\n\nBest regards,\nQA4SM team'.format(
+                   '\n{}\nif you take no further action.\nIf you want to extend the validations\' ' \
+                   'lifetime or archive them, ' \
+                   'please visit\n{}\n(you will need to log in).\nPlease note that archived and published validations' \
+                   ' are not subjected to deletion.\n\nBest regards,\nQA4SM team'.format(
                     user.first_name,
                     user.last_name,
                     ",\n".join(val_names),
