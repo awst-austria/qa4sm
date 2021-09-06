@@ -113,13 +113,32 @@ class TestCommands(TestCase):
         run5.save()
         runid5 = run5.id
 
+        # test what happens if there is no user assigned to a validation
+        no_user_run = ValidationRun()
+        no_user_run.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        no_user_run.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        no_user_run.user = None
+        no_user_run.save()
+        no_user_run_id = no_user_run.id
+
+        # test what happens if there is no user assigned to a validation, but validation has been published
+        no_user_run_published = ValidationRun()
+        no_user_run_published.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        no_user_run_published.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        no_user_run_published.user = None
+        no_user_run_published.doi = '10101/101.010'
+        no_user_run_published.save()
+        no_user_run_published_id = no_user_run_published.id
+
         ended_vals2 = ValidationRun.objects.filter(end_time__isnull=False).count()
-        assert ended_vals + 5 == ended_vals2
+        assert ended_vals + 7 == ended_vals2
         assert runid1
         assert runid2
         assert runid3
         assert runid4
         assert runid5
+        assert no_user_run_id
+        assert no_user_run_published_id
 
         # run the command
         args = []
@@ -132,6 +151,8 @@ class TestCommands(TestCase):
         run3 = ValidationRun.objects.get(pk=runid3)
         run4 = ValidationRun.objects.get(pk=runid4)
         run5 = ValidationRun.objects.get(pk=runid5)
+        non_user_val = ValidationRun.objects.filter(pk=no_user_run_id)
+        no_user_run_published = ValidationRun.objects.get(pk=no_user_run_published_id)
 
         ## with the last command call, the user should have been notified about most of our test validations
         ## but the validations should not have been deleted yet
@@ -140,6 +161,8 @@ class TestCommands(TestCase):
         assert run3.expiry_notified
         assert run4.expiry_notified
         assert run5.expiry_notified
+        assert len(non_user_val) == 0 # there should be no validation anymore, because it was already removed
+        assert not no_user_run_published.expiry_notified # no notification sent
 
         ## the validations may have been extended in the previous step, undo that to get them really deleted in the next call
         run1.last_extended = None
@@ -157,7 +180,9 @@ class TestCommands(TestCase):
 
         ## the two expired validations should be have been deleted now
         ended_vals3 = ValidationRun.objects.filter(end_time__isnull=False).count()
-        assert ended_vals + 3 == ended_vals3
+        assert ended_vals + 4 == ended_vals3
+
+
 
     def test_setdatasetpaths(self):
         new_test_path = 'new_test_path/'
