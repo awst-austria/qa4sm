@@ -211,3 +211,8 @@ PASSWORD_RESET_TIMEOUT_DAYS = 1
 
 VALIDATION_EXPIRY_DAYS = 60
 VALIDATION_EXPIRY_WARNING_DAYS = 7
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
