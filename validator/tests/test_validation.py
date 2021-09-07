@@ -1769,7 +1769,7 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
         new_run = get_object_or_404(ValidationRun, pk=run_id)
         copied_run_info = _copy_validationrun(new_run, self.testuser)
-        assert copied_run_info['run_id'] == run_id
+        assert copied_run_info['run_id'] == run_id  # the id is the same because it belongs to the user that created it
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
         copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
