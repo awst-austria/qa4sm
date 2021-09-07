@@ -625,9 +625,11 @@ class TestViews(TransactionTestCase):
 
         # with only one parameter, we'll get complaints about the missing formset management hidden inputs
         # see https://docs.djangoproject.com/en/2.2/topics/forms/formsets/#understanding-the-managementform
+        # with django 3.2 apparently it's not 400 anymore
         validation_params = {'scaling_method': 'doesnt exist'}
         result = self.client.post(url, validation_params)
-        self.assertEqual(result.status_code, 400)
+        self.assertEqual(result.status_code, 200)
+        assert result.context['dc_formset']._non_form_errors
 
         ## with a wrong number of dataset configuration forms, we should get an error in the form
         for totalnum in [10, 0]:
