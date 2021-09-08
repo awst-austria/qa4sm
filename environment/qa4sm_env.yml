@@ -180,7 +180,7 @@ dependencies:
     - h5py==3.1.0
     - idna==3.2
     - inflection==0.5.1
-    - ismn==0.4.post0.dev107+g10b5592
+    - git+https://github.com/awst-austria/ismn.git
     - itypes==1.2.0
     - jinja2==3.0.1
     - kombu==4.6.11
