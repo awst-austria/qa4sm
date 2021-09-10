@@ -197,6 +197,26 @@ class TestValidationRunView(TestCase):
         response = self.client.get(tracked_validations_url)
         assert response.status_code == 403
 
+    def test_get_copied_validations(self):
+        # validation copied
+        copied_run = copy_validationrun(ValidationRun.objects.get(pk=self.run_2.id), self.test_user)
+        copied_run_url_name = 'Copied run record'
+
+        # everything is ok
+        response = self.client.get(reverse(copied_run_url_name, kwargs={'id': copied_run['run_id']}))
+        assert response.status_code == 200
+        assert response.json()['original_run'] == str(self.run_2.id)
+
+        # wrong id
+        response = self.client.get(reverse(copied_run_url_name, kwargs={'id': self.wrong_id}))
+        assert response.status_code == 404
+
+        # another user - they should have an access, because this method is used to pass information about a validation,
+        # and we allow sharing validations between users
+        self.client.login(**self.second_user_data)
+        response = self.client.get(reverse(copied_run_url_name, kwargs={'id': copied_run['run_id']}))
+        assert response.status_code == 200
+        assert response.json()['original_run'] == str(self.run_2.id)
 
 
 
