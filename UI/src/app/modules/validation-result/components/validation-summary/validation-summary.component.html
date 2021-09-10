@@ -55,7 +55,11 @@
     </ng-template>
     <div *ngIf="configurations$| async as configurations" class="card-body">
       <ul>
-        <li>Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
+        <li *ngIf="validationRun.is_a_copy">
+          Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
+          original validation run on {{this.originalDate| date: 'mediumDate' :timeZone }}.
+        </li>
+        <li *ngIf="!validationRun.is_a_copy">Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
           on {{ validationRun.end_time | date: dateFormat :timeZone }} {{timeZone}}.
         </li>
         <li>Compared {{ configurations.length  }} datasets:

@@ -31,6 +31,8 @@ export class ValidationSummaryComponent implements OnInit {
   timeZone = 'UTC';
   scalingMethods = SCALING_CHOICES;
   hideElement = true;
+  // isCopied: boolean;
+  originalDate: Date;
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
 
@@ -45,8 +47,10 @@ export class ValidationSummaryComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit(): void {
+    // this.isCopied =
     this.updateConfig();
     this.updateValidationRun();
+    this.getOriginalDate();
   }
 
   getCurrentUser(): number {
@@ -103,7 +107,7 @@ export class ValidationSummaryComponent implements OnInit {
         ...validation,
         runTime: this.getRunTime(validation.start_time, validation.end_time),
         errorRate: validation.total_points !== 0 ? (validation.total_points - validation.ok_points) / validation.total_points : 1,
-        isOwner: validation.user === this.authService.currentUser.id
+        isOwner: validation.user === this.authService.currentUser.id,
       })),
     );
   }
@@ -137,5 +141,15 @@ export class ValidationSummaryComponent implements OnInit {
     } else {
       this.router.navigate(['/my-validations']);
     }
+  }
+
+  getOriginalDate(): void{
+    this.validationModel.validationRun.subscribe(data => {
+      if (data.is_a_copy){
+        this.validationService.getCopiedRunRecord(data.id).subscribe(copiedRun => {
+          this.originalDate = copiedRun.original_run_date;
+        });
+      }
+    });
   }
 }
