@@ -597,7 +597,7 @@ def copy_validationrun(run_to_copy, new_user):
         run_to_copy.is_archived = False
         run_to_copy.expiry_notified = False
 
-        run_to_copy.name_tag = 'copy_of_' + old_val_name
+        run_to_copy.name_tag = 'Copy of ' + old_val_name if old_val_name != '' else 'Copy of Unnamed Validation'
         run_to_copy.save()
         run_id = run_to_copy.id
 
