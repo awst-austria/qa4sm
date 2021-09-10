@@ -114,7 +114,7 @@ def custom_tracked_validation_runs(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_copied_validations(request, **kwargs):
     copied_run = get_object_or_404(CopiedValidations, copied_run_id=kwargs['id'])
     serializer = CopiedValidationRunSerializer(copied_run)
