@@ -584,6 +584,7 @@ def copy_validationrun(run_to_copy, new_user):
         # old info which is needed then
         old_scaling_ref_id = run_to_copy.scaling_ref_id
         old_val_id = str(run_to_copy.id)
+        old_val_name = run_to_copy.name_tag
 
         dataset_conf = run_to_copy.dataset_configurations.all()
 
@@ -596,6 +597,7 @@ def copy_validationrun(run_to_copy, new_user):
         run_to_copy.is_archived = False
         run_to_copy.expiry_notified = False
 
+        run_to_copy.name_tag = 'copy_of_' + old_val_name
         run_to_copy.save()
         run_id = run_to_copy.id
 
