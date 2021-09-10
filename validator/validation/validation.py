@@ -578,11 +578,13 @@ def copy_validationrun(run_to_copy, new_user):
     else:
         # copying validation
         valrun_user = CopiedValidations(used_by_user=new_user, original_run=run_to_copy)
+        valrun_user.original_run_date = run_to_copy.start_time
         valrun_user.save()
 
         # old info which is needed then
         old_scaling_ref_id = run_to_copy.scaling_ref_id
         old_val_id = str(run_to_copy.id)
+        old_val_name = run_to_copy.name_tag
 
         dataset_conf = run_to_copy.dataset_configurations.all()
 
@@ -590,6 +592,12 @@ def copy_validationrun(run_to_copy, new_user):
         run_to_copy.id = None
         run_to_copy.start_time = datetime.now(tzlocal())
         run_to_copy.end_time = datetime.now(tzlocal())
+        # treating this validation as a brand new:
+        run_to_copy.last_extended = None
+        run_to_copy.is_archived = False
+        run_to_copy.expiry_notified = False
+
+        run_to_copy.name_tag = 'copy_of_' + old_val_name
         run_to_copy.save()
         run_id = run_to_copy.id
 

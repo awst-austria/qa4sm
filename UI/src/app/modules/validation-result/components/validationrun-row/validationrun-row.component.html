@@ -41,8 +41,12 @@
 
       </span>
 
-      <span class="font-weight-normal"> Started:
+      <span *ngIf="!validationRun.is_a_copy" class="font-weight-normal"> Started:
         {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}}
+      </span>
+      <span *ngIf="validationRun.is_a_copy" class="font-weight-normal">
+        Copied: {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}} <br>
+        (Date of original run: {{ originalDate|date: 'mediumDate' :timeZone }})
       </span>
 
     </h5>
