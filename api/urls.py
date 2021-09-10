@@ -14,7 +14,7 @@ from api.views.validation_config_view import start_validation, get_validation_co
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.user_view import signup_post, user_update, user_delete, users
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
-    custom_tracked_validation_runs
+    custom_tracked_validation_runs, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, delete_result, change_name, archive_result, \
@@ -96,4 +96,5 @@ urlpatterns = [
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
+    url(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
 ]

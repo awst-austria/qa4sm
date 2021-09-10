@@ -9,7 +9,7 @@ from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.forms import PublishingForm
-from validator.models import ValidationRun
+from validator.models import ValidationRun, CopiedValidations
 from validator.validation import get_inspection_table
 
 
@@ -113,7 +113,21 @@ def custom_tracked_validation_runs(request):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_copied_validations(request, **kwargs):
+    copied_run = get_object_or_404(CopiedValidations, copied_run_id=kwargs['id'])
+    serializer = CopiedValidationRunSerializer(copied_run)
+    return  JsonResponse(serializer.data, status=status.HTTP_200_OK)
+
+
 class ValidationRunSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
+        fields = get_fields_as_list(model)
+
+
+class CopiedValidationRunSerializer(ModelSerializer):
+    class Meta:
+        model = CopiedValidations
         fields = get_fields_as_list(model)
