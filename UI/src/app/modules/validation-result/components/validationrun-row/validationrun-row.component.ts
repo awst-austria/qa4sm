@@ -27,7 +27,6 @@ export class ValidationrunRowComponent implements OnInit {
   timeZone = 'UTC';
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
-  isCopied: boolean;
   originalDate: Date;
 
   constructor(private datasetConfigService: DatasetConfigurationService,
@@ -40,8 +39,7 @@ export class ValidationrunRowComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isCopied = this.is_validation_copied(this.validationRun);
-    if (this.isCopied){
+    if (this.validationRun.is_a_copy){
       this.getOriginalDate(this.validationRun);
     }
     this.updateConfig();
@@ -101,10 +99,6 @@ export class ValidationrunRowComponent implements OnInit {
         this.validationService.refreshComponent(validationId);
       });
     // window.location.reload();
-  }
-
-  is_validation_copied(valrun: ValidationrunDto): boolean{
-    return valrun.doi === '' && this.authService.currentUser.copied_runs.includes(valrun.id);
   }
 
   getOriginalDate(copiedRun: ValidationrunDto): void{
