@@ -9,6 +9,7 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -26,16 +27,23 @@ export class ValidationrunRowComponent implements OnInit {
   timeZone = 'UTC';
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
+  isCopied: boolean;
+  originalDate: Date;
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
               private globalParamsService: GlobalParamsService,
-              private validationService: ValidationrunService) {
+              private validationService: ValidationrunService,
+              private authService: AuthService) {
   }
 
   ngOnInit(): void {
+    this.isCopied = this.is_validation_copied(this.validationRun);
+    if (this.isCopied){
+      this.getOriginalDate(this.validationRun);
+    }
     this.updateConfig();
   }
 
@@ -94,4 +102,15 @@ export class ValidationrunRowComponent implements OnInit {
       });
     // window.location.reload();
   }
+
+  is_validation_copied(valrun: ValidationrunDto): boolean{
+    return valrun.doi === '' && this.authService.currentUser.copied_runs.includes(valrun.id);
+  }
+
+  getOriginalDate(copiedRun: ValidationrunDto): void{
+    this.validationService.getCopiedRunRecord(copiedRun.id).subscribe(data => {
+      this.originalDate = data.original_run_date;
+    });
+  }
+
 }
