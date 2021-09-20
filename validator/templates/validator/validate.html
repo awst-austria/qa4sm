@@ -616,6 +616,8 @@
             $('#id_max_lat').val(coordinates[0][2].lat);
             $('#id_max_lon').val(coordinates[0][2].lng);
 
+            start_ajax_to_set_version_dependent_settings()
+
             $('#mapDialog').modal('hide');
         }
 
