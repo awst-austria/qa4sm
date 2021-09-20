@@ -23,6 +23,10 @@ export class SpatialSubsetComponent implements OnInit {
     this.subsetModel.minLon$.next(null);
   }
 
+  disableGlobal(): boolean{
+    return this.subsetModel.limited$.getValue();
+  }
+
   checkVal(value: number): any{
     if (this.subsetModel.limited$.getValue()){
       return value;
