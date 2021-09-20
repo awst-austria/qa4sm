@@ -1,6 +1,6 @@
 from os import path
 
-from ascat import AscatNc
+from ascat.read_native.cdr import AscatGriddedNcTs
 from c3s_sm.interface import C3STs as c3s_read
 from ecmwf_models.interface import ERATs
 from esa_cci_sm.interface import CCITs
@@ -47,7 +47,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
         ascat_data_folder = path.join(folder_name, 'data')
         ascat_grid_path = first_file_in(path.join(folder_name, 'grid'), '.nc')
         fn_format = "{:04d}"
-        reader = AscatNc(path=ascat_data_folder, fn_format=fn_format,
+        reader = AscatGriddedNcTs(path=ascat_data_folder, fn_format=fn_format,
                          grid_filename=ascat_grid_path, static_layer_path=None,
                          ioclass_kws={'read_bulk':True})
 
