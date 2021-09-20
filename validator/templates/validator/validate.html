@@ -253,7 +253,7 @@
                                                     <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
                                                         <span class="fas fa-globe" ></span>
                                                     </button>
-                                                    <button type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
+                                                    <button id="clear-coordinates" type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
                                                         <span class="fas fa-trash-alt" ></span>
                                                     </button>
                                                 </div>
@@ -849,22 +849,28 @@
 
         function compare_and_set_map_boundaries(params){
             // console.log(params)
-            min_map_lon = -360
-            max_map_lon = 360
+            min_map_lon = -180
+            max_map_lon = 180
             min_map_lat = -90
             max_map_lat = 90
+            var clearButton =  $('#clear-coordinates')
+            clearButton.attr('disabled', false)
 
             if (params[0] != null){
                 min_map_lon = params[0]
+                clearButton.attr('disabled', true)
             }
             if(params[1] != null){
                 max_map_lon = params[1]
+                clearButton.attr('disabled', true)
             }
             if(params[2] != null){
                 min_map_lat = params[2]
+                clearButton.attr('disabled', true)
             }
             if(params[3] != null){
                 max_map_lat = params[3]
+                clearButton.attr('disabled', true)
             }
             bounds = L.latLngBounds(L.latLng(min_map_lat, min_map_lon), L.latLng(max_map_lat, max_map_lon))
             map.setMaxBounds(bounds);
