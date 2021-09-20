@@ -881,7 +881,6 @@
             let min_map_lon = map.options.maxBounds._southWest.lng
             let min_map_lat = map.options.maxBounds._southWest.lat
             let max_map_lat = map.options.maxBounds._northEast.lat
-            console.log(max_map_lon, min_map_lon, max_map_lat, min_map_lat)
 
             if (min_map_lon > min_lon_selector.val() || max_map_lon < max_lon_selector.val() || min_map_lat > min_lat_selector.val() || max_map_lat < max_lat_selector.val()){
                 if (min_map_lon > min_lon_selector.val()){
