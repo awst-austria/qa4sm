@@ -119,7 +119,7 @@ export class BoundingBoxControl extends Control {
       return;
     }
 
-    //remove previous selection from map
+    // //remove previous selection from map
     this.boundingBoxSource.clear();
 
     let geomFunction = createBox();
@@ -136,7 +136,6 @@ export class BoundingBoxControl extends Control {
       this.currentSelectedCoordinates = transformExtent(evt.feature.getGeometry().getExtent(),
         this.getMap().getView().getProjection().getCode(),
         'EPSG:4326');
-
       //then update the model.
       if (!this.boundingBox.limited$.getValue()){
         this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
@@ -144,29 +143,45 @@ export class BoundingBoxControl extends Control {
         this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
         this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
       } else{
-
-        if (this.currentSelectedCoordinates[0] > this.boundingBox.minLon$.getValue()
-          && this.currentSelectedCoordinates[0] < this.boundingBox.maxLon$.getValue()){
+        // checking if chosen coordinates do not exceed limitations
+        let showAlert = false; // if true, the alert will be given that coordinates were adjusted to limitations
+        if (this.currentSelectedCoordinates[0] > this.boundingBox.minLonLimit$.getValue()
+          && this.currentSelectedCoordinates[0] < this.boundingBox.maxLonLimit$.getValue()){
           this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
+        } else{
+          this.boundingBox.minLon$.next(this.boundingBox.minLonLimit$.getValue());
+          showAlert = true;
         }
-        if (this.currentSelectedCoordinates[1] > this.boundingBox.minLat$.getValue()
-          && this.currentSelectedCoordinates[1] < this.boundingBox.maxLat$.getValue()){
+
+        if (this.currentSelectedCoordinates[1] > this.boundingBox.minLatLimit$.getValue()
+          && this.currentSelectedCoordinates[1] < this.boundingBox.maxLatLimit$.getValue()){
           this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
+        } else{
+          this.boundingBox.minLat$.next(this.boundingBox.minLatLimit$.getValue());
+          showAlert = true;
         }
-        if (this.currentSelectedCoordinates[2] < this.boundingBox.maxLon$.getValue()
-          && this.currentSelectedCoordinates[2]  > this.boundingBox.minLon$.getValue()){
+
+        if (this.currentSelectedCoordinates[2] < this.boundingBox.maxLonLimit$.getValue()
+          && this.currentSelectedCoordinates[2]  > this.boundingBox.minLonLimit$.getValue()){
           this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
+        } else {
+          this.boundingBox.maxLon$.next(this.boundingBox.maxLonLimit$.getValue());
+          showAlert = true;
         }
-        if (this.currentSelectedCoordinates[3] < this.boundingBox.maxLat$.getValue()
-        && this.currentSelectedCoordinates[3] > this.boundingBox.minLat$.getValue()){
+
+        if (this.currentSelectedCoordinates[3] < this.boundingBox.maxLatLimit$.getValue()
+        && this.currentSelectedCoordinates[3] > this.boundingBox.minLatLimit$.getValue()){
           this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
+        } else {
+          this.boundingBox.maxLat$.next(this.boundingBox.maxLatLimit$.getValue());
+          showAlert = true;
         }
-
         this.updateBoundingBox();
+        if (showAlert){
         alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
-          'Bounds have been corrected to fit available subsetting');
+            'Bounds have been corrected to fit available subsetting');
+        }
       }
-
 
       this.getMap().removeInteraction(this.bboxDraw);
       this.bboxDraw = null;
