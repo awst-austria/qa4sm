@@ -136,6 +136,7 @@ export class BoundingBoxControl extends Control {
       this.currentSelectedCoordinates = transformExtent(evt.feature.getGeometry().getExtent(),
         this.getMap().getView().getProjection().getCode(),
         'EPSG:4326');
+
       //then update the model.
       if (!this.boundingBox.limited$.getValue()){
         this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
@@ -176,9 +177,24 @@ export class BoundingBoxControl extends Control {
           this.boundingBox.maxLat$.next(this.boundingBox.maxLatLimit$.getValue());
           showAlert = true;
         }
-        this.updateBoundingBox();
         if (showAlert){
-        alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+          // here I'm creating a new extent to create new geometry to set it to the current event
+          const extent = boundingExtent([
+            [this.boundingBox.minLon$.getValue(), this.boundingBox.minLat$.getValue()],
+            [this.boundingBox.maxLon$.getValue(), this.boundingBox.maxLat$.getValue()]]);
+
+          const boxCoordinates = [
+            [getBottomLeft(extent),
+              getBottomRight(extent),
+              getTopRight(extent),
+              getTopLeft(extent),
+              getBottomLeft(extent)],
+          ];
+
+          evt.feature.setGeometry(new Polygon(boxCoordinates));
+
+          // and here, we inform a user about that
+          alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
             'Bounds have been corrected to fit available subsetting');
         }
       }
