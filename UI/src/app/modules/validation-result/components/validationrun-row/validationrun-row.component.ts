@@ -9,6 +9,7 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -26,16 +27,21 @@ export class ValidationrunRowComponent implements OnInit {
   timeZone = 'UTC';
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
+  originalDate: Date;
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
               private globalParamsService: GlobalParamsService,
-              private validationService: ValidationrunService) {
+              private validationService: ValidationrunService,
+              private authService: AuthService) {
   }
 
   ngOnInit(): void {
+    if (this.validationRun.is_a_copy){
+      this.getOriginalDate(this.validationRun);
+    }
     this.updateConfig();
   }
 
@@ -92,4 +98,11 @@ export class ValidationrunRowComponent implements OnInit {
       });
     // window.location.reload();
   }
+
+  getOriginalDate(copiedRun: ValidationrunDto): void{
+    this.validationService.getCopiedRunRecord(copiedRun.id).subscribe(data => {
+      this.originalDate = data.original_run_date;
+    });
+  }
+
 }

@@ -20,6 +20,7 @@ const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names
 const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comparison';
 const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
+const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 
 const csrfToken = '{{csrf_token}}';
 const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
@@ -142,6 +143,11 @@ export class ValidationrunService {
 
   copyValidation(params: any): Observable<any>{
     return this.httpClient.get(copyValidationUrl, {params});
+  }
+
+  getCopiedRunRecord(validationId: string): Observable<any>{
+    const urlWithParam = copiedValidationRecordUrl + '/' + validationId;
+    return this.httpClient.get(urlWithParam);
   }
 
 }
