@@ -253,7 +253,7 @@
                                                     <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
                                                         <span class="fas fa-globe" ></span>
                                                     </button>
-                                                    <button type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
+                                                    <button id="clear-coordinates" type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
                                                         <span class="fas fa-trash-alt" ></span>
                                                     </button>
                                                 </div>
@@ -616,6 +616,8 @@
             $('#id_max_lat').val(coordinates[0][2].lat);
             $('#id_max_lon').val(coordinates[0][2].lng);
 
+            start_ajax_to_set_version_dependent_settings()
+
             $('#mapDialog').modal('hide');
         }
 
@@ -624,6 +626,7 @@
             $('#id_min_lon').val('');
             $('#id_max_lat').val('');
             $('#id_max_lon').val('');
+            start_ajax_to_set_version_dependent_settings()
         }
 
         function drawBoxFromCoordinates() {
@@ -849,8 +852,8 @@
 
         function compare_and_set_map_boundaries(params){
             // console.log(params)
-            min_map_lon = -360
-            max_map_lon = 360
+            min_map_lon = -180
+            max_map_lon = 180
             min_map_lat = -90
             max_map_lat = 90
 
@@ -881,19 +884,18 @@
             let min_map_lon = map.options.maxBounds._southWest.lng
             let min_map_lat = map.options.maxBounds._southWest.lat
             let max_map_lat = map.options.maxBounds._northEast.lat
-            console.log(max_map_lon, min_map_lon, max_map_lat, min_map_lat)
 
             if (min_map_lon > min_lon_selector.val() || max_map_lon < max_lon_selector.val() || min_map_lat > min_lat_selector.val() || max_map_lat < max_lat_selector.val()){
-                if (min_map_lon > min_lon_selector.val()){
+                if (min_map_lon > min_lon_selector.val() || min_lon_selector.val() == ''){
                     min_lon_selector.val(min_map_lon)
                 }
-                if (max_map_lon < max_lon_selector.val()){
+                if (max_map_lon < max_lon_selector.val() || max_lon_selector.val() == ''){
                     max_lon_selector.val(max_map_lon)
                 }
-                if ( min_map_lat > min_lat_selector.val()){
+                if (min_map_lat > min_lat_selector.val() || min_lat_selector.val() == ''){
                     min_lat_selector.val(min_map_lat)
                 }
-                if (max_map_lat < max_lat_selector.val()){
+                if (max_map_lat < max_lat_selector.val() || max_lat_selector.val() == ''){
                     max_lat_selector.val(max_map_lat)
                 }
 
