@@ -115,6 +115,69 @@ def custom_tracked_validation_runs(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
+def get_summary_statistics(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
+    # rest of the columns when df rendered as html
+    inspection_table = get_inspection_table(validation).reset_index()
+
+    response = HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
+                                                 index=False))
+
+    return response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_validations_for_comparison(request):
+    ref_dataset = request.query_params.get('ref_dataset', 'ISMN')
+    ref_version = request.query_params.get('ref_version', 'ISMN_V20191211')
+    # by default, take 2 datasets at maximum
+    max_non_reference_datasets = int(request.query_params.get('max_datasets', 1))
+    max_datasets = max_non_reference_datasets + 1  # add the reference
+    # filter the validation runs based on the reference dataset/version
+    ref_filtered = ValidationRun.objects.filter(
+        reference_configuration__dataset__short_name=ref_dataset,
+        reference_configuration__version__short_name=ref_version,
+    ).exclude(
+        output_file='')
+    # filter based on the number of non-reference datasets
+    eligible4comparison = []
+    for val in ref_filtered:
+        if val is None:
+            continue
+        if val.dataset_configurations.count() == max_datasets:
+            eligible4comparison.append(val)
+
+    if not eligible4comparison:
+        return JsonResponse(None, status=status.HTTP_200_OK, safe=False)
+
+    serializer = ValidationRunSerializer(eligible4comparison, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+@api_view(['GET'])
+def get_publishing_form(request):
+    validation_id = request.query_params.get('id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    # validation = ValidationRun.objects.all()[0]
+    publishing_form = PublishingForm(validation=validation)
+    print(publishing_form.data)
+    return JsonResponse(publishing_form.data, status=200)
+
+
+@api_view(['GET'])
+def copy_validation_results(request):
+    validation_id = request.query_params.get('validation_id', None)
+    validation = get_object_or_404(ValidationRun, id=validation_id)
+    current_user = request.user
+
+    new_validation = _copy_validationrun(validation, current_user)
+
+    return JsonResponse(new_validation, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def get_copied_validations(request, **kwargs):
     copied_run = get_object_or_404(CopiedValidations, copied_run_id=kwargs['id'])
     serializer = CopiedValidationRunSerializer(copied_run)

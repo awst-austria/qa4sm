@@ -17,6 +17,7 @@ const downloadResultsUrl: string = urlPrefix + '/download-result';
 const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
 const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
+const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comparison';
 const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
@@ -61,6 +62,10 @@ export class ValidationrunService {
 
   getCustomTrackedValidations(): Observable<ValidationrunDto[]> {
     return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl);
+  }
+
+  getValidationsForComparison(params: any): Observable<ValidationrunDto[]> {
+    return this.httpClient.get<ValidationrunDto[]>(validations4ComparisonUrl, {params});
   }
 
   deleteValidation(validationId: string): Observable<any> {

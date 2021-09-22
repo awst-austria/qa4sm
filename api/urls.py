@@ -12,9 +12,11 @@ from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
 from api.views.validation_config_view import start_validation, get_validation_configuration
 from api.views.uptime_view import uptime_ping, get_uptime
+from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric,\
+    download_comparison_table, get_comparison_metrics, get_spatial_extent
 from api.views.user_view import signup_post, user_update, user_delete, users
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
-    custom_tracked_validation_runs, get_copied_validations
+    custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, delete_result, change_name, archive_result, \
@@ -23,7 +25,6 @@ from api.views.serving_file_view import get_results, get_csv_with_statistics, ge
     get_metric_names_and_associated_files, get_graphic_file, get_summary_statistics
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import settings
-
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -73,6 +74,12 @@ urlpatterns = [
     path('validation-configuration', start_validation, name='Run new validation'),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
+    path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
+    path('table-comparison', get_comparison_table, name='Comparison table'),
+    path('plots-comparison', get_comparison_plots_for_metric, name='Comparison plots'),
+    path('image-comparison', get_spatial_extent, name='Extent image'),
+    path('metrics-for-comparison', get_comparison_metrics, name='Comparison metrics'),
+    path('download-comparison-table', download_comparison_table, name='Download comparison csv'),
     path('delete-validation/<uuid:result_uuid>/', delete_result, name='Delete validation'),
     path('change-validation-name/<uuid:result_uuid>/', change_name, name='Change name'),
     path('archive-result/<uuid:result_uuid>/', archive_result, name='Archive results'),
@@ -88,6 +95,7 @@ urlpatterns = [
     path('uptime-report', get_uptime),
     path('get-graphic-files', get_graphic_files, name='Get graphic files'),
     path('get-metric-and-plots-names', get_metric_names_and_associated_files, name='Get metric and plots names'),
+    path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison'),
     path('country-list', get_list_of_countries, name = 'List of countries'),
     path('sign-up', signup_post, name='Sign up'),
     path('user-update', user_update, name='User update'),
@@ -98,3 +106,4 @@ urlpatterns = [
     path('copy-validation', copy_validation_results, name='Copy validation results'),
     url(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
 ]
+

@@ -84,8 +84,6 @@ export class ValidationrunRowComponent implements OnInit {
       status = 'Cancelled';
     } else if (valrun.end_time != null) {
       status = 'ERROR';
-    } else {
-      status = 'Running' + ' ' + `${valrun.progress}%`;
     }
     return status;
   }

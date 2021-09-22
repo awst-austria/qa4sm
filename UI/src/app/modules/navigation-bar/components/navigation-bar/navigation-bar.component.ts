@@ -25,6 +25,7 @@ export class NavigationBarComponent implements OnInit {
       {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate']},
       {label: 'My validations', icon: 'pi pi-fw pi-folder', routerLink: ['my-validations']},
       {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
+      {label: 'Compare validations', icon: 'pi pi-fw pi-th-large', routerLink: ['comparison']},
       {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
           {label: 'About', icon: 'pi pi-fw pi-info', routerLink: ['about']},

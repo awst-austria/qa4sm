@@ -23,6 +23,7 @@ import {Router} from '@angular/router';
 export class ValidationSummaryComponent implements OnInit {
 
   @Input() validationModel: ValidationResultModel;
+  @Input() forComparison: boolean = false;
   @Output() doRefresh = new EventEmitter();
 
   configurations$: Observable<any>;

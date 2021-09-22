@@ -47,6 +47,8 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
+import {ComparisonComponent} from './pages/comparison/comparison.component';
+import {ComparisonModule} from './modules/comparison/comparison.module';
 import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
@@ -71,6 +73,7 @@ import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/
     AboutComponent,
     TermsComponent,
     DatasetInfoComponent,
+    ComparisonComponent,
     HelpComponent,
     SignupComponent,
     SignupCompleteComponent,
@@ -107,6 +110,7 @@ import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/
     ScalingModule,
     NgxPaginationModule,
     MapModule,
+    ComparisonModule,
     IvyGalleryModule,
     NgxPageScrollModule,
     CoreModule,
