@@ -71,7 +71,7 @@ fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
 
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.6 numpy scipy pandas cython pytest==5.4.3 pip matplotlib pyproj django pyresample pygrib cartopy xarray
+conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.7 numpy scipy pandas cython pytest==5.4.3 pip matplotlib pyproj django==3.1.3 pyresample pygrib cartopy xarray
 source activate $PYTHON_ENV_DIR
 
 pip uninstall --yes shapely
@@ -90,7 +90,7 @@ pip install django-widget-tweaks
 pip install psycopg2-binary
 pip install pytest-cov
 pip install pytest-mpl
-pip install celery==4.1.1
+pip install celery
 pip install celery[redis]
 pip install gldas
 pip install smap-io
