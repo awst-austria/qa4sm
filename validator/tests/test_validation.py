@@ -15,20 +15,15 @@ import numpy as np
 import pandas as pd
 import pytest
 from dateutil.tz import tzlocal
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 
 from validator.validation.validation import compare_validation_runs, copy_validationrun
 
 User = get_user_model()
-from django.shortcuts import get_object_or_404
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
 
-import numpy as np
-import pandas as pd
 from django.conf import settings
 from validator.models import DataFilter
 from validator.models import DataVariable
