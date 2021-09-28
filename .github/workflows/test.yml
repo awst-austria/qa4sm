@@ -39,6 +39,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
           environment-file: environment/qa4sm_env.yml
           activate-environment: qa4sm # todo: must match with name in environment.yml
+      - name: Print environment infos
+        run: |
+          conda info -a
+          conda list
+          pip list
+          which pip
+          which python
       - name: Activate Environment
         run: conda activate qa4sm
       - name: Apply needed settings

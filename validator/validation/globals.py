@@ -126,4 +126,12 @@ METADATA_TEMPLATE = {'other_ref': None,
                                  'station': np.array([' ' * 256]),
                                  'timerange_from': np.array([' ' * 256]),
                                  'timerange_to': np.array([' ' * 256]),
-                                 'variable': np.array([' ' * 256])}}
+                                 'variable': np.array([' ' * 256]),
+                                 'instrument_depthfrom': np.float32([np.nan]),
+                                 'instrument_depthto': np.float32([np.nan])
+                                 }
+                     }
+
+INSTRUMENT_META = "instrument"
+MEASURE_DEPTH_FROM = "instrument_depthfrom"
+MEASURE_DEPTH_TO = "instrument_depthto"
