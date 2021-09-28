@@ -10,8 +10,6 @@ from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
-from django.urls.base import reverse
-from ismn.interface import ISMN_Interface
 from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
