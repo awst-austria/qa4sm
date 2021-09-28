@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0034_mutually_exclusive_filters'),
+        ('validator', '0034_copiedvalidations_original_run_date'),
     ]
 
     operations = [
