@@ -6,10 +6,8 @@ dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
   - alsa-lib=1.2.3
-  - asgiref=3.3.4
+  - asgiref=3.4.1
   - attrs=21.2.0
-  - backports=1.0
-  - backports.functools_lru_cache=1.6.4
   - bzip2=1.0.8
   - c-ares=1.17.2
   - ca-certificates=2021.5.30
@@ -20,10 +18,11 @@ dependencies:
   - cycler=0.10.0
   - cython=0.29.24
   - dbus=1.13.6
-  - django=3.1.3
-  - eccodes=2.22.1
+  - django=3.2.7
+  - eccodes=2.23.0
   - expat=2.4.1
   - fontconfig=2.13.1
+  - freeglut=3.2.1
   - freetype=2.10.4
   - geos=3.9.1
   - gettext=0.19.8.1
@@ -32,10 +31,10 @@ dependencies:
   - gst-plugins-base=1.18.5
   - gstreamer=1.18.5
   - hdf4=4.2.15
-  - hdf5=1.10.6
+  - hdf5=1.12.1
   - icu=68.1
-  - importlib-metadata=4.8.1
-  - jasper=1.900.1
+  - iniconfig=1.1.1
+  - jasper=2.0.14
   - jbig=2.1
   - jpeg=9d
   - kiwisolver=1.3.2
@@ -57,11 +56,12 @@ dependencies:
   - libgfortran-ng=11.2.0
   - libgfortran5=11.2.0
   - libglib=2.68.4
+  - libglu=9.0.0
   - libgomp=11.2.0
   - libiconv=1.16
   - liblapack=3.9.0
   - libllvm11=11.1.0
-  - libnetcdf=4.8.0
+  - libnetcdf=4.8.1
   - libnghttp2=1.43.0
   - libogg=1.3.4
   - libopenblas=0.3.17
@@ -95,7 +95,7 @@ dependencies:
   - pcre=8.45
   - pillow=8.3.2
   - pip=21.2.4
-  - pluggy=0.13.1
+  - pluggy=1.0.0
   - proj=8.1.0
   - pthread-stubs=0.4
   - py=1.10.0
@@ -110,7 +110,7 @@ dependencies:
   - pyqtwebengine=5.12.1
   - pyresample=1.21.1
   - pyshp=2.1.3
-  - pytest=5.4.3
+  - pytest=6.2.5
   - python=3.8.12
   - python-dateutil=2.8.2
   - python_abi=3.8
@@ -120,20 +120,29 @@ dependencies:
   - readline=8.1
   - scipy=1.7.1
   - setuptools=58.0.4
+  - shapely=1.7.1
   - six=1.16.0
   - sqlite=3.36.0
   - sqlparse=0.4.2
   - tk=8.6.11
+  - toml=0.10.2
   - tornado=6.1
   - typing_extensions=3.10.0.2
-  - wcwidth=0.2.5
   - wheel=0.37.0
   - xarray=0.19.0
+  - xorg-fixesproto=5.0
+  - xorg-inputproto=2.3.2
+  - xorg-kbproto=1.0.7
+  - xorg-libx11=1.7.2
   - xorg-libxau=1.0.9
   - xorg-libxdmcp=1.1.3
+  - xorg-libxext=1.3.4
+  - xorg-libxfixes=5.0.3
+  - xorg-libxi=1.7.10
+  - xorg-xextproto=7.3.0
+  - xorg-xproto=7.0.31
   - xz=5.2.5
   - yaml=0.2.5
-  - zipp=3.5.0
   - zlib=1.2.11
   - zstd=1.5.0
   - pip:
@@ -141,14 +150,13 @@ dependencies:
     - ascat==2.0.1
     - billiard==3.6.4.0
     - c3s-sm==0.1.2
-    - cached-property==1.5.2
     - cadati==0.0.2
     - cdsapi==0.5.1
     - celery==5.1.2
-    - cftime==1.5.0
+    - cftime==1.5.1
     - charset-normalizer==2.0.6
     - click==7.1.2
-    - click-didyoumean==0.0.3
+    - click-didyoumean==0.3.0
     - click-plugins==1.1.1
     - click-repl==0.2.0
     - colorcet==2.0.6
@@ -163,9 +171,7 @@ dependencies:
     - drf-yasg==1.20.0
     - ease-grid==0.2
     - ecmwf-api-client==1.6.1
-    - ecmwf-models==0.7
     - esa-cci-sm==0.1.1
-    - gldas==0.6.1
     - h5netcdf==0.11.0
     - h5py==3.4.0
     - idna==3.2
@@ -192,20 +198,19 @@ dependencies:
     - pytest-cov==2.12.1
     - pytest-django==4.4.0
     - pytest-mpl==0.13
-    - qa4sm-reader==0.5
+    - qa4sm-reader==0.6.0
     - redis==3.5.3
     - repurpose==0.8
     - requests==2.26.0
     - ruamel-yaml==0.17.16
     - ruamel-yaml-clib==0.2.6
     - seaborn==0.11.2
-    - shapely==1.7.1
     - smap-io==0.4
     - smecv-grid==0.2.1
     - smos==0.2
-    - toml==0.10.2
     - tqdm==4.62.3
     - trollsift==0.2.1
     - uritemplate==3.0.1
     - urllib3==1.26.7
     - vine==5.0.0
+    - wcwidth==0.2.5
