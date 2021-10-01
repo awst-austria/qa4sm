@@ -14,7 +14,7 @@ class Email(models.Model):
     sent = models.BooleanField(default=False)
 
     def send_email(self):
-        recipients = [user.email for user in self.send_to.all() if user.email is not '']
+        recipients = [user.email for user in self.send_to.all() if user.email != '']
         if len(recipients) != 0:
             _send_email(recipients, self.subject, self.content)
         else:
