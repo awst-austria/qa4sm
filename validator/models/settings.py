@@ -4,6 +4,7 @@ class Settings(models.Model):
     class Meta:
         verbose_name_plural = "Settings"
 
+    id = models.AutoField(primary_key=True)
     maintenance_mode = models.BooleanField(default=True)
     news = models.TextField(blank=True)
 
