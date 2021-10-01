@@ -6,6 +6,7 @@ from django.conf import settings
 
 
 class Email(models.Model):
+    id = models.AutoField(primary_key=True)
     send_to = models.ManyToManyField(User, related_name='addressees')
     subject = models.CharField(max_length=200)
     content = models.TextField()
