@@ -78,6 +78,7 @@ dependencies:
   - libxkbcommon=1.0.3
   - libxml2=2.9.12
   - libzip=1.8.0
+  - libzlib=1.2.11
   - lz4-c=1.9.3
   - matplotlib=3.4.3
   - matplotlib-base=3.4.3
@@ -96,7 +97,7 @@ dependencies:
   - pillow=8.3.2
   - pip=21.2.4
   - pluggy=1.0.0
-  - proj=8.1.0
+  - proj=8.1.1
   - pthread-stubs=0.4
   - py=1.10.0
   - pygrib=2.1.4
@@ -163,7 +164,7 @@ dependencies:
     - configparser==5.0.2
     - coreapi==2.3.3
     - coreschema==0.0.4
-    - coverage==5.5
+    - coverage==6.0
     - datedown==0.3
     - django-countries==7.2.1
     - django-widget-tweaks==1.4.8
@@ -180,7 +181,7 @@ dependencies:
     - inflection==0.5.1
     - ismn==1.1.0
     - itypes==1.2.0
-    - jinja2==3.0.1
+    - jinja2==3.0.2
     - kombu==5.1.0
     - llvmlite==0.37.0
     - lxml==4.6.3
@@ -197,7 +198,7 @@ dependencies:
     - pygeogrids==0.4.1
     - pynetcf==0.2.2
     - pytesmo==0.12.0
-    - pytest-cov==2.12.1
+    - pytest-cov==3.0.0
     - pytest-django==4.4.0
     - pytest-mpl==0.13
     - qa4sm-reader==0.6.0
@@ -210,6 +211,7 @@ dependencies:
     - smap-io==0.4
     - smecv-grid==0.2.1
     - smos==0.2
+    - tomli==1.2.1
     - tqdm==4.62.3
     - trollsift==0.2.1
     - uritemplate==3.0.1
