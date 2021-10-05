@@ -33,6 +33,10 @@ class TestAdmin(TestCase):
 
     __logger = logging.getLogger(__name__)
 
+    # setting False, because the page that we refer here may raise logging.exception and pytest 6.0.0 and newer
+    # does not handle it
+    logging.raiseExceptions = False
+
     def setUp(self):
         self.user_credentials = {
             'username': 'testuser',
