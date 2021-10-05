@@ -6,7 +6,7 @@ from validator.models import Email
 from django.contrib.admin import ModelAdmin
 
 def bulk_send_email_to_users(modeladmin, request, queryset):
-    recipients = [user.email for user in queryset if user.email is not '']
+    recipients = [user.email for user in queryset if user.email != '']
     new_email = Email(subject='', content='')
     new_email.save()
     for user in queryset:
