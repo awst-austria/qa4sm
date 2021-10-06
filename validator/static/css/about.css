@@ -16,3 +16,9 @@
     height: 6rem;
     float: right;
 }
+
+#logo_esa {
+    height: 4rem;
+    float: right;
+    margin-left: 2rem
+}
