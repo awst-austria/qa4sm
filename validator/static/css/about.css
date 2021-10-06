@@ -20,5 +20,6 @@
 #logo_esa {
     height: 4rem;
     float: right;
-    margin-left: 2rem
+    margin-left: 2rem;
+    margin-bottom: 0.5rem;
 }
