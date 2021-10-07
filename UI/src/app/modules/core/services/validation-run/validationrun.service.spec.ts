@@ -1,13 +1,21 @@
+// Http testing module and mocking controller
+import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
+// Other imports
+import {HttpClient} from '@angular/common/http';
 import {TestBed} from '@angular/core/testing';
 
 import {ValidationrunService} from './validationrun.service';
 
 describe('ValidationrunService', () => {
   let service: ValidationrunService;
+  let httpClient: HttpClient;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
     service = TestBed.inject(ValidationrunService);
+    httpClient = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   it('should be created', () => {
