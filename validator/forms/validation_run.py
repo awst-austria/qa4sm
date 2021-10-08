@@ -28,6 +28,7 @@ class ValidationRunForm(forms.ModelForm):
             'max_lat',
             'max_lon',
             'tcol',
+            'bootstrap_tcol_cis',
             ]
 
     scaling_ref = forms.fields.ChoiceField(choices=[(ValidationRun.SCALE_TO_REF, 'Reference'), (ValidationRun.SCALE_TO_DATA, 'Data'), ])
