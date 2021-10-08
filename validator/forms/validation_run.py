@@ -71,6 +71,7 @@ class ValidationRunForm(forms.ModelForm):
 
         # remember initial tcol value to set it correctly in setTcLock
         self.initial_tcol = self.fields["tcol"].initial
+        self.initial_bootstrap_tcol_cis = self.fields["bootstrap_tcol_cis"].initial
 
     def clean(self):
         values = super(ValidationRunForm, self).clean()

@@ -358,13 +358,22 @@
 
                                         <div class="container">
                                             <div class="row">
-                                                 <div class="custom-control custom-switch">
+                                                <div class="custom-control custom-switch">
                                                     <input id="tcol" class="custom-control-input" name="tcol" type="checkbox" disabled="true">
-                                                    <label class="custom-control-label" for="tcol">Include Triple Collocation Metrics &nbsp;</label>
-                                                 </div>
-
+                                                    <label class="custom-control-label" for="tcol">Include Triple Collocation metrics &nbsp;</label>
+                                                </div>
                                                 <span class="input-group-text fas fa-question-circle help-icon"
-                                                    title="Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.">
+                                                      title="Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.">
+                                                </span>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="custom-control custom-switch">
+                                                    <input id="bootstrap_tcol_cis" class="custom-control-input" name="bootstrap_tcol_cis" type="checkbox" disabled="true">
+                                                    <label class="custom-control-label" for="bootstrap_tcol_cis">Bootstrap Triple Collocation metric confidence intervals (Warning: very slow) &nbsp;</label>
+                                                </div>
+                                                <span class="input-group-text fas fa-question-circle help-icon"
+                                                      title="Calculates confidence intervals via bootstrapping with 1000 repetitions. This can significantly impact performance, typically increases runtime by a factor of 5.">
                                                 </span>
                                             </div>
                                         </div>
@@ -999,7 +1008,7 @@
             setTcLock();
         });
 
-        function setTcLock(checked = false) {
+        function setTcLock(checked = false, checked_bootstrap = false) {
             var formsetPrefix = 'datasets';
             var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
             var totalNoForms = $(totalSelector).val();
@@ -1007,11 +1016,30 @@
             if ( n_datasets >= 3) {
                 $('#tcol').prop('checked', checked);
                 $('#tcol').prop('disabled', false);
+                // If the box is already checked (happens when loading an
+                // existing validation), then directly unlock the bootstrapping
+                // button and set it to the right value.
+                // Otherwise the bootstrap button will be unlocked/locked
+                // whenever the tcol checkbox changes
+                if (checked) {
+                    $('#bootstrap_tcol_cis').prop('checked', checked_bootstrap)
+                    $('#bootstrap_tcol_cis').prop('disabled', false);
+                }
             } else {
                 $('#tcol').prop('checked', false);
                 $('#tcol').prop('disabled', true);
             }
         }
+
+        // upon changes to the tcol checkbox enable/disable the bootstrapping
+        // checkbox accordingly
+        $('#tcol').change(function() {
+            if ($('#tcol:checked').val() == 'on') {
+                $('#bootstrap_tcol_cis').prop('disabled', false);
+            } else {
+                $('#bootstrap_tcol_cis').prop('disabled', true);
+            }
+        });
     </script>
 
     <script type="text/javascript">
@@ -1120,7 +1148,7 @@
                     prev_container.toggleClass('active show')
                 }
             }
-        setTcLock();
+            setTcLock();
         }
 
         $('#remove_dc_form').click(function() {
@@ -1219,9 +1247,12 @@
       if($('#id_datasets-TOTAL_FORMS') >= $('#id_datasets-MIN_NUM_FORMS')){
         set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
       }
-      // and here the same just for tcol, but make sure to remember the
-      // original state
-      setTcLock({{ val_form.initial_tcol|yesno:"true,false" }});
+        // and here the same just for tcol, but make sure to remember the
+        // original state
+        setTcLock(
+            checked = {{ val_form.initial_tcol|yesno:"true,false" }},
+            checked_bootstrap = {{ val_form.initial_bootstrap_tcol_cis|yesno:"true,false" }}
+        );
 
 
       if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){
