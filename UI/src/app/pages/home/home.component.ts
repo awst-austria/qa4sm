@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {WebsiteGraphicsService} from '../../modules/core/services/global/website-graphics.service';
 import {Observable} from 'rxjs';
 
 import {Router} from '@angular/router';
@@ -74,7 +73,6 @@ export class HomeComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
-              public plotService: WebsiteGraphicsService,
               private gallery: Gallery,
               private router: Router) {
   }
