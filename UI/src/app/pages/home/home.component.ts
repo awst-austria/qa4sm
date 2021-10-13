@@ -2,8 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {Observable} from 'rxjs';
-
-import {Router} from '@angular/router';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
 
@@ -73,8 +71,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
-              private gallery: Gallery,
-              private router: Router) {
+              private gallery: Gallery) {
   }
 
   ngOnInit(): void {
@@ -95,7 +92,4 @@ export class HomeComponent implements OnInit {
     this.gallery.load(prop);
   }
 
-  goToSignUp(): void {
-    this.router.navigate(['/signup']);
-  }
 }
