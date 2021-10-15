@@ -1,6 +1,7 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AnomClimatologyComponent} from './anom-climatology.component';
+import {BehaviorSubject} from 'rxjs';
 
 describe('AnomClimatologyComponent', () => {
   let component: AnomClimatologyComponent;
@@ -16,6 +17,12 @@ describe('AnomClimatologyComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AnomClimatologyComponent);
     component = fixture.componentInstance;
+    component.anomaliesModel = {
+      method$: new BehaviorSubject('none'),
+      description: '',
+      anomaliesFrom$: new BehaviorSubject(new Date()),
+      anomaliesTo$: new BehaviorSubject(new Date())
+    };
     fixture.detectChanges();
   });
 
