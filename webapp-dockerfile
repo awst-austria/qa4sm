@@ -7,6 +7,6 @@ ADD ./ /tmp/qa4sm-git
 
 COPY ./docker/webapp/entrypoint.sh /usr/bin/entrypoint.sh
 RUN bash /tmp/qa4sm-git/docker/webapp/install.sh
-#COPY ./docker/webapp/entrypoint.sh /usr/local/bin/
+COPY ./docker/webapp/entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["entrypoint.sh"]
