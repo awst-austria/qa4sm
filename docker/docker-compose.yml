@@ -1,0 +1,49 @@
+version: "3.9"
+services:      
+  qa4sm-db:
+    image: "postgres"
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - type: bind
+        source: /var/qa4sm-prod/db/log
+        target: /var/log
+      - type: bind
+        source: /var/qa4sm-prod/db/data
+        target: /var/lib/postgresql/data
+        
+  qa4sm-redis:
+    image: "redis:alpine"
+  
+  qa4sm-rabbitmq:
+    image: "rabbitmq"
+
+  web:
+    image: "awst/qa4sm:latest"
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      PGPASSWORD: "${POSTGRES_PASSWORD}"
+      QA4SM_DB_NAME: "${QA4SM_DB_NAME}"
+      QA4SM_DB_USER: "${QA4SM_DB_USER}"
+      QA4SM_DB_PASSWORD: "${QA4SM_DB_PASSWORD}"
+      QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
+
+    volumes:
+      - type: bind
+        source: /var/qa4sm-prod/webapp/log
+        target: /var/log
+      - type: bind
+        source: /var/qa4sm-prod/webapp/output
+        target: /data/qa4sm/output
+      - type: bind
+        source: /var/qa4sm-prod/webapp/settings/settings_conf.py
+        target: /var/lib/qa4sm-web-val/valentina/valentina/settings_conf.py
+      - type: bind
+        source: /var/
+        target: /var/lib/qa4sm-web-val/valentina/data
+
+  proxy:
+    image: qa4sm-proxy:latest
+    ports:
+      - "8080:80"
+        
