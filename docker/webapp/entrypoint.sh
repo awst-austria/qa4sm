@@ -17,7 +17,9 @@ if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_
 else
 	echo "DB does not exist, let's create it..."
 	psql -h qa4sm-db -p 5432 -U postgres -q -c '\set ON_ERROR_STOP on' -c "CREATE DATABASE $QA4SM_DB_NAME;" -c "CREATE USER $QA4SM_DB_USER WITH ENCRYPTED PASSWORD '$QA4SM_DB_PASSWORD';" -c "GRANT ALL PRIVILEGES ON DATABASE $QA4SM_DB_NAME TO $QA4SM_DB_USER;"
-	if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
+fi
+
+if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
 		echo "DB has been created, building schema"
 		python $APP_DIR/manage.py migrate
 		echo "Loading fixtures"
@@ -28,10 +30,9 @@ else
                 echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'qa4sm@awst.at', '$ADMIN_PASS')" | python $APP_DIR/manage.py shell
 
 	else
-		echo "DB creation failed"
+		echo "DB does not exist"
 		exit -1
 	fi
-fi
 
 if [ ! -d "/var/log/apache2" ]; then
   mkdir /var/log/apache2
