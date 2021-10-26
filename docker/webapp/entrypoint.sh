@@ -10,7 +10,8 @@ conda activate /var/lib/qa4sm-web-val/virtenv
 python $APP_DIR/manage.py collectstatic --noinput
 
 echo "Pg password: $PGPASSWORD"
-
+# wait for the db to initialize
+sleep 10s
 if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
     echo "DB exists"
 else
@@ -31,5 +32,15 @@ else
 		exit -1
 	fi
 fi
-ln -s /data/qa4sm/data /var/lib/qa4sm-web-val/valentina/data
+
+if [ ! -d "/var/log/apache2" ]; then
+  mkdir /var/log/apache2
+  chown www-data:www-data /var/log/apache2
+fi
+
+if [ ! -d "/var/log/valentina" ]; then
+  mkdir /var/log/valentina
+fi
+chown www-data:www-data -R /var/log/valentina
+
 exec apachectl -D FOREGROUND

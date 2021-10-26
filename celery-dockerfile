@@ -1,0 +1,12 @@
+FROM ubuntu:20.10
+RUN apt-get update && apt-get -y install apt-utils
+RUN apt-get -y install curl gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git
+ADD ./ /tmp/qa4sm-git
+
+COPY ./docker/celery-w/entrypoint.sh /usr/bin/entrypoint.sh
+RUN bash /tmp/qa4sm-git/docker/celery-w/install.sh
+#COPY ./docker/webapp/entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/entrypoint.sh /entrypoint.sh # backwards compat
+COPY entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/entrypoint.sh /entrypoint.sh # backwards compat
+ENTRYPOINT ["entrypoint.sh"]

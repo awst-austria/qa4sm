@@ -10,4 +10,8 @@ ln -s /data/qa4sm/data /var/lib/qa4sm-web-val/valentina/data
 mkdir run_celery
 touch run_celery/celery.state.dat
 cd $APP_DIR
+MKL_NUM_THREADS=1
+OMP_NUM_THREADS=1
+MKL_DYNAMIC=FALSE
+OPENBLAS_NUM_THREADS=1
 celery -A valentina worker --max-tasks-per-child=1 --concurrency=$QA4SM_CELERY_WORKERS -l INFO --time-limit=16000 --prefetch-multiplier=1
