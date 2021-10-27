@@ -24,5 +24,5 @@ pip install mod_wsgi
 mod_wsgi-express module-config
 a2dismod wsgi
 rm /usr/lib/apache2/modules/mod_wsgi.so
-cp /var/lib/qa4sm-web-val/virtenv/lib/python3.6/site-packages/mod_wsgi/server/mod_wsgi-py36.cpython-36m-x86_64-linux-gnu.so /usr/lib/apache2/modules/mod_wsgi.so
+cp /var/lib/qa4sm-web-val/virtenv/lib/python3.8/site-packages/mod_wsgi/server/mod_wsgi-py38.cpython-38m-x86_64-linux-gnu.so /usr/lib/apache2/modules/mod_wsgi.so
 a2enmod wsgi && a2enmod headers
