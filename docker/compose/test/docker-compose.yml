@@ -6,10 +6,10 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
       - type: bind
-        source: "${WORKSPACE}db/log"
+        source: "${QA4SM_WORKSPACE}db/log"
         target: /var/log
       - type: bind
-        source: "${WORKSPACE}db/data"
+        source: "${QA4SM_WORKSPACE}db/data"
         target: /var/lib/postgresql/data
         
   qa4sm-redis:
@@ -30,13 +30,13 @@ services:
 
     volumes:
       - type: bind
-        source: "${WORKSPACE}webapp/log"
+        source: "${QA4SM_WORKSPACE}webapp/log"
         target: /var/log
       - type: bind
-        source: "${WORKSPACE}webapp/output"
+        source: "${QA4SM_WORKSPACE}webapp/output"
         target: /data/qa4sm/output
       - type: bind
-        source: "${WORKSPACE}webapp/settings/settings_conf.py"
+        source: "${QA4SM_WORKSPACE}webapp/settings/settings_conf.py"
         target: /var/lib/qa4sm-web-val/valentina/valentina/settings_conf.py
       - type: bind
         source: "${DATA_FOLDER}"
@@ -53,10 +53,10 @@ services:
       QA4SM_CELERY_WORKERS: "${QA4SM_WORKER_THREAD_PER_NODE}"
     volumes:
       - type: bind
-        source: "${WORKSPACE}celery-w1/log"
+        source: "${QA4SM_WORKSPACE}celery-w1/log"
         target: /var/log
       - type: bind
-        source: ${WORKSPACE}webapp/settings/settings_conf.py
+        source: ${QA4SM_WORKSPACE}webapp/settings/settings_conf.py
         target: /var/lib/qa4sm-web-val/valentina/valentina/settings_conf.py
       - type: bind
         source: "${DATA_FOLDER}"
