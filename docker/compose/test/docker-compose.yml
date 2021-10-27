@@ -39,7 +39,7 @@ services:
         source: "${QA4SM_WORKSPACE}webapp/settings/settings_conf.py"
         target: /var/lib/qa4sm-web-val/valentina/valentina/settings_conf.py
       - type: bind
-        source: "${DATA_FOLDER}"
+        source: "${QA4SM_DATA_FOLDER}"
         target: /var/lib/qa4sm-web-val/valentina/data
 
   proxy:
@@ -59,5 +59,5 @@ services:
         source: ${QA4SM_WORKSPACE}webapp/settings/settings_conf.py
         target: /var/lib/qa4sm-web-val/valentina/valentina/settings_conf.py
       - type: bind
-        source: "${DATA_FOLDER}"
+        source: "${QA4SM_DATA_FOLDER}"
         target: /var/lib/qa4sm-web-val/valentina/data
