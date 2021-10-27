@@ -493,7 +493,7 @@ class TestViews(TransactionTestCase):
              'initial_filters': '1,2',
              'initial_paramfilters': '18,24',
              'initial_paramfilter_params': ismn_networks + ";" + ismn_depths,
-             'initial_version': '5',
+             'initial_version': '18',
              'initial_variable': '4'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
@@ -507,7 +507,7 @@ class TestViews(TransactionTestCase):
         ]
         for id in checked_filter_ids:
             assert f'id="{id}" checked' in return_data["filters"]
-        assert return_data["versions"].startswith('<option value="5">')
+        assert return_data["versions"].startswith('<option value="18">')
         assert return_data["variables"].startswith('<option value="4">')
 
         # check parametrised filters
