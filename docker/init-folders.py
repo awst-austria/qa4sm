@@ -4,21 +4,24 @@ import pathlib
 import os.path
 from os import path
 
-app_suffix = 'prod'
+ws_dir = 'prod'
 if len(sys.argv) > 1:
-    app_suffix = sys.argv[1]
+    ws_dir = sys.argv[1]
+else:
+    print('Missing basepath')
+    sys.exit(1)
 
 # webapp folders
-webapp_log_dir = '/var/qa4sm-' + app_suffix + '/webapp/log'
-webapp_output_dir = '/var/qa4sm-' + app_suffix + '/webapp/output'
-webapp_settings_dir = '/var/qa4sm-' + app_suffix + '/webapp/settings'
+webapp_log_dir =  ws_dir + '/webapp/log'
+webapp_output_dir = ws_dir + '/webapp/output'
+webapp_settings_dir = ws_dir + '/webapp/settings'
 
 # db folders
-db_log_dir = '/var/qa4sm-' + app_suffix + '/db/log'
-db_data_dir = '/var/qa4sm-' + app_suffix + '/db/data'
+db_log_dir = ws_dir + '/db/log'
+db_data_dir =  ws_dir + '/db/data'
 
 # celery worker folders
-celery_log_dir = '/var/qa4sm-' + app_suffix + '/celery-w1/log'
+celery_log_dir = ws_dir + '/celery-w1/log'
 
 if not path.exists(webapp_log_dir):
     print('Creating folder: {}'.format(webapp_log_dir))
