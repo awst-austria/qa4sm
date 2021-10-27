@@ -34,7 +34,7 @@ services:
         target: /var/log
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/output"
-        target: /data/qa4sm/output
+        target: /var/lib/qa4sm-web-val/valentina/output
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/settings/settings_conf.py"
         target: /var/lib/qa4sm-web-val/valentina/valentina/settings_conf.py
