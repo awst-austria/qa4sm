@@ -34,6 +34,17 @@
     },
     {
         "model": "validator.datasetversion",
+        "pk": 5,
+        "fields": {
+            "short_name": "ISMN_V20180712_MINI",
+            "pretty_name": "20180712 mini testset",
+            "help_text": "Test dataset with only 4 stations",
+            "time_range_start": "",
+            "time_range_end": ""
+        }
+    },
+    {
+        "model": "validator.datasetversion",
         "pk": 7,
         "fields": {
             "short_name": "GLDAS_NOAH025_3H_2_1",
