@@ -16,6 +16,7 @@ from validator.models import DatasetVersion
 from validator.models import Settings
 from validator.models import ValidationRun
 from validator.validation import globals
+from django.test.utils import override_settings
 
 
 @shared_task(bind=True)
@@ -24,11 +25,17 @@ def execute_test_job(self, parameter):
     time.sleep(10)
 
 ## See also: https://stackoverflow.com/a/11887308/
+@override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
+                   CELERY_TASK_ALWAYS_EAGER=True)
 class TestAdmin(TestCase):
 
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     __logger = logging.getLogger(__name__)
+
+    # setting False, because the page that we refer here may raise logging.exception and pytest 6.0.0 and newer
+    # does not handle it
+    logging.raiseExceptions = False
 
     def setUp(self):
         self.user_credentials = {
