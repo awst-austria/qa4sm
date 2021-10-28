@@ -29,6 +29,7 @@ if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_
 	  python $APP_DIR/manage.py loaddata variables
 	  python $APP_DIR/manage.py loaddata filters
 	  python $APP_DIR/manage.py loaddata datasets
+	  python $APP_DIR/manage.py loaddata networks
 
 	if [ "$NEW_DB" = "TRUE" ]; then
       echo "Creating admin user"
