@@ -27,11 +27,9 @@ import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject, of, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
-import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
 import {delay} from 'rxjs/operators';
-
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
@@ -73,7 +71,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private variableService: DatasetVariableService,
               private filterService: FilterService,
               private validationConfigService: ValidationRunConfigService,
-              private validationRunService: ValidationrunService,
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute,
