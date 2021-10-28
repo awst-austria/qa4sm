@@ -220,13 +220,13 @@
         }
     },
     {
-        "model": "validator.datasetversion", 
-        "pk": 30, 
+        "model": "validator.datasetversion",
+        "pk": 30,
         "fields": {
-            "short_name": "ISMN_V20210131", 
-            "pretty_name": "20210131 global", 
-            "help_text": "ISMN from 2021-01-31", 
-            "time_range_start": "", 
+            "short_name": "ISMN_V20210131",
+            "pretty_name": "20210131 global",
+            "help_text": "ISMN from 2021-01-31",
+            "time_range_start": "",
             "time_range_end": ""
         }
     },
