@@ -24,13 +24,13 @@ fi
 if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
 		echo "Running migrations"
 		python $APP_DIR/manage.py migrate
-
-	if [ "$NEW_DB" = "TRUE" ]; then
-	  echo "Loading fixtures"
+    echo "Loading fixtures"
 	  python $APP_DIR/manage.py loaddata versions
 	  python $APP_DIR/manage.py loaddata variables
 	  python $APP_DIR/manage.py loaddata filters
 	  python $APP_DIR/manage.py loaddata datasets
+
+	if [ "$NEW_DB" = "TRUE" ]; then
       echo "Creating admin user"
       echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'qa4sm@awst.at', '$ADMIN_PASS')" | python $APP_DIR/manage.py shell
     fi
