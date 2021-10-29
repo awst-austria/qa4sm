@@ -30,6 +30,7 @@ if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_
 	  python $APP_DIR/manage.py loaddata filters
 	  python $APP_DIR/manage.py loaddata datasets
 	  python $APP_DIR/manage.py loaddata networks
+	  python $APP_DIR/manage.py setdatasetpaths --path /var/lib/qa4sm-web-val/valentina/data
 
 	if [ "$NEW_DB" = "TRUE" ]; then
       echo "Creating admin user"
