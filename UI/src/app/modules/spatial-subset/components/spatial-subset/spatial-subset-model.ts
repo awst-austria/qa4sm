@@ -5,7 +5,11 @@ export class SpatialSubsetModel {
               public maxLon$: BehaviorSubject<number>,
               public minLat$: BehaviorSubject<number>,
               public minLon$: BehaviorSubject<number>,
-              public limited$: BehaviorSubject<boolean>) {
+              public limited$: BehaviorSubject<boolean>,
+              public maxLatLimit$?: BehaviorSubject<number>,
+              public maxLonLimit$?: BehaviorSubject<number>,
+              public minLatLimit$?: BehaviorSubject<number>,
+              public minLonLimit$?: BehaviorSubject<number>) {
   }
 
 }
