@@ -4,7 +4,6 @@ import {ModalWindowService} from '../../../core/services/global/modal-window.ser
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
 
 @Component({
   selector: 'qa-publishing',
@@ -29,7 +28,6 @@ export class PublishingComponent implements OnInit {
     private modalService: ModalWindowService,
     private validationrunService: ValidationrunService,
     private formBuilder: FormBuilder,
-    private router: Router
   ) { }
 
   ngOnInit(): void {

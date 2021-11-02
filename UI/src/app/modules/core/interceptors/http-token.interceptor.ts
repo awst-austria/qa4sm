@@ -1,16 +1,10 @@
 import {Injectable} from '@angular/core';
-import {
-  HttpRequest,
-  HttpHandler,
-  HttpEvent,
-  HttpInterceptor, HttpHeaders
-} from '@angular/common/http';
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {NGXLogger} from 'ngx-logger';
 
 @Injectable()
 export class HttpTokenInterceptor implements HttpInterceptor {
-  constructor(private logger:NGXLogger) {
+  constructor() {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {

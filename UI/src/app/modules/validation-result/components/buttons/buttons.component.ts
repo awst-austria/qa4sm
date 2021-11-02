@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
@@ -32,8 +32,7 @@ export class ButtonsComponent implements OnInit {
   status: string;
 
 
-  constructor(private httpClient: HttpClient,
-              private router: Router,
+  constructor(private router: Router,
               private validationService: ValidationrunService,
               public authService: AuthService,
               private modalService: ModalWindowService ) { }

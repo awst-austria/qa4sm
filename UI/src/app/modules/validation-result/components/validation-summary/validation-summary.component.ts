@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
 import {combineLatest, Observable} from 'rxjs';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
@@ -36,8 +35,7 @@ export class ValidationSummaryComponent implements OnInit {
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
 
-  constructor(private datasetConfigService: DatasetConfigurationService,
-              private datasetService: DatasetService,
+  constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
               private filterService: FilterService,
