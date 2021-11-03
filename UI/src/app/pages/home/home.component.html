@@ -68,25 +68,23 @@
 
   </div>
 
-  <hr class="featurette-divider">
+<!--  <hr class="featurette-divider">-->
+
 
   <div class="container-marketing p-grid">
-    <div class="p-md-5">
-      <div *ngIf="settings$|async as settings">
-        <div class="card news card-body">
-          <h5 class="card-title">News</h5>
-          <div [innerHTML]=settings[0].news></div>
-        </div>
+    <div class="p-md-12">
+    <div class="overflow">
+      <div *ngFor="let logo of logoFiles">
+        <a href="{{logo.link}}">
+          <img alt="{{logo.link}}" [src]="logo.plot">
+        </a>
       </div>
     </div>
+    </div>
+  </div>
+  <hr class="featurette-divider">
+  <div class="container-marketing p-grid">
     <div class="p-md-7">
-      <div class="overflow">
-        <div *ngFor="let logo of logoFiles">
-          <a href="{{logo.link}}">
-            <img alt="{{logo.link}}" [src]="logo.plot">
-          </a>
-        </div>
-      </div>
       <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
       The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
       <ul class="list">
@@ -100,6 +98,14 @@
       control of soil moisture data products and provider users with <b>traceable validation results</b>.
       <p>QA4SM is supported by the <a href="https://www.ffg.at/en">Austrian Space Application Programme</a>.</p>
 
+    </div>
+    <div class="p-md-5">
+      <div *ngIf="settings$|async as settings">
+        <div class="card news card-body">
+          <h5 class="card-title">News</h5>
+          <div [innerHTML]=settings[0].news></div>
+        </div>
+      </div>
       <div >
         <img class="scaled_image"
              [src]="workflowDiagram[0].plot"
@@ -109,6 +115,7 @@
              style="max-width: 80%"/>
       </div>
     </div>
+
   </div>
 
   <hr class="featurette-divider">

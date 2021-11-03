@@ -32,17 +32,21 @@ export class HomeComponent implements OnInit {
   }];
 
   logoFiles = [{
-    plot: logoUrlPrefix + 'logo_ffg.png',
-    link: 'https://www.ffg.at/',
-    description: 'FFG'
+    plot: logoUrlPrefix + 'logo_awst.png',
+    link: 'https://www.awst.at/',
+    description: 'AWST'
   }, {
     plot: logoUrlPrefix + 'logo_tuwien_geo.png',
     link: 'https://www.geo.tuwien.ac.at/',
     description: 'GEO'
   }, {
-    plot: logoUrlPrefix + 'logo_awst.png',
-    link: 'https://www.awst.at/',
-    description: 'AWST'
+    plot: logoUrlPrefix + 'logo_esa.png',
+    link: 'https://www.esa.int/',
+    description: 'ESA'
+  }, {
+    plot: logoUrlPrefix + 'logo_ffg.png',
+    link: 'https://www.ffg.at/',
+    description: 'FFG'
   }];
 
   workflowDiagram = [{
