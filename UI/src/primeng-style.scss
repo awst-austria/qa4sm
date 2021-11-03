@@ -2193,10 +2193,21 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border-color: transparent;
 }
 .p-carousel{
+  position: relative;
   width: 100%;
-  //background-color: deepskyblue;
 }
 
+div.carousel-caption{
+  position: absolute;
+  top: 11rem;
+  vertical-align: bottom;
+}
+
+.p-carousel ul.p-carousel-indicators.p-reset{
+  padding-top: 0;
+  margin-top: -2rem;
+  z-index: 1;
+}
 
 .p-carousel-items-content{
   //background-color: greenyellow;
