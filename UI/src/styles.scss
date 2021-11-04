@@ -304,6 +304,10 @@ img {
   flex-wrap: nowrap;
 }
 
+.non-scrollable{
+  position: fixed;
+  overflow-y: hidden;
+}
 
 // @media
 
