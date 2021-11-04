@@ -8,6 +8,7 @@ from api.frontend_urls import get_angular_url
 
 __logger = logging.getLogger(__name__)
 
+
 def send_val_done_notification(val_run):
         __logger.info('Sending mail about validation {} to user {}...'.format(val_run.id, val_run.user))
 
@@ -15,7 +16,8 @@ def send_val_done_notification(val_run):
 
         # enumerate datasets with "and" and Oxford comma.
         dataset_string = ''
-        and_position = val_run.dataset_configurations.count() - 1 - (1 if val_run.reference_configuration is not None else 0)
+        and_position = val_run.dataset_configurations.count() - 1 - (
+            1 if val_run.reference_configuration is not None else 0)
         i = 0
         for dc in val_run.dataset_configurations.all():
             if dc.id != val_run.reference_configuration.id:
@@ -40,27 +42,53 @@ def send_val_done_notification(val_run):
                     subject=subject,
                     body=body)
 
-def send_val_expiry_notification(val_run):
-        __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_run.id, val_run.user))
 
-        url = settings.SITE_URL + '/login/?next=' + get_angular_url('result', val_run.id)
+        # url = settings.SITE_URL + '/login/?next=' + get_angular_url('result', val_run.id)
+def send_val_expiry_notification(val_runs):
+    val_ids = ', '.join([str(val.id) for val in val_runs])
+    user = val_runs[0].user
+    __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_ids, user))
 
-        dataset_name = "{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id)
+    if user is not None:
+        urls = []
+        val_names = []
+        val_dates = []
+        for val_run in val_runs:
+            urls.append(settings.SITE_URL + '/login/?next=' + get_angular_url('result', val_run.id))
+            val_names.append("{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id))
+            val_dates.append(val_run.expiry_date.strftime("%Y-%m-%d %H:%M"))
+
+            val_run.expiry_notified = True
+            val_run.save()
 
         subject = '[QA4SM] Validation expiring soon'
-        body = 'Dear {} {},\n\nyour validation {} will expire soon.\nIt will be deleted automatically on {} if you take no further action.\nIf you want to extend the validation\'s lifetime or archive it, please visit\n{}\n(you will need to log in)\n\nBest regards,\nQA4SM team'.format(
-            val_run.user.first_name,
-            val_run.user.last_name,
-            dataset_name,
-            val_run.expiry_date.strftime("%Y-%m-%d %H:%M"),
-            url)
 
-        _send_email(recipients=[val_run.user.email],
+        if len(val_runs) == 1:
+            body = 'Dear {} {},\n\nyour validation {} will expire soon.\nIt will be deleted automatically on {} ' \
+                  'if you take no further action.\nIf you want to extend the validation\'s lifetime or archive it,' \
+                  ' please visit\n{}\n(you will need to log in).\nPlease note that archived and published validations' \
+                   ' are not subjected to deletion.\n\nBest regards,\nQA4SM team'.format(
+                    user.first_name,
+                    user.last_name,
+                    val_names[0],
+                    val_dates[0],
+                    urls[0])
+        else:
+            body = 'Dear {} {},\n\nyour validations:\n{}\nwill expire soon.\nThey will be deleted automatically on:' \
+                   '\n{}\nif you take no further action.\nIf you want to extend the validations\' ' \
+                   'lifetime or archive them, ' \
+                   'please visit\n{}\n(you will need to log in).\nPlease note that archived and published validations' \
+                   ' are not subjected to deletion.\n\nBest regards,\nQA4SM team'.format(
+                    user.first_name,
+                    user.last_name,
+                    ",\n".join(val_names),
+                    ",\n".join(val_dates),
+                    ",\n".join(urls))
+
+        _send_email(recipients=[user.email],
                     subject=subject,
                     body=body)
 
-        val_run.expiry_notified = True
-        val_run.save()
 
 def send_new_user_signed_up(user):
         __logger.info('Sending mail about new user {} to admins...'.format(user.username))
@@ -77,6 +105,7 @@ def send_new_user_signed_up(user):
         _send_email(recipients=[settings.EMAIL_FROM],
                     subject=subject,
                     body=body)
+
 
 def send_user_account_removal_request(user):
         __logger.info('Sending mail about user removal request ({}) to admins...'.format(user.username))
@@ -118,6 +147,7 @@ def send_user_status_changed(user, activate):
         _send_email(recipients=[user.email],
                     subject=subject,
                     body=body)
+
 
 def _send_email(recipients, subject, body):
     try:

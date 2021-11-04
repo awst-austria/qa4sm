@@ -6,6 +6,7 @@ from validator.models.version import DatasetVersion
 
 
 class Dataset(models.Model):
+    id = models.AutoField(primary_key=True)
     short_name = models.CharField(max_length=30)
     pretty_name = models.CharField(max_length=30)
     help_text = models.CharField(max_length=150)
@@ -22,6 +23,7 @@ class Dataset(models.Model):
     variables = models.ManyToManyField(DataVariable, related_name='variables')
 
     filters = models.ManyToManyField(DataFilter, related_name='filters')
+    resolution = models.JSONField(null=True)
     
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration

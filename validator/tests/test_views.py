@@ -514,8 +514,10 @@ class TestViews(TransactionTestCase):
         root = document_fromstring(return_data["paramfilters"])
         for i, (id, val) in enumerate(
                 zip(["18", "24"], [ismn_networks, ismn_depths])):
-            assert val == root[0][i][5].value
-            assert id == root[0][i][2].value
+            # iterate html script and not java function text
+            n=2*i
+            assert val == root[0][n][5].value
+            assert id == root[0][n][2].value
 
         response = self.client.get(url, {'dataset_id': ''})
         self.assertEqual(response.status_code, 400)
@@ -625,7 +627,8 @@ class TestViews(TransactionTestCase):
         # see https://docs.djangoproject.com/en/2.2/topics/forms/formsets/#understanding-the-managementform
         validation_params = {'scaling_method': 'doesnt exist'}
         result = self.client.post(url, validation_params)
-        self.assertEqual(result.status_code, 400)
+        self.assertEqual(result.status_code, 200)
+        assert result.context['dc_formset']._non_form_errors
 
         ## with a wrong number of dataset configuration forms, we should get an error in the form
         for totalnum in [10, 0]:
