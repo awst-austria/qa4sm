@@ -94,10 +94,32 @@ class TestMailer(TestCase):
         run.save()
         assert not run.expiry_notified
 
-        val_mail.send_val_expiry_notification(run)
+        val_mail.send_val_expiry_notification([run])
         self.check_outbox()
 
         assert ValidationRun.objects.get(pk=run.id).expiry_notified
+
+        # multiple validations in one email:
+        run = ValidationRun()
+        now = datetime.now(tzlocal())
+        run.start_time = now - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS)
+        run.end_time = run.start_time + timedelta(days=1)
+        run.user = self.testuser
+        run.save()
+        assert not run.expiry_notified
+
+        run_2 = ValidationRun()
+        now = datetime.now(tzlocal())
+        run_2.start_time = now - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS)
+        run_2.end_time = run_2.start_time + timedelta(days=1)
+        run_2.user = self.testuser
+        run_2.save()
+        assert not run_2.expiry_notified
+
+        val_mail.send_val_expiry_notification([run, run_2])
+
+        assert ValidationRun.objects.get(pk=run.id).expiry_notified
+        assert ValidationRun.objects.get(pk=run_2.id).expiry_notified
 
     def test_user_signup(self):
         val_mail.send_new_user_signed_up(self.testuser)
