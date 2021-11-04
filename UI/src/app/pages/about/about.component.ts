@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
-import {WebsiteGraphicsService} from '../../modules/core/services/global/website-graphics.service';
 
 const logoUrlPrefix = '/static/images/logo/';
 const logoAwstUrl = logoUrlPrefix + 'logo_awst.png';
@@ -20,8 +19,7 @@ export class AboutComponent implements OnInit {
   logoFfg: string;
   logoTuWien: string;
 
-  constructor(private globalParamsService: GlobalParamsService,
-              public plotService: WebsiteGraphicsService) { }
+  constructor(private globalParamsService: GlobalParamsService) { }
 
   ngOnInit(): void {
     this.logoAwst = logoAwstUrl;

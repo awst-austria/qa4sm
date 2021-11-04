@@ -27,11 +27,9 @@ import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject, of, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
-import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
 import {delay} from 'rxjs/operators';
-
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  //TODO: this should come from either config file or the database
@@ -56,7 +54,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
-      new BehaviorSubject<boolean>(false)),
+      new BehaviorSubject<boolean>(false),
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<number>(null),
+      new BehaviorSubject<number>(null)),
     new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
     new AnomaliesModel(new BehaviorSubject<string>(ANOMALIES_NONE), ANOMALIES_NONE_DESC, new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
@@ -73,7 +75,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private variableService: DatasetVariableService,
               private filterService: FilterService,
               private validationConfigService: ValidationRunConfigService,
-              private validationRunService: ValidationrunService,
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute,
@@ -420,23 +421,27 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
-    const condition = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0
+    const condition = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0;
     this.validationModel.spatialSubsetModel.limited$.next(condition);
 
     if (maxLons.length !== 0){
       this.validationModel.spatialSubsetModel.maxLon$.next(Math.max(...maxLons));
+      this.validationModel.spatialSubsetModel.maxLonLimit$.next(Math.max(...maxLons));
     }
 
     if (minLons.length !== 0){
       this.validationModel.spatialSubsetModel.minLon$.next(Math.max(...minLons));
+      this.validationModel.spatialSubsetModel.minLonLimit$.next(Math.max(...minLons));
     }
 
     if (maxLats.length !== 0){
       this.validationModel.spatialSubsetModel.maxLat$.next(Math.max(...maxLats));
+      this.validationModel.spatialSubsetModel.maxLatLimit$.next(Math.max(...maxLats));
     }
 
     if (minLats.length !== 0){
       this.validationModel.spatialSubsetModel.minLat$.next(Math.max(...minLats));
+      this.validationModel.spatialSubsetModel.minLatLimit$.next(Math.max(...minLats));
     }
 
     if (condition){

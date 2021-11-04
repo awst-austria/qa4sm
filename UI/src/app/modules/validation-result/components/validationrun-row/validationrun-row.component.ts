@@ -9,7 +9,6 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -34,8 +33,7 @@ export class ValidationrunRowComponent implements OnInit {
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
               private globalParamsService: GlobalParamsService,
-              private validationService: ValidationrunService,
-              private authService: AuthService) {
+              private validationService: ValidationrunService) {
   }
 
   ngOnInit(): void {
