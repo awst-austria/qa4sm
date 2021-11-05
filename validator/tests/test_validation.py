@@ -128,7 +128,10 @@ class TestValidation(TestCase):
                 elif metric in pair_metrics:
                     num_vars = n_datasets - 1
                 elif metric in tcol_metrics:
-                    num_vars = n_datasets - 1
+                    # for this testcase CIs via bootstrapping are activated, so
+                    # for every metric there's the value and lower and upper CI
+                    # values.
+                    num_vars = (n_datasets - 1) * 3
                 else:
                     raise ValueError(f"Unknown metric {metric}")
 

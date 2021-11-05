@@ -92,6 +92,7 @@ class TestViews(TransactionTestCase):
             'error_points': 5,
             'anomalies': 'climatology',
             'tcol': True,
+            'bootstrap_tcol_cis': True,
             'anomalies_from': datetime(1990, 1, 1, 0, 0, tzinfo=UTC),
             'anomalies_to': datetime(2010, 12, 31, 23, 59, 59, tzinfo=UTC),
         }
@@ -876,6 +877,7 @@ class TestViews(TransactionTestCase):
         assert val_form.initial["min_lat"] == -30
         assert val_form.initial["max_lat"] == 30
         assert val_form.initial["tcol"] == val_form.initial_tcol == True
+        assert val_form.initial["bootstrap_tcol_cis"] == val_form.initial_bootstrap_tcol_cis == True
         assert val_form.initial["anomalies"] == "climatology"
         assert val_form.initial["anomalies_from"] == 1990
         assert val_form.initial["anomalies_to"] == 2010
