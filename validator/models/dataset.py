@@ -6,6 +6,7 @@ from validator.models.version import DatasetVersion
 
 
 class Dataset(models.Model):
+    id = models.AutoField(primary_key=True)
     short_name = models.CharField(max_length=30)
     pretty_name = models.CharField(max_length=30)
     help_text = models.CharField(max_length=150)

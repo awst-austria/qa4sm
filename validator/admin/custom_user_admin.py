@@ -10,6 +10,7 @@ from django.urls.base import reverse
 from django.utils.html import escape
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from validator.admin import bulk_send_email_to_users
 
 from validator.admin.user_status_change import *  # @UnusedWildImport
 
@@ -26,7 +27,7 @@ class CustomUserAdmin(UserAdmin):
     def __init__(self, model, admin_site):
         super(CustomUserAdmin, self).__init__(model, admin_site)
         self.actions += [bulk_user_activation, bulk_user_deactivation,
-                         silent_bulk_user_activation, silent_bulk_user_deactivation]
+                         silent_bulk_user_activation, silent_bulk_user_deactivation, bulk_send_email_to_users]
         for field_name, attributes in self.fieldsets:
             ## add the organisation field to the Personal info part of the user
             ## admin form

@@ -6,6 +6,7 @@ from validator.models.dataset_configuration import DatasetConfiguration
 
 
 class ParametrisedFilter(models.Model):
+    id = models.AutoField(primary_key=True)
     dataset_config = models.ForeignKey(to=DatasetConfiguration, on_delete=models.CASCADE, null=False)
     filter = models.ForeignKey(to=DataFilter, on_delete=models.PROTECT, null=False)
     parameters = models.TextField()
