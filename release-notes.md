@@ -1,3 +1,10 @@
+QA4SM v1.6.2 - Release notes 2021-07-26
+=======================================================
+# Updates
+1. Switching to python 3.8
+2. Migrating to a dockerized system
+
+
 QA4SM v1.6.1 - Release notes 2021-07-26
 =======================================================
 # Updates
