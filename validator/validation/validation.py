@@ -269,9 +269,7 @@ def create_pytesmo_validation(validation_run):
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         tcol_metrics = TripleCollocationMetrics(
-            ref_name,
-            metadata_template=metadata_template,
-            bootstrap_cis=validation_run.bootstrap_tcol_cis
+            ref_name, metadata_template=metadata_template,
         )
         metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
 

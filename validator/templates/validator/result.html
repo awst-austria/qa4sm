@@ -103,10 +103,6 @@
                             {% if val.tcol %} activated. {% else %} deactivated. {% endif %}
                         </li>
 
-                        <li>Bootstrapping of confidence intervals for Triple Collocation Analysis was
-                            {% if val.bootstrap_tcol_cis %} activated. {% else %} deactivated. {% endif %}
-                        </li>
-
                         {% if val.scaling_method != 'none' %}
                             <li>Scaling reference:
                             {{ val.scaling_ref.dataset.pretty_name }} ({{ val.scaling_ref.version.pretty_name }}, {{ val.scaling_ref.variable.pretty_name }})
