@@ -6167,6 +6167,15 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   padding-left: 0.2rem;
 }
 
+.clearCoordinates.p-button-info{
+  width: 2.5rem;
+  height: 2.1rem;
+}
+
+.clearCoordinates.p-button-info .p-button-icon{
+  font-size: 1.2rem;
+}
+
 @media screen and (min-width: 564px) and (max-width: 714.9px){
   .btn-action.p-button {
     width: 1.75rem;
