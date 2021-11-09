@@ -4841,7 +4841,7 @@ div.carousel-caption{
 }
 
 .p-menubar .p-menuitem.p-menuitem-active > .p-menuitem-link {
-  background: #e9ecef;
+  background:  rgba(248, 193, 0, .5);
 }
 
 .p-menubar .p-menuitem.p-menuitem-active > .p-menuitem-link .p-menuitem-text {
@@ -5341,7 +5341,7 @@ div.carousel-caption{
 }
 
 .p-tieredmenu .p-menuitem-link:not(.p-disabled):hover {
-  background: #e9ecef;
+  background: red;
 }
 
 .p-tieredmenu .p-menuitem-link:not(.p-disabled):hover .p-menuitem-text {
