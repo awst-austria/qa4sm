@@ -52,7 +52,7 @@
                         (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
                         label="Remove dataset"
                         icon="pi pi-trash"
-                        class="p-button-danger p-my-2"
+                        class="removeDataset p-button-danger p-my-2"
                         style="padding: 0.2rem;">
                 </button>
               </div>
@@ -64,7 +64,7 @@
                   label="Add dataset"
                   icon="pi pi-plus-circle"
                   (click)="addDatasetToValidate()"
-                  class="p-button-success p-my-2"
+                  class="addDataset p-button-success p-my-2"
                   style="padding: 0.2rem;"
                   [disabled]="addDatasetButtonDisabled()">
           </button>

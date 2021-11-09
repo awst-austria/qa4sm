@@ -6156,6 +6156,17 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   background-color: rgba(248, 193, 0, .5);
 }
 
+.addDataset.p-button-success, .removeDataset.p-button-danger{
+  height: 2rem;
+}
+
+.addDataset.p-button-success .p-button-label, .removeDataset.p-button-danger .p-button-label{
+  padding-right: 0.2rem;
+}
+.addDataset.p-button-success .p-button-icon, .removeDataset.p-button-danger .p-button-icon{
+  padding-left: 0.2rem;
+}
+
 @media screen and (min-width: 564px) and (max-width: 714.9px){
   .btn-action.p-button {
     width: 1.75rem;
