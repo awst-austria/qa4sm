@@ -1652,6 +1652,21 @@ p-togglebutton.ng-dirty.ng-invalid > .p-togglebutton.p-button {
   border-radius: 4px;
 }
 
+#validateButton .p-button{
+  width: 8rem;
+  height: 3rem;
+  font-size: 1.25rem;
+  padding-right: 1.5rem;
+}
+#validateButton .p-button-icon.p-button-icon-left{
+  font-size: 1.25rem;
+}
+
+
+//.p-button#validateButton{
+//  width: 100rem;
+//}
+
 .p-button:enabled:hover {
   background: #0069d9;
   color: #ffffff;
