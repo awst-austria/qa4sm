@@ -4850,6 +4850,7 @@ div.carousel-caption{
 
 .p-menubar .p-menuitem.p-menuitem-active > .p-menuitem-link .p-menuitem-icon, .p-menubar .p-menuitem.p-menuitem-active > .p-menuitem-link .p-submenu-icon {
   color: #212529;
+
 }
 
 @media screen and (max-width: 960px) {
@@ -6068,8 +6069,8 @@ div.carousel-caption{
   font-size: 1rem;
   height: 2rem;
   margin-right: 0.2rem;
-  background-color: #4760E5;
-  border-color: #4760E5;
+  background-color: $button-base-color;
+  border-color: $button-base-color;
 }
 
 .btn-action-home.p-button{
@@ -6077,8 +6078,8 @@ div.carousel-caption{
   height: 3rem;
   font-size: 1.25rem;
   margin-right: 0.2rem;
-  background-color: #4760E5;
-  border-color: #4760E5;
+  background-color: $button-base-color;
+  border-color: $button-base-color;
   margin-bottom: 0.1rem;
 }
 
@@ -6123,7 +6124,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
 }
 
 .save_name_btn.p-button:not(.disabled):hover, .cancel_editing_btn.p-button:not(.disabled):hover{
-  color: #4760E5;
+  color: $button-base-color;
   background-color: $base-color;
   border-color: $base-color;
   transform: scale(1.2);
