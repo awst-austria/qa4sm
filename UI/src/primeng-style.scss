@@ -6059,7 +6059,16 @@ div.carousel-caption{
 
 .validation-row .p-panel .p-panel-header{
   font-size: 1.5rem;
-  text-align: left;
+}
+
+.validation-row .p-panel .p-panel-title{
+  width: 94%;
+  text-align: center;
+}
+
+.validation-small-row .p-panel .p-panel-title{
+  width: 89%;
+  text-align: center;
 }
 
 .validation-row .p-panel .p-panel-header .p-panel-icons{
