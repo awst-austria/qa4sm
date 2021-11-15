@@ -9,17 +9,20 @@
   <div class="p-grid p-pt-1">
 
     <div class="p-col-12 p-sm-5">
-
-      <div class="p-grid no-gutters">
+      <div class="p-grid no-gutters" id="lowerLeft">
         <div class="p-col-12">
           <div class="p-d-flex p-jc-center  p-pb-2">
-            Lower left
+            <!--            Lower left-->
           </div>
         </div>
-        <div class="p-col-6">
+        <div class="label p-col-1">
           <div class="p-fluid">
-            <div class="p-float-label ">
-
+            <span>Lower left</span>
+          </div>
+        </div>
+        <div class="p-col-4 p-mx-0 p-px-0">
+          <div class="p-fluid">
+            <div class="p-float-label">
               <p-inputNumber id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLat$|async"
                              [min]="checkVal(subsetModel.minLat$|async)"
@@ -30,7 +33,7 @@
           </div>
 
         </div>
-        <div class="p-col-6">
+        <div class="p-col-4 p-mx-0 p-px-0">
           <div class="p-fluid">
             <div class="p-float-label ">
               <p-inputNumber id="minLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
@@ -56,13 +59,18 @@
 
     <!--    Upper right coordinates-->
     <div class="p-col-12 p-sm-5">
-      <div class="p-grid no-gutters">
+      <div class="p-grid no-gutters" id="upperRight">
         <div class="p-col-12">
           <div class="p-d-flex p-jc-center p-pb-2">
-            Upper right
+<!--            Upper right-->
           </div>
         </div>
-        <div class="p-col-6">
+        <div class="label p-col-1">
+          <div class="p-fluid">
+            <span>Upper right</span>
+          </div>
+        </div>
+        <div class="p-col-4 p-mx-0 p-px-0">
           <div class="p-fluid">
             <div class="p-float-label ">
 
@@ -75,7 +83,7 @@
             </div>
           </div>
         </div>
-        <div class="p-col-6">
+        <div class="p-col-4  p-mx-0 p-px-0">
           <div class="p-fluid">
             <div class="p-float-label ">
               <p-inputNumber id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"

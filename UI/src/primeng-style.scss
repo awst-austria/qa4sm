@@ -952,9 +952,12 @@ p-inputmask.ng-dirty.ng-invalid > .p-inputtext {
   border-color: #dc3545;
 }
 
-p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext {
+.p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext {
   border-color: #dc3545;
 }
+//.p-inputnumber-input{
+//  background-color: #00AAE3;
+//}
 
 .p-inputswitch {
   width: 3rem;
@@ -1017,6 +1020,16 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
   appearance: none;
   border-radius: 4px;
+}
+
+#minLatInput .p-inputtext, #maxLatInput .p-inputtext{
+  border-radius: 0;
+}
+
+#minLonInput .p-inputtext, #maxLonInput .p-inputtext{
+  border-left: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
 }
 
 .p-inputtext:enabled:hover {
