@@ -223,7 +223,6 @@ dependencies:
     - pytest-cov==2.12.1
     - pytest-django==4.4.0
     - pytest-mpl==0.13
-    - qa4sm-preprocessing==0.0.1
     - qa4sm-reader==0.5
     - redis==3.5.3
     - repurpose==0.8
