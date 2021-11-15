@@ -45,7 +45,7 @@ services:
   proxy:
     image: "awst/qa4sm-proxy:latest-hr"
     ports:
-      - "8080:80"
+      - "8082:80"
   worker-1:
     image: "awst/qa4sm-worker:latest-hr"
     environment:
