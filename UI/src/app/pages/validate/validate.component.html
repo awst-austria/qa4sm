@@ -15,10 +15,10 @@
     p-lg-10 p-lg-offset-1
     p-xl-8 p-xl-offset-2">
 
-    <div class="p-grid">
+    <div class="p-grid" style="justify-content: center">
 
       <!--  data column-->
-      <div class="p-md-6 p-col-12">
+      <div class="p-md-5 p-col-10">
         <p-panel header="Data" [toggleable]="true" class="validation-small-row">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
@@ -73,7 +73,7 @@
       </div>
 
       <!--  reference column-->
-      <div class="p-md-6 p-col-12">
+      <div class="p-md-5 p-col-10">
         <p-panel header="Reference" [toggleable]="true" class="validation-small-row">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
@@ -105,7 +105,7 @@
       </div>
 
       <!--      Map-->
-      <div class="p-col-12">
+      <div class="p-col-10">
         <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel" collapsed="true" class="validation-row">
           <qa-map class="map" #qwerty
                   [spatialSubset]="validationModel.spatialSubsetModel"
@@ -116,33 +116,33 @@
       </div>
 
       <!--      Spatial subsetting-->
-      <div class="p-col-12">
+      <div class="p-col-10">
         <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
       </div>
 
 
       <!--      Validation period-->
-      <div class="p-col-12">
+      <div class="p-col-10">
         <qa-validation-period [validationPeriodModel]="validationModel.validationPeriodModel"></qa-validation-period>
       </div>
 
       <!--      Metrics-->
-      <div class="p-col-12">
+      <div class="p-col-10">
         <qa-metrics [validationModel]="validationModel"></qa-metrics>
       </div>
 
       <!--      Anomalies-->
-      <div class="p-col-12">
+      <div class="p-col-10">
         <qa-anomalies [anomaliesModel]="validationModel.anomalies"></qa-anomalies>
       </div>
 
       <!--      Scaling-->
-      <div class="p-col-12">
+      <div class="p-col-10">
         <qa-scaling [validationModel]="validationModel"></qa-scaling>
       </div>
 
       <!-- Name -->
-      <div class="p-col-12">
+      <div class="p-col-10">
         <div class="p-grid p-px-2">
             <span class="label p-col-1">
               <label for="name">Name</label>
@@ -159,7 +159,7 @@
         </div>
       </div>
 
-      <div class="p-col-12">
+      <div class="p-col-10">
         <div>
           <div class="p-d-flex p-jc-center">
             <p-button id="validateButton" label="Validate" icon="pi pi-play" (onClick)="startValidation(true)"></p-button>
