@@ -101,6 +101,7 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
+    bootstrap_tcol_cis = models.BooleanField(default=False)
     used_by = models.ManyToManyField(User, through=CopiedValidations, through_fields=('original_run', 'used_by_user'),
                                      related_name='copied_runs')
 
@@ -110,10 +111,14 @@ class ValidationRun(models.Model):
 
     @property
     def expiry_date(self):
-        if self.is_archived or (self.end_time is None):
+        if (self.is_archived or (self.end_time is None)) and (self.progress != -1):
             return None
 
-        initial_date = self.last_extended if self.last_extended else self.end_time
+        if self.progress == -1:
+            initial_date = self.start_time
+        else:
+            initial_date = self.last_extended if self.last_extended else self.end_time
+
         return initial_date + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
 
     @property

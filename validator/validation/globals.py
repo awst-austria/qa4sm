@@ -91,9 +91,7 @@ ERA5_LAND_sm = 'ERA5_LAND_sm'
 ESA_CCI_SM_P_sm = 'ESA_CCI_SM_P_sm'
 ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
-CGLS_SSM = 'CGLS_SSM'
-CGLS_SWI_T40 = 'CGLS_SWI_T40'
-CGLS_SWI_T5 = 'CGLS_SWI_T5'
+
 
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
@@ -101,9 +99,8 @@ NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, CGLS_SCATSAR_SWI1km]
 
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
-VR_FIELDS = ['interval_from', 'interval_to',
-             'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-             'anomalies', 'anomalies_from', 'anomalies_to']
+VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
+             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to']
 DS_FIELDS = ['dataset', 'version']
 
 IRREGULAR_GRIDS = {'SMAP' : 0.35,

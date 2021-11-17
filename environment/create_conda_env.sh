@@ -102,6 +102,7 @@ pip install ismn
 pip install requests
 pip install qa4sm-reader>=0.3.4
 pip install qa4sm-preprocessing
+pip install djangorestframework
 
 cd $TEMP_DIR
 
