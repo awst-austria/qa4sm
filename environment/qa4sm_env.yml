@@ -184,6 +184,8 @@ dependencies:
     - click-repl==0.2.0
     - colorcet==2.0.6
     - configparser==5.1.0
+    - coreapi==2.3.3
+    - coreschema==0.0.4
     - coverage==6.1.2
     - datedown==0.3
     - deprecated==1.2.13
@@ -200,7 +202,9 @@ dependencies:
     - fasteners==0.16.3
     - h5py==3.5.0
     - idna==3.3
+    - inflection==0.5.1
     - ismn==1.1.0
+    - itypes==1.2.0
     - kombu==5.2.1
     - llvmlite==0.37.0
     - lxml==4.6.4
@@ -226,6 +230,7 @@ dependencies:
     - repurpose==0.8
     - requests==2.26.0
     - ruamel-yaml==0.17.17
+    - ruamel-yaml-clib==0.2.6
     - seaborn==0.11.2
     - smap-io==0.4
     - smecv-grid==0.2.1
@@ -233,6 +238,7 @@ dependencies:
     - tomli==1.2.2
     - tqdm==4.62.3
     - trollsift==0.2.1
+    - uritemplate==3.0.1
     - urllib3==1.26.7
     - vine==5.0.0
     - wcwidth==0.2.5

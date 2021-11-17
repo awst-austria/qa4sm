@@ -47,6 +47,7 @@
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                             <a class="dropdown-item {% if request.path == about_url %} navbar-btn-active {% endif %}" href="{{ about_url }}"><span class="fas fa-info-circle"></span> About</a>
                             <a class="dropdown-item {% if request.path == help_url %} navbar-btn-active {% endif %}" href="{{ help_url }}"><span class="fas fa-question-circle"></span> Help</a>
+                            <a class="dropdown-item" href="https://www.geo.tuwien.ac.at/media/filer_public/15/6c/156cd163-cd29-4dd3-a132-820bcb653817/frm4sm_dt3-1_qa4sm_sum_v11.pdf" target="_blank"><span class="fas fa-book-open"></span> User Manual</a>
                             <a class="dropdown-item {% if request.path == datasets_url %} navbar-btn-active {% endif %}" href="{{ datasets_url }}"><span class="fas fa-database"></span> Datasets</a>
                             <a class="dropdown-item {% if request.path == terms_url %} navbar-btn-active {% endif %}" href="{{ terms_url }}"><span class="fas fa-balance-scale"></span> Terms</a>
                             {% if user.is_authenticated %}

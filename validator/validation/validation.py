@@ -281,7 +281,9 @@ def create_pytesmo_validation(validation_run):
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         tcol_metrics = TripleCollocationMetrics(
-            ref_name, metadata_template=metadata_template,
+            ref_name,
+            metadata_template=metadata_template,
+            bootstrap_cis=validation_run.bootstrap_tcol_cis
         )
         metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
 
@@ -438,6 +440,11 @@ def run_validation(validation_id):
                 validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 __logger.exception(
                     'Celery could not execute the job. Job ID: {} Error: {}'.format(async_result.id, async_result.info))
+                # forgetting task doesn't remove it, so cleaning has to be added here
+                if celery_task_cancelled(async_result.id):
+                    validation_aborted = True
+                else:
+                    untrack_celery_task(async_result.id)
             finally:
                 # whether finished or cancelled or failed, forget about this task now
                 async_result.forget()

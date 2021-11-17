@@ -28,6 +28,7 @@ class ValidationRunForm(forms.ModelForm):
             'max_lat',
             'max_lon',
             'tcol',
+            'bootstrap_tcol_cis',
             ]
 
     scaling_ref = forms.fields.ChoiceField(choices=[(ValidationRun.SCALE_TO_REF, 'Reference'), (ValidationRun.SCALE_TO_DATA, 'Data'), ])
@@ -70,6 +71,7 @@ class ValidationRunForm(forms.ModelForm):
 
         # remember initial tcol value to set it correctly in setTcLock
         self.initial_tcol = self.fields["tcol"].initial
+        self.initial_bootstrap_tcol_cis = self.fields["bootstrap_tcol_cis"].initial
 
     def clean(self):
         values = super(ValidationRunForm, self).clean()
