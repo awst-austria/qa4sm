@@ -52,12 +52,25 @@ def get_results(request):
 def get_csv_with_statistics(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
-    inspection_table = get_inspection_table(validation).reset_index()
+    inspection_table = get_inspection_table(validation)
+
+    if isinstance(inspection_table, str):
+        return JsonResponse(
+            {'message': 'Given validation output file size is too large to be read'},
+            status=404
+        )
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=Stats_summary.csv'
 
-    inspection_table.to_csv(path_or_buf=response, sep=',', float_format='%.2f', index=False, decimal=".")
+    inspection_table.reset_index().to_csv(
+        path_or_buf=response,
+        sep=',',
+        float_format='%.2f',
+        index=False,
+        decimal="."
+    )
+
     return response
 
 
@@ -157,7 +170,17 @@ def get_summary_statistics(request):
     validation = get_object_or_404(ValidationRun, id=validation_id)
     # resetting index added, otherwise there would be a row shift between the index column header and the header of the
     # rest of the columns when df rendered as html
-    inspection_table = get_inspection_table(validation).reset_index()
+    inspection_table = get_inspection_table(validation)
 
-    return HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
-                                                 index=False))
+    if isinstance(inspection_table, str):
+        return JsonResponse(
+            {'message': 'Given validation output file size is too large to be read'},
+            status=404
+        )
+
+    return HttpResponse(
+        inspection_table.reset_index().to_html(
+            table_id=None,
+            classes=['table', 'table-bordered', 'table-striped'],
+            index=False
+        ))
