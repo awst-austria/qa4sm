@@ -175,10 +175,7 @@ def get_summary_statistics(request):
     inspection_table = get_inspection_table(validation)
 
     if isinstance(inspection_table, str):
-        return JsonResponse(
-            {'message': 'Given validation output file size is too large to be read'},
-            status=404
-        )
+        return HttpResponse('error file size')
 
     return HttpResponse(
         inspection_table.reset_index().to_html(
