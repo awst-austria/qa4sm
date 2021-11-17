@@ -189,7 +189,7 @@ def get_inspection_table(validation_run):
 
         # Check that .csv file was created
         if stats_file is not None:
-            stats = pd.read_csv(stats_file)
+            stats = pd.read_csv(stats_file, index_col="Metric", dtype=str)
         # Check that file size is less than 100 MB
         elif file_size > 100*2**20:
             warnings.warn(

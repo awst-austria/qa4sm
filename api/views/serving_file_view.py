@@ -50,6 +50,7 @@ def get_results(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_csv_with_statistics(request):
+    """Download .csv of the statistics"""
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
     inspection_table = get_inspection_table(validation)
@@ -166,6 +167,7 @@ def get_graphic_file(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_summary_statistics(request):
+    """Show statistics table on results page"""
     validation_id = request.query_params.get('id', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
     # resetting index added, otherwise there would be a row shift between the index column header and the header of the
