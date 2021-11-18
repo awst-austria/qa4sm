@@ -15,7 +15,7 @@
           <div *ngIf="(table$|async) as table" class="p-pb-3">
             <ng-template [ngIf]="table=='error file size'" [ngIfElse]="showTable" class="p-pb-3">
               This validation has resulted in a file whose size
-              exceeds the maximum limit; for this reason, the statistics table cannot be generated on the fly.
+              exceeds the maximum limit. For this reason, the statistics table cannot be generated on the fly.
             </ng-template>
             <ng-template #showTable>
               <div class="p-pb-3">The mean, median and standard deviation are calculated on the validation results aggregated by metric

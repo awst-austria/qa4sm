@@ -56,10 +56,7 @@ def get_csv_with_statistics(request):
     inspection_table = get_inspection_table(validation)
 
     if isinstance(inspection_table, str):
-        return JsonResponse(
-            {'message': 'Given validation output file size is too large to be read'},
-            status=404
-        )
+        return HttpResponse('error file size', 404)
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=Stats_summary.csv'
