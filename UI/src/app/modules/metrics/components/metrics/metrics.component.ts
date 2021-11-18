@@ -28,7 +28,7 @@ export class MetricsComponent implements OnInit {
     this.bootstrapTripleCollocationMetrics = new MetricModel(
       'Bootstrap Triple Collocation metric confidence intervals (Warning: very slow)',
       'Calculates confidence intervals via bootstrapping with 1000 repetitions. This can significantly impact performance, typically increases runtime by a factor of 5.',
-      new BehaviorSubject<boolean>(false), false, 'btcol');
+      new BehaviorSubject<boolean>(false), false, 'bootstrap_tcol_cis');
     this.validationModel.metrics.push(this.bootstrapTripleCollocationMetrics);
   }
 
