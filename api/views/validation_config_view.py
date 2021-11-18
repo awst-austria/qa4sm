@@ -93,7 +93,8 @@ def get_validation_configuration(request, **kwargs):
                 if val_run.scaling_ref.id != val_run.reference_configuration.id:
                     val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
 
-        metrics = [{'id': 'tcol', 'value': val_run.tcol}]
+        metrics = [{'id': 'tcol', 'value': val_run.tcol},
+                   {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
 
         # Reference filters
@@ -188,6 +189,9 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             for metric in validated_data.get('metrics'):
                 if metric.get('id') == 'tcol':
                     new_val_run.tcol = metric.get('value')
+                if metric.get('id') == 'bootstrap_tcol_cis':
+                    new_val_run.bootstrap_tcol_cis = metric.get('value')
+
 
             new_val_run.save()
 
