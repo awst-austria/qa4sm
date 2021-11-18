@@ -563,7 +563,7 @@ def ajax_get_dataset_options(request):
             initial_filters,
         ),
         'paramfilters': __render_parametrised_filters(
-            selected_dataset.filters.filter(parameterised=True),
+            selected_dataset.filters.filter(parameterised=True).order_by('id'),
             param_filter_widget_id,
             initial_paramfilters,
             initial_paramfilter_params,
