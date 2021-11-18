@@ -10,7 +10,7 @@ from rest_framework.serializers import ModelSerializer
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.forms import PublishingForm
 from validator.models import ValidationRun, CopiedValidations
-from validator.validation import get_inspection_table
+
 
 
 
