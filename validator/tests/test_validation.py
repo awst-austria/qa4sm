@@ -127,7 +127,10 @@ class TestValidation(TestCase):
                 elif metric in pair_metrics:
                     num_vars = n_datasets - 1
                 elif metric in tcol_metrics:
-                    num_vars = n_datasets - 1
+                    # for this testcase CIs via bootstrapping are activated, so
+                    # for every metric there's the value and lower and upper CI
+                    # values.
+                    num_vars = (n_datasets - 1) * 3
                 else:
                     raise ValueError(f"Unknown metric {metric}")
 
@@ -799,9 +802,6 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 9
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
         self.check_results(new_run)
         self.delete_run(new_run)
 

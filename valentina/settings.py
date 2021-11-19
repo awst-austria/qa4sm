@@ -109,6 +109,14 @@ WSGI_APPLICATION = 'valentina.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+DB_HOST = os.getenv('QA4SM_DB_HOST')
+DB_ENV_PASSWORD = os.getenv('QA4SM_DB_PASSWORD')
+if DB_ENV_PASSWORD is not None:
+    DB_PASSWORD=DB_ENV_PASSWORD
+
+if DB_HOST is None:
+    DB_HOST='localhost'
+
 if DBSM == "postgresql":
     DATABASES = {
         'default': {
@@ -116,7 +124,7 @@ if DBSM == "postgresql":
             'NAME': 'valentina',
             'USER': 'django',
             'PASSWORD': DB_PASSWORD,
-            'HOST': 'localhost',
+            'HOST': DB_HOST,
             'PORT': '',
         }
     }
