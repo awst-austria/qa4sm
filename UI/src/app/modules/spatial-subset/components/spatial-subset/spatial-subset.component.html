@@ -1,7 +1,7 @@
 <p-panel header="Spatial Subsetting" [toggleable]="true" class="validation-row">
   <ng-template pTemplate="icons">
     <label class="p-panel-header-icon"
-           pTooltip="Restrict the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on a map by clicking on the globe button."
+           pTooltip="Restrict the input and reference data to a lat/lon bounding box (specified with lower left and upper right corner coordinates). You can also select the bounding box on a map above."
            tooltipPosition="bottom">
       <span class="pi pi-question-circle"></span>
     </label>
@@ -12,12 +12,11 @@
       <div class="p-grid" id="lowerLeft">
         <div class="p-col-12">
           <div class="p-d-flex p-jc-center  p-pb-2">
-            <!--            Lower left-->
           </div>
         </div>
         <div class="label p-col-4">
           <div class="p-fluid">
-            <div>Lower left</div>
+            <div pTooltip="Lower left bounding box corner">Lower left</div>
           </div>
         </div>
         <div class="p-col-4 p-px-0 p-mx-0">
@@ -67,7 +66,7 @@
         </div>
         <div class="label p-col-4">
           <div class="p-fluid">
-            <span>Upper right</span>
+            <div pTooltip="Upper right bounding box corner">Upper right</div>
           </div>
         </div>
         <div class="p-col-4 p-mx-0 p-px-0">
