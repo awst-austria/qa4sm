@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, render
 
 from validator.doi import get_doi_for_validation
 from validator.forms import PublishingForm, ResultsSortingForm
-from validator.models import ValidationRun, CopiedValidations
+from validator.models import ValidationRun, CopiedValidations, DatasetConfiguration
 from validator.validation.globals import METRICS
 from validator.validation.graphics import get_dataset_combis_and_metrics_from_files, get_inspection_table
 
@@ -37,7 +37,8 @@ def _copy_validationrun(run_to_copy, new_user):
         old_scaling_ref_id = run_to_copy.scaling_ref_id
         old_val_id = str(run_to_copy.id)
 
-        dataset_conf = run_to_copy.dataset_configurations.all()
+        dataset_conf = DatasetConfiguration.objects.filter(validation=run_to_copy)
+
 
         run_to_copy.user = new_user
         run_to_copy.id = None

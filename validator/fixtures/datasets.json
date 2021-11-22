@@ -107,7 +107,6 @@
             "citation": "<a target=\"_blank\" href=\"https://ismn.earth/en/terms-and-conditions/\" rel=\"noreferrer\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\" rel=\"noreferrer\">readme (v20180830)</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\" rel=\"noreferrer\">readme (v20190222)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20210131_Readme.txt\" rel=\"noreferrer\">readme (v20210131)</a>",
             "is_only_reference": true,
             "versions": [
-                5,
                 18,
                 30
             ],
