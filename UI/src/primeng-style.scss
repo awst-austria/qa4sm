@@ -1038,6 +1038,12 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-top-left-radius: 0;
 }
 
+#method .p-dropdown{
+  border-left: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
 .p-inputtext:enabled:hover {
   border-color: #ced4da;
 }
