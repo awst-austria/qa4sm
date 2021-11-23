@@ -19,8 +19,7 @@
       <div *ngIf="published" class="p-col-10 p-text-center">
         <h1>Published validations</h1>
         <p class="lead text-muted">
-          The QA4SM validations below have been published by their owners to <a target="_blank"
-                                                                                href="https://zenodo.org/"
+          The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/"
                                                                                 rel="noreferrer">Zenodo</a>
           and
           can be referenced with a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
@@ -28,7 +27,7 @@
       </div>
 
       <div *ngIf="validations.length" class="p-col-10">
-        <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
+          <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
       </div>
 
       <!-- Rows -->
