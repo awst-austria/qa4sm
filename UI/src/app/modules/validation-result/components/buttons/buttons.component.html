@@ -159,7 +159,7 @@
 </div>
 
 <!--Buttons shown on the single validation page (both custom and published)-->
-<div *ngIf="!validationList" class="col-sm" style="text-align: right;">
+<div *ngIf="!validationList" class="col-sm p-pb-4" style="text-align: right;">
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
     <button pButton
