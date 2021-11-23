@@ -49,6 +49,7 @@
 
               <div style="width: 100%;text-align: right">
                 <button pButton type="button"
+                        [disabled]="validationModel.datasetConfigurations.length < 2"
                         (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
                         label="Remove dataset"
                         icon="pi pi-trash"
