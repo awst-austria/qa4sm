@@ -7,7 +7,7 @@
     <div class="p-grid" style="justify-content: center">
 
       <!-- custom -->
-      <div *ngIf="!published" class="p-col-10 p-text-center">
+      <div *ngIf="!published" class="p-col-9 p-text-center">
         <h1>My validations</h1>
         <p *ngIf="!validations.length" class="lead text-muted">
           You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
@@ -16,7 +16,7 @@
       </div>
 
       <!-- published -->
-      <div *ngIf="published" class="p-col-10 p-text-center">
+      <div *ngIf="published" class="p-col-9 p-text-center">
         <h1>Published validations</h1>
         <p class="lead text-muted">
           The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/"
@@ -26,12 +26,12 @@
         </p>
       </div>
 
-      <div *ngIf="validations.length" class="p-col-10">
+      <div *ngIf="validations.length" class="p-col-9">
           <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
       </div>
 
       <!-- Rows -->
-      <div *ngIf="validations.length" class="p-col-10">
+      <div *ngIf="validations.length" class="p-col-9">
         <div *ngFor="let valrun of validations  | paginate :
         {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
 
