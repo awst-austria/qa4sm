@@ -118,7 +118,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       this.validationModel.datasetConfigurations.push(model);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
         model.datasetModel.selectedDataset = dataset;
-        this.loadFiltersForModel(model) // Load the available filters for the dataset
+        this.loadFiltersForModel(model, true) // Load the available filters for the dataset
           .subscribe(data => { // when it is loaded, set the values from the config
             datasetConfig.basic_filters.forEach(basicFilterConfig => {
               data.basicFilters.forEach(filter => {
@@ -145,7 +145,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.referenceConfigurations.push(referenceModel);
     this.datasetService.getDatasetById(config.reference_config.dataset_id).subscribe(dataset => {
       referenceModel.datasetModel.selectedDataset = dataset;
-      this.loadFiltersForModel(referenceModel)
+      this.loadFiltersForModel(referenceModel, true)
         .subscribe(model => { // when it is loaded, set the values from the config
           config.reference_config.basic_filters.forEach(basicFilterConfig => {
             model.basicFilters.forEach(filter => {
@@ -275,10 +275,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
       // and the filters
       this.loadFiltersForModel(model);
+        // .pipe(
+        // map((basicFilter) => {
+        //   basicFilter.basicFilters.forEach(bf => bf.enabled = bf.filterDto.name === 'FIL_ALL_VALID_RANGE');
+        // })).subscribe();
     });
   }
 
-  private loadFiltersForModel(model: DatasetConfigModel): ReplaySubject<DatasetConfigModel> {
+  private loadFiltersForModel(model: DatasetConfigModel, reloadingSettings= false): ReplaySubject<DatasetConfigModel> {
     const updatedModel$ = new ReplaySubject<DatasetConfigModel>();
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
         model.basicFilters = [];
@@ -287,7 +291,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           if (filter.parameterised) {
             model.parameterisedFilters.push(new FilterModel(filter, false, false, filter.default_parameter));
           } else {
-            model.basicFilters.push(new FilterModel(filter, false, false, null));
+            const newFilter = new FilterModel(filter, false, false, null);
+            if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE'){
+              newFilter.enabled = true;
+            }
+            model.basicFilters.push(newFilter);
           }
         });
         updatedModel$.next(model);
