@@ -297,18 +297,5 @@
             "default_parameter": "0.00,0.10",
             "disable_filter": null
         }
-    },
-    {
-        "model": "validator.datafilter",
-        "pk": 25,
-        "fields": {
-            "name": "FIL_AREA_AVG",
-            "description": "Average observations in radius [m]:",
-            "help_text": "All available data points the the selected be averaged before using them in the validation.",
-            "parameterised": true,
-            "dialog_name": "radius_select",
-            "default_parameter": "10000",
-            "disable_filter": null
-        }
     }
 ]

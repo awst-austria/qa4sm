@@ -61,10 +61,10 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk':True})
 
     if dataset.short_name == globals.CGLS_SCATSAR_SWI1km:
-        reader = S1CglsTs(folder_name, parameters='SWI_005')  # placeholder param
+        reader = S1CglsTs(folder_name)
 
     if dataset.short_name == globals.CGLS_CSAR_SSM1km:
-        reader = S1CglsTs(folder_name, parameters='ssm')
+        reader = S1CglsTs(folder_name)
 
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))

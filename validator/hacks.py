@@ -14,7 +14,7 @@ on the fly - because pytesmo can't handle it.
 Remove after https://github.com/TUW-GEO/pytesmo/issues/150 is fixed.
 '''
 class TimezoneAdapter(object):
-
+    
     def __init__(self, reader):
         self.cls = reader
 
@@ -34,7 +34,6 @@ class TimezoneAdapter(object):
 
         if type(data) is TS or issubclass(type(data), TS):
             data = data.data
-
         if (hasattr(data.index, 'tz') and (data.index.tz is not None)):
 #             warnings.warn('Dropping timezone information for data')
             data.index = data.index.tz_convert(None)
