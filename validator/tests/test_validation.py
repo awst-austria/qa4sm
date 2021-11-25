@@ -31,8 +31,12 @@ from validator.models import DatasetConfiguration
 from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
-from validator.tests.auxiliary_functions import generate_default_validation, \
-    generate_default_validation_triple_coll, generate_ismn_nonref_validation
+from validator.tests.auxiliary_functions import (
+    generate_default_validation,
+    generate_default_validation_triple_coll,
+    generate_ismn_nonref_validation,
+    generate_default_validation_hires,
+)
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
@@ -923,7 +927,7 @@ class TestValidation(TestCase):
             ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters="COSMOS"),
             ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
         ]
-        msk_reader = val.setup_filtering(
+        msk_reader, read_name, read_kwargs  = val.setup_filtering(
             ismn_reader,
             data_filters,
             param_filters,
@@ -1002,11 +1006,14 @@ class TestValidation(TestCase):
 
                 reader = val.create_reader(dataset, version)
 
+                if dataset.short_name == val.globals.ASCAT:
+                    reader = val.BasicAdapter(reader)
+
                 assert reader is not None
                 if dataset.short_name == val.globals.ISMN:
-                    data = reader.read_ts(0)
+                    data = reader.read(0)
                 else:
-                    data = reader.read_ts(-155.42, 19.78)  ## hawaii
+                    data = reader.read(-155.42, 19.78)  ## hawaii
                 assert data is not None
                 assert isinstance(data, pd.DataFrame)
 
@@ -1019,9 +1026,10 @@ class TestValidation(TestCase):
         variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         reader = val.create_reader(dataset, version)
 
-        no_msk_reader = val.setup_filtering(reader, None, None, dataset, variable)
+        no_msk_reader, read_name, read_kwargs = \
+            val.setup_filtering(reader, None, None, dataset, variable)
         assert no_msk_reader is not None
-        data = no_msk_reader.read_ts(0)
+        data = getattr(no_msk_reader, read_name)(0, **read_kwargs)
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
@@ -1032,13 +1040,17 @@ class TestValidation(TestCase):
             DataFilter.objects.get(name="FIL_ISMN_GOOD"),
         ]
         param_filters = [
-            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters="  COSMOS , SCAN "),
-            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"),
+                               parameters="  COSMOS , SCAN "),
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"),
+                               parameters="0.0,0.1")
         ]
-        msk_reader = val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
+        msk_reader, read_name, read_kwargs  = \
+            val.setup_filtering(reader, data_filters, param_filters, dataset,
+                                variable)
 
         assert msk_reader is not None
-        data = msk_reader.read_ts(0)
+        data = getattr(no_msk_reader, read_name)(0, **read_kwargs)
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
@@ -1070,7 +1082,7 @@ class TestValidation(TestCase):
                                      dataset_config=run.reference_configuration)
         pfilter.save()
 
-        ref_reader = val.validation._get_reference_reader(run)
+        ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
 
         with pytest.raises(ValueError, match=r".*than.*"):
             val.create_jobs(
@@ -1135,20 +1147,26 @@ class TestValidation(TestCase):
                 for variable in va:
                     for data_filter in fils:
                         self.__logger.debug(
-                            "Testing {} version {} variable {} filter {}".format(dataset, version, variable,
-                                                                                 data_filter.name))
+                            "Testing {} version {} variable {} filter {}"
+                                .format(dataset, version, variable, data_filter.name))
                         if data_filter.parameterised:
-                            pfilter = ParametrisedFilter(filter=data_filter, parameters=data_filter.default_parameter)
-                            msk_reader = val.setup_filtering(reader, [], [pfilter], dataset, variable)
+                            pfilter = ParametrisedFilter(
+                                filter=data_filter, parameters=data_filter.default_parameter)
+
+                            msk_reader, read_name, read_kwargs = \
+                                val.setup_filtering(reader, [], [pfilter], dataset, variable)
+
                         else:
-                            msk_reader = val.setup_filtering(reader, [data_filter], [], dataset, variable)
+                            msk_reader, read_name, read_kwargs = \
+                                val.setup_filtering(reader, [data_filter], [], dataset, variable)
 
                         assert msk_reader is not None
                         if dataset.short_name == val.globals.ISMN:
-                            data = msk_reader.read_ts(0)
+                            data = getattr(msk_reader, read_name)(0, **read_kwargs)
                         else:
-                            data = msk_reader.read_ts(-155.42, 19.78)  ## hawaii
+                            data = getattr(msk_reader, read_name)(-155.42, 19.78, **read_kwargs)  ## hawaii
                         assert data is not None
+                        assert variable.pretty_name in data.columns
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
                         assert not data[variable.pretty_name].empty
@@ -1198,7 +1216,7 @@ class TestValidation(TestCase):
                 run.reference_configuration = ref_c
                 run.save()
 
-                ref_reader = val.validation._get_reference_reader(run)
+                ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
 
                 total_points, jobs = val.create_jobs(
                     run,
@@ -1221,8 +1239,14 @@ class TestValidation(TestCase):
         max_lon = -154.625  # ur
 
         # we need the reader just to get the grid
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name='C3S_V201812')
+        c3s_reader = val.create_reader(dataset, version)
+        # apply Basic Adapter only
+        c3s_reader, _, _ = val.setup_filtering(
+            c3s_reader, filters=None, param_filters=None, dataset=dataset,
+            variable=DataVariable.objects.get(short_name='C3S_sm'))
+
         gpis, lons, lats, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat,
@@ -1239,8 +1263,14 @@ class TestValidation(TestCase):
 
     def test_no_geographic_subsetting(self):
         # we need the reader just to get the grid
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name='C3S_V201812')
+        c3s_reader = val.create_reader(dataset, version)
+        # apply Basic Adapter only
+        c3s_reader, _, _ = val.setup_filtering(
+            c3s_reader, filters=None, param_filters=None, dataset=dataset,
+            variable=DataVariable.objects.get(short_name='C3S_sm'))
+
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, None, None, None, None)
@@ -1258,8 +1288,15 @@ class TestValidation(TestCase):
         russia_gpi2 = 898567
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
-            c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                           DatasetVersion.objects.get(short_name='C3S_V201812'))
+            dataset = Dataset.objects.get(short_name='C3S')
+            version = DatasetVersion.objects.get(short_name='C3S_V201812')
+
+            c3s_reader = val.create_reader(dataset, version)
+            # apply Basic Adapter only
+            c3s_reader, _, _ = val.setup_filtering(
+                c3s_reader, filters=None, param_filters=None, dataset=dataset,
+                variable=DataVariable.objects.get(short_name='C3S_sm'))
+
             gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
             subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat,
@@ -1273,8 +1310,15 @@ class TestValidation(TestCase):
 
     def test_geographic_subsetting_shifted(self):
         ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name='C3S_V201812')
+
+        c3s_reader = val.create_reader(dataset, version)
+        # apply Basic Adapter only
+        c3s_reader, _, _ = val.setup_filtering(
+            c3s_reader, filters=None, param_filters=None, dataset=dataset,
+            variable=DataVariable.objects.get(short_name='C3S_sm'))
+
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
         test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1),  # americas
