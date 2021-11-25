@@ -150,12 +150,12 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
                 inner_reader.activate_network(networks)
             continue
 
-        if pfil.filter.name  == 'FIL_AREA_AVG' and pfil.parameters:
-
-            read_name = 'read_area'
-            read_kwargs = {'radius': int(pfil.parameters),
-                           'area': 'circle',
-                           'average': True}
+        # if pfil.filter.name  == 'FIL_AREA_AVG' and pfil.parameters:
+        #
+        #     read_name = 'read_area'
+        #     read_kwargs = {'radius': int(pfil.parameters),
+        #                    'area': 'circle',
+        #                    'average': True}
 
     masking_filters = []
 

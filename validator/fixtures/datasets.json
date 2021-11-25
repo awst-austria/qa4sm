@@ -326,7 +326,6 @@
             "is_only_reference": false,
             "versions": [
                 21,
-                25,
                 32
             ],
             "variables": [
@@ -390,8 +389,7 @@
                 17
             ],
             "filters": [
-                1,
-                25
+                1
             ]
         }
     }
