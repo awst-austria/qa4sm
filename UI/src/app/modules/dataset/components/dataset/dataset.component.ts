@@ -41,7 +41,6 @@ export class DatasetComponent implements OnInit {
       this.datasets$ = this.datasetService.getAllDatasets().pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
         const referenceDatasets: DatasetDto[] = [];
         datasets.forEach(dataset => {
-          console.log(dataset);
           if (dataset.not_as_reference === false){
             referenceDatasets.push(dataset);
           }
