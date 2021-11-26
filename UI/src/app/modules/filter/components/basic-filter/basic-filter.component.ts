@@ -18,7 +18,6 @@ export class BasicFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.filterModel.filterDto.description, this.filterModel.filterDto.to_include);
   }
 
   include_filters(event: Event): void {
