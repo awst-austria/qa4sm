@@ -19,6 +19,7 @@
             <div class="p-float-label">
               <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
                           yearRange="1970:2100"
+                          [maxDate]="validationPeriodModel.intervalTo$|async"
                           [ngModel]="(validationPeriodModel.intervalFrom$|async)"
                           (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-calendar>
               <label for="fromDateInput">From</label>
@@ -45,7 +46,9 @@
           <div class="p-fluid">
             <div class="p-float-label">
               <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                          yearRange="1970:2100" [ngModel]="(validationPeriodModel.intervalTo$|async)"
+                          yearRange="1970:2100"
+                          [minDate]="validationPeriodModel.intervalFrom$|async"
+                          [ngModel]="(validationPeriodModel.intervalTo$|async)"
                           (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-calendar>
               <label for="toDateInput">To</label>
             </div>
