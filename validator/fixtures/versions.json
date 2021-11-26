@@ -7,7 +7,8 @@
             "pretty_name": "v201706",
             "help_text": "C3S from June 2017",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2017-06-30"
+            "time_range_end": "2017-06-30",
+            "geographical_range": null
         }
     },
     {
@@ -18,7 +19,8 @@
             "pretty_name": "v5 PM/ascending",
             "help_text": "",
             "time_range_start": "2015-03-31",
-            "time_range_end": "2018-12-04"
+            "time_range_end": "2018-12-04",
+            "geographical_range": null
         }
     },
     {
@@ -29,7 +31,8 @@
             "pretty_name": "H113",
             "help_text": "",
             "time_range_start": "2007-01-02",
-            "time_range_end": "2017-12-31"
+            "time_range_end": "2017-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -40,7 +43,8 @@
             "pretty_name": "20180712 mini testset",
             "help_text": "Test dataset with only 4 stations",
             "time_range_start": "",
-            "time_range_end": ""
+            "time_range_end": "",
+            "geographical_range": null
         }
     },
     {
@@ -51,7 +55,8 @@
             "pretty_name": "NOAH025 3H.2.1",
             "help_text": "Version 2.1",
             "time_range_start": "2000-01-01",
-            "time_range_end": "2017-12-31"
+            "time_range_end": "2017-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -62,7 +67,8 @@
             "pretty_name": "v201812",
             "help_text": "C3S from December 2018",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2018-12-31"
+            "time_range_end": "2018-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -73,7 +79,8 @@
             "pretty_name": "v04.4",
             "help_text": "",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2018-06-30"
+            "time_range_end": "2018-06-30",
+            "geographical_range": null
         }
     },
     {
@@ -84,7 +91,8 @@
             "pretty_name": "V.105 Ascending",
             "help_text": "",
             "time_range_start": "2010-01-12",
-            "time_range_end": "2018-12-31"
+            "time_range_end": "2018-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -95,7 +103,8 @@
             "pretty_name": "v20190613",
             "help_text": "snapshot of the reanalysis dataset from 2019-06-13",
             "time_range_start": "1979-01-01",
-            "time_range_end": "2019-03-31"
+            "time_range_end": "2019-03-31",
+            "geographical_range": null
         }
     },
     {
@@ -106,7 +115,8 @@
             "pretty_name": "v20190904",
             "help_text": "snapshot of the reanalysis dataset from 2019-09-04",
             "time_range_start": "2001-01-01",
-            "time_range_end": "2019-04-30"
+            "time_range_end": "2019-04-30",
+            "geographical_range": null
         }
     },
     {
@@ -117,7 +127,8 @@
             "pretty_name": "20191211 global",
             "help_text": "ISMN from 2019-12-11",
             "time_range_start": "",
-            "time_range_end": ""
+            "time_range_end": "",
+            "geographical_range": null
         }
     },
     {
@@ -128,7 +139,8 @@
             "pretty_name": "v04.5",
             "help_text": "-",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2018-12-31"
+            "time_range_end": "2018-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -139,7 +151,8 @@
             "pretty_name": "v04.5",
             "help_text": "-",
             "time_range_start": "1991-08-05",
-            "time_range_end": "2018-12-31"
+            "time_range_end": "2018-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -150,7 +163,8 @@
             "pretty_name": "v04.5",
             "help_text": "-",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2018-12-31"
+            "time_range_end": "2018-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -161,7 +175,8 @@
             "pretty_name": "v04.7",
             "help_text": "-",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
+            "time_range_end": "2019-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -172,7 +187,8 @@
             "pretty_name": "v05.2",
             "help_text": "-",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
+            "time_range_end": "2019-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -183,7 +199,8 @@
             "pretty_name": "v05.2",
             "help_text": "-",
             "time_range_start": "1991-08-05",
-            "time_range_end": "2019-12-31"
+            "time_range_end": "2019-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -194,7 +211,8 @@
             "pretty_name": "v05.2",
             "help_text": "-",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
+            "time_range_end": "2019-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -205,7 +223,8 @@
             "pretty_name": "v201912",
             "help_text": "C3S from December 2019",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2019-12-31"
+            "time_range_end": "2019-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -216,7 +235,8 @@
             "pretty_name": "v6 PM/ascending",
             "help_text": "-",
             "time_range_start": "2015-03-31",
-            "time_range_end": "2020-05-23"
+            "time_range_end": "2020-05-23",
+            "geographical_range": null
         }
     },
     {
@@ -227,7 +247,8 @@
             "pretty_name": "20210131 global",
             "help_text": "ISMN from 2021-01-31",
             "time_range_start": "",
-            "time_range_end": ""
+            "time_range_end": "",
+            "geographical_range": null
         }
     },
         {
@@ -238,7 +259,8 @@
             "pretty_name": "v202012",
             "help_text": "C3S from December 2020",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2020-12-31"
+            "time_range_end": "2020-12-31",
+            "geographical_range": null
         }
     },
         {
@@ -249,7 +271,8 @@
             "pretty_name": "v06.1",
             "help_text": "-",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2020-12-31"
+            "time_range_end": "2020-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -260,7 +283,8 @@
             "pretty_name": "v06.1",
             "help_text": "-",
             "time_range_start": "1991-08-05",
-            "time_range_end": "2020-12-31"
+            "time_range_end": "2020-12-31",
+            "geographical_range": null
         }
     },
     {
@@ -271,7 +295,45 @@
             "pretty_name": "v06.1",
             "help_text": "-",
             "time_range_start": "1978-11-01",
-            "time_range_end": "2020-12-31"
+            "time_range_end": "2020-12-31",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 35,
+        "fields": {
+            "short_name": "CGLS_CSAR_SSM1km_V1_1",
+            "pretty_name": "V1.1",
+            "help_text": "CGLS Sentinel1 SSM 1km (TIF) product",
+            "time_range_start": "2014-10-03",
+            "time_range_end": "2020-08-31",
+            "geographical_range":            {
+                "min_lat": 35.004464285714285,
+                "max_lat": 71.99553571427731,
+                "min_lon": -10.995535714285714,
+                "max_lon": 49.99553571428398
+            }
+
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 36,
+        "fields": {
+            "short_name": "CGLS_SCATSAR_SWI1km_V1_0",
+            "pretty_name": "V1.0",
+            "help_text": "CGLS S1/ASCAT SWI 1km (TIF) product",
+            "time_range_start": "2015-01-01",
+            "time_range_end": "2020-07-31",
+            "geographical_range":            {
+                "min_lat": 35.004464285714285,
+                "max_lat": 71.99553571427731,
+                "min_lon": -10.995535714285714,
+                "max_lon": 49.99553571428398
+            }
+
+
         }
     }
 ]
