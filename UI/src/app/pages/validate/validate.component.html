@@ -40,7 +40,8 @@
 
               <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
                 <qa-basic-filter
-                  [ngClass]="isIncluded(filter.filterDto.id, item.basicFilters) == true ? 'ml-1' : ''"
+                  [ngClass]="{'ml-1': isIncluded(filter.filterDto.id, item.basicFilters)}"
+                  [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
                   [filterModel]="filter"
                   (onExcludeMutual)="this.excludeFilter($event, item.basicFilters)"
                   (onIncludeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">

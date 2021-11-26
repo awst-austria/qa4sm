@@ -9,6 +9,7 @@ import {FilterModel} from './filter-model';
 export class BasicFilterComponent implements OnInit {
 
   @Input() filterModel: FilterModel;
+  @Input() isIncluded: boolean;
   @Output() onIncludeMutual = new EventEmitter<string>();
   @Output() onMutuallyIncluded = new EventEmitter<string>();
   @Output() onExcludeMutual = new EventEmitter<number>();
@@ -17,6 +18,7 @@ export class BasicFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.filterModel.filterDto.description, this.filterModel.filterDto.to_include);
   }
 
   include_filters(event: Event): void {
