@@ -61,3 +61,7 @@ services:
       - type: bind
         source: "${QA4SM_DATA_FOLDER}"
         target: /var/lib/qa4sm-web-val/valentina/data
+    deploy:
+      resources:
+        limits:
+          memory: 250G
