@@ -12,6 +12,7 @@
             <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
                         yearRange="1970:2100" [ngModel]="anomaliesModel.anomaliesFrom$|async"
                         (ngModelChange)="anomaliesModel.anomaliesFrom$.next($event)"
+                        [maxDate]="anomaliesModel.anomaliesTo$|async"
             ></p-calendar>
             <label for="fromDateInput">From</label>
           </div>
@@ -33,7 +34,9 @@
             <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
                         yearRange="1970:2100"
                         [ngModel]="anomaliesModel.anomaliesTo$|async"
-                        (ngModelChange)="anomaliesModel.anomaliesTo$.next($event)"></p-calendar>
+                        (ngModelChange)="anomaliesModel.anomaliesTo$.next($event)"
+                        [minDate]="anomaliesModel.anomaliesFrom$|async"
+            ></p-calendar>
             <label for="toDateInput">To</label>
           </div>
         </div>
