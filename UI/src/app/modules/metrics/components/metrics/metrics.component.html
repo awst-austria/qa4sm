@@ -9,12 +9,11 @@
   <div class="p-grid p-pt-3">
     <div class="p-col-12">
       <qa-metric [metricModel]="tripleCollocationMetrics"
-                 [disabled]="validationModel.datasetConfigurations.length<2" (click)="switchOffBootstrap()"></qa-metric>
+                 [disabled]="checkIfDisabled('tcol')" (click)="switchOffBootstrap()"></qa-metric>
     </div>
     <div class="p-col-12">
       <qa-metric [metricModel]="bootstrapTripleCollocationMetrics"
-                 [disabled]="validationModel.datasetConfigurations.length<2 ||
-                  !(validationModel.datasetConfigurations.length>1 && tripleCollocationMetrics.value$.getValue())"></qa-metric>
+                 [disabled]="checkIfDisabled('btcol')"></qa-metric>
     </div>
   </div>
 </p-panel>

@@ -32,9 +32,29 @@ export class MetricsComponent implements OnInit {
     this.validationModel.metrics.push(this.bootstrapTripleCollocationMetrics);
   }
 
-  switchOffBootstrap(): void{
-    if (!this.tripleCollocationMetrics.value$.getValue()){
+  switchOffBootstrap(): void {
+    if (!this.tripleCollocationMetrics.value$.getValue()) {
       this.bootstrapTripleCollocationMetrics.value$.next(false);
     }
   }
+
+  checkIfDisabled(metricName: string): boolean {
+    let condition = true;
+    const conditionTcol = this.validationModel.datasetConfigurations.length < 2;
+    const conditionBtcol = conditionTcol ||
+      !(this.validationModel.datasetConfigurations.length  > 1 && this. tripleCollocationMetrics.value$.getValue());
+
+    if (conditionTcol) {
+      this.tripleCollocationMetrics.value$.next(false);
+      this.bootstrapTripleCollocationMetrics.value$.next(false);
+    } else {
+      if (metricName === 'tcol'){
+        condition = conditionTcol;
+      } else if (metricName === 'btcol') {
+        condition = conditionBtcol;
+      }
+    }
+    return condition;
+  }
+
 }
