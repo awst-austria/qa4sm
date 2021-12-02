@@ -21,7 +21,7 @@
                         [ngModel]="selectedScalingModel|async"
                         (ngModelChange)="selectedScalingModel.next($event)"
                         optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
-            <label for="scalingMethodSelector">Method</label>
+            <label for="scalingMethodSelector">Select</label>
           </div>
         </div>
       </div>
@@ -41,7 +41,7 @@
                         (ngModelChange)="selectedScaleToModel$.next($event)"
                         [disabled]="isScalingSelectorDisabled()"
                         optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
-            <label for="scalingReferenceSelector">Scale To</label>
+            <label for="scalingReferenceSelector">Select</label>
           </div>
         </div>
       </div>

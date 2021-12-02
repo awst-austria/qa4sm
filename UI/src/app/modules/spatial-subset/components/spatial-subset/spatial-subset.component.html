@@ -28,7 +28,7 @@
                              [max] ="checkValIfLimited(subsetModel.maxLat$|async, true)"
                              (ngModelChange)="subsetModel.minLat$.next($event)"></p-inputNumber>
 
-              <label for="minLatInput">Lat</label>
+              <label for="minLatInput">Min. Latitude</label>
             </div>
           </div>
 
@@ -42,7 +42,7 @@
                              [max]="checkValIfLimited(subsetModel.maxLon$|async, true)"
                              (ngModelChange)="subsetModel.minLon$.next($event)"></p-inputNumber>
 
-              <label for="minLonInput">Lon</label>
+              <label for="minLonInput">Min. Longitude</label>
             </div>
           </div>
         </div>
@@ -81,7 +81,7 @@
                              [max]="checkValIfLimited(subsetModel.maxLat$|async)"
                              (ngModelChange)="subsetModel.maxLat$.next($event)"></p-inputNumber>
 
-              <label for="maxLatInput">Lat</label>
+              <label for="maxLatInput">Max. Latitude</label>
             </div>
           </div>
         </div>
@@ -94,7 +94,7 @@
                              [max]="checkValIfLimited(subsetModel.maxLon$|async)"
                              (ngModelChange)="subsetModel.maxLon$.next($event)"></p-inputNumber>
 
-              <label for="maxLonInput">Lon</label>
+              <label for="maxLonInput">Max. Longitude</label>
             </div>
           </div>
         </div>
