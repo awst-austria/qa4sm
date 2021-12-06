@@ -4,6 +4,8 @@ import {ValidationrunService} from '../../modules/core/services/validation-run/v
 import {DatasetConfigurationService} from '../../modules/validation-result/services/dataset-configuration.service';
 import {ValidationResultModel} from './validation-result-model';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
+import {combineLatest} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-validation',
@@ -33,10 +35,25 @@ export class ValidationResultComponent implements OnInit {
     this.modalWindowService.watch().subscribe(state => {
       this.isPublishingWindowOpen = state === 'open';
     });
+    this.sortDatasetsByReference();
   }
 
   update(): void{
     this.validationModel.validationRun = this.validationRunService.getValidationRunById(this.validationId);
+  }
+
+  sortDatasetsByReference(): void{
+    this.validationModel.datasetConfigs = combineLatest(
+      this.validationModel.datasetConfigs,
+      this.validationModel.validationRun
+    ).pipe(
+      map(([dataConfigs, validationRun]) =>
+        dataConfigs.sort((a, b) => {
+          return a.id !== validationRun.reference_configuration ? -1 : 1;
+          }
+        )
+      )
+    );
   }
 
 }
