@@ -110,6 +110,7 @@ describe('ValidationSummaryComponent', () => {
         tcol: false,
         total_points: 0,
         user: 1,
+        bootstrap_tcol_cis: false
       }),
       datasetConfigs: of([])
     };
