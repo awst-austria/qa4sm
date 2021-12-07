@@ -279,3 +279,6 @@
     </div>
   </ng-template>
 </div>
+<div *ngIf="!validationList && (publishingInProgress$|async)" class="col-sm p-pb-4 text-muted" id="publishingInProgress">
+  <span class="pi pi-spin pi-spinner"></span> <span> Publishing in progress... </span>
+</div>
