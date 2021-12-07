@@ -13,6 +13,7 @@ import {FormBuilder, Validators} from '@angular/forms';
 export class PublishingComponent implements OnInit {
   formErrors: any;
   display$: Observable<'open' | 'close'>;
+  publishingInProgress = false;
   @Input() validationId: string;
 
   publishingForm = this.formBuilder.group({
@@ -38,9 +39,12 @@ export class PublishingComponent implements OnInit {
     this.modalService.close();
   }
   publish(): void{
+    // this.publishingInProgress = true;
+    this.validationrunService.changePublishingStatus(true);
+    this.close();
     this.validationrunService.publishResults(this.validationId, this.publishingForm.value).subscribe(
       () => {
-        this.close();
+        this.validationrunService.changePublishingStatus(false);
         window.location.reload();
       },
       error => {
