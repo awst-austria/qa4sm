@@ -39,7 +39,6 @@ export class PublishingComponent implements OnInit {
     this.modalService.close();
   }
   publish(): void{
-    // this.publishingInProgress = true;
     this.validationrunService.changePublishingStatus(true);
     this.close();
     this.validationrunService.publishResults(this.validationId, this.publishingForm.value).subscribe(
