@@ -27,7 +27,6 @@ def start_validation(request):
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
     new_val_run.save()
-
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 
@@ -198,8 +197,8 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             # prepare DatasetConfiguration models
             reference_config = None
             dataset_config_models = []
-            configs_to_save = [validated_data.get('reference_config')]
-            configs_to_save.extend(validated_data.get('dataset_configs'))
+            configs_to_save = validated_data.get('dataset_configs')
+            configs_to_save.append(validated_data.get('reference_config'))
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,
                                                                    dataset_id=config.get('dataset_id'),
@@ -215,13 +214,13 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 config_model.save()
                 dataset_config_models.append(config_model)
 
-            new_val_run.reference_configuration = dataset_config_models[0]
+            new_val_run.reference_configuration = dataset_config_models[-1]
             scale_to = validated_data.get('scaling_method', None)
             if scale_to is not None:
                 if scale_to == ValidationRun.SCALE_TO_DATA:
                     new_val_run.scaling_ref = dataset_config_models[1]
                 else:
-                    new_val_run.scaling_ref = dataset_config_models[0]
+                    new_val_run.scaling_ref = dataset_config_models[-1]
 
             new_val_run.save()
 
