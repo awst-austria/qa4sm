@@ -8,7 +8,9 @@ dependencies:
   - alsa-lib=1.2.3
   - asgiref=3.4.1
   - attrs=21.2.0
-  - bokeh=2.4.1
+  - bokeh=2.4.2
+  - brotli=1.0.9
+  - brotli-bin=1.0.9
   - backports=1.0
   - backports.functools_lru_cache=1.6.4
   - blas=1.0
@@ -20,7 +22,6 @@ dependencies:
   - click=8.0.3
   - cloudpickle=2.0.0
   - configobj=5.0.6
-
   - curl=7.80.0
   - cycler=0.11.0
   - cython=0.29.24
@@ -35,7 +36,6 @@ dependencies:
   - fontconfig=2.13.1
   - freeglut=3.2.1
   - freetype=2.10.4
-  - geos=3.9.1
   - fsspec=2021.11.0
   - geos=3.10.0
   - gettext=0.19.8.1
@@ -111,7 +111,7 @@ dependencies:
   - numpy=1.20.3
   - numpy-base=1.20.3
   - olefile=0.46
-  - openblas=0.3.17
+  - openblas=0.3.18
   - openjpeg=2.4.0
   - openssl=1.1.1l
   - packaging=21.0
@@ -189,7 +189,6 @@ dependencies:
     - cftime==1.5.1.1
     - chardet==4.0.0
     - charset-normalizer==2.0.7
-    - click==7.1.2
     - click-didyoumean==0.3.0
     - click-plugins==1.1.1
     - click-repl==0.2.0
