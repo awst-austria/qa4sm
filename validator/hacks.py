@@ -13,6 +13,8 @@ Wrapper for data readers that discards timezone information from the data
 on the fly - because pytesmo can't handle it.
 Remove after https://github.com/TUW-GEO/pytesmo/issues/150 is fixed.
 '''
+
+
 class TimezoneAdapter(object):
 
     def __init__(self, reader):
@@ -25,7 +27,7 @@ class TimezoneAdapter(object):
             data = data.data
 
         if (hasattr(data.index, 'tz') and (data.index.tz is not None)):
-#             warnings.warn('Dropping timezone information for data')
+            #             warnings.warn('Dropping timezone information for data')
             data.index = data.index.tz_convert(None)
         return data
 
@@ -34,9 +36,8 @@ class TimezoneAdapter(object):
 
         if type(data) is TS or issubclass(type(data), TS):
             data = data.data
-
         if (hasattr(data.index, 'tz') and (data.index.tz is not None)):
-#             warnings.warn('Dropping timezone information for data')
+            #             warnings.warn('Dropping timezone information for data')
             data.index = data.index.tz_convert(None)
         return data
 

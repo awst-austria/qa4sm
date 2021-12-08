@@ -42,6 +42,8 @@ CCIP = 'ESA_CCI_SM_passive'
 SMOS = 'SMOS'
 ERA5 = 'ERA5'
 ERA5_LAND = 'ERA5_LAND'
+CGLS_CSAR_SSM1km = 'CGLS_CSAR_SSM1km'
+CGLS_SCATSAR_SWI1km = 'CGLS_SCATSAR_SWI1km'
 
 ## dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -71,6 +73,8 @@ ESA_CCI_SM_C_V05_2 = 'ESA_CCI_SM_C_V05_2'
 ESA_CCI_SM_A_V06_1 = 'ESA_CCI_SM_A_V06_1'
 ESA_CCI_SM_P_V06_1 = 'ESA_CCI_SM_P_V06_1'
 ESA_CCI_SM_C_V06_1 = 'ESA_CCI_SM_C_V06_1'
+CGLS_CSAR_SSM1km_V1_1 = 'CGLS_CSAR_SSM1km_V1_1'
+CGLS_SCATSAR_SWI1km_V1_0 = 'CGLS_SCATSAR_SWI1km_V1_0'
 
 ## dataset data variables
 C3S_sm = 'C3S_sm'
@@ -91,7 +95,7 @@ ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
-NOT_AS_REFERENCE = []
+NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, CGLS_SCATSAR_SWI1km]
 
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings

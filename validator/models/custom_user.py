@@ -10,7 +10,6 @@ from django_countries.fields import CountryField
 
 class User(AbstractUser):
     __logger = logging.getLogger(__name__)
-
     id = models.AutoField(primary_key=True)
     organisation = models.CharField(max_length=50, blank=True)
     country = CountryField(blank=True, blank_label='Country')
