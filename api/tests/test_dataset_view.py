@@ -19,7 +19,7 @@ class TestDatasetView(TestCase):
         dataset_url = reverse('Datasets')
         response = self.client.get(dataset_url)
         assert response.status_code == 200
-        assert len(response.json()) == 11
+        assert len(response.json()) == 13
 
         self.client.logout()
 

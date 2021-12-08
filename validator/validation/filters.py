@@ -2,7 +2,7 @@ import logging
 
 import pandas as pd
 
-from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
+from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter, BasicAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
 
@@ -111,18 +111,21 @@ def get_used_variables(filters, dataset, variable):
     return variables
 
 
-def setup_filtering(reader, filters, param_filters, dataset, variable):
+def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
     # figure out which variables we have to load because we want to use them
     load_vars = get_used_variables(filters, dataset, variable)
 
     # restrict the variables that are read from file in the reader
-    if hasattr(reader.cls, 'parameters'):
-        __logger.debug("Replacing existing variables to read: {}".format(reader.cls.parameters))
-        reader.cls.parameters = load_vars
+    if hasattr(reader, 'parameters'):
+        __logger.debug("Replacing existing variables to read: {}".format(reader.parameters))
+        reader.parameters = load_vars
+
+    read_name = 'read'
+    read_kwargs = {}
 
     if not filters and not param_filters:
         __logger.debug('No filters to apply for dataset {}.'.format(dataset))
-        return reader
+        return BasicAdapter(reader, read_name=read_name), read_name, read_kwargs
 
     filtered_reader = reader
 
@@ -146,6 +149,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
                 __logger.debug('Selected networks: ' + ';'.join(networks))
                 inner_reader.activate_network(networks)
             continue
+
 
     masking_filters = []
 
@@ -243,7 +247,11 @@ def setup_filtering(reader, filters, param_filters, dataset, variable):
             masking_filters.append((era_temp_variable, '>', 274.15))
             continue
 
-    if len(masking_filters):
-        filtered_reader = AdvancedMaskingAdapter(filtered_reader, masking_filters)
 
-    return filtered_reader
+    if len(masking_filters):
+        filtered_reader = AdvancedMaskingAdapter(filtered_reader, masking_filters,
+                                                 read_name=read_name)
+    else:
+        filtered_reader = BasicAdapter(filtered_reader, read_name=read_name)
+
+    return filtered_reader, read_name, read_kwargs
