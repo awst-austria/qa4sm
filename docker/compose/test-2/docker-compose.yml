@@ -45,7 +45,7 @@ services:
   proxy:
     image: "awst/qa4sm-proxy:latest-2"
     ports:
-      - "8081:80"
+      - "8082:80"
   ui:
     image: "awst/qa4sm-ui:latest-2"
 
