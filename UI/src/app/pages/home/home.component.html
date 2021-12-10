@@ -4,11 +4,11 @@
       <p-carousel [value]="carouselFiles" [circular]="true" [autoplayInterval]="5000"
                   [numVisible]="1" [numScroll]="1">
         <ng-template let-image pTemplate="item" >
-          <img alt="{{image.link}}"
+          <img alt="{{image.attrLink}}"
                [src]="image.plot"
                class="carousel-img">
           <div class="image-attribution">
-            <a href="{{ image.link }}">{{ image.description }}</a>
+            <a href="{{ image.attrLink }}" target="_blank">{{ image.description }}</a>
           </div>
         </ng-template>
       </p-carousel>
@@ -75,7 +75,7 @@
     <div class="p-md-12">
     <div class="overflow">
       <div *ngFor="let logo of logoFiles">
-        <a href="{{logo.link}}">
+        <a href="{{logo.link}}" target="_blank">
           <img alt="{{logo.link}}" [src]="logo.plot">
         </a>
       </div>

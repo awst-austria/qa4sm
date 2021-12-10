@@ -2248,8 +2248,8 @@ div.carousel-caption{
 }
 
 .p-carousel ul.p-carousel-indicators.p-reset{
-  padding-top: 0;
-  margin-top: -2rem;
+  padding: 0;
+  transform: translate(0, -2rem);
   z-index: 1;
 }
 
