@@ -26,8 +26,7 @@ def get_ismn_networks(request):
 
     network_list = []
     for net in networks:
-        network = {'name': net.name, 'continent': net.continent, 'stations': net.number_of_stations,
-                   'geo': json.loads(net.station_info)}
+        network = {'name': net.name, 'continent': net.continent, 'stations': net.number_of_stations}
         network_list.append(network)
 
     return JsonResponse(network_list, safe=False)
