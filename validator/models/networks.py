@@ -2,6 +2,7 @@ from django.db import models
 
 from validator.models import DatasetVersion
 
+
 class ISMNNetworks(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=60)
@@ -9,8 +10,6 @@ class ISMNNetworks(models.Model):
     country = models.CharField(max_length=60)
     number_of_stations = models.IntegerField()
     versions = models.ManyToManyField(DatasetVersion, related_name='network_version')
-    station_info = models.CharField(max_length=50000)
-    station_info_short = models.CharField(max_length=50000)
 
     def __str__(self):
         return self.name
