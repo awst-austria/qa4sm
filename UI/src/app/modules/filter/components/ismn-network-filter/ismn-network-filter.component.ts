@@ -17,7 +17,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
   @Input() filterModel: BehaviorSubject<FilterModel>;
   @Input() datasetModel: DatasetComponentSelectionModel;
 
-  networkSelectorVisible: boolean = false;
+  networkSelectorVisible = false;
 
   networkTree: TreeNode[];
 
@@ -33,28 +33,28 @@ export class IsmnNetworkFilterComponent implements OnInit {
     });
   }
 
-  showNetworkSelector() {
+  showNetworkSelector(): void {
     this.networkSelectorVisible = true;
   }
 
-  private loadNetworks() {
+  private loadNetworks(): void {
     this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
       this.buildTree(data);
     });
   }
 
-  private buildTree(networks: IsmnNetworkDto[]) {
-    let continents: TreeNode[] = [];
+  private buildTree(networks: IsmnNetworkDto[]): void {
+    const continents: TreeNode[] = [];
     networks.forEach(net => {
       let continentFound = false;
       continents.forEach(continent => {
-        if (net.continent == continent.key) {
+        if (net.continent === continent.key) {
           continent.children.push(this.networkDtoToTreeModel(net));
           continentFound = true;
         }
       });
-      if (continentFound == false) {
-        let newContinent: TreeNode = {key: net.continent, label: net.continent};
+      if (continentFound === false) {
+        const newContinent: TreeNode = {key: net.continent, label: net.continent, data: {continent: true}};
         newContinent.children = [];
         newContinent.children.push(this.networkDtoToTreeModel(net));
         continents.push(newContinent);
@@ -64,7 +64,11 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private networkDtoToTreeModel(network: IsmnNetworkDto): TreeNode<IsmnNetworkDto> {
-    let node: TreeNode = {key: network.name, label: network.name, data: network};
-    return node;
+    return {key: network.name, label: network.name, data: network};
   }
+
+  public onNetworkSelect(e): void {
+    console.log(e);
+  }
+
 }
