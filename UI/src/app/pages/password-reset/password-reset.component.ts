@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {AuthService} from '../../modules/core/services/auth/auth.service';
 
 @Component({
   selector: 'qa-password-reset',
@@ -12,12 +13,15 @@ export class PasswordResetComponent implements OnInit {
   resetPasswordForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
   });
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
   }
 
   onSubmit(): void{
-    console.log('reset my password');
+    console.log('reset my password', this.resetPasswordForm.value);
+    this.authService.resetPassword(this.resetPasswordForm.value).subscribe(response => {
+      console.log(response);
+    });
   }
 }
