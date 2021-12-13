@@ -10,7 +10,7 @@ export class PasswordResetComponent implements OnInit {
 
 
   resetPasswordForm = new FormGroup({
-    email: new FormControl('', Validators.required),
+    email: new FormControl('', [Validators.required, Validators.email]),
   });
   constructor() { }
 
