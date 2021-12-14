@@ -14,8 +14,8 @@ import {IsmnNetworkDto} from '../../../core/services/filter/ismn-network.dto';
 })
 export class IsmnNetworkFilterComponent implements OnInit {
 
-  @Input() filterModel: BehaviorSubject<FilterModel>;
-  @Input() datasetModel: DatasetComponentSelectionModel;
+  @Input() filterModel$: BehaviorSubject<FilterModel>;
+  @Input() datasetModel$: DatasetComponentSelectionModel;
 
   networkSelectorVisible = false;
 
@@ -26,7 +26,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadNetworks();
-    this.filterModel.subscribe(model => {
+    this.filterModel$.subscribe(model => {
       if (model != null) {
         this.loadNetworks();
       }
@@ -38,7 +38,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private loadNetworks(): void {
-    this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
+    this.networkService.getNetworksByDatasetVersionId(this.datasetModel$.selectedVersion.id).subscribe(data => {
       this.buildTree(data);
     });
   }
@@ -54,7 +54,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
         }
       });
       if (continentFound === false) {
-        const newContinent: TreeNode = {key: net.continent, label: net.continent, data: {continent: true}};
+        const newContinent: TreeNode = {key: net.continent, label: net.continent};
         newContinent.children = [];
         newContinent.children.push(this.networkDtoToTreeModel(net));
         continents.push(newContinent);
@@ -68,7 +68,40 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   public onNetworkSelect(e): void {
-    console.log(e);
+    if (e.node.data == null) {  // Full continent selected
+
+      e.node.children.forEach(network => {
+        console.log('Adding network: ' + network);
+        console.log(network);
+        this.addNetworkToFilterModel(network);
+      });
+    } else { // Network selected
+
+    }
+    //console.log(e['node']['data']);
+    console.log('New paramter: ' + this.filterModel$.value.parameters);
+  }
+
+  private addNetworkToFilterModel(network: IsmnNetworkDto): void {
+    const filter = this.filterModel$.value;
+    if (!filter.parameters.includes(network.name)) {
+      if (filter.parameters.length > 0) {
+        filter.parameters = filter.parameters + ',';
+      }
+      filter.parameters = filter.parameters + network.name;
+      this.filterModel$.next(filter);
+    }
+  }
+
+  private removeNetworkFromFilterModel(network: IsmnNetworkDto): void {
+    const filter = this.filterModel$.value;
+    const posWithComa = filter.parameters.indexOf(',' + network.name);
+    const pos = filter.parameters.indexOf(network.name);
+    if (posWithComa > -1) {
+      filter.parameters.replace(',' + network.name, '');
+    } else if (pos > -1) {
+      filter.parameters.replace(network.name, '');
+    }
   }
 
 }

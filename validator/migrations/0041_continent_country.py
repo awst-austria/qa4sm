@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0039_validationrun_bootstrap_tcol_cis'),
+        ('validator', '0040_auto_20211213_0828'),
     ]
 
     operations = [
