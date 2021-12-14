@@ -350,7 +350,7 @@
         "model": "validator.dataset",
         "pk": 12,
         "fields": {
-            "short_name": "CGLS_CSAR_SSM1km_1DEGCELL",
+            "short_name": "CGLS_CSAR_SSM1km",
             "pretty_name": "CGLS SSM 1km",
             "help_text": "Copernicus Global Land Service Sentinel 1 Surface Soil Moisture (1km)",
             "storage_path": "testdata/input_data/CGLS_CSAR_SSM1km",
@@ -373,7 +373,7 @@
         "model": "validator.dataset",
         "pk": 13,
         "fields": {
-            "short_name": "CGLS_SCATSAR_SWI1km_1DEGCELL",
+            "short_name": "CGLS_SCATSAR_SWI1km",
             "pretty_name": "CGLS SWI 1km",
             "help_text": "Copernicus Global Land Service Sentinel 1 / ASCAT Soil Water Index (1km)",
             "storage_path": "testdata/input_data/CGLS_SCATSAR_SWI1km",
