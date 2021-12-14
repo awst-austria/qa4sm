@@ -139,6 +139,17 @@ def get_validation_configuration(request, **kwargs):
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
 
+class ParameterisedFilterConfigSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    id = serializers.IntegerField(required=True)
+    parameters = serializers.CharField(required=True)
+
+
 class DatasetConfigSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         pass
@@ -150,6 +161,7 @@ class DatasetConfigSerializer(serializers.Serializer):
     version_id = serializers.IntegerField(required=True)
     variable_id = serializers.IntegerField(required=True)
     basic_filters = serializers.ListField(child=serializers.IntegerField(), required=True)
+    parametrised_filters = ParameterisedFilterConfigSerializer(many=True)
 
 
 # Metrics DTO and serializer
@@ -190,7 +202,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                     new_val_run.tcol = metric.get('value')
                 if metric.get('id') == 'bootstrap_tcol_cis':
                     new_val_run.bootstrap_tcol_cis = metric.get('value')
-
 
             new_val_run.save()
 
@@ -241,7 +252,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     max_lat = serializers.FloatField(required=False, allow_null=True, default=90)
     max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
     name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
-
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):

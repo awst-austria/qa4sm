@@ -18,16 +18,22 @@ export class DatasetConfigModel {
    * This method prepares the DTO for starting the new validation
    */
   public toValRunDatasetConfigDto(): ValidationRunDatasetConfigDto {
-    let enabledBasicFilters: number[] = [];
+    const enabledBasicFilters: number[] = [];
     this.basicFilters.forEach(filter => {
       if (filter.enabled) {
         enabledBasicFilters.push(filter.filterDto.id);
       }
     });
 
-    let parameterisedFilters: ParametrisedFilterConfig[] = [];
+    const parameterisedFilters: ParametrisedFilterConfig[] = [];
+    if (this.ismnNetworkFilter$.value != null) {
+      parameterisedFilters.push({id: ISMN_NETWORK_FILTER_ID, parameters: this.ismnNetworkFilter$.value.parameters});
+      console.log(this.datasetModel.selectedDataset.pretty_name + ': ISMN filter is present ');
+    } else {
+      console.log(this.datasetModel.selectedDataset.pretty_name + ': ISMN filter is null ');
+    }
 
-    let newValDatasetConfigDto: ValidationRunDatasetConfigDto = {
+    const newValDatasetConfigDto: ValidationRunDatasetConfigDto = {
       dataset_id: this.datasetModel.selectedDataset.id,
       variable_id: this.datasetModel.selectedVariable.id,
       version_id: this.datasetModel.selectedVersion.id,

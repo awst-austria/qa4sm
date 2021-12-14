@@ -136,7 +136,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // Prepare reference
     const referenceModel = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null), null,
-        new BehaviorSubject<FilterModel>(null), null);
+      new BehaviorSubject<FilterModel>(null), null);
     this.validationModel.referenceConfigurations.push(referenceModel);
     this.datasetService.getDatasetById(config.reference_config.dataset_id).subscribe(dataset => {
       referenceModel.datasetModel.selectedDataset = dataset;
@@ -236,15 +236,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return itDoes;
   }
 
-  addDatasetToValidate(): void{
+  addDatasetToValidate(): void {
     this.addDataset(this.validationModel.datasetConfigurations, 'C3S', 'v202012');
   }
 
-  addReferenceDataset(): void{
+  addReferenceDataset(): void {
     this.addDataset(this.validationModel.referenceConfigurations, 'ISMN', '20210131 global');
   }
 
-  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void{
+  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void {
     const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, new BehaviorSubject(null), null);
     targetArray.push(model);
     // get all datasets
@@ -270,15 +270,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
       // and the filters
       this.loadFiltersForModel(model);
-        // .pipe(
-        // map((basicFilter) => {
-        //   basicFilter.basicFilters.forEach(bf => bf.enabled = bf.filterDto.name === 'FIL_ALL_VALID_RANGE');
-        // })).subscribe();
+      // .pipe(
+      // map((basicFilter) => {
+      //   basicFilter.basicFilters.forEach(bf => bf.enabled = bf.filterDto.name === 'FIL_ALL_VALID_RANGE');
+      // })).subscribe();
     });
   }
 
 
-  private loadFiltersForModel(model: DatasetConfigModel, reloadingSettings= false): ReplaySubject<DatasetConfigModel> {
+  private loadFiltersForModel(model: DatasetConfigModel, reloadingSettings = false): ReplaySubject<DatasetConfigModel> {
     const updatedModel$ = new ReplaySubject<DatasetConfigModel>();
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
         model.basicFilters = [];
@@ -286,6 +286,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         filters.forEach(filter => {
           if (filter.parameterised) {
             if (filter.id == ISMN_NETWORK_FILTER_ID) {
+              console.log('Adding ISMN filter at init');
               model.ismnNetworkFilter$.next(new FilterModel(filter, false, false, filter.default_parameter));
             } else if (filter.id == ISMN_DEPTH_FILTER_ID) {
               if (model.ismnDepthFilter$) {
@@ -296,13 +297,18 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             }
           } else {
             const newFilter = new FilterModel(filter, false, false, null);
-            if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE'){
+            if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE') {
               newFilter.enabled = true;
             }
             model.basicFilters.push(newFilter);
           }
         });
 
+        if (model.ismnNetworkFilter$.value == null) {
+          console.log('ISMN net filter is null after loading filters');
+        } else {
+          console.log('ISMN net filter is present after loading filters');
+        }
         updatedModel$.next(model);
       },
       error => {
@@ -312,7 +318,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return updatedModel$;
   }
 
-  removeDataset(configModel: DatasetConfigModel): void{
+  removeDataset(configModel: DatasetConfigModel): void {
     const toBeRemoved = this.validationModel.datasetConfigurations.indexOf(configModel);
     if (toBeRemoved > -1) {
       this.validationModel.datasetConfigurations.splice(toBeRemoved, 1);
@@ -321,7 +327,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.setLimitationsOnGeographicalRange();
   }
 
-  onDatasetChange(datasetConfig: DatasetComponentSelectionModel): void{
+  onDatasetChange(datasetConfig: DatasetComponentSelectionModel): void {
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel === datasetConfig) {
         this.loadFiltersForModel(config);
@@ -331,13 +337,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.setLimitationsOnGeographicalRange();
   }
 
-  onReferenceChange(): void{
+  onReferenceChange(): void {
     this.loadFiltersForModel(this.validationModel.referenceConfigurations[0]);
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
   }
 
-  excludeFilter(toExclude: number, basicFilters: any): void{
+  excludeFilter(toExclude: number, basicFilters: any): void {
     // Exclude the filter if mutual is selected
     basicFilters.forEach(filter => {
       if (filter.filterDto.id === toExclude) {
@@ -350,7 +356,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;
   }
 
-  public startValidation(checkForExistingValidation: boolean): void{
+  public startValidation(checkForExistingValidation: boolean): void {
     // debug
 
     // prepare the dataset dtos (dataset, version, variable and filter settings)

@@ -31,6 +31,6 @@ export interface ValidationRunMetricConfigDto {
 }
 
 export interface ParametrisedFilterConfig {
-  id: string;
+  id: number;
   parameters: string;
 }
