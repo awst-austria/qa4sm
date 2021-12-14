@@ -19,6 +19,7 @@ export class AuthService {
   private signUpUrl = this.API_URL + 'api/sign-up';
   private userUpdateUrl = this.API_URL + 'api/user-update';
   private userDeleteUrl = this.API_URL + 'api/user-delete';
+  private passwordResetUrl = this.API_URL + 'api/password-reset';
 
   emptyUser = {
     username: '',
@@ -109,5 +110,8 @@ export class AuthService {
     return this.httpClient.delete<UserDto>(this.userDeleteUrl, username);
   }
 
+  resetPassword(resetPasswordForm: any): Observable<any>{
+    return this.httpClient.post(this.passwordResetUrl, resetPasswordForm);
+  }
 
 }

@@ -29,6 +29,7 @@ export class NavigationBarComponent implements OnInit {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
           {label: 'About', icon: 'pi pi-fw pi-info', routerLink: ['about']},
           {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']},
+          {label: 'User Manual', icon: 'pi pi-fw pi-book', url: 'https://www.geo.tuwien.ac.at/media/filer_public/15/6c/156cd163-cd29-4dd3-a132-820bcb653817/frm4sm_dt3-1_qa4sm_sum_v11.pdf', target: '_blank'},
           {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']},
           {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']},
 

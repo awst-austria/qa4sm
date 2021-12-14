@@ -31,10 +31,9 @@ export class SpatialSubsetComponent implements OnInit {
 
   }
 
-  checkVal(value: number): any{
-    if (this.subsetModel.limited$.getValue()){
+  checkValIfLimited(value: number, checkMinMax = false): any{
+    if (this.subsetModel.limited$.getValue() || checkMinMax){
       return value;
     }
   }
-
 }

@@ -122,7 +122,7 @@
             type="button"
             icon="pi pi-plus"
             class="btn-action"
-            title="Pin this validation"
+            title="Pin this validation. Pinning results gives a quick access to it."
             (click)="addValidation(validationRun.id)"
             onclick="">
     </button>
@@ -159,7 +159,7 @@
 </div>
 
 <!--Buttons shown on the single validation page (both custom and published)-->
-<div *ngIf="!validationList" class="col-sm" style="text-align: right;">
+<div *ngIf="!validationList && !(publishingInProgress$|async)" class="col-sm p-pb-4" style="text-align: right;">
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
     <button pButton
@@ -261,7 +261,7 @@
               type="button"
               icon="pi pi-times"
               class="btn-action-large"
-              label="Unpin"
+              label="Unpin validation"
               title="Remove this validation from your list"
               (click)="removeValidation(validationRun.id)">
       </button>
@@ -271,11 +271,14 @@
               pButton
               type="button"
               icon="pi pi-plus"
-              label="Pin"
-              title="Pinning results gives a quick access to it, however, if the results is removed by the owner, you will loose access to it."
+              label="Pin validation"
+              title="Pinning results gives a quick access to it."
               (click)="addValidation(validationRun.id)">
       </button>
 
     </div>
   </ng-template>
+</div>
+<div *ngIf="!validationList && (publishingInProgress$|async)" class="col-sm p-pb-4 text-muted" id="publishingInProgress">
+  <span class="pi pi-spin pi-spinner"></span> <span> Publishing in progress... </span>
 </div>

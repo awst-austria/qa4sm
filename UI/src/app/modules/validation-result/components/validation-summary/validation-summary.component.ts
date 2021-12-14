@@ -133,7 +133,6 @@ export class ValidationSummaryComponent implements OnInit {
   }
 
   refresh(dorefresh: boolean): void{
-    console.log(dorefresh);
     if (dorefresh){
       this.ngOnInit();
     } else {

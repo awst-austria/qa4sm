@@ -27,7 +27,6 @@ def start_validation(request):
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
     new_val_run.save()
-
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 
@@ -93,7 +92,8 @@ def get_validation_configuration(request, **kwargs):
                 if val_run.scaling_ref.id != val_run.reference_configuration.id:
                     val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
 
-        metrics = [{'id': 'tcol', 'value': val_run.tcol}]
+        metrics = [{'id': 'tcol', 'value': val_run.tcol},
+                   {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
 
         # Reference filters
@@ -188,14 +188,17 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             for metric in validated_data.get('metrics'):
                 if metric.get('id') == 'tcol':
                     new_val_run.tcol = metric.get('value')
+                if metric.get('id') == 'bootstrap_tcol_cis':
+                    new_val_run.bootstrap_tcol_cis = metric.get('value')
+
 
             new_val_run.save()
 
             # prepare DatasetConfiguration models
             reference_config = None
             dataset_config_models = []
-            configs_to_save = [validated_data.get('reference_config')]
-            configs_to_save.extend(validated_data.get('dataset_configs'))
+            configs_to_save = validated_data.get('dataset_configs')
+            configs_to_save.append(validated_data.get('reference_config'))
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,
                                                                    dataset_id=config.get('dataset_id'),
@@ -211,13 +214,13 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 config_model.save()
                 dataset_config_models.append(config_model)
 
-            new_val_run.reference_configuration = dataset_config_models[0]
+            new_val_run.reference_configuration = dataset_config_models[-1]
             scale_to = validated_data.get('scaling_method', None)
             if scale_to is not None:
                 if scale_to == ValidationRun.SCALE_TO_DATA:
                     new_val_run.scaling_ref = dataset_config_models[1]
                 else:
-                    new_val_run.scaling_ref = dataset_config_models[0]
+                    new_val_run.scaling_ref = dataset_config_models[-1]
 
             new_val_run.save()
 
