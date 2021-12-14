@@ -30,12 +30,9 @@ class Command(BaseCommand):
         for dataset in Dataset.objects.all():
             if ((mode == 'u') and bool(dataset.storage_path)):
                 continue
-            if 'CGLS' in dataset.short_name:
-                new_name = dataset.short_name + '_1DEGCELL'
-            else:
-                new_name = dataset.short_name
+
             if parent_data_folder:
-                default_path = path.join(parent_data_folder, new_name)
+                default_path = path.join(parent_data_folder, dataset.short_name)
             elif dataset.storage_path:
                 default_path = dataset.storage_path
             else:
