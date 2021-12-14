@@ -6,6 +6,7 @@ const logoAwstUrl = logoUrlPrefix + 'logo_awst.png';
 const logoEodcUrl = logoUrlPrefix + 'logo_eodc.png';
 const logoFfgUrl = logoUrlPrefix + 'logo_ffg.png';
 const logoTuWienUrl = logoUrlPrefix + 'logo_tuwien_geo.png';
+const logoEsa = logoUrlPrefix + 'logo_esa.png';
 
 @Component({
   selector: 'qa-about',
@@ -18,6 +19,7 @@ export class AboutComponent implements OnInit {
   logoEodc: string;
   logoFfg: string;
   logoTuWien: string;
+  logoEsa: string;
 
   constructor(private globalParamsService: GlobalParamsService) { }
 
@@ -26,6 +28,7 @@ export class AboutComponent implements OnInit {
     this.logoEodc = logoEodcUrl;
     this.logoFfg = logoFfgUrl;
     this.logoTuWien = logoTuWienUrl;
+    this.logoEsa = logoEsa;
   }
   getAppVersion(): string {
     return this.globalParamsService.globalContext.app_version;

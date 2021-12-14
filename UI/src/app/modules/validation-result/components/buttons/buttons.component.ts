@@ -6,6 +6,7 @@ import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {ModalWindowService} from '../../../core/services/global/modal-window.service';
+import {Observable} from 'rxjs';
 
 
 @Component({
@@ -30,6 +31,7 @@ export class ButtonsComponent implements OnInit {
   isOwner: boolean;
   isTrackedByTheUser: boolean;
   status: string;
+  publishingInProgress$: Observable<boolean>;
 
 
   constructor(private router: Router,
@@ -41,6 +43,7 @@ export class ButtonsComponent implements OnInit {
     this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
     this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
+    this.publishingInProgress$ = this.validationService.checkPublishingInProgress();
   }
 
 

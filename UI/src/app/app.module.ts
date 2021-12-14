@@ -56,6 +56,7 @@ import {UserModule} from './modules/user/user.module';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
 import {IsmnDepthFilterModule} from './modules/ismn-depth-filter/ismn-depth-filter.module';
+import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
 
 
 @NgModule({
@@ -76,6 +77,7 @@ import {IsmnDepthFilterModule} from './modules/ismn-depth-filter/ismn-depth-filt
     SignupComponent,
     SignupCompleteComponent,
     DeactivateUserCompleteComponent,
+    PasswordResetComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),

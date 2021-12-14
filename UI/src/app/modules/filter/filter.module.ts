@@ -7,6 +7,7 @@ import {IsmnNetworkFilterComponent} from './components/ismn-network-filter/ismn-
 import {ButtonModule} from 'primeng/button';
 import {DialogModule} from 'primeng/dialog';
 import {TreeModule} from 'primeng/tree';
+import {TooltipModule} from 'primeng/tooltip';
 
 
 @NgModule({
@@ -21,9 +22,10 @@ import {TreeModule} from 'primeng/tree';
     FormsModule,
     ButtonModule,
     DialogModule,
-    TreeModule
+    TreeModule,
+    TooltipModule
 
-  ]
+    ]
 })
 export class FilterModule {
 }
