@@ -4,6 +4,7 @@ from validator.validation import pytz
 from django.contrib.auth import get_user_model
 from validator.uptime import generate_daily_report, generate_monthly_report, get_report
 from django.test import TestCase
+import pytest
 
 User = get_user_model()
 
@@ -103,6 +104,7 @@ class TestUptimeMethods(TestCase):
                                                         tzinfo=pytz.UTC))
         assert monthly_report.uptime_percentage == 100.0
 
+    @pytest.mark.long_running
     def test_generate_daily_reports(self):
 
         # generate daily reports for 1983 October
