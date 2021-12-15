@@ -20,6 +20,7 @@ export class AuthService {
   private userUpdateUrl = this.API_URL + 'api/user-update';
   private userDeleteUrl = this.API_URL + 'api/user-delete';
   private passwordResetUrl = this.API_URL + 'api/password-reset';
+  private setPasswordUrl = this.API_URL + 'api/password-resetconfirm';
 
   emptyUser = {
     username: '',
@@ -112,6 +113,11 @@ export class AuthService {
 
   resetPassword(resetPasswordForm: any): Observable<any>{
     return this.httpClient.post(this.passwordResetUrl, resetPasswordForm);
+  }
+
+  setPassword(setPasswordForm: any, token: string): Observable<any>{
+    const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
+    return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm);
   }
 
 }
