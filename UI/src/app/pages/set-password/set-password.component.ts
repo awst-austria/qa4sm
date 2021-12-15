@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ToastService} from '../../modules/core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-set-password',
@@ -17,19 +18,14 @@ export class SetPasswordComponent implements OnInit {
   formErrors: any;
 
   constructor(private authService: AuthService,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              private router: Router,
+              private toastService: ToastService) { }
 
   ngOnInit(): void {
-    // this.route.params.subscribe(params => {
-    //   this.token = params.token;
-    // });
   }
 
   onSubmit(): void{
-
-    // console.log(this.token);
-    // console.log('reset my password', setPasswordFormToSubmit);
-
     this.route.params.subscribe(params => {
       const tkn = params.token;
       const setPasswordFormToSubmit = {
@@ -37,9 +33,9 @@ export class SetPasswordComponent implements OnInit {
         password: this.setPasswordForm.controls.password1.value
       };
       this.authService.setPassword(setPasswordFormToSubmit, tkn).subscribe(response => {
+          this.router.navigate(['/login']).then(value => this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
       },
         (errors) => {
-        // console.log(errors.error.password);
         this.formErrors = errors.error;
         },
         );
