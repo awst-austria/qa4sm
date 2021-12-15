@@ -40,7 +40,7 @@ const routes: Routes = [
   {path: 'deactivate-user-complete', component: DeactivateUserCompleteComponent},
   {path: 'password-reset', component: PasswordResetComponent},
   {path: 'password-reset/done', component: PasswordResetDoneComponent},
-  {path: 'password-reset/set-password/:token', component: SetPasswordComponent},
+  {path: 'set-password/:token', component: SetPasswordComponent},
   {path: '**', component: ErrorComponent}
 ];
 
