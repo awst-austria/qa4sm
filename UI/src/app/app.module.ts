@@ -57,6 +57,7 @@ import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.c
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
 import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
 import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
+import {SetPasswordComponent} from './pages/set-password/set-password.component';
 
 
 @NgModule({
@@ -79,6 +80,7 @@ import {PasswordResetDoneComponent} from './pages/password-reset-done/password-r
     DeactivateUserCompleteComponent,
     PasswordResetComponent,
     PasswordResetDoneComponent,
+    SetPasswordComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
