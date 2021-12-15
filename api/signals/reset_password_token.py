@@ -1,10 +1,10 @@
-from django.core.mail import EmailMultiAlternatives
 from django.dispatch import receiver
 from django.template.loader import render_to_string
-from django.urls import reverse
 
 from django_rest_passwordreset.signals import reset_password_token_created
 from django_rest_passwordreset.models import get_password_reset_token_expiry_time
+from api.frontend_urls import get_angular_url
+from validator.mailer import _send_email
 
 
 @receiver(reset_password_token_created)
@@ -24,27 +24,14 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         'current_user': reset_password_token.user,
         'username': reset_password_token.user.username,
         'email': reset_password_token.user.email,
-        'reset_password_url': "{}?token={}".format(
-            instance.request.build_absolute_uri(reverse('password-reset:reset-password-confirm')),
-            reset_password_token.key),
+        'reset_password_url':
+            instance.request.build_absolute_uri(get_angular_url('set-password', reset_password_token.key)),
         'password_reset_timeout_hours': get_password_reset_token_expiry_time()
     }
-    print(get_password_reset_token_expiry_time())
     # render email text
-    email_html_message = render_to_string('email/user_reset_password.html', context)
-    email_plaintext_message = render_to_string('email/user_reset_password.txt', context)
+    email_message = render_to_string('email/user_reset_password.html', context)
 
-    print(email_html_message)
-
-    # msg = EmailMultiAlternatives(
-    #     # title:
-    #     "Password Reset for {title}".format(title="Some website title"),
-    #     # message:
-    #     email_plaintext_message,
-    #     # from:
-    #     "noreply@somehost.local",
-    #     # to:
-    #     [reset_password_token.user.email]
-    # )
-    # msg.attach_alternative(email_html_message, "text/html")
-    # msg.send()
+    subject = '[QA4SM] Password reset for QA4SM webservice'
+    _send_email(recipients=[reset_password_token.user.email],
+                subject=subject,
+                body=email_message)
