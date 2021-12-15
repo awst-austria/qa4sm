@@ -8,3 +8,6 @@ warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
 class ValidatorConfig(AppConfig):
     name = 'validator'
+
+    def ready(self):
+        import validator.signals.reset_password_token
