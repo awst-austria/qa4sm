@@ -20,12 +20,13 @@ export class SetPasswordComponent implements OnInit {
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
               private router: Router,
-              private toastService: ToastService) { }
+              private toastService: ToastService) {
+  }
 
   ngOnInit(): void {
   }
 
-  onSubmit(): void{
+  onSubmit(): void {
     this.route.params.subscribe(params => {
       const tkn = params.token;
       const setPasswordFormToSubmit = {
@@ -33,12 +34,13 @@ export class SetPasswordComponent implements OnInit {
         password: this.setPasswordForm.controls.password1.value
       };
       this.authService.setPassword(setPasswordFormToSubmit, tkn).subscribe(response => {
-          this.router.navigate(['/login']).then(value => this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
-      },
-        (errors) => {
-        this.formErrors = errors.error;
+          this.router.navigate(['/login']).then(value =>
+            this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
         },
-        );
+        (errors) => {
+          this.formErrors = errors.error;
+        },
+      );
     });
   }
 }
