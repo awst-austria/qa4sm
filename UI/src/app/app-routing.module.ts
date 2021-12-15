@@ -18,6 +18,7 @@ import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.c
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
 import {DatasetResolver} from './modules/core/services/dataset/dataset.resolver';
 import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
+import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
 
 
 const routes: Routes = [
@@ -37,6 +38,7 @@ const routes: Routes = [
   {path: 'signup-complete', component: SignupCompleteComponent},
   {path: 'deactivate-user-complete', component: DeactivateUserCompleteComponent},
   {path: 'password-reset', component: PasswordResetComponent},
+  {path: 'password-reset/done', component: PasswordResetDoneComponent},
   {path: '**', component: ErrorComponent}
 ];
 
