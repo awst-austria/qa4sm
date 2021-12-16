@@ -18,12 +18,12 @@ export class NavigationBarComponent implements OnInit {
 
   constructor(private authService: AuthService, private router: Router, private toastService: ToastService) {
     this.loginMenuItem = {label: 'Login', icon: 'pi pi-fw pi-sign-in', routerLink: ['login']};
-    this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile']};
+    this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile'], command: event => this.setPreviousUrl('user-profile')};
     this.logoutMenuItem = {label: 'Logout', icon: 'pi pi-fw pi-sign-out', command: event => this.logout()};
     this.items = [
       {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['']},
-      {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate']},
-      {label: 'My validations', icon: 'pi pi-fw pi-folder', routerLink: ['my-validations']},
+      {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate'], command: event => this.setPreviousUrl('validate')},
+      {label: 'My validations', icon: 'pi pi-fw pi-folder', routerLink: ['my-validations'], command: event => this.setPreviousUrl('my-validations')},
       {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
       {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
@@ -62,6 +62,10 @@ export class NavigationBarComponent implements OnInit {
         }
       }
     );
+  }
+
+  setPreviousUrl(prevUrl: string): void{
+    this.authService.setPreviousUrl(prevUrl);
   }
 
 }
