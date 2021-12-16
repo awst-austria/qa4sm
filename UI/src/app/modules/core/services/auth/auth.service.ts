@@ -21,6 +21,7 @@ export class AuthService {
   private userDeleteUrl = this.API_URL + 'api/user-delete';
   private passwordResetUrl = this.API_URL + 'api/password-reset';
   private setPasswordUrl = this.API_URL + 'api/password-resetconfirm';
+  private validateTokenUrl = this.API_URL + 'api/password-resetvalidate_token/';
 
   emptyUser = {
     username: '',
@@ -35,6 +36,7 @@ export class AuthService {
   };
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
+  private resetPasswordToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(private httpClient: HttpClient) {
     this.init();
@@ -111,13 +113,24 @@ export class AuthService {
     return this.httpClient.delete<UserDto>(this.userDeleteUrl, username);
   }
 
-  resetPassword(resetPasswordForm: any): Observable<any>{
+  resetPassword(resetPasswordForm: any): Observable<any> {
     return this.httpClient.post(this.passwordResetUrl, resetPasswordForm);
   }
 
-  setPassword(setPasswordForm: any, token: string): Observable<any>{
+  setPassword(setPasswordForm: any, token: string): Observable<any> {
     const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
     return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm);
   }
 
+  validateResetPasswordToken(tkn: string): Observable<any> {
+    return this.httpClient.post(this.validateTokenUrl, {token: tkn});
+  }
+
+  checkResetPasswordToken(): Observable<string> {
+    return this.resetPasswordToken.asObservable();
+  }
+
+  setResetPasswordToken(newToken: string): void {
+    this.resetPasswordToken.next(newToken);
+  }
 }

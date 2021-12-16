@@ -20,6 +20,9 @@ import {DatasetResolver} from './modules/core/services/dataset/dataset.resolver'
 import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
 import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
 import {SetPasswordComponent} from './pages/set-password/set-password.component';
+import {
+  PasswordResetValidateTokenComponent
+} from './pages/password-reset-validate-token/password-reset-validate-token.component';
 
 
 const routes: Routes = [
@@ -40,7 +43,8 @@ const routes: Routes = [
   {path: 'deactivate-user-complete', component: DeactivateUserCompleteComponent},
   {path: 'password-reset', component: PasswordResetComponent},
   {path: 'password-reset/done', component: PasswordResetDoneComponent},
-  {path: 'set-password/:token', component: SetPasswordComponent},
+  {path: 'password-reset/:token', component: PasswordResetValidateTokenComponent},
+  {path: 'set-password', component: SetPasswordComponent},
   {path: '**', component: ErrorComponent}
 ];
 

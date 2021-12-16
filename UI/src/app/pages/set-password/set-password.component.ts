@@ -24,23 +24,23 @@ export class SetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.authService.checkResetPasswordToken().subscribe(tkn => {
+      this.token = tkn;
+    });
   }
 
   onSubmit(): void {
-    this.route.params.subscribe(params => {
-      const tkn = params.token;
-      const setPasswordFormToSubmit = {
-        token: tkn,
-        password: this.setPasswordForm.controls.password1.value
-      };
-      this.authService.setPassword(setPasswordFormToSubmit, tkn).subscribe(response => {
-          this.router.navigate(['/login']).then(value =>
-            this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
-        },
-        (errors) => {
-          this.formErrors = errors.error;
-        },
-      );
-    });
+    const setPasswordFormToSubmit = {
+      token: this.token,
+      password: this.setPasswordForm.controls.password1.value
+    };
+    this.authService.setPassword(setPasswordFormToSubmit, this.token).subscribe(() => {
+        this.router.navigate(['/login']).then(() =>
+          this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
+      },
+      (errors) => {
+        this.formErrors = errors.error;
+      },
+    );
   }
 }
