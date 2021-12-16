@@ -23,7 +23,7 @@ export class PasswordResetValidateTokenComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.authService.validateResetPasswordToken(params.token).subscribe(response => {
         if (response.status === 'OK'){
-          this.authService.setResetPasswordToken(params.token);
+          this.authService.setPasswordResetToken(params.token);
         } else {
           this.tokenValid = false;
         }

@@ -36,7 +36,7 @@ export class AuthService {
   };
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
-  private resetPasswordToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  private passwordResetToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(private httpClient: HttpClient) {
     this.init();
@@ -126,11 +126,11 @@ export class AuthService {
     return this.httpClient.post(this.validateTokenUrl, {token: tkn});
   }
 
-  checkResetPasswordToken(): Observable<string> {
-    return this.resetPasswordToken.asObservable();
+  checkPasswordResetToken(): Observable<string> {
+    return this.passwordResetToken.asObservable();
   }
 
-  setResetPasswordToken(newToken: string): void {
-    this.resetPasswordToken.next(newToken);
+  setPasswordResetToken(newToken: string): void {
+    this.passwordResetToken.next(newToken);
   }
 }

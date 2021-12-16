@@ -24,7 +24,7 @@ export class SetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.checkResetPasswordToken().subscribe(tkn => {
+    this.authService.checkPasswordResetToken().subscribe(tkn => {
       this.token = tkn;
     });
   }
