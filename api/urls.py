@@ -97,5 +97,5 @@ urlpatterns = [
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
     url(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
-    path('password-reset', include('django_rest_passwordreset.urls', namespace='password_reset')),
+    path('password-reset', include('django_rest_passwordreset.urls', namespace='password-reset')),
 ]
