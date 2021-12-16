@@ -144,7 +144,11 @@ export class ValidationSummaryComponent implements OnInit {
     this.validationModel.validationRun.subscribe(data => {
       if (data.is_a_copy){
         this.validationService.getCopiedRunRecord(data.id).subscribe(copiedRun => {
-          this.originalDate = copiedRun.original_run_date;
+          if (copiedRun.original_run_date){
+            this.originalDate = copiedRun.original_run_date;
+          } else {
+            this.originalDate = data.start_time;
+          }
         });
       }
     });

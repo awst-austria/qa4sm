@@ -101,7 +101,11 @@ export class ValidationrunRowComponent implements OnInit {
 
   getOriginalDate(copiedRun: ValidationrunDto): void{
     this.validationService.getCopiedRunRecord(copiedRun.id).subscribe(data => {
-      this.originalDate = data.original_run_date;
+      if (data.original_run_date){
+        this.originalDate = data.original_run_date;
+      } else{
+        this.originalDate = copiedRun.start_time;
+      }
     });
   }
 
