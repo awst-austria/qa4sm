@@ -25,7 +25,7 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         'username': reset_password_token.user.username,
         'email': reset_password_token.user.email,
         'reset_password_url':
-            instance.request.build_absolute_uri(get_angular_url('set-password', reset_password_token.key)),
+            instance.request.build_absolute_uri(get_angular_url('validate-token', reset_password_token.key)),
         'password_reset_timeout_hours': get_password_reset_token_expiry_time()
     }
     # render email text

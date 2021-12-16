@@ -15,7 +15,8 @@ angular_paths = [
     {'path': 'deactivate-user-complete', 'name': 'deactivate_user_complete'},
     {'path': 'password-reset', 'name': 'password-reset'},
     {'path': 'password-reset/done', 'name': 'password-reset-done'},
-    {'path': 'set-password/:token', 'name': 'set-password'},
+    {'path': 'password-reset/:token', 'name': 'validate-token'},
+    {'path': 'password-reset/set-password', 'name': 'set-password'},
 ]
 
 
