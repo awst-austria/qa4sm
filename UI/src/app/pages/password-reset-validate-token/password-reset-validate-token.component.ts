@@ -8,7 +8,7 @@ import {ActivatedRoute, Router} from '@angular/router';
   styleUrls: ['./password-reset-validate-token.component.scss']
 })
 export class PasswordResetValidateTokenComponent implements OnInit {
-  // token: string;
+  tokenValid = true;
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
               private router: Router) { }
@@ -24,9 +24,13 @@ export class PasswordResetValidateTokenComponent implements OnInit {
       this.authService.validateResetPasswordToken(params.token).subscribe(response => {
         if (response.status === 'OK'){
           this.authService.setResetPasswordToken(params.token);
+        } else {
+          this.tokenValid = false;
         }
       },
-        () => {},
+        () => {
+          this.tokenValid = false;
+        },
         () => {
           this.router.navigate(['set-password']);
         });
