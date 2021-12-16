@@ -39,6 +39,7 @@ export class AuthService {
   private passwordResetToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private previousUrl: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
+
   constructor(private httpClient: HttpClient) {
     this.init();
   }
@@ -135,6 +136,7 @@ export class AuthService {
     this.passwordResetToken.next(newToken);
   }
 
+
   checkPreviousUrl(): Observable<string>{
     return this.previousUrl.asObservable();
   }
@@ -142,4 +144,5 @@ export class AuthService {
   setPreviousUrl(prevUrl: string): void{
     this.previousUrl.next(prevUrl);
   }
+
 }
