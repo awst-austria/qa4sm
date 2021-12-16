@@ -25,7 +25,7 @@ export class PasswordResetComponent implements OnInit {
     this.authService.resetPassword(this.resetPasswordForm.value).subscribe(response => {
       console.log(response);
       if (response.status === 'OK'){
-        this.router.navigate(['password-reset/done']);
+        this.router.navigate(['password-reset-done']);
       }
     });
   }
