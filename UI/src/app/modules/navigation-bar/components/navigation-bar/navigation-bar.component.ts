@@ -17,11 +17,11 @@ export class NavigationBarComponent implements OnInit {
   userProfileMenuItem: MenuItem;
 
   constructor(private authService: AuthService, private router: Router, private toastService: ToastService) {
-    this.loginMenuItem = {label: 'Login', icon: 'pi pi-fw pi-sign-in', routerLink: ['login']};
-    this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile'], command: event => this.setPreviousUrl('user-profile')};
+    this.loginMenuItem = {label: 'Login', icon: 'pi pi-fw pi-sign-in', routerLink: ['login'], command: event => this.setPreviousUrl('user-profile')};
+    this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile']};
     this.logoutMenuItem = {label: 'Logout', icon: 'pi pi-fw pi-sign-out', command: event => this.logout()};
     this.items = [
-      {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['']},
+      {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: [''], command: event => this.setPreviousUrl('')},
       {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate'], command: event => this.setPreviousUrl('validate')},
       {label: 'My validations', icon: 'pi pi-fw pi-folder', routerLink: ['my-validations'], command: event => this.setPreviousUrl('my-validations')},
       {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
@@ -57,6 +57,7 @@ export class NavigationBarComponent implements OnInit {
 
   logout() {
     this.authService.logout().subscribe(result => {
+      this.setPreviousUrl('');
         if (result) {//Successful logout
           this.router.navigate(['home']).then(value => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
         }
