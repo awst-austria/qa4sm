@@ -16,7 +16,8 @@ export class LoginComponent implements OnInit {
 
   loginDto = new LoginDto('', '');
   submitted = false;
-  prevUrl = 'user-profile';
+
+  prevUrl = '';
 
   loginForm = new FormGroup({
     username: new FormControl(this.loginDto.username, Validators.required),
