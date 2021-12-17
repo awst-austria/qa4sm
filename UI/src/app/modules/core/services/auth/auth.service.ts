@@ -142,5 +142,4 @@ export class AuthService {
   setPreviousUrl(prevUrl: string): void{
     this.previousUrl.next(prevUrl);
   }
-
 }

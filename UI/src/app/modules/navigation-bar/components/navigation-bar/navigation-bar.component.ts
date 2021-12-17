@@ -23,7 +23,6 @@ export class NavigationBarComponent implements OnInit {
     this.logoutMenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: event => this.logout()};
     this.items = [
       {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: [''], command: event => this.setPreviousUrl('')},
-
       {label: 'Validate', icon: 'pi pi-fw pi-check-square', routerLink: ['validate'], command: event => this.setPreviousUrl('validate')},
       {label: 'My validations', icon: 'pi pi-fw pi-folder', routerLink: ['my-validations'], command: event => this.setPreviousUrl('my-validations')},
       {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},

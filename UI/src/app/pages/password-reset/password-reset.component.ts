@@ -14,6 +14,7 @@ export class PasswordResetComponent implements OnInit {
   resetPasswordForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
   });
+  formErrors: any;
   constructor(private authService: AuthService,
               private router: Router) { }
 
@@ -25,6 +26,9 @@ export class PasswordResetComponent implements OnInit {
       if (response.status === 'OK'){
         this.router.navigate(['password-reset-done']);
       }
-    });
+    },
+      (errors) => {
+        this.formErrors = errors.error;
+      });
   }
 }
