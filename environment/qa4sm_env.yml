@@ -47,6 +47,7 @@ dependencies:
   - hdf5=1.12.1
   - heapdict=1.0.1
   - icu=68.2
+  - importlib-metadata=4.8.2
   - importlib_metadata=4.8.2
   - iniconfig=1.1.1
   - jasper=2.0.33
