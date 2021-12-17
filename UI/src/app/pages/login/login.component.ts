@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
 
   loginDto = new LoginDto('', '');
   submitted = false;
+
   prevUrl = '';
 
   loginForm = new FormGroup({
