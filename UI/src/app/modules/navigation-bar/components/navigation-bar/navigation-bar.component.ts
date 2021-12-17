@@ -17,7 +17,6 @@ export class NavigationBarComponent implements OnInit {
   userProfileMenuItem: MenuItem;
 
   constructor(private authService: AuthService, private router: Router, private toastService: ToastService) {
-
     this.loginMenuItem = {label: 'Log in', icon: 'pi pi-fw pi-sign-in', routerLink: ['login'], command: event => this.setPreviousUrl('user-profile')};
     this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile']};
     this.logoutMenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: event => this.logout()};
