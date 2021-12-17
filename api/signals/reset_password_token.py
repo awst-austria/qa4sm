@@ -4,7 +4,7 @@ from django.template.loader import render_to_string
 from django_rest_passwordreset.signals import reset_password_token_created
 from django_rest_passwordreset.models import get_password_reset_token_expiry_time
 from api.frontend_urls import get_angular_url
-from validator.mailer import _send_email
+from validator.mailer import send_user_link_to_reset_password
 
 
 @receiver(reset_password_token_created)
@@ -30,8 +30,4 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     }
     # render email text
     email_message = render_to_string('email/user_reset_password.html', context)
-
-    subject = '[QA4SM] Password reset for QA4SM webservice'
-    _send_email(recipients=[reset_password_token.user.email],
-                subject=subject,
-                body=email_message)
+    send_user_link_to_reset_password(reset_password_token.user, email_message)

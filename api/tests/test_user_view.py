@@ -4,7 +4,10 @@ from django.urls import reverse
 from django.test import TestCase
 from rest_framework.test import APIClient
 
+from api.frontend_urls import get_angular_url
 from api.tests.test_helper import *
+from django.core import mail
+from django.conf import settings
 User = get_user_model()
 
 
@@ -268,3 +271,30 @@ class TestUserView(TestCase):
         assert not self.test_user.is_active  # user is not active anymore
         assert not self.client.login(**self.auth_data)  # and they can not login
         assert User.objects.get(username=self.auth_data['username']) # but the account still exists
+
+    def test_password_reset(self):
+        ## pattern to get the password reset link from the email
+        reset_url_pattern = get_angular_url('validate-token', 'DUMMY')
+        reset_submit_url = reverse('password_reset:reset-password-request') # reset-password-request comes from the package
+        submit_new_password_url = reverse('password_reset:reset-password-confirm')
+
+        # original_password = self.auth_data['password']
+
+        # method get is not allowed here
+        response = self.client.get(reset_submit_url, follow=True)
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.post(reset_submit_url, {'email': self.test_user.email})
+        self.assertEqual(response.status_code, 200)
+
+        sent_mail = mail.outbox[0]
+        print('Monika', sent_mail.from_email)
+
+        assert sent_mail
+        assert sent_mail.subject
+        assert sent_mail.body
+        assert sent_mail.from_email == settings.EMAIL_FROM
+        assert self.test_user.email in sent_mail.to
+        assert self.test_user.username in sent_mail.body
+
+        # assert False
