@@ -65,7 +65,6 @@ export class UserFormComponent implements OnInit {
           this.userService.currentUser.organisation = data.organisation;
           this.userService.currentUser.country = data.country;
           this.userService.currentUser.orcid = data.orcid;
-          // this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.userService.currentUser.username));
         },
         error => {
           this.formErrors = error.error;
