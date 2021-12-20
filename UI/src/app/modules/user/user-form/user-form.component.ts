@@ -6,6 +6,7 @@ import {UserDto} from '../../core/services/auth/user.dto';
 import {AuthService} from '../../core/services/auth/auth.service';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
+import {ToastService} from '../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-user-form',
@@ -35,7 +36,8 @@ export class UserFormComponent implements OnInit {
   constructor(private userFormService: LocalApiService,
               private formBuilder: FormBuilder,
               private userService: AuthService,
-              private router: Router) { }
+              private router: Router,
+              private toastService: ToastService) { }
 
   ngOnInit(): void {
     // this.getListOfCountries();
@@ -63,10 +65,13 @@ export class UserFormComponent implements OnInit {
           this.userService.currentUser.organisation = data.organisation;
           this.userService.currentUser.country = data.country;
           this.userService.currentUser.orcid = data.orcid;
-          alert('User profile has been updated');
+          // this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.userService.currentUser.username));
         },
         error => {
           this.formErrors = error.error;
+        },
+        () => {
+          this.toastService.showSuccessWithHeader('', 'User profile has been updated');
         }
       );
     }
