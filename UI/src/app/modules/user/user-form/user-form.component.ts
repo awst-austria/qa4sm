@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {LocalApiService} from '../../core/services/auth/local-api.service';
 import {CountryDto} from '../../core/services/global/country.dto';
@@ -32,6 +32,7 @@ export class UserFormComponent implements OnInit {
   formErrors: any;
 
   @Input() userData: UserDto;
+  @Output() doRefresh = new EventEmitter();
 
   constructor(private userFormService: LocalApiService,
               private formBuilder: FormBuilder,
@@ -51,6 +52,7 @@ export class UserFormComponent implements OnInit {
     if (!this.userData){
       this.userService.signUp(this.userForm.value).subscribe(
         () => {
+          this.formErrors = null;
           this.router.navigate(['/signup-complete']);
         },
         error => {
@@ -65,6 +67,8 @@ export class UserFormComponent implements OnInit {
           this.userService.currentUser.organisation = data.organisation;
           this.userService.currentUser.country = data.country;
           this.userService.currentUser.orcid = data.orcid;
+          this.doRefresh.emit(true);
+          this.formErrors = null;
         },
         error => {
           this.formErrors = error.error;
