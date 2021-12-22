@@ -101,7 +101,7 @@
             "short_name": "ISMN",
             "pretty_name": "ISMN",
             "help_text": "In-situ soil moisture data from over 2600 monitoring stations worldwide",
-            "storage_path": "testdata/input_data/ISMN",
+            "storage_path": "/home/pstradio/Projects_data/QA4SM/Datapool_links/QA4SM/data/input_data/ISMN/",
             "detailed_description": "The ISMN provides in-situ soil moisture data from over 2600 monitoring stations worldwide. The data is harmonised and quality controlled to ensure the highest quality data is provided through the portal. Data is provided from 1952 to present day (<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/\" rel=\"noreferrer\">more information</a>).",
             "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://ismn.earth/en/\" rel=\"noreferrer\"> here</a>.",
             "citation": "<a target=\"_blank\" href=\"https://ismn.earth/en/terms-and-conditions/\" rel=\"noreferrer\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\" rel=\"noreferrer\">readme (v20180830)</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\" rel=\"noreferrer\">readme (v20190222)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20210131_Readme.txt\" rel=\"noreferrer\">readme (v20210131)</a>",
@@ -390,6 +390,28 @@
             ],
             "filters": [
                 1
+            ]
+        }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 14,
+        "fields": {
+            "short_name": "SMOS_2022",
+            "pretty_name": "SMOS",
+            "help_text": "Soil Moisture and Ocean Salinity (SMOS) Mission",
+            "storage_path": "/home/pstradio/Projects_data/QA4SM/Datapool_links/QA4SM/data/input_data/SMOS_L3_CEDA",
+            "detailed_description": "Daily global maps of soil moisture retrieved from the ESA L1B product with a multi-orbit approach.",
+            "source_reference": "Data is available <a target=\"_blank\" href=\"https://www.catds.fr/Products/Available-products-from-CPDC/\"> here</a>.",
+            "citation": "<a target=\"_blank\" href=\"https://essd.copernicus.org/articles/9/293/2017/essd-9-293-2017.pdf\">ATBD</a>",
+            "is_only_reference": false,
+            "versions": [
+                37
+            ],
+            "variables": [
+                10
+            ],
+            "filters": [
             ]
         }
     }

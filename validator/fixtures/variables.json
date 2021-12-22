@@ -104,7 +104,7 @@
         "fields": {
             "short_name": "SMOS_sm",
             "pretty_name": "Soil_Moisture",
-            "help_text": "",
+            "help_text": "Retrieved soil moisture value in m³/m³",
             "min_value": 0.0,
             "max_value": 1.0
         }
@@ -186,5 +186,4 @@
             "max_value": 100.0
         }
     }
-
 ]
