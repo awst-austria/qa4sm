@@ -9,6 +9,7 @@ import {transformExtent} from 'ol/proj';
 import {SpatialSubsetModel} from '../../../spatial-subset/components/spatial-subset/spatial-subset-model';
 import {NgZone} from '@angular/core';
 import {Geometry, Polygon} from 'ol/geom';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 export class BoundingBoxControl extends Control {
   boundingBoxSource: VectorSource;
@@ -16,7 +17,7 @@ export class BoundingBoxControl extends Control {
   currentSelectedCoordinates: number[] = [null, null, null, null];
   ngZone: NgZone;
 
-  constructor(private map: Map, private boundingBox: SpatialSubsetModel, ngZone?: NgZone) {
+  constructor(private map: Map, private boundingBox: SpatialSubsetModel, private toastService: ToastService, ngZone?: NgZone) {
     super({});
     this.ngZone = ngZone;
     //Prepare Source and Layer for the bounding box drawn by the user
@@ -194,8 +195,10 @@ export class BoundingBoxControl extends Control {
           evt.feature.setGeometry(new Polygon(boxCoordinates));
 
           // and here, we inform a user about that
-          alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
-            'Bounds have been corrected to fit available subsetting');
+          this.toastService.showAlert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+            'Bounds corrected to fit available subsetting');
+          // alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+          //   'Bounds have been corrected to fit available subsetting');
         }
       }
 
