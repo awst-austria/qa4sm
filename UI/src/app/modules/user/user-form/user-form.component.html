@@ -41,6 +41,10 @@
                 class="pi pi-question-circle">
           </span>
         </span>
+        <div *ngIf="formErrors && formErrors.password2"
+             class="alert">
+          <span *ngFor="let error of formErrors.password2">{{error.message}}<br></span>
+        </div>
       </div>
 
       <div class="p-py-3">
