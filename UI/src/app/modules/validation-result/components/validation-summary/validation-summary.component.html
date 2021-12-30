@@ -1,11 +1,11 @@
 <main class="p-grid p-mx-0">
-  <p-panel *ngIf="validationRun$ | async as validationRun" class="p-col-12">
+  <p-panel class="p-col-12">
     <ng-template pTemplate="header">
       <div class="text-center" style="width:100%">
         <h4 class="p-my-0 font-weight-normal">
           Summary:
-          <span *ngIf="validationRun.is_unpublished && validationRun.isOwner">
-          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}} </span>
+          <span *ngIf="validationRun.is_unpublished && isOwner">
+          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{valName$|async}} </span>
           <button
             pButton
             type="button"
@@ -19,7 +19,7 @@
             <label for="new-name"></label>
             <input id="new-name"
                    type="text"
-                   value="{{validationRun.name_tag}}"
+                   value="{{valName$|async}}"
                    #newName
                    [ngClass]="{'edit_name': true}">
             <button
@@ -41,12 +41,12 @@
           </span>
         </span>
           <span *ngIf="!validationRun.is_unpublished"
-                class="p-my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
+                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   title="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
-          <span *ngIf="!validationRun.isOwner"
-                class="p-my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
+          <span *ngIf="!isOwner"
+                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   title="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
@@ -147,13 +147,13 @@
         <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
 
-        <li>Processing took {{ validationRun.runTime }} minutes (wall time).</li>
+        <li>Processing took {{ runTime }} minutes (wall time).</li>
 
 
         <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
         <ng-template #elseProgress>
-          <li [ngClass]="{'alert-danger': validationRun.errorRate > 0}">
-            {{validationRun.errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
+          <li [ngClass]="{'alert-danger': errorRate > 0}">
+            {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
             of {{ validationRun.total_points }}) of the processed locations (grid points) produced errors during
             calculation.
           </li>
@@ -185,7 +185,7 @@
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons [validationList]="false" [validationRun]="validationRun" (doRefresh)="refresh($event)"></qa-buttons>
+      <qa-buttons *ngIf="validationModel.validationRun|async as validation" [validationList]="false" [validationRun]="validation" (doRefresh)="refresh($event)"></qa-buttons>
     </div>
   </p-panel>
 </main>
