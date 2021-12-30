@@ -140,7 +140,7 @@ export class ValidationSummaryComponent implements OnInit {
       });
   }
 
-  refresh(doUpdate: any): void {
+  update(doUpdate: any): void {
     if (doUpdate.key === 'archived') {
       this.isArchived$.next(doUpdate.value);
       doUpdate.value ? this.expiryDate$.next(null) : this.expiryDate$.next(this.validationRun.expiry_date);

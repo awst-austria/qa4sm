@@ -185,7 +185,7 @@
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons *ngIf="validationModel.validationRun|async as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="refresh($event)"></qa-buttons>
+      <qa-buttons *ngIf="validationModel.validationRun|async as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
     </div>
   </p-panel>
 </main>
