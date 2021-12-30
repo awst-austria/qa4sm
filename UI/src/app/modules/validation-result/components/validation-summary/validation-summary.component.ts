@@ -37,6 +37,8 @@ export class ValidationSummaryComponent implements OnInit {
   errorRate: number;
   isOwner: boolean;
   valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  expiryDate$: BehaviorSubject<Date> = new BehaviorSubject<Date>(null);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
 
@@ -57,6 +59,8 @@ export class ValidationSummaryComponent implements OnInit {
       (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
     this.isOwner = this.validationRun.user === this.authService.currentUser.id;
     this.valName$.next(this.validationRun.name_tag);
+    this.isArchived$.next(this.validationRun.is_archived);
+    this.expiryDate$.next(this.validationRun.expiry_date);
 
     this.updateConfig();
     this.getOriginalDate();
@@ -136,11 +140,15 @@ export class ValidationSummaryComponent implements OnInit {
       });
   }
 
-  refresh(dorefresh: boolean): void {
-    if (dorefresh) {
-      this.ngOnInit();
-    } else {
-      this.router.navigate(['/my-validations']);
+  refresh(doUpdate: any): void {
+    if (doUpdate.key === 'archived') {
+      this.isArchived$.next(doUpdate.value);
+      doUpdate.value ? this.expiryDate$.next(null) : this.expiryDate$.next(this.validationRun.expiry_date);
+    } else if (doUpdate.key === 'extended'){
+      this.expiryDate$.next(doUpdate.value);
+    }
+    else {
+      // this.router.navigate(['/my-validations']);
     }
   }
 

@@ -158,21 +158,21 @@
             calculation.
           </li>
         </ng-template>
-        <li *ngIf="validationRun.expiry_date && getCurrentUser() === validationRun.user">
+        <li *ngIf="(expiryDate$|async) && getCurrentUser() === validationRun.user">
           <span *ngIf="validationRun.is_near_expiry">
             <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
             This validation will SOON be automatically removed during cleanup
-            on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}.
+            on {{ (expiryDate$|async)|date: dateFormat :timeZone}} {{timeZone}}.
           </span>
 
           <span *ngIf="!validationRun.is_near_expiry">
             <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
             This validation will be automatically removed during cleanup
-            on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.
+            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{timeZone}}.
           </span>
 
         </li>
-        <li *ngIf="validationRun.is_archived && validationRun.is_unpublished">
+        <li *ngIf="(isArchived$|async) && validationRun.is_unpublished">
               <span
                 class="p-panel-header-icon pi pi- expiry-icons">
                 <fa-icon [icon]="faIcons.faArchive"></fa-icon>
@@ -185,7 +185,7 @@
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons *ngIf="validationModel.validationRun|async as validation" [validationList]="false" [validationRun]="validation" (doRefresh)="refresh($event)"></qa-buttons>
+      <qa-buttons *ngIf="validationModel.validationRun|async as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="refresh($event)"></qa-buttons>
     </div>
   </p-panel>
 </main>
