@@ -23,7 +23,7 @@
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
         [ngClass]="{'collapse': validationRun.publishing_in_progress}">
 
-    <button *ngIf="validationRun.is_archived"
+    <button *ngIf="isArchived$|async"
             pButton
             type="button"
             icon="pi pi-calendar"
@@ -32,7 +32,7 @@
             (click)="archiveResults(validationRun.id, false)">
     </button>
 
-    <button *ngIf="!validationRun.is_archived"
+    <button *ngIf="!(isArchived$|async)"
             pButton
             type="button"
             icon="faIcons.faArchive"
@@ -87,7 +87,7 @@
                 icon="pi pi-times"
                 (click)=deleteValidation(validationRun.id)>
         </button>
-        <button *ngIf="!validationRun.is_archived"
+        <button *ngIf="!(isArchived$|async)"
                 pButton
                 type="button"
                 label="Extend Life Span"
@@ -171,7 +171,7 @@
             (click)="deleteValidation(validationRun.id)">
     </button>
 
-    <button *ngIf="validationRun.is_archived; else elseIsArchived"
+    <button *ngIf="isArchived$|async; else elseIsArchived"
             pButton
             type="button"
             icon="pi pi-calendar"

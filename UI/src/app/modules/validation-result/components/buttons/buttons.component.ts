@@ -6,7 +6,7 @@ import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {ModalWindowService} from '../../../core/services/global/modal-window.service';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 
 @Component({
@@ -22,6 +22,7 @@ export class ButtonsComponent implements OnInit {
   @Input() validationList: boolean;
   @Input() tracked: boolean;
   @Output() doRefresh = new EventEmitter();
+  @Output() doUpdate = new EventEmitter();
 
   faIcons = {faArchive: fas.faArchive,
     faStop: fas.faStop,
@@ -32,6 +33,7 @@ export class ButtonsComponent implements OnInit {
   isTrackedByTheUser: boolean;
   status: string;
   publishingInProgress$: Observable<boolean>;
+  isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
 
   constructor(private router: Router,
@@ -44,6 +46,7 @@ export class ButtonsComponent implements OnInit {
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
     this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
     this.publishingInProgress$ = this.validationService.checkPublishingInProgress();
+    this.isArchived$.next(this.validationRun.is_archived);
   }
 
 
@@ -74,9 +77,12 @@ export class ButtonsComponent implements OnInit {
       + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
       return;
     }
-    this.validationService.archiveResult(validationId, archive).subscribe(() => {
-      this.validationService.refreshComponent(validationId);
-      this.doRefresh.emit(true);
+    this.validationService.archiveResult(validationId, archive).subscribe((resp) => {
+      if (resp.statusText === 'OK'){
+        this.validationService.refreshComponent(validationId);
+        this.isArchived$.next(archive);
+        this.doUpdate.emit({key: 'archived', value: archive});
+      }
     });
   }
 
@@ -84,9 +90,11 @@ export class ButtonsComponent implements OnInit {
     if (!confirm('Do you want to extend the lifespan of this result?')) {
       return;
     }
-    this.validationService.extendResult(validationId).subscribe(() => {
-      this.validationService.refreshComponent(validationId);
-      this.doRefresh.emit(true);
+    this.validationService.extendResult(validationId).subscribe((resp) => {
+      if (resp.statusText === 'OK'){
+        this.validationService.refreshComponent(validationId);
+        this.doUpdate.emit({key: 'extended', value: resp.body});
+      }
     });
   }
 
