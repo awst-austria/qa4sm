@@ -180,7 +180,7 @@
           This validation has been archived. It will NOT be automatically removed during cleanup.
 
         </li>
-        <li *ngIf="validationRun.doi">
+        <li *ngIf="!validationRun.is_unpublished">
           <span class="pi pi-book"></span> This result was published on zenodo with DOI
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
