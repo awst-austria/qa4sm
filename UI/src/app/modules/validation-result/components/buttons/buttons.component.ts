@@ -57,7 +57,7 @@ export class ButtonsComponent implements OnInit {
     this.validationService.deleteValidation(validationId).subscribe(
       () => {
         this.validationService.refreshComponent('page');
-        this.doRefresh.emit(false);
+        this.doUpdate.emit({key: 'delete', value: true});
       });
 
   }
