@@ -30,7 +30,7 @@ export class ButtonsComponent implements OnInit {
 
   isLogged: boolean;
   isOwner: boolean;
-  isTrackedByTheUser: boolean;
+  isTrackedByTheUser$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   status: string;
   publishingInProgress$: Observable<boolean>;
   isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
@@ -44,7 +44,7 @@ export class ButtonsComponent implements OnInit {
   ngOnInit(): void {
     this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
-    this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
+    this.isTrackedByTheUser$.next(this.authService.currentUser.copied_runs.includes(this.validationRun.id));
     this.publishingInProgress$ = this.validationService.checkPublishingInProgress();
     this.isArchived$.next(this.validationRun.is_archived);
   }
@@ -106,6 +106,7 @@ export class ButtonsComponent implements OnInit {
     this.validationService.addValidation(validationId).subscribe(
         response => {
           this.validationService.refreshComponent(validationId);
+          this.isTrackedByTheUser$.next(true);
           this.doRefresh.emit(true);
           alert(response);
         });
@@ -119,6 +120,7 @@ export class ButtonsComponent implements OnInit {
     this.validationService.removeValidation(validationId).subscribe(
       response => {
         this.validationService.refreshComponent(validationId);
+        this.isTrackedByTheUser$.next(false);
         this.doRefresh.emit(true);
         alert(response);
       });
