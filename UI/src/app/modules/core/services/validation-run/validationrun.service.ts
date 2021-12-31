@@ -82,7 +82,7 @@ export class ValidationrunService {
   extendResult(validationId: string): Observable<any> {
     const extendUrl = extendResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const extend = true;
-    return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'});
+    return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'response', responseType: 'text'});
   }
 
   saveResultsName(validationId: string, newName: string): Observable<any> {

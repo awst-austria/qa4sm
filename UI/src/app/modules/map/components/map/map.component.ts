@@ -12,6 +12,7 @@ import OSM from 'ol/source/OSM';
 import * as proj4x from 'proj4';
 import {BoundingBoxControl} from './bounding-box-control';
 import {SpatialSubsetModel} from '../../../spatial-subset/components/spatial-subset/spatial-subset-model';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 const proj4 = (proj4x as any).default;
 
@@ -32,7 +33,7 @@ export class MapComponent implements AfterViewInit {
   Map: Map;
   @Output() mapReady = new EventEmitter<Map>();
 
-  constructor(private zone: NgZone, private cd: ChangeDetectorRef) {
+  constructor(private zone: NgZone, private cd: ChangeDetectorRef, private toastService: ToastService,) {
   }
 
   ngAfterViewInit(): void {
@@ -65,7 +66,7 @@ export class MapComponent implements AfterViewInit {
       controls: [new Attribution({collapsible: true})],
       view: this.view,
     });
-    this.Map.addControl(new BoundingBoxControl(this.Map, this.spatialSubset, this.zone));
+    this.Map.addControl(new BoundingBoxControl(this.Map, this.spatialSubset, this.toastService, this.zone));
   }
 
 
