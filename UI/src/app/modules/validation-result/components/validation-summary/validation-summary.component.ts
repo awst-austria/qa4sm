@@ -31,11 +31,11 @@ export class ValidationSummaryComponent implements OnInit {
   timeZone = 'UTC';
   scalingMethods = SCALING_CHOICES;
   hideElement = true;
-  // isCopied: boolean;
   originalDate: Date;
   runTime: number;
   errorRate: number;
   isOwner: boolean;
+  // some BS added to avoid refreshing component every time sth changes
   valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   expiryDate$: BehaviorSubject<Date> = new BehaviorSubject<Date>(null);
@@ -53,15 +53,7 @@ export class ValidationSummaryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.isCopied =
-    this.runTime = this.getRunTime(this.validationRun.start_time, this.validationRun.end_time);
-    this.errorRate = this.validationRun.total_points !== 0 ?
-      (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
-    this.isOwner = this.validationRun.user === this.authService.currentUser.id;
-    this.valName$.next(this.validationRun.name_tag);
-    this.isArchived$.next(this.validationRun.is_archived);
-    this.expiryDate$.next(this.validationRun.expiry_date);
-
+    this.setInitialValues();
     this.updateConfig();
     this.getOriginalDate();
   }
@@ -147,8 +139,8 @@ export class ValidationSummaryComponent implements OnInit {
     } else if (doUpdate.key === 'extended'){
       this.expiryDate$.next(doUpdate.value);
     }
-    else {
-      // this.router.navigate(['/my-validations']);
+    else if (doUpdate.key === 'delete'){
+      this.router.navigate(['/my-validations']);
     }
   }
 
@@ -164,5 +156,15 @@ export class ValidationSummaryComponent implements OnInit {
         });
       }
     });
+  }
+
+  setInitialValues(): void{
+    this.runTime = this.getRunTime(this.validationRun.start_time, this.validationRun.end_time);
+    this.errorRate = this.validationRun.total_points !== 0 ?
+      (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
+    this.isOwner = this.validationRun.user === this.authService.currentUser.id;
+    this.valName$.next(this.validationRun.name_tag);
+    this.isArchived$.next(this.validationRun.is_archived);
+    this.expiryDate$.next(this.validationRun.expiry_date);
   }
 }
