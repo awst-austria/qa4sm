@@ -81,7 +81,7 @@ export class ButtonsComponent implements OnInit {
       return;
     }
     this.validationService.archiveResult(validationId, archive).subscribe((resp) => {
-      if (resp.statusText === 'OK') {
+      if (resp.statusText === 'OK'){
         this.validationService.refreshComponent(validationId);
         this.isArchived$.next(archive);
         this.doUpdate.emit({key: 'archived', value: archive});
@@ -94,7 +94,7 @@ export class ButtonsComponent implements OnInit {
       return;
     }
     this.validationService.extendResult(validationId).subscribe((resp) => {
-      if (resp.statusText === 'OK') {
+      if (resp.statusText === 'OK'){
         this.validationService.refreshComponent(validationId);
         this.doUpdate.emit({key: 'extended', value: resp.body});
       }
