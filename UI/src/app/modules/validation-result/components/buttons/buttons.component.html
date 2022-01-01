@@ -109,7 +109,7 @@
             title="Load validation settings"
             icon="pi pi-replay">
       </button>
-    <button *ngIf="isLogged && isTrackedByTheUser"
+    <button *ngIf="isLogged && (isTrackedByTheUser$|async)"
             pButton
             type="button"
             icon="pi pi-times"
@@ -117,7 +117,7 @@
             title="Remove this validation from your list"
             (click)="removeValidation(validationRun.id)">
     </button>
-    <button *ngIf="isLogged && !isTrackedByTheUser"
+    <button *ngIf="isLogged && !(isTrackedByTheUser$|async)"
             pButton
             type="button"
             icon="pi pi-plus"
@@ -256,7 +256,7 @@
          title="Load settings">
       </a>
 
-      <button *ngIf="isLogged && isTrackedByTheUser && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && (isTrackedByTheUser$|async) && !validationRun.is_unpublished"
               pButton
               type="button"
               icon="pi pi-times"
@@ -266,7 +266,7 @@
               (click)="removeValidation(validationRun.id)">
       </button>
 
-      <button *ngIf="isLogged && !isTrackedByTheUser && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && !(isTrackedByTheUser$|async) && !validationRun.is_unpublished"
               class="btn-action-large"
               pButton
               type="button"
