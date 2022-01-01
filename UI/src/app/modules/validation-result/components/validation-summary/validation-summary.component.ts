@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
-import {combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
@@ -12,6 +12,7 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {Router} from '@angular/router';
+import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 
 
 @Component({
@@ -22,16 +23,22 @@ import {Router} from '@angular/router';
 export class ValidationSummaryComponent implements OnInit {
 
   @Input() validationModel: ValidationResultModel;
+  @Input() validationRun: ValidationrunDto;
   @Output() doRefresh = new EventEmitter();
 
   configurations$: Observable<any>;
-  validationRun$: Observable<any>;
   dateFormat = 'medium';
   timeZone = 'UTC';
   scalingMethods = SCALING_CHOICES;
   hideElement = true;
-  // isCopied: boolean;
   originalDate: Date;
+  runTime: number;
+  errorRate: number;
+  isOwner: boolean;
+  // some BS added to avoid refreshing component every time sth changes
+  valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  expiryDate$: BehaviorSubject<Date> = new BehaviorSubject<Date>(null);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
 
@@ -42,12 +49,12 @@ export class ValidationSummaryComponent implements OnInit {
               private globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService,
               private authService: AuthService,
-              private router: Router) { }
+              private router: Router) {
+  }
 
   ngOnInit(): void {
-    // this.isCopied =
+    this.setInitialValues();
     this.updateConfig();
-    this.updateValidationRun();
     this.getOriginalDate();
   }
 
@@ -55,7 +62,7 @@ export class ValidationSummaryComponent implements OnInit {
     return this.authService.currentUser.id;
   }
 
-  private updateConfig(): void{
+  private updateConfig(): void {
     this.configurations$ = combineLatest(
       this.validationModel.datasetConfigs,
       this.datasetService.getAllDatasets(),
@@ -70,47 +77,37 @@ export class ValidationSummaryComponent implements OnInit {
              variables,
              dataFilters,
              paramFilters]) =>
-      configurations.map(
-        config =>
-          ({...config,
-          dataset: datasets.find(ds =>
-          config.dataset === ds.id)?.pretty_name,
+        configurations.map(
+          config =>
+            ({
+              ...config,
+              dataset: datasets.find(ds =>
+                config.dataset === ds.id)?.pretty_name,
 
-          version: versions.find(dsVersion =>
-          config.version === dsVersion.id).pretty_name,
+              version: versions.find(dsVersion =>
+                config.version === dsVersion.id).pretty_name,
 
-          variable: variables.find(dsVar =>
-          config.variable === dsVar.id).pretty_name,
+              variable: variables.find(dsVar =>
+                config.variable === dsVar.id).pretty_name,
 
-          filters: config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
+              filters: config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
 
-          parametrisedFilters: config.parametrised_filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
+              parametrisedFilters: config.parametrised_filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
 
-          parametrisedFiltersValues: config.parametrised_filters
-            .map(fId => config.parametrisedfilter_set
-              .map(pf => [paramFilters.find(pF => pF.id === pf).filter_id, paramFilters
-                .find(pF => pF.id === pf).parameters])
-              .find(f => f[0] === fId)[1])
+              parametrisedFiltersValues: config.parametrised_filters
+                .map(fId => config.parametrisedfilter_set
+                  .map(pf => [paramFilters.find(pF => pF.id === pf).filter_id, paramFilters
+                    .find(pF => pF.id === pf).parameters])
+                  .find(f => f[0] === fId)[1])
 
-          })
-      ))
+            })
+        ))
     );
     this.configurations$.subscribe(() => {
     });
   }
 
-  private updateValidationRun(): void{
-    this.validationRun$ = this.validationModel.validationRun.pipe(
-      map(validation => ({
-        ...validation,
-        runTime: this.getRunTime(validation.start_time, validation.end_time),
-        errorRate: validation.total_points !== 0 ? (validation.total_points - validation.ok_points) / validation.total_points : 1,
-        isOwner: validation.user === this.authService.currentUser.id,
-      })),
-    );
-  }
-
-  getRunTime(startTime: Date, endTime: Date): number{
+  getRunTime(startTime: Date, endTime: Date): number {
     const startTimeDate = new Date(startTime);
     const endTimeDate = new Date(endTime);
     const runTime = endTimeDate.getTime() - startTimeDate.getTime();
@@ -121,32 +118,53 @@ export class ValidationSummaryComponent implements OnInit {
     return this.globalParamsService.globalContext.doi_prefix;
   }
 
-  toggleEditing(): void{
+  toggleEditing(): void {
     this.hideElement = !this.hideElement;
   }
-  saveName(validationId: string, newName: string): void{
-    this.validationService.saveResultsName(validationId, newName).subscribe(
-      () => {
-        this.doRefresh.emit(true);
-      });
 
+  saveName(validationId: string, newName: string): void {
+    this.validationService.saveResultsName(validationId, newName).subscribe(
+      (resp) => {
+        if (resp === 'Changed.'){
+          this.valName$.next(newName);
+          this.toggleEditing();
+        }
+      });
   }
 
-  refresh(dorefresh: boolean): void{
-    if (dorefresh){
-      this.ngOnInit();
-    } else {
+  update(doUpdate: any): void {
+    if (doUpdate.key === 'archived') {
+      this.isArchived$.next(doUpdate.value);
+      doUpdate.value ? this.expiryDate$.next(null) : this.expiryDate$.next(this.validationRun.expiry_date);
+    } else if (doUpdate.key === 'extended'){
+      this.expiryDate$.next(doUpdate.value);
+    }
+    else if (doUpdate.key === 'delete'){
       this.router.navigate(['/my-validations']);
     }
   }
 
-  getOriginalDate(): void{
+  getOriginalDate(): void {
     this.validationModel.validationRun.subscribe(data => {
-      if (data.is_a_copy){
+      if (data.is_a_copy) {
         this.validationService.getCopiedRunRecord(data.id).subscribe(copiedRun => {
-          this.originalDate = copiedRun.original_run_date;
+          if (copiedRun.original_run_date) {
+            this.originalDate = copiedRun.original_run_date;
+          } else {
+            this.originalDate = data.start_time;
+          }
         });
       }
     });
+  }
+
+  setInitialValues(): void{
+    this.runTime = this.getRunTime(this.validationRun.start_time, this.validationRun.end_time);
+    this.errorRate = this.validationRun.total_points !== 0 ?
+      (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
+    this.isOwner = this.validationRun.user === this.authService.currentUser.id;
+    this.valName$.next(this.validationRun.name_tag);
+    this.isArchived$.next(this.validationRun.is_archived);
+    this.expiryDate$.next(this.validationRun.expiry_date);
   }
 }

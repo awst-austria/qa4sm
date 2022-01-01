@@ -32,7 +32,7 @@
   <p>
     <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
     and one of the soil moisture variables provided in the dataset. All the supported datasets are listed on
-    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">datasets page here</a>.
+    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1" target="_blank">datasets page here</a>.
   </p>
   <div>
     <img alt="dataset selection" class="scaled_image" [src]="datasetSelections">
@@ -42,7 +42,7 @@
     The filters available depend on the data contained within the chosen dataset. For example,
     you can filter the C3S data to include only data with no inconsistencies detected (flag = 0).
     Details of the filter options provided for each dataset are given on the
-    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">supported datasets page</a>. You can also
+    <a routerLink="/datasets" pageScroll [pageScrollDuration]="1" target="_blank">supported datasets page</a>. You can also
     hover your mouse pointer over the question mark next to a filter to get a short explanation.
   </p>
   <p>
@@ -119,7 +119,7 @@
     will be
     implicitly determined through temporal matching of the data and reference selected. For the time range covered by
     the various
-    datasets, see the <a routerLink="/datasets" pageScroll [pageScrollDuration]="1">datasets page</a>.
+    datasets, see the <a routerLink="/datasets" pageScroll [pageScrollDuration]="1" target="_blank">datasets page</a>.
   </p>
   <div>
     <img alt="validation period" class="scaled_image p-mb-3" [src]="validationPeriod">

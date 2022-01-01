@@ -23,7 +23,7 @@
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
         [ngClass]="{'collapse': validationRun.publishing_in_progress}">
 
-    <button *ngIf="validationRun.is_archived"
+    <button *ngIf="isArchived$|async"
             pButton
             type="button"
             icon="pi pi-calendar"
@@ -32,7 +32,7 @@
             (click)="archiveResults(validationRun.id, false)">
     </button>
 
-    <button *ngIf="!validationRun.is_archived"
+    <button *ngIf="!(isArchived$|async)"
             pButton
             type="button"
             icon="faIcons.faArchive"
@@ -87,7 +87,7 @@
                 icon="pi pi-times"
                 (click)=deleteValidation(validationRun.id)>
         </button>
-        <button *ngIf="!validationRun.is_archived"
+        <button *ngIf="!(isArchived$|async)"
                 pButton
                 type="button"
                 label="Extend Life Span"
@@ -109,7 +109,7 @@
             title="Load validation settings"
             icon="pi pi-replay">
       </button>
-    <button *ngIf="isLogged && isTrackedByTheUser"
+    <button *ngIf="isLogged && (isTrackedByTheUser$|async)"
             pButton
             type="button"
             icon="pi pi-times"
@@ -117,7 +117,7 @@
             title="Remove this validation from your list"
             (click)="removeValidation(validationRun.id)">
     </button>
-    <button *ngIf="isLogged && !isTrackedByTheUser"
+    <button *ngIf="isLogged && !(isTrackedByTheUser$|async)"
             pButton
             type="button"
             icon="pi pi-plus"
@@ -171,7 +171,7 @@
             (click)="deleteValidation(validationRun.id)">
     </button>
 
-    <button *ngIf="validationRun.is_archived; else elseIsArchived"
+    <button *ngIf="isArchived$|async; else elseIsArchived"
             pButton
             type="button"
             icon="pi pi-calendar"
@@ -256,7 +256,7 @@
          title="Load settings">
       </a>
 
-      <button *ngIf="isLogged && isTrackedByTheUser && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && (isTrackedByTheUser$|async) && !validationRun.is_unpublished"
               pButton
               type="button"
               icon="pi pi-times"
@@ -266,7 +266,7 @@
               (click)="removeValidation(validationRun.id)">
       </button>
 
-      <button *ngIf="isLogged && !isTrackedByTheUser && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && !(isTrackedByTheUser$|async) && !validationRun.is_unpublished"
               class="btn-action-large"
               pButton
               type="button"

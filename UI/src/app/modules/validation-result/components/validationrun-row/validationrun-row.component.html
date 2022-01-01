@@ -2,7 +2,7 @@
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ validationRun.name_tag }}</h5>
+    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ valName$|async }}</h5>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
     <h5 class="p-my-0"> DOI: <a class="doilink" target="_blank"
@@ -55,7 +55,7 @@
     <h5 class="p-my-0">
       <span *ngIf="hideElement"
             class=" font-weight-normal">
-        Name: {{ validationRun.name_tag }}
+        Name: {{ valName$|async }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="p-my-0 font-weight-normal">
@@ -77,7 +77,7 @@
           <label for="new-name">Name: </label>
           <input id="new-name"
                  type="text"
-                 value="{{validationRun.name_tag}}"
+                 value="{{valName$|async}}"
                  #newName
                  [ngClass]="{'edit_name': true}">
           <button

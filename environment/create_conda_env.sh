@@ -103,6 +103,7 @@ pip install requests
 pip install qa4sm-reader>=0.3.4
 pip install qa4sm-preprocessing
 pip install djangorestframework
+pip install django_rest_passwordreset
 
 cd $TEMP_DIR
 

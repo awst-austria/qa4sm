@@ -12,13 +12,17 @@ angular_paths = [
     {'path': 'datasets', 'name': 'datasets'},
     {'path': 'signup', 'name': 'signup'},
     {'path': 'signup-complete', 'name': 'signup_complete'},
-    {'path': 'deactivate-user-complete', 'name': 'deactivate_user_complete'}
+    {'path': 'deactivate-user-complete', 'name': 'deactivate_user_complete'},
+    {'path': 'password-reset', 'name': 'password-reset'},
+    {'path': 'password-reset-done', 'name': 'password-reset-done'},
+    {'path': 'password-reset/:token', 'name': 'validate-token'},
+    {'path': 'password-reset/set-password', 'name': 'set-password'},
 ]
 
 
 def get_angular_url(url_name, parameter=None):
     """
-    This function returns an angular route based on the name assigned. We need it for example for assigning a url to a
+    This function returns an angular route based on the name assigned. We need it for example for assigning an url to a
     netCDF file. Paths come from UI/src/app/app-routing.module.ts.
     Parameters
     ----------

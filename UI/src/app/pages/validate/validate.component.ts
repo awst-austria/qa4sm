@@ -1,6 +1,8 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
-import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
+import {
+  DatasetComponentSelectionModel
+} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
 import {DatasetConfigModel, ISMN_DEPTH_FILTER_ID, ISMN_NETWORK_FILTER_ID} from './dataset-config-model';
@@ -8,7 +10,9 @@ import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
-import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
+import {
+  ValidationPeriodModel
+} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC, AnomaliesComponent} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
@@ -401,7 +405,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       },
       error => {
         this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
-        console.error(error);
       });
   }
 
@@ -465,8 +468,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
 
     if (condition) {
-      alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+      this.toastService.showAlert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
         'Bounds corrected to fit available subsetting');
+      // alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+      //   'Bounds corrected to fit available subsetting');
     }
 
   }

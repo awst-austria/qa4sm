@@ -7,7 +7,7 @@ import {DatasetVersionService} from 'src/app/modules/core/services/dataset/datas
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 
@@ -18,7 +18,7 @@ import {map} from 'rxjs/operators';
 })
 export class ValidationrunRowComponent implements OnInit {
 
-  @Input() published: boolean = false;
+  @Input() published = false;
   @Input() validationRun: ValidationrunDto;
   configurations$: Observable<any>;
 
@@ -27,6 +27,7 @@ export class ValidationrunRowComponent implements OnInit {
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
   originalDate: Date;
+  valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -41,6 +42,7 @@ export class ValidationrunRowComponent implements OnInit {
       this.getOriginalDate(this.validationRun);
     }
     this.updateConfig();
+    this.valName$.next(this.validationRun.name_tag);
   }
 
   private updateConfig(): void{
@@ -93,15 +95,21 @@ export class ValidationrunRowComponent implements OnInit {
   }
   saveName(validationId: string, newName: string): void{
     this.validationService.saveResultsName(validationId, newName).subscribe(
-      () => {
-        this.validationService.refreshComponent(validationId);
+      (resp) => {
+        if (resp === 'Changed.'){
+          this.valName$.next(newName);
+          this.toggleEditing();
+        }
       });
-    // window.location.reload();
   }
 
   getOriginalDate(copiedRun: ValidationrunDto): void{
     this.validationService.getCopiedRunRecord(copiedRun.id).subscribe(data => {
-      this.originalDate = data.original_run_date;
+      if (data.original_run_date){
+        this.originalDate = data.original_run_date;
+      } else{
+        this.originalDate = copiedRun.start_time;
+      }
     });
   }
 

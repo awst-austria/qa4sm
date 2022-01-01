@@ -150,6 +150,14 @@ def send_user_status_changed(user, activate):
                     body=body)
 
 
+def send_user_link_to_reset_password(user, message):
+    __logger.info('Sending mail about resetting their password to user {}...'.format(user.username))
+    subject = '[QA4SM] Password reset for QA4SM webservice'
+    _send_email(recipients=[user.email],
+                subject=subject,
+                body=message)
+
+
 def _send_email(recipients, subject, body):
     try:
         send_mail(subject=subject,
