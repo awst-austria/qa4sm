@@ -109,7 +109,7 @@ dependencies:
   - ncurses=6.2
   - nspr=4.32
   - nss=3.72
-  - numpy=1.20.3
+  - numpy=1.22.0
   - numpy-base=1.20.3
   - olefile=0.46
   - openblas=0.3.18
@@ -219,11 +219,11 @@ dependencies:
     - itypes==1.2.0
     - jinja2==3.0.1
     - kombu==5.2.1
-    - llvmlite==0.37.0
+    - llvmlite==0.36.0
     - lxml==4.6.4
     - markupsafe==2.0.1
     - netcdf4==1.5.8
-    - numba==0.54.1
+    - numba==0.53.1
     - numcodecs==0.9.1
     - param==1.12.0
     - parse==1.19.0
