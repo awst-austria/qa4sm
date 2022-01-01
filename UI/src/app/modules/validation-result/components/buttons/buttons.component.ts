@@ -24,9 +24,11 @@ export class ButtonsComponent implements OnInit {
   @Output() doRefresh = new EventEmitter();
   @Output() doUpdate = new EventEmitter();
 
-  faIcons = {faArchive: fas.faArchive,
+  faIcons = {
+    faArchive: fas.faArchive,
     faStop: fas.faStop,
-    faFileDownload: fas.faFileDownload};
+    faFileDownload: fas.faFileDownload
+  };
 
   isLogged: boolean;
   isOwner: boolean;
@@ -39,7 +41,8 @@ export class ButtonsComponent implements OnInit {
   constructor(private router: Router,
               private validationService: ValidationrunService,
               public authService: AuthService,
-              private modalService: ModalWindowService ) { }
+              private modalService: ModalWindowService) {
+  }
 
   ngOnInit(): void {
     this.isLogged = this.authService.currentUser.id != null;
@@ -50,7 +53,7 @@ export class ButtonsComponent implements OnInit {
   }
 
 
-  deleteValidation(validationId: string): void{
+  deleteValidation(validationId: string): void {
     if (!confirm('Do you really want to delete the result?')) {
       return;
     }
@@ -62,7 +65,7 @@ export class ButtonsComponent implements OnInit {
 
   }
 
-  stopValidation(validationId: string): void{
+  stopValidation(validationId: string): void {
     if (!confirm('Do you really want to stop the validation?')) {
       return;
     }
@@ -72,13 +75,13 @@ export class ButtonsComponent implements OnInit {
       });
   }
 
-  archiveResults(validationId: string, archive: boolean): void{
+  archiveResults(validationId: string, archive: boolean): void {
     if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
       + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
       return;
     }
     this.validationService.archiveResult(validationId, archive).subscribe((resp) => {
-      if (resp.statusText === 'OK'){
+      if (resp.statusText === 'OK') {
         this.validationService.refreshComponent(validationId);
         this.isArchived$.next(archive);
         this.doUpdate.emit({key: 'archived', value: archive});
@@ -86,52 +89,58 @@ export class ButtonsComponent implements OnInit {
     });
   }
 
-  extendResults(validationId: string): void{
+  extendResults(validationId: string): void {
     if (!confirm('Do you want to extend the lifespan of this result?')) {
       return;
     }
     this.validationService.extendResult(validationId).subscribe((resp) => {
-      if (resp.statusText === 'OK'){
+      if (resp.statusText === 'OK') {
         this.validationService.refreshComponent(validationId);
         this.doUpdate.emit({key: 'extended', value: resp.body});
       }
     });
   }
 
-  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void {
     this.validationService.downloadResultFile(validationId, fileType, fileName);
   }
 
-  addValidation(validationId: string): void{
+  addValidation(validationId: string): void {
     this.validationService.addValidation(validationId).subscribe(
-        response => {
-          this.validationService.refreshComponent(validationId);
-          this.isTrackedByTheUser$.next(true);
-          this.doRefresh.emit(true);
-          alert(response);
-        });
+      response => {
+        // re-initi auth service to update user data - to update list of added runs
+        this.authService.init();
+        this.isTrackedByTheUser$.next(true);
+        // this one is needed to refresh tracked-validations component
+        this.doRefresh.emit(true);
+        alert(response);
+
+
+      });
     this.authService.init();
   }
 
-  removeValidation(validationId: string): void{
+  removeValidation(validationId: string): void {
     if (!confirm('Do you really want to remove this validation from your list?')) {
       return;
     }
     this.validationService.removeValidation(validationId).subscribe(
       response => {
-        this.validationService.refreshComponent(validationId);
+        // re-initi auth service to update user data - to update list of added runs
+        this.authService.init();
         this.isTrackedByTheUser$.next(false);
+        // this one is needed to refresh tracked-validations component
         this.doRefresh.emit(true);
         alert(response);
       });
     this.authService.init();
   }
 
-  open(): void{
+  open(): void {
     this.modalService.open();
   }
 
-  copy(validationId: string): void{
+  copy(validationId: string): void {
     let newId: string;
     const params = new HttpParams().set('validation_id', validationId);
     this.validationService.copyValidation(params).subscribe(data => {
