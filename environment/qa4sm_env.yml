@@ -209,7 +209,7 @@ dependencies:
     - llvmlite==0.37.0
     - lxml==4.6.4
     - netcdf4==1.5.8
-    - numba==0.54.1
+    - numba==0.53.1
     - numcodecs==0.9.1
     - numpy==1.22.0
     - param==1.12.0
