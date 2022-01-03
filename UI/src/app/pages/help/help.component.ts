@@ -34,7 +34,9 @@ export class HelpComponent implements OnInit {
   myValidations: string;
   resultsOverview: string;
   resultsGraphs: string;
-  publicationDialog: string;
+  publishingDialog: string;
+  ismnNetworks: string;
+  ismnDepths: string;
 
   constructor(private globalParamsService: GlobalParamsService) {
   }
@@ -53,14 +55,16 @@ export class HelpComponent implements OnInit {
     this.spatialSubsetting = plotsUrlPrefix + 'spatial_subsetting.png';
     this.mapSelection = plotsUrlPrefix + 'map_selection.png';
     this.validationPeriod = plotsUrlPrefix + 'validation_period.png';
-    this.tca = plotsUrlPrefix + 'tca.png';
+    this.tca = plotsUrlPrefix + 'metrics.png';
     this.scaling = plotsUrlPrefix + 'scaling.png';
     this.nameYourValidation = plotsUrlPrefix + 'name_your_validation.png';
     this.validateButton = plotsUrlPrefix + 'validate_button.png';
     this.myValidations = plotsUrlPrefix + 'my_validations.png';
     this.resultsOverview = plotsUrlPrefix + 'results_overview.png';
     this.resultsGraphs = plotsUrlPrefix + 'results_graphs.png';
-    this.publicationDialog = plotsUrlPrefix + 'publication_dialog.png';
+    this.publishingDialog = plotsUrlPrefix + 'publishing_dialog.png';
+    this.ismnNetworks = plotsUrlPrefix + 'networks.png';
+    this.ismnDepths = plotsUrlPrefix + 'depths.png';
   }
 
   getAdminMail(): string {
