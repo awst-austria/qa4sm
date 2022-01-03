@@ -241,34 +241,14 @@
 
   <ul>
     <li>
-      <span class="pi pi-folder-open"></span> You can access the
-      <a pageScroll="" [pageScrollDuration]="1" href="#results">results details page</a>
-      of a validation through its folder button.
-    </li>
-    <li>
       <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span> The stop button is only visible while the validation is
       still
       running and allows you to abort it.
     </li>
     <li>
-      <span class="pi pi-times"></span> The remove button is only visible once the validation has finished
-      or was aborted and will permanently delete the result.
-    </li>
-    <li>
-      <span class="pi pi-download"></span> The download graphs button allows you to download all graphs
-      produced for the validation (in png and svg formats) in a zip archive.
-    </li>
-    <li>
-      <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> The download NetCDF button allows you to download
-      the
-      validation result (metrics computed).
-    </li>
-
-    <li>
-      <span class="pi pi-calendar-plus"></span> With the extend lifespan button, you can reset the auto-cleanup
-      period of a result and thus postpone its automatic removal. You can use this if you're not sure yet whether
-      you want to keep it - you will have another {{ this.getExpiryPeriod() }} days to decide and will be notified
-      (again) before deletion.
+      <span class="pi pi-folder-open"></span> You can access the
+      <a pageScroll="" [pageScrollDuration]="1" href="#results">results details page</a>
+      of a validation through its folder button.
     </li>
     <li>
       <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> With the archive button, you can exclude a validation
@@ -281,10 +261,43 @@
       before
       deletion and will be notified (again).
     </li>
+    <li>
+      <span class="pi pi-angle-double-right"></span> It contains a drop-down list with following options:
+    </li>
+    <ul>
+      <li>
+        <span class="pi pi-download"></span> The Download Graphs option allows you to download all graphs
+        produced for the validation (in png and svg formats) in a zip archive.
+      </li>
+      <li>
+        <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> The Download NetCDF File option allows you to download
+        the
+        validation result (metrics computed).
+      </li>
+
+      <li>
+        <span class="pi pi-replay"></span> With Load Validation Settings option you can load settings of the particular validations;
+        you will be redirected to the validate page.
+      </li>
+
+      <li>
+        <span class="pi pi-times"></span> The Remove Validation Run option is only visible once the validation has finished
+        or was aborted and will permanently delete the result.
+      </li>
+
+      <li>
+        <span class="pi pi-calendar-plus"></span> With the Extend Life Span option, you can reset the auto-cleanup
+        period of a result and thus postpone its automatic removal. You can use this if you're not sure yet whether
+        you want to keep it - you will have another {{ this.getExpiryPeriod() }} days to decide and will be notified
+        (again) before deletion.
+      </li>
+
+    </ul>
+
   </ul>
-  <div>
-    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">
-  </div>
+<!--  <div>-->
+<!--    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">-->
+<!--  </div>-->
 
   <h1 id="results" class="h3 p-mb-3 font-weight-normal">Validation Results Page</h1>
 
