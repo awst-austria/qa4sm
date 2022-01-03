@@ -14,9 +14,9 @@
     <h5 class="p-my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
-          <span *ngIf="validationRun.is_near_expiry && validationRun.progress === 100" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
+          <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
                 title="'This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
-          <span *ngIf="!validationRun.is_near_expiry && validationRun.progress === 100" class="p-panel-header-icon pi pi-calendar expiry-icons"
+          <span *ngIf="!validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-calendar expiry-icons"
                 title="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
           </span>
           <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
@@ -39,7 +39,6 @@
               title="This validation has been archived. It will NOT be automatically removed during cleanup.">
           <fa-icon [icon]="faIcons.faArchive"></fa-icon>
         </span>
-
       </span>
 
       <span *ngIf="!validationRun.is_a_copy" class="font-weight-normal"> Started:
