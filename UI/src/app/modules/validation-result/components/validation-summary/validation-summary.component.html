@@ -158,14 +158,14 @@
             calculation.
           </li>
         </ng-template>
-        <li *ngIf="(expiryDate$|async) && getCurrentUser() === validationRun.user">
-          <span *ngIf="validationRun.is_near_expiry">
+        <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user">
+          <span *ngIf="isNearExpiry$|async">
             <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
             This validation will SOON be automatically removed during cleanup
             on {{ (expiryDate$|async)|date: dateFormat :timeZone}} {{timeZone}}.
           </span>
 
-          <span *ngIf="!validationRun.is_near_expiry">
+          <span *ngIf="!(isNearExpiry$|async)">
             <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
             This validation will be automatically removed during cleanup
             on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{timeZone}}.
@@ -174,7 +174,7 @@
         </li>
         <li *ngIf="(isArchived$|async) && validationRun.is_unpublished">
               <span
-                class="p-panel-header-icon pi pi- expiry-icons">
+                class="p-panel-header-icon pi expiry-icons">
                 <fa-icon [icon]="faIcons.faArchive"></fa-icon>
               </span>
           This validation has been archived. It will NOT be automatically removed during cleanup.
