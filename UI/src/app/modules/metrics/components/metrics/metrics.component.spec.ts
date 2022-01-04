@@ -1,6 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { MetricsComponent } from './metrics.component';
+import {MetricsComponent} from './metrics.component';
+import {BehaviorSubject} from 'rxjs';
 
 describe('MetricsComponent', () => {
   let component: MetricsComponent;
@@ -8,14 +9,25 @@ describe('MetricsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MetricsComponent ]
+      declarations: [MetricsComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(MetricsComponent);
     component = fixture.componentInstance;
+    component.validationModel = {
+      datasetConfigurations: [],
+      referenceConfigurations: [],
+      spatialSubsetModel: null,
+      validationPeriodModel: null,
+      metrics: [],
+      anomalies: null,
+      scalingModel: null,
+      nameTag$: new BehaviorSubject('')
+    };
+
     fixture.detectChanges();
   });
 

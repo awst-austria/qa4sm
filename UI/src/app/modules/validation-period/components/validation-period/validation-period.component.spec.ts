@@ -1,6 +1,7 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ValidationPeriodComponent } from './validation-period.component';
+import {ValidationPeriodComponent} from './validation-period.component';
+import {BehaviorSubject} from 'rxjs';
 
 describe('ValidationPeriodComponent', () => {
   let component: ValidationPeriodComponent;
@@ -16,6 +17,10 @@ describe('ValidationPeriodComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ValidationPeriodComponent);
     component = fixture.componentInstance;
+    component.validationPeriodModel = {
+      intervalFrom$: new BehaviorSubject(new Date()),
+      intervalTo$: new BehaviorSubject(new Date())
+    };
     fixture.detectChanges();
   });
 

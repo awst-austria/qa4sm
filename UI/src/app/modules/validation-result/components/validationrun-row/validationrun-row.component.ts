@@ -1,14 +1,14 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
-import {GlobalParamsService} from '../../../core/services/gloabal-params/global-params.service';
-import {ValidationRunRowModel} from './validation-configuration-model';
-import {DatasetRowModel} from './dataset-row.model';
+import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
 import {DatasetVersionService} from 'src/app/modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 
 @Component({
@@ -18,14 +18,16 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 })
 export class ValidationrunRowComponent implements OnInit {
 
-  @Input() published: boolean = false;
+  @Input() published = false;
   @Input() validationRun: ValidationrunDto;
+  configurations$: Observable<any>;
 
-  model: ValidationRunRowModel;
   dateFormat = 'medium';
   timeZone = 'UTC';
-  faIcons = {faArchive: fas.faArchive};
+  faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
+  originalDate: Date;
+  valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -36,25 +38,36 @@ export class ValidationrunRowComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.model = new ValidationRunRowModel(this.validationRun, [], new DatasetRowModel());
-    this.loadRowData();
+    if (this.validationRun.is_a_copy){
+      this.getOriginalDate(this.validationRun);
+    }
+    this.updateConfig();
+    this.valName$.next(this.validationRun.name_tag);
   }
 
-  private loadRowData() {
-    this.datasetConfigService.getConfigByValidationrun(this.model.validationRun.id).subscribe(configs => {
-      configs.forEach(config => {
-        let dataset$ = this.datasetService.getDatasetById(config.dataset);
-        let datasetVersion$ = this.datasetVersionService.getVersionById(config.version);
-        let datasetVariable$ = this.datasetVariableService.getVariableById(config.variable);
-        let datasetRowModel = new DatasetRowModel(dataset$, datasetVersion$, datasetVariable$);
+  private updateConfig(): void{
+    this.configurations$ = combineLatest(
+      this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
+      this.datasetService.getAllDatasets(),
+      this.datasetVersionService.getAllVersions(),
+      this.datasetVariableService.getAllVariables()
+    ).pipe(
+      map(([configurations, datasets, versions, variables]) =>
+        configurations.map(
+          config =>
+            ({...config,
+              dataset:  datasets.find(ds =>
+                config.dataset === ds.id)?.pretty_name,
 
-        if (this.model.validationRun.reference_configuration === config.id) {
-          this.model.referenceRow = datasetRowModel;
-        } else {
-          this.model.datasetRows.push(datasetRowModel);
-        }
-      });
-    });
+              version: versions.find(dsVersion =>
+                config.version === dsVersion.id).pretty_name,
+
+              variable: variables.find(dsVar =>
+                config.variable === dsVar.id).pretty_name,
+            })
+        )
+      )
+    );
   }
 
   getDoiPrefix(): string {
@@ -71,6 +84,8 @@ export class ValidationrunRowComponent implements OnInit {
       status = 'Cancelled';
     } else if (valrun.end_time != null) {
       status = 'ERROR';
+    } else {
+      status = 'Running' + ' ' + `${valrun.progress}%`;
     }
     return status;
   }
@@ -79,7 +94,23 @@ export class ValidationrunRowComponent implements OnInit {
     this.hideElement = !this.hideElement;
   }
   saveName(validationId: string, newName: string): void{
-    this.validationService.saveResults(validationId, newName);
-    window.location.reload();
+    this.validationService.saveResultsName(validationId, newName).subscribe(
+      (resp) => {
+        if (resp === 'Changed.'){
+          this.valName$.next(newName);
+          this.toggleEditing();
+        }
+      });
   }
+
+  getOriginalDate(copiedRun: ValidationrunDto): void{
+    this.validationService.getCopiedRunRecord(copiedRun.id).subscribe(data => {
+      if (data.original_run_date){
+        this.originalDate = data.original_run_date;
+      } else{
+        this.originalDate = copiedRun.start_time;
+      }
+    });
+  }
+
 }

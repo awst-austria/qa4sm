@@ -9,6 +9,7 @@ from validator.models.version import DatasetVersion
 class DatasetConfiguration(models.Model):
     id = models.AutoField(primary_key=True)
     # validator.models.validation_run.ValidationRun
+    id = models.AutoField(primary_key=True)
     validation = models.ForeignKey(to='ValidationRun', on_delete=models.CASCADE, related_name='dataset_configurations', null=False)
     dataset = models.ForeignKey(to=Dataset, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     version = models.ForeignKey(to=DatasetVersion, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)

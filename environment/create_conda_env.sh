@@ -90,7 +90,7 @@ pip install django-widget-tweaks
 pip install psycopg2-binary
 pip install pytest-cov
 pip install pytest-mpl
-pip install celery
+pip install celery==4.1.1
 pip install celery[redis]
 pip install gldas
 pip install smap-io
@@ -103,6 +103,7 @@ pip install requests
 pip install qa4sm-reader>=0.3.4
 pip install qa4sm-preprocessing
 pip install djangorestframework
+pip install django_rest_passwordreset
 
 cd $TEMP_DIR
 

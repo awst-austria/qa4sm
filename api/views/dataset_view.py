@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -12,16 +13,14 @@ from validator.models import Dataset
 def dataset(request):
     datasets = Dataset.objects.all()
     serializer = DatasetSerializer(datasets, many=True)
-    print(serializer.data)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_by_id(request, **kwargs):
-    ds = Dataset.objects.get(pk=kwargs['id'])
+    ds = get_object_or_404(Dataset, pk=kwargs['id'])
     serializer = DatasetSerializer(ds)
-    print(serializer.data)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 

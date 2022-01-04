@@ -1,13 +1,19 @@
 import {TestBed} from '@angular/core/testing';
 
-import {NewValidationRunService} from './new-validation-run.service';
+import {ValidationRunConfigService} from './validation-run-config.service';
+import {HttpClient} from '@angular/common/http';
+import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 
 describe('NewValidationRunService', () => {
-  let service: NewValidationRunService;
+  let service: ValidationRunConfigService;
+  let httpClient: HttpClient;
+  let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(NewValidationRunService);
+    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    service = TestBed.inject(ValidationRunConfigService);
+    httpClient = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   it('should be created', () => {

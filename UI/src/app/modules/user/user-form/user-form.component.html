@@ -1,0 +1,157 @@
+<div class="center">
+  <div>
+    <div class="center">
+    <h1 *ngIf="!userData" class="h3 p-mb-3 font-weight-normal"> Sign up </h1>
+    <h1 *ngIf="userData" class="h3 p-mb-3 font-weight-normal">User profile</h1>
+    </div>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="username" type="text" pInputText formControlName="username">
+          <label for="username">Username</label>
+          <span title="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+        <div *ngIf="formErrors && formErrors.username"
+             class="alert">
+          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>
+        </div>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="password" type="password" pInputText formControlName="password1" autocomplete="new-password">
+          <label for="password">Password</label>
+          <span title="Your password can't be too similar to your other personal information.Your password must contain at least 8 characters. Your password can't be a commonly used password. Your password can't be entirely numeric."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+        <div *ngIf="formErrors && formErrors.password1"
+             class="alert">
+          <span *ngFor="let error of formErrors.password1">{{error.message}}<br></span>
+        </div>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="password-confirm" type="password" pInputText formControlName="password2">
+          <label for="password-confirm">Password confirmation</label>
+          <span title="Enter the same password as before, for verification."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+        <div *ngIf="formErrors && formErrors.password2"
+             class="alert">
+          <span *ngFor="let error of formErrors.password2">{{error.message}}<br></span>
+        </div>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="email" type="email" pInputText formControlName="email">
+          <label for="email">Email address</label>
+          <span title="Required. A valid email address where you can receive notifications about validations."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+        <div *ngIf="formErrors && formErrors.email"
+             class="alert">
+          <span *ngFor="let error of formErrors.email">{{error.message}}<br></span>
+        </div>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="first-name" type="text" pInputText formControlName="first_name">
+          <label for="first-name">First name</label>
+          <span title="Optional."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="last-name" type="text" pInputText formControlName="last_name">
+          <label for="last-name">Last name</label>
+          <span title="Optional."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="organisation" type="text" pInputText formControlName="organisation">
+          <label for="organisation">Organisation</label>
+          <span title="Optional. The organisation (university, company, etc.) you work for or represent."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+      </div>
+
+      <div class="p-py-3">
+        <div class="p-float-label">
+          <p-dropdown class="form-field"
+                      [options]="countries$|async"
+                      [style]="{'width':'15rem', 'height': '2.5rem'}"
+                      formControlName="country"
+                      optionLabel="name"
+                      optionValue="code"
+                      placeholder=" "
+                      ngDefaultControl>
+          </p-dropdown>
+          <label>Country</label>
+          <span title="Optional. The country where your organisation (or you) resides."
+                class="pi pi-question-circle"
+                id="countryHelp">
+          </span>
+        </div>
+      </div>
+
+      <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
+          <label for="orcid">Orcid</label>
+          <span title="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+        <div *ngIf="formErrors && formErrors.orcid"
+             class="alert">
+          <span *ngFor="let error of formErrors.orcid">{{error.message}}<br></span>
+        </div>
+      </div>
+
+      <div *ngIf="!userData" class="p-py-3" style="max-width: 15rem; line-height: 1.2rem">
+        <p-checkbox id="terms" formControlName="terms_consent"></p-checkbox>
+        <label for="terms"> I accept the <a [routerLink]="['/terms']">terms, conditions and privacy policy</a>.</label>
+      </div>
+
+      <button *ngIf="!userData"
+              pButton
+              type="submit"
+              label="Submit"
+              [disabled]="!userForm.valid">
+      </button>
+      <button *ngIf="userData"
+              pButton
+              type="submit"
+              label="Save"
+              [disabled]="!userForm.valid">
+      </button>
+
+
+    </form>
+    <p>
+      <button *ngIf="userData"
+              pButton
+              type="button"
+              label="Deactivate my account"
+              (click)="deactivateAccount()"
+              class="p-button-danger">
+      </button>
+    </p>
+  </div>
+</div>
