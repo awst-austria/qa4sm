@@ -1,130 +1,115 @@
-<main class="p-grid p-mx-0">
-  <p-panel class="p-col-12">
-    <ng-template pTemplate="header">
-      <div class="text-center" style="width:100%">
-        <h4 class="p-my-0 font-weight-normal">
-          Summary:
-          <span *ngIf="validationRun.is_unpublished && isOwner">
-          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{valName$|async}} </span>
-          <button
-            pButton
-            type="button"
-            [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
-            title="Change Name"
-            icon="faIcons.faPencil"
-            (click)="toggleEditing()">
-            <fa-icon [icon]="faIcons.faPencil"></fa-icon>
-          </button>
-          <span *ngIf="!hideElement">
-            <label for="new-name"></label>
-            <input id="new-name"
-                   type="text"
-                   value="{{valName$|async}}"
-                   #newName
-                   [ngClass]="{'edit_name': true}">
+<div class="container center-text">
+  <div class="card-deck">
+    <div *ngIf="validationRun$ | async as validationRun" id="result_summary" class="card mb-4 shadow-sm">
+      <div *ngIf="configurations$| async as configurations">
+        <div class="card-header text-center">
+          <h4 class="my-0 font-weight-normal">
+            Summary:
+            <!--          {% if is_owner and val.is_unpublished %}-->
+            <span *ngIf="validationRun.is_unpublished && validationRun.isOwner">
+              <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}</span>
+              <!--          <input class="d-none edit_name"/>-->
             <button
-              pButton
-              type="button"
-              [ngClass]="{'btn-action save_name_btn result_page': true}"
-              title="Save Name"
-              icon="pi pi-save"
-              (click)="saveName(validationRun.id, newName.value)">
-            </button>
-            <button
-              pButton
-              type="button"
-              [ngClass]="{'btn-action cancel_editing_btn result_page': true}"
-              title="Cancel"
-              icon="pi pi-ban"
+              [ngClass]="{'btn btn-sm btn-primary btn-action edit_name_btn': true, 'hidden': !hideElement}"
+              title="Change Name"
               (click)="toggleEditing()">
+              <span class="pi pi-pencil"></span>
             </button>
+            <span *ngIf="!hideElement">
+              <label for="new-name"></label>
+              <input id="new-name"
+                     type="text"
+                     value="{{validationRun.name_tag}}"
+                     #newName
+                     [ngClass]="{'edit_name': true}">
+              <button
+                [ngClass]="{'btn btn-sm btn-primary btn-action save_name_btn result_page': true}"
+                title="Save Name"
+                (click)="saveName(validationRun.id, newName.value)">
+                <span class="pi pi-save"></span></button>
+              <button
+                [ngClass]="{'btn btn-sm btn-primary btn-action cancel_editing_btn result_page': true}"
+                title="Cancel"
+                (click)="toggleEditing()">
+                <span class="pi pi-ban"></span>
+              </button>
+            </span>
           </span>
-        </span>
-          <span *ngIf="!validationRun.is_unpublished"
-                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
-            <span class="no_name_change_info pi pi-question-circle help-icon"
-                  title="Validation has been published. There is no possibility of changing its name."> </span>
+            <span *ngIf="!validationRun.is_unpublished"
+                  class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
+              <span class="no_name_change_info pi pi-question-circle help-icon"
+                    title="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
-          <span *ngIf="!isOwner"
-                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
-            <span class="no_name_change_info pi pi-question-circle help-icon"
-                  title="Validation belongs to another user. There is no possibility of changing its name."> </span>
+            <span *ngIf="!validationRun.isOwner"
+                  class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
+              <span class="no_name_change_info pi pi-question-circle help-icon"
+                    title="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
-        </h4>
-      </div>
-    </ng-template>
-    <div *ngIf="configurations$| async as configurations" class="card-body">
-      <ul>
-        <li *ngIf="validationRun.is_a_copy">
-          Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
-          original validation run on {{this.originalDate| date: 'mediumDate' :timeZone }}.
-        </li>
-        <li *ngIf="!validationRun.is_a_copy">Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
-          on {{ validationRun.end_time | date: dateFormat :timeZone }} {{timeZone}}.
-        </li>
-        <li>Compared {{ configurations.length  }} datasets:
+          </h4>
+        </div>
+        <div class="card-body">
           <ul>
-            <li *ngFor="let config of configurations; let ind = index">
-              <em *ngIf="config.id != validationRun.reference_configuration">Dataset {{ind + 1}}:</em>
-              <em *ngIf="config.id == validationRun.reference_configuration">Reference:</em>
-
-              {{config.dataset}} ({{config.version}}, {{config.variable}})
-              [Filters:
-              <span *ngFor="let filter of config.filters"> {{filter}}; </span>
-              <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
-                              {{paramFilter}} {{config.parametrisedFiltersValues[indF]}}
-              </span>]
+            <li>Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
+              on {{ validationRun.end_time | date: dateFormat :timeZone }} {{timeZone}}.
             </li>
-          </ul>
-        <li
-          *ngIf="validationRun.min_lat && validationRun.min_lon && validationRun.max_lat && validationRun.max_lon; else elseSpatial">
-          Spatial filter bounding box: [{{ validationRun.min_lat }}, {{ validationRun.min_lon }}
-          , {{ validationRun.max_lat }}, {{ validationRun.max_lon }}].
-        </li>
-        <ng-template #elseSpatial>
-          <li>
-            Validated globally.
-          </li>
-        </ng-template>
+            <li>Compared {{ configurations.length  }} datasets:
+              <ul>
+                <li *ngFor="let config of configurations; let ind = index">
+                  <em *ngIf="config.id != validationRun.reference_configuration">Dataset {{ind + 1}}:</em>
+                  <em *ngIf="config.id == validationRun.reference_configuration">Reference:</em>
+
+                  {{config.dataset}} ({{config.version}}, {{config.variable}})
+                  [Filters: <span *ngFor="let filter of config.filters"> {{filter}}; </span>
+                  <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
+                              {{paramFilter}} {{config.parametrisedFiltersValues[indF]}}
+                            </span>
+                  ]
+                </li>
+              </ul>
+            <li
+              *ngIf="validationRun.min_lat && validationRun.min_lon && validationRun.max_lat && validationRun.max_lon; else elseSpatial">
+              Spatial filter bounding box: [{{ validationRun.min_lat }}, {{ validationRun.min_lon }}
+              , {{ validationRun.max_lat }}, {{ validationRun.max_lon }}].
+            </li>
+            <ng-template #elseSpatial>
+              <li>
+                Validated globally.
+              </li>
+            </ng-template>
 
 
-        <li *ngIf="validationRun.interval_from && validationRun.interval_to; else elseTemporal">Validation period /
-          temporal
-          filter: {{ validationRun.interval_from | date: dateFormat :timeZone }} {{timeZone}}
-          to {{ validationRun.interval_to | date: dateFormat :timeZone }} {{timeZone}}.
-        </li>
-        <ng-template #elseTemporal>
-          <li>Validated over entire available timespan.</li>
-        </ng-template>
+            <li *ngIf="validationRun.interval_from && validationRun.interval_to; else elseTemporal">Validation period /
+              temporal
+              filter: {{ validationRun.interval_from | date: dateFormat :timeZone }} {{timeZone}}
+              to {{ validationRun.interval_to | date: dateFormat :timeZone }} {{timeZone}}.
+            </li>
+            <ng-template #elseTemporal>
+              <li>Validated over entire available timespan.</li>
+            </ng-template>
 
 
-        <li *ngIf="validationRun.anomalies != 'none'; else elseAnomalies">
-          Validation metrics calculated from anomalies
-          <span *ngIf="validationRun.anomalies == 'climatology'">
+            <li *ngIf="validationRun.anomalies != 'none'; else elseAnomalies">
+              Validation metrics calculated from anomalies
+              <span *ngIf="validationRun.anomalies == 'climatology'">
                 against climatology computed on years {{ validationRun.anomalies_from|date:"Y" }}
-            through {{ validationRun.anomalies_to|date:"Y" }}.
+                through {{ validationRun.anomalies_to|date:"Y" }}.
               </span>
-          <span *ngIf="validationRun.anomalies == 'moving_avg_35_d'">
+              <span *ngIf="validationRun.anomalies == 'moving_avg_35_d'">
               against 35 day moving average.
               </span>
-        </li>
-        <ng-template #elseAnomalies>
-          <li>Validation metrics calculated from absolute values.</li>
-        </ng-template>
+            </li>
+            <ng-template #elseAnomalies>
+              <li>Validation metrics calculated from absolute values.</li>
+            </ng-template>
 
 
-        <li>Triple collocation analysis was
-          <span *ngIf="validationRun.tcol">activated. </span>
-          <span *ngIf="!validationRun.tcol">deactivated. </span>
-        </li>
+            <li>Triple collocation analysis was
+              <span *ngIf="validationRun.tcol">activated. </span>
+              <span *ngIf="!validationRun.tcol">deactivated. </span>
+            </li>
 
-        <li>Bootstrapping of confidence intervals for Triple Collocation Analysis was
-          <span *ngIf="validationRun.bootstrap_tcol_cis">activated. </span>
-          <span *ngIf="!validationRun.bootstrap_tcol_cis">deactivated. </span>
-        </li>
-
-        <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
-          <span *ngFor="let config of configurations">
+            <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
+              <span *ngFor="let config of configurations">
                 <span *ngIf="config.id === validationRun.reference_configuration">
                   {{config.dataset}} ({{ config.version }}, {{ config.variable }})
 
@@ -139,53 +124,56 @@
                   </ng-template>
               </span>
               </span>
-        </li>
+            </li>
 
-        <ng-template #elseScaling>
-          <li> Scaling reference: {{ scalingMethods[validationRun.scaling_method] }}.</li>
-        </ng-template>
-        <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
-
-
-        <li>Processing took {{ runTime }} minutes (wall time).</li>
+            <ng-template #elseScaling>
+              <li> Scaling reference: {{ scalingMethods[validationRun.scaling_method] }}.</li>
+            </ng-template>
+            <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
 
-        <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
-        <ng-template #elseProgress>
-          <li [ngClass]="{'alert-danger': errorRate > 0}">
-            {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
-            of {{ validationRun.total_points }}) of the processed locations (grid points) produced errors during
-            calculation.
-          </li>
-        </ng-template>
-        <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user">
-          <span *ngIf="isNearExpiry$|async">
-            <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
-            This validation will SOON be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone}} {{timeZone}}.
-          </span>
+            <li>Processing took {{ validationRun.runTime }} minutes (wall time).</li>
 
-          <span *ngIf="!(isNearExpiry$|async)">
-            <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
-            This validation will be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{timeZone}}.
-          </span>
 
-        </li>
-        <li *ngIf="(isArchived$|async) && validationRun.is_unpublished">
-              <span
-                class="p-panel-header-icon pi expiry-icons">
-                <fa-icon [icon]="faIcons.faArchive"></fa-icon>
-              </span>
-          This validation has been archived. It will NOT be automatically removed during cleanup.
+            <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
+            <ng-template #elseProgress>
+              <li [ngClass]="{'alert-danger': validationRun.errorRate > 0}">
+                {{validationRun.errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
+                of {{ validationRun.total_points }}) of the processed locations (grid points) produced errors during
+                calculation.
+              </li>
+            </ng-template>
 
-        </li>
-        <li *ngIf="!validationRun.is_unpublished">
-          <span class="pi pi-book"></span> This result was published on zenodo with DOI
-          <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
-        </li>
-      </ul>
-      <qa-buttons *ngIf="validationModel.validationRun|async as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
+            <!--          {% if is_owner %}-->
+            <!--          {% if valrun.expiry_date %}-->
+            <!--          <li>-->
+            <!--            {% if valrun.is_near_expiry %}-->
+            <!--            <span class="fas fa-exclamation-triangle"></span>-->
+            <!--            This validation will SOON be automatically removed during cleanup on {{ valrun.expiry_date }}.-->
+            <!--            {% else %}-->
+            <!--            <span class="fas fa-calendar-alt"></span>-->
+            <!--            This validation will be automatically removed during cleanup on {{ valrun.expiry_date }}.-->
+            <!--            {% endif %}-->
+            <!--          </li>-->
+            <!--          {% elif valrun.is_archived %}-->
+            <!--          <li>-->
+            <!--            <span class="fas fa-archive"></span>-->
+            <!--            This validation has been archived. It will NOT be automatically removed during cleanup.-->
+            <!--          </li>-->
+            <!--          {% endif %}-->
+            <!--          {% endif %}-->
+
+
+            <li *ngIf="validationRun.doi">
+              <span class="fas fa-book"></span> This result was published on zenodo with DOI <a target="_blank"
+                                                                                                href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
+            </li>
+
+
+          </ul>
+          <qa-buttons [validationList]="false" [validationRun]="validationRun"></qa-buttons>
+        </div>
+      </div>
     </div>
-  </p-panel>
-</main>
+  </div>
+</div>

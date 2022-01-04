@@ -71,7 +71,7 @@ jobs:
       - name: Test with no token
         if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |
-          pytest -k "not test_result_publishing and not test_publish_result"
+          pytest -k "not test_result_publishing"
       - name: Long running tests with no token
         if: ${{ !env.DOI_ACCESS_TOKEN_ENV }}
         run: |

@@ -1,7 +1,4 @@
 from django.contrib.auth import get_user_model, password_validation
-
-from validator import forms
-
 User = get_user_model()
 from django.contrib.auth.forms import UserCreationForm
 
@@ -22,11 +19,12 @@ class UserProfileForm(UserCreationForm):
                   ]
 
     def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get('password1')
-        password2 = cleaned_data.get('password2')
-        if password1 != password2:
-            raise forms.ValidationError({'password1':'Passwords do not match'})
+        form_data = self.cleaned_data
+        if (('password2' not in form_data) or
+            (form_data['password1'] != form_data['password2'])):   # Workaround for missing password2 key
+            self._errors["password1"] = ["Passwords do not match"] # Will raise an error message
+            del form_data['password1']
+        return form_data
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

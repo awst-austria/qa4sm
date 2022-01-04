@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -11,32 +10,44 @@ from validator.models import Dataset, DataFilter, DatasetConfiguration, Parametr
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_filter(request):
-    # All filters are taken
-    data_filters = DataFilter.objects.all()
+    dataset_id = request.query_params.get('dataset', None)
+    # # get single dataset
+    if dataset_id:
+        data_filters = Dataset.objects.get(id=dataset_id).filters
+    # get all datasets
+    else:
+        data_filters = DataFilter.objects.all()
+
     serializer = DataFilterSerializer(data_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def data_filter_by_dataset(request, **kwargs):
-    # Here we can take all the filters or filters assigned to the particular dataset only.
-    data_filters = get_object_or_404(Dataset, id=kwargs['dataset_id']).filters
-    serializer = DataFilterSerializer(data_filters, many=True)
+def data_filter_by_id(request, **kwargs):
+    dataset_filter = DataFilter.objects.get(pk=kwargs['id'])
+    serializer = DataFilterSerializer(dataset_filter)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_parameterised_filter(request):
-    """
-    Here we take the list of all the parameterised filters applied to the existing validation.
-    It's NOT a list od parameterised filters defined in the fixture! That one would be defined as:
-    DataFilter.objects.filter(parameterised = True).
-    """
-    param_filters = ParametrisedFilter.objects.all()
+    config_id = request.query_params.get('config', None)
+    if config_id:
+        param_filters = DatasetConfiguration.objects.get(id=config_id).parametrisedfilter_set.all()
+    else:
+        param_filters = ParametrisedFilter.objects.all()
     serializer = ParameterisedFilterSerializer(param_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def data_parameterised_filter_by_id(request, **kwargs):
+    param_filters = ParametrisedFilter.objects.get(id=kwargs['id'])
+    serilizer = ParameterisedFilterSerializer(param_filters)
+    return JsonResponse(serilizer.data, status=status.HTTP_200_OK, safe=False)
 
 
 class DataFilterSerializer(ModelSerializer):
@@ -49,8 +60,6 @@ class DataFilterSerializer(ModelSerializer):
                   'parameterised',
                   'dialog_name',
                   'default_parameter',
-                  'to_include',
-                  'disable_filter'
                   ]
 
 

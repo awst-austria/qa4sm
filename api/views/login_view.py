@@ -30,6 +30,11 @@ def api_login(request):
     if request.method == 'POST':
 
         # serializer.data #to object
+        cookies = request.COOKIES
+        headers = request.headers
+
+        print('cookies: ', cookies)
+        print('headers: ', headers)
 
         login_serializer = LoginDtoSerializer(data=request.data)
         if not login_serializer.is_valid():

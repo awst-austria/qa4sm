@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -11,8 +10,20 @@ from validator.models import DatasetVersion, Dataset
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version(request):
-    versions = DatasetVersion.objects.all()
-    serializer = DatasetVersionSerializer(versions, many=True)
+    dataset_id = request.query_params.get('dataset', None)
+    version_id = request.query_params.get('version_id', None)
+    # # get single dataset
+    if version_id:
+        version = DatasetVersion.objects.get(id=version_id)
+        serializer = DatasetVersionSerializer(version)
+    else:
+        if dataset_id:
+            versions = Dataset.objects.get(id=dataset_id).versions
+        # get all datasets
+        else:
+            versions = DatasetVersion.objects.all()
+
+        serializer = DatasetVersionSerializer(versions, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
@@ -20,18 +31,10 @@ def dataset_version(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version_by_id(request, **kwargs):
-    version = get_object_or_404(DatasetVersion, id=kwargs['version_id'])
-    serializer = DatasetVersionSerializer(version)
+    ds = DatasetVersion.objects.get(pk=kwargs['id'])
+    serializer = DatasetVersionSerializer(ds)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def dataset_version_by_dataset(request, **kwargs):
-    versions = get_object_or_404(Dataset, id=kwargs['dataset_id']).versions
-    serializer = DatasetVersionSerializer(versions, many=True)
-
-    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 class DatasetVersionSerializer(ModelSerializer):
     class Meta:
@@ -42,5 +45,4 @@ class DatasetVersionSerializer(ModelSerializer):
                   'help_text',
                   'time_range_start',
                   'time_range_end',
-                  'geographical_range'
                   ]

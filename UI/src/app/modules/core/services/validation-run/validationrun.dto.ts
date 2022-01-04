@@ -33,8 +33,7 @@ export class ValidationrunDto{
               public output_dir_url: string,
               public output_file_name: string,
               public copied_run: number[],
-              public is_a_copy: boolean,
-              public bootstrap_tcol_cis: boolean) {
+              public is_a_copy: boolean) {
   }
 }
 

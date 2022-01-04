@@ -14,7 +14,7 @@
   <div class="p-col">
     <span class="p-float-label p-mb-4">
       <p-dropdown id="versionSelector" [style]="{'width': '100%'}" [options]="(selectableDatasetVersions$|async)"
-                  [(ngModel)]="selectionModel.selectedVersion" optionLabel="pretty_name" (onChange)="onVersionChange()"></p-dropdown>
+                  [(ngModel)]="selectionModel.selectedVersion" optionLabel="pretty_name"></p-dropdown>
       <label for="versionSelector">Version</label>
     </span>
 

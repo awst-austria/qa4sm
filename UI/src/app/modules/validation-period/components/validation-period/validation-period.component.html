@@ -1,4 +1,4 @@
-<p-panel header="Validation Period" [toggleable]="true" class="validation-row">
+<p-panel header="Validation Period" [toggleable]="true">
   <ng-template pTemplate="icons">
     <label class="p-panel-header-icon"
            pTooltip="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval."
@@ -6,54 +6,20 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid p-pt-4">
-    <div class="p-col-12 p-sm-5">
-      <div class="p-grid" id="fromField">
-        <div class="small-label p-col-4">
-          <div class="p-fluid">
-            <div>From</div>
-          </div>
-        </div>
-        <div class="p-col-8 p-px-0 p-mx-0">
-          <div class="p-fluid">
-            <div class="p-float-label">
-              <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                          yearRange="1970:2100"
-                          [maxDate]="validationPeriodModel.intervalTo$|async"
-                          [ngModel]="(validationPeriodModel.intervalFrom$|async)"
-                          (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-calendar>
-              <label for="fromDateInput">Choose a date</label>
-            </div>
-          </div>
-
-        </div>
+  <div class="p-grid">
+    <div class="p-col-12 p-sm-6">
+      <div class="p-float-label p-m-2">
+        <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1970:2100" [(ngModel)]="validationPeriodModel.intervalFrom"></p-calendar>
+        <label for="fromDateInput">From</label>
       </div>
     </div>
 
-    <div class="p-col-12 p-sm-2">
-      <div class="p-d-flex p-jc-center">
-      </div>
-    </div>
-
-    <div class="p-col-12 p-sm-5">
-      <div class="p-grid" id="toField">
-        <div class="small-label p-col-4">
-          <div class="p-fluid">
-            <div>To</div>
-          </div>
-        </div>
-        <div class="p-col-8 p-px-0 p-mx-0">
-          <div class="p-fluid">
-            <div class="p-float-label">
-              <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                          yearRange="1970:2100"
-                          [minDate]="validationPeriodModel.intervalFrom$|async"
-                          [ngModel]="(validationPeriodModel.intervalTo$|async)"
-                          (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-calendar>
-              <label for="toDateInput">Chose a date</label>
-            </div>
-          </div>
-        </div>
+    <div class="p-col-12 p-sm-6">
+      <div class="p-float-label p-m-2">
+        <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
+                    yearRange="1970:2100"  [(ngModel)]="validationPeriodModel.intervalTo"></p-calendar>
+        <label for="toDateInput">To</label>
       </div>
     </div>
   </div>

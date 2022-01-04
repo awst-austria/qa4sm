@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import django
 from valentina.settings_conf import *
-from django.db import models
 from valentina.version import APP_VERSION
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -32,10 +31,6 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 # Expected ping frequency in minutes. !Do not change this unless you fully understand the code that use this property!
 UPTIME_PING_INTERVAL = 5
 
-# Default primary key field type can be set here, but only if they solve 'Migrating auto-created through tables' issue
-# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
-# DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 # Application definition
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
@@ -49,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'django_rest_passwordreset'
 
 ]
 

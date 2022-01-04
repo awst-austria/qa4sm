@@ -3,11 +3,10 @@ import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
 import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
+import {NGXLogger} from 'ngx-logger';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
 
-// const csrfToken = '{{csrf_token}}';
-// const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 @Injectable({
   providedIn: 'root'
 })
@@ -16,34 +15,16 @@ export class AuthService {
 
   private loginUrl = this.API_URL + 'api/auth/login';
   private logoutUrl = this.API_URL + 'api/auth/logout';
-  private signUpUrl = this.API_URL + 'api/sign-up';
-  private userUpdateUrl = this.API_URL + 'api/user-update';
-  private userDeleteUrl = this.API_URL + 'api/user-delete';
-  private passwordResetUrl = this.API_URL + 'api/password-reset';
-  private setPasswordUrl = this.API_URL + 'api/password-resetconfirm';
-  private validateTokenUrl = this.API_URL + 'api/password-resetvalidate_token/';
 
-  emptyUser = {
-    username: '',
-    first_name: '',
-    id: null,
-    copied_runs: [],
-    email: '',
-    last_name: '',
-    organisation: '',
-    country: '',
-    orcid: ''
-  };
+  emptyUser = {username: '', firstName: '', id: null, copied_runs: []};
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
-  private passwordResetToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  private previousUrl: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, private logger: NGXLogger) {
     this.init();
   }
 
-  public init() {
+  private init() {
     this.httpClient
       .get<UserDto>(this.loginUrl)
       .subscribe(
@@ -52,6 +33,7 @@ export class AuthService {
           this.authenticated.next(true);
         },
         error => {
+
         }
       );
   }
@@ -72,7 +54,7 @@ export class AuthService {
       .post<UserDto>(this.loginUrl, credentials)
       .subscribe(
         data => {
-          this.currentUser = data;
+          this.currentUser = this.emptyUser;
           this.authenticated.next(true);
           authResult.next(true);
         },
@@ -102,44 +84,4 @@ export class AuthService {
     return logoutResult;
   }
 
-  signUp(userForm: any): Observable<any> {
-    return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'});
-  }
-
-  updateUser(userForm: any): Observable<any> {
-    return this.httpClient.patch(this.userUpdateUrl, userForm);
-  }
-
-  deactivateUser(username: any): Observable<any> {
-    return this.httpClient.delete<UserDto>(this.userDeleteUrl, username);
-  }
-
-  resetPassword(resetPasswordForm: any): Observable<any> {
-    return this.httpClient.post(this.passwordResetUrl, resetPasswordForm);
-  }
-
-  setPassword(setPasswordForm: any, token: string): Observable<any> {
-    const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
-    return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm);
-  }
-
-  validateResetPasswordToken(tkn: string): Observable<any> {
-    return this.httpClient.post(this.validateTokenUrl, {token: tkn});
-  }
-
-  checkPasswordResetToken(): Observable<string> {
-    return this.passwordResetToken.asObservable();
-  }
-
-  setPasswordResetToken(newToken: string): void {
-    this.passwordResetToken.next(newToken);
-  }
-
-  checkPreviousUrl(): Observable<string>{
-    return this.previousUrl.asObservable();
-  }
-
-  setPreviousUrl(prevUrl: string): void{
-    this.previousUrl.next(prevUrl);
-  }
 }
