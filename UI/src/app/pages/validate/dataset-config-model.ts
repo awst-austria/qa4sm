@@ -1,6 +1,6 @@
 import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
-import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
+import {NewValRunDatasetConfigDto} from './service/new-val-run-dataset-config-dto';
 
 
 export class DatasetConfigModel {
@@ -12,7 +12,7 @@ export class DatasetConfigModel {
   /**
    * This method prepares the DTO for starting the new validation
    */
-  public toValRunDatasetConfigDto(): ValidationRunDatasetConfigDto {
+  public toNewValRunDatasetConfigDto(): NewValRunDatasetConfigDto {
     let enabledBasicFilters: number[] = [];
     this.basicFilters.forEach(filter => {
       if (filter.enabled) {
@@ -20,16 +20,11 @@ export class DatasetConfigModel {
       }
     });
 
-    let parameterisedFilters: ParametrisedFilterConfig[] = [];
-
-    let newValDatasetConfigDto: ValidationRunDatasetConfigDto = {
-      dataset_id: this.datasetModel.selectedDataset.id,
-      variable_id: this.datasetModel.selectedVariable.id,
-      version_id: this.datasetModel.selectedVersion.id,
-      basic_filters: enabledBasicFilters,
-      parametrised_filters: parameterisedFilters
-    };
-
+    let newValDatasetConfigDto = new NewValRunDatasetConfigDto(
+      this.datasetModel.selectedDataset.id,
+      this.datasetModel.selectedVersion.id,
+      this.datasetModel.selectedVariable.id,
+      enabledBasicFilters);
     return newValDatasetConfigDto;
   }
 }

@@ -25,7 +25,4 @@ export class ToastService {
   showErrorWithHeader(header: string, message: string) {
     this.messageService.add({key: 'global-toast', severity: 'error', summary: header, detail: message});
   }
-  showAlert(message: string): void{
-    this.messageService.add({key: 'global-toast', severity: 'warn', detail: message});
-  }
 }

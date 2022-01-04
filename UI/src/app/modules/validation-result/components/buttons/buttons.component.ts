@@ -1,12 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
-import {HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
-import {ModalWindowService} from '../../../core/services/global/modal-window.service';
-import {BehaviorSubject, Observable} from 'rxjs';
 
 
 @Component({
@@ -21,134 +19,73 @@ export class ButtonsComponent implements OnInit {
   @Input() published: boolean;
   @Input() validationList: boolean;
   @Input() tracked: boolean;
-  @Output() doRefresh = new EventEmitter();
-  @Output() doUpdate = new EventEmitter();
 
-  faIcons = {
-    faArchive: fas.faArchive,
+  faIcons = {faArchive: fas.faArchive,
     faStop: fas.faStop,
-    faFileDownload: fas.faFileDownload
-  };
+    faFileDownload: fas.faFileDownload,
+    faRedo: fas.faRedo};
 
-  isLogged: boolean;
+  isCurrentUser = true;
   isOwner: boolean;
-  isTrackedByTheUser$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  isTrackedByTheUser: boolean;
   status: string;
-  publishingInProgress$: Observable<boolean>;
-  isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
 
-  constructor(private router: Router,
+  constructor(private httpClient: HttpClient,
+              private router: Router,
               private validationService: ValidationrunService,
-              public authService: AuthService,
-              private modalService: ModalWindowService) {
-  }
+              public authService: AuthService) { }
 
   ngOnInit(): void {
-    this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
-    this.isTrackedByTheUser$.next(this.authService.currentUser.copied_runs.includes(this.validationRun.id));
-    this.publishingInProgress$ = this.validationService.checkPublishingInProgress();
-    this.isArchived$.next(this.validationRun.is_archived);
+    this.isTrackedByTheUser = this.authService.currentUser.copied_runs.includes(this.validationRun.id);
+  }
+
+  basicOnclick(validation: ValidationrunDto): void{
+  //  I'll remove this one, now it's just a function to check if buttons work
+    console.log(validation.id);
+  }
+
+  reloadMyValidations(): void{
+    const targetUrl = '/my-validations';
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+    this.router.onSameUrlNavigation = 'reload';
+    this.router.navigate([targetUrl]);
   }
 
 
-  deleteValidation(validationId: string): void {
-    if (!confirm('Do you really want to delete the result?')) {
-      return;
-    }
-    this.validationService.deleteValidation(validationId).subscribe(
-      () => {
-        this.validationService.refreshComponent('page');
-        this.doUpdate.emit({key: 'delete', value: true});
-      });
+  deleteValidation(validationId: string): void{
+    this.validationService.deleteValidation(validationId);
+    this.reloadMyValidations();
 
   }
 
-  stopValidation(validationId: string): void {
-    if (!confirm('Do you really want to stop the validation?')) {
-      return;
-    }
-    this.validationService.stopValidation(validationId).subscribe(
-      () => {
-        this.validationService.refreshComponent(validationId);
-      });
+  stopValidation(validationId: string): void{
+    this.validationService.stopValidation(validationId);
+    this.reloadMyValidations();
   }
 
-  archiveResults(validationId: string, archive: boolean): void {
-    if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
-      + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
-      return;
-    }
-    this.validationService.archiveResult(validationId, archive).subscribe((resp) => {
-      if (resp.ok){
-        this.validationService.refreshComponent(validationId);
-        this.isArchived$.next(archive);
-        this.doUpdate.emit({key: 'archived', value: resp.body});
-      }
-    });
+  archiveResults(validationId: string, archive: boolean): void{
+    this.validationService.archiveResults(validationId, archive);
+    window.location.reload();
   }
 
-  extendResults(validationId: string): void {
-    if (!confirm('Do you want to extend the lifespan of this result?')) {
-      return;
-    }
-    this.validationService.extendResult(validationId).subscribe((resp) => {
-      if (resp.statusText === 'OK'){
-        this.validationService.refreshComponent(validationId);
-        this.doUpdate.emit({key: 'extended', value: resp.body});
-      }
-    });
+  extendResults(validationId: string): void{
+    this.validationService.extendResults(validationId);
   }
 
-  downloadResultFile(validationId: string, fileType: string, fileName: string): void {
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
     this.validationService.downloadResultFile(validationId, fileType, fileName);
   }
 
-  addValidation(validationId: string): void {
-    this.validationService.addValidation(validationId).subscribe(
-      response => {
-        // re-initi auth service to update user data - to update list of added runs
-        this.authService.init();
-        this.isTrackedByTheUser$.next(true);
-        // this one is needed to refresh tracked-validations component
-        this.doRefresh.emit(true);
-        alert(response);
-
-
-      });
-    this.authService.init();
+  addValidation(validationId: string): void{
+    this.validationService.addValidation(validationId);
+    window.location.reload();
   }
 
-  removeValidation(validationId: string): void {
-    if (!confirm('Do you really want to remove this validation from your list?')) {
-      return;
-    }
-    this.validationService.removeValidation(validationId).subscribe(
-      response => {
-        // re-initi auth service to update user data - to update list of added runs
-        this.authService.init();
-        this.isTrackedByTheUser$.next(false);
-        // this one is needed to refresh tracked-validations component
-        this.doRefresh.emit(true);
-        alert(response);
-      });
-    this.authService.init();
+  removeValidation(validationId: string): void{
+    this.validationService.removeValidation(validationId);
+    window.location.reload();
   }
 
-  open(): void {
-    this.modalService.open();
-  }
-
-  copy(validationId: string): void {
-    let newId: string;
-    const params = new HttpParams().set('validation_id', validationId);
-    this.validationService.copyValidation(params).subscribe(data => {
-      newId = data.run_id;
-      alert('This validation will be copied and add to the list of your validations.');
-      this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
-        this.router.navigate([`validation-result/${newId}`]);
-      });
-    });
-  }
 }

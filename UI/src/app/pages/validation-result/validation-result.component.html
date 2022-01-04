@@ -1,38 +1,24 @@
-<main [ngClass]="{'non-scrollable': isPublishingWindowOpen}">
 <div class="p-grid">
   <div class="p-col-12">
-    <div *ngIf="(validationModel.validationRun|async) as validationRun" class="p-d-flex p-jc-center">
-      <div *ngIf="(validationModel.datasetConfigs|async) as configs">
+    <div class="p-d-flex p-jc-center">
 
-      <div *ngIf="!validationRun.end_time" class="container p-text-center mb-5 mt-4"
+      <div *ngIf="!(validationModel.validationRun|async)?.end_time" class="container p-text-center mb-5 mt-4"
            style="max-width: 40rem;">
-        <h1>Validation Running...</h1>
+        <h1 class="jumbotron-heading">Validation Running...</h1>
         <p class="lead text-muted">
           Your validation is still running. You'll be notified via e-mail once it's finished.</p>
         <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
       </div>
 
-      <div *ngIf="validationRun.end_time" class="container p-mb-5 p-mt-4"
+      <div *ngIf="(validationModel.validationRun|async)?.end_time" class="container mb-5 mt-4"
            style="max-width: 60rem;">
         <h1 class="text-center">Validation Results</h1>
         <div class="p-col-12">
-          <qa-validation-summary [validationModel]="validationModel" [validationRun]="validationRun" (doRefresh)="update()"></qa-validation-summary>
-        </div>
-        <div *ngIf="validationRun.progress === 100 && validationRun.output_file"  class="p-col-12">
-          <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"></qa-summary-statistics>
-        </div>
-        <div *ngIf="validationRun.progress === 100 && validationRun.output_file" class="p-col-12">
-          <qa-result-files [validation]="validationRun"></qa-result-files>
+          <qa-validation-summary [validationModel]="validationModel"></qa-validation-summary>
         </div>
       </div>
 
     </div>
-    </div>
   </div>
 </div>
-  <!-- Custom modal setup -->
-  <qa-publishing *ngIf="isPublishingWindowOpen" [validationId]="validationId"></qa-publishing>
-<!--  <div id="modal-container" class="hidden"></div>-->
-<!--  <div id="overlay" (click)="removeModal()" class="hidden"></div>-->
-  <qa-scroll-to-top></qa-scroll-to-top>
-</main>
+

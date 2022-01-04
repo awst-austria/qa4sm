@@ -5,8 +5,7 @@ export class DatasetVersionDto {
     public pretty_name: string,
     public help_text: string,
     public time_range_start: Date,
-    public time_range_end: Date,
-    public geographical_range: {max_lat: number, max_lon: number, min_lat: number, min_lon: number},
+    public time_range_end: Date
   ) {
   }
 }

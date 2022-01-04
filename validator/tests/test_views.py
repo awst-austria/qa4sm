@@ -498,7 +498,6 @@ class TestViews(TransactionTestCase):
              'initial_variable': '4'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
-        print('Monika', return_data)
         assert return_data['versions']
         assert return_data['variables']
         assert return_data['filters']

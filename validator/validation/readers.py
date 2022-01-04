@@ -47,8 +47,6 @@ def create_reader(dataset, version) -> GriddedNcTs:
         ascat_data_folder = path.join(folder_name, 'data')
         ascat_grid_path = first_file_in(path.join(folder_name, 'grid'), '.nc')
         fn_format = "{:04d}"
-        reader = AscatGriddedNcTs(path=ascat_data_folder, fn_format=fn_format, grid_filename=ascat_grid_path,
-                         static_layer_path=None, ioclass_kws={'read_bulk':True})
         reader = AscatGriddedNcTs(path=ascat_data_folder, fn_format=fn_format,
                          grid_filename=ascat_grid_path, static_layer_path=None,
                          ioclass_kws={'read_bulk':True})

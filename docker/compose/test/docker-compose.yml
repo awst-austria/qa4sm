@@ -46,9 +46,6 @@ services:
     image: "awst/qa4sm-proxy:latest"
     ports:
       - "8081:80"
-  ui:
-    image: "awst/qa4sm-ui:latest"
-
   worker-1:
     image: "awst/qa4sm-worker:latest"
     environment:

@@ -1,6 +1,5 @@
-import errno
 from os import makedirs, listdir, path
-
+import errno
 
 def mkdir_if_not_exists(the_dir):
     try:

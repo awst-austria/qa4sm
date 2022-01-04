@@ -3,7 +3,6 @@ import {CommonModule} from '@angular/common';
 import {CheckboxModule} from 'primeng/checkbox';
 import {BasicFilterComponent} from './components/basic-filter/basic-filter.component';
 import {FormsModule} from '@angular/forms';
-import {TooltipModule} from 'primeng/tooltip';
 
 
 @NgModule({
@@ -11,13 +10,12 @@ import {TooltipModule} from 'primeng/tooltip';
   exports: [
     BasicFilterComponent
   ],
-    imports: [
-        CommonModule,
-        CheckboxModule,
-        FormsModule,
-        TooltipModule
+  imports: [
+    CommonModule,
+    CheckboxModule,
+    FormsModule
 
-    ]
+  ]
 })
 export class FilterModule {
 }

@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AnomaliesModel} from './anomalies-model';
-import {BehaviorSubject} from 'rxjs';
 
 // The following constants come from the validation_run database model
 export const ANOMALIES_NONE: string = 'none';
@@ -25,61 +24,28 @@ export class AnomaliesComponent implements OnInit {
   readonly anomalies35DMa: string = ANOMALIES_35D_MA;
 
   availableAnomalyMethodModels: AnomaliesModel[] = [];
-  selectedMethod$: BehaviorSubject<AnomaliesModel> = new BehaviorSubject<AnomaliesModel>(null);
+  selectedMethod: AnomaliesModel;
 
-  @Input() anomaliesModel: AnomaliesModel;
+  @Input() methodForValidation: AnomaliesModel;
 
   constructor() {
   }
 
-  public setSelection(anomaliesMethodName: string): void {
-    this.availableAnomalyMethodModels.forEach(anomalyModel => {
-      if (anomalyModel.method$.getValue() == anomaliesMethodName) {
-        this.selectedMethod$.next(anomalyModel);
-      }
-    });
-  }
-
   ngOnInit(): void {
     this.prepareAnomaliesMethodModels();
-    this.selectedMethod$.subscribe(value => {
-      this.anomaliesModel.method$.next(value.method$.getValue());
-      this.anomaliesModel.anomaliesFrom$.next(value.anomaliesFrom$.getValue());
-      this.anomaliesModel.anomaliesTo$.next(value.anomaliesTo$.getValue());
-    });
   }
 
+  selectedMethodChanged() {
+    this.methodForValidation.method = this.selectedMethod.method;
+    this.methodForValidation.anomaliesFrom = this.selectedMethod.anomaliesFrom;
+    this.methodForValidation.anomaliesTo = this.selectedMethod.anomaliesTo;
+  }
 
   private prepareAnomaliesMethodModels() {
-    this.availableAnomalyMethodModels.push(
-      new AnomaliesModel(
-        new BehaviorSubject<string>(ANOMALIES_NONE),
-        ANOMALIES_NONE_DESC,
-        new BehaviorSubject<Date>(null),
-        new BehaviorSubject<Date>(null)));
-    this.availableAnomalyMethodModels.push(
-      new AnomaliesModel(
-        new BehaviorSubject<string>(ANOMALIES_35D_MA),
-        ANOMALIES_35D_MA_DESC,
-        new BehaviorSubject<Date>(null),
-        new BehaviorSubject<Date>(null)));
-
-    let climatology = new AnomaliesModel(
-      new BehaviorSubject<string>(ANOMALIES_CLIMATOLOGY),
-      ANOMALIES_CLIMATOLOGY_DESC,
-      new BehaviorSubject<Date>(null),
-      new BehaviorSubject<Date>(null));
-
-    climatology.anomaliesTo$.subscribe(newToDate => {
-      this.anomaliesModel.anomaliesTo$.next(newToDate);
-    });
-    climatology.anomaliesFrom$.subscribe(newFromDate => {
-      this.anomaliesModel.anomaliesFrom$.next(newFromDate);
-    });
-
-    this.availableAnomalyMethodModels.push(climatology);
-
-    this.selectedMethod$.next(this.availableAnomalyMethodModels[0]);
+    this.availableAnomalyMethodModels.push(new AnomaliesModel(ANOMALIES_NONE, ANOMALIES_NONE_DESC));
+    this.availableAnomalyMethodModels.push(new AnomaliesModel(ANOMALIES_35D_MA, ANOMALIES_35D_MA_DESC));
+    this.availableAnomalyMethodModels.push(new AnomaliesModel(ANOMALIES_CLIMATOLOGY, ANOMALIES_CLIMATOLOGY_DESC));
+    this.selectedMethod = this.availableAnomalyMethodModels[0];
   }
 
 }

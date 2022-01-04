@@ -26,7 +26,6 @@ class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
                     duper['parameterised'] = fil.parameterised
                     duper['dialog_name'] = fil.dialog_name
                     duper['default_parameter'] = fil.default_parameter
-                    duper['to_include'] = fil.to_include
                     duper['disable_filter'] = fil.disable_filter
                     if ("initial_params" in attrs
                             and attrs["initial_params"] is not None):

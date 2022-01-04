@@ -1,7 +1,6 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import {SpatialSubsetComponent} from './spatial-subset.component';
-import {BehaviorSubject} from 'rxjs';
+import { SpatialSubsetComponent } from './spatial-subset.component';
 
 describe('SpatialSubsetComponent', () => {
   let component: SpatialSubsetComponent;
@@ -17,13 +16,6 @@ describe('SpatialSubsetComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SpatialSubsetComponent);
     component = fixture.componentInstance;
-    component.subsetModel = {
-      maxLat$: new BehaviorSubject(null),
-      maxLon$: new BehaviorSubject(null),
-      minLat$: new BehaviorSubject(null),
-      minLon$: new BehaviorSubject(null),
-      limited$: new BehaviorSubject(false)
-    };
     fixture.detectChanges();
   });
 

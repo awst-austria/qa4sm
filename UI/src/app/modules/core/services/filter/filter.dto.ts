@@ -5,8 +5,6 @@ export class FilterDto {
               public help_text: string,
               public parameterised: boolean,
               public dialog_name: string,
-              public default_parameter: string,
-              public to_include: string,
-              public disable_filter: number) {
+              public default_parameter: string,) {
   }
 }

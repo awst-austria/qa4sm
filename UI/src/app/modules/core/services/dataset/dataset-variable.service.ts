@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {shareReplay} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
@@ -15,9 +15,9 @@ const CACHE_KEY_ALL_VERSIONS = -1;
 })
 export class DatasetVariableService {
 
-  // cache for dataset arrays
+  //cache for dataset arrays
   arrayRequestCache = new DataCache<Observable<DatasetVariableDto[]>>(5);
-  // cache for single dataset dtos
+  //cache for single dataset dtos
   singleRequestCache = new DataCache<Observable<DatasetVariableDto>>(5);
 
 
@@ -39,8 +39,8 @@ export class DatasetVariableService {
     if (this.arrayRequestCache.isCached(datasetId)) {
       return this.arrayRequestCache.get(datasetId);
     } else {
-      const getUrl = DATASET_VARIABLE_URL + '-by-dataset/' + datasetId;
-      let datasetVariables$ = this.httpClient.get<DatasetVariableDto[]>(getUrl).pipe(shareReplay());
+      let params = new HttpParams().set('dataset', String(datasetId));
+      let datasetVariables$ = this.httpClient.get<DatasetVariableDto[]>(DATASET_VARIABLE_URL, {params: params}).pipe(shareReplay());
       this.arrayRequestCache.push(datasetId, datasetVariables$);
       return datasetVariables$;
     }

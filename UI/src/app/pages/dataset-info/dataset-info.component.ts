@@ -19,7 +19,6 @@ export class DatasetInfoComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateDatasetInfo();
-    this.sort();
   }
 
   private updateDatasetInfo(): void{
@@ -42,15 +41,6 @@ export class DatasetInfoComponent implements OnInit {
         )
       )
     );
-  }
-
-  sort(): void{
-    this.datasetInfo$ = this.datasetInfo$.pipe(map((data) => {
-      data.sort((a, b) => {
-        return a.id < b.id ? -1 : 1;
-      });
-      return data;
-    }));
   }
 
 }
