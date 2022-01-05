@@ -216,12 +216,19 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                                                                    version_id=config.get('version_id'),
                                                                    variable_id=config.get('variable_id'))
                 config_model.save()
-                filter_models = []
-                for filter_id in config.get('basic_filters'):
-                    filter_models.append(DataFilter.objects.get(id=filter_id))
 
-                for filter_model in filter_models:
-                    config_model.filters.add(filter_model)
+                for filter_id in config.get('basic_filters'):
+                    config_model.filters.add(DataFilter.objects.get(id=filter_id))
+
+                for param_filter in config.get('parametrised_filters'):
+                    param_filter_model = ParametrisedFilter.objects.create(
+                        dataset_config=config_model,
+                        filter_id=param_filter.get('id'),
+                        parameters=param_filter.get('parameters')
+                    )
+                    param_filter_model.save()
+                    print(param_filter)
+
                 config_model.save()
                 dataset_config_models.append(config_model)
 
