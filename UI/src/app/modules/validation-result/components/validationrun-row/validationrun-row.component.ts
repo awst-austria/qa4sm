@@ -23,6 +23,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   @Output() doRefresh = new EventEmitter();
   configurations$: Observable<any>;
   validationStatus: any;
+  validationStatus$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   dateFormat = 'medium';
   timeZone = 'UTC';
@@ -45,18 +46,8 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     }
     this.updateConfig();
     this.valName$.next(this.validationRun.name_tag);
-
-    if (
-      (this.validationRun.progress !== -1) &&
-      !(this.validationRun.progress === 100 &&
-        this.validationRun.end_time !== null) &&
-      !(this.validationRun.progress === 0 &&
-        this.validationRun.end_time !== null)){
-      this.validationStatus = setInterval(() => {
-        this.validationService.refreshComponent(this.validationRun.id);
-        this.doRefresh.emit(true);
-      }, 2 * 1000);
-    }
+    this.validationStatus$.next(this.getStatusFromProgress(this.validationRun));
+    this.refreshStatus();
   }
 
   private updateConfig(): void {
@@ -127,6 +118,24 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
         this.originalDate = copiedRun.start_time;
       }
     });
+  }
+
+  refreshStatus(): void{
+    if (
+      (this.validationRun.progress !== -1) &&
+      !(this.validationRun.progress === 100 &&
+        this.validationRun.end_time !== null) &&
+      !(this.validationRun.progress === 0 &&
+        this.validationRun.end_time !== null)){
+      this.validationStatus = setInterval(() => {
+        this.validationService.getValidationRunById(this.validationRun.id).subscribe(data => {
+          this.validationStatus$.next(this.getStatusFromProgress(data));
+          if (data.progress === 100 && data.end_time) {
+            this.validationService.refreshComponent(this.validationRun.id);
+          }
+        });
+      }, 60 * 1000); // one minute
+    }
   }
 
   ngOnDestroy(): void {
