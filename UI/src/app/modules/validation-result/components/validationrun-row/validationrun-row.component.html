@@ -2,11 +2,11 @@
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ validationRun.name_tag }}</h5>
+    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ valName$|async }}</h5>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
     <h5 class="p-my-0"> DOI: <a class="doilink" target="_blank"
-                              href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
+                                href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
     </h5>
   </ng-template>
   <!--  CUSTOM    -->
@@ -14,16 +14,17 @@
     <h5 class="p-my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
-          <span *ngIf="validationRun.is_near_expiry" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
+          <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
                 title="'This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
-          <span *ngIf="!validationRun.is_near_expiry" class="p-panel-header-icon pi pi-calendar expiry-icons"
+          <span *ngIf="!validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-calendar expiry-icons"
                 title="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
+          </span>
+          <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
+                        title="This validation was cancelled.">
           </span>
       </span>
       <!--      if there is no expiry date property: -->
       <span *ngIf="!validationRun.expiry_date">
-          <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
-                title="This validation was cancelled."></span>
           <span *ngIf="!validationRun.end_time && validationRun.progress <= 100"
                 class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
                 title="This validation is still running."></span>
@@ -38,7 +39,6 @@
               title="This validation has been archived. It will NOT be automatically removed during cleanup.">
           <fa-icon [icon]="faIcons.faArchive"></fa-icon>
         </span>
-
       </span>
 
       <span *ngIf="!validationRun.is_a_copy" class="font-weight-normal"> Started:
@@ -55,7 +55,7 @@
     <h5 class="p-my-0">
       <span *ngIf="hideElement"
             class=" font-weight-normal">
-        Name: {{ validationRun.name_tag }}
+        Name: {{ valName$|async }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="p-my-0 font-weight-normal">
@@ -77,7 +77,7 @@
           <label for="new-name">Name: </label>
           <input id="new-name"
                  type="text"
-                 value="{{validationRun.name_tag}}"
+                 value="{{valName$|async}}"
                  #newName
                  [ngClass]="{'edit_name': true}">
           <button

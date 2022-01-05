@@ -19,7 +19,7 @@ from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
 class ValidationRun(models.Model):
-    ## scaling methods
+    # scaling methods
     MIN_MAX = 'min_max'
     LINREG = 'linreg'
     MEAN_STD = 'mean_std'
@@ -34,7 +34,7 @@ class ValidationRun(models.Model):
         (BETA_SCALING, 'CDF matching with beta distribution fitting'),
         )
 
-    ## scale to
+    # scale to
     SCALE_TO_REF = 'ref'
     SCALE_TO_DATA = 'data'
 
@@ -43,7 +43,7 @@ class ValidationRun(models.Model):
         (SCALE_TO_DATA, 'Scale to data')
     )
 
-    ## anomalies
+    # anomalies
     MOVING_AVG_35_D = "moving_avg_35_d"
     CLIMATOLOGY = "climatology"
     NO_ANOM = "none"
@@ -51,9 +51,17 @@ class ValidationRun(models.Model):
         (NO_ANOM, 'Do not calculate'),
         (MOVING_AVG_35_D, '35 day moving average'),
         (CLIMATOLOGY, 'Climatology'),
-        )
+    )
 
-    ## fields
+    # upscaling options
+    NO_UPSCALE = "none"
+    AVERAGE = "average"
+    UPSCALING_METHODS = (
+        (NO_UPSCALE, 'Do not upscale point measurements'),
+        (AVERAGE, 'Average point measurements'),
+    )
+
+    # fields
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name_tag = models.CharField(max_length=80, blank=True)
@@ -81,6 +89,9 @@ class ValidationRun(models.Model):
     # only applicable if anomalies with climatology is selected
     anomalies_from = models.DateTimeField(null=True, blank=True)
     anomalies_to = models.DateTimeField(null=True, blank=True)
+    # upscaling of ISMN point measurements
+    upscaling_method = models.CharField(max_length=50, choices=UPSCALING_METHODS, default=NO_UPSCALE, blank=True)
+    temporal_stability = models.BooleanField(default=False)
 
     output_file = models.FileField(null=True, max_length=250, blank=True)
 
@@ -92,7 +103,8 @@ class ValidationRun(models.Model):
     publishing_in_progress = models.BooleanField(default=False)
 
     tcol = models.BooleanField(default=False)
-    used_by = models.ManyToManyField(User, through=CopiedValidations, through_fields=('copied_run', 'used_by_user'),
+    bootstrap_tcol_cis = models.BooleanField(default=False)
+    used_by = models.ManyToManyField(User, through=CopiedValidations, through_fields=('original_run', 'used_by_user'),
                                      related_name='copied_runs')
 
     # many-to-one relationships coming from other models:
@@ -101,21 +113,25 @@ class ValidationRun(models.Model):
 
     @property
     def expiry_date(self):
-        if (self.is_archived or (self.end_time is None)):
+        if (self.is_archived or (self.end_time is None)) and (self.progress != -1):
             return None
 
-        initial_date = self.last_extended if self.last_extended else self.end_time
+        if self.progress == -1:
+            initial_date = self.start_time
+        else:
+            initial_date = self.last_extended if self.last_extended else self.end_time
+
         return initial_date + timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
 
     @property
     def is_expired(self):
         e = self.expiry_date
-        return ((e is not None) and (timezone.now() > e))
+        return (e is not None) and (timezone.now() > e)
 
     @property
     def is_near_expiry(self):
         e = self.expiry_date
-        return ((e is not None) and (timezone.now() > e - timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)))
+        return (e is not None) and (timezone.now() > e - timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS))
 
     @property
     def is_unpublished(self):
@@ -133,7 +149,7 @@ class ValidationRun(models.Model):
 
     def extend_lifespan(self, commit=True):
         self.last_extended = timezone.now()
-        self.expiry_notified = False;
+        self.expiry_notified = False
 
         if commit:
             self.save()
@@ -161,7 +177,7 @@ class ValidationRun(models.Model):
                     {'anomalies': 'Time period makes no sense for anomalies calculation without climatology.', })
 
         box = {'min_lat': self.min_lat, 'min_lon': self.min_lon, 'max_lat': self.max_lat, 'max_lon': self.max_lon}
-        if (any(x is None for x in box.values()) and any(x is not None for x in box.values())):
+        if any(x is None for x in box.values()) and any(x is not None for x in box.values()):
             affected_fields = {}
             for key, value in box.items():
                 if value is None:

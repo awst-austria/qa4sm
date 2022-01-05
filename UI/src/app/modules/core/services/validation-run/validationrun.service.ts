@@ -37,6 +37,7 @@ const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 })
 export class ValidationrunService {
   private refresh: BehaviorSubject<string> = new BehaviorSubject('');
+  private publishingInProgress: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   doRefresh = this.refresh.asObservable();
   customValidationrun$: Observable<ValidationSetDto>;
@@ -81,7 +82,7 @@ export class ValidationrunService {
   extendResult(validationId: string): Observable<any> {
     const extendUrl = extendResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const extend = true;
-    return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'});
+    return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'response', responseType: 'text'});
   }
 
   saveResultsName(validationId: string, newName: string): Observable<any> {
@@ -143,6 +144,14 @@ export class ValidationrunService {
   getCopiedRunRecord(validationId: string): Observable<any>{
     const urlWithParam = copiedValidationRecordUrl + '/' + validationId;
     return this.httpClient.get(urlWithParam);
+  }
+
+  checkPublishingInProgress(): Observable<boolean>{
+    return this.publishingInProgress.asObservable();
+  }
+
+  changePublishingStatus(inProgress: boolean): void{
+    this.publishingInProgress.next(inProgress);
   }
 
 }

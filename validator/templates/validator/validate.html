@@ -253,7 +253,7 @@
                                                     <button type="button" title="Select on map" class="btn btn-primary" data-toggle="modal" data-target="#mapDialog">
                                                         <span class="fas fa-globe" ></span>
                                                     </button>
-                                                    <button type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
+                                                    <button id="clear-coordinates" type="button" title="Clear coordinates" class="btn btn-primary" onclick="clearCoordinates()">
                                                         <span class="fas fa-trash-alt" ></span>
                                                     </button>
                                                 </div>
@@ -358,13 +358,22 @@
 
                                         <div class="container">
                                             <div class="row">
-                                                 <div class="custom-control custom-switch">
+                                                <div class="custom-control custom-switch">
                                                     <input id="tcol" class="custom-control-input" name="tcol" type="checkbox" disabled="true">
-                                                    <label class="custom-control-label" for="tcol">Include Triple Collocation Metrics &nbsp;</label>
-                                                 </div>
-
+                                                    <label class="custom-control-label" for="tcol">Include Triple Collocation metrics &nbsp;</label>
+                                                </div>
                                                 <span class="input-group-text fas fa-question-circle help-icon"
-                                                    title="Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.">
+                                                      title="Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.">
+                                                </span>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="custom-control custom-switch">
+                                                    <input id="bootstrap_tcol_cis" class="custom-control-input" name="bootstrap_tcol_cis" type="checkbox" disabled="true">
+                                                    <label class="custom-control-label" for="bootstrap_tcol_cis">Bootstrap Triple Collocation metric confidence intervals (Warning: very slow) &nbsp;</label>
+                                                </div>
+                                                <span class="input-group-text fas fa-question-circle help-icon"
+                                                      title="Calculates confidence intervals via bootstrapping with 1000 repetitions. This can significantly impact performance, typically increases runtime by a factor of 5.">
                                                 </span>
                                             </div>
                                         </div>
@@ -584,7 +593,7 @@
 
 
     <script type="text/javascript">
-        var southWest = L.latLng(-90, -360), northEast = L.latLng(90, 360), bounds = L.latLngBounds(southWest, northEast);
+        var southWest = L.latLng(-10, -36), northEast = L.latLng(10, 36), bounds = L.latLngBounds(southWest, northEast);
         var map = L.map('spatialFilterMap', { maxBounds: bounds });
         var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
@@ -616,6 +625,8 @@
             $('#id_max_lat').val(coordinates[0][2].lat);
             $('#id_max_lon').val(coordinates[0][2].lng);
 
+            start_ajax_to_set_version_dependent_settings()
+
             $('#mapDialog').modal('hide');
         }
 
@@ -624,6 +635,7 @@
             $('#id_min_lon').val('');
             $('#id_max_lat').val('');
             $('#id_max_lon').val('');
+            start_ajax_to_set_version_dependent_settings()
         }
 
         function drawBoxFromCoordinates() {
@@ -727,7 +739,7 @@
                         $('#id_target_hidden_input_version').val('');
                     };
                     if(disableAjaxValidationPeriod == "False") {
-                        start_ajax_to_set_validation_period();
+                        start_ajax_to_set_version_dependent_settings();
                     }
                 }
             });
@@ -754,6 +766,10 @@
                 success: function (return_data) {
                   var intervals_from = return_data['intervals_from'];
                   var intervals_to = return_data['intervals_to'];
+                  let min_lon = return_data['min_lon'];
+                  let max_lon = return_data['max_lon'];
+                  let min_lat = return_data['min_lat'];
+                  let max_lat = return_data['max_lat'];
                   // calling functions given in the functions list
                   ind = 0
                   for (func in funcs_set){
@@ -761,12 +777,12 @@
                     param_list = get_list_of_params(arguments[0], args_names[ind]);
                     funcs_set[func](param_list);
                     ind++;
-                  };
+                  }
                 }
             });
-          };
+          }
 
-         function get_list_of_params(args, args_names){
+        function get_list_of_params(args, args_names){
             /**
              * Returns a list of values assinged to arguments which names are give in args_names;
              * @param  {object} args list of arguments returned by ajax function: arguments[0]
@@ -776,11 +792,11 @@
             for (arg_name in args_names){
               var name = args_names[arg_name];
               param_list.push(args[name]);
-            };
+            }
             return param_list
-          };
+          }
 
-          function find_current_ids(){
+        function find_current_ids(){
             // Finds all selects which have 'version' in name attribute
             var versions_list = $('select[name*=version]');
             var ids_list = [];
@@ -788,12 +804,12 @@
               var version_id = parseInt(versions_list[ind].value);
               if (!isNaN(version_id)){
                 ids_list.push(version_id)
-              };
-            };
+              }
+            }
             return ids_list;
-          };
+          }
 //=========================== Time range related functions =====================================================
-          function convert_date_to_string(date){
+        function convert_date_to_string(date){
             // Converts date from Date() constructor to date format YYYY-MM-DD
             var year = date.getFullYear();
             var month = date.getMonth()+1;
@@ -803,7 +819,7 @@
             return year + '-' + month + '-' + day;
           };
 
-          function compare_and_set_time_ranges(params){
+        function compare_and_set_time_ranges(params){
             /**
              * Compares given time ranges and sets the appropriate ones
                 into From and To fields in Validation Period section
@@ -834,10 +850,82 @@
             $('#id_interval_to').val(min_date_to_str);
           }
 
-          function start_ajax_to_set_validation_period(){
+          function start_ajax_to_set_version_dependent_settings(){
               var versionIds = find_current_ids();
               ajax_take_versions_info(versionIds, [compare_and_set_time_ranges], [['intervals_from', 'intervals_to']]);
+              ajax_take_versions_info(versionIds, [compare_and_set_map_boundaries], [['min_lon', 'max_lon', 'min_lat', 'max_lat']]);
+
           }
+
+//================================================================================
+
+        function compare_and_set_map_boundaries(params){
+            // console.log(params)
+            min_map_lon = -180
+            max_map_lon = 180
+            min_map_lat = -90
+            max_map_lat = 90
+
+            if (params[0] != null){
+                min_map_lon = params[0]
+            }
+            if(params[1] != null){
+                max_map_lon = params[1]
+            }
+            if(params[2] != null){
+                min_map_lat = params[2]
+            }
+            if(params[3] != null){
+                max_map_lat = params[3]
+            }
+            bounds = L.latLngBounds(L.latLng(min_map_lat, min_map_lon), L.latLng(max_map_lat, max_map_lon))
+            map.setMaxBounds(bounds);
+            check_spatial_subsetting()
+        }
+
+        function check_spatial_subsetting(){
+            let min_lon_selector =  $('#id_min_lon')
+            let max_lon_selector =  $('#id_max_lon')
+            let min_lat_selector =  $('#id_min_lat')
+            let max_lat_selector =  $('#id_max_lat')
+
+            let max_map_lon = map.options.maxBounds._northEast.lng
+            let min_map_lon = map.options.maxBounds._southWest.lng
+            let min_map_lat = map.options.maxBounds._southWest.lat
+            let max_map_lat = map.options.maxBounds._northEast.lat
+
+            if (min_map_lon > min_lon_selector.val() || max_map_lon < max_lon_selector.val() || min_map_lat > min_lat_selector.val() || max_map_lat < max_lat_selector.val()){
+                if (min_map_lon > min_lon_selector.val() || min_lon_selector.val() == ''){
+                    min_lon_selector.val(min_map_lon)
+                }
+                if (max_map_lon < max_lon_selector.val() || max_lon_selector.val() == ''){
+                    max_lon_selector.val(max_map_lon)
+                }
+                if (min_map_lat > min_lat_selector.val() || min_lat_selector.val() == ''){
+                    min_lat_selector.val(min_map_lat)
+                }
+                if (max_map_lat < max_lat_selector.val() || max_lat_selector.val() == ''){
+                    max_lat_selector.val(max_map_lat)
+                }
+
+                let message = 'The chosen spatial subsetting is bigger than the one covered by chosen datasets. Bounds corrected to fit available subsetting'
+                alert(message)
+            }
+        }
+
+        $('#id_min_lon').on('change', function(event){
+            check_spatial_subsetting()
+        })
+        $('#id_max_lon').on('change', function(event){
+            check_spatial_subsetting()
+        })
+        $('#id_min_lat').on('change', function(event){
+            check_spatial_subsetting()
+        })
+        $('#id_max_lat').on('change', function(event){
+            check_spatial_subsetting()
+        })
+
 //================================================================================
       
         function change_tab_name() {
@@ -856,7 +944,7 @@
                  disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},
                 ajax_change_dataset
             ).change(change_tab_name).change(); // last change() to call change on pageload
-            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_validation_period)
+            $("#{{ dc_form.version.auto_id }}").change(start_ajax_to_set_version_dependent_settings)
         {% endfor %}
 
         function get_version_id(){
@@ -880,7 +968,7 @@
              disableAjaxValidationPeriod: "{{ val_form.disable_ajax_validation_period }}"},
             ajax_change_dataset
         ).change(); // last change() to call change on pageload
-        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_validation_period)
+        $('#id_ref-version').change(get_version_id).change(start_ajax_to_set_version_dependent_settings)
 
     </script>
 
@@ -999,7 +1087,7 @@
             setTcLock();
         });
 
-        function setTcLock(checked = false) {
+        function setTcLock(checked = false, checked_bootstrap = false) {
             var formsetPrefix = 'datasets';
             var totalSelector = '#id_' + formsetPrefix + '-TOTAL_FORMS';
             var totalNoForms = $(totalSelector).val();
@@ -1007,11 +1095,32 @@
             if ( n_datasets >= 3) {
                 $('#tcol').prop('checked', checked);
                 $('#tcol').prop('disabled', false);
+                // If the box is already checked (happens when loading an
+                // existing validation), then directly unlock the bootstrapping
+                // button and set it to the right value.
+                // Otherwise the bootstrap button will be unlocked/locked
+                // whenever the tcol checkbox changes
+                if (checked) {
+                    $('#bootstrap_tcol_cis').prop('checked', checked_bootstrap)
+                    $('#bootstrap_tcol_cis').prop('disabled', false);
+                }
             } else {
                 $('#tcol').prop('checked', false);
                 $('#tcol').prop('disabled', true);
+                $('#bootstrap_tcol_cis').prop('checked', false);
+                $('#bootstrap_tcol_cis').prop('disabled', true);
             }
         }
+
+        // upon changes to the tcol checkbox enable/disable the bootstrapping
+        // checkbox accordingly
+        $('#tcol').change(function() {
+            if ($('#tcol:checked').val() == 'on') {
+                $('#bootstrap_tcol_cis').prop('disabled', false);
+            } else {
+                $('#bootstrap_tcol_cis').prop('disabled', true);
+            }
+        });
     </script>
 
     <script type="text/javascript">
@@ -1120,12 +1229,12 @@
                     prev_container.toggleClass('active show')
                 }
             }
-        setTcLock();
+            setTcLock();
         }
 
         $('#remove_dc_form').click(function() {
             removeTab('.dc_form', '.dc_form_link', 'datasets',  $('#add_dc_form'), $(this));
-            start_ajax_to_set_validation_period();
+            start_ajax_to_set_version_dependent_settings();
         });
 
         function set_after(first_element_selector, second_element_selector){
@@ -1219,9 +1328,12 @@
       if($('#id_datasets-TOTAL_FORMS') >= $('#id_datasets-MIN_NUM_FORMS')){
         set_after('.dc_form_link.nav-item.nav-link.active', '#remove_dc_form')
       }
-      // and here the same just for tcol, but make sure to remember the
-      // original state
-      setTcLock({{ val_form.initial_tcol|yesno:"true,false" }});
+        // and here the same just for tcol, but make sure to remember the
+        // original state
+        setTcLock(
+            checked = {{ val_form.initial_tcol|yesno:"true,false" }},
+            checked_bootstrap = {{ val_form.initial_bootstrap_tcol_cis|yesno:"true,false" }}
+        );
 
 
       if ('{{if_run_exists}}' == 'True' && '{{is_published}}' == 'True'){

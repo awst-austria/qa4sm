@@ -92,6 +92,7 @@ class TestViews(TransactionTestCase):
             'error_points': 5,
             'anomalies': 'climatology',
             'tcol': True,
+            'bootstrap_tcol_cis': True,
             'anomalies_from': datetime(1990, 1, 1, 0, 0, tzinfo=UTC),
             'anomalies_to': datetime(2010, 12, 31, 23, 59, 59, tzinfo=UTC),
         }
@@ -493,10 +494,11 @@ class TestViews(TransactionTestCase):
              'initial_filters': '1,2',
              'initial_paramfilters': '18,24',
              'initial_paramfilter_params': ismn_networks + ";" + ismn_depths,
-             'initial_version': '5',
+             'initial_version': '18',
              'initial_variable': '4'})
         self.assertEqual(response.status_code, 200)
         return_data = json.loads(response.content)
+        print('Monika', return_data)
         assert return_data['versions']
         assert return_data['variables']
         assert return_data['filters']
@@ -507,15 +509,17 @@ class TestViews(TransactionTestCase):
         ]
         for id in checked_filter_ids:
             assert f'id="{id}" checked' in return_data["filters"]
-        assert return_data["versions"].startswith('<option value="5">')
+        assert return_data["versions"].startswith('<option value="18">')
         assert return_data["variables"].startswith('<option value="4">')
 
         # check parametrised filters
         root = document_fromstring(return_data["paramfilters"])
         for i, (id, val) in enumerate(
                 zip(["18", "24"], [ismn_networks, ismn_depths])):
-            assert val == root[0][i][5].value
-            assert id == root[0][i][2].value
+            # iterate html script and not java function text
+            n=2*i
+            assert val == root[0][n][5].value
+            assert id == root[0][n][2].value
 
         response = self.client.get(url, {'dataset_id': ''})
         self.assertEqual(response.status_code, 400)
@@ -625,7 +629,8 @@ class TestViews(TransactionTestCase):
         # see https://docs.djangoproject.com/en/2.2/topics/forms/formsets/#understanding-the-managementform
         validation_params = {'scaling_method': 'doesnt exist'}
         result = self.client.post(url, validation_params)
-        self.assertEqual(result.status_code, 400)
+        self.assertEqual(result.status_code, 200)
+        assert result.context['dc_formset']._non_form_errors
 
         ## with a wrong number of dataset configuration forms, we should get an error in the form
         for totalnum in [10, 0]:
@@ -873,6 +878,7 @@ class TestViews(TransactionTestCase):
         assert val_form.initial["min_lat"] == -30
         assert val_form.initial["max_lat"] == 30
         assert val_form.initial["tcol"] == val_form.initial_tcol == True
+        assert val_form.initial["bootstrap_tcol_cis"] == val_form.initial_bootstrap_tcol_cis == True
         assert val_form.initial["anomalies"] == "climatology"
         assert val_form.initial["anomalies_from"] == 1990
         assert val_form.initial["anomalies_to"] == 2010

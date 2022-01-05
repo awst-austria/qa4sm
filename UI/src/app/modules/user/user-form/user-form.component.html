@@ -92,7 +92,7 @@
       </div>
 
       <div class="p-py-3">
-        <span class="p-float-label">
+        <div class="p-float-label">
           <p-dropdown class="form-field"
                       [options]="countries$|async"
                       [style]="{'width':'15rem', 'height': '2.5rem'}"
@@ -104,9 +104,10 @@
           </p-dropdown>
           <label>Country</label>
           <span title="Optional. The country where your organisation (or you) resides."
-                class="pi pi-question-circle">
+                class="pi pi-question-circle"
+                id="countryHelp">
           </span>
-        </span>
+        </div>
       </div>
 
       <div class="p-py-3">
@@ -125,7 +126,7 @@
 
       <div *ngIf="!userData" class="p-py-3" style="max-width: 15rem; line-height: 1.2rem">
         <p-checkbox id="terms" formControlName="terms_consent"></p-checkbox>
-        <label for="terms"> I accept the <a [routerLink]="['/terms']">terms, conditions, and privacy policy</a>.</label>
+        <label for="terms"> I accept the <a [routerLink]="['/terms']">terms, conditions and privacy policy</a>.</label>
       </div>
 
       <button *ngIf="!userData"

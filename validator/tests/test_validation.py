@@ -1,29 +1,30 @@
-from datetime import datetime
+import errno
 import fnmatch
 import logging
-from os import path
-import os, errno
-from re import IGNORECASE  # @UnresolvedImport
-from re import search as regex_search
+import os
 import shutil
 import time
+from datetime import datetime
+from os import path
+from re import IGNORECASE  # @UnresolvedImport
+from re import search as regex_search
 from zipfile import ZipFile
 
+import netCDF4
+import numpy as np
+import pandas as pd
+import pytest
 from dateutil.tz import tzlocal
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 
 from validator.validation.validation import compare_validation_runs, copy_validationrun
 
 User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
-import netCDF4
-import pytest
 from pytz import UTC
 
-import numpy as np
-import pandas as pd
 from django.conf import settings
 from validator.models import DataFilter
 from validator.models import DataVariable
@@ -33,15 +34,19 @@ from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
 from validator.models import CopiedValidations
+from validator.tests.auxiliary_functions import (
+    generate_default_validation,
+    generate_default_validation_triple_coll,
+    generate_ismn_nonref_validation,
+    generate_default_validation_hires,
+)
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
 import validator.validation as val
-from validator.validation.batches import _geographic_subsetting
+from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
 from django.shortcuts import get_object_or_404
-from validator.tests.auxiliary_functions import generate_default_validation, generate_default_validation_triple_coll
-
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -127,7 +132,10 @@ class TestValidation(TestCase):
                 elif metric in pair_metrics:
                     num_vars = n_datasets - 1
                 elif metric in tcol_metrics:
-                    num_vars = n_datasets - 1
+                    # for this testcase CIs via bootstrapping are activated, so
+                    # for every metric there's the value and lower and upper CI
+                    # values.
+                    num_vars = (n_datasets - 1) * 3
                 else:
                     raise ValueError(f"Unknown metric {metric}")
 
@@ -799,11 +807,144 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        assert new_run.total_points == 9
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
         self.check_results(new_run)
         self.delete_run(new_run)
+
+    def test_c3s_validation_upscaling(self):
+        """
+        Test a validation of CCIP with ISMN as non-reference, and upscaling option active. All ISMN points are averaged
+        and the results should produce 16 points (original c3s points); results are checked with `check_results`
+        """
+        run = generate_ismn_nonref_validation()
+        run.user = self.testuser
+
+        # hawaii bounding box
+        run.min_lat = 18.625  # ll
+        run.min_lon = -156.375  # ll
+        run.max_lat = 20.375  # ur
+        run.max_lon = -154.625  # ur
+
+        # NOTE: ISMN non-reference points need to use one of the upscaling methods
+        run.upscaling_method = "average"
+
+        run.save()
+        run_id = run.id
+        # run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        assert new_run
+        assert new_run.total_points == 16
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 16
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    def validation_upscaling_for_dataset(self, ds, version, variable):
+        """
+        Generate a test with ISMN as non-reference dataset and the provided dataset, version, variable as reference.
+        Test that the results and the output file with the function `check_results`
+        """
+        run = generate_ismn_nonref_validation()
+        run.user = self.testuser
+
+        # NOTE: ISMN non-reference points need to use one of the upscaling methods
+        run.upscaling_method = "average"
+
+        # hawaii bounding box
+        run.min_lat = 18.625  # ll
+        run.min_lon = -156.375  # ll
+        run.max_lat = 20.375  # ur
+        run.max_lon = -154.625  # ur
+
+        # NOTE: ISMN non-reference points need to use one of the upscaling methods
+        run.upscaling = True
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=ds)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=version)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=variable)
+        run.save()
+        run_id = run.id
+        # run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+        assert new_run
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
+    @pytest.mark.long_running
+    def test_all_datasets_validation_upscaling(self):
+        """
+        Test a validation for each sat. dataset with ISMN as non-reference, and upscaling option active. Test description
+        in the function `validation_upscaling_for_dataset`
+        """
+        all_datasets = [
+            (globals.CCI, globals.ESA_CCI_SM_P_V05_2, globals.ESA_CCI_SM_P_sm),
+            (globals.SMAP, globals.SMAP_V5_PM, globals.SMAP_soil_moisture),
+            (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
+            (globals.ERA5, globals.ERA5_20190613, globals.ERA5_sm),
+            (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1, globals.GLDAS_SoilMoi0_10cm_inst)
+        ]
+
+        for ds, version, variable in all_datasets:
+            self.validation_upscaling_for_dataset(ds, version, variable)
+
+    def test_validation_upscaling_lut(self):
+        """
+        Test the function `create_upscaling_lut` in validation/batched.py by checking that the lookup table
+        hase the expected dataset key and values to average. It also checks that when filters are applied to the
+        non-reference dataset, the collected points change; in this case, with filters "COSMOS" and depth 0.0-0.1,
+        no station in the ISMN is found
+        """
+        run = generate_ismn_nonref_validation()
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name="C3S_V202012")
+        c3s_reader = val.create_reader(dataset, version)
+        dataset = Dataset.objects.get(short_name='ISMN')
+        version = DatasetVersion.objects.get(short_name="ISMN_V20180712_MINI")
+        variable = DataVariable.objects.get(short_name="ISMN_soil_moisture")
+        ismn_reader = val.create_reader(dataset, version)
+        datasets = {
+            "0-C3S": {"class": c3s_reader},
+            "1-ISMN": {"class": ismn_reader},
+        }
+
+        lut = create_upscaling_lut(
+            validation_run=run,
+            datasets=datasets,
+            ref_name="0-C3S"
+        )
+        assert list(lut.keys()) == ["1-ISMN"]
+        # the exact gpi number might change, so we only check that ismn points are averaged under three c3s pixels
+        assert len(lut["1-ISMN"].values()) == 4
+
+        data_filters = [
+            DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
+            DataFilter.objects.get(name="FIL_ISMN_GOOD"),
+        ]
+
+        param_filters = [
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters="COSMOS"),
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
+        ]
+        msk_reader, read_name, read_kwargs  = val.setup_filtering(
+            ismn_reader,
+            data_filters,
+            param_filters,
+            dataset,
+            variable
+        )
+        datasets = {
+            "0-C3S": {"class": c3s_reader},
+            "1-ISMN": {"class": msk_reader},
+        }
+        lut = create_upscaling_lut(
+            validation_run=run,
+            datasets=datasets,
+            ref_name="0-C3S"
+        )
+        assert list(lut.keys()) == ["1-ISMN"]
+        assert lut["1-ISMN"] == []
 
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):
@@ -865,11 +1006,14 @@ class TestValidation(TestCase):
 
                 reader = val.create_reader(dataset, version)
 
+                if dataset.short_name == val.globals.ASCAT:
+                    reader = val.BasicAdapter(reader)
+
                 assert reader is not None
                 if dataset.short_name == val.globals.ISMN:
-                    data = reader.read_ts(0)
+                    data = reader.read(0)
                 else:
-                    data = reader.read_ts(-155.42, 19.78)  ## hawaii
+                    data = reader.read(-155.42, 19.78)  ## hawaii
                 assert data is not None
                 assert isinstance(data, pd.DataFrame)
 
@@ -882,9 +1026,10 @@ class TestValidation(TestCase):
         variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
         reader = val.create_reader(dataset, version)
 
-        no_msk_reader = val.setup_filtering(reader, None, None, dataset, variable)
+        no_msk_reader, read_name, read_kwargs = \
+            val.setup_filtering(reader, None, None, dataset, variable)
         assert no_msk_reader is not None
-        data = no_msk_reader.read_ts(0)
+        data = getattr(no_msk_reader, read_name)(0, **read_kwargs)
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
@@ -895,13 +1040,17 @@ class TestValidation(TestCase):
             DataFilter.objects.get(name="FIL_ISMN_GOOD"),
         ]
         param_filters = [
-            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters="  COSMOS , SCAN "),
-            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"),
+                               parameters="  COSMOS , SCAN "),
+            ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"),
+                               parameters="0.0,0.1")
         ]
-        msk_reader = val.setup_filtering(reader, data_filters, param_filters, dataset, variable)
+        msk_reader, read_name, read_kwargs  = \
+            val.setup_filtering(reader, data_filters, param_filters, dataset,
+                                variable)
 
         assert msk_reader is not None
-        data = msk_reader.read_ts(0)
+        data = getattr(no_msk_reader, read_name)(0, **read_kwargs)
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
@@ -933,10 +1082,14 @@ class TestValidation(TestCase):
                                      dataset_config=run.reference_configuration)
         pfilter.save()
 
-        ref_reader = val.validation._get_reference_reader(run)
+        ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
 
         with pytest.raises(ValueError, match=r".*than.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
         ParametrisedFilter.objects.all().delete()
 
@@ -946,7 +1099,11 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
         ParametrisedFilter.objects.all().delete()
 
@@ -955,7 +1112,11 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
         ParametrisedFilter.objects.all().delete()
 
@@ -964,7 +1125,11 @@ class TestValidation(TestCase):
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
-            val.create_jobs(run, ref_reader)
+            val.create_jobs(
+                run,
+                ref_reader,
+                run.reference_configuration
+            )
 
     # test all combinations of datasets, versions, variables, and filters
     @pytest.mark.long_running
@@ -982,20 +1147,26 @@ class TestValidation(TestCase):
                 for variable in va:
                     for data_filter in fils:
                         self.__logger.debug(
-                            "Testing {} version {} variable {} filter {}".format(dataset, version, variable,
-                                                                                 data_filter.name))
+                            "Testing {} version {} variable {} filter {}"
+                                .format(dataset, version, variable, data_filter.name))
                         if data_filter.parameterised:
-                            pfilter = ParametrisedFilter(filter=data_filter, parameters=data_filter.default_parameter)
-                            msk_reader = val.setup_filtering(reader, [], [pfilter], dataset, variable)
+                            pfilter = ParametrisedFilter(
+                                filter=data_filter, parameters=data_filter.default_parameter)
+
+                            msk_reader, read_name, read_kwargs = \
+                                val.setup_filtering(reader, [], [pfilter], dataset, variable)
+
                         else:
-                            msk_reader = val.setup_filtering(reader, [data_filter], [], dataset, variable)
+                            msk_reader, read_name, read_kwargs = \
+                                val.setup_filtering(reader, [data_filter], [], dataset, variable)
 
                         assert msk_reader is not None
                         if dataset.short_name == val.globals.ISMN:
-                            data = msk_reader.read_ts(0)
+                            data = getattr(msk_reader, read_name)(0, **read_kwargs)
                         else:
-                            data = msk_reader.read_ts(-155.42, 19.78)  ## hawaii
+                            data = getattr(msk_reader, read_name)(-155.42, 19.78, **read_kwargs)  ## hawaii
                         assert data is not None
+                        assert variable.pretty_name in data.columns
                         assert isinstance(data, pd.DataFrame)
                         assert len(data.index) > 1
                         assert not data[variable.pretty_name].empty
@@ -1045,9 +1216,13 @@ class TestValidation(TestCase):
                 run.reference_configuration = ref_c
                 run.save()
 
-                ref_reader = val.validation._get_reference_reader(run)
+                ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
 
-                total_points, jobs = val.create_jobs(run, ref_reader)
+                total_points, jobs = val.create_jobs(
+                    run,
+                    ref_reader,
+                    run.reference_configuration
+                )
                 print(version)
                 print(len(jobs))
                 print(total_points)
@@ -1064,8 +1239,14 @@ class TestValidation(TestCase):
         max_lon = -154.625  # ur
 
         # we need the reader just to get the grid
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name='C3S_V201812')
+        c3s_reader = val.create_reader(dataset, version)
+        # apply Basic Adapter only
+        c3s_reader, _, _ = val.setup_filtering(
+            c3s_reader, filters=None, param_filters=None, dataset=dataset,
+            variable=DataVariable.objects.get(short_name='C3S_sm'))
+
         gpis, lons, lats, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublons, sublats, subindex = _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat,
@@ -1082,8 +1263,14 @@ class TestValidation(TestCase):
 
     def test_no_geographic_subsetting(self):
         # we need the reader just to get the grid
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name='C3S_V201812')
+        c3s_reader = val.create_reader(dataset, version)
+        # apply Basic Adapter only
+        c3s_reader, _, _ = val.setup_filtering(
+            c3s_reader, filters=None, param_filters=None, dataset=dataset,
+            variable=DataVariable.objects.get(short_name='C3S_sm'))
+
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
         subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, None, None, None, None)
@@ -1101,8 +1288,15 @@ class TestValidation(TestCase):
         russia_gpi2 = 898567
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
-            c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                           DatasetVersion.objects.get(short_name='C3S_V201812'))
+            dataset = Dataset.objects.get(short_name='C3S')
+            version = DatasetVersion.objects.get(short_name='C3S_V201812')
+
+            c3s_reader = val.create_reader(dataset, version)
+            # apply Basic Adapter only
+            c3s_reader, _, _ = val.setup_filtering(
+                c3s_reader, filters=None, param_filters=None, dataset=dataset,
+                variable=DataVariable.objects.get(short_name='C3S_sm'))
+
             gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
             subgpis, sublats, sublons, subindex = _geographic_subsetting(gpis, lats, lons, min_lat, min_lon, max_lat,
@@ -1116,8 +1310,15 @@ class TestValidation(TestCase):
 
     def test_geographic_subsetting_shifted(self):
         ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
-        c3s_reader = val.create_reader(Dataset.objects.get(short_name='C3S'),
-                                       DatasetVersion.objects.get(short_name='C3S_V201812'))
+        dataset = Dataset.objects.get(short_name='C3S')
+        version = DatasetVersion.objects.get(short_name='C3S_V201812')
+
+        c3s_reader = val.create_reader(dataset, version)
+        # apply Basic Adapter only
+        c3s_reader, _, _ = val.setup_filtering(
+            c3s_reader, filters=None, param_filters=None, dataset=dataset,
+            variable=DataVariable.objects.get(short_name='C3S_sm'))
+
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
         test_coords = [(-46.55, -1214.64, 71.96, -1105.66, 1),  # americas

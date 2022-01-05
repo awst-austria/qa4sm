@@ -9,6 +9,7 @@ import {FilterModel} from './filter-model';
 export class BasicFilterComponent implements OnInit {
 
   @Input() filterModel: FilterModel;
+  @Input() isIncluded: boolean;
   @Output() onIncludeMutual = new EventEmitter<string>();
   @Output() onMutuallyIncluded = new EventEmitter<string>();
   @Output() onExcludeMutual = new EventEmitter<number>();

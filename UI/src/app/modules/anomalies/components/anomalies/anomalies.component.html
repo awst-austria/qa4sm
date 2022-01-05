@@ -1,4 +1,4 @@
-<p-panel header="Anomalies" [toggleable]="true">
+<p-panel header="Anomalies" [toggleable]="true" class="validation-row">
   <ng-template pTemplate="icons">
     <label class="p-panel-header-icon"
            pTooltip="Optionally calculates metrics from anomalies instead of absolute values. First, a climatology is computed using the chosen method and time period (only whole years are used), then the anomalies are calculated based on this. &quot;35 day moving average&quot; means that the climatology is calculated as a moving average of the data; &quot;climatology&quot; means that the average for each day of the year is calculated."
@@ -6,19 +6,27 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid">
-    <div class="p-col-12">
-      <div class="p-float-label p-m-2">
-        <p-dropdown id="anomaliesMethodSelector"
-                    [options]="availableAnomalyMethodModels"
-                    [ngModel]="selectedMethod$|async"
-                    (ngModelChange)="selectedMethod$.next($event)"
-                    optionLabel="description"></p-dropdown>
-        <label for="anomaliesMethodSelector">Method</label>
+  <div class="p-grid p-pt-4" style="justify-content: center">
+    <div class="p-col-12 p-sm-4">
+      <div class="p-grid" id="method">
+        <div class="small-label p-col-4">
+          <div class="p-fluid">
+            <div>Method</div>
+          </div>
+        </div>
+        <div class="p-col-7 p-px-0">
+          <div class="p-float-label">
+            <p-dropdown id="anomaliesMethodSelector"
+                        [options]="availableAnomalyMethodModels"
+                        [ngModel]="selectedMethod$|async"
+                        (ngModelChange)="selectedMethod$.next($event)"
+                        optionLabel="description"></p-dropdown>
+            <label for="anomaliesMethodSelector">Select</label>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="p-col-12 p-sm-6">
+    <div class="p-col-12 p-sm-8">
       <qa-anom-climatology *ngIf="((selectedMethod$|async).method$|async)==anomaliesClimatology"
                            [anomaliesModel]="anomaliesModel"></qa-anom-climatology>
     </div>

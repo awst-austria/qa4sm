@@ -240,13 +240,13 @@
         }
     },
     {
-        "model": "validator.datasetversion", 
-        "pk": 30, 
+        "model": "validator.datasetversion",
+        "pk": 30,
         "fields": {
-            "short_name": "ISMN_V20210131", 
-            "pretty_name": "20210131 global", 
-            "help_text": "ISMN from 2021-01-31", 
-            "time_range_start": "", 
+            "short_name": "ISMN_V20210131",
+            "pretty_name": "20210131 global",
+            "help_text": "ISMN from 2021-01-31",
+            "time_range_start": "",
             "time_range_end": "",
             "geographical_range": null
         }
@@ -297,6 +297,43 @@
             "time_range_start": "1978-11-01",
             "time_range_end": "2020-12-31",
             "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 35,
+        "fields": {
+            "short_name": "CGLS_CSAR_SSM1km_V1_1",
+            "pretty_name": "V1.1",
+            "help_text": "CGLS Sentinel1 SSM 1km (TIF) product",
+            "time_range_start": "2014-10-03",
+            "time_range_end": "2020-08-31",
+            "geographical_range":            {
+                "min_lat": 35.004464285714285,
+                "max_lat": 71.99553571427731,
+                "min_lon": -10.995535714285714,
+                "max_lon": 49.99553571428398
+            }
+
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 36,
+        "fields": {
+            "short_name": "CGLS_SCATSAR_SWI1km_V1_0",
+            "pretty_name": "V1.0",
+            "help_text": "CGLS S1/ASCAT SWI 1km (TIF) product",
+            "time_range_start": "2015-01-01",
+            "time_range_end": "2020-07-31",
+            "geographical_range":            {
+                "min_lat": 35.004464285714285,
+                "max_lat": 71.99553571427731,
+                "min_lon": -10.995535714285714,
+                "max_lon": 49.99553571428398
+            }
+
+
         }
     }
 ]

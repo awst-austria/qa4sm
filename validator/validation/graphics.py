@@ -1,4 +1,8 @@
+import warnings
+
 import matplotlib.pyplot as plt
+import pandas as pd
+
 plt.switch_backend('agg') ## this allows headless graph production
 
 import logging
@@ -38,19 +42,17 @@ def generate_all_graphs(validation_run, outfolder):
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
 
-    fnb, fnm = plot_all(validation_run.output_file.path,
+    fnb, fnm, fcsv = plot_all(validation_run.output_file.path,
         out_dir=outfolder, out_type='png')
-    fnb_svg, fnm_svg = plot_all(validation_run.output_file.path,
+    fnb_svg, fnm_svg, fcsv = plot_all(validation_run.output_file.path,
         out_dir=outfolder, out_type='svg')
 
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         for pngfile in fnb + fnm:
-            print(pngfile)
             arcname = path.basename(pngfile)
             myzip.write(pngfile, arcname=arcname)
         for svgfile in fnb_svg + fnm_svg:
-            print(svgfile)
             arcname = path.basename(svgfile)
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
@@ -171,10 +173,36 @@ def get_inspection_table(validation_run):
         Quick inspection table of the results.
     """
     outfile = validation_run.output_file
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
     # the first condition checks whether the outfile field has been properly
     # set, the second then whether the file really exists
     if bool(outfile) and path.exists(outfile.path):
-        return get_img_stats(outfile.path).drop(columns="Group")
+        file_size = os.path.getsize(outfile.path)
+
+        stats_file = None
+        for root, dirs, files in os.walk(run_dir):
+            for f in files:
+                if not f.endswith('.csv'): continue
+                else:
+                    stats_file = os.path.join(run_dir, f)
+                    break
+
+        # Check that .csv file was created
+        if stats_file is not None:
+            stats = pd.read_csv(stats_file, index_col="Metric", dtype=str)
+        # Check that file size is less than 100 MB
+        elif file_size > 100*2**20:
+            warnings.warn(
+                f"File size of {file_size} bytes is too large to be read"
+            )
+            # Return string to distinguish with 'None' in first conditional statement
+            return "No output"
+        else:
+            stats = get_img_stats(outfile.path)
+
+        stats = stats.drop(columns="Group", errors="ignore")
+        return stats
+
     else:
         # This happens when the output file has not been generated yet, because
         # the validation is still running. In this case the table won't be

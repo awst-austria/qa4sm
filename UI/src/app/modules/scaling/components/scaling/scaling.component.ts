@@ -57,7 +57,7 @@ export class ScalingComponent implements OnInit {
 
   isScalingSelectorDisabled(): boolean {
     if (this.validationModel.datasetConfigurations.length > 1) {
-      this.selectedScalingModel.getValue().scaleTo$.next(SCALING_REFERENCE_DEFAULT);
+      this.selectedScaleToModel$.next(SCALING_REFERENCE_DEFAULT);
       return true;
     } else {
       return false;

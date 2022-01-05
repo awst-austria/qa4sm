@@ -1,27 +1,27 @@
-<div>
-  <div class="p-grid">
-    <div style="max-width: 6rem" class="p-col-2 p-mt-2">
-      <span id="sorting_form"> Sort By: </span>
+<div class="p-grid" id="sortingForm">
+  <div class="p-col-12 p-sm-2 p-px-0 p-mx-0">
+    <div class="small-label">
+      <span> Sort By:</span>
     </div>
-    <div class="p-col">
-      <div class="box">
-        <p-dropdown id="sortingChoiceSelector" (onChange)="onSortingChange()"
-                    [options]="sortingChoicesModels"
-                    [(ngModel)]="selectedChoicesModel"
-                    optionLabel="displayName"
-                    [style]="{'width': '100%'}">
-        </p-dropdown>
-      </div>
-    </div>
-    <div class="p-col">
-      <div class="box">
-        <p-dropdown id="orderSelector" (onChange)="onSortingChange()"
-                    [options]="orderChoicesModels"
-                    [(ngModel)]="selectedOrderModel"
-                    optionLabel="direction"
-                    [style]="{'width': '100%'}">
-        </p-dropdown>
-      </div>
+  </div>
+  <div class="p-col-12 p-sm-5 p-px-0 p-mx-0">
+    <!--      <div class="box">-->
+    <p-dropdown id="sortingChoiceSelector" (onChange)="onSortingChange()"
+                [options]="sortingChoicesModels"
+                [(ngModel)]="selectedChoicesModel"
+                optionLabel="displayName"
+                [style]="{'width': '100%'}">
+    </p-dropdown>
+    <!--      </div>-->
+  </div>
+  <div class="p-col-12 p-sm-5 p-px-0 p-mx-0">
+    <div class="box">
+      <p-dropdown id="orderSelector" (onChange)="onSortingChange()"
+                  [options]="orderChoicesModels"
+                  [(ngModel)]="selectedOrderModel"
+                  optionLabel="direction"
+                  [style]="{'width': '100%'}">
+      </p-dropdown>
     </div>
   </div>
 </div>

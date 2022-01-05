@@ -13,6 +13,7 @@ import {FormBuilder, Validators} from '@angular/forms';
 export class PublishingComponent implements OnInit {
   formErrors: any;
   display$: Observable<'open' | 'close'>;
+  publishingInProgress$: Observable<boolean>;
   @Input() validationId: string;
 
   publishingForm = this.formBuilder.group({
@@ -33,22 +34,28 @@ export class PublishingComponent implements OnInit {
   ngOnInit(): void {
     this.display$ = this.modalService.watch();
     this.getPublishingForm();
+    this.publishingInProgress$ = this.validationrunService.checkPublishingInProgress();
   }
+
   close(): void{
     this.modalService.close();
   }
   publish(): void{
+    this.validationrunService.changePublishingStatus(true);
+    this.formErrors = [];
+
     this.validationrunService.publishResults(this.validationId, this.publishingForm.value).subscribe(
       () => {
+        this.validationrunService.changePublishingStatus(false);
         this.close();
         window.location.reload();
       },
       error => {
-        // refreshing the window so that error messages shows up
-        this.modalService.open();
         this.formErrors = error.error;
+        this.validationrunService.changePublishingStatus(false);
       });
   }
+
   getPublishingForm(): void{
     const params = new HttpParams().set('id', this.validationId);
     this.validationrunService.getPublishingFormData(params).subscribe(data => {
