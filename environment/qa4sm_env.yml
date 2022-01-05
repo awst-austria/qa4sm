@@ -8,12 +8,7 @@ dependencies:
   - alsa-lib=1.2.3
   - asgiref=3.4.1
   - attrs=21.2.0
-  - bokeh=2.4.2
-  - brotli=1.0.9
-  - brotli-bin=1.0.9
-  - backports=1.0
-  - backports.functools_lru_cache=1.6.4
-  - blas=1.0
+  - bokeh=2.4.1
   - bzip2=1.0.8
   - c-ares=1.18.1
   - ca-certificates=2021.10.8
@@ -109,9 +104,7 @@ dependencies:
   - ncurses=6.2
   - nspr=4.32
   - nss=3.72
-  - numpy-base=1.20.3
   - olefile=0.46
-  - openblas=0.3.18
   - openjpeg=2.4.0
   - openssl=1.1.1l
   - packaging=21.0
@@ -158,7 +151,6 @@ dependencies:
   - tornado=6.1
   - typing_extensions=3.10.0.2
   - wheel=0.37.0
-  - xarray=0.19.0
   - xorg-fixesproto=5.0
   - xorg-inputproto=2.3.2
   - xorg-kbproto=1.0.7
@@ -185,9 +177,7 @@ dependencies:
     - cadati==0.0.2
     - cdsapi==0.5.1
     - celery==5.2.0
-    - cffi==1.14.6
     - cftime==1.5.1.1
-    - chardet==4.0.0
     - charset-normalizer==2.0.7
     - click-didyoumean==0.3.0
     - click-plugins==1.1.1
@@ -197,7 +187,6 @@ dependencies:
     - coreapi==2.3.3
     - coreschema==0.0.4
     - coverage==6.1.2
-    - cryptography==35.0.0
     - datedown==0.3
     - deprecated==1.2.13
     - django-countries==7.2.1
@@ -216,11 +205,9 @@ dependencies:
     - inflection==0.5.1
     - ismn==1.1.0
     - itypes==1.2.0
-    - jinja2==3.0.1
     - kombu==5.2.1
     - llvmlite==0.36.0
     - lxml==4.6.4
-    - markupsafe==2.0.1
     - netcdf4==1.5.8
     - numba==0.53.1
     - numcodecs==0.9.1
@@ -229,17 +216,16 @@ dependencies:
     - parse==1.19.0
     - prompt-toolkit==3.0.22
     - psycopg2-binary==2.9.2
-    - pycparser==2.20
     - pyct==0.4.8
     - pygeobase==0.4.0
     - pygeogrids==0.4.1
     - pynetcf==0.2.2
-    - pytesmo==0.12.0
+    - pytesmo==0.13.2
     - pytest-cov==3.0.0
     - pytest-django==4.4.0
     - pytest-mpl==0.13
     - qa4sm-preprocessing==0.1.1
-    - qa4sm-reader==0.6.3
+    - qa4sm-reader==0.6.1
     - redis==4.0.0
     - repurpose==0.8
     - requests==2.26.0
@@ -256,7 +242,6 @@ dependencies:
     - urllib3==1.26.7
     - vine==5.0.0
     - wcwidth==0.2.5
-    - django_rest_passwordreset==1.2.1
     - wrapt==1.13.3
     - xarray==0.18.2
     - zarr==2.10.2
