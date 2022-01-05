@@ -108,8 +108,10 @@
                 [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
                 [filterModel$]="validationModel.referenceConfigurations[0].ismnNetworkFilter$"></qa-ismn-network-filter>
             </div>
-            <qa-ismn-depth-filter
-              *ngIf="validationModel.referenceConfigurations[0].ismnDepthFilter$"></qa-ismn-depth-filter>
+            <div *ngIf="validationModel.referenceConfigurations[0].ismnDepthFilter$|async">
+              <qa-ismn-depth-filter></qa-ismn-depth-filter>
+            </div>
+
           </div>
 
         </p-panel>
@@ -164,8 +166,9 @@
                  pInputText
                  [ngModel]="validationModel.nameTag$|async"
                  (ngModelChange)="validationModel.nameTag$.next($event)">
-          <span title="You can optionally name the validation to make it easier to identify in your list of validations."
-                class="pi pi-question-circle p-col-1 help-field">
+          <span
+            title="You can optionally name the validation to make it easier to identify in your list of validations."
+            class="pi pi-question-circle p-col-1 help-field">
           </span>
         </div>
       </div>
@@ -173,7 +176,8 @@
       <div class="p-col-10">
         <div>
           <div class="p-d-flex p-jc-center">
-            <p-button id="validateButton" label="Validate" icon="pi pi-play" (onClick)="startValidation(true)"></p-button>
+            <p-button id="validateButton" label="Validate" icon="pi pi-play"
+                      (onClick)="startValidation(true)"></p-button>
           </div>
         </div>
       </div>

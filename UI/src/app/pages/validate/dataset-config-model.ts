@@ -28,9 +28,6 @@ export class DatasetConfigModel {
     const parameterisedFilters: ParametrisedFilterConfig[] = [];
     if (this.ismnNetworkFilter$.value != null) {
       parameterisedFilters.push({id: ISMN_NETWORK_FILTER_ID, parameters: this.ismnNetworkFilter$.value.parameters});
-      console.log(this.datasetModel.selectedDataset.pretty_name + ': ISMN filter is present ');
-    } else {
-      console.log(this.datasetModel.selectedDataset.pretty_name + ': ISMN filter is null ');
     }
 
     const newValDatasetConfigDto: ValidationRunDatasetConfigDto = {

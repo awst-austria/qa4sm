@@ -1,8 +1,6 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
-import {
-  DatasetComponentSelectionModel
-} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
+import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
 import {DatasetConfigModel, ISMN_DEPTH_FILTER_ID, ISMN_NETWORK_FILTER_ID} from './dataset-config-model';
@@ -10,9 +8,7 @@ import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
-import {
-  ValidationPeriodModel
-} from '../../modules/validation-period/components/validation-period/validation-period-model';
+import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ANOMALIES_NONE, ANOMALIES_NONE_DESC, AnomaliesComponent} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
@@ -112,7 +108,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     // Prepare dataset config
     config.dataset_configs.forEach(datasetConfig => {
-      const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, new BehaviorSubject(null), null);
+      const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
+        null, new BehaviorSubject(null), new BehaviorSubject(null));
       this.validationModel.datasetConfigurations.push(model);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
         model.datasetModel.selectedDataset = dataset;
@@ -140,7 +137,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // Prepare reference
     const referenceModel = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null), null,
-      new BehaviorSubject<FilterModel>(null), null);
+      new BehaviorSubject<FilterModel>(null), new BehaviorSubject<FilterModel>(null));
     this.validationModel.referenceConfigurations.push(referenceModel);
     this.datasetService.getDatasetById(config.reference_config.dataset_id).subscribe(dataset => {
       referenceModel.datasetModel.selectedDataset = dataset;
@@ -249,7 +246,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void {
-    const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null), null, new BehaviorSubject(null), null);
+    const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
+      null, new BehaviorSubject(null), new BehaviorSubject(null));
     targetArray.push(model);
     // get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
@@ -287,12 +285,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
         model.basicFilters = [];
         model.ismnNetworkFilter$.next(null);
+        model.ismnDepthFilter$.next(null);
         filters.forEach(filter => {
           if (filter.parameterised) {
-            if (filter.id == ISMN_NETWORK_FILTER_ID) {
+            if (filter.id === ISMN_NETWORK_FILTER_ID) {
               console.log('Adding ISMN filter at init');
               model.ismnNetworkFilter$.next(new FilterModel(filter, false, false, filter.default_parameter));
-            } else if (filter.id == ISMN_DEPTH_FILTER_ID) {
+            } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
               if (model.ismnDepthFilter$) {
                 model.ismnDepthFilter$.next(new FilterModel(filter, false, false, filter.default_parameter));
               } else {
