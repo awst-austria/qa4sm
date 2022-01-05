@@ -11,5 +11,6 @@
   </div>
 </div>
 <p-dialog styleClass="networkDialog" header="Select network(s)" position="top" [(visible)]="networkSelectorVisible">
-  <p-tree [value]="networkTree" selectionMode="checkbox" (onNodeSelect)="onNetworkSelect($event)"></p-tree>
+  <p-tree [value]="networkTree" selectionMode="checkbox" (onNodeSelect)="onNetworkSelect($event)"
+          [(selection)]="selectedNetworks"></p-tree>
 </p-dialog>

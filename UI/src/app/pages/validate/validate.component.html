@@ -105,7 +105,7 @@
             <div *ngIf="validationModel.referenceConfigurations[0].ismnNetworkFilter$|async">
               <qa-ismn-network-filter
 
-                [datasetModel$]="validationModel.referenceConfigurations[0].datasetModel"
+                [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
                 [filterModel$]="validationModel.referenceConfigurations[0].ismnNetworkFilter$"></qa-ismn-network-filter>
             </div>
             <qa-ismn-depth-filter
