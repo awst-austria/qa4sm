@@ -81,10 +81,10 @@ export class ButtonsComponent implements OnInit {
       return;
     }
     this.validationService.archiveResult(validationId, archive).subscribe((resp) => {
-      if (resp.statusText === 'OK'){
+      if (resp.ok){
         this.validationService.refreshComponent(validationId);
         this.isArchived$.next(archive);
-        this.doUpdate.emit({key: 'archived', value: archive});
+        this.doUpdate.emit({key: 'archived', value: resp.body});
       }
     });
   }

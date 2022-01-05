@@ -67,16 +67,15 @@
                 title="Download validation run .nc file">
           <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
         </button>
-        <button pButton
-                routerLink="/validate/"
-                class="dropdown-item"
-                [queryParams]="{validation_id: validationRun.id}"
-                title="Load validation settings"
-                label="Load Validation Settings"
-                icon="pi pi-replay">
-        </button>
       </div>
-
+      <button pButton
+              routerLink="/validate/"
+              class="dropdown-item"
+              [queryParams]="{validation_id: validationRun.id}"
+              title="Load validation settings"
+              label="Load Validation Settings"
+              icon="pi pi-replay">
+      </button>
       <span *ngIf="validationRun.is_unpublished"
             [ngClass]="{'collapse': validationRun.publishing_in_progress}">
         <button pButton

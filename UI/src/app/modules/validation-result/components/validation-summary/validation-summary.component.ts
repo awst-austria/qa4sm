@@ -39,6 +39,7 @@ export class ValidationSummaryComponent implements OnInit {
   valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
   expiryDate$: BehaviorSubject<Date> = new BehaviorSubject<Date>(null);
+  isNearExpiry$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
 
@@ -134,10 +135,11 @@ export class ValidationSummaryComponent implements OnInit {
 
   update(doUpdate: any): void {
     if (doUpdate.key === 'archived') {
-      this.isArchived$.next(doUpdate.value);
-      doUpdate.value ? this.expiryDate$.next(null) : this.expiryDate$.next(this.validationRun.expiry_date);
+      this.isArchived$.next(doUpdate.value === 'None');
+      doUpdate.value !== 'None' ? this.expiryDate$.next(doUpdate.value) : this.expiryDate$.next(null);
     } else if (doUpdate.key === 'extended'){
       this.expiryDate$.next(doUpdate.value);
+      this.isNearExpiry$.next(false);
     }
     else if (doUpdate.key === 'delete'){
       this.router.navigate(['/my-validations']);
@@ -166,5 +168,6 @@ export class ValidationSummaryComponent implements OnInit {
     this.valName$.next(this.validationRun.name_tag);
     this.isArchived$.next(this.validationRun.is_archived);
     this.expiryDate$.next(this.validationRun.expiry_date);
+    this.isNearExpiry$.next(this.validationRun.is_near_expiry);
   }
 }

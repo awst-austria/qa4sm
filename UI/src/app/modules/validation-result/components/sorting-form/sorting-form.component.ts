@@ -39,7 +39,6 @@ export class SortingFormComponent implements OnInit {
   ngOnInit(): void {
     this.prepareSortingChoices();
     this.prepareSortingOrder();
-    this.onSortingChange();
   }
 
   onSortingChange(): void{
@@ -47,7 +46,7 @@ export class SortingFormComponent implements OnInit {
     this.orderQueryName.emit(order);
   }
 
-  private prepareSortingChoices() {
+  private prepareSortingChoices(): void{
     this.sortingChoicesModels.push(new SortChoicesModel(SORT_BY_TIME_DISPLAY_NAME, SORT_BY_TIME_QUERY_NAME));
     this.sortingChoicesModels.push(new SortChoicesModel(SORT_BY_NAME_DISPLAY_NAME, SORT_BY_NAME_QUERY_NAME));
     this.sortingChoicesModels.push(new SortChoicesModel(SORT_BY_STATUS_DISPLAY_NAME, SORT_BY_STATUS_QUERY_NAME));
@@ -55,7 +54,7 @@ export class SortingFormComponent implements OnInit {
     this.selectedChoicesModel = this.sortingChoicesModels[0];
   }
 
-  private prepareSortingOrder() {
+  private prepareSortingOrder(): void{
     this.orderChoicesModels.push(new SortOrderModel(ORDER_DIRECTION_DESC, ORDER_DIRECTION_DESC_PREP));
     this.orderChoicesModels.push(new SortOrderModel(ORDER_DIRECTION_ASC, ORDER_DIRECTION_ASC_PREP));
     this.selectedOrderModel = this.orderChoicesModels[0];

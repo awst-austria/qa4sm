@@ -65,7 +65,7 @@ def archive_result(request, result_uuid):
         return HttpResponse("Wrong action parameter.", status=400)
 
     val_run.archive(unarchive=(not archive_mode))
-    return HttpResponse("Changed.", status=200)
+    return HttpResponse(val_run.expiry_date, status=200)
 
 
 @api_view(['PATCH'])
