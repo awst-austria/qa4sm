@@ -15,5 +15,4 @@ from .uptime_ping import UptimePing
 from .uptime_agent import UptimeAgent
 from .uptime_report import UptimeReport
 from .email import Email
-from. country import Country
 
