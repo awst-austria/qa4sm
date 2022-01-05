@@ -69,7 +69,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
         }
       });
     });
-    //this.doNetworkPreselection(this.networkTree, networksToBeSelected);
+    this.updateFilterModel();
   }
 
   private networkDtoToTreeModel(network: IsmnNetworkDto, parentNode: TreeNode): TreeNode<IsmnNetworkDto> {
@@ -81,80 +81,26 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   public onNetworkSelect(e): void {
-    console.log('Network selected. Selection size: ' + this.selectedNetworks.length);
-    // if (e.node.data == null) {  // Full continent selected
-    //
-    //   e.node.children.forEach(network => {
-    //     console.log('Adding network: ' + network);
-    //     console.log(network);
-    //     this.addNetworkToFilterModel(network);
-    //   });
-    // } else { // Network selected
-    //
-    // }
-    //
-    // console.log('New paramter: ' + this.filterModel$.value.parameters);
+    this.updateFilterModel();
   }
 
-  private addNetworkToFilterModel(network: IsmnNetworkDto): void {
-    const filter = this.filterModel$.value;
-    if (!filter.parameters.includes(network.name)) {
-      if (filter.parameters.length > 0) {
-        filter.parameters = filter.parameters + ',';
+  private updateFilterModel(): void {
+    this.filterModel$.value.parameters = '';
+    this.selectedNetworks.forEach(net => {
+      if (net.data != null) {  // continent checkboxes does not have data
+        if (!this.filterModel$.value.parameters.includes(net.key)) {
+          if (this.filterModel$.value.parameters.length > 0) {
+            this.filterModel$.value.parameters = this.filterModel$.value.parameters + ',';
+          }
+          this.filterModel$.value.parameters = this.filterModel$.value.parameters + net.key;
+        }
       }
-      filter.parameters = filter.parameters + network.name;
-      this.filterModel$.next(filter);
-    }
-  }
-
-  private removeNetworkFromFilterModel(network: IsmnNetworkDto): void {
-    const filter = this.filterModel$.value;
-    const posWithComa = filter.parameters.indexOf(',' + network.name);
-    const pos = filter.parameters.indexOf(network.name);
-    if (posWithComa > -1) {
-      filter.parameters.replace(',' + network.name, '');
-    } else if (pos > -1) {
-      filter.parameters.replace(network.name, '');
-    }
-  }
-
-  private initComponent(): void {
-    this.loadNetworks();
-  }
-
-  private loadNetworks(): void {
-    this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
-      this.buildNetworkTree(data, this.filterModel$.value.filterDto.default_parameter);
     });
   }
 
-  private doNetworkPreselection(treeNodes: TreeNode[], networksToBeSelected: string): void {
-    this.selectedNetworks.length = 0;
-    treeNodes.forEach(node => {
-      if (networksToBeSelected.includes(node.label)) {
-        this.selectedNetworks.push(node);
-      }
-
-      if (node.children !== undefined) {
-        node.children.forEach(child => {
-          //check child if the parent is not selected
-          if (networksToBeSelected.includes(child.label) && !networksToBeSelected.includes(node.label)) {
-            node.partialSelected = true;
-            child.parent = node;
-          }
-
-        });
-      } else {
-        return;
-      }
-
-      this.doNetworkPreselection(node.children, networksToBeSelected);
-
-      node.children.forEach(child => {
-        if (child.partialSelected) {
-          node.partialSelected = true;
-        }
-      });
+  private initComponent(): void {
+    this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
+      this.buildNetworkTree(data, this.filterModel$.value.filterDto.default_parameter);
     });
   }
 }
