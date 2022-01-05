@@ -135,7 +135,7 @@
       <!--    CUSTOM -->
       <div *ngIf="!published">
         <strong>Status:</strong><br/>
-        {{ getStatusFromProgress(validationRun)}}
+        {{validationStatus$|async}}
       </div>
     </div>
 
