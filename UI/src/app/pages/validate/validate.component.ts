@@ -118,7 +118,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             datasetConfig.basic_filters.forEach(basicFilterConfig => {
               data.basicFilters.forEach(filter => {
                 if (basicFilterConfig === filter.filterDto.id) {
-                  filter.enabled = true;
+                  filter.enabled$.next(true);
                 }
               });
             });
@@ -146,7 +146,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           config.reference_config.basic_filters.forEach(basicFilterConfig => {
             model.basicFilters.forEach(filter => {
               if (basicFilterConfig === filter.filterDto.id) {
-                filter.enabled = true;
+                filter.enabled$.next(true);
               }
             });
           });
@@ -290,28 +290,40 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           if (filter.parameterised) {
             if (filter.id === ISMN_NETWORK_FILTER_ID) {
               console.log('Adding ISMN filter at init');
-              model.ismnNetworkFilter$.next(new FilterModel(filter, false, false, filter.default_parameter));
+              model.ismnNetworkFilter$.next(new FilterModel(
+                filter,
+                new BehaviorSubject<boolean>(false),
+                new BehaviorSubject<boolean>(false),
+                new BehaviorSubject<string>(filter.default_parameter)));
             } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
               if (model.ismnDepthFilter$) {
-                model.ismnDepthFilter$.next(new FilterModel(filter, false, false, filter.default_parameter));
+                model.ismnDepthFilter$.next(new FilterModel(
+                  filter,
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<string>(filter.default_parameter)));
               } else {
-                model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(filter, false, false, filter.default_parameter));
+                model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+                  filter,
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<string>(filter.default_parameter))
+                );
               }
             }
           } else {
-            const newFilter = new FilterModel(filter, false, false, null);
+            const newFilter = (new FilterModel(
+              filter,
+              new BehaviorSubject<boolean>(false),
+              new BehaviorSubject<boolean>(false),
+              new BehaviorSubject<string>(null)));
             if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE') {
-              newFilter.enabled = true;
+              newFilter.enabled$.next(true);
             }
             model.basicFilters.push(newFilter);
           }
         });
 
-        if (model.ismnNetworkFilter$.value == null) {
-          console.log('ISMN net filter is null after loading filters');
-        } else {
-          console.log('ISMN net filter is present after loading filters');
-        }
         updatedModel$.next(model);
       },
       error => {

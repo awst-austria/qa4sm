@@ -2,12 +2,8 @@
   <div class="p-col-12">
     <p-checkbox label="Network filter"
                 [binary]="true" [ngModel]="true" readonly="true">
-
     </p-checkbox>
-
     <a (click)="showNetworkSelector()"><i class="pi pi-cog" style="padding-left: 5px;cursor: pointer;"></i></a>
-
-
   </div>
 </div>
 <p-dialog styleClass="networkDialog" header="Select network(s)" position="top" [(visible)]="networkSelectorVisible">

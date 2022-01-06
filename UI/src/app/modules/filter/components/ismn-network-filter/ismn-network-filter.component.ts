@@ -85,17 +85,19 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private updateFilterModel(): void {
-    this.filterModel$.value.parameters = '';
+    let newSelection = '';
     this.selectedNetworks.forEach(net => {
       if (net.data != null) {  // continent checkboxes does not have data
-        if (!this.filterModel$.value.parameters.includes(net.key)) {
-          if (this.filterModel$.value.parameters.length > 0) {
-            this.filterModel$.value.parameters = this.filterModel$.value.parameters + ',';
+        if (!newSelection.includes(net.key)) {
+          if (newSelection.length > 0) {
+            newSelection = newSelection + ',';
           }
-          this.filterModel$.value.parameters = this.filterModel$.value.parameters + net.key;
+          newSelection = newSelection + net.key;
         }
       }
     });
+
+    this.filterModel$.value.parameters$.next(newSelection);
   }
 
   private initComponent(): void {

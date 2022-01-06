@@ -20,14 +20,14 @@ export class DatasetConfigModel {
   public toValRunDatasetConfigDto(): ValidationRunDatasetConfigDto {
     const enabledBasicFilters: number[] = [];
     this.basicFilters.forEach(filter => {
-      if (filter.enabled) {
+      if (filter.enabled$) {
         enabledBasicFilters.push(filter.filterDto.id);
       }
     });
 
     const parameterisedFilters: ParametrisedFilterConfig[] = [];
     if (this.ismnNetworkFilter$.value != null) {
-      parameterisedFilters.push({id: ISMN_NETWORK_FILTER_ID, parameters: this.ismnNetworkFilter$.value.parameters});
+      parameterisedFilters.push({id: ISMN_NETWORK_FILTER_ID, parameters: this.ismnNetworkFilter$.value.parameters$.value});
     }
 
     const newValDatasetConfigDto: ValidationRunDatasetConfigDto = {
