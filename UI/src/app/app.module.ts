@@ -55,13 +55,10 @@ import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
-import {IsmnDepthFilterModule} from './modules/ismn-depth-filter/ismn-depth-filter.module';
 import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
 import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
 import {SetPasswordComponent} from './pages/set-password/set-password.component';
-import {
-  PasswordResetValidateTokenComponent
-} from './pages/password-reset-validate-token/password-reset-validate-token.component';
+import {PasswordResetValidateTokenComponent} from './pages/password-reset-validate-token/password-reset-validate-token.component';
 
 
 @NgModule({
@@ -121,9 +118,7 @@ import {
     IvyGalleryModule,
     NgxPageScrollModule,
     CoreModule,
-    UserModule,
-    IsmnDepthFilterModule
-
+    UserModule
   ],
   providers: [
     {
