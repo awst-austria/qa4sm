@@ -1,0 +1,16 @@
+<div class="p-grid no-gutters">
+  <div class="p-col-12">
+    <p-checkbox label="Network filter"
+                [binary]="true" [ngModel]="true" readonly="true">
+
+    </p-checkbox>
+
+    <a (click)="showNetworkSelector()"><i class="pi pi-cog" style="padding-left: 5px;cursor: pointer;"></i></a>
+
+
+  </div>
+</div>
+<p-dialog styleClass="networkDialog" header="Select network(s)" position="top" [(visible)]="networkSelectorVisible">
+  <p-tree [value]="networkTree" selectionMode="checkbox" (onNodeSelect)="onNetworkSelect($event)" (onNodeUnselect)="onNetworkUnselect($event)"
+          [(selection)]="selectedNetworks"></p-tree>
+</p-dialog>

@@ -139,6 +139,17 @@ def get_validation_configuration(request, **kwargs):
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
 
+class ParameterisedFilterConfigSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    id = serializers.IntegerField(required=True)
+    parameters = serializers.CharField(required=True)
+
+
 class DatasetConfigSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         pass
@@ -150,6 +161,7 @@ class DatasetConfigSerializer(serializers.Serializer):
     version_id = serializers.IntegerField(required=True)
     variable_id = serializers.IntegerField(required=True)
     basic_filters = serializers.ListField(child=serializers.IntegerField(), required=True)
+    parametrised_filters = ParameterisedFilterConfigSerializer(many=True)
 
 
 # Metrics DTO and serializer
@@ -191,7 +203,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 if metric.get('id') == 'bootstrap_tcol_cis':
                     new_val_run.bootstrap_tcol_cis = metric.get('value')
 
-
             new_val_run.save()
 
             # prepare DatasetConfiguration models
@@ -205,12 +216,19 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                                                                    version_id=config.get('version_id'),
                                                                    variable_id=config.get('variable_id'))
                 config_model.save()
-                filter_models = []
-                for filter_id in config.get('basic_filters'):
-                    filter_models.append(DataFilter.objects.get(id=filter_id))
 
-                for filter_model in filter_models:
-                    config_model.filters.add(filter_model)
+                for filter_id in config.get('basic_filters'):
+                    config_model.filters.add(DataFilter.objects.get(id=filter_id))
+
+                for param_filter in config.get('parametrised_filters'):
+                    param_filter_model = ParametrisedFilter.objects.create(
+                        dataset_config=config_model,
+                        filter_id=param_filter.get('id'),
+                        parameters=param_filter.get('parameters')
+                    )
+                    param_filter_model.save()
+                    print(param_filter)
+
                 config_model.save()
                 dataset_config_models.append(config_model)
 
@@ -241,7 +259,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     max_lat = serializers.FloatField(required=False, allow_null=True, default=90)
     max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
     name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
-
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):
