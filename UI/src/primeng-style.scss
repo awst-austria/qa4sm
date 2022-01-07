@@ -3276,7 +3276,7 @@ div.carousel-caption{
 }
 
 .p-tree .p-tree-container .p-treenode {
-  padding: 0.143rem;
+  padding-bottom: 0.143rem;
 }
 
 .p-tree .p-tree-container .p-treenode .p-treenode-content {
@@ -4109,8 +4109,8 @@ div.carousel-caption{
 
 .p-dialog .p-dialog-header {
   border-bottom: 1px solid #e9ecef;
-  background: #ffffff;
-  color: #212529;
+  background: $base-color;
+  color: white;
   padding: 1rem;
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
@@ -4124,7 +4124,7 @@ div.carousel-caption{
 .p-dialog .p-dialog-header .p-dialog-header-icon {
   width: 2rem;
   height: 2rem;
-  color: #6c757d;
+  color: white;
   border: 0 none;
   background: transparent;
   border-radius: 50%;
