@@ -57,6 +57,12 @@ a.no-decorations{
   display: none;
 }
 
+#publishingInProgress {
+  font-family: $base-font;
+  text-align: right;
+  font-size: 1.1rem;
+}
+
 
 @media screen and (max-width: 714.9px){
   .col-sm{

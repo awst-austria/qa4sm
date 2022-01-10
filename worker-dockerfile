@@ -1,0 +1,10 @@
+FROM awst/qa4sm-base:latest
+RUN apt-get update && apt-get -y install apt-utils
+RUN apt-get -y install curl gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git
+ADD ./ /tmp/qa4sm-git
+
+RUN bash /tmp/qa4sm-git/docker/celery-w/install.sh
+COPY ./docker/celery-w/entrypoint.sh /usr/bin/entrypoint.sh
+COPY ./docker/celery-w/entrypoint.sh /usr/local/bin/
+RUN ln -s usr/local/bin/entrypoint.sh /entrypoint.sh # backwards compat
+ENTRYPOINT ["entrypoint.sh"]

@@ -16,8 +16,4 @@ export class UserProfileComponent implements OnInit {
     this.currentUser = this.authService.currentUser;
   }
 
-  // getUsername(): string {
-  //   return this.authService.currentUser.username;
-  // }
-
 }

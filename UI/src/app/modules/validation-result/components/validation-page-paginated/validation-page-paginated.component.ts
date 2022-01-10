@@ -21,6 +21,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   constructor(private validationrunService: ValidationrunService) { }
 
   ngOnInit(): void {
+    this.getValidationsAndItsNumber(this.published);
     this.validationrunService.doRefresh.subscribe(value => {
         if (value && value !== 'page'){
           this.updateData(value);

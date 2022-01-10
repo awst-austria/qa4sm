@@ -4,7 +4,11 @@ from django.urls import reverse
 from django.test import TestCase
 from rest_framework.test import APIClient
 
+from api.frontend_urls import get_angular_url
 from api.tests.test_helper import *
+from django.core import mail
+from django.conf import settings
+from re import findall as regex_find
 User = get_user_model()
 
 
@@ -268,3 +272,79 @@ class TestUserView(TestCase):
         assert not self.test_user.is_active  # user is not active anymore
         assert not self.client.login(**self.auth_data)  # and they can not login
         assert User.objects.get(username=self.auth_data['username']) # but the account still exists
+
+    def test_password_reset(self):
+        ## pattern to get the password reset link from the email
+        reset_url_pattern = get_angular_url('validate-token', 'DUMMY')
+        reset_url_pattern = reset_url_pattern.replace('DUMMY', '([^/]+)')
+        reset_submit_url = reverse('password_reset:reset-password-request') # reset-password-request comes from the package
+        submit_new_password_url = reverse('password_reset:reset-password-confirm')
+        validate_token_url = reverse('password_reset:reset-password-validate')
+
+        original_password = self.auth_data['password']
+
+        # method get is not allowed here
+        response = self.client.get(reset_submit_url, follow=True)
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.post(reset_submit_url, {'email': self.test_user.email})
+        self.assertEqual(response.status_code, 200)
+
+        sent_mail = mail.outbox[0]
+
+        assert sent_mail
+        assert sent_mail.subject
+        assert sent_mail.body
+        assert sent_mail.from_email == settings.EMAIL_FROM
+        assert self.test_user.email in sent_mail.to
+        assert self.test_user.username in sent_mail.body
+
+        # assert False
+
+        ## check that the email contains a confirmation link with userid and token
+        urls = regex_find(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+',
+                          sent_mail.body)
+        token = None
+        for u in urls:
+            rmatch = regex_find(reset_url_pattern, u)
+            if rmatch:
+                token = rmatch[0]
+
+        assert token
+
+        # try to submit invalid password
+        response = self.client.post(submit_new_password_url, {'password': '123456', 'token': token})
+        assert response.status_code == 400
+        assert response.json()['password'][0] == 'This password is too short. It must contain at least 8 characters.'
+        assert response.json()['password'][1] == 'This password is too common.'
+        assert response.json()['password'][2] == 'This password is entirely numeric.'
+
+        ## now try to use the link in the email several times - should only be successful the first time
+        for i in range(1, 3):
+            # validate token from the email
+            response = self.client.post(validate_token_url, {'token': token})
+            ## first time
+            if i == 1:
+                self.assertEqual(response.status_code, 200)
+                # If the token is ok, the website is redirected to the new password form which sends
+                # new password and the token (password and password confirmation are validated in the frontend part)
+                self.auth_data['password'] = '1superPassword!!'
+                response = self.client.post(submit_new_password_url, {'password': self.auth_data['password'], 'token': token})
+                assert response.status_code == 200
+            ## second time
+            else:
+                ## token is no more valid
+                self.assertEqual(response.status_code, 404)
+
+                # so there is no possibility ot submit a new password
+                response = self.client.post(submit_new_password_url, {'password': '1superPassword!!', 'token': token})
+                assert response.status_code == 404
+
+
+        ## make sure we can log in with the new password
+        login_success = self.client.login(**self.auth_data)
+        assert login_success
+
+        ## make sure we can't log in with the old password
+        login_success = self.client.login(**{'username': self.auth_data['username'], 'password': original_password})
+        assert not login_success

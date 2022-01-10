@@ -1,12 +1,16 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ToastService } from './toast.service';
+import {ToastService} from './toast.service';
+import {MessageService} from 'primeng/api';
 
 describe('ToastService', () => {
   let service: ToastService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    const messageServiceSpy = jasmine.createSpyObj('MessageService', ['add']);
+    TestBed.configureTestingModule({
+      providers: [{provide: MessageService, useValue: messageServiceSpy}]
+    });
     service = TestBed.inject(ToastService);
   });
 

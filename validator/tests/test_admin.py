@@ -10,13 +10,8 @@ from django.test import TestCase
 from django.urls.base import reverse
 
 from valentina.celery import app
-from validator.models import DataVariable
-from validator.models import Dataset
-from validator.models import DatasetVersion
 from validator.models import Settings
-from validator.models import ValidationRun
-from validator.validation import globals
-from api.frontend_urls import get_angular_url
+
 
 
 @shared_task(bind=True)
@@ -30,6 +25,9 @@ class TestAdmin(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     __logger = logging.getLogger(__name__)
+    # setting False, because the page that we refer here may raise logging.exception and pytest 6.0.0 and newer
+    # does not handle it
+    logging.raiseExceptions = False
 
     def setUp(self):
         self.user_credentials = {

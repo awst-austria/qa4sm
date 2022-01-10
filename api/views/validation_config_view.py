@@ -27,7 +27,6 @@ def start_validation(request):
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
     new_val_run.save()
-
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 
@@ -93,7 +92,8 @@ def get_validation_configuration(request, **kwargs):
                 if val_run.scaling_ref.id != val_run.reference_configuration.id:
                     val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
 
-        metrics = [{'id': 'tcol', 'value': val_run.tcol}]
+        metrics = [{'id': 'tcol', 'value': val_run.tcol},
+                   {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
 
         # Reference filters
@@ -139,6 +139,17 @@ def get_validation_configuration(request, **kwargs):
         return JsonResponse(None, status=status.HTTP_404_NOT_FOUND, safe=False)
 
 
+class ParameterisedFilterConfigSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    id = serializers.IntegerField(required=True)
+    parameters = serializers.CharField(required=True)
+
+
 class DatasetConfigSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         pass
@@ -150,6 +161,7 @@ class DatasetConfigSerializer(serializers.Serializer):
     version_id = serializers.IntegerField(required=True)
     variable_id = serializers.IntegerField(required=True)
     basic_filters = serializers.ListField(child=serializers.IntegerField(), required=True)
+    parametrised_filters = ParameterisedFilterConfigSerializer(many=True)
 
 
 # Metrics DTO and serializer
@@ -188,36 +200,45 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             for metric in validated_data.get('metrics'):
                 if metric.get('id') == 'tcol':
                     new_val_run.tcol = metric.get('value')
+                if metric.get('id') == 'bootstrap_tcol_cis':
+                    new_val_run.bootstrap_tcol_cis = metric.get('value')
 
             new_val_run.save()
 
             # prepare DatasetConfiguration models
             reference_config = None
             dataset_config_models = []
-            configs_to_save = [validated_data.get('reference_config')]
-            configs_to_save.extend(validated_data.get('dataset_configs'))
+            configs_to_save = validated_data.get('dataset_configs')
+            configs_to_save.append(validated_data.get('reference_config'))
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,
                                                                    dataset_id=config.get('dataset_id'),
                                                                    version_id=config.get('version_id'),
                                                                    variable_id=config.get('variable_id'))
                 config_model.save()
-                filter_models = []
-                for filter_id in config.get('basic_filters'):
-                    filter_models.append(DataFilter.objects.get(id=filter_id))
 
-                for filter_model in filter_models:
-                    config_model.filters.add(filter_model)
+                for filter_id in config.get('basic_filters'):
+                    config_model.filters.add(DataFilter.objects.get(id=filter_id))
+
+                for param_filter in config.get('parametrised_filters'):
+                    param_filter_model = ParametrisedFilter.objects.create(
+                        dataset_config=config_model,
+                        filter_id=param_filter.get('id'),
+                        parameters=param_filter.get('parameters')
+                    )
+                    param_filter_model.save()
+                    print(param_filter)
+
                 config_model.save()
                 dataset_config_models.append(config_model)
 
-            new_val_run.reference_configuration = dataset_config_models[0]
+            new_val_run.reference_configuration = dataset_config_models[-1]
             scale_to = validated_data.get('scaling_method', None)
             if scale_to is not None:
                 if scale_to == ValidationRun.SCALE_TO_DATA:
                     new_val_run.scaling_ref = dataset_config_models[1]
                 else:
-                    new_val_run.scaling_ref = dataset_config_models[0]
+                    new_val_run.scaling_ref = dataset_config_models[-1]
 
             new_val_run.save()
 
@@ -238,7 +259,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     max_lat = serializers.FloatField(required=False, allow_null=True, default=90)
     max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
     name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
-
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):

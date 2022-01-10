@@ -1,4 +1,4 @@
-<p-panel header="Scaling" [toggleable]="true">
+<p-panel header="Scaling" [toggleable]="true" class="validation-row">
   <ng-template pTemplate="icons">
     <label class="p-panel-header-icon"
            pTooltip="Optionally calculates metrics from anomalies instead of absolute values. First, a climatology is computed using the chosen method and time period (only whole years are used), then the anomalies are calculated based on this. &quot;35 day moving average&quot; means that the climatology is calculated as a moving average of the data; &quot;climatology&quot; means that the average for each day of the year is calculated."
@@ -6,27 +6,44 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid">
-    <div class="p-col-12">
-      <div class="p-float-label p-m-2">
-        <p-dropdown id="scalingMethodSelector" (onChange)="updateScalingModel()"
-                    [options]="scalingModels"
-                    [ngModel]="selectedScalingModel|async"
-                    (ngModelChange)="selectedScalingModel.next($event)"
-                    optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
-        <label for="scalingMethodSelector">Method</label>
+  <div class="p-grid p-pt-4">
+    <div class="p-col-12 p-sm-5">
+      <div class="p-grid" id="scalingMethod">
+        <div class="small-label p-col-4">
+          <div class="p-fluid">
+            <div>Method</div>
+          </div>
+        </div>
+        <div class="p-col-8 p-px-0">
+          <div class="p-float-label">
+            <p-dropdown id="scalingMethodSelector" (onChange)="updateScalingModel()"
+                        [options]="scalingModels"
+                        [ngModel]="selectedScalingModel|async"
+                        (ngModelChange)="selectedScalingModel.next($event)"
+                        optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
+            <label for="scalingMethodSelector">Select</label>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="p-col-12 p-sm-6">
-      <div class="p-float-label p-m-2" *ngIf="(selectedScalingModel|async).id!=noScalingId">
-        <p-dropdown id="scalingReferenceSelector" (onChange)="updateScalingModel()"
-                    [options]="scaleToModels"
-                    [ngModel]="selectedScaleToModel$|async"
-                    (ngModelChange)="selectedScaleToModel$.next($event)"
-                    [disabled]="isScalingSelectorDisabled()"
-                    optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
-        <label for="scalingReferenceSelector">Scale To</label>
+    <div class="p-col-12 p-sm-7">
+      <div class="p-grid" id="scalingTo" *ngIf="(selectedScalingModel|async).id!=noScalingId">
+        <div class="small-label p-col-4">
+          <div class="p-fluid">
+            <div>Scale to</div>
+          </div>
+        </div>
+        <div class="p-col-8 p-px-0">
+          <div class="p-float-label">
+            <p-dropdown id="scalingReferenceSelector" (onChange)="updateScalingModel()"
+                        [options]="scaleToModels"
+                        [ngModel]="selectedScaleToModel$|async"
+                        (ngModelChange)="selectedScaleToModel$.next($event)"
+                        [disabled]="isScalingSelectorDisabled()"
+                        optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
+            <label for="scalingReferenceSelector">Select</label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
