@@ -26,7 +26,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initComponent();
+    console.log('Network filter init');
     // in case the filter model gets updated externally we need to re-initialize this component
     this.filterModel$.subscribe(model => {
       if (model != null) {
@@ -102,7 +102,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
 
   private initComponent(): void {
     this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
-      this.buildNetworkTree(data, this.filterModel$.value.filterDto.default_parameter);
+      this.buildNetworkTree(data, this.filterModel$.value.parameters$.value);
     });
   }
 }
