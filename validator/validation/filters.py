@@ -108,6 +108,34 @@ def get_used_variables(filters, dataset, variable):
             variables.append(era_temp_variable)
             continue
 
+        if fil.name == "FIL_SMOSL3_QUAL_RECOMMENDED":
+            variables.append('Science_Flags')
+            continue
+
+        if fil.name == "FIL_SMOSL3_STRONG_TOPO":
+            variables.append('Science_Flags')
+            continue
+
+        if fil.name == "FIL_SMOSL3_SNOW":
+            variables.append('Science_Flags')
+            continue
+
+        if fil.name == "FIL_SMOSL3_SOIL_FROZEN":
+            variables.append('Science_Flags')
+            continue
+
+        if fil.name == "FIL_SMOSL3_WETLANDS":
+            variables.append('Science_Flags')
+            continue
+
+        if fil.name == "FIL_SMOSL3_RAIN":
+            variables.append('Science_Flags')
+            continue
+
+        if fil.name == "FIL_SMOSL3_WINTER_FORESTS":
+            variables.append('Science_Flags')
+            continue
+
     return variables
 
 
@@ -149,7 +177,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
                 __logger.debug('Selected networks: ' + ';'.join(networks))
                 inner_reader.activate_network(networks)
             continue
-
 
     masking_filters = []
 
@@ -247,6 +274,34 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             masking_filters.append((era_temp_variable, '>', 274.15))
             continue
 
+        # SMOS L3 Flags ----------------------------------------
+        if fil.name == "FIL_SMOSL3_QUAL_RECOMMENDED":
+            masking_filters.append(('Science_Flags', '==', 0))
+            continue
+
+        if fil.name == "FIL_SMOSL3_STRONG_TOPO":
+            masking_filters.append(('Science_Flags', smos_exclude_bitmask, 0b00001000))
+            continue
+
+        if fil.name == "FIL_SMOSL3_SNOW":
+            masking_filters.append(('Science_Flags', smos_exclude_bitmask, 0b00001000))
+            continue
+
+        if fil.name == "FIL_SMOSL3_SOIL_FROZEN":
+            masking_filters.append(('Science_Flags', smos_exclude_bitmask, 0b00001000))
+            continue
+
+        if fil.name == "FIL_SMOSL3_WETLANDS":
+            masking_filters.append(('Science_Flags', smos_exclude_bitmask, 0b00001000))
+            continue
+
+        if fil.name == "FIL_SMOSL3_RAIN":
+            masking_filters.append(('Science_Flags', smos_exclude_bitmask, 0b00001000))
+            continue
+
+        if fil.name == "FIL_SMOSL3_WINTER_FORESTS":
+            masking_filters.append(('Science_Flags', smos_exclude_bitmask, 0b00001000))
+            continue
 
     if len(masking_filters):
         filtered_reader = AdvancedMaskingAdapter(filtered_reader, masking_filters,

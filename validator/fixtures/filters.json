@@ -92,7 +92,9 @@
             "help_text": "Data captured when satellite was descending",
             "parameterised": false,
             "dialog_name": null,
-            "default_parameter": null
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": 6
         }
     },
     {
@@ -315,6 +317,104 @@
             "parameterised": true,
             "dialog_name": "ismn_depth",
             "default_parameter": "0.00,0.10",
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 31,
+        "fields": {
+            "name": "FIL_SMOSL3_QUAL_RECOMMENDED",
+            "description": "Soil moisture values are retrieved and recommended",
+            "help_text": "Soil moisture values are retrieved and recommended (Quality_Flag == 0)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": "25,26,27,28,29,30",
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 25,
+        "fields": {
+            "name": "FIL_SMOSL3_STRONG_TOPO",
+            "description": "Exclude strong topography",
+            "help_text": "Science Flag ...",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": "",
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 26,
+        "fields": {
+            "name": "FIL_SMOSL3_SNOW",
+            "description": "Exclude snow conditions",
+            "help_text": "Science Flag ...",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": "",
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 27,
+        "fields": {
+            "name": "FIL_SMOSL3_SOIL_FROZEN",
+            "description": "Exclude frozen soil",
+            "help_text": "Science Flag ...",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": "",
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 28,
+        "fields": {
+            "name": "FIL_SMOSL3_WETLANDS",
+            "description": "Exclude wetlands",
+            "help_text": "Science Flag ...",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": "",
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 29,
+        "fields": {
+            "name": "FIL_SMOSL3_RAIN",
+            "description": "Exclude intense rain events",
+            "help_text": "Science Flag ...",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": "",
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 30,
+        "fields": {
+            "name": "FIL_SMOSL3_WINTER_FORESTS",
+            "description": "Exclude winter forests",
+            "help_text": "Science Flag ...",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": "",
             "to_include": null,
             "disable_filter": null
         }
