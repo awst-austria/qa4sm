@@ -59,7 +59,8 @@ export class ValidationSelectorComponent implements OnInit {
     selected.push(model);
     // get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
-      model.datasetModel.selectedDataset = datasets[0];
+      model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === 'ISMN');
+      console.log('Monika', model.datasetModel.selectedDataset);
       this.selectValidationLabel = 'Wait for validations to be loaded';
       // then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
@@ -75,6 +76,7 @@ export class ValidationSelectorComponent implements OnInit {
       refDataset = String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name);
       refVersion = String(this.selectedDatasetModel[0].datasetModel.selectedVersion.short_name);
     }
+    console.log(refDataset, refVersion);
     const parameters = new HttpParams()
       .set('ref_dataset', refDataset)
       .set('ref_version', refVersion)
