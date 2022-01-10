@@ -9,9 +9,8 @@
       <ng-template pTemplate="icons">
       </ng-template>
 
-      <div *ngIf="updatedMetrics$|async as metrics">
+      <div *ngIf="updatedMetrics$|async as metrics" style="min-height: 400px">
         <div *ngIf="metrics[indx] && metrics[indx].overviewFiles|async as overviewPlots">
-
           <div class="p-grid p-align-center">
             <div [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
               <img *ngIf="metrics[indx].boxplotFile|async as boxplot"

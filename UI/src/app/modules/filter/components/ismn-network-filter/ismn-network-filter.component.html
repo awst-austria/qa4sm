@@ -7,6 +7,11 @@
   </div>
 </div>
 <p-dialog styleClass="networkDialog" header="Select network(s)" position="top" [(visible)]="networkSelectorVisible">
+  <div class="p-pb-3" style="max-width: 350px">
+    Click on a continent to unfold its list of networks.<br/>
+    You can find more information about the ISMN networks on the <a href="https://ismn.geo.tuwien.ac.at/en/networks/"
+                                                                    target="_blank">ISMN networks list</a>.
+  </div>
   <p-tree [value]="networkTree" selectionMode="checkbox" (onNodeSelect)="onNetworkSelect($event)" (onNodeUnselect)="onNetworkUnselect($event)"
           [(selection)]="selectedNetworks"></p-tree>
 </p-dialog>
