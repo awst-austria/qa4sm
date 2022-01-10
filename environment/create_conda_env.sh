@@ -90,7 +90,7 @@ pip install django-widget-tweaks
 pip install psycopg2-binary
 pip install pytest-cov
 pip install pytest-mpl
-pip install celery==4.1.1
+pip install celery
 pip install celery[redis]
 pip install gldas
 pip install smap-io

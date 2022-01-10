@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
@@ -7,7 +7,7 @@ import {DatasetVersionService} from 'src/app/modules/core/services/dataset/datas
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 
@@ -16,17 +16,21 @@ import {map} from 'rxjs/operators';
   templateUrl: './validationrun-row.component.html',
   styleUrls: ['./validationrun-row.component.scss']
 })
-export class ValidationrunRowComponent implements OnInit {
+export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
-  @Input() published: boolean = false;
+  @Input() published = false;
   @Input() validationRun: ValidationrunDto;
+  @Output() doRefresh = new EventEmitter();
   configurations$: Observable<any>;
+  validationStatus: any;
+  validationStatus$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   dateFormat = 'medium';
   timeZone = 'UTC';
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
   originalDate: Date;
+  valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -37,13 +41,16 @@ export class ValidationrunRowComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.validationRun.is_a_copy){
+    if (this.validationRun.is_a_copy) {
       this.getOriginalDate(this.validationRun);
     }
     this.updateConfig();
+    this.valName$.next(this.validationRun.name_tag);
+    this.validationStatus$.next(this.getStatusFromProgress(this.validationRun));
+    this.refreshStatus();
   }
 
-  private updateConfig(): void{
+  private updateConfig(): void {
     this.configurations$ = combineLatest(
       this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
       this.datasetService.getAllDatasets(),
@@ -53,8 +60,9 @@ export class ValidationrunRowComponent implements OnInit {
       map(([configurations, datasets, versions, variables]) =>
         configurations.map(
           config =>
-            ({...config,
-              dataset:  datasets.find(ds =>
+            ({
+              ...config,
+              dataset: datasets.find(ds =>
                 config.dataset === ds.id)?.pretty_name,
 
               version: versions.find(dsVersion =>
@@ -76,7 +84,7 @@ export class ValidationrunRowComponent implements OnInit {
     let status: string;
     if (valrun.progress === 0 && valrun.end_time === null) {
       status = 'Scheduled';
-    } else if (valrun.progress === 100 && valrun.end_time){
+    } else if (valrun.progress === 100 && valrun.end_time) {
       status = 'Done';
     } else if (valrun.progress === -1) {
       status = 'Cancelled';
@@ -91,15 +99,18 @@ export class ValidationrunRowComponent implements OnInit {
   toggleEditing(): void{
     this.hideElement = !this.hideElement;
   }
-  saveName(validationId: string, newName: string): void{
+
+  saveName(validationId: string, newName: string): void {
     this.validationService.saveResultsName(validationId, newName).subscribe(
-      () => {
-        this.validationService.refreshComponent(validationId);
+      (resp) => {
+        if (resp === 'Changed.'){
+          this.valName$.next(newName);
+          this.toggleEditing();
+        }
       });
-    // window.location.reload();
   }
 
-  getOriginalDate(copiedRun: ValidationrunDto): void{
+  getOriginalDate(copiedRun: ValidationrunDto): void {
     this.validationService.getCopiedRunRecord(copiedRun.id).subscribe(data => {
       if (data.original_run_date){
         this.originalDate = data.original_run_date;
@@ -107,6 +118,28 @@ export class ValidationrunRowComponent implements OnInit {
         this.originalDate = copiedRun.start_time;
       }
     });
+  }
+
+  refreshStatus(): void{
+    if (
+      (this.validationRun.progress !== -1) &&
+      !(this.validationRun.progress === 100 &&
+        this.validationRun.end_time !== null) &&
+      !(this.validationRun.progress === 0 &&
+        this.validationRun.end_time !== null)){
+      this.validationStatus = setInterval(() => {
+        this.validationService.getValidationRunById(this.validationRun.id).subscribe(data => {
+          this.validationStatus$.next(this.getStatusFromProgress(data));
+          if (data.progress === 100 && data.end_time) {
+            this.validationService.refreshComponent(this.validationRun.id);
+          }
+        });
+      }, 60 * 1000); // one minute
+    }
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.validationStatus);
   }
 
 }

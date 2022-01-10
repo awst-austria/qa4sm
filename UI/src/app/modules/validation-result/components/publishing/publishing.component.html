@@ -1,5 +1,5 @@
 <ng-container *ngIf="display$ | async as display">
-  <div class="form-background" [class.open]="display === 'open'" (click)="close()">
+  <div class="form-background" [class.open]="display === 'open' && !(publishingInProgress$|async)" (click)="close()">
     <p-panel class="publishing-form" (click)="$event.stopPropagation()">
       <ng-template pTemplate="header">
         <h4 class="my-0 font-weight-normal" id="publishDialogTitle">Publish results</h4>

@@ -198,7 +198,7 @@ Keep note of the username, email, and password you enter here, you'll need it to
 
 Populate the database with information about the datasets:
 
-    python manage.py loaddata versions variables filters datasets networks
+    python manage.py loaddata versions variables filters datasets networks countries
 
 This should result in the message "Installed x object(s) from y fixture(s)".
 

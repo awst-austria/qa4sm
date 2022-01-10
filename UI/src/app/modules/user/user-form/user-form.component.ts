@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {LocalApiService} from '../../core/services/auth/local-api.service';
 import {CountryDto} from '../../core/services/global/country.dto';
@@ -6,6 +6,7 @@ import {UserDto} from '../../core/services/auth/user.dto';
 import {AuthService} from '../../core/services/auth/auth.service';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
+import {ToastService} from '../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-user-form',
@@ -31,11 +32,13 @@ export class UserFormComponent implements OnInit {
   formErrors: any;
 
   @Input() userData: UserDto;
+  @Output() doRefresh = new EventEmitter();
 
   constructor(private userFormService: LocalApiService,
               private formBuilder: FormBuilder,
               private userService: AuthService,
-              private router: Router) { }
+              private router: Router,
+              private toastService: ToastService) { }
 
   ngOnInit(): void {
     // this.getListOfCountries();
@@ -49,6 +52,7 @@ export class UserFormComponent implements OnInit {
     if (!this.userData){
       this.userService.signUp(this.userForm.value).subscribe(
         () => {
+          this.formErrors = null;
           this.router.navigate(['/signup-complete']);
         },
         error => {
@@ -63,10 +67,14 @@ export class UserFormComponent implements OnInit {
           this.userService.currentUser.organisation = data.organisation;
           this.userService.currentUser.country = data.country;
           this.userService.currentUser.orcid = data.orcid;
-          alert('User profile has been updated');
+          this.doRefresh.emit(true);
+          this.formErrors = null;
         },
         error => {
           this.formErrors = error.error;
+        },
+        () => {
+          this.toastService.showSuccessWithHeader('', 'User profile has been updated');
         }
       );
     }
@@ -96,6 +104,8 @@ export class UserFormComponent implements OnInit {
     const username = this.userService.currentUser.username;
     this.userService.deactivateUser(username).subscribe(
       () => {
+        this.userService.currentUser = this.userService.emptyUser;
+        this.userService.authenticated.next(false);
         this.router.navigate(['/deactivate-user-complete']);
       }
     );
