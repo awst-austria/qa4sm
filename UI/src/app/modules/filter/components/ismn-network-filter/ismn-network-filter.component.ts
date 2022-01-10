@@ -26,7 +26,6 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Network filter init');
     // in case the filter model gets updated externally we need to re-initialize this component
     this.filterModel$.subscribe(model => {
       if (model != null) {
@@ -77,7 +76,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   public onNetworkUnselect(e): void {
-    console.log('Unselect network: ' + e);
+    this.updateFilterModel();
   }
 
   public onNetworkSelect(e): void {

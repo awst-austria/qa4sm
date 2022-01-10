@@ -19,6 +19,5 @@ export class IsmnDepthFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.filterModel$.value.parameters$.value);
   }
 }
