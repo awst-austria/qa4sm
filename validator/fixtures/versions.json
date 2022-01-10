@@ -337,8 +337,8 @@
         "model": "validator.datasetversion",
         "pk": 37,
         "fields": {
-            "short_name": "SMOS_L3",
-            "pretty_name": "SMOS_L3",
+            "short_name": "SMOSL3_012022",
+            "pretty_name": "SMOSL3_012022",
             "help_text": "L3-SM (CATDS): Preliminary Daily Retrieval",
             "time_range_start": "2010-07-01",
             "time_range_end": "2020-12-31",

@@ -71,7 +71,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.CGLS_CSAR_SSM1km:
         reader = S1CglsTs(folder_name)
 
-    if dataset.short_name == globals.SMOS_2022:
+    if dataset.short_name == globals.SMOS_L3:
         reader = GriddedNcOrthoMultiTs(folder_name)
 
     if not reader:
