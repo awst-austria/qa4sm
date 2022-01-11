@@ -35,6 +35,7 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {'max_retries': 3,'interval_start': 1,'interva
 DBSM = 'sqlite'
 DB_PASSWORD = 's3cr3t'
 
+
 ## Email settings
 EMAIL_HOST = 'smtp.ionos.de'
 EMAIL_PORT = '587'

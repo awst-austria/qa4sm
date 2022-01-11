@@ -1,5 +1,5 @@
-from django.conf.urls import url
-from django.urls import path
+from django.conf.urls import re_path
+from django.urls import path, include
 
 from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_dataset
     # data_parameterised_filter_by_config
@@ -7,6 +7,7 @@ from api.views.data_filter_view import data_filter, data_parameterised_filter, d
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
 from api.views.dataset_version_view import dataset_version, dataset_version_by_id, dataset_version_by_dataset
 from api.views.dataset_view import dataset, dataset_by_id
+from api.views.ismn_network_view import get_ismn_networks
 from api.views.login_view import api_login
 from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
@@ -25,6 +26,7 @@ from api.views.serving_file_view import get_results, get_csv_with_statistics, ge
     get_metric_names_and_associated_files, get_graphic_file, get_summary_statistics
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import settings
+
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -50,27 +52,27 @@ urlpatterns = [
     #   GOOD:  path('my-new-endpoint', my_new_view, name='fancy stuff'),
     #   WRONG: path('my-new-endpoint/', my_new_view, name='fancy stuff'),
     #
-    url(r'^test$', users), # are we using this one somehow?
-    url(r'^path_test/(?P<username>.+)$', path_var_get),
+    re_path(r'^test$', users), # are we using this one somehow?
+    re_path(r'^path_test/(?P<username>.+)$', path_var_get),
     path('auth/login', api_login, name='api-login'),
     path('auth/logout', api_logout, name='api-logout'),
     path('dataset', dataset, name='Datasets'),
-    url(r'^dataset/(?P<id>.+)$', dataset_by_id),
+    re_path(r'^dataset/(?P<id>.+)$', dataset_by_id),
     path('dataset-version', dataset_version, name='Dataset version'),
-    url(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id),
-    url(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset version by dataset'),
+    re_path(r'^dataset-version/(?P<version_id>.+)$', dataset_version_by_id),
+    re_path(r'^dataset-version-by-dataset/(?P<dataset_id>.+)$', dataset_version_by_dataset, name='Dataset version by dataset'),
     path('dataset-variable', dataset_variable, name='Dataset variable'),
-    url(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id),
-    url(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset_variable_by_dataset'),
+    re_path(r'^dataset-variable/(?P<variable_id>.+)$', dataset_variable_by_id),
+    re_path(r'^dataset-variable-by-dataset/(?P<dataset_id>.+)$', dataset_variable_by_dataset, name='Dataset_variable_by_dataset'),
     path('published-results', published_results, name='Published results'),
-    url(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
+    re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
-    url(r'^dataset-configuration/(?P<dataset_id>.+)$', dataset_configuration_by_dataset, name='Configuration'),
+    re_path(r'^dataset-configuration/(?P<dataset_id>.+)$', dataset_configuration_by_dataset, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
-    url(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset),
+    re_path(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset),
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
-    url(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
+    re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
     path('validation-configuration', start_validation, name='Run new validation'),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
@@ -104,6 +106,7 @@ urlpatterns = [
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
-    url(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
+    re_path(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
+    path('password-reset', include('django_rest_passwordreset.urls', namespace='password-reset')),
+    path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
 ]
-

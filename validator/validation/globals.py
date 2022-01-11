@@ -42,6 +42,8 @@ CCIP = 'ESA_CCI_SM_passive'
 SMOS = 'SMOS'
 ERA5 = 'ERA5'
 ERA5_LAND = 'ERA5_LAND'
+CGLS_CSAR_SSM1km = 'CGLS_CSAR_SSM1km'
+CGLS_SCATSAR_SWI1km = 'CGLS_SCATSAR_SWI1km'
 
 ## dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -71,6 +73,8 @@ ESA_CCI_SM_C_V05_2 = 'ESA_CCI_SM_C_V05_2'
 ESA_CCI_SM_A_V06_1 = 'ESA_CCI_SM_A_V06_1'
 ESA_CCI_SM_P_V06_1 = 'ESA_CCI_SM_P_V06_1'
 ESA_CCI_SM_C_V06_1 = 'ESA_CCI_SM_C_V06_1'
+CGLS_CSAR_SSM1km_V1_1 = 'CGLS_CSAR_SSM1km_V1_1'
+CGLS_SCATSAR_SWI1km_V1_0 = 'CGLS_SCATSAR_SWI1km_V1_0'
 
 ## dataset data variables
 C3S_sm = 'C3S_sm'
@@ -91,12 +95,12 @@ ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
-NOT_AS_REFERENCE = []
+NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, CGLS_SCATSAR_SWI1km]
 
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
 VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-                 'anomalies', 'anomalies_from', 'anomalies_to']
+             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to']
 DS_FIELDS = ['dataset', 'version']
 
 IRREGULAR_GRIDS = {'SMAP' : 0.35,
@@ -126,4 +130,12 @@ METADATA_TEMPLATE = {'other_ref': None,
                                  'station': np.array([' ' * 256]),
                                  'timerange_from': np.array([' ' * 256]),
                                  'timerange_to': np.array([' ' * 256]),
-                                 'variable': np.array([' ' * 256])}}
+                                 'variable': np.array([' ' * 256]),
+                                 'instrument_depthfrom': np.float32([np.nan]),
+                                 'instrument_depthto': np.float32([np.nan])
+                                 }
+                     }
+
+INSTRUMENT_META = "instrument"
+MEASURE_DEPTH_FROM = "instrument_depthfrom"
+MEASURE_DEPTH_TO = "instrument_depthto"

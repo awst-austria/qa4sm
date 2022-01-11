@@ -1,14 +1,18 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {TrackedValidationsComponent} from './tracked-validations.component';
+import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 
 describe('TrackedValidationsComponent', () => {
   let component: TrackedValidationsComponent;
   let fixture: ComponentFixture<TrackedValidationsComponent>;
 
   beforeEach(async () => {
+    const validationrunServiceSpy = jasmine.createSpyObj('ValidationrunService',
+      ['getCustomTrackedValidations']);
     await TestBed.configureTestingModule({
-      declarations: [ TrackedValidationsComponent ]
+      declarations: [ TrackedValidationsComponent ],
+      providers: [{provide: ValidationrunService, useValue: validationrunServiceSpy}]
     })
     .compileComponents();
   });

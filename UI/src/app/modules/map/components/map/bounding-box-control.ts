@@ -9,6 +9,7 @@ import {transformExtent} from 'ol/proj';
 import {SpatialSubsetModel} from '../../../spatial-subset/components/spatial-subset/spatial-subset-model';
 import {NgZone} from '@angular/core';
 import {Geometry, Polygon} from 'ol/geom';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 export class BoundingBoxControl extends Control {
   boundingBoxSource: VectorSource;
@@ -16,7 +17,7 @@ export class BoundingBoxControl extends Control {
   currentSelectedCoordinates: number[] = [null, null, null, null];
   ngZone: NgZone;
 
-  constructor(private map: Map, private boundingBox: SpatialSubsetModel, ngZone?: NgZone) {
+  constructor(private map: Map, private boundingBox: SpatialSubsetModel, private toastService: ToastService, ngZone?: NgZone) {
     super({});
     this.ngZone = ngZone;
     //Prepare Source and Layer for the bounding box drawn by the user
@@ -119,7 +120,7 @@ export class BoundingBoxControl extends Control {
       return;
     }
 
-    //remove previous selection from map
+    // //remove previous selection from map
     this.boundingBoxSource.clear();
 
     let geomFunction = createBox();
@@ -144,29 +145,62 @@ export class BoundingBoxControl extends Control {
         this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
         this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
       } else{
-
-        if (this.currentSelectedCoordinates[0] > this.boundingBox.minLon$.getValue()
-          && this.currentSelectedCoordinates[0] < this.boundingBox.maxLon$.getValue()){
+        // checking if chosen coordinates do not exceed limitations
+        let showAlert = false; // if true, the alert will be given that coordinates were adjusted to limitations
+        if (this.currentSelectedCoordinates[0] > this.boundingBox.minLonLimit$.getValue()
+          && this.currentSelectedCoordinates[0] < this.boundingBox.maxLonLimit$.getValue()){
           this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
+        } else{
+          this.boundingBox.minLon$.next(this.boundingBox.minLonLimit$.getValue());
+          showAlert = true;
         }
-        if (this.currentSelectedCoordinates[1] > this.boundingBox.minLat$.getValue()
-          && this.currentSelectedCoordinates[1] < this.boundingBox.maxLat$.getValue()){
+
+        if (this.currentSelectedCoordinates[1] > this.boundingBox.minLatLimit$.getValue()
+          && this.currentSelectedCoordinates[1] < this.boundingBox.maxLatLimit$.getValue()){
           this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
+        } else{
+          this.boundingBox.minLat$.next(this.boundingBox.minLatLimit$.getValue());
+          showAlert = true;
         }
-        if (this.currentSelectedCoordinates[2] < this.boundingBox.maxLon$.getValue()
-          && this.currentSelectedCoordinates[2]  > this.boundingBox.minLon$.getValue()){
+
+        if (this.currentSelectedCoordinates[2] < this.boundingBox.maxLonLimit$.getValue()
+          && this.currentSelectedCoordinates[2]  > this.boundingBox.minLonLimit$.getValue()){
           this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
+        } else {
+          this.boundingBox.maxLon$.next(this.boundingBox.maxLonLimit$.getValue());
+          showAlert = true;
         }
-        if (this.currentSelectedCoordinates[3] < this.boundingBox.maxLat$.getValue()
-        && this.currentSelectedCoordinates[3] > this.boundingBox.minLat$.getValue()){
+
+        if (this.currentSelectedCoordinates[3] < this.boundingBox.maxLatLimit$.getValue()
+        && this.currentSelectedCoordinates[3] > this.boundingBox.minLatLimit$.getValue()){
           this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
+        } else {
+          this.boundingBox.maxLat$.next(this.boundingBox.maxLatLimit$.getValue());
+          showAlert = true;
         }
+        if (showAlert){
+          // here I'm creating a new extent to create new geometry to set it to the current event
+          const extent = boundingExtent([
+            [this.boundingBox.minLon$.getValue(), this.boundingBox.minLat$.getValue()],
+            [this.boundingBox.maxLon$.getValue(), this.boundingBox.maxLat$.getValue()]]);
 
-        this.updateBoundingBox();
-        alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
-          'Bounds have been corrected to fit available subsetting');
+          const boxCoordinates = [
+            [getBottomLeft(extent),
+              getBottomRight(extent),
+              getTopRight(extent),
+              getTopLeft(extent),
+              getBottomLeft(extent)],
+          ];
+
+          evt.feature.setGeometry(new Polygon(boxCoordinates));
+
+          // and here, we inform a user about that
+          this.toastService.showAlert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+            'Bounds corrected to fit available subsetting');
+          // alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
+          //   'Bounds have been corrected to fit available subsetting');
+        }
       }
-
 
       this.getMap().removeInteraction(this.bboxDraw);
       this.bboxDraw = null;

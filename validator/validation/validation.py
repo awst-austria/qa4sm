@@ -71,22 +71,24 @@ def _get_actual_time_range(val_run, dataset_version_id):
     return [actual_start, actual_end]
 
 
-def _get_reference_reader(val_run):
-    ref_reader = create_reader(val_run.reference_configuration.dataset, val_run.reference_configuration.version)
+def _get_reference_reader(val_run) -> ('Reader', str, dict):
+    ref_reader = create_reader(val_run.reference_configuration.dataset,
+                               val_run.reference_configuration.version)
 
     # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
-    ref_reader = setup_filtering(
-        ref_reader,
-        list(val_run.reference_configuration.filters.all()),
-        list(val_run.reference_configuration.parametrisedfilter_set.all()),
-        val_run.reference_configuration.dataset,
-        val_run.reference_configuration.variable
-    )
+    filtered_reader, read_name, read_kwargs = \
+        setup_filtering(
+            reader=ref_reader,
+            filters=list(val_run.reference_configuration.filters.all()),
+            param_filters=list(val_run.reference_configuration.parametrisedfilter_set.all()),
+            dataset=val_run.reference_configuration.dataset,
+            variable=val_run.reference_configuration.variable)
 
     while hasattr(ref_reader, 'cls'):
         ref_reader = ref_reader.cls
 
-    return ref_reader
+    return ref_reader, read_name, read_kwargs
+
 
 
 def set_outfile(validation_run, run_dir):
@@ -104,7 +106,7 @@ def save_validation_config(validation_run):
         ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
         ds.url = settings.SITE_URL + get_angular_url('result', validation_run.id)
         if validation_run.interval_from is None:
-            ds.val_interval_from="N/A"
+            ds.val_interval_from = "N/A"
         else:
             ds.val_interval_from = validation_run.interval_from.strftime('%Y-%m-%d %H:%M')
 
@@ -180,24 +182,33 @@ def save_validation_config(validation_run):
 
 def create_pytesmo_validation(validation_run):
     ds_list = []
+    ds_read_names = []
     ref_name = None
     scaling_ref_name = None
 
     ds_num = 1
     for dataset_config in validation_run.dataset_configurations.all():
-        reader = create_reader(dataset_config.dataset, dataset_config.version)
-        reader = setup_filtering(reader, list(dataset_config.filters.all()),
-                                 list(dataset_config.parametrisedfilter_set.all()),
-                                 dataset_config.dataset, dataset_config.variable)
+        reader = create_reader(dataset_config.dataset,
+                               dataset_config.version)
+
+        reader, read_name, read_kwargs = \
+            setup_filtering(
+                reader=reader,
+                filters=list(dataset_config.filters.all()),
+                param_filters=list(dataset_config.parametrisedfilter_set.all()),
+                dataset=dataset_config.dataset,
+                variable=dataset_config.variable)
+
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
-            reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name])
+            reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name],
+                                    read_name=read_name)
         if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
             # make sure our baseline period is in UTC and without timezone information
             anomalies_baseline = [validation_run.anomalies_from.astimezone(tz=pytz.UTC).replace(tzinfo=None),
                                   validation_run.anomalies_to.astimezone(tz=pytz.UTC).replace(tzinfo=None)]
             reader = AnomalyClimAdapter(reader, columns=[dataset_config.variable.pretty_name],
-                                        timespan=anomalies_baseline)
+                                        timespan=anomalies_baseline, read_name=read_name)
 
         if (validation_run.reference_configuration and
                 (dataset_config.id == validation_run.reference_configuration.id)):
@@ -207,7 +218,9 @@ def create_pytesmo_validation(validation_run):
             dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
             ds_num += 1
 
-        ds_list.append((dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name]}))
+        ds_list.append((dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name],
+                                       'kwargs': read_kwargs}))
+        ds_read_names.append((dataset_name, read_name))
 
         if (validation_run.reference_configuration and
                 (dataset_config.id == validation_run.reference_configuration.id)):
@@ -254,7 +267,7 @@ def create_pytesmo_validation(validation_run):
         datasets,
         ref_name=ref_name,
         period=period,
-        read_ts_names='read',
+        read_ts_names=dict(ds_read_names),
         upscale_parms=upscale_parms,
     )
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
@@ -273,7 +286,9 @@ def create_pytesmo_validation(validation_run):
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         tcol_metrics = TripleCollocationMetrics(
-            ref_name, metadata_template=metadata_template,
+            ref_name,
+            metadata_template=metadata_template,
+            bootstrap_cis=validation_run.bootstrap_tcol_cis
         )
         metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
 
@@ -360,7 +375,7 @@ def untrack_celery_task(task_id):
 def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
-    validation_aborted = False;
+    validation_aborted = False
 
     if (not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (not settings.CELERY_TASK_ALWAYS_EAGER):
         app.control.add_consumer(validation_run.user.username, reply=True)  # @UndefinedVariable
@@ -369,7 +384,7 @@ def run_validation(validation_id):
         run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
         mkdir_if_not_exists(run_dir)
 
-        ref_reader = _get_reference_reader(validation_run)
+        ref_reader, read_name, read_kwargs = _get_reference_reader(validation_run)
 
         total_points, jobs = create_jobs(
             validation_run=validation_run,
@@ -386,7 +401,8 @@ def run_validation(validation_id):
         async_results = []
         job_table = {}
         for j in jobs:
-            celery_job = execute_job.apply_async(args=[validation_id, j], queue=validation_run.user.username)
+            celery_job = execute_job.apply_async(args=[validation_id, j],
+                                                 queue=validation_run.user.username)
             async_results.append(celery_job)
             job_table[celery_job.id] = j
             track_celery_task(validation_run, celery_job.id)
@@ -429,6 +445,11 @@ def run_validation(validation_id):
                 validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 __logger.exception(
                     'Celery could not execute the job. Job ID: {} Error: {}'.format(async_result.id, async_result.info))
+                # forgetting task doesn't remove it, so cleaning has to be added here
+                if celery_task_cancelled(async_result.id):
+                    validation_aborted = True
+                else:
+                    untrack_celery_task(async_result.id)
             finally:
                 # whether finished or cancelled or failed, forget about this task now
                 async_result.forget()
@@ -703,7 +724,7 @@ def copy_validationrun(run_to_copy, new_user):
         old_val_id = str(run_to_copy.id)
         old_val_name = run_to_copy.name_tag
 
-        dataset_conf = run_to_copy.dataset_configurations.all()
+        dataset_conf = DatasetConfiguration.objects.filter(validation=run_to_copy)
 
         run_to_copy.user = new_user
         run_to_copy.id = None

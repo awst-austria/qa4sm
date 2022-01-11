@@ -23,7 +23,7 @@
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
         [ngClass]="{'collapse': validationRun.publishing_in_progress}">
 
-    <button *ngIf="validationRun.is_archived"
+    <button *ngIf="isArchived$|async"
             pButton
             type="button"
             icon="pi pi-calendar"
@@ -32,7 +32,7 @@
             (click)="archiveResults(validationRun.id, false)">
     </button>
 
-    <button *ngIf="!validationRun.is_archived"
+    <button *ngIf="!(isArchived$|async)"
             pButton
             type="button"
             icon="faIcons.faArchive"
@@ -67,16 +67,15 @@
                 title="Download validation run .nc file">
           <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
         </button>
-        <button pButton
-                routerLink="/validate/"
-                class="dropdown-item"
-                [queryParams]="{validation_id: validationRun.id}"
-                title="Load validation settings"
-                label="Load Validation Settings"
-                icon="pi pi-replay">
-        </button>
       </div>
-
+      <button pButton
+              routerLink="/validate/"
+              class="dropdown-item"
+              [queryParams]="{validation_id: validationRun.id}"
+              title="Load validation settings"
+              label="Load Validation Settings"
+              icon="pi pi-replay">
+      </button>
       <span *ngIf="validationRun.is_unpublished"
             [ngClass]="{'collapse': validationRun.publishing_in_progress}">
         <button pButton
@@ -87,7 +86,7 @@
                 icon="pi pi-times"
                 (click)=deleteValidation(validationRun.id)>
         </button>
-        <button *ngIf="!validationRun.is_archived"
+        <button *ngIf="!(isArchived$|async)"
                 pButton
                 type="button"
                 label="Extend Life Span"
@@ -109,7 +108,7 @@
             title="Load validation settings"
             icon="pi pi-replay">
       </button>
-    <button *ngIf="isLogged && isTrackedByTheUser"
+    <button *ngIf="isLogged && (isTrackedByTheUser$|async)"
             pButton
             type="button"
             icon="pi pi-times"
@@ -117,12 +116,12 @@
             title="Remove this validation from your list"
             (click)="removeValidation(validationRun.id)">
     </button>
-    <button *ngIf="isLogged && !isTrackedByTheUser"
+    <button *ngIf="isLogged && !(isTrackedByTheUser$|async)"
             pButton
             type="button"
             icon="pi pi-plus"
             class="btn-action"
-            title="Pin this validation"
+            title="Pin this validation. Pinning results gives a quick access to it."
             (click)="addValidation(validationRun.id)"
             onclick="">
     </button>
@@ -159,7 +158,7 @@
 </div>
 
 <!--Buttons shown on the single validation page (both custom and published)-->
-<div *ngIf="!validationList" class="col-sm" style="text-align: right;">
+<div *ngIf="!validationList && !(publishingInProgress$|async)" class="col-sm p-pb-4" style="text-align: right;">
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
     <button pButton
@@ -171,7 +170,7 @@
             (click)="deleteValidation(validationRun.id)">
     </button>
 
-    <button *ngIf="validationRun.is_archived; else elseIsArchived"
+    <button *ngIf="isArchived$|async; else elseIsArchived"
             pButton
             type="button"
             icon="pi pi-calendar"
@@ -256,26 +255,29 @@
          title="Load settings">
       </a>
 
-      <button *ngIf="isLogged && isTrackedByTheUser && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && (isTrackedByTheUser$|async) && !validationRun.is_unpublished"
               pButton
               type="button"
               icon="pi pi-times"
               class="btn-action-large"
-              label="Unpin"
+              label="Unpin validation"
               title="Remove this validation from your list"
               (click)="removeValidation(validationRun.id)">
       </button>
 
-      <button *ngIf="isLogged && !isTrackedByTheUser && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && !(isTrackedByTheUser$|async) && !validationRun.is_unpublished"
               class="btn-action-large"
               pButton
               type="button"
               icon="pi pi-plus"
-              label="Pin"
-              title="Pinning results gives a quick access to it, however, if the results is removed by the owner, you will loose access to it."
+              label="Pin validation"
+              title="Pinning results gives a quick access to it."
               (click)="addValidation(validationRun.id)">
       </button>
 
     </div>
   </ng-template>
+</div>
+<div *ngIf="!validationList && (publishingInProgress$|async)" class="col-sm p-pb-4 text-muted" id="publishingInProgress">
+  <span class="pi pi-spin pi-spinner"></span> <span> Publishing in progress... </span>
 </div>

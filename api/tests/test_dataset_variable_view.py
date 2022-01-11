@@ -20,14 +20,14 @@ class TestDatasetVariableView(TestCase):
         dataset_variable_url = reverse('Dataset variable')
         response = self.client.get(dataset_variable_url)
         assert response.status_code == 200
-        assert len(response.json()) == 14  # now we have 14, when we merge HR will be more
+        assert len(response.json()) == 17  # updated after merging hr
 
         # check availability after logging out
         self.client.logout()
 
         response = self.client.get(dataset_variable_url)
         assert response.status_code == 200
-        assert len(response.json()) == 14
+        assert len(response.json()) == 17
 
     def test_dataset_variable_by_id(self):
         dataset_variable_url = reverse('Dataset variable')

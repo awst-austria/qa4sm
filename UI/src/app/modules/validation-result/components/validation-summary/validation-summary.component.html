@@ -1,5 +1,5 @@
 <main class="p-grid p-mx-0">
-  <p-panel *ngIf="validationRun$ | async as validationRun" class="p-col-12 p-py-0 p-px-1"
+  <p-panel class="p-col-12 p-py-0 p-px-1"
            [ngClass]="{'for-comparison-body': forComparison}">
     <ng-template *ngIf="forComparison" pTemplate="header">
       <div class="text-center" style="width:100%">
@@ -10,69 +10,58 @@
       <div class="text-center" style="width:100%">
         <h4 class="p-my-0 font-weight-normal">
           Summary:
-          <span *ngIf="validationRun.is_unpublished && validationRun.isOwner">
-            <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}} </span>
+          <span *ngIf="validationRun.is_unpublished && isOwner">
+          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{valName$|async}} </span>
+          <button
+            pButton
+            type="button"
+            [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
+            title="Change Name"
+            icon="faIcons.faPencil"
+            (click)="toggleEditing()">
+            <fa-icon [icon]="faIcons.faPencil"></fa-icon>
+          </button>
+          <span *ngIf="!hideElement">
+            <label for="new-name"></label>
+            <input id="new-name"
+                   type="text"
+                   value="{{valName$|async}}"
+                   #newName
+                   [ngClass]="{'edit_name': true}">
             <button
               pButton
               type="button"
-              [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
-              title="Change Name"
-              icon="faIcons.faPencil"
-              (click)="toggleEditing()">
-              <fa-icon [icon]="faIcons.faPencil"></fa-icon>
+              [ngClass]="{'btn-action save_name_btn result_page': true}"
+              title="Save Name"
+              icon="pi pi-save"
+              (click)="saveName(validationRun.id, newName.value)">
             </button>
-            <span *ngIf="!hideElement">
-              <label for="new-name"></label>
-              <input id="new-name"
-                     type="text"
-                     value="{{validationRun.name_tag}}"
-                     #newName
-                     [ngClass]="{'edit_name': true}">
-              <button
-                pButton
-                type="button"
-                [ngClass]="{'btn-action save_name_btn result_page': true}"
-                title="Save Name"
-                icon="pi pi-save"
-                (click)="saveName(validationRun.id, newName.value)">
-              </button>
-              <button
-                pButton
-                type="button"
-                [ngClass]="{'btn-action cancel_editing_btn result_page': true}"
-                title="Cancel"
-                icon="pi pi-ban"
-                (click)="toggleEditing()">
-              </button>
-            </span>
+            <button
+              pButton
+              type="button"
+              [ngClass]="{'btn-action cancel_editing_btn result_page': true}"
+              title="Cancel"
+              icon="pi pi-ban"
+              (click)="toggleEditing()">
+            </button>
           </span>
+        </span>
           <span *ngIf="!validationRun.is_unpublished"
-                class="p-my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
+                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   title="Validation has been published. There is no possibility of changing its name."> </span>
-              </span>
-          <span *ngIf="!validationRun.isOwner"
-                class="p-my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
+            </span>
+          <span *ngIf="!isOwner"
+                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   title="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
-          <span *ngIf="!validationRun.is_unpublished"
-                class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
-            <span class="no_name_change_info pi pi-question-circle help-icon"
-                  title="Validation has been published. There is no possibility of changing its name."> </span>
-              </span>
-          <span *ngIf="!validationRun.isOwner"
-                class="my-0 font-weight-normal no_edit_name">{{validationRun.name_tag}}
-            <span class="no_name_change_info pi pi-question-circle help-icon"
-                  title="Validation belongs to another user. There is no possibility of changing its name."> </span>
-              </span>
         </h4>
       </div>
     </ng-template>
     <!--    </div>-->
     <div *ngIf="configurations$| async as configurations" class="card-body">
       <ul [ngClass]="{'for-comparison-list': forComparison}">
-        <li>Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
           original validation run on {{this.originalDate| date: 'mediumDate' :timeZone }}.
@@ -136,6 +125,11 @@
           <span *ngIf="!validationRun.tcol">deactivated. </span>
         </li>
 
+        <li>Bootstrapping of confidence intervals for Triple Collocation Analysis was
+          <span *ngIf="validationRun.bootstrap_tcol_cis">activated. </span>
+          <span *ngIf="!validationRun.bootstrap_tcol_cis">deactivated. </span>
+        </li>
+
         <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
           <span *ngFor="let config of configurations">
                 <span *ngIf="config.id === validationRun.reference_configuration">
@@ -159,45 +153,45 @@
         </ng-template>
         <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
-        <li *ngIf="!forComparison">Processing took {{ validationRun.runTime }} minutes (wall time).</li>
+        <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 
         <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
         <ng-template #elseProgress>
-          <li *ngIf="!forComparison" [ngClass]="{'alert-danger': validationRun.errorRate > 0}">
-            {{validationRun.errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
+          <li *ngIf="!forComparison" [ngClass]="{'alert-danger': errorRate > 0}">
+            {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
             of {{ validationRun.total_points }}) of the processed locations (grid points) produced errors during
             calculation.
           </li>
         </ng-template>
-        <li *ngIf="validationRun.expiry_date && getCurrentUser() === validationRun.user && !forComparison">
-            <span *ngIf="validationRun.is_near_expiry">
-              <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
-              This validation will SOON be automatically removed during cleanup
-              on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}.
-            </span>
+        <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user  && !forComparison">
+          <span *ngIf="isNearExpiry$|async">
+            <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
+            This validation will SOON be automatically removed during cleanup
+            on {{ (expiryDate$|async)|date: dateFormat :timeZone}} {{timeZone}}.
+          </span>
 
-          <span *ngIf="!validationRun.is_near_expiry">
-              <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
-              This validation will be automatically removed during cleanup
-              on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.
-            </span>
+          <span *ngIf="!(isNearExpiry$|async)">
+            <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
+            This validation will be automatically removed during cleanup
+            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{timeZone}}.
+          </span>
 
         </li>
-        <li *ngIf="validationRun.is_archived && validationRun.is_unpublished && !forComparison">
-                <span
-                  class="p-panel-header-icon pi pi- expiry-icons">
-                  <fa-icon [icon]="faIcons.faArchive"></fa-icon>
-                </span>
+        <li *ngIf="(isArchived$|async) && validationRun.is_unpublished && !forComparison">
+              <span
+                class="p-panel-header-icon pi expiry-icons">
+                <fa-icon [icon]="faIcons.faArchive"></fa-icon>
+              </span>
           This validation has been archived. It will NOT be automatically removed during cleanup.
+
         </li>
-        <li *ngIf="validationRun.doi && !forComparison">
+        <li *ngIf="!validationRun.is_unpublished && !forComparison">
           <span class="pi pi-book"></span> This result was published on zenodo with DOI
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
         <!--        </div>-->
       </ul>
-      <qa-buttons *ngIf="!forComparison" [validationList]="false" [validationRun]="validationRun"
-                  (doRefresh)="refresh($event)"></qa-buttons>
+      <qa-buttons *ngIf="!forComparison && (validationModel.validationRun|async) as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
     </div>
   </p-panel>
 </main>

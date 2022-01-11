@@ -6,7 +6,6 @@ import {Router} from '@angular/router';
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 
 
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -17,6 +16,7 @@ export class LoginComponent implements OnInit {
 
   loginDto = new LoginDto('', '');
   submitted = false;
+  prevUrl = '';
 
   loginForm = new FormGroup({
     username: new FormControl(this.loginDto.username, Validators.required),
@@ -29,6 +29,9 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loginService.checkPreviousUrl().subscribe(previousUrl => {
+      this.prevUrl = previousUrl;
+    });
   }
 
   onSubmit() {
@@ -40,7 +43,7 @@ export class LoginComponent implements OnInit {
 
     this.loginService.login(this.loginDto).subscribe(authenticated => {
       if (authenticated) {
-        this.router.navigate(['user-profile']).then(
+        this.router.navigate([this.prevUrl]).then(
           value => this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.loginService.currentUser.username));
       } else {
         this.toastService.showErrorWithHeader('Login failed', 'Wrong username or password');

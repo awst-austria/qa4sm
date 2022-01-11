@@ -1,12 +1,5 @@
-#sorting_form{
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  font-size: 1.15rem;
-}
-
-@media screen and (max-width: 548.9px){
-  div #sorting_form{
-    font-size: 1rem;
-    margin: 0;
-  }
-
+#sortingForm{
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
 }

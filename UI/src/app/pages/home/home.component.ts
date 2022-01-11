@@ -1,10 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {WebsiteGraphicsService} from '../../modules/core/services/global/website-graphics.service';
 import {Observable} from 'rxjs';
-
-import {Router} from '@angular/router';
 import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {Gallery} from 'angular-gallery';
 
@@ -22,30 +19,34 @@ export class HomeComponent implements OnInit {
 
   public carouselFiles = [{
     plot: homeUrlPrefix + 'map_us_spearman.jpg',
-    link: '#',
+    attrLink: '#',
     description: 'Image: QA4SM'
   }, {
     plot: homeUrlPrefix + 'smos.jpg',
-    link: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
+    attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
     description: 'Image: ESA'
   }, {
     plot: homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
-    link: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
+    attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
     description: 'Image: ESA'
   }];
 
   logoFiles = [{
-    plot: logoUrlPrefix + 'logo_ffg.png',
-    link: 'https://www.ffg.at/',
-    description: 'FFG'
+    plot: logoUrlPrefix + 'logo_awst.png',
+    link: 'https://www.awst.at/',
+    description: 'AWST'
   }, {
     plot: logoUrlPrefix + 'logo_tuwien_geo.png',
     link: 'https://www.geo.tuwien.ac.at/',
     description: 'GEO'
   }, {
-    plot: logoUrlPrefix + 'logo_awst.png',
-    link: 'https://www.awst.at/',
-    description: 'AWST'
+    plot: logoUrlPrefix + 'logo_esa.png',
+    link: 'https://www.esa.int/',
+    description: 'ESA'
+  }, {
+    plot: logoUrlPrefix + 'logo_ffg.png',
+    link: 'https://www.ffg.at/',
+    description: 'FFG'
   }];
 
   workflowDiagram = [{
@@ -74,9 +75,7 @@ export class HomeComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
-              public plotService: WebsiteGraphicsService,
-              private gallery: Gallery,
-              private router: Router) {
+              private gallery: Gallery) {
   }
 
   ngOnInit(): void {
@@ -97,7 +96,4 @@ export class HomeComponent implements OnInit {
     this.gallery.load(prop);
   }
 
-  goToSignUp(): void {
-    this.router.navigate(['/signup']);
-  }
 }

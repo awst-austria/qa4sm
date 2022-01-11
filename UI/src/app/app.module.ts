@@ -57,6 +57,13 @@ import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
 import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
 import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
+import {IsmnDepthFilterModule} from './modules/ismn-depth-filter/ismn-depth-filter.module';
+import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
+import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
+import {SetPasswordComponent} from './pages/set-password/set-password.component';
+import {
+  PasswordResetValidateTokenComponent
+} from './pages/password-reset-validate-token/password-reset-validate-token.component';
 
 
 @NgModule({
@@ -78,6 +85,10 @@ import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/
     SignupComponent,
     SignupCompleteComponent,
     DeactivateUserCompleteComponent,
+    PasswordResetComponent,
+    PasswordResetDoneComponent,
+    SetPasswordComponent,
+    PasswordResetValidateTokenComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -114,7 +125,8 @@ import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/
     IvyGalleryModule,
     NgxPageScrollModule,
     CoreModule,
-    UserModule
+    UserModule,
+    IsmnDepthFilterModule
 
   ],
   providers: [
