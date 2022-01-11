@@ -24,6 +24,7 @@ export class PlotsComponent implements OnInit {
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(
     [],
     new ExtentModel(true).getIntersection,
+    false
   );
   // metrics to show the table/plots for
   comparisonMetrics: MetricsComparisonDto[] = [];
@@ -45,9 +46,10 @@ export class PlotsComponent implements OnInit {
   startComparison(): void {
     // start comparison on button click; updated recursively
     this.comparisonService.currentComparisonModel.pipe(debounceTime(5000)).subscribe(comparison => {
-      if (comparison.selectedValidations.length > 0) {
-        this.comparisonModel = comparison;
-        this.getComparisonMetrics(comparison);
+      this.comparisonModel = comparison;
+      if ((comparison.selectedValidations.length > 1 && !comparison.multipleNonReference) ||
+        (comparison.selectedValidations.length === 1 && comparison.multipleNonReference)) {
+          this.getComparisonMetrics(comparison);
       }
     });
   }
@@ -104,7 +106,7 @@ export class PlotsComponent implements OnInit {
       parameters = parameters.append('plot_types', plotType);
     });
     this.comparisonService.getComparisonPlots(parameters).subscribe(data => {
-      if (data){
+      if (data) {
         this.plots = data;
         this.showLoadingSpinner = false;
       }

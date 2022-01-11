@@ -114,20 +114,6 @@ def custom_tracked_validation_runs(request):
 
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
-def get_summary_statistics(request):
-    validation_id = request.query_params.get('id', None)
-    validation = get_object_or_404(ValidationRun, id=validation_id)
-    # resetting index added, otherwise there would be a row shift between the index column header and the header of the
-    # rest of the columns when df rendered as html
-    inspection_table = get_inspection_table(validation).reset_index()
-
-    response = HttpResponse(inspection_table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped'],
-                                                 index=False))
-
-    return response
-
-@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_validations_for_comparison(request):
     ref_dataset = request.query_params.get('ref_dataset', 'ISMN')
@@ -154,26 +140,6 @@ def get_validations_for_comparison(request):
 
     serializer = ValidationRunSerializer(eligible4comparison, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
-
-@api_view(['GET'])
-def get_publishing_form(request):
-    validation_id = request.query_params.get('id', None)
-    validation = get_object_or_404(ValidationRun, id=validation_id)
-    # validation = ValidationRun.objects.all()[0]
-    publishing_form = PublishingForm(validation=validation)
-    print(publishing_form.data)
-    return JsonResponse(publishing_form.data, status=200)
-
-
-@api_view(['GET'])
-def copy_validation_results(request):
-    validation_id = request.query_params.get('validation_id', None)
-    validation = get_object_or_404(ValidationRun, id=validation_id)
-    current_user = request.user
-
-    new_validation = _copy_validationrun(validation, current_user)
-
-    return JsonResponse(new_validation, status=200)
 
 
 @api_view(['GET'])
