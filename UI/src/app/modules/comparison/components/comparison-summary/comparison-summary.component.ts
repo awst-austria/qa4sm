@@ -14,6 +14,7 @@ import {DatasetConfigurationService} from '../../../validation-result/services/d
 export class ComparisonSummaryComponent implements OnInit {
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(
     [], new ExtentModel(true).getIntersection,
+    false
   );
   isSingle = true;
   valResModels: ValidationResultModel[] = [];
@@ -30,8 +31,9 @@ export class ComparisonSummaryComponent implements OnInit {
   startComparison(): void {
     // start comparison on button click; updated recursively
     this.comparisonService.currentComparisonModel.subscribe(comparison => {
-      if (comparison.selectedValidations.length > 0) {
-        this.comparisonModel = comparison;
+      this.comparisonModel = comparison;
+      if ((comparison.selectedValidations.length > 1 && !comparison.multipleNonReference) ||
+        (comparison.selectedValidations.length === 1 && comparison.multipleNonReference)) {
         this.getValidationResultModels(comparison);
         this.isSingle = (this.comparisonModel.selectedValidations.length === 1);
       }

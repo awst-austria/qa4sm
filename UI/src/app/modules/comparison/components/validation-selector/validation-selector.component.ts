@@ -31,6 +31,7 @@ export class ValidationSelectorComponent implements OnInit {
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(
     [],
     new ExtentModel(true).getIntersection,
+    this.multipleNonReference
   );
 
   constructor(private datasetService: DatasetService,
@@ -44,6 +45,7 @@ export class ValidationSelectorComponent implements OnInit {
     this.comparisonService.currentComparisonModel.subscribe(model => this.comparisonModel = model);
     this.addDatasetToSelection();
     this.comparisonModel.getIntersection = this.checkOverlapping();
+    this.comparisonModel.multipleNonReference = this.multipleNonReference;
   }
 
   addDatasetToSelection(): void {
@@ -122,6 +124,7 @@ export class ValidationSelectorComponent implements OnInit {
     // should add the selected validation in the comparisonModel
     this.comparisonModel.selectedValidations.push(this.selectedValidation);
     this.comparisonModel.getIntersection = this.checkOverlapping();
+    this.comparisonModel.multipleNonReference = this.multipleNonReference;
   }
 
   removeValidation(target: ValidationrunDto): void {
@@ -129,6 +132,7 @@ export class ValidationSelectorComponent implements OnInit {
     const toBeRemoved = this.comparisonModel.selectedValidations.indexOf(target);
     this.comparisonModel.selectedValidations.splice(toBeRemoved, 1);
     this.comparisonModel.getIntersection = this.checkOverlapping();
+    this.comparisonModel.multipleNonReference = this.multipleNonReference;
     this.comparisonService.sendComparisonModel(this.comparisonModel);
   }
 

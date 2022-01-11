@@ -25,7 +25,8 @@ export class TableComparisonComponent implements OnInit {
   startComparison(): void {
     // start comparison on button click; updated recursively
     this.comparisonService.currentComparisonModel.pipe(debounceTime(2000)).subscribe(comparison => {
-      if (comparison.selectedValidations.length > 0) {
+      if ((comparison.selectedValidations.length > 1 && !comparison.multipleNonReference) ||
+        (comparison.selectedValidations.length === 1 && comparison.multipleNonReference)) {
         this.getComparisonMetrics(comparison);
       }
     });

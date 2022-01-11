@@ -26,6 +26,7 @@ export class ComparisonService {
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(
     [],
     new ExtentModel(true).getIntersection,
+    false
   );
   private comparisonModelSubject = new BehaviorSubject<Validations2CompareModel>(this.comparisonModel);
   currentComparisonModel = this.comparisonModelSubject.asObservable();
