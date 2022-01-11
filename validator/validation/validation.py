@@ -158,7 +158,7 @@ def save_validation_config(validation_run):
                         'val_resolution', validation_run.reference_configuration.dataset.resolution["value"]
                     )
                     ds.setncattr(
-                        'val_resulution_unit', validation_run.reference_configuration.dataset.resolution["unit"]
+                        'val_resolution_unit', validation_run.reference_configuration.dataset.resolution["unit"]
                     )
                 # ISMN has null resolution attribute, therefore
                 # we write no output resolution
