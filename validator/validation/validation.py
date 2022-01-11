@@ -153,6 +153,18 @@ def save_validation_config(validation_run):
                     (dataset_config.id == validation_run.reference_configuration.id)):
                 ds.val_ref = 'val_dc_dataset' + str(i)
 
+                try:
+                    ds.setncattr(
+                        'val_resolution', validation_run.reference_configuration.dataset.resolution["value"]
+                    )
+                    ds.setncattr(
+                        'val_resulution_unit', validation_run.reference_configuration.dataset.resolution["unit"]
+                    )
+                # ISMN has null resolution attribute, therefore
+                # we write no output resolution
+                except AttributeError:
+                    continue
+
             if ((validation_run.scaling_ref is not None) and
                     (dataset_config.id == validation_run.scaling_ref.id)):
                 ds.val_scaling_ref = 'val_dc_dataset' + str(i)
