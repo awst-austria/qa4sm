@@ -1,0 +1,11 @@
+<div class="p-grid no-gutters">
+  <div class="p-col-12">
+    <p-checkbox label="Depth range selector"
+                [binary]="true" [ngModel]="true" readonly="true">
+    </p-checkbox>
+    <a (click)="dialogVisible=true"><i class="pi pi-cog" style="padding-left: 5px;cursor: pointer;"></i></a>
+  </div>
+</div>
+<p-dialog header="Set depth range" position="top" [(visible)]="dialogVisible">
+  <p>Depth selector</p>
+</p-dialog>

@@ -104,81 +104,91 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private modelFromValidationConfig(config: ValidationRunConfigDto): void {
-
+  private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
+    // TODO: parameterized filter setup seems to be missing
     // Prepare dataset config
-    config.dataset_configs.forEach(datasetConfig => {
-      const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
+    validationRunConfig.dataset_configs.forEach(datasetConfig => {
+      const newDatasetConfigModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
         null, new BehaviorSubject(null), new BehaviorSubject(null));
-      this.validationModel.datasetConfigurations.push(model);
+      this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
-        model.datasetModel.selectedDataset = dataset;
-        this.loadFiltersForModel(model, true) // Load the available filters for the dataset
-          .subscribe(data => { // when it is loaded, set the values from the config
+        newDatasetConfigModel.datasetModel.selectedDataset = dataset;
+        this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
+          .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
             datasetConfig.basic_filters.forEach(basicFilterConfig => {
-              data.basicFilters.forEach(filter => {
+              datasetConfigModel.basicFilters.forEach(filter => {
                 if (basicFilterConfig === filter.filterDto.id) {
-                  filter.enabled = true;
+                  filter.enabled$.next(true);
                 }
               });
+            });
+            datasetConfig.parametrised_filters.forEach(paramFilter => {
+              if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
+                datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
+              }
             });
           });
       });
 
       this.versionService.getVersionById(datasetConfig.version_id).subscribe(versionDto => {
-        model.datasetModel.selectedVersion = versionDto;
+        newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
       });
 
       this.variableService.getVariableById(datasetConfig.variable_id).subscribe(variableDto => {
-        model.datasetModel.selectedVariable = variableDto;
+        newDatasetConfigModel.datasetModel.selectedVariable = variableDto;
       });
     });
 
     // Prepare reference
-    const referenceModel = new DatasetConfigModel(
+    const newReferenceModel = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null), null,
       new BehaviorSubject<FilterModel>(null), new BehaviorSubject<FilterModel>(null));
-    this.validationModel.referenceConfigurations.push(referenceModel);
-    this.datasetService.getDatasetById(config.reference_config.dataset_id).subscribe(dataset => {
-      referenceModel.datasetModel.selectedDataset = dataset;
-      this.loadFiltersForModel(referenceModel, true)
-        .subscribe(model => { // when it is loaded, set the values from the config
-          config.reference_config.basic_filters.forEach(basicFilterConfig => {
-            model.basicFilters.forEach(filter => {
+    this.validationModel.referenceConfigurations.push(newReferenceModel);
+    this.datasetService.getDatasetById(validationRunConfig.reference_config.dataset_id).subscribe(dataset => {
+      newReferenceModel.datasetModel.selectedDataset = dataset;
+      this.loadFiltersForModel(newReferenceModel, true)
+        .subscribe(referenceConfigModel => { // when it is loaded, set the values from the config
+          validationRunConfig.reference_config.basic_filters.forEach(basicFilterConfig => {
+            referenceConfigModel.basicFilters.forEach(filter => {
               if (basicFilterConfig === filter.filterDto.id) {
-                filter.enabled = true;
+                filter.enabled$.next(true);
               }
             });
+          });
+          validationRunConfig.reference_config.parametrised_filters.forEach(paramFilter => {
+            if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
+              referenceConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
+            }
           });
         });
     });
 
-    this.versionService.getVersionById(config.reference_config.version_id).subscribe(versionDto => {
-      referenceModel.datasetModel.selectedVersion = versionDto;
+    this.versionService.getVersionById(validationRunConfig.reference_config.version_id).subscribe(versionDto => {
+      newReferenceModel.datasetModel.selectedVersion = versionDto;
     });
 
-    this.variableService.getVariableById(config.reference_config.variable_id).subscribe(variableDto => {
-      referenceModel.datasetModel.selectedVariable = variableDto;
+    this.variableService.getVariableById(validationRunConfig.reference_config.variable_id).subscribe(variableDto => {
+      newReferenceModel.datasetModel.selectedVariable = variableDto;
     });
 
     // Spatial subset
-    this.validationModel.spatialSubsetModel.maxLon$.next(config.max_lon);
-    this.validationModel.spatialSubsetModel.maxLat$.next(config.max_lat);
-    this.validationModel.spatialSubsetModel.minLon$.next(config.min_lon);
-    this.validationModel.spatialSubsetModel.minLat$.next(config.min_lat);
+    this.validationModel.spatialSubsetModel.maxLon$.next(validationRunConfig.max_lon);
+    this.validationModel.spatialSubsetModel.maxLat$.next(validationRunConfig.max_lat);
+    this.validationModel.spatialSubsetModel.minLon$.next(validationRunConfig.min_lon);
+    this.validationModel.spatialSubsetModel.minLat$.next(validationRunConfig.min_lat);
 
     // Temporal subset
-    if (config.interval_from != null) {
-      this.validationModel.validationPeriodModel.intervalFrom$.next(new Date(config.interval_from));
+    if (validationRunConfig.interval_from != null) {
+      this.validationModel.validationPeriodModel.intervalFrom$.next(new Date(validationRunConfig.interval_from));
     }
 
-    if (config.interval_to != null) {
-      this.validationModel.validationPeriodModel.intervalTo$.next(new Date(config.interval_to));
+    if (validationRunConfig.interval_to != null) {
+      this.validationModel.validationPeriodModel.intervalTo$.next(new Date(validationRunConfig.interval_to));
     }
 
     // Metrics
-    if (config.metrics) {
-      config.metrics.forEach(metricDto => {
+    if (validationRunConfig.metrics) {
+      validationRunConfig.metrics.forEach(metricDto => {
         this.validationModel.metrics.forEach(metricModel => {
           if (metricModel.id === metricDto.id) {
             metricModel.value$.next(metricDto.value);
@@ -189,21 +199,21 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
     // Anomalies
-    if (config.anomalies_method != null) {
-      this.anomaliesChild.setSelection(config.anomalies_method);
-      if (config.anomalies_from != null) {
-        this.validationModel.anomalies.anomaliesFrom$.next(new Date(config.anomalies_from));
+    if (validationRunConfig.anomalies_method != null) {
+      this.anomaliesChild.setSelection(validationRunConfig.anomalies_method);
+      if (validationRunConfig.anomalies_from != null) {
+        this.validationModel.anomalies.anomaliesFrom$.next(new Date(validationRunConfig.anomalies_from));
       }
-      if (config.anomalies_to != null) {
-        this.validationModel.anomalies.anomaliesTo$.next(new Date(config.anomalies_from));
+      if (validationRunConfig.anomalies_to != null) {
+        this.validationModel.anomalies.anomaliesTo$.next(new Date(validationRunConfig.anomalies_from));
       }
     }
 
     // Scaling
-    this.scalingChild.setSelection(config.scaling_method, config.scale_to);
+    this.scalingChild.setSelection(validationRunConfig.scaling_method, validationRunConfig.scale_to);
 
     // Name
-    this.validationModel.nameTag$.next(config.name_tag);
+    this.validationModel.nameTag$.next(validationRunConfig.name_tag);
   }
 
   includeFilter(toInclude: string, basicFilters: any, enabled: boolean): void {
@@ -272,10 +282,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
       // and the filters
       this.loadFiltersForModel(model);
-      // .pipe(
-      // map((basicFilter) => {
-      //   basicFilter.basicFilters.forEach(bf => bf.enabled = bf.filterDto.name === 'FIL_ALL_VALID_RANGE');
-      // })).subscribe();
     });
   }
 
@@ -289,29 +295,40 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         filters.forEach(filter => {
           if (filter.parameterised) {
             if (filter.id === ISMN_NETWORK_FILTER_ID) {
-              console.log('Adding ISMN filter at init');
-              model.ismnNetworkFilter$.next(new FilterModel(filter, false, false, filter.default_parameter));
+              model.ismnNetworkFilter$.next(new FilterModel(
+                filter,
+                new BehaviorSubject<boolean>(false),
+                new BehaviorSubject<boolean>(false),
+                new BehaviorSubject<string>(filter.default_parameter)));
             } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
               if (model.ismnDepthFilter$) {
-                model.ismnDepthFilter$.next(new FilterModel(filter, false, false, filter.default_parameter));
+                model.ismnDepthFilter$.next(new FilterModel(
+                  filter,
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<string>(filter.default_parameter)));
               } else {
-                model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(filter, false, false, filter.default_parameter));
+                model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+                  filter,
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<boolean>(false),
+                  new BehaviorSubject<string>(filter.default_parameter))
+                );
               }
             }
           } else {
-            const newFilter = new FilterModel(filter, false, false, null);
+            const newFilter = (new FilterModel(
+              filter,
+              new BehaviorSubject<boolean>(false),
+              new BehaviorSubject<boolean>(false),
+              new BehaviorSubject<string>(null)));
             if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE') {
-              newFilter.enabled = true;
+              newFilter.enabled$.next(true);
             }
             model.basicFilters.push(newFilter);
           }
         });
 
-        if (model.ismnNetworkFilter$.value == null) {
-          console.log('ISMN net filter is null after loading filters');
-        } else {
-          console.log('ISMN net filter is present after loading filters');
-        }
         updatedModel$.next(model);
       },
       error => {
