@@ -1,6 +1,6 @@
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -8,10 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
-from validator.forms import PublishingForm
 from validator.models import ValidationRun, CopiedValidations
-
-
 
 
 @api_view(['GET'])
@@ -147,7 +144,7 @@ def get_validations_for_comparison(request):
 def get_copied_validations(request, **kwargs):
     copied_run = get_object_or_404(CopiedValidations, copied_run_id=kwargs['id'])
     serializer = CopiedValidationRunSerializer(copied_run)
-    return  JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
 class ValidationRunSerializer(ModelSerializer):
