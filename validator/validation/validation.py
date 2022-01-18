@@ -162,8 +162,8 @@ def save_validation_config(validation_run):
                     )
                 # ISMN has null resolution attribute, therefore
                 # we write no output resolution
-                except AttributeError:
-                    continue
+                except (AttributeError, TypeError):
+                    pass
 
             if ((validation_run.scaling_ref is not None) and
                     (dataset_config.id == validation_run.scaling_ref.id)):
