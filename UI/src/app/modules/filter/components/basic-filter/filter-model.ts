@@ -3,8 +3,8 @@ import {BehaviorSubject} from 'rxjs';
 
 export class FilterModel {
   constructor(public filterDto: FilterDto,
-              public enabled$: BehaviorSubject<boolean>,
-              public readonly$: BehaviorSubject<boolean>,
+              public enabled: boolean,
+              public readonly: boolean,
               public parameters$: BehaviorSubject<string>) {
   }
 }

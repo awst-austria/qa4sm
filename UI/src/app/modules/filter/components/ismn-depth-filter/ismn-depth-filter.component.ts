@@ -15,9 +15,38 @@ export class IsmnDepthFilterComponent implements OnInit {
 
   dialogVisible = false;
 
+  editFrom = 0;
+  editTo = 0;
+
   constructor() {
   }
 
   ngOnInit(): void {
+    this.filterModel$.subscribe(model => {
+      if (model != null) {
+        this.initComponent();
+      }
+    });
+  }
+
+  private initComponent(): void {
+    this.updateUiFields(this.filterModel$.value.filterDto.default_parameter);
+    this.filterModel$.subscribe(() => this.initFilterFieldSubscriptions());
+    this.initFilterFieldSubscriptions();
+  }
+
+  private initFilterFieldSubscriptions(): void {
+    this.filterModel$.value.parameters$.subscribe(param => this.updateUiFields(param));
+  }
+
+  private updateUiFields(parameters: string): void {
+    const values = parameters.split(',');
+    this.editFrom = Number(values[0]);
+    this.editTo = Number(values[1]);
+  }
+
+  public saveNewValues(): void {
+    this.filterModel$.value.parameters$.next(this.editFrom + ',' + this.editTo);
+    this.dialogVisible = false;
   }
 }

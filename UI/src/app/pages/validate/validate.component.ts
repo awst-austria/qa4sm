@@ -118,13 +118,17 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             datasetConfig.basic_filters.forEach(basicFilterConfig => {
               datasetConfigModel.basicFilters.forEach(filter => {
                 if (basicFilterConfig === filter.filterDto.id) {
-                  filter.enabled$.next(true);
+                  filter.enabled = true;
                 }
               });
             });
             datasetConfig.parametrised_filters.forEach(paramFilter => {
               if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
                 datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
+
+              }
+              if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
+                datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
               }
             });
           });
@@ -151,13 +155,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           validationRunConfig.reference_config.basic_filters.forEach(basicFilterConfig => {
             referenceConfigModel.basicFilters.forEach(filter => {
               if (basicFilterConfig === filter.filterDto.id) {
-                filter.enabled$.next(true);
+                filter.enabled = true;
               }
             });
           });
           validationRunConfig.reference_config.parametrised_filters.forEach(paramFilter => {
             if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
               referenceConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
+            }
+            if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
+              referenceConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
             }
           });
         });
@@ -297,21 +304,21 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             if (filter.id === ISMN_NETWORK_FILTER_ID) {
               model.ismnNetworkFilter$.next(new FilterModel(
                 filter,
-                new BehaviorSubject<boolean>(false),
-                new BehaviorSubject<boolean>(false),
+                false,
+                false,
                 new BehaviorSubject<string>(filter.default_parameter)));
             } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
               if (model.ismnDepthFilter$) {
                 model.ismnDepthFilter$.next(new FilterModel(
                   filter,
-                  new BehaviorSubject<boolean>(false),
-                  new BehaviorSubject<boolean>(false),
+                  false,
+                  false,
                   new BehaviorSubject<string>(filter.default_parameter)));
               } else {
                 model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
                   filter,
-                  new BehaviorSubject<boolean>(false),
-                  new BehaviorSubject<boolean>(false),
+                  false,
+                  false,
                   new BehaviorSubject<string>(filter.default_parameter))
                 );
               }
@@ -319,11 +326,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           } else {
             const newFilter = (new FilterModel(
               filter,
-              new BehaviorSubject<boolean>(false),
-              new BehaviorSubject<boolean>(false),
+              false,
+              false,
               new BehaviorSubject<string>(null)));
             if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE') {
-              newFilter.enabled$.next(true);
+              newFilter.enabled = true;
             }
             model.basicFilters.push(newFilter);
           }
