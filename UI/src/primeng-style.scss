@@ -519,6 +519,11 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   background: #007bff;
 }
 
+.param-filter-checkbox .p-checkbox-box.p-highlight{
+  border-color: rgba(0, 123, 255, 0.16);
+  background: rgba(0, 123, 255, 0.6);
+}
+
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
   border-color: #ced4da;
 }
@@ -535,6 +540,12 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   background: #0062cc;
   color: #ffffff;
 }
+
+.param-filter-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover{
+  border-color: rgba(0, 123, 255, 0.16);
+  background: rgba(0, 123, 255, 0.6);
+}
+
 
 p-checkbox.ng-dirty.ng-invalid > .p-checkbox > .p-checkbox-box {
   border-color: #dc3545;
@@ -4105,6 +4116,10 @@ div.carousel-caption{
   border-radius: 4px;
   box-shadow: none;
   border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#ismn-depth-selector .p-dialog {
+  width: 550px;
 }
 
 .p-dialog .p-dialog-header {
