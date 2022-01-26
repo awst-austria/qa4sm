@@ -7,26 +7,53 @@
   </div>
 </div>
 
-<p-dialog header="Select measurements depth range" position="top" [(visible)]="dialogVisible">
-  <p>Choose a range to include measurements done only at a<br> particular depth range.<br>
-    The filter will be applied to all stations in all chosen networks.</p>
-  <div class="p-grid">
-    <div class="p-col-12">
-      <div class="p-float-label">
-        <p-inputNumber id="depthFromInput"  [minFractionDigits]="1" [maxFractionDigits]="2" suffix=" m" [(ngModel)]="editFrom"></p-inputNumber>
-        <label for="depthFromInput">Depth from</label>
+<p-dialog id="ismn-depth-selector" header="Select measurements depth range" position="top" [(visible)]="dialogVisible">
+  <div class="p-pb-3 p-pl-0"> Choose a range to include measurements done only at a<br> particular depth range.<br>
+    The filter will be applied to all stations in all chosen networks.</div>
+  <div class="p-grid" style="display: flex">
+    <div class="p-col-12 p-pl-3">
+      <div class="p-grid"  id="depthFromInput">
+        <div class="p-col-2 p-px-0">
+          <div class="p-fluid">
+            <div>Depth from: </div>
+          </div>
+        </div>
+        <div class="p-col-3 p-mx-0 p-px-0 p-fluid">
+          <p-inputNumber
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2" suffix=" m"
+            [(ngModel)]="editFrom"
+            [showButtons]="true"
+            [step]="0.01"
+            [min]="0"
+            decrementButtonClass="changeValueButton">
+          </p-inputNumber>
+        </div>
       </div>
     </div>
-    <div class="p-col-12">
-      <div class="p-float-label">
-        <p-inputNumber id="depthToInput" [minFractionDigits]="1" [maxFractionDigits]="2" suffix=" m" [(ngModel)]="editTo"></p-inputNumber>
-        <label for="depthToInput">Depth to</label>
+
+    <div class="p-col-12 p-pl-3">
+      <div class="p-grid"  id="depthToInput">
+        <div class="p-col-2 p-px-0">
+          <div class="p-fluid">
+            <div>Depth to: </div>
+          </div>
+        </div>
+        <div class="p-col-3 p-mx-0 p-px-0 p-fluid">
+          <p-inputNumber
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2" suffix=" m"
+            [(ngModel)]="editTo"
+            [showButtons]="true"
+            [step]="0.01"
+            [min]="0">
+          </p-inputNumber>
+        </div>
       </div>
     </div>
+
     <div class="p-col-12">
       <p-button label="OK" (onClick)="saveNewValues()"></p-button>
     </div>
   </div>
 
-
-</p-dialog>
