@@ -2,6 +2,7 @@ from validator.models import Dataset, DatasetVersion, DatasetConfiguration, Vali
 from dateutil.tz import tzlocal
 from datetime import datetime
 
+
 def generate_default_validation_hires():
     run = ValidationRun()
     run.start_time = datetime.now(tzlocal())
@@ -26,6 +27,7 @@ def generate_default_validation_hires():
     run.save()
 
     return run
+
 
 def generate_default_validation():
     run = ValidationRun()
@@ -88,7 +90,7 @@ def generate_default_validation_triple_coll():
     return run
 
 
-def generate_ismn_nonref_validation():
+def generate_ismn_upscaling_validation():
     """Generate a validation where ISMN is used as non-reference"""
     run = ValidationRun()
     run.start_time = datetime.now(tzlocal())
