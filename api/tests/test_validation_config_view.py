@@ -174,7 +174,7 @@ class TestValidationConfigView(TransactionTestCase):
                DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id
         assert DataFilter.objects.get(name='FIL_ISMN_GOOD').id in val_run_dict['reference_config']['basic_filters']
 
-        param_filters_id = [p_filter.id for p_filter in
+        param_filters_id = [p_filter.filter_id for p_filter in
                             ParametrisedFilter.objects.filter(dataset_config=self.run.reference_configuration)]
 
         assert param_filters_id == [el['id'] for el in val_run_dict['reference_config']['parametrised_filters']]
