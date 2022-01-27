@@ -16,19 +16,24 @@ export const SCALING_METHOD_LIN_REG_DESC = 'Linear regression';
 export const SCALING_METHOD_MEAN_STD = 'mean_std';
 export const SCALING_METHOD_MEAN_STD_DESC = 'Mean/standard deviation';
 
+export const SCALING_METHOD_CDF_MATCH = 'cdf_match';
+export const SCALING_METHOD_CDF_MATCH_DESC = 'Cumulative Distributions Functions (CDF) matching';
+
 export const SCALING_REFERENCE_REF = 'ref';
 export const SCALING_REFERENCE_REF_DESC = 'Reference';
 export const SCALING_REFERENCE_DATA = 'data';
 export const SCALING_REFERENCE_DATA_DESC = 'Data';
 
 export const SCALING_REFERENCE_DEFAULT = new ScalingToModel(SCALING_REFERENCE_REF, SCALING_REFERENCE_REF_DESC);
-export const SCALING_METHOD_DEFAULT = new ScalingModel(SCALING_METHOD_NO_SCALING, SCALING_METHOD_NO_SCALING_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT));
+export const SCALING_METHOD_DEFAULT = new ScalingModel(SCALING_METHOD_MEAN_STD, SCALING_METHOD_MEAN_STD_DESC,
+  new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT));
 
 export let SCALING_CHOICES = {};
 SCALING_CHOICES[SCALING_METHOD_NO_SCALING] = SCALING_METHOD_NO_SCALING_DESC;
 SCALING_CHOICES[SCALING_METHOD_MIN_MAX] = SCALING_METHOD_MIN_MAX_DESC;
 SCALING_CHOICES[SCALING_METHOD_LIN_REG] = SCALING_METHOD_LIN_REG_DESC;
 SCALING_CHOICES[SCALING_METHOD_MEAN_STD] = SCALING_METHOD_MEAN_STD_DESC;
+SCALING_CHOICES[SCALING_METHOD_CDF_MATCH] = SCALING_METHOD_CDF_MATCH_DESC;
 // export const SCALING_METHOD_LIN_CDF_MATCH='lin_cdf_match';
 // export const SCALING_METHOD_CDF_MATCH='cdf_match';
 
@@ -44,7 +49,8 @@ export class ScalingComponent implements OnInit {
   scalingModels: ScalingModel[] = [new ScalingModel(SCALING_METHOD_NO_SCALING, SCALING_METHOD_NO_SCALING_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
     new ScalingModel(SCALING_METHOD_MIN_MAX, SCALING_METHOD_MIN_MAX_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
     new ScalingModel(SCALING_METHOD_LIN_REG, SCALING_METHOD_LIN_REG_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
-    new ScalingModel(SCALING_METHOD_MEAN_STD, SCALING_METHOD_MEAN_STD_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT))];
+    new ScalingModel(SCALING_METHOD_MEAN_STD, SCALING_METHOD_MEAN_STD_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
+    new ScalingModel(SCALING_METHOD_CDF_MATCH, SCALING_METHOD_CDF_MATCH_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT))];
   selectedScalingModel: BehaviorSubject<ScalingModel>;
 
   scaleToModels: ScalingToModel[] = [];
@@ -79,7 +85,7 @@ export class ScalingComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.selectedScalingModel = new BehaviorSubject<ScalingModel>(this.scalingModels[0]);
+    this.selectedScalingModel = new BehaviorSubject<ScalingModel>(this.scalingModels.find(model => model.id === 'mean_std'));
     this.prepareScalingReferenceModels();
     this.updateScalingModel();
   }
