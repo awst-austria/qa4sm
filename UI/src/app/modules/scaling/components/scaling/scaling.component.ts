@@ -46,11 +46,17 @@ SCALING_CHOICES[SCALING_METHOD_CDF_MATCH] = SCALING_METHOD_CDF_MATCH_DESC;
 export class ScalingComponent implements OnInit {
 
   readonly noScalingId = SCALING_METHOD_NO_SCALING;
-  scalingModels: ScalingModel[] = [new ScalingModel(SCALING_METHOD_NO_SCALING, SCALING_METHOD_NO_SCALING_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
-    new ScalingModel(SCALING_METHOD_MIN_MAX, SCALING_METHOD_MIN_MAX_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
-    new ScalingModel(SCALING_METHOD_LIN_REG, SCALING_METHOD_LIN_REG_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
-    new ScalingModel(SCALING_METHOD_MEAN_STD, SCALING_METHOD_MEAN_STD_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
-    new ScalingModel(SCALING_METHOD_CDF_MATCH, SCALING_METHOD_CDF_MATCH_DESC, new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT))];
+  scalingModels: ScalingModel[] =
+    [ new ScalingModel(SCALING_METHOD_NO_SCALING, SCALING_METHOD_NO_SCALING_DESC,
+       new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
+      new ScalingModel(SCALING_METHOD_MIN_MAX, SCALING_METHOD_MIN_MAX_DESC,
+        new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
+      new ScalingModel(SCALING_METHOD_LIN_REG, SCALING_METHOD_LIN_REG_DESC,
+        new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
+      new ScalingModel(SCALING_METHOD_MEAN_STD, SCALING_METHOD_MEAN_STD_DESC,
+        new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT)),
+      new ScalingModel(SCALING_METHOD_CDF_MATCH, SCALING_METHOD_CDF_MATCH_DESC,
+        new BehaviorSubject<ScalingToModel>(SCALING_REFERENCE_DEFAULT))];
   selectedScalingModel: BehaviorSubject<ScalingModel>;
 
   scaleToModels: ScalingToModel[] = [];
@@ -72,9 +78,9 @@ export class ScalingComponent implements OnInit {
 
   public setSelection(scalingMethodName: string, reference: string): void {
     this.scalingModels.forEach(scalingModel => {
-      if (scalingModel.id == scalingMethodName) {
+      if (scalingModel.id === scalingMethodName) {
         this.scaleToModels.forEach(scaleToModel => {
-          if (scaleToModel.id == reference) {
+          if (scaleToModel.id === reference) {
             scalingModel.scaleTo$.next(scaleToModel);
           }
         });
@@ -90,12 +96,12 @@ export class ScalingComponent implements OnInit {
     this.updateScalingModel();
   }
 
-  updateScalingModel() {
+  updateScalingModel(): void{
     this.validationModel.scalingModel.id = this.selectedScalingModel.getValue().id;
     this.validationModel.scalingModel.scaleTo$.next(this.selectedScaleToModel$.getValue());
   }
 
-  private prepareScalingReferenceModels() {
+  private prepareScalingReferenceModels(): void{
     this.scaleToModels.push(SCALING_REFERENCE_DEFAULT);
     this.scaleToModels.push(new ScalingToModel(SCALING_REFERENCE_DATA, SCALING_REFERENCE_DATA_DESC));
     this.selectedScaleToModel$ = new BehaviorSubject<ScalingToModel>(this.scaleToModels[0]);
