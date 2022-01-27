@@ -72,7 +72,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private networkDtoToTreeModel(network: IsmnNetworkDto, parentNode: TreeNode): TreeNode<IsmnNetworkDto> {
-    return {key: network.name, label: network.name, data: network, parent: parentNode};
+    return {key: network.name, label: network.name + ' (' + network.country + ')', data: network, parent: parentNode};
   }
 
   public onNetworkUnselect(e): void {
