@@ -16,7 +16,7 @@ export const SCALING_METHOD_LIN_REG_DESC = 'Linear regression';
 export const SCALING_METHOD_MEAN_STD = 'mean_std';
 export const SCALING_METHOD_MEAN_STD_DESC = 'Mean/standard deviation';
 
-export const SCALING_METHOD_CDF_MATCH = 'cdf_match';
+export const SCALING_METHOD_CDF_MATCH = 'cdf_beta_match';
 export const SCALING_METHOD_CDF_MATCH_DESC = 'Cumulative Distributions Functions (CDF) matching';
 
 export const SCALING_REFERENCE_REF = 'ref';
@@ -34,8 +34,6 @@ SCALING_CHOICES[SCALING_METHOD_MIN_MAX] = SCALING_METHOD_MIN_MAX_DESC;
 SCALING_CHOICES[SCALING_METHOD_LIN_REG] = SCALING_METHOD_LIN_REG_DESC;
 SCALING_CHOICES[SCALING_METHOD_MEAN_STD] = SCALING_METHOD_MEAN_STD_DESC;
 SCALING_CHOICES[SCALING_METHOD_CDF_MATCH] = SCALING_METHOD_CDF_MATCH_DESC;
-// export const SCALING_METHOD_LIN_CDF_MATCH='lin_cdf_match';
-// export const SCALING_METHOD_CDF_MATCH='cdf_match';
 
 
 @Component({
