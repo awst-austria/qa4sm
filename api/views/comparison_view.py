@@ -19,19 +19,19 @@ def get_validations(ids):
 
 
 def get_table(request):
-    """Get the comparison table as an html table"""
+    """Get the comparison table as a html table"""
     validation_ids = request.query_params.getlist('ids', None)
     metric_list = request.query_params.getlist('metric_list', None)
     extent = request.query_params.get('extent', None)
-    get_intersection = request.query_params.get('get_intersection', False)
+    get_intersection = request.query_params.get('get_intersection', 'false')
     validation_runs = get_validations(validation_ids)
     try:
         table = comparison_table(
-                validation_runs=validation_runs,
-                metric_list=metric_list,
-                extent=extent,
-                get_intersection=json.loads(get_intersection)
-            ).reset_index()
+            validation_runs=validation_runs,
+            metric_list=metric_list,
+            extent=extent,
+            get_intersection=json.loads(get_intersection)
+        ).reset_index()
         return table
 
     except (SpatialExtentError, ComparisonError) as e:
@@ -41,11 +41,15 @@ def get_table(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_comparison_table(request):
-    """Get the comparison table as an html table"""
+    """Get the comparison table as a html table"""
     table = get_table(request)
     try:
-        response = HttpResponse(table.to_html(table_id=None, classes=['table', 'table-bordered', 'table-striped', 'comparison'],
-                                  index=False))
+        response = HttpResponse(
+            table.to_html(
+                table_id=None,
+                classes=['table', 'table-bordered', 'table-striped', 'comparison'],
+                index=False)
+        )
     except AttributeError as e:
         response = HttpResponse(str(e))
     return response
@@ -72,10 +76,13 @@ def download_comparison_table(request):
 def get_comparison_metrics(request):
     """Get the metrics that are common to all validations"""
     validation_ids = request.query_params.getlist('ids', None)
-    get_intersection = request.query_params.get('get_intersection', False)
+    get_intersection = request.query_params.get('get_intersection', 'false')
     validation_runs = get_validations(validation_ids)
     try:
-        comp = generate_comparison(validation_runs, get_intersection=json.loads(get_intersection))
+        comp = generate_comparison(
+            validation_runs,
+            get_intersection=json.loads(get_intersection)
+        )
         response = []
         for short_name, pretty_name in comp.common_metrics.items():
             metric_dict = {'metric_query_name': short_name,
@@ -96,7 +103,7 @@ def get_comparison_plots_for_metric(request):
     plot_types = request.query_params.getlist('plot_types', None)
     metric = request.query_params.get('metric', None)
     extent = request.query_params.get('extent', None)
-    get_intersection = request.query_params.get('get_intersection', False)
+    get_intersection = request.query_params.get('get_intersection', 'false')
     validation_runs = get_validations(validation_ids)
 
     encoded_plots = []
@@ -116,9 +123,10 @@ def get_comparison_plots_for_metric(request):
             continue
 
     if not encoded_plots:
-        return JsonResponse([{'message': str("No plot could be produced from the selected comparison")}],
-         status=200, safe=False
-         )
+        return JsonResponse(
+            [{'message': str("No plot could be produced from the selected comparison")}],
+            status=200, safe=False
+        )
 
     return JsonResponse(encoded_plots, status=200, safe=False)
 
@@ -127,7 +135,7 @@ def get_comparison_plots_for_metric(request):
 @permission_classes([IsAuthenticated])
 def get_spatial_extent(request):
     """Get an image with the spatial extent of the comparison"""
-    get_intersection = request.query_params.get('get_intersection', False)
+    get_intersection = request.query_params.get('get_intersection', 'false')
     validation_ids = request.query_params.getlist('ids', None)
     validation_runs = get_validations(validation_ids)
     try:
