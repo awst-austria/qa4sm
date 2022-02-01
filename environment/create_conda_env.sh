@@ -71,7 +71,7 @@ fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
 
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.8 numpy scipy pandas cython pytest pip matplotlib pyproj django pyresample pygrib cartopy xarray dask
+conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.8 numpy scipy pandas cython pytest pip matplotlib pyproj django=3.2 pyresample pygrib cartopy xarray dask
 source activate $PYTHON_ENV_DIR
 
 pip uninstall --yes shapely
@@ -80,7 +80,7 @@ pip install sqlparse
 pip install pynetcf
 pip install ascat
 pip install c3s_sm
-pip install esa_cci_sm
+pip install esa_cci_sm==0.1.1
 pip install smos
 pip install ecmwf_models
 pip install coverage
@@ -100,9 +100,10 @@ pip install --upgrade --force-reinstall netcdf4
 pip install pytesmo
 pip install ismn
 pip install requests
-pip install qa4sm-reader>=0.3.4
+pip install qa4sm-reader
 pip install qa4sm-preprocessing
 pip install djangorestframework
+pip install django_rest_passwordreset
 
 cd $TEMP_DIR
 

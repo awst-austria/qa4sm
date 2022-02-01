@@ -1,6 +1,12 @@
 <div class="p-grid no-gutters">
-  <div class="p-col-12">
+  <div class="p-col-11">
     <p-checkbox [label]="filterModel.filterDto.description" [(ngModel)]="filterModel.enabled"
-                [binary]="true"></p-checkbox>
+                [disabled]="filterModel.readonly"
+                [binary]="true"
+                (onChange)="include_filters($event); exclude_filters($event)"
+    ></p-checkbox>
+  </div>
+  <div [ngClass]="{'p-col-1': true, 'adjust-margin': isIncluded}">
+    <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
   </div>
 </div>

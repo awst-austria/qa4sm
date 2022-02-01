@@ -47,6 +47,18 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
+import {HelpComponent} from './pages/help/help.component';
+import {IvyGalleryModule} from 'angular-gallery';
+import {NgxPageScrollModule} from 'ngx-page-scroll';
+import {CoreModule} from './modules/core/core.module';
+import {SignupComponent} from './pages/signup/signup.component';
+import {UserModule} from './modules/user/user.module';
+import {SignupCompleteComponent} from './pages/signup-complete/signup-complete.component';
+import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/deactivate-user-complete.component';
+import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
+import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
+import {SetPasswordComponent} from './pages/set-password/set-password.component';
+import {PasswordResetValidateTokenComponent} from './pages/password-reset-validate-token/password-reset-validate-token.component';
 
 
 @NgModule({
@@ -63,6 +75,14 @@ import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component'
     AboutComponent,
     TermsComponent,
     DatasetInfoComponent,
+    HelpComponent,
+    SignupComponent,
+    SignupCompleteComponent,
+    DeactivateUserCompleteComponent,
+    PasswordResetComponent,
+    PasswordResetDoneComponent,
+    SetPasswordComponent,
+    PasswordResetValidateTokenComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -94,8 +114,11 @@ import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component'
     AnomaliesModule,
     ScalingModule,
     NgxPaginationModule,
-    MapModule
-
+    MapModule,
+    IvyGalleryModule,
+    NgxPageScrollModule,
+    CoreModule,
+    UserModule
   ],
   providers: [
     {

@@ -1,2 +1,20 @@
-@import "~bootstrap/dist/css/bootstrap.css";
 @import "../buttons/buttons.component.scss";
+li{
+  word-break: break-word;
+}
+.expiry-icons{
+  font-size: 1.1rem;
+}
+
+div.card-body{
+  padding-top: 0;
+}
+
+input{
+  font-size: 1.1rem;
+}
+.alert-danger {
+  color: rgb(255, 108, 92);
+  background-color: rgba(255, 108, 92, .15);
+}
+

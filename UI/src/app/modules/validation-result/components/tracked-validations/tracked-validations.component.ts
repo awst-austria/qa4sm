@@ -20,4 +20,8 @@ export class TrackedValidationsComponent implements OnInit {
     this.trackedRuns$ = this.validationrunService.getCustomTrackedValidations();
   }
 
+  refresh(): void{
+    this.ngOnInit();
+  }
+
 }

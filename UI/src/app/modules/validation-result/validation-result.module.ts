@@ -9,19 +9,38 @@ import {ValidationPagePaginatedComponent} from './components/validation-page-pag
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
 import {ButtonsComponent} from './components/buttons/buttons.component';
 import {InputTextModule} from 'primeng/inputtext';
 import {TrackedValidationsComponent} from './components/tracked-validations/tracked-validations.component';
+import {SummaryStatisticsComponent} from './components/summary-statistics/summary-statistics.component';
+import {ResultFilesComponent} from './components/result-files/result-files.component';
+import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
+import {ButtonModule} from 'primeng/button';
+import {PublishingComponent} from './components/publishing/publishing.component';
+import {ExistingValidationComponent} from './components/existing-validation/existing-validation.component';
 
 @NgModule({
-    declarations: [ValidationrunRowComponent, ValidationPagePaginatedComponent, SortingFormComponent, ValidationSummaryComponent, ButtonsComponent, TrackedValidationsComponent],
+  declarations: [ValidationrunRowComponent,
+    ValidationPagePaginatedComponent,
+    SortingFormComponent,
+    ValidationSummaryComponent,
+    ButtonsComponent,
+    TrackedValidationsComponent,
+    SummaryStatisticsComponent,
+    ResultFilesComponent,
+    PublishingComponent,
+    ExistingValidationComponent],
     exports: [
         ValidationrunRowComponent,
         ValidationPagePaginatedComponent,
         ValidationSummaryComponent,
         TrackedValidationsComponent,
+        SummaryStatisticsComponent,
+        ResultFilesComponent,
+        PublishingComponent,
+        ExistingValidationComponent,
     ],
     imports: [
         CommonModule,
@@ -32,7 +51,11 @@ import {TrackedValidationsComponent} from './components/tracked-validations/trac
         RouterModule,
         DropdownModule,
         FormsModule,
-        InputTextModule
+        InputTextModule,
+        NgDompurifyModule,
+        ButtonModule,
+        ReactiveFormsModule
     ]
 })
-export class ValidationResultModule { }
+export class ValidationResultModule {
+}

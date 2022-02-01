@@ -1,20 +1,34 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ValidationrunDto} from './validationrun.dto';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {ValidationSetDto} from '../../../validation-result/services/validation.set.dto';
 import {saveAs} from 'file-saver-es';
+import {MetricsPlotsDto} from './metrics-plots.dto';
+import {PublishingFormDto} from './publishing-form.dto';
 
 const urlPrefix = environment.API_URL + 'api';
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
 const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
 const trackedCustomRunsUrl: string = urlPrefix + '/custom-tracked-run';
-const downloadUrl: string = urlPrefix + '/download-result';
+const downloadResultsUrl: string = urlPrefix + '/download-result';
+const summaryStatisticsUrl: string = urlPrefix + '/summary-statistics';
+const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
+const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
+const publishingFormURL: string = urlPrefix + '/publishing-form';
+const copyValidationUrl: string = urlPrefix + '/copy-validation';
+const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 
 const csrfToken = '{{csrf_token}}';
-const resultUrl = urlPrefix + '/modify-validation/00000000-0000-0000-0000-000000000000';
+const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
+const archiveResultUrl = urlPrefix + '/archive-result/00000000-0000-0000-0000-000000000000';
+const extendResultUrl = urlPrefix + '/extend-result/00000000-0000-0000-0000-000000000000';
+const publishResultUrl = urlPrefix + '/publish-result/00000000-0000-0000-0000-000000000000';
+const addValidationUrl = urlPrefix + '/add-validation/00000000-0000-0000-0000-000000000000';
+const removeValidationUrl = urlPrefix + '/remove-validation/00000000-0000-0000-0000-000000000000';
+const deleteResultUrl = urlPrefix + '/delete-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
@@ -22,7 +36,10 @@ const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
   providedIn: 'root'
 })
 export class ValidationrunService {
+  private refresh: BehaviorSubject<string> = new BehaviorSubject('');
+  private publishingInProgress: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
+  doRefresh = this.refresh.asObservable();
   customValidationrun$: Observable<ValidationSetDto>;
   publishedValidationrun$: Observable<ValidationSetDto>;
 
@@ -39,10 +56,6 @@ export class ValidationrunService {
     return this.customValidationrun$;
   }
 
-  getValidationRuns(): Observable<ValidationrunDto[]> {
-    return this.httpClient.get<ValidationrunDto[]>(validationRunsUrl);
-  }
-
   getValidationRunById(id: string): Observable<ValidationrunDto> {
     return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
   }
@@ -51,84 +64,94 @@ export class ValidationrunService {
     return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl);
   }
 
-  deleteValidation(validationId: string): void {
-    if (!confirm('Do you really want to delete the result?')) {
-      return;
-    }
-    const deleteUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    this.httpClient.delete(deleteUrl, {headers}).subscribe(
-      () => {
-      });
+  deleteValidation(validationId: string): Observable<any> {
+    const deleteUrl = deleteResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    return this.httpClient.delete(deleteUrl, {headers});
   }
 
-  stopValidation(validationId: string): void {
-    if (!confirm('Do you really want to stop the validation?')) {
-      return;
-    }
+  stopValidation(validationId: string): Observable<any> {
     const stopUrl = stopValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    this.httpClient.delete(stopUrl, {headers}).subscribe(
-      () => {
-      });
+    return this.httpClient.delete(stopUrl, {headers});
   }
 
-  archiveResults(validationId: string, archive: boolean): void {
-    if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
-      + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
-      return;
-    }
-    const archiveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'}).subscribe(
-      () => {
-      });
+  archiveResult(validationId: string, archive: boolean): Observable<any> {
+    const archiveUrl = archiveResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    return this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'});
   }
 
-  extendResults(validationId: string): void {
-    if (!confirm('Do you want to extend the lifespan of this result?')) {
-      return;
-    }
-    const extendUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  extendResult(validationId: string): Observable<any> {
+    const extendUrl = extendResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const extend = true;
-    this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      (response) => {
-        const newExpiry = new Date(response);
-        alert('The expiry date of your validation has been shifted to ' + newExpiry.toLocaleDateString());
-        location.reload();
-      });
+    return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'response', responseType: 'text'});
   }
 
-  saveResults(validationId: string, newName: string): void {
-    const saveUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  saveResultsName(validationId: string, newName: string): Observable<any> {
+    const saveUrl = changeNameUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {save_name: true, new_name: newName};
-    console.log(data);
-    this.httpClient.patch(saveUrl + '/', data, {headers , observe: 'body', responseType: 'json'}).subscribe(
-      () => {
-      });
+    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
 
   }
 
-  downloadResultFile(validationId: string, fileType: string, fileName: string): void{
-    const fileUrl = `${downloadUrl}?validationId=${validationId}&fileType=${fileType}`;
+  publishResults(validationId: string, publishingData: any): Observable<any> {
+    const publishUrl = publishResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const data = {publish: true, publishing_form: publishingData};
+    return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'json'});
+  }
+
+  downloadResultFile(validationId: string, fileType: string, fileName: string): void {
+    const fileUrl = `${downloadResultsUrl}?validationId=${validationId}&fileType=${fileType}`;
     saveAs(fileUrl, fileName);
   }
 
-  addValidation(validationId: string): void {
-    const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  addValidation(validationId: string): Observable<any> {
+    const addUrl = addValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {add_validation: true};
-    this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      response => {
-        alert(response);
-      }
-    );
+    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
 
-  removeValidation(validationId: string): void {
-    if (!confirm('Do you really want to remove this validation from your list?')) {
-      return;
-    }
-    const addUrl = resultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+  removeValidation(validationId: string): Observable<any> {
+    const addUrl = removeValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {remove_validation: true};
-    this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'}).subscribe(
-      response => alert(response)
-    );
+    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
   }
+
+  getSummaryStatistics(params: any): Observable<any> {
+    return this.httpClient.get(summaryStatisticsUrl, {params, headers, responseType: 'text'});
+  }
+
+  downloadSummaryStatisticsCsv(validationId: string): void {
+    const fileUrl = `${downloadStatisticsCsvUrl}?validationId=${validationId}`;
+    saveAs(fileUrl);
+  }
+
+  getMetricsAndPlotsNames(params: any): Observable<MetricsPlotsDto[]> {
+    return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
+  }
+
+  getPublishingFormData(params: any): Observable<PublishingFormDto>{
+    return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params});
+  }
+
+  refreshComponent(validationIdOrPage: string): void{
+    // here we can give or validation id or the word 'page' if entire page should be reloaded (e.g. when a validation is removed)
+    this.refresh.next(validationIdOrPage);
+  }
+
+  copyValidation(params: any): Observable<any>{
+    return this.httpClient.get(copyValidationUrl, {params});
+  }
+
+  getCopiedRunRecord(validationId: string): Observable<any>{
+    const urlWithParam = copiedValidationRecordUrl + '/' + validationId;
+    return this.httpClient.get(urlWithParam);
+  }
+
+  checkPublishingInProgress(): Observable<boolean>{
+    return this.publishingInProgress.asObservable();
+  }
+
+  changePublishingStatus(inProgress: boolean): void{
+    this.publishingInProgress.next(inProgress);
+  }
+
 }
