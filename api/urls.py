@@ -27,7 +27,6 @@ from api.views.serving_file_view import get_results, get_csv_with_statistics, ge
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import settings
 
-
 # schema_view = get_schema_view(
 #     openapi.Info(
 #         title="Snippets API",

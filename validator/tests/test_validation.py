@@ -15,12 +15,10 @@ import numpy as np
 import pandas as pd
 import pytest
 from dateutil.tz import tzlocal
-from django.conf import settings
 from django.contrib.auth import get_user_model
 
 from validator.validation.validation import compare_validation_runs, copy_validationrun
 
-User = get_user_model()
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
@@ -37,8 +35,7 @@ from validator.models import CopiedValidations
 from validator.tests.auxiliary_functions import (
     generate_default_validation,
     generate_default_validation_triple_coll,
-    generate_ismn_nonref_validation,
-    generate_default_validation_hires,
+    generate_ismn_upscaling_validation,
 )
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals
@@ -47,6 +44,9 @@ from validator.validation.batches import _geographic_subsetting, create_upscalin
 from validator.validation.globals import METRICS, TC_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
 from django.shortcuts import get_object_or_404
+
+User = get_user_model()
+
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -230,6 +230,10 @@ class TestValidation(TestCase):
                 if dataset_config.id == run.reference_configuration.id:
                     assert ds.val_ref == ds_name, 'Wrong validation config attribute. [reference_configuration]'
 
+                    if run.reference_configuration.dataset.short_name != "ISMN":
+                        assert ds.val_resolution == run.reference_configuration.dataset.resolution["value"]
+                        assert ds.val_resolution_unit == run.reference_configuration.dataset.resolution["unit"]
+
                 if dataset_config.id == run.scaling_ref.id:
                     assert ds.val_scaling_ref == ds_name, 'Wrong validation config attribute. [scaling_ref]'
 
@@ -269,9 +273,8 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-
-        #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.BETA_SCALING # cdf matching
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -364,8 +367,8 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.BETA_SCALING # cdf matching 
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -556,7 +559,7 @@ class TestValidation(TestCase):
 
         run_id = run.id
 
-        ## run the validation
+        # run the validation
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
@@ -712,8 +715,8 @@ class TestValidation(TestCase):
                 config.filters.clear()
                 config.save()
 
-        #run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.BETA_SCALING # cdf matching 
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -801,7 +804,7 @@ class TestValidation(TestCase):
 
         run_id = run.id
 
-        ## run the validation
+        # run the validation
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
@@ -810,12 +813,45 @@ class TestValidation(TestCase):
         self.check_results(new_run)
         self.delete_run(new_run)
 
+    def test_nc_attributes(self):
+        """
+        Test correctness and completedness of netCDF attributes in the output file;
+        a validation that doesn't involve ISMN ref is used to check the resolution attributes
+        """
+        run = generate_default_validation()
+        run.user = self.testuser
+
+        # need validation without ISMN as referebce to check resolution attributes
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
+        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
+        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
+        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+        run.reference_configuration.save()
+
+        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+        run.min_lat = self.hawaii_coordinates[0]
+        run.min_lon = self.hawaii_coordinates[1]
+        run.max_lat = self.hawaii_coordinates[2]
+        run.max_lon = self.hawaii_coordinates[3]
+
+        run.save()
+        run_id = run.id
+        # run the validation
+        val.run_validation(run_id)
+
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        self.check_results(new_run)
+        self.delete_run(new_run)
+
     def test_c3s_validation_upscaling(self):
         """
         Test a validation of CCIP with ISMN as non-reference, and upscaling option active. All ISMN points are averaged
         and the results should produce 16 points (original c3s points); results are checked with `check_results`
         """
-        run = generate_ismn_nonref_validation()
+        run = generate_ismn_upscaling_validation()
         run.user = self.testuser
 
         # hawaii bounding box
@@ -845,7 +881,7 @@ class TestValidation(TestCase):
         Generate a test with ISMN as non-reference dataset and the provided dataset, version, variable as reference.
         Test that the results and the output file with the function `check_results`
         """
-        run = generate_ismn_nonref_validation()
+        run = generate_ismn_upscaling_validation()
         run.user = self.testuser
 
         # NOTE: ISMN non-reference points need to use one of the upscaling methods
@@ -896,7 +932,7 @@ class TestValidation(TestCase):
         non-reference dataset, the collected points change; in this case, with filters "COSMOS" and depth 0.0-0.1,
         no station in the ISMN is found
         """
-        run = generate_ismn_nonref_validation()
+        run = generate_ismn_upscaling_validation()
         dataset = Dataset.objects.get(short_name='C3S')
         version = DatasetVersion.objects.get(short_name="C3S_V202012")
         c3s_reader = val.create_reader(dataset, version)
@@ -927,7 +963,7 @@ class TestValidation(TestCase):
             ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_NETWORKS"), parameters="COSMOS"),
             ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1")
         ]
-        msk_reader, read_name, read_kwargs  = val.setup_filtering(
+        msk_reader, read_name, read_kwargs = val.setup_filtering(
             ismn_reader,
             data_filters,
             param_filters,
@@ -1045,7 +1081,7 @@ class TestValidation(TestCase):
             ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"),
                                parameters="0.0,0.1")
         ]
-        msk_reader, read_name, read_kwargs  = \
+        msk_reader, read_name, read_kwargs = \
             val.setup_filtering(reader, data_filters, param_filters, dataset,
                                 variable)
 
@@ -1875,5 +1911,3 @@ class TestValidation(TestCase):
         user_to_remove.delete()
         copied_runs = CopiedValidations.objects.all()
         assert len(copied_runs) == 0
-
-

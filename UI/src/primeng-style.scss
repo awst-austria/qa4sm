@@ -519,6 +519,11 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   background: #007bff;
 }
 
+.param-filter-checkbox .p-checkbox-box.p-highlight{
+  border-color: rgba(0, 123, 255, 0.16);
+  background: rgba(0, 123, 255, 0.6);
+}
+
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
   border-color: #ced4da;
 }
@@ -535,6 +540,12 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   background: #0062cc;
   color: #ffffff;
 }
+
+.param-filter-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover{
+  border-color: rgba(0, 123, 255, 0.16);
+  background: rgba(0, 123, 255, 0.6);
+}
+
 
 p-checkbox.ng-dirty.ng-invalid > .p-checkbox > .p-checkbox-box {
   border-color: #dc3545;
@@ -4107,6 +4118,10 @@ div.carousel-caption{
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+#ismn-depth-selector .p-dialog {
+  width: 550px;
+}
+
 .p-dialog .p-dialog-header {
   border-bottom: 1px solid #e9ecef;
   background: $base-color;
@@ -6204,6 +6219,26 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
 }
 .dataframe.comparison td:first-child{
   min-width: 20rem;
+}
+
+.addDataset.p-button-success, .removeDataset.p-button-danger{
+  height: 2rem;
+}
+
+.addDataset.p-button-success .p-button-label, .removeDataset.p-button-danger .p-button-label{
+  padding-right: 0.2rem;
+}
+.addDataset.p-button-success .p-button-icon, .removeDataset.p-button-danger .p-button-icon{
+  padding-left: 0.2rem;
+}
+
+.clearCoordinates.p-button-info{
+  width: 2.5rem;
+  height: 2.1rem;
+}
+
+.clearCoordinates.p-button-info .p-button-icon{
+  font-size: 1.2rem;
 }
 
 .addDataset.p-button-success, .removeDataset.p-button-danger{

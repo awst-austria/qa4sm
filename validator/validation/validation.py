@@ -11,7 +11,6 @@ from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
 from django.urls.base import reverse
-
 from netCDF4 import Dataset
 from pytesmo.validation_framework.adapters import AnomalyAdapter, \
     AnomalyClimAdapter
@@ -153,6 +152,18 @@ def save_validation_config(validation_run):
             if ((validation_run.reference_configuration is not None) and
                     (dataset_config.id == validation_run.reference_configuration.id)):
                 ds.val_ref = 'val_dc_dataset' + str(i)
+
+                try:
+                    ds.setncattr(
+                        'val_resolution', validation_run.reference_configuration.dataset.resolution["value"]
+                    )
+                    ds.setncattr(
+                        'val_resolution_unit', validation_run.reference_configuration.dataset.resolution["unit"]
+                    )
+                # ISMN has null resolution attribute, therefore
+                # we write no output resolution
+                except (AttributeError, TypeError):
+                    pass
 
             if ((validation_run.scaling_ref is not None) and
                     (dataset_config.id == validation_run.scaling_ref.id)):

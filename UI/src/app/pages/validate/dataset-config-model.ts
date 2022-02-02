@@ -1,4 +1,6 @@
-import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
+import {
+  DatasetComponentSelectionModel
+} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
 import {BehaviorSubject} from 'rxjs';
@@ -27,7 +29,11 @@ export class DatasetConfigModel {
 
     const parameterisedFilters: ParametrisedFilterConfig[] = [];
     if (this.ismnNetworkFilter$.value != null) {
-      parameterisedFilters.push({id: ISMN_NETWORK_FILTER_ID, parameters: this.ismnNetworkFilter$.value.parameters});
+      parameterisedFilters.push({id: ISMN_NETWORK_FILTER_ID, parameters: this.ismnNetworkFilter$.value.parameters$.value});
+    }
+
+    if (this.ismnDepthFilter$.value != null) {
+      parameterisedFilters.push({id: ISMN_DEPTH_FILTER_ID, parameters: this.ismnDepthFilter$.value.parameters$.value});
     }
 
     const newValDatasetConfigDto: ValidationRunDatasetConfigDto = {

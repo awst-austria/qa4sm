@@ -366,7 +366,11 @@
             ],
             "filters": [
                 1
-            ]
+            ],
+            "resolution": {
+                "value": 1,
+                "unit": "km"
+            }
         }
     },
     {
@@ -390,7 +394,12 @@
             ],
             "filters": [
                 1
-            ]
+            ],
+            "resolution": {
+                "value": 1,
+                "unit": "km"
+            }
         }
     }
+
 ]

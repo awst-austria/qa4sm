@@ -26,7 +26,6 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initComponent();
     // in case the filter model gets updated externally we need to re-initialize this component
     this.filterModel$.subscribe(model => {
       if (model != null) {
@@ -73,11 +72,11 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private networkDtoToTreeModel(network: IsmnNetworkDto, parentNode: TreeNode): TreeNode<IsmnNetworkDto> {
-    return {key: network.name, label: network.name, data: network, parent: parentNode};
+    return {key: network.name, label: network.name + ' (' + network.country + ')', data: network, parent: parentNode};
   }
 
   public onNetworkUnselect(e): void {
-    console.log('Unselect network: ' + e);
+    this.updateFilterModel();
   }
 
   public onNetworkSelect(e): void {
@@ -85,22 +84,24 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private updateFilterModel(): void {
-    this.filterModel$.value.parameters = '';
+    let newSelection = '';
     this.selectedNetworks.forEach(net => {
       if (net.data != null) {  // continent checkboxes does not have data
-        if (!this.filterModel$.value.parameters.includes(net.key)) {
-          if (this.filterModel$.value.parameters.length > 0) {
-            this.filterModel$.value.parameters = this.filterModel$.value.parameters + ',';
+        if (!newSelection.includes(net.key)) {
+          if (newSelection.length > 0) {
+            newSelection = newSelection + ',';
           }
-          this.filterModel$.value.parameters = this.filterModel$.value.parameters + net.key;
+          newSelection = newSelection + net.key;
         }
       }
     });
+
+    this.filterModel$.value.parameters$.next(newSelection);
   }
 
   private initComponent(): void {
     this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
-      this.buildNetworkTree(data, this.filterModel$.value.filterDto.default_parameter);
+      this.buildNetworkTree(data, this.filterModel$.value.parameters$.value);
     });
   }
 }

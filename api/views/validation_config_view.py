@@ -2,6 +2,7 @@ from multiprocessing.context import Process
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connections
+from django.db.models import Case, When
 from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import status, serializers
@@ -13,7 +14,6 @@ from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter
 from validator.validation import run_validation
-from django.db.models import Case, When
 from validator.validation.validation import compare_validation_runs
 
 
@@ -103,7 +103,7 @@ def get_validation_configuration(request, **kwargs):
 
         parametrised_filters = []
         for param_filter in ParametrisedFilter.objects.filter(dataset_config=val_run.reference_configuration):
-            parametrised_filters.append({'id': param_filter.id, 'parameters': param_filter.parameters})
+            parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
 
         val_run_dict['reference_config'] = {
             'dataset_id': val_run.reference_configuration.dataset.id,
