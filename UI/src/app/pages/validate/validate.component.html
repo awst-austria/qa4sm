@@ -1,13 +1,3 @@
-<!--<p-button label="Map" (onClick)="showMap()"></p-button>-->
-<!--<p-dialog header="Map" [visible]="(mapVisible|async)" (close)="mapVisible.next(false)">-->
-<!--  <qa-map class="map"-->
-<!--          [center]="[-483281,6904172]"-->
-
-<!--          [zoom]="8.5"></qa-map>-->
-<!--</p-dialog>-->
-<!--<qa-map class="map"-->
-<!--        [center]="[-483281,6904172]"-->
-<!--        [zoom]="8.5"></qa-map>-->
 <div class="p-grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
   <div class="
     p-col-12
@@ -110,7 +100,10 @@
                 [filterModel$]="validationModel.referenceConfigurations[0].ismnNetworkFilter$"></qa-ismn-network-filter>
             </div>
             <div *ngIf="validationModel.referenceConfigurations[0].ismnDepthFilter$|async">
-              <qa-ismn-depth-filter></qa-ismn-depth-filter>
+              <qa-ismn-depth-filter
+                [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
+                [filterModel$]="validationModel.referenceConfigurations[0].ismnDepthFilter$">
+              </qa-ismn-depth-filter>
             </div>
 
           </div>

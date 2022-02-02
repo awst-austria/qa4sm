@@ -127,7 +127,6 @@ import {
     CoreModule,
     UserModule,
     IsmnDepthFilterModule
-
   ],
   providers: [
     {

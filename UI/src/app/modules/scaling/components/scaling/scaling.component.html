@@ -20,7 +20,7 @@
                         [options]="scalingModels"
                         [ngModel]="selectedScalingModel|async"
                         (ngModelChange)="selectedScalingModel.next($event)"
-                        optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
+                        optionLabel="description" [style]="{'min-width':'250px', 'max-width':'300px'}"></p-dropdown>
             <label for="scalingMethodSelector">Select</label>
           </div>
         </div>

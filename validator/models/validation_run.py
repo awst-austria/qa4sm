@@ -231,6 +231,7 @@ class ValidationRun(models.Model):
 
 
 
+
 # delete model output directory on disk when model is deleted
 @receiver(post_delete, sender=ValidationRun)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

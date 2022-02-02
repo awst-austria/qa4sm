@@ -27,12 +27,4 @@ describe('AppComponent', () => {
     const app = fixture.componentInstance;
     expect(app.title).toEqual('qa4sm-ui');
   });
-
-  // it('should render title', () => {
-  //   const fixture = TestBed.createComponent(AppComponent);
-  //   fixture.detectChanges();
-  //   const compiled = fixture.nativeElement;
-  //   console.log(compiled.querySelector('.content'));
-  //   expect(compiled.querySelector('.content span').textContent).toContain('UI app is running!');
-  // });
 });

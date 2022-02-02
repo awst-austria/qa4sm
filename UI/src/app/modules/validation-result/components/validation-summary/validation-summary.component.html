@@ -59,7 +59,6 @@
         </h4>
       </div>
     </ng-template>
-    <!--    </div>-->
     <div *ngIf="configurations$| async as configurations" class="card-body">
       <ul [ngClass]="{'for-comparison-list': forComparison}">
         <li *ngIf="validationRun.is_a_copy">
@@ -189,7 +188,6 @@
           <span class="pi pi-book"></span> This result was published on zenodo with DOI
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
-        <!--        </div>-->
       </ul>
       <qa-buttons *ngIf="!forComparison && (validationModel.validationRun|async) as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
     </div>

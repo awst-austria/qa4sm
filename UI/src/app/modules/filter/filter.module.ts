@@ -8,24 +8,28 @@ import {ButtonModule} from 'primeng/button';
 import {DialogModule} from 'primeng/dialog';
 import {TreeModule} from 'primeng/tree';
 import {TooltipModule} from 'primeng/tooltip';
+import {IsmnDepthFilterComponent} from './components/ismn-depth-filter/ismn-depth-filter.component';
+import {InputNumberModule} from 'primeng/inputnumber';
 
 
 @NgModule({
-  declarations: [BasicFilterComponent, IsmnNetworkFilterComponent],
+  declarations: [BasicFilterComponent, IsmnNetworkFilterComponent, IsmnDepthFilterComponent],
   exports: [
     BasicFilterComponent,
-    IsmnNetworkFilterComponent
+    IsmnNetworkFilterComponent,
+    IsmnDepthFilterComponent
   ],
-  imports: [
-    CommonModule,
-    CheckboxModule,
-    FormsModule,
-    ButtonModule,
-    DialogModule,
-    TreeModule,
-    TooltipModule
+    imports: [
+        CommonModule,
+        CheckboxModule,
+        FormsModule,
+        ButtonModule,
+        DialogModule,
+        TreeModule,
+        TooltipModule,
+        InputNumberModule
 
-    ]
+  ]
 })
 export class FilterModule {
 }
