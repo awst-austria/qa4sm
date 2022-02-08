@@ -51,7 +51,6 @@
             </p-accordionTab>
 
           </p-accordion>
-
           <button pButton
                   type="button"
                   label="Add dataset"
@@ -148,39 +147,14 @@
         <qa-scaling [validationModel]="validationModel"></qa-scaling>
       </div>
 
-      <!-- Name -->
-      <div class="p-col-10">
-        <div class="p-grid p-px-2">
-            <span class="label p-col-1">
-              <label for="name">Name your validation</label>
-            </span>
-          <input class="form-field p-col"
-                 id="name"
-                 type="text"
-                 pInputText
-                 [ngModel]="validationModel.nameTag$|async"
-                 (ngModelChange)="validationModel.nameTag$.next($event)">
-          <span
-            title="You can optionally name the validation to make it easier to identify in your list of validations."
-            class="pi pi-question-circle p-col-1 help-field">
-          </span>
-        </div>
-      </div>
-
-      <div class="p-col-10">
+      <div class="p-col-12">
         <div>
           <div class="p-d-flex p-jc-center">
-            <p-button id="validateButton" label="Validate" icon="pi pi-play"
-                      (onClick)="startValidation(true)"></p-button>
+            <p-button label="Validate" (onClick)="startValidation()"></p-button>
           </div>
         </div>
       </div>
 
     </div>
   </div>
-  <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
-                          [isThereValidation]="isThereValidation"
-                          (startValidation)="startValidation(false)">
-  </qa-existing-validation>
 </div>
-<qa-scroll-to-top></qa-scroll-to-top>

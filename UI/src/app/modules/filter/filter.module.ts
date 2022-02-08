@@ -29,7 +29,7 @@ import {InputNumberModule} from 'primeng/inputnumber';
         TooltipModule,
         InputNumberModule
 
-  ]
+    ]
 })
 export class FilterModule {
 }

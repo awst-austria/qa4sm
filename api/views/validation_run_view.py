@@ -11,6 +11,8 @@ from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
 
 
+
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def published_results(request):
