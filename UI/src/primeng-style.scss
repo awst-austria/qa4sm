@@ -4918,6 +4918,10 @@ div.carousel-caption{
   background:  rgba(248, 193, 0, .5);
 }
 
+.p-menubar .p-menuitem > .p-menuitem-link.p-menuitem-link-active {
+  background:   #F8C100;
+}
+
 .p-menubar .p-menuitem.p-menuitem-active > .p-menuitem-link .p-menuitem-text {
   color: #212529;
 }
