@@ -26,7 +26,7 @@ export class NavigationBarComponent implements OnInit {
     this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile']};
     this.logoutMenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: event => this.logout()};
     this.items = [
-      {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: [''], command: event => this.setPreviousUrl('')},
+      {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['home'], command: event => this.setPreviousUrl('home')},
       {
         label: 'Validate',
         icon: 'pi pi-fw pi-check-square',
