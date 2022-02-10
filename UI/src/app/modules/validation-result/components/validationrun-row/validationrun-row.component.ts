@@ -36,7 +36,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
-              private globalParamsService: GlobalParamsService,
+              public globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService) {
   }
 

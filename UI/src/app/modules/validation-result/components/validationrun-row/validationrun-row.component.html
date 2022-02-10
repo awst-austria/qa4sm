@@ -70,6 +70,7 @@
           icon="faIcons.faPencil"
           [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
           pTooltip="Change Name"
+          [life]="globalParamsService.tooltipLifetime"
           (click)="toggleEditing()">
           <fa-icon [icon]="faIcons.faPencil"></fa-icon>
         </button>
@@ -86,6 +87,7 @@
             icon="pi pi-save"
             [ngClass]="{'btn-action save_name_btn': true}"
             pTooltip="Save Name"
+            [life]="globalParamsService.tooltipLifetime"
             (click)="saveName(validationRun.id, newName.value)">
           </button>
           <button
@@ -94,6 +96,7 @@
             icon="pi pi-ban"
             [ngClass]="{'btn-action cancel_editing_btn': true}"
             pTooltip="Cancel"
+            [life]="globalParamsService.tooltipLifetime"
             (click)="toggleEditing()">
           </button>
         </span>
