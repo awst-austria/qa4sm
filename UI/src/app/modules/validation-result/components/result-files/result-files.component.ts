@@ -11,6 +11,7 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {map} from 'rxjs/operators';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {SafeUrl} from '@angular/platform-browser';
+import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 
 @Component({
   selector: 'qa-result-files',
@@ -28,7 +29,8 @@ export class ResultFilesComponent implements OnInit {
 
   constructor(private validationService: ValidationrunService,
               public plotService: WebsiteGraphicsService,
-              private gallery: Gallery) {
+              private gallery: Gallery,
+              public globals: GlobalParamsService) {
   }
 
   ngOnInit(): void {

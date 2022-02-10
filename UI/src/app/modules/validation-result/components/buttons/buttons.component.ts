@@ -7,6 +7,7 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 import {BehaviorSubject, Observable} from 'rxjs';
+import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 
 
 @Component({
@@ -41,7 +42,8 @@ export class ButtonsComponent implements OnInit {
   constructor(private router: Router,
               private validationService: ValidationrunService,
               public authService: AuthService,
-              private modalService: ModalWindowService) {
+              private modalService: ModalWindowService,
+              public globals: GlobalParamsService) {
   }
 
   ngOnInit(): void {

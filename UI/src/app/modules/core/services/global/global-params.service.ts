@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {environment} from '../../../../../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {GlobalParamsDto} from './global-params.dto';
@@ -19,6 +19,8 @@ export class GlobalParamsService {
   expiry_period: '',
   warning_period: '',
   };
+
+  tooltipLifetime = 2000; // needed to set it somewhere global;
 
   constructor(private httpClient: HttpClient) {
     this.init();

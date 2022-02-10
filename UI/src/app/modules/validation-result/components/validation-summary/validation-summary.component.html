@@ -10,7 +10,8 @@
             pButton
             type="button"
             [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
-            title="Change Name"
+            pTooltip="Change Name"
+            [life]="globalParamsService.tooltipLifetime"
             icon="faIcons.faPencil"
             (click)="toggleEditing()">
             <fa-icon [icon]="faIcons.faPencil"></fa-icon>
@@ -26,7 +27,8 @@
               pButton
               type="button"
               [ngClass]="{'btn-action save_name_btn result_page': true}"
-              title="Save Name"
+              pTooltip="Save Name"
+              [life]="globalParamsService.tooltipLifetime"
               icon="pi pi-save"
               (click)="saveName(validationRun.id, newName.value)">
             </button>
@@ -34,7 +36,8 @@
               pButton
               type="button"
               [ngClass]="{'btn-action cancel_editing_btn result_page': true}"
-              title="Cancel"
+              pTooltip="Cancel"
+              [life]="globalParamsService.tooltipLifetime"
               icon="pi pi-ban"
               (click)="toggleEditing()">
             </button>
@@ -43,12 +46,12 @@
           <span *ngIf="!validationRun.is_unpublished"
                 class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
-                  title="Validation has been published. There is no possibility of changing its name."> </span>
+                  pTooltip="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
           <span *ngIf="!isOwner"
                 class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
-                  title="Validation belongs to another user. There is no possibility of changing its name."> </span>
+                  pTooltip="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
         </h4>
       </div>

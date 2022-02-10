@@ -21,7 +21,7 @@
 
             <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; let datasetIdx = index"
                             [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / '+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.pretty_name)"
-                            [selected]="datasetIdx == 0">
+                            [selected]="datasetIdx == validationModel.datasetConfigurations.length - 1">
 
               <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset"
                           [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
@@ -86,6 +86,7 @@
             <ng-container *ngFor="let filter of validationModel.referenceConfigurations[0].basicFilters; let i = index">
               <qa-basic-filter
                 [ngClass]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters) == true ? 'ml-1' : ''"
+                [isIncluded]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters)"
                 [filterModel]="filter"
                 (onExcludeMutual)="this.excludeFilter($event, validationModel.referenceConfigurations[0].basicFilters)"
                 (onIncludeMutual)="includeFilter($event, validationModel.referenceConfigurations[0].basicFilters, filter.enabled)">
@@ -160,7 +161,7 @@
                  [ngModel]="validationModel.nameTag$|async"
                  (ngModelChange)="validationModel.nameTag$.next($event)">
           <span
-            title="You can optionally name the validation to make it easier to identify in your list of validations."
+            pTooltip="You can optionally name the validation to make it easier to identify in your list of validations."
             class="pi pi-question-circle p-col-1 help-field">
           </span>
         </div>

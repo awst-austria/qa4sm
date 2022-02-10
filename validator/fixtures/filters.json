@@ -92,7 +92,9 @@
             "help_text": "Data captured when satellite was descending",
             "parameterised": false,
             "dialog_name": null,
-            "default_parameter": null
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": 6
         }
     },
     {
