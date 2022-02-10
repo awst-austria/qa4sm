@@ -31,7 +31,7 @@ export class IsmnDepthFilterComponent implements OnInit {
 
   private initComponent(): void {
     this.updateUiFields(this.filterModel$.value.filterDto.default_parameter);
-    this.filterModel$.subscribe(() => this.initFilterFieldSubscriptions());
+    // this.filterModel$.subscribe(() => this.initFilterFieldSubscriptions());
     this.initFilterFieldSubscriptions();
   }
 
