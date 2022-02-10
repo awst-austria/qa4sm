@@ -15,28 +15,28 @@
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
           <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
-                title="'This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
+                pTooltip="This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
           <span *ngIf="!validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-calendar expiry-icons"
-                title="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
+                pTooltip="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
           </span>
           <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
-                        title="This validation was cancelled.">
+                        pTooltip="This validation was cancelled.">
           </span>
       </span>
       <!--      if there is no expiry date property: -->
       <span *ngIf="!validationRun.expiry_date">
           <span *ngIf="!validationRun.end_time && validationRun.progress <= 100"
                 class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
-                title="This validation is still running."></span>
+                pTooltip="This validation is still running."></span>
 
           <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}" rel="noreferrer">
             <span *ngIf="validationRun.doi" class="p-panel-header-icon pi pi-book expiry-icons"
-                  title="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
+                  pTooltip="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
             </span>
           </a>
         <span *ngIf="validationRun.is_archived && validationRun.is_unpublished"
               class="p-panel-header-icon pi pi- expiry-icons"
-              title="This validation has been archived. It will NOT be automatically removed during cleanup.">
+              pTooltip="This validation has been archived. It will NOT be automatically removed during cleanup.">
           <fa-icon [icon]="faIcons.faArchive"></fa-icon>
         </span>
       </span>
@@ -60,7 +60,7 @@
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="p-my-0 font-weight-normal">
         <span class="pi pi-question-circle help-icon"
-              title="Validation has been published. There is no possibility of changing its name.">
+              pTooltip="Validation has been published. There is no possibility of changing its name.">
         </span>
       </span>
       <ng-template #elseUnpublished>
@@ -69,7 +69,7 @@
           type="button"
           icon="faIcons.faPencil"
           [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
-          title="Change Name"
+          pTooltip="Change Name"
           (click)="toggleEditing()">
           <fa-icon [icon]="faIcons.faPencil"></fa-icon>
         </button>
@@ -85,7 +85,7 @@
             type="button"
             icon="pi pi-save"
             [ngClass]="{'btn-action save_name_btn': true}"
-            title="Save Name"
+            pTooltip="Save Name"
             (click)="saveName(validationRun.id, newName.value)">
           </button>
           <button
@@ -93,7 +93,7 @@
             type="button"
             icon="pi pi-ban"
             [ngClass]="{'btn-action cancel_editing_btn': true}"
-            title="Cancel"
+            pTooltip="Cancel"
             (click)="toggleEditing()">
           </button>
         </span>
