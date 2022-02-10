@@ -36,6 +36,7 @@ export class ButtonsComponent implements OnInit {
   status: string;
   publishingInProgress$: Observable<boolean>;
   isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  tooltipLifetime = 2000;
 
 
   constructor(private router: Router,
