@@ -80,7 +80,7 @@ export class DatasetComponent implements OnInit {
 
     this.selectableDatasetVersions$.subscribe(
       versions => {
-      this.selectionModel.selectedVersion = versions[versions.length - 1];
+      this.selectionModel.selectedVersion = versions[0];
       },
       () => {
       },
@@ -107,14 +107,14 @@ export class DatasetComponent implements OnInit {
 
   sortById(listOfElements): any{
     return listOfElements.sort((a, b) => {
-      return a.id < b.id ? -1 : 1;
+      return a.id < b.id ? 1 : -1;
     });
   }
 
   sortObservableById(observableOfListOfElements: Observable<any>): Observable<any>{
     return observableOfListOfElements.pipe(map((data) => {
       data.sort((a, b) => {
-        return a.id < b.id ? -1 : 1;
+        return a.id < b.id ? 1 : -1;
       });
       return data;
     }));
