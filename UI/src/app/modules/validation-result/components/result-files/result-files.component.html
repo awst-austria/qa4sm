@@ -50,7 +50,8 @@
                     icon="pi pi-download"
                     class="btn-action-large"
                     label="Download graphs"
-                    title="Download graphs .zip"
+                    pTooltip="Download graphs .zip"
+                    life="2000"
                     (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
             </button>
           </div>
@@ -71,7 +72,8 @@
                     class="btn-action-large"
                     icon="faIcons.faFileDownload"
                     label="Download NetCDF"
-                    title="Download all results in NetCDF format"
+                    pTooltip="Download all results in NetCDF format"
+                    life="2000"
                     (click)="downloadResultFile(validation.id, 'netCDF', validation.output_file_name)">
               <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
             </button>
