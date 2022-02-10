@@ -86,6 +86,7 @@
             <ng-container *ngFor="let filter of validationModel.referenceConfigurations[0].basicFilters; let i = index">
               <qa-basic-filter
                 [ngClass]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters) == true ? 'ml-1' : ''"
+                [isIncluded]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters)"
                 [filterModel]="filter"
                 (onExcludeMutual)="this.excludeFilter($event, validationModel.referenceConfigurations[0].basicFilters)"
                 (onIncludeMutual)="includeFilter($event, validationModel.referenceConfigurations[0].basicFilters, filter.enabled)">
