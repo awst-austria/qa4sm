@@ -10,6 +10,7 @@ import {DatasetVariableService} from '../../../core/services/dataset/dataset-var
 import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
 import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
+import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 
 @Component({
   selector: 'qa-summary-statistics',
@@ -29,7 +30,8 @@ export class SummaryStatisticsComponent implements OnInit {
   constructor(private validationService: ValidationrunService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
-              private datasetVariableService: DatasetVariableService) {
+              private datasetVariableService: DatasetVariableService,
+              public globals: GlobalParamsService) {
   }
 
   ngOnInit(): void {

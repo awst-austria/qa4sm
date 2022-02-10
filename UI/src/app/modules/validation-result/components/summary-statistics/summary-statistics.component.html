@@ -30,7 +30,7 @@
                         label="Download .csv table"
                         class="btn-action-large"
                         pTooltip="Download the table to a .csv file"
-                        life="2000"
+                        [life]="globals.tooltipLifetime"
                         (click)="getSummaryStatisticsAsCsv()">
                 </button>
               </div>
