@@ -39,61 +39,55 @@ export class DatasetComponent implements OnInit {
     // Create dataset observable
     if (this.reference) {
       this.datasets$ = this.datasetService.getAllDatasets().pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-        const referenceDatasets: DatasetDto[] = [];
+        let referenceDatasets: DatasetDto[] = [];
         datasets.forEach(dataset => {
           if (dataset.not_as_reference === false){
             referenceDatasets.push(dataset);
           }
         });
+        referenceDatasets = this.sortById(referenceDatasets);
         return referenceDatasets;
       }));
     } else {
       // filter out datasets than can be used only as reference
       this.datasets$ = this.datasetService.getAllDatasets().pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-        const nonOnlyReferenceDatasets: DatasetDto[] = [];
+        let nonOnlyReferenceDatasets: DatasetDto[] = [];
         datasets.forEach(dataset => {
           if (dataset.is_only_reference === false) {
             nonOnlyReferenceDatasets.push(dataset);
           }
         });
+        nonOnlyReferenceDatasets = this.sortById(nonOnlyReferenceDatasets);
         return nonOnlyReferenceDatasets;
       }));
     }
 
-    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
-    this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
-  }
+    this.selectableDatasetVersions$ = this.sortObservableById(
+      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
 
-  // private updateSelectableVersionsAndVariable(): void{
-  //   if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length === 0) {
-  //     return;
-  //   }
-  //
-  //   this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
-  //   this.selectableDatasetVersions$.subscribe(versions => {
-  //     this.selectionModel.selectedVersion = versions[0];
-  //   });
-  //
-  //   this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
-  //   this.selectableDatasetVariables$.subscribe(variables => {
-  //     this.selectionModel.selectedVariable = variables[0];
-  //   });
-  // }
+    this.selectableDatasetVariables$ = this.sortObservableById(
+      this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+  }
 
   private updateSelectableVersionsAndVariableAndEmmit(): void{
     if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length === 0) {
       return;
     }
 
-    this.selectableDatasetVersions$ = this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id);
+    this.selectableDatasetVersions$ = this.sortObservableById(
+      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
+
+
     this.selectableDatasetVersions$.subscribe(
       versions => {
-      this.selectionModel.selectedVersion = versions[0];
+      this.selectionModel.selectedVersion = versions[versions.length - 1];
       },
       () => {
       },
       () => {
-        this.selectableDatasetVariables$ = this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id);
+        this.selectableDatasetVariables$ = this.sortObservableById(
+          this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+
         this.selectableDatasetVariables$.subscribe(
           variables => {
           this.selectionModel.selectedVariable = variables[0];
@@ -109,5 +103,20 @@ export class DatasetComponent implements OnInit {
   }
   onVersionChange(): void{
     this.changeDataset.emit(this.selectionModel);
+  }
+
+  sortById(listOfElements): any{
+    return listOfElements.sort((a, b) => {
+      return a.id < b.id ? -1 : 1;
+    });
+  }
+
+  sortObservableById(observableOfListOfElements: Observable<any>): Observable<any>{
+    return observableOfListOfElements.pipe(map((data) => {
+      data.sort((a, b) => {
+        return a.id < b.id ? -1 : 1;
+      });
+      return data;
+    }));
   }
 }
