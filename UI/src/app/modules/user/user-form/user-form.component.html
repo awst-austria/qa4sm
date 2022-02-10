@@ -64,7 +64,7 @@
       <div class="p-py-3">
         <span class="p-float-label">
           <input class="form-field" id="first-name" type="text" pInputText formControlName="first_name">
-          <label for="first-name">First name</label>
+          <label for="first-name">First name (optional)</label>
           <span pTooltip="Optional."
                 class="pi pi-question-circle">
           </span>
@@ -74,7 +74,7 @@
       <div class="p-py-3">
         <span class="p-float-label">
           <input class="form-field" id="last-name" type="text" pInputText formControlName="last_name">
-          <label for="last-name">Last name</label>
+          <label for="last-name">Last name (optional)</label>
           <span pTooltip="Optional."
                 class="pi pi-question-circle">
           </span>
@@ -84,7 +84,7 @@
       <div class="p-py-3">
         <span class="p-float-label">
           <input class="form-field" id="organisation" type="text" pInputText formControlName="organisation">
-          <label for="organisation">Organisation</label>
+          <label for="organisation">Organisation (optional)</label>
           <span pTooltip="Optional. The organisation (university, company, etc.) you work for or represent."
                 class="pi pi-question-circle">
           </span>
@@ -102,7 +102,7 @@
                       placeholder=" "
                       ngDefaultControl>
           </p-dropdown>
-          <label>Country</label>
+          <label>Country (optional)</label>
           <span pTooltip="Optional. The country where your organisation (or you) resides."
                 [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userForm.controls.country.value==''}"
                 id="countryHelp">
@@ -113,7 +113,7 @@
       <div class="p-py-3">
         <span class="p-float-label">
           <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
-          <label for="orcid">ORCID</label>
+          <label for="orcid">ORCID (optional)</label>
           <span pTooltip="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM."
                 class="pi pi-question-circle">
           </span>
