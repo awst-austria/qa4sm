@@ -7,7 +7,7 @@
           icon="faIcons.faStop"
           class="btn-action"
           pTooltip="Cancel validation"
-          [life]="tooltipLifetime"
+          [life]="globals.tooltipLifetime"
           (click)="stopValidation(validationRun.id)">
     <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span>
   </button>
@@ -18,7 +18,7 @@
      icon="pi pi-folder-open"
      routerLink="/validation-result/{{validationRun.id}}"
      pTooltip="View results"
-     [life]="tooltipLifetime">
+     [life]="globals.tooltipLifetime">
   </a>
 
   <!--custom validations only-->
@@ -30,7 +30,7 @@
             type="button"
             icon="pi pi-calendar"
             pTooltip="Un-archive"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             class="btn-action"
             (click)="archiveResults(validationRun.id, false)">
     </button>
@@ -40,7 +40,7 @@
             type="button"
             icon="faIcons.faArchive"
             pTooltip="Archive"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             class="btn-action"
             (click)="archiveResults(validationRun.id, true)">
       <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
@@ -61,7 +61,7 @@
                 label="Download Graphs"
                 (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id + '_graphs.zip')"
                 pTooltip="Download graphs as a .zip file"
-                [life]="tooltipLifetime">
+                [life]="globals.tooltipLifetime">
         </button>
         <button pButton
                 type="button"
@@ -70,7 +70,7 @@
                 label="Download NetCDF File"
                 (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
                 pTooltip="Download validation run results as a .nc file"
-                [life]="tooltipLifetime">
+                [life]="globals.tooltipLifetime">
           <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
         </button>
       </div>
@@ -79,7 +79,7 @@
               class="dropdown-item"
               [queryParams]="{validation_id: validationRun.id}"
               pTooltip="Loading settings will redirect you to the validate page"
-              [life]="tooltipLifetime"
+              [life]="globals.tooltipLifetime"
               label="Load Validation Settings"
               icon="pi pi-replay">
       </button>
@@ -89,7 +89,7 @@
                 type="button"
                 class="dropdown-item"
                 pTooltip="Remove this validation run"
-                [life]="tooltipLifetime"
+                [life]="globals.tooltipLifetime"
                 label="Delete Validation Run"
                 icon="pi pi-times"
                 (click)=deleteValidation(validationRun.id)>
@@ -101,7 +101,7 @@
                 icon="pi pi-calendar-plus"
                 class="dropdown-item"
                 pTooltip="Extend lifespan of this validation run"
-                [life]="tooltipLifetime"
+                [life]="globals.tooltipLifetime"
 
                 (click)=extendResults(validationRun.id)>
         </button>
@@ -116,7 +116,7 @@
             class="btn-action"
             [queryParams]="{validation_id: validationRun.id}"
             pTooltip="Loading settings will redirect you to the validate page"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             icon="pi pi-replay">
       </button>
     <button *ngIf="isLogged && (isTrackedByTheUser$|async)"
@@ -125,7 +125,7 @@
             icon="pi pi-times"
             class="btn-action"
             pTooltip="Remove this validation from your list"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             (click)="removeValidation(validationRun.id)">
     </button>
     <button *ngIf="isLogged && !(isTrackedByTheUser$|async)"
@@ -134,7 +134,7 @@
             icon="pi pi-plus"
             class="btn-action"
             pTooltip="Pin this validation. Pinning results gives a quick access to it."
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             (click)="addValidation(validationRun.id)"
             onclick="">
     </button>
@@ -149,7 +149,7 @@
             class="btn-action"
             (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id + '_graphs.zip')"
             pTooltip="Download graphs .zip"
-            [life]="tooltipLifetime">
+            [life]="globals.tooltipLifetime">
     </button>
     <button pButton
             type="button"
@@ -157,7 +157,7 @@
             class="btn-action"
             (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
             pTooltip="Download validation run .nc file"
-            [life]="tooltipLifetime">
+            [life]="globals.tooltipLifetime">
       <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
     </button>
     <button *ngIf="isLogged"
@@ -166,7 +166,7 @@
             icon="pi pi-times"
             class="btn-action"
             pTooltip="Remove this validation from your list"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             (click)="removeValidation(validationRun.id)">
     </button>
   </span>
@@ -182,7 +182,7 @@
             icon="pi pi-times"
             class="btn-action-large"
             pTooltip="Remove this validation run"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             label="Delete"
             (click)="deleteValidation(validationRun.id)">
     </button>
@@ -194,7 +194,7 @@
             class="btn-action-large"
             label="Un-archive"
             pTooltip="Un-archive"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             (click)="archiveResults(validationRun.id, false)">
     </button>
 
@@ -205,7 +205,7 @@
               class="btn-action-large"
               label="Renew"
               pTooltip="Extend lifespan of this validation run"
-              [life]="tooltipLifetime"
+              [life]="globals.tooltipLifetime"
               (click)="extendResults(validationRun.id)">
       </button>
       <button pButton
@@ -214,7 +214,7 @@
               class="btn-action-large"
               label="Archive"
               pTooltip="Archived results are not removed automatically"
-              [life]="tooltipLifetime"
+              [life]="globals.tooltipLifetime"
               (click)="archiveResults(validationRun.id, true)">
         <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
       </button>
@@ -227,7 +227,7 @@
             class="btn-action-large"
             label="Publish"
             pTooltip="Publish on Zenodo"
-            [life]="tooltipLifetime"
+            [life]="globals.tooltipLifetime"
             data-toggle="modal"
             data-target="#publishDialog"
             (click)="open()">
@@ -242,7 +242,7 @@
        routerLink="/validate/"
        [queryParams]="{validation_id: validationRun.id}"
        pTooltip="Loading settings will redirect you to the validate page"
-       [life]="tooltipLifetime">
+       [life]="globals.tooltipLifetime">
     </a>
 
     <div [ngClass]="{'collapse': !validationRun.publishing_in_progress}"
@@ -263,7 +263,7 @@
               icon="pi pi-copy"
               class="btn-action-large"
               pTooltip="If you copy this validation, it will be added to the list of your validations with all the result files. You will have a full control over the copy."
-              [life]="tooltipLifetime"
+              [life]="globals.tooltipLifetime"
               label="Copy validation"
               (click)="copy(validationRun.id)">
       </button>
@@ -277,7 +277,7 @@
          routerLink="/validate/"
          [queryParams]="{validation_id: validationRun.id}"
          pTooltip="Load settings"
-         [life]="tooltipLifetime">
+         [life]="globals.tooltipLifetime">
       </a>
 
       <button *ngIf="isLogged && (isTrackedByTheUser$|async) && !validationRun.is_unpublished"
@@ -287,7 +287,7 @@
               class="btn-action-large"
               label="Unpin validation"
               pTooltip="Remove this validation from your list"
-              [life]="tooltipLifetime"
+              [life]="globals.tooltipLifetime"
               (click)="removeValidation(validationRun.id)">
       </button>
 
@@ -298,7 +298,7 @@
               icon="pi pi-plus"
               label="Pin validation"
               pTooltip="Pinning results gives a quick access to it."
-              [life]="tooltipLifetime"
+              [life]="globals.tooltipLifetime"
               (click)="addValidation(validationRun.id)">
       </button>
 

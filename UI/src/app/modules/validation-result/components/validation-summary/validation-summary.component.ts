@@ -47,7 +47,7 @@ export class ValidationSummaryComponent implements OnInit {
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
               private filterService: FilterService,
-              private globalParamsService: GlobalParamsService,
+              public globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService,
               private authService: AuthService,
               private router: Router) {
