@@ -51,7 +51,7 @@
                     class="btn-action-large"
                     label="Download graphs"
                     pTooltip="Download graphs .zip"
-                    life="2000"
+                    [life]="globals.tooltipLifetime"
                     (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
             </button>
           </div>
@@ -73,7 +73,7 @@
                     icon="faIcons.faFileDownload"
                     label="Download NetCDF"
                     pTooltip="Download all results in NetCDF format"
-                    life="2000"
+                    [life]="globals.tooltipLifetime"
                     (click)="downloadResultFile(validation.id, 'netCDF', validation.output_file_name)">
               <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
             </button>
