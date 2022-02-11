@@ -27,9 +27,9 @@ class TestSettingsView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 1
 
-        # should not be reached by a non logged in user
+        # should be also reached by a non logged in user
         self.client.logout()
 
         response = self.client.get(settings_url)
-        assert response.status_code == 403
+        assert response.status_code == 200
 
