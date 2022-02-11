@@ -1,14 +1,14 @@
 from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 
 from validator.models import Settings
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def settings(request):
     settings_model = Settings.objects.all()
     serializer = SettingsSerializer(settings_model, many=True)
@@ -21,6 +21,5 @@ class SettingsSerializer(ModelSerializer):
     class Meta:
         model = Settings
         fields = ['id',
-                  'maintenance_mode',
                   'news',
                   ]
