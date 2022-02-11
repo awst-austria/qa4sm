@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import include, path
 urlpatterns = [
-    path('', include('validator.urls')),
-    path('api/', include('api.urls')),
+    path('old_app', include('validator.urls')),
+    path('old_app/api/', include('api.urls')),
 
 ]
