@@ -22,4 +22,5 @@ class SettingsSerializer(ModelSerializer):
         model = Settings
         fields = ['id',
                   'news',
+                  'maintenance_mode'
                   ]
