@@ -16,7 +16,10 @@ Including another URLconf
 from django.views.generic.base import RedirectView
 from django.urls import include, path
 
+from valentina.settings_conf import SITE_URL
+
 urlpatterns = [
+    path('', RedirectView.as_view(url=SITE_URL+'/ui/home/')),
     path('old_ui/', include('validator.urls')),
     path('api/', include('api.urls')),
 ]
