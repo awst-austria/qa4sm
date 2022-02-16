@@ -8,6 +8,9 @@ from django.urls.base import reverse
 
 import django.forms as forms
 
+from api.frontend_urls import get_angular_url
+
+
 def validate_orcid(orcid):
     if orcid:
         r = reg_search(settings.ORICD_REGEX, orcid)
@@ -42,7 +45,8 @@ class PublishingForm(forms.Form):
         super(PublishingForm, self).__init__(data, *args, **kwargs)
 
     def _validation_url(self, val_id):
-        return settings.SITE_URL + reverse('result', kwargs={'result_uuid': val_id})
+        return settings.SITE_URL + get_angular_url('result', val_id)
+        # return settings.SITE_URL + reverse('result', kwargs={'result_uuid': val_id})
 
     def _formdata_from_validation(self, validation):
             title = "Validation of " + (" vs ".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in validation.dataset_configurations.all()]))
