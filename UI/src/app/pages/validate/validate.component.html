@@ -5,7 +5,7 @@
     p-lg-10 p-lg-offset-1
     p-xl-8 p-xl-offset-2">
 
-    <div class="p-grid" style="justify-content: center">
+    <div *ngIf="!maintenanceMode" class="p-grid" style="justify-content: center">
 
       <!--  data column-->
       <div class="p-md-5 p-col-10">
@@ -177,6 +177,13 @@
       </div>
 
     </div>
+
+    <div *ngIf="maintenanceMode" class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+      <h1 class="jumbotron-heading">Maintenance...</h1>
+      <p class="lead text-muted">Sorry! Currently, you can't start new validations because we're doing maintenance on
+        the service. Please come back later.</p>
+    </div>
+
   </div>
   <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
                           [isThereValidation]="isThereValidation"

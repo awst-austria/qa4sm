@@ -1,6 +1,8 @@
 import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
-import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
+import {
+  DatasetComponentSelectionModel
+} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
 import {DatasetConfigModel, ISMN_DEPTH_FILTER_ID, ISMN_NETWORK_FILTER_ID} from './dataset-config-model';
@@ -8,11 +10,21 @@ import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
 import {SpatialSubsetModel} from '../../modules/spatial-subset/components/spatial-subset/spatial-subset-model';
-import {ValidationPeriodModel} from '../../modules/validation-period/components/validation-period/validation-period-model';
+import {
+  ValidationPeriodModel
+} from '../../modules/validation-period/components/validation-period/validation-period-model';
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
-import {ANOMALIES_NONE, ANOMALIES_NONE_DESC, AnomaliesComponent} from '../../modules/anomalies/components/anomalies/anomalies.component';
+import {
+  ANOMALIES_NONE,
+  ANOMALIES_NONE_DESC,
+  AnomaliesComponent
+} from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
-import {ValidationRunConfigDto, ValidationRunDatasetConfigDto, ValidationRunMetricConfigDto} from './service/validation-run-config-dto';
+import {
+  ValidationRunConfigDto,
+  ValidationRunDatasetConfigDto,
+  ValidationRunMetricConfigDto
+} from './service/validation-run-config-dto';
 import {ValidationRunConfigService} from './service/validation-run-config.service';
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
@@ -22,6 +34,7 @@ import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
 import {delay} from 'rxjs/operators';
+import {SettingsService} from '../../modules/core/services/global/settings.service';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
@@ -65,6 +78,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   validationEnd: Date = new Date();
   isThereValidation: ExistingValidationDto;
   public isExistingValidationWindowOpen: boolean;
+  maintenanceMode = false;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -74,7 +88,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute,
-              private modalWindowService: ModalWindowService) {
+              private modalWindowService: ModalWindowService,
+              private settingsService: SettingsService) {
   }
 
   ngAfterViewInit(): void {
@@ -82,6 +97,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.settingsService.getAllSettings().subscribe(setting => {
+      this.maintenanceMode = setting[0].maintenance_mode;
+    });
     this.modalWindowService.watch().subscribe(state => {
       this.isExistingValidationWindowOpen = state === 'open';
     });
