@@ -4,7 +4,6 @@ from re import IGNORECASE  # @UnresolvedImport
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.urls.base import reverse
 
 import django.forms as forms
 
