@@ -1,3 +1,7 @@
+from django.shortcuts import redirect
+
+from valentina.settings_conf import SITE_URL
+
 angular_paths = [
     {'path': 'home', 'name': 'home'},
     {'path': 'login', 'name': 'login'},
@@ -44,3 +48,8 @@ def get_angular_url(url_name, parameter=None):
         searched_path = searched_element['path']
 
     return '/ui/' + searched_path
+
+
+def redirect_result_page(request, result_uuid):
+    new_url = SITE_URL + get_angular_url('result', result_uuid)
+    return redirect(new_url)
