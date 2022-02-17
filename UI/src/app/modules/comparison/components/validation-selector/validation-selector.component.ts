@@ -9,6 +9,7 @@ import {HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {ComparisonService} from '../../services/comparison.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
@@ -37,7 +38,8 @@ export class ValidationSelectorComponent implements OnInit {
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
               private validationrunService: ValidationrunService,
-              private comparisonService: ComparisonService) {
+              private comparisonService: ComparisonService,
+              private toastService: ToastService) {
   }
 
   ngOnInit(): void {
@@ -164,6 +166,13 @@ export class ValidationSelectorComponent implements OnInit {
 
   startComparison(): void{
     // should start the comparison
-    this.comparisonService.sendComparisonModel(this.comparisonModel);
+    console.log(this.comparisonModel.multipleNonReference);
+    if (this.comparisonModel.selectedValidations.length === 0 ||
+      (this.comparisonModel.selectedValidations.length === 1 && !this.comparisonModel.multipleNonReference)) {
+      this.toastService.showErrorWithHeader('Nothing to compare', 'Add two validations or check  ' +
+        '"Multiple non-reference datasets" and add one validation to start comparison.');
+    } else {
+      this.comparisonService.sendComparisonModel(this.comparisonModel);
+    }
   }
 }
