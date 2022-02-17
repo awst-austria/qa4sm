@@ -13,9 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.views.generic.base import RedirectView
 from django.urls import include, path
-urlpatterns = [
-    path('', include('validator.urls')),
-    path('api/', include('api.urls')),
 
+from django.conf import settings
+
+from api.frontend_urls import redirect_result_page
+
+urlpatterns = [
+    path('', RedirectView.as_view(url=settings.SITE_URL+'/ui/home/')),
+    path('old_ui/', include('validator.urls')),
+    path('api/', include('api.urls')),
+    # redirection to the new result page, it is needed for old published validations
+    path('result/<uuid:result_uuid>/', redirect_result_page),
 ]

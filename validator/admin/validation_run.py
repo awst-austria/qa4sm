@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.utils.html import format_html
-from django.urls.base import reverse
 from django.contrib.admin.options import ModelAdmin, TabularInline
+
+from api.frontend_urls import get_angular_url
 from validator.models.dataset_configuration import DatasetConfiguration
 
 # see https://docs.djangoproject.com/en/2.1/ref/contrib/admin/#inlinemodeladmin-objects
@@ -26,7 +28,7 @@ class ValidationRunAdmin(ModelAdmin):
     def open_button(self, valrun):
         return format_html(
             '<a class="button" target="_blank" href="{}">Open</a>',
-            reverse('result', args=[valrun.id]),
+            settings.SITE_URL + get_angular_url('result', valrun.id),
         )
     open_button.short_description = 'Open'
     open_button.allow_tags = True
