@@ -22,7 +22,7 @@ from api.frontend_urls import redirect_result_page
 
 urlpatterns = [
     path('', RedirectView.as_view(url=settings.SITE_URL+'/ui/home/')),
-    path('old_ui/', include('validator.urls')),
+    path('django/', include('validator.urls')),
     path('api/', include('api.urls')),
     # redirection to the new result page, it is needed for old published validations
     path('result/<uuid:result_uuid>/', redirect_result_page),
