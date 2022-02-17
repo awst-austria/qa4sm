@@ -1,20 +1,11 @@
-QA4SM v1.8.2 - Release notes 2022-01-07
+QA4SM v2.0.0 - Release notes 2022-02-17
 =======================================================
 
-# Improvements
+# Major changes
 
-1.  Pytesmo and Numpy versions updated
-
-QA4SM v1.8.1 - Release notes 2021-12-01
-=======================================================
-
-# Improvements
-
-1.  Memory issues handled
-
-QA4SM v1.8.0 - Release notes 2021-11-30
-=======================================================
+1. New User Interface
 
 # New features
 
-1.  Sentinel-1 radar high resolution data now available for validation.
+1. Automatic update of validation progress
+2. Possibility of copying a validation belonging to another user
