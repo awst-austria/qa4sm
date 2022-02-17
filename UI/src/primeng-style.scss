@@ -1,13 +1,11 @@
-@import "style.variables.scss";
-
 @charset "UTF-8";
+@import "style.variables.scss";
 
 
 $font-dialog-header: 1.25rem;
 $panel-header-padding: 0rem 0.5rem;
 $accordion-header-padding: 0.5rem 0.5rem;
 
-@charset "UTF-8";
 :root {
   --surface-a: #ffffff;
   --surface-b: $base-color;
@@ -5492,7 +5490,7 @@ div.carousel-caption{
 .p-inline-message.p-inline-message-info {
   background: #cce5ff;
   border: solid #b8daff;
-  border-width: 0px;
+  border-width: 0;
   color: #004085;
 }
 
@@ -5503,7 +5501,7 @@ div.carousel-caption{
 .p-inline-message.p-inline-message-success {
   background: #d4edda;
   border: solid #c3e6cb;
-  border-width: 0px;
+  border-width: 0;
   color: #155724;
 }
 
@@ -5514,7 +5512,7 @@ div.carousel-caption{
 .p-inline-message.p-inline-message-warn {
   background: #fff3cd;
   border: solid #ffeeba;
-  border-width: 0px;
+  border-width: 0;
   color: #856404;
 }
 
@@ -5525,7 +5523,7 @@ div.carousel-caption{
 .p-inline-message.p-inline-message-error {
   background: #f8d7da;
   border: solid #f5c6cb;
-  border-width: 0px;
+  border-width: 0;
   color: #721c24;
 }
 
@@ -6224,6 +6222,38 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
 .dropdown-item.p-button:hover{
   color: #212529;
   background-color: rgba(248, 193, 0, .5);
+}
+.dataframe thead th{
+  text-align: center;
+}
+.dataframe td:first-child{
+  font-weight: bold;
+}
+.dataframe.comparison td:not(:first-child){
+  width: 10rem;
+}
+.dataframe.comparison td:first-child{
+  min-width: 20rem;
+}
+
+.addDataset.p-button-success, .removeDataset.p-button-danger{
+  height: 2rem;
+}
+
+.addDataset.p-button-success .p-button-label, .removeDataset.p-button-danger .p-button-label{
+  padding-right: 0.2rem;
+}
+.addDataset.p-button-success .p-button-icon, .removeDataset.p-button-danger .p-button-icon{
+  padding-left: 0.2rem;
+}
+
+.clearCoordinates.p-button-info{
+  width: 2.5rem;
+  height: 2.1rem;
+}
+
+.clearCoordinates.p-button-info .p-button-icon{
+  font-size: 1.2rem;
 }
 
 .addDataset.p-button-success, .removeDataset.p-button-danger{

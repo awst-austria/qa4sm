@@ -10,6 +10,7 @@ from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from qa4sm_reader.plot_all import plot_all, get_img_stats
+from qa4sm_reader.comparing import QA4SMComparison, ComparisonError, SpatialExtentError
 
 from django.conf import settings
 
@@ -18,6 +19,8 @@ cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS, TC_METRICS, METRIC_TEMPLATE, TC_METRIC_TEMPLATE
 import os
+from io import BytesIO
+import base64
 from parse import *
 
 
@@ -208,3 +211,163 @@ def get_inspection_table(validation_run):
         # the validation is still running. In this case the table won't be
         # rendered anyways.
         return None
+
+
+def generate_comparison(
+        validation_runs:list,
+        extent:tuple=None,
+        get_intersection:bool=True
+) -> tuple:
+    """Initializes a QA4SMComparison class"""
+    outfiles = [validation_run.output_file for validation_run in validation_runs]
+    # handle single validation or multiple validations
+    if len(outfiles) == 1:
+        outpaths = outfiles[0].path
+    else:
+        outpaths = []
+        for file in outfiles:
+            outpaths.append(file.path)
+
+    comparison = QA4SMComparison(
+        paths=outpaths,
+        extent=extent,
+        get_intersection=get_intersection
+    )
+
+    return comparison
+
+
+def comparison_table(
+        validation_runs:list,
+        metric_list:list,
+        extent:tuple=None,
+        get_intersection:bool=True,
+) -> pd.DataFrame:
+    """
+    Creates a pandas comparison table
+
+    Parameters
+    ----------
+    validation_runs: list
+        list of ValidationRun to be compared
+    extent : tuple, optional (default: None)
+        Area to subset the values for.
+        (min_lon, max_lon, min_lat, max_lat)
+    get_intersection: bool, default is True
+        Whether to get the intersection or union of the two spatial exents
+    metric_list: list
+        list of metrics for the table
+
+    Returns
+    -------
+    table: pd.DataFrame
+        comparison table
+    """
+    comparison = generate_comparison(
+        validation_runs=validation_runs,
+        extent=extent,
+        get_intersection=get_intersection
+    )
+    table = comparison.diff_table(metric_list)
+
+    return table
+
+
+def encoded_comparisonPlots(
+        validation_runs:list,
+        plot_type:str,
+        metric:str,
+        extent:tuple=None,
+        get_intersection:bool=True,
+) -> str:
+    """
+    Creates a plot encoding in base64 showing the comparison result for a set (2) or a single validation run
+    (if contains 2 satellite datasets)
+
+    Parameters
+    ----------
+    validation_runs: list
+        list of ValidationRun to be compared
+    extent : tuple, optional (default: None)
+        Area to subset the values for.
+        (min_lon, max_lon, min_lat, max_lat)
+    get_intersection: bool, default is True
+        Whether to get the intersection or union of the two spatial exents
+    plot_type: str
+        the plot type to show in the comparison page. Can be one of "table", "boxplot", "correlation",
+        "mapplot" ("difference")
+    metric: str
+        the selected metric type
+
+    Returns
+    -------
+    encoded: str
+        base64 encoding of the plot image
+    """
+    comparison = generate_comparison(
+        validation_runs=validation_runs,
+        extent=extent,
+        get_intersection=get_intersection
+    )
+    image = BytesIO()
+
+    comparison.wrapper(
+        method=plot_type,
+        metric=metric
+    )
+    plt.savefig(image, format='png')
+    encoded = base64.b64encode(image.getvalue()).decode('utf-8')
+
+    return encoded
+
+
+def get_extent_image(
+        validation_runs:list,
+        extent:tuple=None,
+        get_intersection:bool=True,
+        encoded:bool=True,
+):
+    """
+    Creates an image encoding in base64 showing the selected comparison extent
+
+    Parameters
+    ----------
+    validation_runs: list
+        list of ValidationRun to be compared
+    extent : tuple, optional (default: None)
+        Area to subset the values for.
+        (min_lon, max_lon, min_lat, max_lat)
+    get_intersection: bool, default is True
+        Whether to get the intersection or union of the two spatial exents
+    encoded: bool, default is True
+        Whether to encode the image that is returned
+
+    Returns
+    -------
+    encoded: str
+        base64 encoding of the plot image
+    """
+    try:
+        comparison = generate_comparison(
+            validation_runs=validation_runs,
+            extent=extent,
+            get_intersection=get_intersection
+        )
+    except SpatialExtentError:
+        return "Raise message to check box"
+
+    image = BytesIO()
+    try:
+        comparison.visualize_extent(
+            intersection=get_intersection,
+            plot_points=True,
+        )
+        plt.savefig(image, format='png')
+        if encoded:
+            encoded = base64.encodebytes(image.getvalue()).decode('utf-8')
+            return encoded
+
+        return image
+
+    except ComparisonError:
+        return "error encountered"

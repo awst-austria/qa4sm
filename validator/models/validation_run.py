@@ -209,6 +209,28 @@ class ValidationRun(models.Model):
 
         return len(copied_runs) != 0
 
+    @property
+    def comparison_label(self):
+        # check name tag has been given and it's not empty
+        if self.name_tag is not None and self.name_tag:
+            print(self.name_tag)
+            return self.name_tag
+
+        configs = DatasetConfiguration.objects.filter(validation = self.id)
+        datasets = [conf.dataset.short_name+', ' for conf in configs if conf.id != self.reference_configuration.id]
+        t = self.start_time
+        minute = str(t.minute)
+        if t.minute < 10:
+            minute = '0' + minute
+        label = 'Validation date: '+str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(t.hour) + ':' + minute +', Non-reference-dataset: '
+        for dataset in datasets:
+            label += dataset
+        label = label.strip(', ')
+
+        return label
+
+
+
 
 
 # delete model output directory on disk when model is deleted
