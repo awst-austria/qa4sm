@@ -1,0 +1,88 @@
+<div  *ngIf="showLoadingSpinner" class="text-center">
+  <qa-loading-spinner></qa-loading-spinner>
+</div>
+<div *ngIf="!showLoadingSpinner" class="p-grid no-gutters">
+<!--<div *ngIf="(metricPlots$|async) as plots" class="p-grid no-gutters">-->
+  <div class="p-col-12">
+    <!--  <p-panel>-->
+    <p-panel [toggleable]="true" [collapsed]="false">
+      <ng-template pTemplate="header">
+        <div class="text-center my-1" style="width: 92%">
+          <h4 class="my-0 font-weight-normal">Comparison plots</h4>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="icons">
+        <label class="mb-0" pTooltip="Shown are the comparison plots for {{selectedMetric.metric_pretty_name}}. To generate maps and
+        correlation plots with the comparison results, make sure that the input validations have overlapping extents
+        and that 'Compare the union of spatial extents' is unchecked."
+               tooltipPosition="bottom">
+          <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+        </label>
+      </ng-template>
+
+      <div class="p-col">
+        <div class="p-grid center">
+          <div class="p-pb-3">
+            {{ plots.length == 1 ?
+            "If the validations have overlapping extents, uncheck the box in the 'Spatial extent' dialogue " +
+            "window and re-run the comparison to produce a map plot of the difference of common validation points." :
+            ""
+            }}
+          </div>
+          <div *ngFor="let comparisonplot of plots; let ind = index" class='p-col'>
+            <img width="95%"
+                 height="95%"
+                 [src]=sanitizePlotUrl(comparisonplot.plot)
+                 (click)="showGallery(ind, plots)"
+                 [ngClass]="{'result-plot': true, 'pcol6': true, 'small-size': plots.length == 1}"
+                 alt="An Overview map for {{selectedMetric.metric_pretty_name}}">
+              <!--  Download buttons for each plot -->
+              <div class="p-py-3 p-pl-2" style="text-align: left">
+                <a class="btn-action-large"
+                   pButton
+                   type="button"
+                   icon="pi pi-download"
+                   [href]=sanitizePlotUrl(comparisonplot.plot)
+                   download="plot{{ind}}_{{selectedMetric.metric_pretty_name}}.png"
+                   label="Download image"
+                   title="Download the image as .png">
+                </a>
+              </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!--  buttons  -->
+      <div class="p-grid">
+        <!--  Multiple file download  -->
+<!--        <div class="p-col-3 center p-mt-2">-->
+<!--          <button pButton-->
+<!--                  type="button"-->
+<!--                  class="btn-action-large"-->
+<!--                  title="Download graphs .zip"-->
+<!--                  label="Download graphs"-->
+<!--                  icon="pi pi-download"-->
+<!--                  (click)="downloadResultFiles()">-->
+<!--          </button>-->
+<!--        </div>-->
+        <!--   Metric selector  -->
+        <div class="p-col p-mt-4">
+        <span class="p-float-label p-mt-4 p-mt-4">
+          <p-dropdown id="metricSelector"
+                      [options]="this.comparisonMetrics"
+                      [(ngModel)]="selectedMetric"
+                      (onChange)="onMetricChange()"
+                      optionLabel="metric_pretty_name"
+                      [style]="{'width': '100%'}">
+          </p-dropdown>
+          <label for="metricSelector">Select a metric</label>
+        </span>
+        </div>
+      </div>
+
+    </p-panel>
+    <!--  </p-panel>-->
+  </div>
+</div>
+

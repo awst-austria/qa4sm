@@ -47,6 +47,8 @@ import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
+import {ComparisonComponent} from './pages/comparison/comparison.component';
+import {ComparisonModule} from './modules/comparison/comparison.module';
 import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
@@ -58,7 +60,9 @@ import {DeactivateUserCompleteComponent} from './pages/deactivate-user-complete/
 import {PasswordResetComponent} from './pages/password-reset/password-reset.component';
 import {PasswordResetDoneComponent} from './pages/password-reset-done/password-reset-done.component';
 import {SetPasswordComponent} from './pages/set-password/set-password.component';
-import {PasswordResetValidateTokenComponent} from './pages/password-reset-validate-token/password-reset-validate-token.component';
+import {
+  PasswordResetValidateTokenComponent
+} from './pages/password-reset-validate-token/password-reset-validate-token.component';
 
 
 @NgModule({
@@ -75,6 +79,7 @@ import {PasswordResetValidateTokenComponent} from './pages/password-reset-valida
     AboutComponent,
     TermsComponent,
     DatasetInfoComponent,
+    ComparisonComponent,
     HelpComponent,
     SignupComponent,
     SignupCompleteComponent,
@@ -115,6 +120,7 @@ import {PasswordResetValidateTokenComponent} from './pages/password-reset-valida
     ScalingModule,
     NgxPaginationModule,
     MapModule,
+    ComparisonModule,
     IvyGalleryModule,
     NgxPageScrollModule,
     CoreModule,

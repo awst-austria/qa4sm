@@ -8,6 +8,7 @@ export class ValidationrunDto{
               public total_points: number,
               public error_points: number,
               public progress: number,
+              public dataset_configurations: number[],
               public reference_configuration: number,
               public scaling_ref: number,
               public scaling_method: string,
@@ -34,7 +35,8 @@ export class ValidationrunDto{
               public output_file_name: string,
               public copied_run: number[],
               public is_a_copy: boolean,
-              public bootstrap_tcol_cis: boolean) {
+              public bootstrap_tcol_cis: boolean,
+              public comparison_label?: string) {
   }
 }
 

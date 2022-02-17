@@ -21,25 +21,26 @@ export class NavigationBarComponent implements OnInit {
       label: 'Log in',
       icon: 'pi pi-fw pi-sign-in',
       routerLink: ['login'],
-      command: event => this.setPreviousUrl('user-profile')
+      command: () => this.setPreviousUrl('user-profile')
     };
     this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile']};
-    this.logoutMenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: event => this.logout()};
+    this.logoutMenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout()};
     this.items = [
-      {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['home'], command: event => this.setPreviousUrl('home')},
+      {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['home'], command: () => this.setPreviousUrl('home')},
       {
         label: 'Validate',
         icon: 'pi pi-fw pi-check-square',
         routerLink: ['validate'],
-        command: event => this.setPreviousUrl('validate')
+        command: () => this.setPreviousUrl('validate')
       },
       {
         label: 'My validations',
         icon: 'pi pi-fw pi-folder',
         routerLink: ['my-validations'],
-        command: event => this.setPreviousUrl('my-validations')
+        command: () => this.setPreviousUrl('my-validations')
       },
       {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
+      {label: 'Compare validations', icon: 'pi pi-fw pi-th-large', routerLink: ['comparison']},
       {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
           {label: 'About', icon: 'pi pi-fw pi-info', routerLink: ['about']},
@@ -79,7 +80,7 @@ export class NavigationBarComponent implements OnInit {
     this.authService.logout().subscribe(result => {
         this.setPreviousUrl('');
         if (result) {// Successful logout
-          this.router.navigate(['home']).then(value => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
+          this.router.navigate(['home']).then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
         }
       }
     );
