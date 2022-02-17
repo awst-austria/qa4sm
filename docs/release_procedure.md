@@ -10,7 +10,7 @@ Updating dependency versions can be done at any time during the development but 
 
 ## Dependency version management
 
-1. Create a new environment, e.g. with the `environment/recreate_environment_file.sh` script or by updating single python packages in `environment/qa4sm_env.yml`.
+1. Create a new environment, e.g. with the `environment/create_conda_env.sh` script or by updating single python packages in `environment/qa4sm_env.yml`.
 2. Activate the new environment `conda activate new_env` (if the path has not been changed: new_env = /var/lib/qa4sm-conda).
 3. Test for regressions/problems by running all integration/unit tests with `pytest -m ""` and fix all issues (in particular those coming from updated dependencies).
 4. Test for regressions manually by inspecting all pages and all major functionality of the webapp.
@@ -54,7 +54,7 @@ If you have access to the AWST buildserver, you can do steps 1-4 by running buil
         * The app has changed significantly so much so that backward compatibility with older versions gets broken.
         * Large set of new features
         * At times, new UI can also be released as major release.
-    * minor: Indicates the release of one or more newer features or major enhancements representing a set of bug fixes on previous major release. Minor releases do not break the backward compatibility of the product.
+    * minor: Indicates the release of one or more new features or major enhancements representing a set of bug fixes on previous major release. Minor releases do not break the backward compatibility of the product.
     * patch: Indicates one or more bug fixes related with one or more existing features which need to be released in between minor releases. Patch release never releases a new functionality.
 
     Source: <https://vitalflux.com/software-build-release-versioning-strategy/>
@@ -63,12 +63,10 @@ If you have access to the AWST buildserver, you can do steps 1-4 by running buil
 
 6. Update the version number in `valentina/version.py`. Commit your release notes and version increase.
 
-7. Commit your changes again and create an annotated tag using the following command:
-
-        git tag -a v1.1.1 -m "Version 1.1.1, created YYYY-mm-dd"
-
-8. Deploy on the ops system from the tag
-9. Don't forget to set the data paths again using the `python manage.py setdatasetpaths` command.
+7. Update the `docker/compose/prod/docker-compose.yml` file with the new version number. You need to change the image version for the web, proxy and worker-1 containers at line number 22, 46 and 50. For example: `awst/qa4sm-proxy:1.2.3`. All 3 mentioned containers should have the same version. The db, redis and rabbitmq containers should be left untouched.
+8. Commit your changes and create a git tag with the chosen version number. e.g.: `v1.2.3`.
+9. Update Jenkins jobs with the current version number.
+10. Run QA4SM_Build_Prod_base_image and then  QA4SM_Deploy_to_prod job. Restart the instance.
 
 
 ## Release notes template
