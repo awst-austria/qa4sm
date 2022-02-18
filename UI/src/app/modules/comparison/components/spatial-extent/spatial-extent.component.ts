@@ -8,7 +8,6 @@ import {ExtentModel} from './extent-model';
   styleUrls: ['./spatial-extent.component.scss']
 })
 export class SpatialExtentComponent implements OnInit {
-  spatialExtentChecked = false;
 
   @Input() extentModel: ExtentModel;
   @Input() disabled: boolean;

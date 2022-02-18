@@ -3,7 +3,7 @@
     <p-checkbox label="Include all points from the selected validations"
                 [binary]="true"
                 [disabled]="this.disabled"
-                [ngModel]="spatialExtentChecked"
+                [ngModel]="!this.disabled && 0"
                 (ngModelChange)="spatialExtentChange($event)">
     </p-checkbox>
     <label class="p-panel-header-icon"
