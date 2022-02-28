@@ -44,8 +44,9 @@ ERA5 = 'ERA5'
 ERA5_LAND = 'ERA5_LAND'
 CGLS_CSAR_SSM1km = 'CGLS_CSAR_SSM1km'
 CGLS_SCATSAR_SWI1km = 'CGLS_SCATSAR_SWI1km'
+SMOS_L3 = 'SMOS_L3'
 
-## dataset versions
+# dataset versions
 C3S_V201706 = 'C3S_V201706'
 C3S_V201812 = 'C3S_V201812'
 C3S_V201912 = 'C3S_V201912'
@@ -75,8 +76,9 @@ ESA_CCI_SM_P_V06_1 = 'ESA_CCI_SM_P_V06_1'
 ESA_CCI_SM_C_V06_1 = 'ESA_CCI_SM_C_V06_1'
 CGLS_CSAR_SSM1km_V1_1 = 'CGLS_CSAR_SSM1km_V1_1'
 CGLS_SCATSAR_SWI1km_V1_0 = 'CGLS_SCATSAR_SWI1km_V1_0'
+SMOSL3_012022 = 'SMOSL3_012022'
 
-## dataset data variables
+# dataset data variables
 C3S_sm = 'C3S_sm'
 SMAP_soil_moisture = 'SMAP_soil_moisture'
 SMOS_sm = 'SMOS_sm'
@@ -103,9 +105,9 @@ VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'm
              'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to']
 DS_FIELDS = ['dataset', 'version']
 
-IRREGULAR_GRIDS = {'SMAP' : 0.35,
-                   'SMOS' : 0.25,
-                   'ASCAT' : 0.1}
+IRREGULAR_GRIDS = {'SMAP': 0.35,
+                   'SMOS': 0.25,
+                   'ASCAT': 0.1}
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
