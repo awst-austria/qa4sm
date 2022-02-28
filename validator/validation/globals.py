@@ -95,7 +95,7 @@ ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
-NOT_AS_REFERENCE = [CGLS_CSAR_SSM1km, CGLS_SCATSAR_SWI1km]
+NOT_AS_REFERENCE = []
 
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
