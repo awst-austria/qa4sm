@@ -323,7 +323,7 @@
     },
     {
         "model": "validator.datafilter",
-        "pk": 31,
+        "pk": 25,
         "fields": {
             "name": "FIL_SMOSL3_QUAL_RECOMMENDED",
             "description": "Soil moisture values are retrieved and recommended",
@@ -331,13 +331,13 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": "25,26,27,28,29,30",
+            "to_include": "26,27,28,29,30,31",
             "disable_filter": null
         }
     },
     {
         "model": "validator.datafilter",
-        "pk": 25,
+        "pk": 26,
         "fields": {
             "name": "FIL_SMOSL3_STRONG_TOPO",
             "description": "Exclude strong topography",
@@ -351,7 +351,7 @@
     },
     {
         "model": "validator.datafilter",
-        "pk": 26,
+        "pk": 27,
         "fields": {
             "name": "FIL_SMOSL3_SNOW",
             "description": "Exclude snow conditions",
@@ -365,7 +365,7 @@
     },
     {
         "model": "validator.datafilter",
-        "pk": 27,
+        "pk": 28,
         "fields": {
             "name": "FIL_SMOSL3_SOIL_FROZEN",
             "description": "Exclude frozen soil",
@@ -379,7 +379,7 @@
     },
     {
         "model": "validator.datafilter",
-        "pk": 28,
+        "pk": 29,
         "fields": {
             "name": "FIL_SMOSL3_WETLANDS",
             "description": "Exclude wetlands",
@@ -393,7 +393,7 @@
     },
     {
         "model": "validator.datafilter",
-        "pk": 29,
+        "pk": 30,
         "fields": {
             "name": "FIL_SMOSL3_RAIN",
             "description": "Exclude intense rain events",
@@ -407,7 +407,7 @@
     },
     {
         "model": "validator.datafilter",
-        "pk": 30,
+        "pk": 31,
         "fields": {
             "name": "FIL_SMOSL3_WINTER_FORESTS",
             "description": "Exclude winter forests",
