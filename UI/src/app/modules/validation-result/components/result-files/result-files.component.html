@@ -47,6 +47,7 @@
 
           <div *ngIf="metrics[indx].metadataFiles|async as metadataPlots">
             <hr class="featurette-divider">
+            <div class="subtitle">Metadata plots</div>
             <div class="p-col">
               <div class="p-grid">
                 <div *ngFor="let plot of metadataPlots; let ind = index"
