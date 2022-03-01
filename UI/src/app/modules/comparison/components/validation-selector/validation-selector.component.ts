@@ -166,7 +166,6 @@ export class ValidationSelectorComponent implements OnInit {
 
   startComparison(): void{
     // should start the comparison
-    console.log(this.comparisonModel.multipleNonReference);
     if (this.comparisonModel.selectedValidations.length === 0 ||
       (this.comparisonModel.selectedValidations.length === 1 && !this.comparisonModel.multipleNonReference)) {
       this.toastService.showErrorWithHeader('Nothing to compare', 'Add two validations or check  ' +
