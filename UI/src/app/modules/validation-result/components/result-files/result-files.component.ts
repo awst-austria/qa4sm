@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {EMPTY, Observable} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
@@ -35,6 +35,9 @@ export class ResultFilesComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateMetricsWithPlots();
+    this.updatedMetrics$.subscribe(data => {
+      console.log(data);
+    });
   }
 
   private updateMetricsWithPlots(): void {
@@ -47,6 +50,7 @@ export class ResultFilesComponent implements OnInit {
               ...metric,
               boxplotFile: this.getPlots([metric.boxplot_file]),
               overviewFiles: this.getPlots(metric.overview_files),
+              metadataFiles: this.getPlots(metric.metadata_files)
             })
         )
       )
@@ -77,6 +81,11 @@ export class ResultFilesComponent implements OnInit {
 
   getPlots(files: any): Observable<PlotDto[]> {
     let params = new HttpParams();
+    // handling an empty list added
+    if (files.length === 0){
+      return EMPTY;
+    }
+
     files.forEach(file => {
       params = params.append('file', file);
     });
@@ -86,7 +95,5 @@ export class ResultFilesComponent implements OnInit {
   sanitizePlotUrl(plotBase64: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plotBase64);
   }
-
-
 
 }
