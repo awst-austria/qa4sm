@@ -97,7 +97,7 @@ def get_metric_names_and_associated_files(request):
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
     response = []
 
-    for ind, key in enumerate(metrics):
+    for metric_ind, key in enumerate(metrics):
         boxplot_file = ''
         boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
 
@@ -118,20 +118,23 @@ def get_metric_names_and_associated_files(request):
         datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if file_dict['file_name'] in files]
 
         # for ISMN there might be also metadata plots
-        metadata_files = [] # empty if there is no files
+        boxplot_dicts = [{'ind': 0, 'name': 'General', 'file': boxplot_file}]
         if ref_dataset_name == ISMN:
             metadata_plots = [{'file_name': 'boxplot_'+ metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
-            metadata_files = [file_path + file_dict['file_name']
-                              for file_dict in metadata_plots if file_dict['file_name'] in files]
+            for meta_ind, file_dict in enumerate(metadata_plots):
+                if file_dict['file_name'] in files:
+                    boxplot_dicts.append({'ind': meta_ind + 1, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
+                                          'file': file_path + file_dict['file_name']})
 
-        metric_dict = {'ind': ind,
+        metric_dict = {'ind': metric_ind,
                        'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
-                       'boxplot_file': boxplot_file,
+                       'boxplot_dicts': boxplot_dicts,
                        'overview_files': overview_files,
-                       'metadata_files': metadata_files,
-                       'datasets': datasets}
+                       'metadata_files': [],
+                       'datasets': datasets,
+                       }
         response.append(metric_dict)
     #
     return JsonResponse(response, status=200, safe=False)
