@@ -118,7 +118,7 @@ def get_metric_names_and_associated_files(request):
         datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if file_dict['file_name'] in files]
 
         # for ISMN there might be also metadata plots
-        boxplot_dicts = [{'ind': 0, 'name': 'General', 'file': boxplot_file}]
+        boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
         if ref_dataset_name == ISMN:
             metadata_plots = [{'file_name': 'boxplot_'+ metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
