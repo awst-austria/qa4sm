@@ -57,6 +57,8 @@ export class ResultFilesComponent implements OnInit {
 
   onMetricChange(): void {
     this.metricIndx = this.selectedMetrics.ind;
+    // resetting boxplot index
+    this.boxplotIndx = 0;
   }
 
   onBoxPlotChange(event): void{
