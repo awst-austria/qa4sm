@@ -57,7 +57,7 @@
                     </span>
             </div>
           </div>
-          <div class="p-grid">
+          <div [ngClass]="{'p-grid': true, 'p-pt-3': boxplots.length === 1}">
             <div [ngClass]="{'p-col-6': true}">
               <span class="p-float-label p-mb-4">
                 <p-dropdown id="metricSelector"
