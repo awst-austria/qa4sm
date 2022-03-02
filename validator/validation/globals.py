@@ -139,7 +139,7 @@ METADATA_TEMPLATE = {'other_ref': None,
 INSTRUMENT_META = "instrument"
 MEASURE_DEPTH_FROM = "instrument_depthfrom"
 MEASURE_DEPTH_TO = "instrument_depthto"
-METADATA_PLOT_NAMES = {"Land cover": "metadata_lc_2010",
-                       "Climate": "metadata_climate_KG",
-                       "Soil": "metadata_instrument_depth_and_soil_type",
+METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
+                       "Climate classification": "metadata_climate_KG",
+                       "Soil type classification": "metadata_instrument_depth_and_soil_type",
                        }
