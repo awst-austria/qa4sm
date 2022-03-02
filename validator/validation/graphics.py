@@ -46,9 +46,9 @@ def generate_all_graphs(validation_run, outfolder):
 
 
     fnb, fnm, fcsv = plot_all(validation_run.output_file.path,
-        out_dir=outfolder, out_type='png')
+        out_dir=outfolder, out_type='png', save_metadata=True)
     fnb_svg, fnm_svg, fcsv = plot_all(validation_run.output_file.path,
-        out_dir=outfolder, out_type='svg')
+        out_dir=outfolder, out_type='svg', save_metadata=True)
 
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:

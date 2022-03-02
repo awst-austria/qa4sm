@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {Observable} from 'rxjs';
+import {EMPTY, Observable} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
@@ -24,7 +24,9 @@ export class ResultFilesComponent implements OnInit {
 
   updatedMetrics$: Observable<any>;
   selectedMetrics: MetricsPlotsDto;
-  indx = 0;
+  metricIndx = 0;
+  selectedBoxplot: any;
+  boxplotIndx = 0;
   // plotPrefix = 'data:image/png;base64,';
 
   constructor(private validationService: ValidationrunService,
@@ -45,7 +47,7 @@ export class ResultFilesComponent implements OnInit {
           metric =>
             ({
               ...metric,
-              boxplotFile: this.getPlots([metric.boxplot_file]),
+              boxplotFiles: this.getPlots(metric.boxplot_dicts.map(boxplotFile => boxplotFile.file)),
               overviewFiles: this.getPlots(metric.overview_files),
             })
         )
@@ -54,8 +56,14 @@ export class ResultFilesComponent implements OnInit {
   }
 
   onMetricChange(): void {
-    this.indx = this.selectedMetrics.ind;
+    this.metricIndx = this.selectedMetrics.ind;
+    // resetting boxplot index
+    this.boxplotIndx = 0;
   }
+
+  onBoxPlotChange(event): void{
+    this.boxplotIndx = this.selectedBoxplot.ind;
+}
 
   showGallery(index: number = 0, imagesListObject): void {
     const imagesList = [];
@@ -77,6 +85,11 @@ export class ResultFilesComponent implements OnInit {
 
   getPlots(files: any): Observable<PlotDto[]> {
     let params = new HttpParams();
+    // handling an empty list added
+    if (files.length === 0){
+      return EMPTY;
+    }
+
     files.forEach(file => {
       params = params.append('file', file);
     });
@@ -86,7 +99,5 @@ export class ResultFilesComponent implements OnInit {
   sanitizePlotUrl(plotBase64: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plotBase64);
   }
-
-
 
 }
