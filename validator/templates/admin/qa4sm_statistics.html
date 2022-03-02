@@ -69,7 +69,7 @@
   // ajax to take info on a user
   function ajax_show_user_info(user_id) {
       // url is fixed, as it is admin site so its name is not visible here
-      var url = '/admin/validator/statistics/user_id';
+      var url = '/django/admin/validator/statistics/user_id/';
       var user_id = $('#users_list').val()
       $.ajax({
           url: url,
