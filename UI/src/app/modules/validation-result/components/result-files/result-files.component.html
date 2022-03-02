@@ -10,17 +10,17 @@
       </ng-template>
 
       <div *ngIf="updatedMetrics$|async as metrics" style="min-height: 400px">
-        <div>
-          <div *ngIf="metrics[indx] && metrics[indx].overviewFiles|async as overviewPlots">
+        <div *ngIf="metrics[metricIndx].boxplotFiles|async as boxplots">
+          <div *ngIf="metrics[metricIndx] && metrics[metricIndx].overviewFiles|async as overviewPlots">
             <div class="p-grid p-align-center">
-              <div [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
-                <img *ngIf="metrics[indx].boxplotFile|async as boxplot"
-                     width="95%"
+              <div
+                   [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
+                <img width="95%"
                      height="95%"
-                     [src]="sanitizePlotUrl(boxplot[0].plot)"
-                     (click)="showGallery(0, boxplot)"
+                     [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
+                     (click)="showGallery(boxplotIndx, boxplots)"
                      [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
-                     alt="Boxplot for {{metrics[indx].metric_pretty_name}}">
+                     alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}">
               </div>
               <div class="p-col">
                 <div class="p-grid">
@@ -29,14 +29,14 @@
                              'p-col': overviewPlots.length === 1,
                              'p-col-10': overviewPlots.length === 2,
                              'p-col-6': overviewPlots.length > 2}">
-              <span class="image-label">
-                {{metrics[indx].datasets[ind]}}
-              </span>
+                    <span class="image-label">
+                      {{metrics[metricIndx].datasets[ind]}}
+                    </span>
                     <img width="95%" height="95%"
                          [src]="sanitizePlotUrl(plot.plot)"
                          (click)="showGallery(ind, overviewPlots)"
                          [ngClass]="{'result-plot':true, 'pcol': true}"
-                         alt="An Overview map for {{metrics[indx].metric_pretty_name}}">
+                         alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}">
                   </div>
                 </div>
               </div>
@@ -44,27 +44,7 @@
             </div>
 
           </div>
-
-          <div *ngIf="metrics[indx].metadataFiles|async as metadataPlots">
-            <hr class="featurette-divider">
-            <div class="subtitle">Metadata plots</div>
-            <div class="p-col">
-              <div class="p-grid">
-                <div *ngFor="let plot of metadataPlots; let ind = index"
-                     [ngClass]="{'image-container': true,
-                             'p-col-6': metadataPlots.length === 2,
-                             'p-col-4': metadataPlots.length === 3}">
-                  <img width="95%" height="95%"
-                       [src]="sanitizePlotUrl(plot.plot)"
-                       (click)="showGallery(ind, metadataPlots)"
-                       [ngClass]="{'result-plot':true, 'pcol': true}"
-                       alt="A metadata plot for {{metrics[indx].metric_pretty_name}}">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="p-grid">
+          <div class="p-grid p-pt-2">
             <div class="p-col-3 px-0 center p-mt-3">
               <button pButton
                       type="button"
@@ -76,16 +56,29 @@
                       (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
               </button>
             </div>
-            <div class="p-col">
-          <span class="p-float-label p-mb-4 p-mt-3">
-            <p-dropdown id="metricSelector"
-                        (onChange)="onMetricChange()"
-                        [options]="metrics"
-                        [(ngModel)]="selectedMetrics"
-                        optionLabel="metric_pretty_name"
-                        [style]="{'width': '100%'}">
-            </p-dropdown>
-          </span>
+            <div [ngClass]="{'p-col-3': boxplots.length > 1, 'p-col': boxplots.length === 1}">
+              <span class="p-float-label p-mb-4 p-mt-3">
+                <p-dropdown id="metricSelector"
+                            (onChange)="onMetricChange()"
+                            [options]="metrics"
+                            [(ngModel)]="selectedMetrics"
+                            optionLabel="metric_pretty_name"
+                            [style]="{'width': '100%'}">
+                </p-dropdown>
+                <label for="metricSelector">Select metric</label>
+              </span>
+            </div>
+            <div class="p-col-3" *ngIf="boxplots.length > 1">
+              <span  class="p-float-label p-mb-4 p-mt-3">
+                  <p-dropdown id="boxplotSelector"
+                              (onChange)="onBoxPlotChange($event)"
+                              [options]="metrics[metricIndx].boxplot_dicts"
+                              [(ngModel)]="selectedBoxplot"
+                              optionLabel="name"
+                              [style]="{'width': '100%'}">
+                  </p-dropdown>
+                  <label for="boxplotSelector">Select boxplot</label>
+                </span>
             </div>
             <div class="p-col-3 px-0 p-mt-3 center">
               <button pButton

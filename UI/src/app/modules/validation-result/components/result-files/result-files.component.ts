@@ -24,7 +24,9 @@ export class ResultFilesComponent implements OnInit {
 
   updatedMetrics$: Observable<any>;
   selectedMetrics: MetricsPlotsDto;
-  indx = 0;
+  metricIndx = 0;
+  selectedBoxplot: any;
+  boxplotIndx = 0;
   // plotPrefix = 'data:image/png;base64,';
 
   constructor(private validationService: ValidationrunService,
@@ -35,9 +37,6 @@ export class ResultFilesComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateMetricsWithPlots();
-    this.updatedMetrics$.subscribe(data => {
-      console.log(data);
-    });
   }
 
   private updateMetricsWithPlots(): void {
@@ -48,9 +47,8 @@ export class ResultFilesComponent implements OnInit {
           metric =>
             ({
               ...metric,
-              boxplotFile: this.getPlots([metric.boxplot_file]),
+              boxplotFiles: this.getPlots(metric.boxplot_dicts.map(boxplotFile => boxplotFile.file)),
               overviewFiles: this.getPlots(metric.overview_files),
-              metadataFiles: this.getPlots(metric.metadata_files)
             })
         )
       )
@@ -58,8 +56,12 @@ export class ResultFilesComponent implements OnInit {
   }
 
   onMetricChange(): void {
-    this.indx = this.selectedMetrics.ind;
+    this.metricIndx = this.selectedMetrics.ind;
   }
+
+  onBoxPlotChange(event): void{
+    this.boxplotIndx = this.selectedBoxplot.ind;
+}
 
   showGallery(index: number = 0, imagesListObject): void {
     const imagesList = [];
