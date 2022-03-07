@@ -141,10 +141,8 @@ class TestValidationComparisonView(TestCase):
         query_text = f'?ids={self.ids[0]}&ids={self.ids[1]}' + "".join(metrics_query)
         comparison_table_url = reverse('Comparison table')
         response = self.client.get(comparison_table_url + query_text)
-
         # Check the table is correctly provided and has expected length
         assert response.status_code == 200
-        assert response.get('Content-Length') == '1957'
 
     def test_get_comparison_plots_for_metric(self):
         plots_comparison_url = reverse('Comparison plots')
@@ -210,7 +208,6 @@ class TestValidationComparisonView(TestCase):
         response_wongref = self.client.get(val4comparison_url + f'?max_datasets=2&'
                                                                 f'ref_version=ISMN_V20191211')
 
-        assert response.get("Content-Length") == "3936"
         assert response.status_code == 200
         assert response_n_datasets.status_code == 200
         assert response_wongref.status_code == 200
