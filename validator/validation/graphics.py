@@ -45,10 +45,18 @@ def generate_all_graphs(validation_run, outfolder):
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-    fnb, fnm, fcsv = plot_all(validation_run.output_file.path,
-                              out_dir=outfolder, out_type='png')
-    fnb_svg, fnm_svg, fcsv = plot_all(validation_run.output_file.path,
-                                      out_dir=outfolder, out_type='svg')
+    fnb, fnm, fcsv = plot_all(
+        validation_run.output_file.path,
+        out_dir=outfolder,
+        out_type='png',
+        save_metadata=True
+    )
+    fnb_svg, fnm_svg, fcsv = plot_all(
+        validation_run.output_file.path,
+        out_dir=outfolder,
+        out_type='svg',
+        save_metadata=True
+    )
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         for pngfile in fnb + fnm:
