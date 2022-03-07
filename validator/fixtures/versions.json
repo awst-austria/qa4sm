@@ -338,9 +338,21 @@
         "model": "validator.datasetversion",
         "pk": 37,
         "fields": {
-            "short_name": "SMOSL3_012022",
-            "pretty_name": "SMOSL3_012022",
-            "help_text": "L3-SM (CATDS): Preliminary Daily Retrieval",
+            "short_name": "Level3_ASC",
+            "pretty_name": "Level3 Ascending",
+            "help_text": "SMOS L3-SM (CATDS) Descending Obs.",
+            "time_range_start": "2010-07-01",
+            "time_range_end": "2020-12-31",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 38,
+        "fields": {
+            "short_name": "Level3_DESC",
+            "pretty_name": "Level3 Descending",
+            "help_text": "SMOS L3-SM (CATDS) Ascending Obs.",
             "time_range_start": "2010-07-01",
             "time_range_end": "2020-12-31",
             "geographical_range": null

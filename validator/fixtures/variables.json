@@ -185,6 +185,16 @@
             "min_value": 0.0,
             "max_value": 100.0
         }
+    },
+    {
+        "model": "validator.datavariable",
+        "pk": 18,
+        "fields": {
+            "short_name": "SMOSL3_sm",
+            "pretty_name": "Soil_Moisture",
+            "help_text": "Retrieved soil moisture value in m³/m³",
+            "min_value": 0.0,
+            "max_value": 1.0
+        }
     }
-
 ]

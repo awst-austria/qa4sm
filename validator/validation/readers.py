@@ -69,7 +69,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = S1CglsTs(folder_name)
 
     if dataset.short_name == globals.SMOS_L3:
-        reader = GriddedNcOrthoMultiTs(folder_name)
+        reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))

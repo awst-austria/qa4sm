@@ -331,7 +331,7 @@
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": "26,27,28,29,30,31",
+            "to_include": "26,27,28,29,30,31,32",
             "disable_filter": null
         }
     },
@@ -339,13 +339,13 @@
         "model": "validator.datafilter",
         "pk": 26,
         "fields": {
-            "name": "FIL_SMOSL3_STRONG_TOPO",
-            "description": "Exclude strong topography",
-            "help_text": "Science Flag ...",
+            "name": "FIL_SMOSL3_NON_NOMINAL",
+            "description": "Exclude non nominal values",
+            "help_text": "Exlude all values flagged as non nominal due to scene characteristics",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
-            "to_include": null,
+            "to_include": "27,28,29,30,31",
             "disable_filter": null
         }
     },
@@ -353,9 +353,9 @@
         "model": "validator.datafilter",
         "pk": 27,
         "fields": {
-            "name": "FIL_SMOSL3_SNOW",
-            "description": "Exclude snow conditions",
-            "help_text": "Science Flag ...",
+            "name": "FIL_SMOSL3_STRONG_TOPO",
+            "description": "Exclude strong topography",
+            "help_text": "Exlude values flagged due to radiometric fraction of Moderate/Strong Topography of more than 5%",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
@@ -367,9 +367,9 @@
         "model": "validator.datafilter",
         "pk": 28,
         "fields": {
-            "name": "FIL_SMOSL3_SOIL_FROZEN",
-            "description": "Exclude frozen soil",
-            "help_text": "Science Flag ...",
+            "name": "FIL_SMOSL3_FROZEN",
+            "description": "Exclude frozen soil and snow conditions",
+            "help_text": "Exclude values flagged due to high radiometric fraction of snow/ice/frost",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
@@ -381,9 +381,9 @@
         "model": "validator.datafilter",
         "pk": 29,
         "fields": {
-            "name": "FIL_SMOSL3_WETLANDS",
-            "description": "Exclude wetlands",
-            "help_text": "Science Flag ...",
+            "name": "FIL_SMOSL3_FOREST",
+            "description": "Exclude forests",
+            "help_text": "Exclude values flagged due to radiometric fraction of forest larger than 10%",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
@@ -395,9 +395,9 @@
         "model": "validator.datafilter",
         "pk": 30,
         "fields": {
-            "name": "FIL_SMOSL3_RAIN",
-            "description": "Exclude intense rain events",
-            "help_text": "Science Flag ...",
+            "name": "FIL_SMOSL3_WATER",
+            "description": "Exclude surface water",
+            "help_text": "Exclude values flagged due to too high radiometric fraction of open water/floods/wetlands",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
@@ -409,9 +409,23 @@
         "model": "validator.datafilter",
         "pk": 31,
         "fields": {
-            "name": "FIL_SMOSL3_WINTER_FORESTS",
-            "description": "Exclude winter forests",
-            "help_text": "Science Flag ...",
+            "name": "FIL_SMOSL3_RAIN",
+            "description": "Exclude intense rain events",
+            "help_text": "Exclude values flagged due to precipitation of more than 10.00 mm/h from ECMWF parameters",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": "",
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 32,
+        "fields": {
+            "name": "FIL_SMOSL3_RETRIEVAL",
+            "description": "Exclude retrieval issues",
+            "help_text": "Exclude values flagged due to problems in the retrieval parameters",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": "",
