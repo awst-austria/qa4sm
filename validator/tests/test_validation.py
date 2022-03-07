@@ -1204,8 +1204,12 @@ class TestValidation(TestCase):
                         assert data is not None
                         assert variable.pretty_name in data.columns
                         assert isinstance(data, pd.DataFrame)
-                        assert len(data.index) > 1
-                        assert not data[variable.pretty_name].empty
+
+                        # handles the case where all values are flagged (i.e. for SMOS L3)
+                        if not len(data.index) > 1 or data[variable.pretty_name].empty:
+                            unfiltered = reader.read(-155.42, 19.78, **read_kwargs)
+
+                            assert unfiltered.count()[variable.pretty_name] == len(unfiltered)
 
         print("Test duration: {}".format(time.time() - start_time))
 
