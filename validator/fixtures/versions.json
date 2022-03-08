@@ -342,7 +342,7 @@
             "pretty_name": "Level3 Ascending",
             "help_text": "SMOS L3-SM (CATDS) Descending Obs.",
             "time_range_start": "2010-07-01",
-            "time_range_end": "2020-12-31",
+            "time_range_end": "2022-02-14",
             "geographical_range": null
         }
     },
@@ -354,7 +354,7 @@
             "pretty_name": "Level3 Descending",
             "help_text": "SMOS L3-SM (CATDS) Ascending Obs.",
             "time_range_start": "2010-07-01",
-            "time_range_end": "2020-12-31",
+            "time_range_end": "2022-02-14",
             "geographical_range": null
         }
     }
