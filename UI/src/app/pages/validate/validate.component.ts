@@ -273,7 +273,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   addDatasetToValidate(): void {
-    this.addDataset(this.validationModel.datasetConfigurations, 'C3S', 'v202012');
+    this.addDataset(this.validationModel.datasetConfigurations, 'C3S_combined', 'v202012');
   }
 
   addReferenceDataset(): void {

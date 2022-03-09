@@ -29,7 +29,7 @@ class TestHacks(TestCase):
         set_dataset_paths()
 
     def test_timezone_adapter(self):
-        c3s_storage_path = Path(Dataset.objects.get(short_name='C3S').storage_path)
+        c3s_storage_path = Path(Dataset.objects.get(short_name='C3S_combined').storage_path)
         c3s_data_folder = c3s_storage_path.joinpath('C3S_V201706/TCDR/063_images_to_ts/combined-daily')
         c3s_reader = c3s_read(c3s_data_folder)
 
