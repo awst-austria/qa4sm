@@ -1,0 +1,25 @@
+<div class="p-grid no-gutters">
+  <div class="p-col-4 p-px-0 p-mx-0">
+    <div class="p-fluid">
+      <div class="p-float-label">
+        <p-inputNumber id="threshold_filter" [minFractionDigits]="1" [maxFractionDigits]="2"
+                       [ngModel]="filterModel.selectedValue$|async"
+                       [min]="filterModel.filterDto.min_threshold"
+                       [max]="filterModel.filterDto.max_threshold"
+                       (ngModelChange)="filterModel.selectedValue$.next($event)"
+        ></p-inputNumber>
+        <label for="threshold_filter" [pTooltip]="filterModel.filterDto.description"></label>
+      </div>
+    </div>
+  </div>
+  <div [ngClass]="{'p-col-1': true, 'adjust-margin': false}">
+    <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
+  </div>
+  <div class="p-col-12 p-sm-2">
+    <div class="p-d-flex p-jc-center">
+      <button pButton type="button" icon="pi pi-trash" pTooltip="Set parameter with default value"
+              class="clearCoordinates p-button-info p-mr-2" style="padding: 0.2rem;"
+              (click)="SetParamDefault()"></button>
+    </div>
+  </div>
+</div>

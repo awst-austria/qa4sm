@@ -126,8 +126,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // TODO: parameterized filter setup seems to be missing
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
-      const newDatasetConfigModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
-        null, new BehaviorSubject(null), new BehaviorSubject(null));
+      const newDatasetConfigModel = new DatasetConfigModel(
+          new DatasetComponentSelectionModel(null, null, null),
+          null, null,
+          new BehaviorSubject(null),
+          new BehaviorSubject(null),
+      );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
         newDatasetConfigModel.datasetModel.selectedDataset = dataset;
@@ -163,7 +167,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     // Prepare reference
     const newReferenceModel = new DatasetConfigModel(
-      new DatasetComponentSelectionModel(null, null, null), null,
+      new DatasetComponentSelectionModel(null, null, null),
+      null, null,
       new BehaviorSubject<FilterModel>(null), new BehaviorSubject<FilterModel>(null));
     this.validationModel.referenceConfigurations.push(newReferenceModel);
     this.datasetService.getDatasetById(validationRunConfig.reference_config.dataset_id).subscribe(dataset => {
@@ -281,8 +286,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void {
-    const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
-      null, new BehaviorSubject(null), new BehaviorSubject(null));
+    const model = new DatasetConfigModel(
+        new DatasetComponentSelectionModel(null, null, null),
+      null, null,
+        new BehaviorSubject(null),
+        new BehaviorSubject(null)
+  );
     targetArray.push(model);
     // get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {

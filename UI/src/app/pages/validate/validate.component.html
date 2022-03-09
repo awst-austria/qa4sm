@@ -27,7 +27,7 @@
                           [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                           [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
-
+<!--              Normal filters -->
               <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
                 <qa-basic-filter
                   [ngClass]="{'ml-1': isIncluded(filter.filterDto.id, item.basicFilters)}"
@@ -36,6 +36,13 @@
                   (onExcludeMutual)="this.excludeFilter($event, item.basicFilters)"
                   (onIncludeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
                 </qa-basic-filter>
+              </ng-container>
+
+<!--              Filters with a threshold -->
+              <ng-container *ngFor="let thresher of item.thresholdFilters; let filterIdx = index">
+                <qa-threshold-filter
+                  [filterModel]="thresher">
+                </qa-threshold-filter>
               </ng-container>
 
               <div style="width: 100%;text-align: right">
