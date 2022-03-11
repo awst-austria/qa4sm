@@ -5,7 +5,12 @@ import {
 } from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
-import {DatasetConfigModel, ISMN_DEPTH_FILTER_ID, ISMN_NETWORK_FILTER_ID} from './dataset-config-model';
+import {
+  DatasetConfigModel,
+  ISMN_DEPTH_FILTER_ID,
+  ISMN_NETWORK_FILTER_ID,
+  SMOS_RFI_FILTER_ID
+} from './dataset-config-model';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
@@ -80,6 +85,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   public isExistingValidationWindowOpen: boolean;
   maintenanceMode = false;
 
+  smos_threshold_filter = SMOS_RFI_FILTER_ID
+
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
@@ -128,7 +135,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
       const newDatasetConfigModel = new DatasetConfigModel(
           new DatasetComponentSelectionModel(null, null, null),
-          null, null,
+          null,
+          new BehaviorSubject(null),
           new BehaviorSubject(null),
           new BehaviorSubject(null),
       );
@@ -145,9 +153,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               });
             });
             datasetConfig.parametrised_filters.forEach(paramFilter => {
+              if (paramFilter.id === SMOS_RFI_FILTER_ID) {
+                datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
+              }
               if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
                 datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
-
               }
               if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
                 datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
@@ -168,8 +178,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // Prepare reference
     const newReferenceModel = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
-      null, null,
-      new BehaviorSubject<FilterModel>(null), new BehaviorSubject<FilterModel>(null));
+      null,
+        new BehaviorSubject(null),
+        new BehaviorSubject<FilterModel>(null),
+        new BehaviorSubject<FilterModel>(null));
     this.validationModel.referenceConfigurations.push(newReferenceModel);
     this.datasetService.getDatasetById(validationRunConfig.reference_config.dataset_id).subscribe(dataset => {
       newReferenceModel.datasetModel.selectedDataset = dataset;
@@ -188,6 +200,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             }
             if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
               referenceConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
+            }
+            if (paramFilter.id === SMOS_RFI_FILTER_ID) {
+              referenceConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
             }
           });
         });
@@ -288,7 +303,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void {
     const model = new DatasetConfigModel(
         new DatasetComponentSelectionModel(null, null, null),
-      null, null,
+      null,
+        new BehaviorSubject(null),
         new BehaviorSubject(null),
         new BehaviorSubject(null)
   );
@@ -324,6 +340,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const updatedModel$ = new ReplaySubject<DatasetConfigModel>();
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
         model.basicFilters = [];
+        model.smosRfiFilter$.next(null);
         model.ismnNetworkFilter$.next(null);
         model.ismnDepthFilter$.next(null);
         filters.forEach(filter => {
@@ -333,7 +350,22 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 filter,
                 false,
                 false,
-                new BehaviorSubject<string>(filter.default_parameter)));
+                  new BehaviorSubject<string>(filter.default_parameter)));
+            } else if (filter.id === SMOS_RFI_FILTER_ID) {
+              if (model.smosRfiFilter$) {
+                model.smosRfiFilter$.next(new FilterModel(
+                  filter,
+                  false,
+                  false,
+                  new BehaviorSubject<string>(filter.default_parameter)));
+              } else {
+                model.smosRfiFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+                  filter,
+                  false,
+                  false,
+                  new BehaviorSubject<string>(filter.default_parameter))
+                );
+              }
             } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
               if (model.ismnDepthFilter$) {
                 model.ismnDepthFilter$.next(new FilterModel(
@@ -362,7 +394,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             model.basicFilters.push(newFilter);
           }
         });
-
         updatedModel$.next(model);
       },
       error => {

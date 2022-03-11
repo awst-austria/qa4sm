@@ -21,7 +21,6 @@ export interface ValidationRunDatasetConfigDto {
   version_id: number;
   variable_id: number;
   basic_filters: number[];
-  threshold_filters: number[];
   parametrised_filters: ParametrisedFilterConfig[];
 
 }

@@ -11,10 +11,6 @@ class DataFilter(models.Model):
     default_parameter = models.TextField(null=True, blank=True)
     to_include = models.CharField(max_length=150, null=True, blank=True)
     disable_filter = models.IntegerField(null=True)
-    threshold = models.BooleanField(default=False),
-    default_threshold = models.FloatField(null=True),
-    min_threshold = models.FloatField(null=True),
-    max_threshold = models.FloatField(null=True),
 
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration

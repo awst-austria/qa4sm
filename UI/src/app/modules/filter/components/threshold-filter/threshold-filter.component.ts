@@ -1,5 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ThresholdFilterModel} from "./threshold-filter-model";
+import {FilterModel} from "../basic-filter/filter-model";
+import {BehaviorSubject} from "rxjs";
+import {DatasetComponentSelectionModel} from "../../../dataset/components/dataset/dataset-component-selection-model";
 
 @Component({
   selector: 'qa-threshold-filter',
@@ -8,23 +10,32 @@ import {ThresholdFilterModel} from "./threshold-filter-model";
 })
 export class ThresholdFilterComponent implements OnInit {
 
-  @Input() filterModel: ThresholdFilterModel;
+  @Input() filterModel$: BehaviorSubject<FilterModel>;
+  @Input() datasetModel: DatasetComponentSelectionModel;
+  @Input() minThreshold: number = 0.;
+  @Input() maxThreshold: number = 1.;
+  @Input() increment: number = 0.05;
+  @Input() units: string = "fraction";
 
-  constructor() { }
+  editThreshold = "0";
+
+  constructor() {
+  }
 
   ngOnInit(): void {
+    this.filterModel$.subscribe(model => {
+      if (model != null) {
+        this.initComponent();
+      }
+    });
   }
 
-  SetParamDefault(): void{
-    this.filterModel.selectedValue$.next(this.filterModel.filterDto.default_threshold);
+  private initComponent(): void {
+    this.editThreshold = this.filterModel$.value.filterDto.default_parameter;
+    this.filterModel$.value.parameters$.subscribe(param => this.editThreshold = param);
   }
 
-  checkValIfLimited(value: number): any {
-    if (
-      this.filterModel.selectedValue$.getValue() <= this.filterModel.filterDto.max_threshold &&
-      this.filterModel.selectedValue$.getValue() >= this.filterModel.filterDto.min_threshold) {
-      return value;
-    }
+  public saveNewValue(event): void {
+    this.filterModel$.value.parameters$.next(event.value);
   }
-
 }
