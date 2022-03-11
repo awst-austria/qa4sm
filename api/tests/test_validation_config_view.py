@@ -178,7 +178,6 @@ class TestValidationConfigView(TransactionTestCase):
                             ParametrisedFilter.objects.filter(dataset_config=self.run.reference_configuration)]
 
         assert param_filters_id == [el['id'] for el in val_run_dict['reference_config']['parametrised_filters']]
-        assert DataFilter.objects.get(name='FIL_C3S_FLAG_0').id in val_run_dict['dataset_configs'][0]['basic_filters']
         assert DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id in \
                val_run_dict['dataset_configs'][0]['basic_filters']
 

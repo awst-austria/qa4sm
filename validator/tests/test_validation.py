@@ -285,7 +285,6 @@ class TestValidation(TestCase):
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
@@ -331,8 +330,6 @@ class TestValidation(TestCase):
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                if config.dataset.short_name == 'C3S':
-                    config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
@@ -379,7 +376,6 @@ class TestValidation(TestCase):
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
             config.save()
@@ -425,7 +421,6 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -510,7 +505,6 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -597,7 +591,6 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -638,7 +631,6 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -681,7 +673,6 @@ class TestValidation(TestCase):
 
         for config in run.dataset_configurations.all():
             if config != run.reference_configuration:
-                #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -1532,8 +1523,6 @@ class TestValidation(TestCase):
             config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             if config.dataset.short_name == globals.ISMN:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            if config.dataset.short_name == globals.C3S:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
             print('old one', config.dataset == globals.ISMN, config, config.filters.all())
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
@@ -1673,8 +1662,6 @@ class TestValidation(TestCase):
             new_config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             if new_config.dataset.short_name == globals.ISMN:
                 new_config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            if new_config.dataset.short_name == globals.C3S:
-                new_config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
 
             new_config.save()
 
@@ -1838,7 +1825,6 @@ class TestValidation(TestCase):
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 

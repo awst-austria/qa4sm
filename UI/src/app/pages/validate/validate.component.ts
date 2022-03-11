@@ -347,7 +347,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               false,
               false,
               new BehaviorSubject<string>(null)));
-            if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE') {
+            if (!reloadingSettings && newFilter.filterDto.default_set_active) {
               newFilter.enabled = true;
             }
             model.basicFilters.push(newFilter);

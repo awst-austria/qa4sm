@@ -138,7 +138,6 @@ class TestValidity(TestCase):
         data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
         data_c.save() # object needs to be saved before m2m relationship can be used
 
-        data_c.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
         data_c.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
         data_c.save()
 
