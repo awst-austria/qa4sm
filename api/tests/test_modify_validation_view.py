@@ -46,14 +46,15 @@ class TestModifyValidationView(TestCase):
     def test_stop_validation(self):
         # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
         run = default_parameterized_validation_to_be_run(self.test_user, tcol=True)
-
+        run.save()
         run_id = run.id
         val.run_validation(run_id)
         new_run = ValidationRun.objects.get(pk=run_id)
-
+        print(new_run.progress)
         # let it run a little bit
-        time.sleep(1)
+        time.sleep(2)
         # the validation has just started so the progress must be below 100
+        print(new_run.progress)
         assert new_run.progress < 100
 
         # now let's try out cancelling the validation
