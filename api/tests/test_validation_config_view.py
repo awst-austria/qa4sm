@@ -194,6 +194,8 @@ class TestValidationConfigView(TransactionTestCase):
         response = self.client.get(reverse('Validation configuration', kwargs={'id': self.wrong_id}))
         assert response.status_code == 404
 
+    # stopping validation tested here, because TransactionTestCase is needed and using it in two places causes some
+    # issues
     def test_stop_validation(self):
         # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
         start_validation_url = reverse('Run new validation')
