@@ -17,13 +17,19 @@ from validator.models import ValidationRun
 from dateutil import parser
 
 from validator.validation import mkdir_if_not_exists, set_outfile
-
+from validator.validation import globals
 User = get_user_model()
-
+from django.test.testcases import TransactionTestCase
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
-class TestModifyValidationView(TestCase):
+class TestModifyValidationView(TransactionTestCase):
+    serialized_rollback = True
+
+    ## https://docs.djangoproject.com/en/2.2/topics/testing/tools/#simpletestcase
+    databases = '__all__'
+    allow_database_queries = True
+
     fixtures = ['variables', 'versions', 'datasets', 'filters']
     __logger = logging.getLogger(__name__)
 
@@ -45,21 +51,59 @@ class TestModifyValidationView(TestCase):
 
     def test_stop_validation(self):
         # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
-        run = default_parameterized_validation_to_be_run(self.test_user, tcol=True)
-        run.save()
-        run_id = run.id
-        val.run_validation(run_id)
+        start_validation_url = reverse('Run new validation')
+
+        basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
+        good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3S).id,
+                                          'variable_id': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+                                          'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
+                                          'basic_filters': [basic_filter_id],
+                                          'parametrised_filters': []},
+                                         {'dataset_id': Dataset.objects.get(short_name=globals.SMAP).id,
+                                          'variable_id': DataVariable.objects.get(
+                                              short_name=globals.SMAP_soil_moisture).id,
+                                          'version_id': DatasetVersion.objects.get(short_name=globals.SMAP_V6_PM).id,
+                                          'basic_filters': [basic_filter_id],
+                                          'parametrised_filters': []}],
+                     'reference_config': {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
+                                          'variable_id': DataVariable.objects.get(
+                                              short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+                                          'version_id': DatasetVersion.objects.get(
+                                              short_name=globals.GLDAS_NOAH025_3H_2_1).id,
+                                          'basic_filters': [basic_filter_id],
+                                          'parametrised_filters': []},
+                     'interval_from': datetime(1978, 1, 1),
+                     'interval_to': datetime(2020, 1, 1),
+                     'min_lat': 18.022843268729,
+                     'min_lon': -161.334244440612,
+                     'max_lat': 23.0954743716834,
+                     'max_lon': -153.802918037877,
+                     'metrics': [{'id': 'tcol', 'value': True}],
+                     'anomalies_method': 'none',
+                     'anomalies_from': None,
+                     'anomalies_to': None,
+                     'scaling_method': ValidationRun.MEAN_STD,
+                     'scale_to': ValidationRun.SCALE_TO_REF,
+                     'name_tag': 'test_validation'}
+
+        # log in
+        self.client.login(**self.auth_data)
+
+        # submit without checking for an existing validation
+        response = self.client.post(start_validation_url, good_form, format='json')
+        run_id = response.json()['id']
+        self.assertEqual(response.status_code, 200)
+
+        # # let it run a little
+        time.sleep(1)
+        # # the validation has just started so the progress must be below 100
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        # let it run a little bit
-        time.sleep(2)
-        # the validation has just started so the progress must be below 100
         assert new_run.progress < 100
-
         # now let's try out cancelling the validation
         response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
         assert response.status_code == 200
-
+        #
         # let's try canceling non existing validation
         response = self.client.delete(
             reverse('Stop validation', kwargs={'result_uuid': 'f0000000-a000-b000-c000-d00000000000'}))
@@ -73,14 +117,14 @@ class TestModifyValidationView(TestCase):
         self.client.logout()
         response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
         assert response.status_code == 403
-        #
+
         # log in as another user and check the access
         self.client.login(**self.alt_data)
         response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
         assert response.status_code == 403
 
         # give it some time
-        time.sleep(2)
+        time.sleep(5)
         # the progress should be -1, but it takes some time for a validation to settle down so setting -1 here would
         # require some time, but we can check that it's not bigger than 0 so there was no progress
         assert new_run.progress <= 0
