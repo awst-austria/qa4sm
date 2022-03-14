@@ -438,7 +438,7 @@
         "pk": 33,
         "fields": {
             "name": "FIL_SMOSL3_RFI",
-            "description": "Set RFI threshold",
+            "description": "Set RFI probability threshold",
             "help_text": "Values above the selected RFI probability threshold will be filterd out. The allowed range is 0.0-1.0",
             "parameterised": true,
             "dialog_name": null,

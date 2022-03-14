@@ -31,10 +31,11 @@ def data_filter_by_dataset(request, **kwargs):
 def data_parameterised_filter(request):
     """
     Here we take the list of all the parameterised filters applied to the existing validation.
-    It's NOT a list od parameterised filters defined in the fixture! That one would be defined as:
+    It's NOT a list of parameterised filters defined in the fixture! That one would be defined as:
     DataFilter.objects.filter(parameterised = True).
     """
     param_filters = ParametrisedFilter.objects.all()
+    print(param_filters)
     serializer = ParameterisedFilterSerializer(param_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 

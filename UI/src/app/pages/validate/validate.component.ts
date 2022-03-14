@@ -399,7 +399,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       error => {
         updatedModel$.error(error);
       });
-
     return updatedModel$;
   }
 
