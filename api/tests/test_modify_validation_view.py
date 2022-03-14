@@ -17,13 +17,14 @@ from validator.models import ValidationRun
 from dateutil import parser
 
 from validator.validation import mkdir_if_not_exists, set_outfile
-
+from validator.validation import globals
 User = get_user_model()
-
+from django.test.testcases import TransactionTestCase
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestModifyValidationView(TestCase):
+
     fixtures = ['variables', 'versions', 'datasets', 'filters']
     __logger = logging.getLogger(__name__)
 
@@ -42,50 +43,6 @@ class TestModifyValidationView(TestCase):
 
         self.run_2 = create_default_validation_without_running(self.alt_test_user, tcol=True)
         self.run_2.save()
-
-    def test_stop_validation(self):
-        # start a new validation (tcol is run here, because a default one would finish before I cancel it :) )
-        run = default_parameterized_validation_to_be_run(self.test_user, tcol=True)
-        run.save()
-        run_id = run.id
-        val.run_validation(run_id)
-        new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run.progress)
-        # let it run a little bit
-        time.sleep(2)
-        # the validation has just started so the progress must be below 100
-        print(new_run.progress)
-        assert new_run.progress < 100
-
-        # now let's try out cancelling the validation
-        response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
-        assert response.status_code == 200
-
-        # let's try canceling non existing validation
-        response = self.client.delete(
-            reverse('Stop validation', kwargs={'result_uuid': 'f0000000-a000-b000-c000-d00000000000'}))
-        assert response.status_code == 404
-
-        # let's try to submit wrong method
-        response = self.client.get(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
-        assert response.status_code == 405
-
-        # log out and check the access
-        self.client.logout()
-        response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
-        assert response.status_code == 403
-        #
-        # log in as another user and check the access
-        self.client.login(**self.alt_data)
-        response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
-        assert response.status_code == 403
-
-        # give it some time
-        time.sleep(2)
-        # the progress should be -1, but it takes some time for a validation to settle down so setting -1 here would
-        # require some time, but we can check that it's not bigger than 0 so there was no progress
-        assert new_run.progress <= 0
-        delete_run(new_run)
 
     def test_change_name(self):
         change_name_url = reverse('Change name', kwargs={'result_uuid': self.run_id})
