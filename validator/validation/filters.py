@@ -99,92 +99,100 @@ def get_used_variables(filters, dataset, variable):
     if not filters:
         return variables
 
-    for fil in filters:
-        if fil.name == "FIL_ISMN_GOOD":
-            variables.append('soil_moisture_flag')
-            continue
+    try:
+        for fil in filters:
+            if fil.name == "FIL_ISMN_GOOD":
+                variables.append('soil_moisture_flag')
+                continue
 
-        if ((fil.name == "FIL_C3S_FLAG_0") or
-                (fil.name == "FIL_C3S_NO_FLAG_1") or
-                (fil.name == "FIL_C3S_NO_FLAG_2")):
-            variables.append('flag')
-            continue
+            if ((fil.name == "FIL_C3S_FLAG_0") or
+                    (fil.name == "FIL_C3S_NO_FLAG_1") or
+                    (fil.name == "FIL_C3S_NO_FLAG_2")):
+                variables.append('flag')
+                continue
 
-        if ((fil.name == "FIL_C3S_MODE_ASC") or
-                (fil.name == "FIL_C3S_MODE_DESC")):
-            variables.append('mode')
-            continue
+            if ((fil.name == "FIL_C3S_MODE_ASC") or
+                    (fil.name == "FIL_C3S_MODE_DESC")):
+                variables.append('mode')
+                continue
 
-        if fil.name == "FIL_GLDAS_UNFROZEN":
-            temp_variable = variable.pretty_name.replace("Moi", "TMP")
-            variables.append(temp_variable)
-            variables.append('SWE_inst')
-            continue
+            if fil.name == "FIL_GLDAS_UNFROZEN":
+                temp_variable = variable.pretty_name.replace("Moi", "TMP")
+                variables.append(temp_variable)
+                variables.append('SWE_inst')
+                continue
 
-        if ((fil.name == "FIL_ASCAT_METOP_A") or
-                (fil.name == "FIL_ASCAT_METOP_B")):
-            variables.append('sat_id')
-            continue
+            if ((fil.name == "FIL_ASCAT_METOP_A") or
+                    (fil.name == "FIL_ASCAT_METOP_B")):
+                variables.append('sat_id')
+                continue
 
-        if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN":
-            variables.append('ssf')
-            continue
+            if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN":
+                variables.append('ssf')
+                continue
 
-        if fil.name == "FIL_ASCAT_NO_CONF_FLAGS":
-            variables.append('conf_flag')
-            continue
+            if fil.name == "FIL_ASCAT_NO_CONF_FLAGS":
+                variables.append('conf_flag')
+                continue
 
-        if fil.name == "FIL_ASCAT_NO_PROC_FLAGS":
-            variables.append('proc_flag')
-            continue
+            if fil.name == "FIL_ASCAT_NO_PROC_FLAGS":
+                variables.append('proc_flag')
+                continue
 
-        if fil.name == "FIL_SMOS_QUAL_RECOMMENDED":
-            variables.append('Quality_Flag')
-            continue
+            if fil.name == "FIL_SMOS_QUAL_RECOMMENDED":
+                variables.append('Quality_Flag')
+                continue
 
-        if fil.name == "FIL_SMOS_UNFROZEN":
-            variables.append('Scene_Flags')
-            variables.append('Soil_Temperature_Level1')
-            continue
+            if fil.name == "FIL_SMOS_UNFROZEN":
+                variables.append('Scene_Flags')
+                variables.append('Soil_Temperature_Level1')
+                continue
 
-        if fil.name == "FIL_SMOS_UNPOLLUTED":
-            variables.append('Scene_Flags')
-            continue
+            if fil.name == "FIL_SMOS_UNPOLLUTED":
+                variables.append('Scene_Flags')
+                continue
 
-        if fil.name == "FIL_SMOS_BRIGHTNESS":
-            variables.append('Processing_Flags')
-            continue
+            if fil.name == "FIL_SMOS_BRIGHTNESS":
+                variables.append('Processing_Flags')
+                continue
 
-        if fil.name == "FIL_SMOS_TOPO_NO_MODERATE":
-            variables.append('Processing_Flags')
-            continue
+            if fil.name == "FIL_SMOS_TOPO_NO_MODERATE":
+                variables.append('Processing_Flags')
+                continue
 
-        if fil.name == "FIL_SMOS_TOPO_NO_STRONG":
-            variables.append('Processing_Flags')
-            continue
+            if fil.name == "FIL_SMOS_TOPO_NO_STRONG":
+                variables.append('Processing_Flags')
+                continue
 
-        if fil.name == "FIL_ERA5_TEMP_UNFROZEN":
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            variables.append(era_temp_variable)
-            continue
+            if fil.name == "FIL_ERA5_TEMP_UNFROZEN":
+                era_temp_variable = variable.pretty_name.replace("wv", "t")
+                variables.append(era_temp_variable)
+                continue
 
-        if fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN":
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            variables.append(era_temp_variable)
-            continue
+            if fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN":
+                era_temp_variable = variable.pretty_name.replace("wv", "t")
+                variables.append(era_temp_variable)
+                continue
 
-        if fil.name in (
-                "FIL_SMOSL3_QUAL_RECOMMENDED",
-                "FIL_SMOSL3_NON_NOMINAL",
-                "FIL_SMOSL3_STRONG_TOPO",
-                "FIL_SMOSL3_FROZEN",
-                "FIL_SMOSL3_FOREST",
-                "FIL_SMOSL3_WATER",
-                "FIL_SMOSL3_RAIN",
-                "FIL_SMOSL3_RETRIEVAL",
-        ):
-            variables.append('Science_Flags')
-            continue
+            if fil.name in (
+                    "FIL_SMOSL3_QUAL_RECOMMENDED",
+                    "FIL_SMOSL3_NON_NOMINAL",
+                    "FIL_SMOSL3_STRONG_TOPO",
+                    "FIL_SMOSL3_FROZEN",
+                    "FIL_SMOSL3_FOREST",
+                    "FIL_SMOSL3_WATER",
+                    "FIL_SMOSL3_RAIN",
+                    "FIL_SMOSL3_RETRIEVAL",
+            ):
+                variables.append('Science_Flags')
+                continue
+
+    # meaning these are parametrized filters
+    except AttributeError:
+        for fil in filters:
+            if fil.filter.name == "FIL_SMOSL3_RFI":
+                variables.append('Rfi_Prob')
+                continue
 
     return variables
 
@@ -192,6 +200,8 @@ def get_used_variables(filters, dataset, variable):
 def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
     # figure out which variables we have to load because we want to use them
     load_vars = get_used_variables(filters, dataset, variable)
+    load_vars.extend(get_used_variables(param_filters, dataset, variable))
+    print(f"Loaded filter variables: {load_vars}")
 
     # restrict the variables that are read from file in the reader
     if hasattr(reader, 'parameters'):
@@ -207,10 +217,18 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
     filtered_reader = reader
 
+    masking_filters = []
+
     for pfil in param_filters:
         __logger.debug(
-            "Setting up parametrised filter {} for dataset {} with parameter {}".format(pfil.filter.name, dataset,
-                                                                                        pfil.parameters))
+            f"Setting up parametrised filter {pfil.filter.name} for "
+            f"dataset {dataset} with parameter {pfil.parameters}"
+        )
+
+        if pfil.filter.name == "FIL_SMOSL3_RFI":
+            param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
+            masking_filters.append(('Rfi_Prob', '<=', float(param)))
+            continue
 
         inner_reader = filtered_reader
         while hasattr(inner_reader, 'cls'):
@@ -227,8 +245,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
                 __logger.debug('Selected networks: ' + ';'.join(networks))
                 inner_reader.activate_network(networks)
             continue
-
-    masking_filters = []
 
     for fil in filters:
         __logger.debug("Setting up filter {} for dataset {}.".format(fil.name, dataset))
