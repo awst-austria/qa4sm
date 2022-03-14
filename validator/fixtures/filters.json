@@ -296,7 +296,7 @@
             "default_parameter": "",
             "to_include": null,
             "disable_filter": null,
-            "default_set_active": false
+            "default_set_active": true
         }
     },
     {
