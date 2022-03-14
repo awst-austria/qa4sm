@@ -535,7 +535,7 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP)
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMAP_soil_moisture)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -916,7 +916,7 @@ class TestValidation(TestCase):
         """
         all_datasets = [
             (globals.CCIC, globals.ESA_CCI_SM_P_V05_2, globals.ESA_CCI_SM_P_sm),
-            (globals.SMAP, globals.SMAP_V5_PM, globals.SMAP_soil_moisture),
+            (globals.SMAP_L3, globals.SMAP_V5_PM, globals.SMAP_soil_moisture),
             (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
             (globals.ERA5, globals.ERA5_20190613, globals.ERA5_sm),
             (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1, globals.GLDAS_SoilMoi0_10cm_inst)

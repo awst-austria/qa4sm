@@ -55,7 +55,7 @@ class TestMailer(TestCase):
     def test_val_finished(self):
         test_datasets = [Dataset.objects.get(short_name=globals.C3SC),
                          Dataset.objects.get(short_name=globals.ASCAT),
-                         Dataset.objects.get(short_name=globals.SMAP),]
+                         Dataset.objects.get(short_name=globals.SMAP_L3),]
 
         run = ValidationRun()
         run.start_time = datetime.now(tzlocal())

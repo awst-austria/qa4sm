@@ -39,7 +39,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.GLDAS:
         reader = GLDASTs(folder_name, ioclass_kws={'read_bulk':True})
 
-    if dataset.short_name == globals.SMAP:
+    if dataset.short_name == globals.SMAP_L3:
         smap_data_folder = path.join(folder_name, 'netcdf')
         reader = SMAPTs(smap_data_folder, ioclass_kws={'read_bulk':True})
 
