@@ -116,55 +116,46 @@ def get_validation_configuration(request, **kwargs):
                    {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
 
-        # Reference filters
-        basic_filters = []
-        for basic_filter in val_run.reference_configuration.filters.all():
-            dataset_id = val_run.reference_configuration.dataset.id
-            dataset_filters = Dataset.objects.get(id=dataset_id).filters.all()
-
-            if basic_filter.id in dataset_filters:
-                basic_filters.append(basic_filter.id)
-            else:
-                changes_in_settings['filters'] = True
-
-        parametrised_filters = []
-        for param_filter in ParametrisedFilter.objects.filter(dataset_config=val_run.reference_configuration):
-            dataset_id = val_run.reference_configuration.dataset.id
-            dataset_filters = Dataset.objects.get(id=dataset_id).filters.all()
-            if param_filter in dataset_filters:
-                parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
-            else:
-                changes_in_settings['filters'] = True
-                print('Yes, something has changed')
-
-        val_run_dict['reference_config'] = {
-            'dataset_id': val_run.reference_configuration.dataset.id,
-            'version_id': val_run.reference_configuration.version.id,
-            'variable_id': val_run.reference_configuration.variable.id,
-            'basic_filters': basic_filters,
-            'parametrised_filters': parametrised_filters
-        }
-
         # dataset configs and filters
         datasets = []
         val_run_dict['dataset_configs'] = datasets
         for ds in val_run.dataset_configurations.all():
-            if val_run.reference_configuration_id == ds.id:
-                continue
 
-            ds_dict = {'dataset_id': ds.dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
+            dataset_id = ds.dataset.id
+            ds_dict = {'dataset_id': dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
             filters_list = []
             ds_dict['basic_filters'] = filters_list
+
             for basic_filter in ds.filters.all():
-                filters_list.append(basic_filter.id)
+                # check if the reloaded filter still belongs to the dataset
+                dataset_filters = Dataset.objects.get(id=dataset_id).filters.all()
+                if basic_filter in dataset_filters:
+                    filters_list.append(basic_filter.id)
+                else:
+                    changes_in_settings['filters'] = True
 
             parametrised_filters = []
             ds_dict['parametrised_filters'] = parametrised_filters
             for param_filter in ParametrisedFilter.objects.filter(dataset_config=ds):
-                parametrised_filters.append({'id': param_filter.id, 'parameters': param_filter.parameters})
+                # check if the reloaded filter still belongs to the dataset
+                dataset_filter_ids = Dataset.objects.get(id=dataset_id).filters.all().values_list('id', flat=True)
+                if param_filter.filter_id in dataset_filter_ids:
+                    parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
+                else:
+                    changes_in_settings['filters'] = True
 
-            datasets.append(ds_dict)
+            if val_run.reference_configuration_id == ds.id:
+                val_run_dict['reference_config'] = {
+                    'dataset_id': val_run.reference_configuration.dataset.id,
+                    'version_id': val_run.reference_configuration.version.id,
+                    'variable_id': val_run.reference_configuration.variable.id,
+                    'basic_filters': filters_list,
+                    'parametrised_filters': parametrised_filters
+                }
+            else:
+                datasets.append(ds_dict)
 
+        print(changes_in_settings)
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)
     except ObjectDoesNotExist:
@@ -259,7 +250,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                         parameters=param_filter.get('parameters')
                     )
                     param_filter_model.save()
-                    print(param_filter)
 
                 config_model.save()
                 dataset_config_models.append(config_model)
