@@ -12,7 +12,8 @@ from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
-from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset
+from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset, \
+    DatasetVersion
 from validator.validation import run_validation
 from validator.validation.validation import compare_validation_runs
 
@@ -54,20 +55,32 @@ def start_validation(request):
 @permission_classes([AllowAny])
 def get_validation_configuration(request, **kwargs):
     changes_in_settings = {
-        'datasets': False,
-        'versions': False,
-        'variables': False,
-        'filters': False,
-        'metrics': False,
+        'filters': [],
         'anomalies': False,
         'scaling': False
     }
+
     validation_run_id = kwargs['id']
     try:
         val_run = ValidationRun.objects.get(pk=validation_run_id)
-        val_run_dict = {}
+        validation_configs = val_run.dataset_configurations.all()
 
-        val_run_dict['name_tag'] = val_run.name_tag
+        #  first check if there are still all the datasets available:
+        datasets_in_validation = validation_configs.values_list('dataset', flat=True)
+        ds_versions_in_validation = validation_configs.values_list('version', flat=True)
+
+        available_datasets = Dataset.objects.all().values_list('id', flat=True)
+        available_versions = DatasetVersion.objects.all().values_list('id', flat=True)
+
+        all_datasets_available = all([dataset in available_datasets for dataset in datasets_in_validation])
+        all_versions_available = all([version in available_versions for version in ds_versions_in_validation])
+
+        if not (all_datasets_available and all_versions_available):
+            return JsonResponse({'message': 'Could not restore validation run, because some of '
+                                            'the chosen datasets or their versions are not available anymore'},
+                                status=status.HTTP_404_NOT_FOUND, safe=False)
+
+        val_run_dict = {'name_tag': val_run.name_tag}
 
         if val_run.interval_from is not None:
             val_run_dict['interval_from'] = val_run.interval_from.date()
@@ -79,6 +92,7 @@ def get_validation_configuration(request, **kwargs):
         else:
             val_run_dict['interval_to'] = None
 
+        # if the anomaly method doesn't exist anymore, set 'none'
         if val_run.anomalies is not None and val_run.anomalies in dict(ValidationRun.ANOMALIES_METHODS).keys():
             val_run_dict['anomalies_method'] = val_run.anomalies
         else:
@@ -100,6 +114,7 @@ def get_validation_configuration(request, **kwargs):
         val_run_dict['max_lat'] = val_run.max_lat
         val_run_dict['max_lon'] = val_run.max_lon
 
+        # if a scaling method doesn't exist anymore, set 'none'
         if val_run.scaling_method in dict(ValidationRun.SCALING_METHODS).keys():
             val_run_dict['scaling_method'] = val_run.scaling_method
         else:
@@ -112,6 +127,7 @@ def get_validation_configuration(request, **kwargs):
                 if val_run.scaling_ref.id != val_run.reference_configuration.id:
                     val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
 
+        # if one day we decide to remove any of these metrics, we need to check if reloaded settings use them
         metrics = [{'id': 'tcol', 'value': val_run.tcol},
                    {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
@@ -119,11 +135,13 @@ def get_validation_configuration(request, **kwargs):
         # dataset configs and filters
         datasets = []
         val_run_dict['dataset_configs'] = datasets
-        for ds in val_run.dataset_configurations.all():
+
+        for ds in validation_configs:
 
             dataset_id = ds.dataset.id
             ds_dict = {'dataset_id': dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
             filters_list = []
+            non_existing_filters_list = []
             ds_dict['basic_filters'] = filters_list
 
             for basic_filter in ds.filters.all():
@@ -132,7 +150,7 @@ def get_validation_configuration(request, **kwargs):
                 if basic_filter in dataset_filters:
                     filters_list.append(basic_filter.id)
                 else:
-                    changes_in_settings['filters'] = True
+                    non_existing_filters_list.append(basic_filter.description)
 
             parametrised_filters = []
             ds_dict['parametrised_filters'] = parametrised_filters
@@ -142,7 +160,11 @@ def get_validation_configuration(request, **kwargs):
                 if param_filter.filter_id in dataset_filter_ids:
                     parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
                 else:
-                    changes_in_settings['filters'] = True
+                    filter_desc = DataFilter.objects.get(id=param_filter.filter.id).description
+                    non_existing_filters_list.append(filter_desc)
+
+            if len(non_existing_filters_list) != 0:
+                changes_in_settings['filters'].append({'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
 
             if val_run.reference_configuration_id == ds.id:
                 val_run_dict['reference_config'] = {
@@ -155,7 +177,10 @@ def get_validation_configuration(request, **kwargs):
             else:
                 datasets.append(ds_dict)
 
-        print(changes_in_settings)
+        if changes_in_settings['anomalies'] or changes_in_settings['scaling'] or \
+                len(changes_in_settings['filters']) != 0:
+            val_run_dict['changes'] = changes_in_settings
+
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)
     except ObjectDoesNotExist:
