@@ -21,6 +21,7 @@ import {
 } from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
 import {
+  ConfigurationChanges,
   ValidationRunConfigDto,
   ValidationRunDatasetConfigDto,
   ValidationRunMetricConfigDto
@@ -109,6 +110,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
           valrun => {
             this.modelFromValidationConfig(valrun);
+            if (valrun.changes){
+              this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
+                this.messageAboutConfigurationChanges(valrun.changes));
+            }
           }
         );
       } else {
@@ -120,6 +125,23 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
 
     });
+  }
+
+  private messageAboutConfigurationChanges(changes: ConfigurationChanges): string{
+    let message = '';
+    if (changes.scaling) {
+      message += 'Chosen scaling method is not available anymore. "No scaling" set instead.\n';
+    }
+    if (changes.anomalies) {
+      message += '\nChosen anomalies method is not available anymore. "Do not calculate" set instead.\n';
+    }
+    if (changes.filters.length !== 0){
+      changes.filters.forEach(filter => {
+        message += `\nFilters:${filter.filter_desc.map(desc => ' ' + desc)} for dataset ${filter.dataset} not available.`;
+      });
+    }
+
+    return message.toString();
   }
 
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
