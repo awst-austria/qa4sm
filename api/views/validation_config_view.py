@@ -12,10 +12,13 @@ from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
-from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter
+from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset
 from validator.validation import run_validation
 from validator.validation.validation import compare_validation_runs
 
+
+def _check_if_settings_exist():
+    pass
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -50,6 +53,15 @@ def start_validation(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_validation_configuration(request, **kwargs):
+    changes_in_settings = {
+        'datasets': False,
+        'versions': False,
+        'variables': False,
+        'filters': False,
+        'metrics': False,
+        'anomalies': False,
+        'scaling': False
+    }
     validation_run_id = kwargs['id']
     try:
         val_run = ValidationRun.objects.get(pk=validation_run_id)
@@ -67,8 +79,11 @@ def get_validation_configuration(request, **kwargs):
         else:
             val_run_dict['interval_to'] = None
 
-        if val_run.anomalies is not None:
+        if val_run.anomalies is not None and val_run.anomalies in dict(ValidationRun.ANOMALIES_METHODS).keys():
             val_run_dict['anomalies_method'] = val_run.anomalies
+        else:
+            val_run_dict['anomalies_method'] = ValidationRun.NO_ANOM
+            changes_in_settings['anomalies'] = True
 
         if val_run.anomalies_from is not None:
             val_run_dict['anomalies_from'] = val_run.anomalies_from.date()
@@ -85,7 +100,12 @@ def get_validation_configuration(request, **kwargs):
         val_run_dict['max_lat'] = val_run.max_lat
         val_run_dict['max_lon'] = val_run.max_lon
 
-        val_run_dict['scaling_method'] = val_run.scaling_method
+        if val_run.scaling_method in dict(ValidationRun.SCALING_METHODS).keys():
+            val_run_dict['scaling_method'] = val_run.scaling_method
+        else:
+            val_run_dict['scaling_method'] = ValidationRun.NO_SCALING
+            changes_in_settings['scaling'] = True
+
         if val_run.scaling_method is not None or val_run.scaling_method != 'none':
             val_run_dict['scale_to'] = ValidationRun.SCALE_TO_REF
             if val_run.scaling_ref is not None:
@@ -99,11 +119,23 @@ def get_validation_configuration(request, **kwargs):
         # Reference filters
         basic_filters = []
         for basic_filter in val_run.reference_configuration.filters.all():
-            basic_filters.append(basic_filter.id)
+            dataset_id = val_run.reference_configuration.dataset.id
+            dataset_filters = Dataset.objects.get(id=dataset_id).filters.all()
+
+            if basic_filter.id in dataset_filters:
+                basic_filters.append(basic_filter.id)
+            else:
+                changes_in_settings['filters'] = True
 
         parametrised_filters = []
         for param_filter in ParametrisedFilter.objects.filter(dataset_config=val_run.reference_configuration):
-            parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
+            dataset_id = val_run.reference_configuration.dataset.id
+            dataset_filters = Dataset.objects.get(id=dataset_id).filters.all()
+            if param_filter in dataset_filters:
+                parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
+            else:
+                changes_in_settings['filters'] = True
+                print('Yes, something has changed')
 
         val_run_dict['reference_config'] = {
             'dataset_id': val_run.reference_configuration.dataset.id,
