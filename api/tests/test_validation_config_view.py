@@ -141,11 +141,11 @@ class TestValidationConfigView(TransactionTestCase):
 
         # removing some fields and posting not full form
 
-        del good_form['max_lon'] # not relevant, it can be null
+        del good_form['max_lon']  # not relevant, it can be null
         response = self.client.post(start_validation_url, good_form, format='json')
         assert response.status_code == 200
 
-        del good_form['dataset_configs'] # relevant, can not be omitted
+        del good_form['dataset_configs']  # relevant, can not be omitted
         response = self.client.post(start_validation_url, good_form, format='json')
         assert response.status_code == 400
 
@@ -172,7 +172,7 @@ class TestValidationConfigView(TransactionTestCase):
                Dataset.objects.get(short_name=globals.ISMN).id
         assert val_run_dict['reference_config']['version_id'] == \
                DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id
-        assert val_run_dict['reference_config']['variable_id'] ==\
+        assert val_run_dict['reference_config']['variable_id'] == \
                DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id
         assert DataFilter.objects.get(name='FIL_ISMN_GOOD').id in val_run_dict['reference_config']['basic_filters']
 
@@ -188,6 +188,8 @@ class TestValidationConfigView(TransactionTestCase):
                DatasetVersion.objects.get(short_name=globals.C3S_V202012).id
         assert val_run_dict['dataset_configs'][0]['variable_id'] == \
                DataVariable.objects.get(short_name=globals.C3S_sm).id
+        #  applied all existing settings, so there will be no change
+        assert 'changes' not in val_run_dict.keys()
 
         # non existing validation - 404 expected
         response = self.client.get(reverse('Validation configuration', kwargs={'id': self.wrong_id}))
