@@ -244,8 +244,8 @@
         "pk": 18,
         "fields": {
             "name": "FIL_ISMN_NETWORKS",
-            "description": "Use ISMN networks:",
-            "help_text": "Click 'select' to chose the ISMN networks to use in this validation",
+            "description": "Use ISMN networks",
+            "help_text": "Obligatory filter. \nClick 'select' to chose the ISMN networks to use in this validation. If no network is chosen, there will be no result returned.",
             "parameterised": true,
             "dialog_name": "ismn_networks",
             "default_parameter": "AMMA-CATCH,BIEBRZA_S-1,BNZ-LTER,CARBOAFRICA,COSMOS,CTP_SMTMN,DAHRA,FLUXNET-AMERIFLUX,FMI,FR_Aqui,HOBE,iRON,LAB-net,MySMNet,OZNET,PBO_H2O,REMEDHUS,RISMA,RSMN,SCAN,SMOSMANIA,TERENO,USCRN,WEGENERNET,WSMN",
@@ -334,8 +334,8 @@
         "pk": 24,
         "fields": {
             "name": "FIL_ISMN_DEPTH",
-            "description": "Use measurements at given depth:",
-            "help_text": "Click 'select' to introduce soil moisture depths",
+            "description": "Use measurements at given depth",
+            "help_text": "Obligatory filter. \nClick 'select' to introduce soil moisture depths",
             "parameterised": true,
             "dialog_name": "ismn_depth",
             "default_parameter": "0.00,0.10",
