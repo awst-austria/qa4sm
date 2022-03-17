@@ -30,7 +30,7 @@ class TestDatasetView(TestCase):
         dataset_url = reverse('Datasets')
         response = self.client.get(f'{dataset_url}/1')
         assert response.status_code == 200
-        assert response.json()['pretty_name'] == 'C3S'
+        assert response.json()['pretty_name'] == 'C3S SM combined'
 
         response = self.client.get(f'{dataset_url}/100')  # wrong id
         assert response.status_code == 404

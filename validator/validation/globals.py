@@ -31,15 +31,15 @@ TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_
                       "_{metric}",
                       "_for_{id_met}-{ds_met}"]
 
-C3S = 'C3S'
+C3SC = 'C3S_combined'
 ISMN = 'ISMN'
 GLDAS = 'GLDAS'
-SMAP = 'SMAP'
+SMAP_L3 = 'SMAP_L3'
 ASCAT = 'ASCAT'
-CCI = 'ESA_CCI_SM_combined'
+CCIC = 'ESA_CCI_SM_combined'
 CCIA = 'ESA_CCI_SM_active'
 CCIP = 'ESA_CCI_SM_passive'
-SMOS = 'SMOS'
+SMOS_IC = 'SMOS_IC'
 ERA5 = 'ERA5'
 ERA5_LAND = 'ERA5_LAND'
 CGLS_CSAR_SSM1km = 'CGLS_CSAR_SSM1km'
@@ -103,8 +103,8 @@ VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'm
              'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to']
 DS_FIELDS = ['dataset', 'version']
 
-IRREGULAR_GRIDS = {'SMAP' : 0.35,
-                   'SMOS' : 0.25,
+IRREGULAR_GRIDS = {'SMAP_L3' : 0.35,
+                   'SMOS_IC' : 0.25,
                    'ASCAT' : 0.1}
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
