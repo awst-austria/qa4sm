@@ -154,7 +154,7 @@ class TestAdmin(TestCase):
     #         'datasets-INITIAL_FORMS': 1,
     #         'datasets-MIN_NUM_FORMS': 1,
     #         'datasets-MAX_NUM_FORMS': 5,
-    #         'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3S).id,
+    #         'datasets-0-dataset': Dataset.objects.get(short_name=globals.C3SC).id,
     #         'datasets-0-version': DatasetVersion.objects.get(short_name=globals.C3S_V201706).id,
     #         'datasets-0-variable': DataVariable.objects.get(short_name=globals.C3S_sm).id,
     #         'ref-dataset': Dataset.objects.get(short_name=globals.ISMN).id,

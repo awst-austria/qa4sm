@@ -331,7 +331,7 @@ class TestValidation(TestCase):
             if config == run.reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
-                if config.dataset.short_name == 'C3S':
+                if config.dataset.short_name == 'C3S_combined':
                     config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
@@ -535,7 +535,7 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP)
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMAP_soil_moisture)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -620,7 +620,7 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3S)
+        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3SC)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V202012)
         run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.C3S_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -915,8 +915,8 @@ class TestValidation(TestCase):
         in the function `validation_upscaling_for_dataset`
         """
         all_datasets = [
-            (globals.CCI, globals.ESA_CCI_SM_P_V05_2, globals.ESA_CCI_SM_P_sm),
-            (globals.SMAP, globals.SMAP_V5_PM, globals.SMAP_soil_moisture),
+            (globals.CCIC, globals.ESA_CCI_SM_P_V05_2, globals.ESA_CCI_SM_P_sm),
+            (globals.SMAP_L3, globals.SMAP_V5_PM, globals.SMAP_soil_moisture),
             (globals.ASCAT, globals.ASCAT_H113, globals.ASCAT_sm),
             (globals.ERA5, globals.ERA5_20190613, globals.ERA5_sm),
             (globals.GLDAS, globals.GLDAS_NOAH025_3H_2_1, globals.GLDAS_SoilMoi0_10cm_inst)
@@ -933,7 +933,7 @@ class TestValidation(TestCase):
         no station in the ISMN is found
         """
         run = generate_ismn_upscaling_validation()
-        dataset = Dataset.objects.get(short_name='C3S')
+        dataset = Dataset.objects.get(short_name='C3S_combined')
         version = DatasetVersion.objects.get(short_name="C3S_V202012")
         c3s_reader = val.create_reader(dataset, version)
         dataset = Dataset.objects.get(short_name='ISMN')
@@ -941,14 +941,14 @@ class TestValidation(TestCase):
         variable = DataVariable.objects.get(short_name="ISMN_soil_moisture")
         ismn_reader = val.create_reader(dataset, version)
         datasets = {
-            "0-C3S": {"class": c3s_reader},
+            "0-C3S_combined": {"class": c3s_reader},
             "1-ISMN": {"class": ismn_reader},
         }
 
         lut = create_upscaling_lut(
             validation_run=run,
             datasets=datasets,
-            ref_name="0-C3S"
+            ref_name="0-C3S_combined"
         )
         assert list(lut.keys()) == ["1-ISMN"]
         # the exact gpi number might change, so we only check that ismn points are averaged under three c3s pixels
@@ -971,13 +971,13 @@ class TestValidation(TestCase):
             variable
         )
         datasets = {
-            "0-C3S": {"class": c3s_reader},
+            "0-C3S_combined": {"class": c3s_reader},
             "1-ISMN": {"class": msk_reader},
         }
         lut = create_upscaling_lut(
             validation_run=run,
             datasets=datasets,
-            ref_name="0-C3S"
+            ref_name="0-C3S_combined"
         )
         assert list(lut.keys()) == ["1-ISMN"]
         assert lut["1-ISMN"] == []
@@ -1279,7 +1279,7 @@ class TestValidation(TestCase):
         max_lon = -154.625  # ur
 
         # we need the reader just to get the grid
-        dataset = Dataset.objects.get(short_name='C3S')
+        dataset = Dataset.objects.get(short_name='C3S_combined')
         version = DatasetVersion.objects.get(short_name='C3S_V201812')
         c3s_reader = val.create_reader(dataset, version)
         # apply Basic Adapter only
@@ -1303,7 +1303,7 @@ class TestValidation(TestCase):
 
     def test_no_geographic_subsetting(self):
         # we need the reader just to get the grid
-        dataset = Dataset.objects.get(short_name='C3S')
+        dataset = Dataset.objects.get(short_name='C3S_combined')
         version = DatasetVersion.objects.get(short_name='C3S_V201812')
         c3s_reader = val.create_reader(dataset, version)
         # apply Basic Adapter only
@@ -1328,7 +1328,7 @@ class TestValidation(TestCase):
         russia_gpi2 = 898567
 
         for min_lat, min_lon, max_lat, max_lon in test_coords:
-            dataset = Dataset.objects.get(short_name='C3S')
+            dataset = Dataset.objects.get(short_name='C3S_combined')
             version = DatasetVersion.objects.get(short_name='C3S_V201812')
 
             c3s_reader = val.create_reader(dataset, version)
@@ -1350,7 +1350,7 @@ class TestValidation(TestCase):
 
     def test_geographic_subsetting_shifted(self):
         ## leaflet allows users to shift the map arbitrarily to the left or right. Check that we can compensate for that
-        dataset = Dataset.objects.get(short_name='C3S')
+        dataset = Dataset.objects.get(short_name='C3S_combined')
         version = DatasetVersion.objects.get(short_name='C3S_V201812')
 
         c3s_reader = val.create_reader(dataset, version)
@@ -1536,7 +1536,7 @@ class TestValidation(TestCase):
             config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             if config.dataset.short_name == globals.ISMN:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            if config.dataset.short_name == globals.C3S:
+            if config.dataset.short_name == globals.C3SC:
                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
             print('old one', config.dataset == globals.ISMN, config, config.filters.all())
 
@@ -1677,7 +1677,7 @@ class TestValidation(TestCase):
             new_config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             if new_config.dataset.short_name == globals.ISMN:
                 new_config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            if new_config.dataset.short_name == globals.C3S:
+            if new_config.dataset.short_name == globals.C3SC:
                 new_config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
 
             new_config.save()
@@ -1699,7 +1699,7 @@ class TestValidation(TestCase):
         # adding filter for C3S
         c3s_filter = DataFilter.objects.get(name='FIL_C3S_MODE_ASC')
         for new_config in run.dataset_configurations.all():
-            if new_config.dataset.short_name == globals.C3S:
+            if new_config.dataset.short_name == globals.C3SC:
                 new_config.filters.add(c3s_filter)
                 new_config.save()
         is_there_one = compare_validation_runs(run, published_runs, user)
@@ -1708,7 +1708,7 @@ class TestValidation(TestCase):
 
         # getting back to the right settings
         for new_config in run.dataset_configurations.all():
-            if new_config.dataset.short_name == globals.C3S:
+            if new_config.dataset.short_name == globals.C3SC:
                 new_config.filters.remove(c3s_filter)
         is_there_one = compare_validation_runs(run, published_runs, user)
         assert is_there_one['is_there_validation']
