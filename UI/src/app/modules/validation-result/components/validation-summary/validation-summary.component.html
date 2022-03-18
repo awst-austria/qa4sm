@@ -48,7 +48,7 @@
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
-          <span *ngIf="!isOwner"
+          <span *ngIf="!isOwner && validationRun.is_unpublished"
                 class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation belongs to another user. There is no possibility of changing its name."> </span>
