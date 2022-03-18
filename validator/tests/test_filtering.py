@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from validator.admin import User
 from validator.models import DataFilter
 from validator.models import ParametrisedFilter
 from validator.tests.auxiliary_functions import generate_default_validation_smos
@@ -12,9 +13,23 @@ from validator.validation.readers import create_reader
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidation(TestCase):
+    databases = '__all__'
+    allow_database_queries = True
+    fixtures = ['variables', 'versions', 'datasets', 'filters']
 
     def setUp(self) -> None:
         self.run = generate_default_validation_smos()
+        self.user_data = {
+            'username': 'testuser',
+            'password': 'secret',
+            'email': 'noreply@awst.at'
+            }
+
+        try:
+            self.testuser = User.objects.get(username=self.user_data['username'])
+        except User.DoesNotExist:
+            self.testuser = User.objects.create_user(**self.user_data)
+
         self.run.user = self.testuser
 
         for config in self.run.dataset_configurations.all():
@@ -42,8 +57,8 @@ class TestValidation(TestCase):
     def test_setup_filtering(self) -> None:
         setup_filtering(
             self.smos_reader,
-            self.smos_config.filters,
-            self.smos_config.parametrised_filters,
+            self.smos_config.filters.all(),
+            ParametrisedFilter.objects.filter(dataset_config_id=self.smos_config.id),
             self.smos_config.version,
             self.smos_config.variable,
         )
