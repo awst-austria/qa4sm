@@ -43,10 +43,10 @@ describe('DatasetInfoComponent', () => {
       },
       {
         id: 1,
-        short_name: 'C3S',
-        pretty_name: 'C3S',
+        short_name: 'C3S_combined',
+        pretty_name: 'C3S SM combined',
         help_text: 'C3S long-term data record',
-        storage_path: 'testdata/input_data/C3S',
+        storage_path: 'testdata/input_data/C3S_combined',
         detailed_description: '',
         source_reference: '',
         citation: '',
@@ -106,7 +106,8 @@ describe('DatasetInfoComponent', () => {
         dialog_name: null,
         default_parameter: null,
         to_include: null,
-        disable_filter: null
+        disable_filter: null,
+        default_set_active: true
       },
       {
         id: 2,
@@ -117,7 +118,8 @@ describe('DatasetInfoComponent', () => {
         dialog_name: null,
         default_parameter: null,
         to_include: '4,5',
-        disable_filter: null
+        disable_filter: null,
+        default_set_active: true
       },
 
     ];

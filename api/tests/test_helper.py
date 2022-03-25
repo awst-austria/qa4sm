@@ -66,7 +66,7 @@ def generate_default_validation():
 
     data_c = DatasetConfiguration()
     data_c.validation = run
-    data_c.dataset = Dataset.objects.get(short_name='C3S')
+    data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V202012')
     data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
     data_c.save()
@@ -92,14 +92,14 @@ def generate_default_validation_triple_coll():
 
     data_c = DatasetConfiguration()
     data_c.validation = run
-    data_c.dataset = Dataset.objects.get(short_name='C3S')
+    data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V201912')
     data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
     data_c.save()
 
     other_data_c = DatasetConfiguration()
     other_data_c.validation = run
-    other_data_c.dataset = Dataset.objects.get(short_name='SMOS')
+    other_data_c.dataset = Dataset.objects.get(short_name='SMOS_IC')
     other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
     other_data_c.variable = DataVariable.objects.get(short_name='SMOS_sm')
     other_data_c.save()
@@ -135,7 +135,6 @@ def default_parameterized_validation_to_be_run(user, tcol=False):
         if config == run.reference_configuration:
             config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
         else:
-            config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
             config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
         config.save()

@@ -8,6 +8,7 @@ class DataFilter(models.Model):
     help_text = models.CharField(max_length=150)
     parameterised = models.BooleanField(default=False)
     dialog_name = models.CharField(max_length=30, null=True, blank=True)
+    default_set_active = models.BooleanField(default=False)
     default_parameter = models.TextField(null=True, blank=True)
     to_include = models.CharField(max_length=150, null=True, blank=True)
     disable_filter = models.IntegerField(null=True)

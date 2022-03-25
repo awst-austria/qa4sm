@@ -28,19 +28,19 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.ISMN:
         reader = ISMN_Interface(folder_name)
 
-    if dataset.short_name == globals.C3S:
+    if dataset.short_name == globals.C3SC:
         c3s_data_folder = path.join(folder_name, 'TCDR/063_images_to_ts/combined-daily')
         reader = c3s_read(c3s_data_folder, ioclass_kws={'read_bulk': True})
 
-    if (dataset.short_name == globals.CCI or
-            dataset.short_name == globals.CCIA or
-            dataset.short_name == globals.CCIP):
-        reader = CCITs(folder_name, ioclass_kws={'read_bulk': True})
+    if (dataset.short_name == globals.CCIC or
+        dataset.short_name == globals.CCIA or
+        dataset.short_name == globals.CCIP):
+        reader = CCITs(folder_name, ioclass_kws={'read_bulk':True})
 
     if dataset.short_name == globals.GLDAS:
         reader = GLDASTs(folder_name, ioclass_kws={'read_bulk': True})
 
-    if dataset.short_name == globals.SMAP:
+    if dataset.short_name == globals.SMAP_L3:
         smap_data_folder = path.join(folder_name, 'netcdf')
         reader = SMAPTs(smap_data_folder, ioclass_kws={'read_bulk': True})
 
@@ -52,8 +52,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
                                   grid_filename=ascat_grid_path, static_layer_path=None,
                                   ioclass_kws={'read_bulk': True})
 
-    if dataset.short_name == globals.SMOS:
-        reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
+    if dataset.short_name == globals.SMOS_IC:
+        reader = SMOSTs(folder_name, ioclass_kws={'read_bulk':True})
 
     if dataset.short_name == globals.ERA5:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk': True})

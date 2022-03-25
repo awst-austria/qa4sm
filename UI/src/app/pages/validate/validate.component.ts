@@ -26,6 +26,7 @@ import {
 } from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
 import {
+  ConfigurationChanges,
   ValidationRunConfigDto,
   ValidationRunDatasetConfigDto,
   ValidationRunMetricConfigDto
@@ -116,6 +117,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
           valrun => {
             this.modelFromValidationConfig(valrun);
+            if (valrun.changes){
+              this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
+                this.messageAboutConfigurationChanges(valrun.changes));
+            }
           }
         );
       } else {
@@ -127,6 +132,23 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
 
     });
+  }
+
+  private messageAboutConfigurationChanges(changes: ConfigurationChanges): string{
+    let message = '';
+    if (changes.scaling) {
+      message += 'Chosen scaling method is not available anymore. "No scaling" set instead.\n';
+    }
+    if (changes.anomalies) {
+      message += '\nChosen anomalies method is not available anymore. "Do not calculate" set instead.\n';
+    }
+    if (changes.filters.length !== 0){
+      changes.filters.forEach(filter => {
+        message += `\nFilters:${filter.filter_desc.map(desc => ' ' + desc)} for dataset ${filter.dataset} not available.`;
+      });
+    }
+
+    return message.toString();
   }
 
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
@@ -293,7 +315,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   addDatasetToValidate(): void {
-    this.addDataset(this.validationModel.datasetConfigurations, 'C3S', 'v202012');
+    this.addDataset(this.validationModel.datasetConfigurations, 'C3S_combined', 'v202012');
   }
 
   addReferenceDataset(): void {
@@ -388,7 +410,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               false,
               false,
               new BehaviorSubject<string>(null)));
-            if (!reloadingSettings && newFilter.filterDto.name === 'FIL_ALL_VALID_RANGE') {
+            if (!reloadingSettings && newFilter.filterDto.default_set_active) {
               newFilter.enabled = true;
             }
             model.basicFilters.push(newFilter);
@@ -494,12 +516,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   setLimitationsOnGeographicalRange(): void {
-    // this.setDefaultGeographicalRange();
     const maxLons = [];
     const minLons = [];
     const maxLats = [];
     const minLats = [];
 
+    // check if there are geographical limits in both reference and non-reference datasets
     if (this.validationModel.datasetConfigurations.length > 0) {
       this.validationModel.datasetConfigurations.forEach(config => {
         if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.geographical_range) {
@@ -522,34 +544,49 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
-    const condition = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0;
-    this.validationModel.spatialSubsetModel.limited$.next(condition);
+    // get current values of the spatial subsetting
+    const lonMaxCurrent = this.validationModel.spatialSubsetModel.maxLon$.value;
+    const lonMinCurrent = this.validationModel.spatialSubsetModel.minLon$.value;
+    const latMaxCurrent = this.validationModel.spatialSubsetModel.maxLat$.value;
+    const latMinCurrent = this.validationModel.spatialSubsetModel.minLat$.value;
+    // new limits
+    const lonMaxLimit = Math.max(...maxLons);
+    const lonMinLimit = Math.max(...minLons);
+    const latMaxLimit = Math.max(...maxLats);
+    const latMinLimit = Math.max(...minLats);
 
-    if (maxLons.length !== 0) {
-      this.validationModel.spatialSubsetModel.maxLon$.next(Math.max(...maxLons));
-      this.validationModel.spatialSubsetModel.maxLonLimit$.next(Math.max(...maxLons));
+    // conditions to verify
+    const isGeographicallyLimited = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0;
+    const hasTheSameRange = lonMaxLimit === lonMaxCurrent && lonMinLimit === lonMinCurrent &&
+      latMaxLimit === latMaxCurrent && latMinLimit === latMinCurrent;
+
+    // push the condition and the new value if conditions are met
+    this.validationModel.spatialSubsetModel.limited$.next(isGeographicallyLimited);
+
+    if (maxLons.length !== 0 && lonMaxCurrent !== lonMaxLimit) {
+      this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
+      this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     }
 
-    if (minLons.length !== 0) {
-      this.validationModel.spatialSubsetModel.minLon$.next(Math.max(...minLons));
-      this.validationModel.spatialSubsetModel.minLonLimit$.next(Math.max(...minLons));
+    if (minLons.length !== 0 && lonMinCurrent !== lonMinLimit) {
+      this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
+      this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     }
 
-    if (maxLats.length !== 0) {
-      this.validationModel.spatialSubsetModel.maxLat$.next(Math.max(...maxLats));
-      this.validationModel.spatialSubsetModel.maxLatLimit$.next(Math.max(...maxLats));
+    if (maxLats.length !== 0 && latMaxCurrent !== latMaxLimit) {
+      this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
+      this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     }
 
-    if (minLats.length !== 0) {
-      this.validationModel.spatialSubsetModel.minLat$.next(Math.max(...minLats));
-      this.validationModel.spatialSubsetModel.minLatLimit$.next(Math.max(...minLats));
+    if (minLats.length !== 0 && latMinCurrent !== latMinLimit) {
+      this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
+      this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
     }
 
-    if (condition) {
+    // inform a user about the automatic change
+    if (isGeographicallyLimited && !hasTheSameRange) {
       this.toastService.showAlert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
         'Bounds corrected to fit available subsetting');
-      // alert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
-      //   'Bounds corrected to fit available subsetting');
     }
 
   }

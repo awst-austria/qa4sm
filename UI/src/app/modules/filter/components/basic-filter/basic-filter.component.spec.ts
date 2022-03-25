@@ -28,10 +28,7 @@ describe('BasicFilterComponent', () => {
         default_parameter: null,
         to_include: null,
         disable_filter: null,
-        threshold: false,
-        default_threshold: null,
-        min_threshold: null,
-        max_threshold: null
+        default_set_active: true,
       },
       enabled: true,
       readonly: false,
