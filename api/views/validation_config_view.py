@@ -12,10 +12,14 @@ from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
-from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter
+from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset, \
+    DatasetVersion
 from validator.validation import run_validation
 from validator.validation.validation import compare_validation_runs
 
+
+def _check_if_settings_exist():
+    pass
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -50,12 +54,33 @@ def start_validation(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_validation_configuration(request, **kwargs):
+    changes_in_settings = {
+        'filters': [],
+        'anomalies': False,
+        'scaling': False
+    }
+
     validation_run_id = kwargs['id']
     try:
         val_run = ValidationRun.objects.get(pk=validation_run_id)
-        val_run_dict = {}
+        validation_configs = val_run.dataset_configurations.all()
 
-        val_run_dict['name_tag'] = val_run.name_tag
+        #  first check if there are still all the datasets available:
+        datasets_in_validation = validation_configs.values_list('dataset', flat=True)
+        ds_versions_in_validation = validation_configs.values_list('version', flat=True)
+
+        available_datasets = Dataset.objects.all().values_list('id', flat=True)
+        available_versions = DatasetVersion.objects.all().values_list('id', flat=True)
+
+        all_datasets_available = all([dataset in available_datasets for dataset in datasets_in_validation])
+        all_versions_available = all([version in available_versions for version in ds_versions_in_validation])
+
+        if not (all_datasets_available and all_versions_available):
+            return JsonResponse({'message': 'Could not restore validation run, because some of '
+                                            'the chosen datasets or their versions are not available anymore'},
+                                status=status.HTTP_404_NOT_FOUND, safe=False)
+
+        val_run_dict = {'name_tag': val_run.name_tag}
 
         if val_run.interval_from is not None:
             val_run_dict['interval_from'] = val_run.interval_from.date()
@@ -67,8 +92,12 @@ def get_validation_configuration(request, **kwargs):
         else:
             val_run_dict['interval_to'] = None
 
-        if val_run.anomalies is not None:
+        # if the anomaly method doesn't exist anymore, set 'none'
+        if val_run.anomalies is not None and val_run.anomalies in dict(ValidationRun.ANOMALIES_METHODS).keys():
             val_run_dict['anomalies_method'] = val_run.anomalies
+        else:
+            val_run_dict['anomalies_method'] = ValidationRun.NO_ANOM
+            changes_in_settings['anomalies'] = True
 
         if val_run.anomalies_from is not None:
             val_run_dict['anomalies_from'] = val_run.anomalies_from.date()
@@ -85,53 +114,72 @@ def get_validation_configuration(request, **kwargs):
         val_run_dict['max_lat'] = val_run.max_lat
         val_run_dict['max_lon'] = val_run.max_lon
 
-        val_run_dict['scaling_method'] = val_run.scaling_method
+        # if a scaling method doesn't exist anymore, set 'none'
+        if val_run.scaling_method in dict(ValidationRun.SCALING_METHODS).keys():
+            val_run_dict['scaling_method'] = val_run.scaling_method
+        else:
+            val_run_dict['scaling_method'] = ValidationRun.NO_SCALING
+            changes_in_settings['scaling'] = True
+
         if val_run.scaling_method is not None or val_run.scaling_method != 'none':
             val_run_dict['scale_to'] = ValidationRun.SCALE_TO_REF
             if val_run.scaling_ref is not None:
                 if val_run.scaling_ref.id != val_run.reference_configuration.id:
                     val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
 
+        # if one day we decide to remove any of these metrics, we need to check if reloaded settings use them
         metrics = [{'id': 'tcol', 'value': val_run.tcol},
                    {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
 
-        # Reference filters
-        basic_filters = []
-        for basic_filter in val_run.reference_configuration.filters.all():
-            basic_filters.append(basic_filter.id)
-
-        parametrised_filters = []
-        for param_filter in ParametrisedFilter.objects.filter(dataset_config=val_run.reference_configuration):
-            parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
-
-        val_run_dict['reference_config'] = {
-            'dataset_id': val_run.reference_configuration.dataset.id,
-            'version_id': val_run.reference_configuration.version.id,
-            'variable_id': val_run.reference_configuration.variable.id,
-            'basic_filters': basic_filters,
-            'parametrised_filters': parametrised_filters
-        }
-
         # dataset configs and filters
         datasets = []
         val_run_dict['dataset_configs'] = datasets
-        for ds in val_run.dataset_configurations.all():
-            if val_run.reference_configuration_id == ds.id:
-                continue
 
-            ds_dict = {'dataset_id': ds.dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
+        for ds in validation_configs:
+
+            dataset_id = ds.dataset.id
+            ds_dict = {'dataset_id': dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
             filters_list = []
+            non_existing_filters_list = []
             ds_dict['basic_filters'] = filters_list
+
             for basic_filter in ds.filters.all():
-                filters_list.append(basic_filter.id)
+                # check if the reloaded filter still belongs to the dataset
+                dataset_filters = Dataset.objects.get(id=dataset_id).filters.all()
+                if basic_filter in dataset_filters:
+                    filters_list.append(basic_filter.id)
+                else:
+                    non_existing_filters_list.append(basic_filter.description)
 
             parametrised_filters = []
             ds_dict['parametrised_filters'] = parametrised_filters
             for param_filter in ParametrisedFilter.objects.filter(dataset_config=ds):
-                parametrised_filters.append({'id': param_filter.id, 'parameters': param_filter.parameters})
+                # check if the reloaded filter still belongs to the dataset
+                dataset_filter_ids = Dataset.objects.get(id=dataset_id).filters.all().values_list('id', flat=True)
+                if param_filter.filter_id in dataset_filter_ids:
+                    parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
+                else:
+                    filter_desc = DataFilter.objects.get(id=param_filter.filter.id).description
+                    non_existing_filters_list.append(filter_desc)
 
-            datasets.append(ds_dict)
+            if len(non_existing_filters_list) != 0:
+                changes_in_settings['filters'].append({'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
+
+            if val_run.reference_configuration_id == ds.id:
+                val_run_dict['reference_config'] = {
+                    'dataset_id': val_run.reference_configuration.dataset.id,
+                    'version_id': val_run.reference_configuration.version.id,
+                    'variable_id': val_run.reference_configuration.variable.id,
+                    'basic_filters': filters_list,
+                    'parametrised_filters': parametrised_filters
+                }
+            else:
+                datasets.append(ds_dict)
+
+        if changes_in_settings['anomalies'] or changes_in_settings['scaling'] or \
+                len(changes_in_settings['filters']) != 0:
+            val_run_dict['changes'] = changes_in_settings
 
         return JsonResponse(val_run_dict,
                             status=status.HTTP_200_OK, safe=False)
@@ -227,7 +275,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                         parameters=param_filter.get('parameters')
                     )
                     param_filter_model.save()
-                    print(param_filter)
 
                 config_model.save()
                 dataset_config_models.append(config_model)

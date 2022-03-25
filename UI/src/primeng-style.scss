@@ -518,8 +518,8 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
 }
 
 .param-filter-checkbox .p-checkbox-box.p-highlight{
-  border-color: rgba(0, 123, 255, 0.16);
-  background: rgba(0, 123, 255, 0.6);
+  border-color: rgba(150, 150, 150, 0.15);
+  background: rgba(150, 150, 150, 0.6);
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
@@ -5678,6 +5678,7 @@ div.carousel-caption{
 
 .p-toast .p-toast-message .p-toast-message-content .p-toast-detail {
   margin: 0.5rem 0 0 0;
+  white-space: pre-line;
 }
 
 .p-toast .p-toast-message .p-toast-icon-close {

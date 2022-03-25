@@ -106,7 +106,8 @@ describe('DatasetInfoComponent', () => {
         dialog_name: null,
         default_parameter: null,
         to_include: null,
-        disable_filter: null
+        disable_filter: null,
+        default_set_active: true
       },
       {
         id: 2,
@@ -117,7 +118,8 @@ describe('DatasetInfoComponent', () => {
         dialog_name: null,
         default_parameter: null,
         to_include: '4,5',
-        disable_filter: null
+        disable_filter: null,
+        default_set_active: true
       },
 
     ];
