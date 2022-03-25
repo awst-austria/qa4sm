@@ -14,6 +14,7 @@ export interface ValidationRunConfigDto {
   scaling_method: string;
   scale_to: string;
   name_tag: string;
+  changes?: ConfigurationChanges;
 }
 
 export interface ValidationRunDatasetConfigDto {
@@ -33,4 +34,10 @@ export interface ValidationRunMetricConfigDto {
 export interface ParametrisedFilterConfig {
   id: number;
   parameters: string;
+}
+
+export interface ConfigurationChanges {
+  filters: {dataset: string, filter_desc: string[]}[];
+  anomalies: boolean;
+  scaling: boolean;
 }

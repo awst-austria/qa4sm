@@ -41,13 +41,13 @@ class TestDataFilterView(TestCase):
         dataset_id = 1  #
         response = self.client.get(f'{data_filter_url}/{dataset_id}')
         assert response.status_code == 200
-        assert len(response.json()) == 6
+        assert len(response.json()) == 3
 
         # log out to check if it still works
         self.client.logout()
         response = self.client.get(f'{data_filter_url}/{dataset_id}')
         assert response.status_code == 200
-        assert len(response.json()) == 6
+        assert len(response.json()) == 3
 
     def test_data_parameterized_filters(self):
         param_filter_url = reverse('Parameterised filter')
