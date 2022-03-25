@@ -325,13 +325,13 @@
         "model": "validator.datafilter",
         "pk": 25,
         "fields": {
-            "name": "FIL_SMOSL3_QUAL_RECOMMENDED",
-            "description": "Soil moisture values are retrieved and recommended",
-            "help_text": "Soil moisture values are retrieved and recommended (Quality_Flag == 0)",
+            "name": "FIL_SMOSL3_STRONG_TOPO_MANDATORY",
+            "description": "Exclude strong topography",
+            "help_text": "Exlude values flagged due to radiometric fraction of Strong Topography of more than 5%. NOTE: mandatory filter",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": "26,27,28,29,30,31,32",
+            "to_include": null,
             "disable_filter": null
         }
     },
@@ -339,23 +339,23 @@
         "model": "validator.datafilter",
         "pk": 26,
         "fields": {
-            "name": "FIL_SMOSL3_NON_NOMINAL",
-            "description": "Exclude non nominal values",
-            "help_text": "Exlude all values flagged as non nominal due to scene characteristics",
+            "name": "FIL_SMOSL3_MODERATE_TOPO",
+            "description": "Exclude moderate topography",
+            "help_text": "Exlude values flagged due to radiometric fraction of Moderate Topography of more than 5%",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
-            "to_include": "27,28,29,30,31",
+            "to_include": null,
             "disable_filter": null
         }
     },
-    {
+        {
         "model": "validator.datafilter",
         "pk": 27,
         "fields": {
-            "name": "FIL_SMOSL3_STRONG_TOPO",
-            "description": "Exclude strong topography",
-            "help_text": "Exlude values flagged due to radiometric fraction of Moderate/Strong Topography of more than 5%",
+            "name": "FIL_SMOSL3_ICE_MANDATORY",
+            "description": "Exclude ice in scene",
+            "help_text": "Exclude values flagged due to high radiometric fraction of ice surface type. NOTE: mandatory filter",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
@@ -369,7 +369,7 @@
         "fields": {
             "name": "FIL_SMOSL3_FROZEN",
             "description": "Exclude frozen soil and snow conditions",
-            "help_text": "Exclude values flagged due to high radiometric fraction of snow/ice/frost",
+            "help_text": "Exclude values flagged due to high radiometric fraction of snow/frost",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
@@ -381,9 +381,9 @@
         "model": "validator.datafilter",
         "pk": 29,
         "fields": {
-            "name": "FIL_SMOSL3_FOREST",
-            "description": "Exclude forests",
-            "help_text": "Exclude values flagged due to radiometric fraction of forest larger than 10%",
+            "name": "FIL_SMOSL3_URBAN_LOW",
+            "description": "Exclude low urban surface type",
+            "help_text": "Exclude values flagged due to a radiometric fraction of urban surface type of more than 10%",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
@@ -395,9 +395,9 @@
         "model": "validator.datafilter",
         "pk": 30,
         "fields": {
-            "name": "FIL_SMOSL3_WATER",
-            "description": "Exclude surface water",
-            "help_text": "Exclude values flagged due to too high radiometric fraction of open water/floods/wetlands",
+            "name": "FIL_SMOSL3_URBAN_HIGH",
+            "description": "Exclude high urban surface type",
+            "help_text": "Exclude values flagged due to a radiometric fraction of urban surface type of more than 30%",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
@@ -409,9 +409,9 @@
         "model": "validator.datafilter",
         "pk": 31,
         "fields": {
-            "name": "FIL_SMOSL3_RAIN",
-            "description": "Exclude intense rain events",
-            "help_text": "Exclude values flagged due to precipitation of more than 10.00 mm/h from ECMWF parameters",
+            "name": "FIL_SMOSL3_WATER",
+            "description": "Exclude surface water",
+            "help_text": "Exclude values flagged due to high radiometric fraction of open water/floods/wetlands",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
@@ -423,9 +423,9 @@
         "model": "validator.datafilter",
         "pk": 32,
         "fields": {
-            "name": "FIL_SMOSL3_RETRIEVAL",
-            "description": "Exclude retrieval issues",
-            "help_text": "Exclude values flagged due to problems in the retrieval parameters",
+            "name": "FIL_SMOSL3_EXTERNAL",
+            "description": "Exclude external atmospheric events",
+            "help_text": "Exclude values flagged due to precipitation of more than 10.00 mm/h from ECMWF parameters or high Total Electric Constant",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
@@ -437,9 +437,23 @@
         "model": "validator.datafilter",
         "pk": 33,
         "fields": {
+            "name": "FIL_SMOSL3_TAU_FO",
+            "description": "Exclude forest opacity",
+            "help_text": "Exclude values flagged due to mean forest opacity above the 1.0 neper threshold",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 34,
+        "fields": {
             "name": "FIL_SMOSL3_RFI",
             "description": "Set RFI probability threshold",
-            "help_text": "Values above the selected RFI probability threshold will be filterd out. The allowed range is 0.0-1.0",
+            "help_text": "Values affected by Radio Frequency Interference (RFI) probability above the selected threshold will be filtered out. The probability is expressed in fractional units, with allowed range [0.0, 1.0]. NOTE: mandatory filter",
             "parameterised": true,
             "dialog_name": null,
             "default_parameter": "0.80",

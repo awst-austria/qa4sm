@@ -50,7 +50,7 @@ def check_normalized_bits_array(
 ) -> bool:
     """
     Takes a list of bit_indices ([0] is the first bit only, [0,1] are the first
-    two bits) and a number and checks if the bit(s) is/are active for this
+    two bits) and a number and checks if the bit(s) is (are) active for this
     number.
 
     If multiple combinations are passed in bit_indices, ANY of them
@@ -175,14 +175,15 @@ def get_used_variables(filters, dataset, variable):
                 continue
 
             if fil.name in (
-                    "FIL_SMOSL3_QUAL_RECOMMENDED",
-                    "FIL_SMOSL3_NON_NOMINAL",
-                    "FIL_SMOSL3_STRONG_TOPO",
+                    "FIL_SMOSL3_STRONG_TOPO_MANDATORY",
+                    "FIL_SMOSL3_MODERATE_TOPO",
+                    "FIL_SMOSL3_ICE_MANDATORY",
                     "FIL_SMOSL3_FROZEN",
-                    "FIL_SMOSL3_FOREST",
+                    "FIL_SMOSL3_URBAN_LOW",
+                    "FIL_SMOSL3_URBAN_HIGH",
                     "FIL_SMOSL3_WATER",
-                    "FIL_SMOSL3_RAIN",
-                    "FIL_SMOSL3_RETRIEVAL",
+                    "FIL_SMOSL3_EXTERNAL",
+                    "FIL_SMOSL3_TAU_FO",
             ):
                 variables.append('Science_Flags')
                 continue
@@ -332,41 +333,44 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             masking_filters.append(('Scene_Flags', check_normalized_bits_array, [[3]]))
             continue
 
-        # TODO: filter bit value is equal to the topography and needs to be updated
         if fil.name == "FIL_SMOS_BRIGHTNESS":
             masking_filters.append(('Processing_Flags', check_normalized_bits_array, [[0]]))
             continue
 
-        if fil.name == "FIL_SMOSL3_QUAL_RECOMMENDED":
-            masking_filters.append(('Science_Flags', '==', 0))
+        if fil.name == "FIL_SMOSL3_STRONG_TOPO_MANDATORY":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[3]]))
             continue
 
-        if fil.name == "FIL_SMOSL3_NON_NOMINAL":
-            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[0]]))
+        if fil.name == "FIL_SMOSL3_MODERATE_TOPO":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[4]]))
             continue
 
-        if fil.name == "FIL_SMOSL3_STRONG_TOPO":
-            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[3], [4]]))
+        if fil.name == "FIL_SMOSL3_ICE_MANDATORY":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[12]]))
             continue
 
         if fil.name == "FIL_SMOSL3_FROZEN":
-            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[6], [7], [8], [11], [12]]))
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[6], [7], [8], [11]]))
             continue
 
-        if fil.name == "FIL_SMOSL3_FOREST":
-            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[9]]))
+        if fil.name == "FIL_SMOSL3_URBAN_LOW":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[15]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_URBAN_HIGH":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[16]]))
             continue
 
         if fil.name == "FIL_SMOSL3_WATER":
             masking_filters.append(('Science_Flags', check_normalized_bits_array, [[5], [13], [14]]))
             continue
 
-        if fil.name == "FIL_SMOSL3_RAIN":
-            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[25]]))
+        if fil.name == "FIL_SMOSL3_EXTERNAL":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[24], [25]]))
             continue
 
-        if fil.name == "FIL_SMOSL3_RETRIEVAL":
-            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[20], [21], [22], [23]]))
+        if fil.name == "FIL_SMOSL3_TAU_FO":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[27]]))
             continue
 
         # snow depth in the nc file yet, this is the preliminary one.

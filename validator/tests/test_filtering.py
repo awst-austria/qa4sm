@@ -1,9 +1,12 @@
+import numpy as np
+import pytest
 from django.test import TestCase
 from django.test.utils import override_settings
 import django
 
 from validator.admin import User
 from validator.models import DataFilter, DataVariable
+from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 
 from validator.models import ParametrisedFilter
 from validator.tests.auxiliary_functions import generate_default_validation_smos
@@ -40,13 +43,14 @@ class TestValidation(TestCase):
             else:
                 self.smos_config = config
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-                config.filters.add(DataFilter.objects.get(name='FIL_SMOSL3_RETRIEVAL'))
+                config.filters.add(DataFilter.objects.get(name='FIL_SMOSL3_EXTERNAL'))
 
             config.save()
 
+        self.rfi_theshold = 0.016  # needs to be low as testdata have low values
         pfilter = ParametrisedFilter(
             filter=DataFilter.objects.get(name="FIL_SMOSL3_RFI"),
-            parameters=0.8,
+            parameters=self.rfi_theshold,
             dataset_config=self.smos_config
         )
         pfilter.save()
@@ -56,24 +60,52 @@ class TestValidation(TestCase):
             self.smos_config.version
         )
 
-    def test_setup_filtering(self) -> None:
-        filtered_reader, read_name, read_kwargs = setup_filtering(
+        self.filtered_reader, self.read_name, self.read_kwargs = setup_filtering(
             self.smos_reader,
             self.smos_config.filters.all(),
             ParametrisedFilter.objects.filter(dataset_config_id=self.smos_config.id),
             self.smos_config.version,
             self.smos_config.variable,
         )
+
+    def test_setup_filtering(self) -> None:
+        # check that the function outputs the correct objects
         f_list_should = [
-            ('Rfi_Prob', '<=', 0.8),
+            ('Rfi_Prob', '<=', self.rfi_theshold),
             ('Soil_Moisture', '>=', 0.0),
             ('Soil_Moisture', '<=', 1.0),
-            ('Science_Flags', check_normalized_bits_array, [[20], [21], [22], [23]])
+            ('Science_Flags', check_normalized_bits_array, [[24], [25]])
         ]
-        assert filtered_reader.filter_list == f_list_should
+        assert isinstance(self.filtered_reader, AdvancedMaskingAdapter)
+        assert self.filtered_reader.filter_list == f_list_should
 
-        assert read_name == 'read'
-        assert not read_kwargs
+        assert self.read_name == 'read'
+        assert not self.read_kwargs
+
+        # take an hawaiian gpi
+        gpi = 542803
+        out_data = self.filtered_reader.read(gpi)
+        # check that the reader filters the data correctly
+        assert list(out_data.columns) == ["Soil_Moisture", "Science_Flags", "Rfi_Prob"]
+        assert self.smos_reader.read(gpi).Rfi_Prob.count() > out_data.Rfi_Prob.count()
+        # assert Rfi threshold works
+        assert (out_data.Rfi_Prob.values < self.rfi_theshold).all()
+
+        # assert the bit function works on data
+        def return_index(x, ind):
+            try:
+                return str(bin(x)).split('b')[1][ind]
+            except IndexError:
+                return "0"
+        df_filtered = out_data.Science_Flags.apply(
+            lambda x: return_index(x, -26)
+        )
+        df_unfiltered = self.smos_reader.read(gpi).Science_Flags.apply(
+            lambda x: return_index(x, -26)
+        )
+        # assert one gets filtered, the other doesn't
+        assert (df_filtered == "0").all() \
+               and not (df_unfiltered == "0").all()
 
     def test_get_used_variables(self) -> None:
         # provide a few filters to test
@@ -82,7 +114,7 @@ class TestValidation(TestCase):
             ("FIL_C3S_MODE_ASC", "C3S_sm", "mode", DataFilter),
             ("FIL_ASCAT_METOP_A", "ASCAT_sm", "sat_id", DataFilter),
             ("FIL_ERA5_TEMP_UNFROZEN", "ERA5_sm", "stl1", DataFilter),
-            ("FIL_SMOSL3_STRONG_TOPO", "SMOSL3_sm", "Science_Flags", DataFilter),
+            ("FIL_SMOSL3_STRONG_TOPO_MANDATORY", "SMOSL3_sm", "Science_Flags", DataFilter),
             ("FIL_SMOSL3_RFI", "SMOSL3_sm", "Rfi_Prob", ParametrisedFilter),
         ]
 
@@ -101,8 +133,30 @@ class TestValidation(TestCase):
 
             assert used_variables == used_variables_should
 
-# bits_tests = [
-#     ('', [[3]], ),
-# ]
-# def test_check_normalized_bits_array() -> None:
-#     pass
+
+bits_list = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+bits_tests = [
+    (bits_list, [[3]], np.array([True, True, True, True, True, True, True, True, False, False])),
+    (bits_list, [[0], [1]], np.array([True, False, False, False, True, False, False, False, True, False])),
+    (bits_list, [[0, 1]], np.array([True, True, True, False, True, True, True, False, True, True])),
+    (bits_list, [[3], [0, 1]], np.array([True, True, True, False, True, True, True, False, False, False])),
+]
+
+test_names = [
+    "single",
+    "or",
+    "and",
+    "and_or"
+]
+
+
+@pytest.mark.parametrize(
+    "input_list, input_indices, expected", bits_tests, ids=test_names
+)
+def test_check_normalized_bits_array(input_list, input_indices, expected) -> None:
+    result = check_normalized_bits_array(input_list, input_indices)
+
+    np.testing.assert_array_equal(
+        result, expected
+    )

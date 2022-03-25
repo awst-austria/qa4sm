@@ -5,7 +5,7 @@ import {BehaviorSubject} from 'rxjs';
 
 export const ISMN_NETWORK_FILTER_ID = 18;
 export const ISMN_DEPTH_FILTER_ID = 24;
-export const SMOS_RFI_FILTER_ID = 33;
+export const SMOS_RFI_FILTER_ID = 34;
 
 export class DatasetConfigModel {
 
