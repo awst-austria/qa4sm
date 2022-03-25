@@ -58,7 +58,7 @@ class TestDOI(TestCase):
 
         data_c = DatasetConfiguration()
         data_c.validation = val
-        data_c.dataset = Dataset.objects.get(short_name='C3S')
+        data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
         data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
         data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
         data_c.save()

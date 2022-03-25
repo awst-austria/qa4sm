@@ -45,12 +45,12 @@ class TestValidationConfigView(TransactionTestCase):
         start_validation_url = reverse('Run new validation')
 
         basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
-        good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3S).id,
+        good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
                                           'variable_id': DataVariable.objects.get(short_name=globals.C3S_sm).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
                                           'basic_filters': [basic_filter_id],
                                           'parametrised_filters': []},
-                                         {'dataset_id': Dataset.objects.get(short_name=globals.SMAP).id,
+                                         {'dataset_id': Dataset.objects.get(short_name=globals.SMAP_L3).id,
                                           'variable_id': DataVariable.objects.get(
                                               short_name=globals.SMAP_soil_moisture).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.SMAP_V6_PM).id,
@@ -183,7 +183,7 @@ class TestValidationConfigView(TransactionTestCase):
         assert DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id in \
                val_run_dict['dataset_configs'][0]['basic_filters']
 
-        assert val_run_dict['dataset_configs'][0]['dataset_id'] == Dataset.objects.get(short_name=globals.C3S).id
+        assert val_run_dict['dataset_configs'][0]['dataset_id'] == Dataset.objects.get(short_name=globals.C3SC).id
         assert val_run_dict['dataset_configs'][0]['version_id'] == \
                DatasetVersion.objects.get(short_name=globals.C3S_V202012).id
         assert val_run_dict['dataset_configs'][0]['variable_id'] == \
@@ -202,12 +202,12 @@ class TestValidationConfigView(TransactionTestCase):
         start_validation_url = reverse('Run new validation')
 
         basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
-        good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3S).id,
+        good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
                                           'variable_id': DataVariable.objects.get(short_name=globals.C3S_sm).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
                                           'basic_filters': [basic_filter_id],
                                           'parametrised_filters': []},
-                                         {'dataset_id': Dataset.objects.get(short_name=globals.SMAP).id,
+                                         {'dataset_id': Dataset.objects.get(short_name=globals.SMAP_L3).id,
                                           'variable_id': DataVariable.objects.get(
                                               short_name=globals.SMAP_soil_moisture).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.SMAP_V6_PM).id,
