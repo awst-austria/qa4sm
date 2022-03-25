@@ -355,7 +355,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": true
         }
     },
     {
@@ -369,7 +370,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": false
         }
     },
         {
@@ -383,7 +385,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": true
         }
     },
     {
@@ -397,7 +400,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": false
         }
     },
     {
@@ -411,7 +415,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": false
         }
     },
     {
@@ -425,7 +430,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": false
         }
     },
     {
@@ -439,7 +445,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": false
         }
     },
     {
@@ -453,7 +460,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": false
         }
     },
     {
@@ -467,7 +475,8 @@
             "dialog_name": null,
             "default_parameter": null,
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": false
         }
     },
     {
@@ -481,7 +490,8 @@
             "dialog_name": null,
             "default_parameter": "0.80",
             "to_include": null,
-            "disable_filter": null
+            "disable_filter": null,
+            "default_set_active": true
         }
     }
 ]
