@@ -52,7 +52,8 @@ class DataFilterSerializer(ModelSerializer):
                   'default_parameter',
                   'to_include',
                   'disable_filter',
-                  'default_set_active'
+                  'default_set_active',
+                  'readonly'
                   ]
 
 

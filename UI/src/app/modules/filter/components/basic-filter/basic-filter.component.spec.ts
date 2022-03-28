@@ -29,9 +29,9 @@ describe('BasicFilterComponent', () => {
         to_include: null,
         disable_filter: null,
         default_set_active: true,
+        readonly: true,
       },
       enabled: true,
-      readonly: false,
       parameters$: null
     };
     fixture.detectChanges();
