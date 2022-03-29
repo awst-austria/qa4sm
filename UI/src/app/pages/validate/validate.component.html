@@ -89,7 +89,7 @@
               (changeDataset)="onReferenceChange()"></qa-dataset>
 
             <ng-container *ngFor="let filter of validationModel.referenceConfigurations[0].basicFilters; let i = index">
-              <qa-basic-filter *ngIf="filter.filterDto.id != smos_threshold_filter"
+              <qa-basic-filter *ngIf="filter.filterDto.id != smosThresholdFilter"
                 [ngClass]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters) == true ? 'ml-1' : ''"
                 [isIncluded]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters)"
                 [filterModel]="filter"
