@@ -11,7 +11,6 @@ from smos.smos_ic.interface import SMOSTs
 from pynetcf.time_series import GriddedNcTs
 
 from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
-from qa4sm_preprocessing.nc_image_reader.readers import GriddedNcOrthoMultiTs
 
 from validator.validation import globals
 from validator.validation.util import first_file_in

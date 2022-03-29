@@ -396,7 +396,7 @@
             "short_name": "SMOS_L3",
             "pretty_name": "SMOS",
             "help_text": "Soil Moisture and Ocean Salinity (SMOS) Mission",
-            "storage_path": "testdata/input_data/SMOS_l3",
+            "storage_path": "testdata/input_data/SMOS_L3",
             "detailed_description": "Daily global maps of soil moisture retrieved from the ESA L1B product with a multi-orbit approach.",
             "source_reference": "Data is available <a target=\"_blank\" href=\"https://www.catds.fr/Products/Available-products-from-CPDC/\"> here</a>.",
             "citation": "<a target=\"_blank\" href=\"https://essd.copernicus.org/articles/9/293/2017/essd-9-293-2017.pdf\">ATBD</a>",
@@ -417,7 +417,9 @@
                 29,
                 30,
                 31,
-                32
+                32,
+                33,
+                34
             ]
         }
     }

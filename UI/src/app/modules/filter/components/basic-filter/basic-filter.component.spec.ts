@@ -16,6 +16,7 @@ describe('BasicFilterComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(BasicFilterComponent);
     component = fixture.componentInstance;
+    // @ts-ignore
     component.filterModel = {
       filterDto: {
         id: 1,
@@ -28,10 +29,10 @@ describe('BasicFilterComponent', () => {
         to_include: null,
         disable_filter: null,
         default_set_active: true,
+        readonly: true,
       },
       enabled: true,
-      readonly: false,
-      parameters: ''
+      parameters$: null
     };
     fixture.detectChanges();
   });

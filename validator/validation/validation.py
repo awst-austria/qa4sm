@@ -88,7 +88,6 @@ def _get_reference_reader(val_run) -> ('Reader', str, dict):
     return ref_reader, read_name, read_kwargs
 
 
-
 def set_outfile(validation_run, run_dir):
     outfile = first_file_in(run_dir, '.nc')
     if outfile is not None:
@@ -208,7 +207,6 @@ def create_pytesmo_validation(validation_run):
                 param_filters=list(dataset_config.parametrisedfilter_set.all()),
                 dataset=dataset_config.dataset,
                 variable=dataset_config.variable)
-
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name],
@@ -643,7 +641,8 @@ def _compare_datasets(new_run_config, old_run_config):
             ds_ind = 0
             new_dataset = new_run_config[conf_ind]
             old_dataset = old_run_config[conf_ind]
-            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
+            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset,
+                                                                                             ds_fields[ds_ind]):
                 ds_ind += 1
             if ds_ind == max_ds_ind:
                 the_same = _compare_filters(new_dataset, old_dataset)
@@ -688,7 +687,7 @@ def compare_validation_runs(new_run, runs_set, user):
         where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
     """
     vr_fields = VR_FIELDS
-    is_the_same = False # set to False because it looks for the first found validation run
+    is_the_same = False  # set to False because it looks for the first found validation run
     is_published = False
     old_user = None
     max_vr_ind = len(vr_fields)
@@ -714,7 +713,7 @@ def compare_validation_runs(new_run, runs_set, user):
         'val_id': val_id,
         'belongs_to_user': old_user == user,
         'is_published': is_published
-        }
+    }
     return response
 
 
