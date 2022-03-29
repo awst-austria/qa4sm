@@ -4,6 +4,7 @@
                 [readonly]=filterModel.filterDto.readonly
                 [binary]="true"
                 (onChange)="include_filters($event); exclude_filters($event)"
+                [ngClass]="{'readonly-filter-checkbox': filterModel.filterDto.readonly}"
     ></p-checkbox>
   </div>
   <div [ngClass]="{'p-col-1': true, 'adjust-margin': isIncluded}">
