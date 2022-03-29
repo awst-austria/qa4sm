@@ -86,7 +86,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   public isExistingValidationWindowOpen: boolean;
   maintenanceMode = false;
 
-  smos_threshold_filter = SMOS_RFI_FILTER_ID
+  smosThresholdFilter = SMOS_RFI_FILTER_ID;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -371,16 +371,19 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               model.ismnNetworkFilter$.next(new FilterModel(
                 filter,
                 false,
+                  false,
                   new BehaviorSubject<string>(filter.default_parameter)));
             } else if (filter.id === SMOS_RFI_FILTER_ID) {
               if (model.smosRfiFilter$) {
                 model.smosRfiFilter$.next(new FilterModel(
                   filter,
                   false,
+                  false,
                   new BehaviorSubject<string>(filter.default_parameter)));
               } else {
                 model.smosRfiFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
                   filter,
+                  false,
                   false,
                   new BehaviorSubject<string>(filter.default_parameter))
                 );
@@ -390,10 +393,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 model.ismnDepthFilter$.next(new FilterModel(
                   filter,
                   false,
+                  false,
                   new BehaviorSubject<string>(filter.default_parameter)));
               } else {
                 model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
                   filter,
+                  false,
                   false,
                   new BehaviorSubject<string>(filter.default_parameter))
                 );
@@ -402,6 +407,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           } else {
             const newFilter = (new FilterModel(
               filter,
+              false,
               false,
               new BehaviorSubject<string>(null)));
             if (!reloadingSettings && newFilter.filterDto.default_set_active) {
