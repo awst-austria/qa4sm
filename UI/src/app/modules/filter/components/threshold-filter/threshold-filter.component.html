@@ -3,7 +3,7 @@
     <div class="p-grid">
       <div class="p-col-7 p-pt-3" *ngIf="filterModel$|async as filterModel">
         <p-checkbox label="{{filterModel.filterDto.description + ':'}}"
-                    [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly class="param-filter-checkbox">
+                    [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly class="readonly-filter-checkbox">
         </p-checkbox>
       </div>
       <div class="p-col-4 p-mx-0 p-px-0 p-fluid">
