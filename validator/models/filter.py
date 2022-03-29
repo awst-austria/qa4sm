@@ -3,9 +3,9 @@ from django.db import models
 
 class DataFilter(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=40)
     description = models.CharField(max_length=80)
-    help_text = models.CharField(max_length=150)
+    help_text = models.CharField(max_length=250)
     parameterised = models.BooleanField(default=False)
     dialog_name = models.CharField(max_length=30, null=True, blank=True)
     default_set_active = models.BooleanField(default=False)
