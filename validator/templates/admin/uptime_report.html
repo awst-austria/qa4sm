@@ -1,0 +1,41 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block content %}
+
+<div>
+    <h1><b>Uptime monitoring statistics</b></h1>
+</div>
+
+{% if daily_statistics %}
+<div>
+    <h2>
+        Daily statistics
+    </h2>
+    <p>The maximum daily downtime is <b> {{ daily_statistics.max_downtime_minutes }} minutes. </b></p>
+    <p>The minimum daily uptime is <b> {{ daily_statistics.min_uptime_percentage }}%. </b></p>
+    <p>The maximum daily downtime happened <b> {{ daily_statistics.number_of_maximum_downtime }} time(s) </b>, on
+        {% for date in daily_statistics.dates_of_maximum_downtime %} <b> {{date}} </b> {% endfor %}
+    </p>
+    <p>The average daily downtime is <b> {{daily_statistics.average_downtime_minutes}} </b></p>
+    <p>The median of daily downtime is <b> {{daily_statistics.median_downtime_minutes}} </b></p>
+</div>
+{% endif %}
+{%if monthly_statistics%}
+<div>
+    <h2>
+        Monthly statistics
+    </h2>
+    <p>The maximum monthly downtime is <b> {{ monthly_statistics.max_downtime_minutes }} minutes. </b></p>
+    <p>The minimum monthly uptime is <b> {{ monthly_statistics.min_uptime_percentage }}%. </b></p>
+    <p>The maximum monthly downtime happened <b> {{ monthly_statistics.number_of_maximum_downtime }} time(s) </b>, on
+        {% for date in monthly_statistics.dates_of_maximum_downtime %} <b> {{date}} </b> {% endfor %}
+    </p>
+    <p>The average monthly downtime is <b>{{monthly_statistics.average_downtime_minutes}}</b> </p>
+    <p>The median of monthly downtime is <b>{{monthly_statistics.median_downtime_minutes}}</b> </p>
+</div>
+{%endif%}
+
+<a href="{% url 'admin:validator_uptimereport_changelist' %}">Go back</a>
+
+{% endblock %}

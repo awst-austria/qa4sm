@@ -1,7 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-User = get_user_model()
-
 from validator.admin import CustomUserAdmin
 from validator.admin import SystemSettingsAdmin
 from validator.admin import ValidationRunAdmin
@@ -16,9 +14,8 @@ from validator.models import Settings
 from validator.models import ValidationRun
 from validator.models import Statistics
 from validator.models import Email
-from validator.models import UptimePing
 from validator.models import UptimeReport
-from validator.models import UptimeAgent
+User = get_user_model()
 
 admin.site.register(Settings, SystemSettingsAdmin)
 admin.site.register(User, CustomUserAdmin)

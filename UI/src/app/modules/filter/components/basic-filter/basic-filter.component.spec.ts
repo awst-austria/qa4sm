@@ -32,6 +32,7 @@ describe('BasicFilterComponent', () => {
         readonly: true,
       },
       enabled: true,
+      readonly: false,
       parameters$: null
     };
     fixture.detectChanges();
