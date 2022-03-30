@@ -35,7 +35,6 @@ def data_parameterised_filter(request):
     DataFilter.objects.filter(parameterised = True).
     """
     param_filters = ParametrisedFilter.objects.all()
-    print(param_filters)
     serializer = ParameterisedFilterSerializer(param_filters, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
