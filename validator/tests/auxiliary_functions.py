@@ -63,7 +63,7 @@ def generate_default_validation_smos():
     data_c = DatasetConfiguration()
     data_c.validation = run
     data_c.dataset = Dataset.objects.get(short_name='SMOS_L3')
-    data_c.version = DatasetVersion.objects.get(short_name='Level3_DESC')
+    data_c.version = DatasetVersion.objects.get(short_name='SMOSL3_v339_DESC')
     data_c.variable = DataVariable.objects.get(short_name='SMOSL3_sm')
     data_c.save()
 
