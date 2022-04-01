@@ -5,11 +5,13 @@ WEB_VAL_GIT_DIR="/tmp/qa4sm-git"
 APP_DIR="/var/lib/qa4sm-web-val/valentina"
 LOG_DIR="/var/log/valentina"
 LOG_FILE="$LOG_DIR/valentina.log"
+AUTO_CLEANUP_PATH="/autocleanup"
 mkdir -p "$APP_DIR"
 mkdir $LOG_DIR
 touch $LOG_FILE
 chown root:www-data -R $LOG_DIR
 chmod ug+rwx -R $LOG_DIR
+chmod 755 -R $AUTO_CLEANUP_PATH
 
 rsync -r "$WEB_VAL_GIT_DIR/" "$APP_DIR/" --exclude="tests" --exclude="db.sqlite3"
 ls "$WEB_VAL_GIT_DIR/docker/"
