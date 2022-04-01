@@ -3,29 +3,28 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 
-
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
-METRICS = {'R' : 'Pearson\'s r',
-           'p_R' : 'Pearson\'s r p-value',
-           'rho' : 'Spearman\'s rho',
-           'p_rho' : 'Spearman\'s rho p-value',
-           'RMSD' : 'Root-mean-square deviation',
-           'BIAS' : 'Bias (difference of means)',
-           'n_obs' : '# observations',
-           'urmsd' : 'Unbiased root-mean-square deviation',
-           'RSS' : 'Residual sum of squares',
-           'mse' : 'Mean square error',
-           'mse_corr' : 'Mean square error correlation',
-           'mse_bias' : 'Mean square error bias',
-           'mse_var' : 'Mean square error variance',}
+METRICS = {'R': 'Pearson\'s r',
+           'p_R': 'Pearson\'s r p-value',
+           'rho': 'Spearman\'s rho',
+           'p_rho': 'Spearman\'s rho p-value',
+           'RMSD': 'Root-mean-square deviation',
+           'BIAS': 'Bias (difference of means)',
+           'n_obs': '# observations',
+           'urmsd': 'Unbiased root-mean-square deviation',
+           'RSS': 'Residual sum of squares',
+           'mse': 'Mean square error',
+           'mse_corr': 'Mean square error correlation',
+           'mse_bias': 'Mean square error bias',
+           'mse_var': 'Mean square error variance', }
 
 METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_",
                    "{metric}"]
 
 TC_METRICS = {'snr': 'TC: Signal-to-noise ratio',
               'err_std': 'TC: Error standard deviation',
-              'beta': 'TC: Scaling coefficient',}
+              'beta': 'TC: Scaling coefficient', }
 
 TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
                       "_{metric}",
@@ -76,8 +75,8 @@ ESA_CCI_SM_P_V06_1 = 'ESA_CCI_SM_P_V06_1'
 ESA_CCI_SM_C_V06_1 = 'ESA_CCI_SM_C_V06_1'
 CGLS_CSAR_SSM1km_V1_1 = 'CGLS_CSAR_SSM1km_V1_1'
 CGLS_SCATSAR_SWI1km_V1_0 = 'CGLS_SCATSAR_SWI1km_V1_0'
-SMOSL3_Level3_DESC = 'Level3_DESC'
-SMOSL3_Level3_ASC = 'Level3_ASC'
+SMOSL3_Level3_DESC = 'SMOSL3_v339_DESC'
+SMOSL3_Level3_ASC = 'SMOSL3_v339_ASC'
 
 # dataset data variables
 C3S_sm = 'C3S_sm'
@@ -96,48 +95,47 @@ ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 SMOSL3_sm = 'SMOSL3_sm'
 
-
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
-
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
 VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
              'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to']
 DS_FIELDS = ['dataset', 'version']
 
-IRREGULAR_GRIDS = {'SMAP_L3' : 0.35,
-                   'SMOS_IC' : 0.25,
-                   'ASCAT' : 0.1}
+IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
+                   'SMOS_L3': 0.25,
+                   'SMOS_IC': 0.25,
+                   'ASCAT': 0.1}
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
 
 METADATA_TEMPLATE = {'other_ref': None,
-                     'ismn_ref':{'clay_fraction': np.float32([np.nan]),
-                                 'climate_KG': np.array([' ' * 256]),
-                                 'climate_insitu': np.array([' ' * 256]),
-                                 'elevation': np.float32([np.nan]),
-                                 'instrument': np.array([' ' * 256]),
-                                 'latitude': np.float32([np.nan]),
-                                 'lc_2000': np.float32([np.nan]),
-                                 'lc_2005': np.float32([np.nan]),
-                                 'lc_2010': np.float32([np.nan]),
-                                 'lc_insitu': np.array([' ' * 256]),
-                                 'longitude': np.float32([np.nan]),
-                                 'network': np.array([' ' * 256]),
-                                 'organic_carbon': np.float32([np.nan]),
-                                 'sand_fraction': np.float32([np.nan]),
-                                 'saturation': np.float32([np.nan]),
-                                 'silt_fraction': np.float32([np.nan]),
-                                 'station': np.array([' ' * 256]),
-                                 'timerange_from': np.array([' ' * 256]),
-                                 'timerange_to': np.array([' ' * 256]),
-                                 'variable': np.array([' ' * 256]),
-                                 'instrument_depthfrom': np.float32([np.nan]),
-                                 'instrument_depthto': np.float32([np.nan])
-                                 }
+                     'ismn_ref': {'clay_fraction': np.float32([np.nan]),
+                                  'climate_KG': np.array([' ' * 256]),
+                                  'climate_insitu': np.array([' ' * 256]),
+                                  'elevation': np.float32([np.nan]),
+                                  'instrument': np.array([' ' * 256]),
+                                  'latitude': np.float32([np.nan]),
+                                  'lc_2000': np.float32([np.nan]),
+                                  'lc_2005': np.float32([np.nan]),
+                                  'lc_2010': np.float32([np.nan]),
+                                  'lc_insitu': np.array([' ' * 256]),
+                                  'longitude': np.float32([np.nan]),
+                                  'network': np.array([' ' * 256]),
+                                  'organic_carbon': np.float32([np.nan]),
+                                  'sand_fraction': np.float32([np.nan]),
+                                  'saturation': np.float32([np.nan]),
+                                  'silt_fraction': np.float32([np.nan]),
+                                  'station': np.array([' ' * 256]),
+                                  'timerange_from': np.array([' ' * 256]),
+                                  'timerange_to': np.array([' ' * 256]),
+                                  'variable': np.array([' ' * 256]),
+                                  'instrument_depthfrom': np.float32([np.nan]),
+                                  'instrument_depthto': np.float32([np.nan])
+                                  }
                      }
 
 INSTRUMENT_META = "instrument"

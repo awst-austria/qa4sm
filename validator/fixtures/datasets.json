@@ -394,7 +394,7 @@
         "pk": 14,
         "fields": {
             "short_name": "SMOS_L3",
-            "pretty_name": "SMOS",
+            "pretty_name": "SMOS Level 3",
             "help_text": "Soil Moisture and Ocean Salinity (SMOS) Mission",
             "storage_path": "testdata/input_data/SMOS_L3",
             "detailed_description": "Daily global maps of soil moisture retrieved from the ESA L1B product with a multi-orbit approach.",
