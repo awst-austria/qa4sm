@@ -53,7 +53,7 @@ def send_val_expiry_notification(val_runs):
         val_names = []
         val_dates = []
         for val_run in val_runs:
-            urls.append(settings.SITE_URL + '/login/?next=' + get_angular_url('result', val_run.id))
+            urls.append(settings.SITE_URL + get_angular_url('result', val_run.id))
             val_names.append("{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id))
             val_dates.append(val_run.expiry_date.strftime("%Y-%m-%d %H:%M"))
 
