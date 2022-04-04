@@ -5,7 +5,7 @@ RUN update-rc.d apache2 disable
 
 ADD ./ /tmp/qa4sm-git
 COPY ./docker/webapp/entrypoint.sh /usr/bin/entrypoint.sh
-COPY ./docker/webapp/run_autocleanup.sh /autocleanup/run_autocleanup.sh
+COPY ./docker/webapp/run_autocleanup.sh /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
 RUN bash /tmp/qa4sm-git/docker/webapp/install.sh
 COPY ./docker/webapp/entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/entrypoint.sh /entrypoint.sh # backwards compat
