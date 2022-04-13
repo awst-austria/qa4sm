@@ -16,13 +16,12 @@ class Email(models.Model):
     sent = models.BooleanField(default=False)
 
     def send_email(self):
-
         message_template = get_template('admin/email.html')
         html_message_content = message_template.render({'message': self.content})
 
         recipients = [user.email for user in self.send_to.all() if user.email != '']
         if len(recipients) != 0:
-            _send_email(recipients, self.subject, html_message_content)
+            _send_email(recipients, self.subject, html_message_content, as_html_message=True)
         else:
             body = f'The email entitled {self.subject} can not be sent, as there were no recipients chosen.'
             _send_email([settings.EMAIL_FROM], 'Empty Addressees List', body)
