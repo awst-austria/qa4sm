@@ -114,6 +114,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
                 this.messageAboutConfigurationChanges(valrun.changes));
             }
+          },
+          (response) => {
+            if (response.message){
+              this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
+            }
+            of({}).pipe(delay(0)).subscribe(() => {
+              this.setDefaultGeographicalRange();
+            });
+            this.addDatasetToValidate();
+            this.addReferenceDataset();
           }
         );
       } else {
@@ -522,8 +532,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       latMaxLimit >= latMaxCurrent && latMinLimit <= latMinCurrent;
 
     // push the condition and the new value if conditions are met
-
-    console.log('Max Lons', maxLons.length !== 0, lonMaxCurrent !== lonMaxLimit);
     if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);

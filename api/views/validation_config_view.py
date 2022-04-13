@@ -13,13 +13,14 @@ from rest_framework.serializers import ModelSerializer
 from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset, \
-    DatasetVersion
+    DatasetVersion, DataVariable
 from validator.validation import run_validation
 from validator.validation.validation import compare_validation_runs
 
 
 def _check_if_settings_exist():
     pass
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -57,7 +58,8 @@ def get_validation_configuration(request, **kwargs):
     changes_in_settings = {
         'filters': [],
         'anomalies': False,
-        'scaling': False
+        'scaling': False,
+        'variables': []
     }
 
     validation_run_id = kwargs['id']
@@ -68,16 +70,19 @@ def get_validation_configuration(request, **kwargs):
         #  first check if there are still all the datasets available:
         datasets_in_validation = validation_configs.values_list('dataset', flat=True)
         ds_versions_in_validation = validation_configs.values_list('version', flat=True)
+        ds_variables_in_validation = validation_configs.values_list('variable', flat=True)
 
         available_datasets = Dataset.objects.all().values_list('id', flat=True)
         available_versions = DatasetVersion.objects.all().values_list('id', flat=True)
+        available_variables = DataVariable.objects.all().values_list('id', flat=True)
 
         all_datasets_available = all([dataset in available_datasets for dataset in datasets_in_validation])
         all_versions_available = all([version in available_versions for version in ds_versions_in_validation])
+        all_variables_available = all([variable in available_variables for variable in ds_variables_in_validation])
 
-        if not (all_datasets_available and all_versions_available):
+        if not (all_datasets_available and all_versions_available and all_variables_available):
             return JsonResponse({'message': 'Could not restore validation run, because some of '
-                                            'the chosen datasets or their versions are not available anymore'},
+                                            'the chosen datasets, their versions or variables are not available anymore'},
                                 status=status.HTTP_404_NOT_FOUND, safe=False)
 
         val_run_dict = {'name_tag': val_run.name_tag}
@@ -139,6 +144,13 @@ def get_validation_configuration(request, **kwargs):
         for ds in validation_configs:
 
             dataset_id = ds.dataset.id
+
+            if ds.variable_id not in Dataset.objects.get(pk=dataset_id).variables.all():
+                return JsonResponse({'message': 'Could not restore validation run, because some of '
+                                                'the chosen datasets, their versions or variables '
+                                                'are not available anymore'},
+                                    status=status.HTTP_404_NOT_FOUND, safe=False)
+
             ds_dict = {'dataset_id': dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
             filters_list = []
             non_existing_filters_list = []
@@ -164,7 +176,8 @@ def get_validation_configuration(request, **kwargs):
                     non_existing_filters_list.append(filter_desc)
 
             if len(non_existing_filters_list) != 0:
-                changes_in_settings['filters'].append({'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
+                changes_in_settings['filters'].append(
+                    {'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
 
             if val_run.reference_configuration_id == ds.id:
                 val_run_dict['reference_config'] = {
