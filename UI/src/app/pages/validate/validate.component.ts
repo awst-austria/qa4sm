@@ -114,6 +114,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
                 this.messageAboutConfigurationChanges(valrun.changes));
             }
+          },
+          (response) => {
+            if (response.message){
+              this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
+            }
+            of({}).pipe(delay(0)).subscribe(() => {
+              this.setDefaultGeographicalRange();
+            });
+            this.addDatasetToValidate();
+            this.addReferenceDataset();
           }
         );
       } else {
