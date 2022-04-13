@@ -532,8 +532,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       latMaxLimit >= latMaxCurrent && latMinLimit <= latMinCurrent;
 
     // push the condition and the new value if conditions are met
-
-    console.log('Max Lons', maxLons.length !== 0, lonMaxCurrent !== lonMaxLimit);
     if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
