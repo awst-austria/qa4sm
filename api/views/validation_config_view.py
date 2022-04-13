@@ -144,8 +144,7 @@ def get_validation_configuration(request, **kwargs):
         for ds in validation_configs:
 
             dataset_id = ds.dataset.id
-
-            if ds.variable_id not in Dataset.objects.get(pk=dataset_id).variables.all():
+            if DataVariable.objects.get(pk=ds.variable_id) not in Dataset.objects.get(pk=dataset_id).variables.all():
                 return JsonResponse({'message': 'Could not restore validation run, because some of '
                                                 'the chosen datasets, their versions or variables '
                                                 'are not available anymore'},
