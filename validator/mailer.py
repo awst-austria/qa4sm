@@ -162,6 +162,7 @@ def _send_email(recipients, subject, body):
     try:
         send_mail(subject=subject,
                   message=body,
+                  html_message=body,
                   from_email=settings.EMAIL_FROM,
                   recipient_list=recipients,
                   fail_silently=False,)
