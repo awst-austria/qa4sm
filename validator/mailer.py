@@ -158,10 +158,11 @@ def send_user_link_to_reset_password(user, message):
                 body=message)
 
 
-def _send_email(recipients, subject, body):
+def _send_email(recipients, subject, body, as_html_message=False):
     try:
         send_mail(subject=subject,
                   message=body,
+                  html_message=body if as_html_message else None,
                   from_email=settings.EMAIL_FROM,
                   recipient_list=recipients,
                   fail_silently=False,)

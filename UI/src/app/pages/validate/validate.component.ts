@@ -121,6 +121,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
                 this.messageAboutConfigurationChanges(valrun.changes));
             }
+          },
+          (response) => {
+            if (response.message){
+              this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
+            }
+            of({}).pipe(delay(0)).subscribe(() => {
+              this.setDefaultGeographicalRange();
+            });
+            this.addDatasetToValidate();
+            this.addReferenceDataset();
           }
         );
       } else {
@@ -550,41 +560,39 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const latMaxCurrent = this.validationModel.spatialSubsetModel.maxLat$.value;
     const latMinCurrent = this.validationModel.spatialSubsetModel.minLat$.value;
     // new limits
-    const lonMaxLimit = Math.max(...maxLons);
+    const lonMaxLimit = Math.min(...maxLons);
     const lonMinLimit = Math.max(...minLons);
-    const latMaxLimit = Math.max(...maxLats);
+    const latMaxLimit = Math.min(...maxLats);
     const latMinLimit = Math.max(...minLats);
 
     // conditions to verify
     const isGeographicallyLimited = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0;
-    const hasTheSameRange = lonMaxLimit === lonMaxCurrent && lonMinLimit === lonMinCurrent &&
-      latMaxLimit === latMaxCurrent && latMinLimit === latMinCurrent;
+    const hasTheSameOrSmallerRange = lonMaxLimit >= lonMaxCurrent && lonMinLimit <= lonMinCurrent &&
+      latMaxLimit >= latMaxCurrent && latMinLimit <= latMinCurrent;
 
     // push the condition and the new value if conditions are met
-    this.validationModel.spatialSubsetModel.limited$.next(isGeographicallyLimited);
-
-    if (maxLons.length !== 0 && lonMaxCurrent !== lonMaxLimit) {
+    if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     }
 
-    if (minLons.length !== 0 && lonMinCurrent !== lonMinLimit) {
+    if (minLons.length !== 0 && lonMinLimit > lonMinCurrent) {
       this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     }
 
-    if (maxLats.length !== 0 && latMaxCurrent !== latMaxLimit) {
+    if (maxLats.length !== 0 && latMaxLimit < latMaxCurrent) {
       this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     }
 
-    if (minLats.length !== 0 && latMinCurrent !== latMinLimit) {
+    if (minLats.length !== 0 && latMinLimit > latMinCurrent) {
       this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
     }
 
     // inform a user about the automatic change
-    if (isGeographicallyLimited && !hasTheSameRange) {
+    if (isGeographicallyLimited && !hasTheSameOrSmallerRange) {
       this.toastService.showAlert('The chosen spatial subsetting is bigger than the one covered by chosen datasets. ' +
         'Bounds corrected to fit available subsetting');
     }

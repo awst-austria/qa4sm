@@ -1,3 +1,14 @@
+QA4SM v2.0.2 - Release notes 2022-03-30
+=======================================================
+
+# Updates
+1. Dataset names updated,
+2. Dataset filter lists updated
+
+# Improvements
+1. Admin panel improved to monitor service downtime
+
+
 QA4SM v2.0.1 - Release notes 2022-03-14
 =======================================================
 
