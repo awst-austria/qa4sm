@@ -3,7 +3,7 @@ import warnings
 import matplotlib.pyplot as plt
 import pandas as pd
 
-plt.switch_backend('agg') ## this allows headless graph production
+plt.switch_backend('agg')  ## this allows headless graph production
 
 import logging
 from os import path, remove
@@ -14,14 +14,15 @@ from qa4sm_reader.plot_all import plot_all, get_img_stats
 from django.conf import settings
 
 from cartopy import config as cconfig
+
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-from validator.validation.globals import OUTPUT_FOLDER, METRICS, TC_METRICS, METRIC_TEMPLATE, TC_METRIC_TEMPLATE
+from validator.validation.globals import *
 import os
 from parse import *
 
-
 __logger = logging.getLogger(__name__)
+
 
 def generate_all_graphs(validation_run, outfolder):
     """
@@ -41,12 +42,10 @@ def generate_all_graphs(validation_run, outfolder):
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-
     fnb, fnm, fcsv = plot_all(validation_run.output_file.path,
-        out_dir=outfolder, out_type='png')
+                              out_dir=outfolder, out_type='png')
     fnb_svg, fnm_svg, fcsv = plot_all(validation_run.output_file.path,
-        out_dir=outfolder, out_type='svg')
-
+                                      out_dir=outfolder, out_type='svg')
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
         for pngfile in fnb + fnm:
@@ -56,6 +55,7 @@ def generate_all_graphs(validation_run, outfolder):
             arcname = path.basename(svgfile)
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
+
 
 def get_dataset_combis_and_metrics_from_files(validation_run):
     """
@@ -84,10 +84,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     pairs, triples = {}, {}
     ref0_config = None
 
-    ds_names = [ds_config.dataset.short_name for ds_config in validation_run.dataset_configurations.all()]
-
     metrics = {}
-
 
     for root, dirs, files in os.walk(run_dir):
         for f in files:
@@ -102,26 +99,24 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
 
                 template = ''.join([METRIC_TEMPLATE[0],
                                     METRIC_TEMPLATE[1].format(metric=pair_metric)]) + '.png'
+                parsed = parse(template, f)
 
-                parsed = parse(template,f)
                 if parsed is None:
                     continue
                 else:
+                    ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+                    ds = f"{parsed['id_sat']}-{parsed['ds_sat']}"
 
-                    if (parsed['ds_ref'] in ds_names) and (parsed['ds_sat'] in ds_names):
-                        ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
-                        ds = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+                    if ref0_config is None and (int(parsed['id_ref']) == 0):
+                        ref0_config = True
 
-                        if ref0_config is None and (int(parsed['id_ref']) == 0):
-                            ref0_config = True
+                    if pair_metric not in metrics.keys():
+                        metrics[pair_metric] = METRICS[pair_metric]
 
-                        if pair_metric not in metrics.keys():
-                            metrics[pair_metric] = METRICS[pair_metric]
-
-                        pair = '{}_and_{}'.format(ref, ds)
-                        pretty_pair = '{} and {}'.format(ref, ds)
-                        if pair not in pairs.keys():
-                            pairs[pair] = pretty_pair # pretty name
+                    pair = '{}_and_{}'.format(ref, ds)
+                    pretty_pair = '{} and {}'.format(ref, ds)
+                    if pair not in pairs.keys():
+                        pairs[pair] = pretty_pair  # pretty name
 
             for tcol_metric in TC_METRICS.keys():
 
@@ -133,22 +128,21 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                 if parsed is None:
                     continue
                 else:
-                    if all([parsed[d] in ds_names for d in ['ds_ref', 'ds_sat', 'ds_sat2', 'ds_met']]):
-                        ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
-                        ds = f"{parsed['id_sat']}-{parsed['ds_sat']}"
-                        ds2 = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
-                        ds_met = f"{parsed['id_met']}-{parsed['ds_met']}"
+                    ref = f"{parsed['id_ref']}-{parsed['ds_ref']}"
+                    ds = f"{parsed['id_sat']}-{parsed['ds_sat']}"
+                    ds2 = f"{parsed['id_sat2']}-{parsed['ds_sat2']}"
+                    ds_met = f"{parsed['id_met']}-{parsed['ds_met']}"
 
-                        metric = f"{tcol_metric}_for_{ds_met}"
+                    metric = f"{tcol_metric}_for_{ds_met}"
 
-                        if metric not in metrics.keys():
-                            metrics[metric] = f"{TC_METRICS[tcol_metric]} for {ds_met}"
+                    if metric not in metrics.keys():
+                        metrics[metric] = f"{TC_METRICS[tcol_metric]} for {ds_met}"
 
-                        triple = '{}_and_{}_and_{}'.format(ref, ds, ds2)
-                        pretty_triple = '{} and {} and {}'.format(ref, ds, ds2)
+                    triple = '{}_and_{}_and_{}'.format(ref, ds, ds2)
+                    pretty_triple = '{} and {} and {}'.format(ref, ds, ds2)
 
-                        if triple not in triples.keys():
-                            triples[triple] = pretty_triple
+                    if triple not in triples.keys():
+                        triples[triple] = pretty_triple
 
     # import logging
     # __logger = logging.getLogger(__name__)
@@ -157,6 +151,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     # __logger.debug(f"Metrics: {metrics}")
 
     return pairs, triples, metrics, ref0_config
+
 
 def get_inspection_table(validation_run):
     """
@@ -182,7 +177,8 @@ def get_inspection_table(validation_run):
         stats_file = None
         for root, dirs, files in os.walk(run_dir):
             for f in files:
-                if not f.endswith('.csv'): continue
+                if not f.endswith('.csv'):
+                    continue
                 else:
                     stats_file = os.path.join(run_dir, f)
                     break
@@ -191,7 +187,7 @@ def get_inspection_table(validation_run):
         if stats_file is not None:
             stats = pd.read_csv(stats_file, index_col="Metric", dtype=str)
         # Check that file size is less than 100 MB
-        elif file_size > 100*2**20:
+        elif file_size > 100 * 2 ** 20:
             warnings.warn(
                 f"File size of {file_size} bytes is too large to be read"
             )
