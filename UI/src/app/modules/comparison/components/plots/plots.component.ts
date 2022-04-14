@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ComparisonService} from '../../services/comparison.service';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
@@ -21,6 +21,7 @@ const PLOT_TYPES = ['boxplot', 'mapplot'];
 })
 
 export class PlotsComponent implements OnInit {
+  @Output() isError = new EventEmitter<boolean>();
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(
     [],
     new ExtentModel(true).getIntersection,
@@ -31,6 +32,7 @@ export class PlotsComponent implements OnInit {
   selectedMetric: MetricsComparisonDto;
   metricsErrorMessage: string;
   showLoadingSpinner = true;
+  errorHappened = false;
   plots: PlotDto[];
 
   constructor(private comparisonService: ComparisonService,
@@ -110,7 +112,13 @@ export class PlotsComponent implements OnInit {
         this.plots = data;
         this.showLoadingSpinner = false;
       }
-    });
+    },
+      () => {
+        this.showLoadingSpinner = false;
+        this.errorHappened = true;
+        this.isError.emit(true);
+      }
+    );
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {

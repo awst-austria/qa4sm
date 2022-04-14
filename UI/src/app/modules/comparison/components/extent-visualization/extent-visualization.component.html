@@ -2,7 +2,7 @@
   <qa-loading-spinner></qa-loading-spinner>
 </div>
 
-<div *ngIf="!showLoadingSpinner" class="p-grid no-gutters">
+<div *ngIf="!showLoadingSpinner && ! errorHappened" class="p-grid no-gutters">
   <div *ngIf="img == 'Raise message to check box', else noError" class="p-col-12">
     <p-panel>
       <ng-template pTemplate="header">

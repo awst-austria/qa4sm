@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ComparisonService} from '../../services/comparison.service';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
@@ -10,10 +10,12 @@ import {debounceTime} from 'rxjs/operators';
   styleUrls: ['./table-comparison.component.scss']
 })
 export class TableComparisonComponent implements OnInit {
+  @Output() isError = new EventEmitter<boolean>();
 
   comparisonParameters: HttpParams;
   table: string;
   showLoadingSpinner = true;
+  errorHappened = false;
 
   constructor(private comparisonService: ComparisonService) {
   }
@@ -58,7 +60,12 @@ export class TableComparisonComponent implements OnInit {
         this.table = data;
         this.showLoadingSpinner = false;
       }
-    });
+    },
+      () => {
+        this.showLoadingSpinner = false;
+        this.errorHappened = true;
+        this.isError.emit(true);
+      });
   }
 
   getComparisonTableAsCsv(): void {
