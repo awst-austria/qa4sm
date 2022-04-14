@@ -30,22 +30,7 @@
           <qa-table-comparison (isError)="handleError($event)"></qa-table-comparison>
           <!--  plots section  -->
           <qa-plots (isError)="handleError($event)"></qa-plots>
-
-          <div *ngIf="isError">
-            Some of the comparison results are not available, because the chosen validations are too large to be processed on the fly.
-          </div>
-
         </div>
-
-<!--        <div *ngIf="showComparisonResults && isError" class="comparison-result-container">-->
-<!--          <div  class="p-text-center">-->
-<!--            <h3 class="p-my-3">Validation comparison results</h3>-->
-<!--          </div>-->
-<!--          <qa-comparison-summary></qa-comparison-summary>-->
-<!--          <div>-->
-<!--            -->
-<!--          </div>-->
-<!--        </div>-->
 
       </div>
     </div>

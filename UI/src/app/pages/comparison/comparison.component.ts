@@ -40,7 +40,8 @@ export class ComparisonComponent implements OnInit {
       this.isError = event;
       this.toastService.showErrorWithHeader(
         'Comparison results not available',
-        'Some of the comparison results are not available, because the chosen validations are too large to be processed on the fly.');
+        'Some of the comparison results are not available, because the chosen validations are too large to be processed on the fly.',
+        7000);
     }
   }
 }

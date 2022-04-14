@@ -1,6 +1,9 @@
 <div  *ngIf="showLoadingSpinner" class="text-center">
   <qa-loading-spinner></qa-loading-spinner>
 </div>
+<div *ngIf="!showLoadingSpinner && errorHappened" class="center alert">
+ <h4> Extent plot not available! </h4>
+</div>
 
 <div *ngIf="!showLoadingSpinner && ! errorHappened" class="p-grid no-gutters">
   <div *ngIf="img == 'Raise message to check box', else noError" class="p-col-12">
