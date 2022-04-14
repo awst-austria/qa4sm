@@ -1,3 +1,14 @@
+QA4SM v2.0.3 - Release notes 2022-04-14
+=======================================================
+
+# Bug Fixing
+1. Setting automatic bounding box fixed,
+2. Showing plots for dataset with updated names fixed,
+
+# Improvements
+1. Reloading settings improved to handle missing variables,
+2. Admin panel updated
+
 QA4SM v2.0.2 - Release notes 2022-03-30
 =======================================================
 
