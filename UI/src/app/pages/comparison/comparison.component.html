@@ -25,12 +25,13 @@
           </div>
           <qa-comparison-summary></qa-comparison-summary>
           <!--        visualize the validation extent-->
-          <qa-extent-visualization></qa-extent-visualization>
+          <qa-extent-visualization (isError)="handleError($event)"></qa-extent-visualization>
           <!--  table section  -->
-          <qa-table-comparison></qa-table-comparison>
+          <qa-table-comparison (isError)="handleError($event)"></qa-table-comparison>
           <!--  plots section  -->
-          <qa-plots></qa-plots>
+          <qa-plots (isError)="handleError($event)"></qa-plots>
         </div>
+
       </div>
     </div>
   </div>

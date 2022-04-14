@@ -1,7 +1,10 @@
 <div *ngIf="showLoadingSpinner" class="text-center">
   <qa-loading-spinner></qa-loading-spinner>
 </div>
-<div *ngIf="!showLoadingSpinner" class="p-grid no-gutters">
+<div *ngIf="!showLoadingSpinner && errorHappened" class="center alert">
+  <h4> Comparison statistics not available! </h4>
+</div>
+<div *ngIf="!showLoadingSpinner && !errorHappened" class="p-grid no-gutters">
 <!--<div *ngIf="(comparisonTable$|async) as table" class="p-grid no-gutters">-->
   <div class="p-col-12">
     <p-panel [toggleable]="true" [collapsed]="true">

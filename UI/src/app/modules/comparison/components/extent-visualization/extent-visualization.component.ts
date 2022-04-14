@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {HttpParams} from '@angular/common/http';
 import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
@@ -22,8 +22,10 @@ export class ExtentVisualizationComponent implements OnInit {
     false
   );
 
+  @Output() isError = new EventEmitter<boolean>();
   intersectionText: boolean;
   showLoadingSpinner = true;
+  errorHappened = false;
   img: string;
 
   constructor(private validationRunService: ValidationrunService,
@@ -64,7 +66,13 @@ export class ExtentVisualizationComponent implements OnInit {
         this.img = data;
         this.showLoadingSpinner = false;
       }
-    });
+    },
+      () => {
+        this.showLoadingSpinner = false;
+        this.errorHappened = true;
+        this.isError.emit(true);
+      }
+    );
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
