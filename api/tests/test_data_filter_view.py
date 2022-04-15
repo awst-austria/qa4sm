@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.test import TestCase
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
+from validator.models import DataFilter, Dataset
 
 
 class TestDataFilterView(TestCase):
@@ -64,3 +65,20 @@ class TestDataFilterView(TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 2
 
+    def test_sorting_with_included_filters(self):
+        data_filter_url = reverse('Dataset filters')
+        # check filters for C3S (id = 1)
+        dataset_id = 1  #
+        # overwrite the last filter so it has others as 'to_include'
+        dataset_filter_to_update = Dataset.objects.get(pk=dataset_id).filters.all().order_by('id').last()
+        filters_to_include_list = list(Dataset.objects.get(pk=dataset_id).filters.all().values_list('id', flat=True))[0:-1]
+        filters_to_include_string = ','.join([str(filter_id) for filter_id in filters_to_include_list])
+        dataset_filter_to_update.to_include = filters_to_include_string
+        dataset_filter_to_update.save()
+
+        response = self.client.get(f'{data_filter_url}/{dataset_id}')
+        assert response.status_code == 200
+        assert len(response.json()) == 3
+
+        # check if the last one become the first one after sorting:
+        assert response.json()[0]['id'] == dataset_filter_to_update.id
