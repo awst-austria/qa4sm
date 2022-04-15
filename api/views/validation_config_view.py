@@ -21,6 +21,7 @@ from validator.validation.validation import compare_validation_runs
 def _check_if_settings_exist():
     pass
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def start_validation(request):
