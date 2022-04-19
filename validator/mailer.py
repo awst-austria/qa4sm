@@ -173,13 +173,3 @@ def _send_email(recipients, subject, body, html_message=None):
                 __logger.info(f'E-mail to the user {recipient} could not be sent.')
     except Exception:
         __logger.exception('E-mail could not be sent.')
-    # try:
-    #     for recipient in recipients:
-    #         send_mail(subject=subject,
-    #                   message=body,
-    #                   html_message=html_message,
-    #                   from_email=settings.EMAIL_FROM,
-    #                   recipient_list=[recipient],
-    #                   fail_silently=False,)
-    # except Exception:
-    #     __logger.exception('E-mail could not be sent.')
