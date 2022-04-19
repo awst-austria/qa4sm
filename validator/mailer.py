@@ -1,6 +1,7 @@
 import logging
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, send_mass_mail, EmailMultiAlternatives
+from django.core import mail
 from django.urls.base import reverse
 from django.conf import settings
 from api.frontend_urls import get_angular_url
@@ -158,16 +159,16 @@ def send_user_link_to_reset_password(user, message):
                 body=message)
 
 
-def _send_email(recipients, subject, body, as_html_message=False):
+def _send_email(recipients, subject, body, html_message=None):
     try:
-        # send_mass_email doesn't have an option for sending html :( but we don't send many emails to multiple users,
-        # so I can leave it this way for now
+        connection = mail.get_connection()
+        connection.open()
+        messages = list()
         for recipient in recipients:
-            send_mail(subject=subject,
-                      message=body,
-                      html_message=body if as_html_message else None,
-                      from_email=settings.EMAIL_FROM,
-                      recipient_list=[recipient],
-                      fail_silently=False,)
+            msg = EmailMultiAlternatives(subject, body, settings.EMAIL_FROM, [recipient])
+            msg.attach_alternative(html_message, "text/html")
+            messages.append(msg)
+        connection.send_messages(messages)
+        connection.close()
     except Exception:
         __logger.exception('E-mail could not be sent.')
