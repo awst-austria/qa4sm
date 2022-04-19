@@ -166,7 +166,8 @@ def _send_email(recipients, subject, body, html_message=None):
         messages = list()
         for recipient in recipients:
             msg = EmailMultiAlternatives(subject, body, settings.EMAIL_FROM, [recipient])
-            msg.attach_alternative(html_message, "text/html")
+            if html_message:
+                msg.attach_alternative(html_message, "text/html")
             messages.append(msg)
         connection.send_messages(messages)
         connection.close()
