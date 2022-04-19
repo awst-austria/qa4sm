@@ -160,11 +160,14 @@ def send_user_link_to_reset_password(user, message):
 
 def _send_email(recipients, subject, body, as_html_message=False):
     try:
-        send_mail(subject=subject,
-                  message=body,
-                  html_message=body if as_html_message else None,
-                  from_email=settings.EMAIL_FROM,
-                  recipient_list=recipients,
-                  fail_silently=False,)
+        # send_mass_email doesn't have an option for sending html :( but we don't send many emails to multiple users,
+        # so I can leave it this way for now
+        for recipient in recipients:
+            send_mail(subject=subject,
+                      message=body,
+                      html_message=body if as_html_message else None,
+                      from_email=settings.EMAIL_FROM,
+                      recipient_list=[recipient],
+                      fail_silently=False,)
     except Exception:
         __logger.exception('E-mail could not be sent.')
