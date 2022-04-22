@@ -10,11 +10,35 @@
     <center><h1><b>QA4SM statistics</b></h1></center>
 </section>
 <section>
-    <h1> Currently we have <b>{{ stats.number_of_users }}</b> users </h1>
+    <h1> Currently we have <b>{{ stats.number_of_users }}</b> users, including <b>{{ stats.number_of_staff }}</b> staff
+        members </h1>
+    <h1>Our users come all together from <b>{{ stats.number_of_countries}}</b> countries
+        (<a id="toggle-countries" onclick="toggleCountryTable()"><span id="show-countries">show countries</span><span
+                id="hide-countries" class="hidden">hide countries</span></a>)
+    </h1>
+    <table class="country-table hidden">
+        <tr>
+            <td><b>Country name</b></td>
+            <td><b>Number of users</b></td>
+        </tr>
+        {% for country_name, users_number in stats.number_of_users_in_country_dict.items %}
+        <tr>
+            <td> {{ country_name }}</td>
+            <td> {{users_number}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
     <h1> Up to now <b>{{ stats.number_of_validations }}</b> {% if stats.number_of_validations == 1 %} validation has {%
-        else %} validations have {% endif%} been run</h1>
-    <h1> The user who runs validations most frequently is <b>{{stats.most_frequent_user.name}}</b> and he/she has run
+        else %} validations have {% endif %} been run</h1>
+    <h1> The user who runs validations most frequently is <b>{{ stats.most_frequent_user.name }}</b> and he/she has run
         <b>{{stats.most_frequent_user.validation_num}}</b> by now</h1>
+</section>
+<section>
+    {{stats.monthly_reports|slice:"0:1"}}
+    <!--    {%for object in stats.monthly_reports%}-->
+    <!--    {{ object }} <br>-->
+    <!--    {% endfor %}-->
 </section>
 <section>
     <h1>To see statistics on a particular user please choose the user from the list:
@@ -41,148 +65,169 @@
     <a href="#" id='hide_user_info'> Hide information</a>
 </section>
 
- <!-- Plot divs -->
+<!-- Plot divs -->
 <div id="val_nums_by_users" class="plot_div"></div>
 <div id="validations_in_time" class="plot_div"></div>
 <div id="datasets_cumulative" class="plot_div"></div>
+<div id="monthly_outage" class="plot_div"></div>
+<div id="monthly_uptime" class="plot_div"></div>
+<div id="daily_outage" class="plot_div"></div>
+<div id="daily_uptime" class="plot_div"></div>
 
 <script type="text/javascript">
- // showing info on a user
-  function show_info(info){
-    $('#user_info')[0].hidden = false;
-    $('#username').text(info.username)
-    $('#validation_number').text(info.validations_num)
-    $('#last_validation').text(info.last_validation)
-    $('#last_login').text(info.last_login)
-  }
+    // showing info on a user
+    function show_info(info) {
+        $('#user_info')[0].hidden = false;
+        $('#username').text(info.username)
+        $('#validation_number').text(info.validations_num)
+        $('#last_validation').text(info.last_validation)
+        $('#last_login').text(info.last_login)
+    }
 
-  function user_datasets_plot(used_datasets, div_id){
-    var datasets = used_datasets.datasets
-    var versions = used_datasets.versions
-    var dataset_counts = used_datasets.dataset_count
+    function user_datasets_plot(used_datasets, div_id) {
+        var datasets = used_datasets.datasets
+        var versions = used_datasets.versions
+        var dataset_counts = used_datasets.dataset_count
 
-    var datasets_plot_data = datasets_stack_barplot(datasets, dataset_counts, versions)
-    var layout = dataset_barplot_layout()
-    Plotly.react(div_id, datasets_plot_data,  layout);
+        var datasets_plot_data = datasets_stack_barplot(datasets, dataset_counts, versions)
+        var layout = dataset_barplot_layout()
+        Plotly.react(div_id, datasets_plot_data, layout);
 
-  }
-  // ajax to take info on a user
-  function ajax_show_user_info(user_id) {
-      // url is fixed, as it is admin site so its name is not visible here
-      var url = '/django/admin/validator/statistics/user_id/';
-      var user_id = $('#users_list').val()
-      $.ajax({
-          url: url,
-          data: {'user_id': user_id},
-          success: function (return_data) {
-              var info = {
-                'username': return_data['user_name'],
-                'validations_num': return_data['val_num'],
-                'last_validation': return_data['last_validation'],
-                'last_login': return_data['last_login'],
-                'used_datasets': return_data['datasets_used']
-              }
-              show_info(info)
-              user_datasets_plot(info.used_datasets, 'user_datasets_plot')
-        }
-      });
-  }
+    }
+
+    // ajax to take info on a user
+    function ajax_show_user_info(user_id) {
+        // url is fixed, as it is admin site so its name is not visible here
+        var url = '/django/admin/validator/statistics/user_id/';
+        var user_id = $('#users_list').val()
+        $.ajax({
+            url: url,
+            data: {'user_id': user_id},
+            success: function (return_data) {
+                var info = {
+                    'username': return_data['user_name'],
+                    'validations_num': return_data['val_num'],
+                    'last_validation': return_data['last_validation'],
+                    'last_login': return_data['last_login'],
+                    'used_datasets': return_data['datasets_used']
+                }
+                show_info(info)
+                user_datasets_plot(info.used_datasets, 'user_datasets_plot')
+            }
+        });
+    }
 
 
-// taking statistics on a user on change and on click
-$("#users_list").change(ajax_show_user_info)
-$("#users_list").click(ajax_show_user_info)
-// hiding ifo on a user
-$('#hide_user_info').on('click', function(){
-  $('#user_info')[0].hidden = true;
-})
+    // taking statistics on a user on change and on click
+    $("#users_list").change(ajax_show_user_info)
+    $("#users_list").click(ajax_show_user_info)
+    // hiding ifo on a user
+    $('#hide_user_info').on('click', function () {
+        $('#user_info')[0].hidden = true;
+    })
 
 </script>
 
 <script>
-// Common plot parameters:
-  // ============ Font size =================
-  var title_font_size = 20;
-  var axis_font_size = 16;
-  var tick_font_size = 12;
-  // ============ Font type =================
-  var title_font_type = 'Arial, monospace';
-  var axis_font_type = 'Arial, monospace';
-  var tick_font_type = 'Arial, monospace';
-  // ============ Colors =================
-  var plot_bgcolor = 'rgb(240, 240, 240)';
-  var basic_color = 'rgb(0, 204, 204)'//'rgb(255,20,147)';
-  var versions_colors = ['rgb(0, 204, 204)', 'rgb(0, 204, 0)', 'rgb(204, 0, 0)', 'rgb(204, 0, 204)']
+    // Common plot parameters:
+    // ============ Font size =================
+    var title_font_size = 26;
+    var axis_font_size = 20;
+    var tick_font_size = 16;
+    var legend_font_size = 14;
+    // ============ Font type =================
+    var title_font_type = 'Arial, monospace';
+    var axis_font_type = 'Arial, monospace';
+    var tick_font_type = 'Arial, monospace';
+    // ============ Colors =================
+    var plot_bgcolor = 'rgb(240, 240, 240)';
+    var basic_color = 'rgb(0, 204, 204)'//'rgb(255,20,147)';
+    var basic_color_2 = 'rgb(0, 100, 0)'//'rgb(255,20,147)';
+    var versions_colors = ['rgb(0, 204, 204)', 'rgb(0, 204, 0)', 'rgb(204, 0, 0)', 'rgb(204, 0, 204)']
 
 
-// Auxiliary functions for plotting:
-function datasets_stack_barplot(x_dataset, y_dataset, names){
-  /**
- * Prepare data for stacked barplot, where stacked names are different for different bars
- * @param  {[object]} x_dataset: [list with names of x-axis values (e.g. datasets)]
- * @param  {[object]} y_dataset [list of values or other lists to be shown as bars (e.g. datasets versiosn)]
- * @param  {[object]} names [list of values or other lists containing names of values shown as stacked bars (e.g. datasets names)]
- * @return {[object]}[list of dicts ready to be used in plotly plot function]
- */
+    // Auxiliary functions for plotting:
+    function datasets_stack_barplot(x_dataset, y_dataset, names) {
+        /**
+         * Prepare data for stacked barplot, where stacked names are different for different bars
+         * @param  {[object]} x_dataset: [list with names of x-axis values (e.g. datasets)]
+         * @param  {[object]} y_dataset [list of values or other lists to be shown as bars (e.g. datasets versiosn)]
+         * @param  {[object]} names [list of values or other lists containing names of values shown as stacked bars (e.g. datasets names)]
+         * @return {[object]}[list of dicts ready to be used in plotly plot function]
+         */
 
-  var plot_data = []
-  for (var dataset_ind=0; dataset_ind<x_dataset.length; dataset_ind++){
-    for (var vers_ind=0; vers_ind<names[dataset_ind].length; vers_ind++){
-      var data = {
-        x: [x_dataset[dataset_ind]],
-        y: [y_dataset[dataset_ind][vers_ind]],
-        name: names[dataset_ind][vers_ind],
-        type: 'bar',
-      }
-      plot_data.push(data)
+        var plot_data = []
+        for (var dataset_ind = 0; dataset_ind < x_dataset.length; dataset_ind++) {
+            for (var vers_ind = 0; vers_ind < names[dataset_ind].length; vers_ind++) {
+                var data = {
+                    x: [x_dataset[dataset_ind]],
+                    y: [y_dataset[dataset_ind][vers_ind]],
+                    name: names[dataset_ind][vers_ind],
+                    type: 'bar',
+                }
+                plot_data.push(data)
+            }
+        }
+        return plot_data
     }
-  }
-  return plot_data
-}
 
-function dataset_barplot_layout(){
-  // wraped this layout in a funciton because it's used at least in two places
-  var layout = {
-    barmode: 'stack',
-    plot_bgcolor: plot_bgcolor,
-    title: {
-      text:'Datasets counts',
-      font: {
-        family: title_font_type,
-        size: title_font_size,
-      },
-    yref: 'container',
-    y: 0.85
-      },
-    xaxis: {
-      title: {
-          text:'Datasets',
-          font: {
-            family: axis_font_type,
-            size: axis_font_size},
-            standoff: 10,
-          },
-      tickfont:{
-        size: tick_font_size,
-        family: tick_font_type
-      },
-      automargin: true
-    },
-    yaxis: {
-      title: {
-          text:'Counts',
-          font: {
-            family: axis_font_type,
-            size: axis_font_size}
-          }
-      }
-  }
-  return layout
-}
+    function dataset_barplot_layout() {
+        // wraped this layout in a funciton because it's used at least in two places
+        var layout = {
+            barmode: 'stack',
+            height: 600,
+            plot_bgcolor: plot_bgcolor,
+            title: {
+                text: 'Datasets counts',
+                font: {
+                    family: title_font_type,
+                    size: title_font_size,
+                },
+                yref: 'container',
+                y: 0.9
+            },
+            xaxis: {
+                title: {
+                    text: 'Datasets',
+                    font: {
+                        family: axis_font_type,
+                        size: axis_font_size
+                    },
+                    standoff: 10,
+                },
+                tickfont: {
+                    size: tick_font_size,
+                    family: tick_font_type
+                },
+                automargin: true
+            },
+            yaxis: {
+                title: {
+                    text: 'Counts',
+                    font: {
+                        family: axis_font_type,
+                        size: axis_font_size
+                    }
+                },
+                tickfont: {
+                    size: tick_font_size,
+                    family: tick_font_type
+                },
+            },
+            legend: {
+                orientation: "h",
+                y: -0.7,
+                font: {
+                    size: legend_font_size
+                }
+            }
+        }
+        return layout
+    }
 
-  //==========================================================================================
+    //==========================================================================================
     // Datasets counts - general
-    var datasets_info = {{ stats.datasets_for_plot|safe }}
+    var datasets_info = {{stats.datasets_for_plot | safe}};
     var datasets = datasets_info.datasets
     var versions = datasets_info.versions
     var dataset_counts = datasets_info.dataset_count
@@ -190,113 +235,136 @@ function dataset_barplot_layout(){
     var datasets_plot_data = datasets_stack_barplot(datasets, dataset_counts, versions)
     var datasets_plot_layout = dataset_barplot_layout()
 
-  Plotly.react(datasets_cumulative, datasets_plot_data,  datasets_plot_layout);
-  //==========================================================================================
+    Plotly.react(datasets_cumulative, datasets_plot_data, datasets_plot_layout);
+    //==========================================================================================
     // Number of validations run by each user plot
-	var val_nums_by_users_div = $('#val_nums_by_users')[0];
-  var val_nums_by_users_plot_data = [{
+    var val_nums_by_users_div = $('#val_nums_by_users')[0];
+    var val_nums_by_users_plot_data = [{
         x: {{stats.val_num_by_user_data.users|safe}},
         y: {{stats.val_num_by_user_data.validations_num|safe}},
         type: 'bar',
-        marker: {
-          color: basic_color
+        marker: {color: basic_color}}]
+
+    var val_nums_by_user_layout = {
+        plot_bgcolor: plot_bgcolor,
+        title: {
+            text: 'Number of validations run by each user',
+            font: {
+                family: title_font_type,
+                size: title_font_size
+            },
+            yref: 'container',
+            y: 0.85
+        },
+        xaxis: {
+            title: {
+                text: 'Users',
+                font: {
+                    family: axis_font_type,
+                    size: axis_font_size
+                },
+                standoff: 10,
+            },
+            tickfont: {
+                size: tick_font_size,
+                family: tick_font_type
+            },
+            automargin: true
+        },
+        yaxis: {
+            title: {
+                text: 'Number of validations',
+                font: {
+                    family: axis_font_type,
+                    size: axis_font_size
+                }
+            },
+            tickfont: {
+                size: tick_font_size,
+                family: tick_font_type
+            },
         }
-    }]
+    }
 
-  var val_nums_by_user_layout = {
-    plot_bgcolor: plot_bgcolor,
-    title: {
-      text:'Number of validations run by each user',
-      font: {
-        family: title_font_type,
-        size: title_font_size
-      },
-    yref: 'container',
-    y: 0.85
-      },
-    xaxis: {
-      title: {
-          text:'Users',
-          font: {
-            family: axis_font_type,
-            size: axis_font_size},
-            standoff: 10,
-          },
-      tickfont:{
-        size: tick_font_size,
-        family: tick_font_type
-      },
-      automargin: true
-    },
-    yaxis: {
-      title: {
-          text:'Number of validations',
-          font: {
-            family: axis_font_type,
-            size: axis_font_size}
-          }
-      }
-  }
+    Plotly.react(val_nums_by_users_div, val_nums_by_users_plot_data, val_nums_by_user_layout);
 
-	Plotly.react( val_nums_by_users_div, val_nums_by_users_plot_data, val_nums_by_user_layout);
+    //==========================================================================================
+    // Number of validations by time range:
+    var first_epoch = {{stats.validations_for_plot.first_validation | safe}}[0];
+    var last_epoch = {{stats.validations_for_plot.last_validation | safe}}[0];
+    var H1 = 3600000; //xbins are defined in mili seconds, therefore one hour is defined this way
+    var D1 = H1 * 24; // one day
+    var W1 = D1 * 7; // one week
+    var M1 = D1 * 30; // one week
+    var val_nums_by_users_div = $('#validations_in_time')[0];
 
-//==========================================================================================
-  // Number of validations by time range:
-  var first_epoch = {{stats.validations_for_plot.first_validation|safe}}[0];
-  var last_epoch = {{stats.validations_for_plot.last_validation|safe}}[0];
-  var H1 = 3600000; //xbins are defined in mili seconds, therefore one hour is defined this way
-  var D1 = H1 * 24; // one day
-  var W1 = D1 * 7; // one week
-  var val_nums_by_users_div = $('#validations_in_time')[0];
-
-  var validations_in_time_data = [{
-        x: {{ stats.validations_for_plot.validations_time|safe }},
+    var validations_in_time_data = [{
+        x: {{stats.validations_for_plot.validations_time | safe}},
         autobinx: false,
         autobiny: true,
-        marker: {color: basic_color},
-        name: 'date',
-        type: 'histogram',
-        xbins: {
-          end: last_epoch,
-          size: H1,
-          start: first_epoch
-        }
-    }];
-
-  var validations_in_time_layout = {
-      plot_bgcolor: plot_bgcolor,
-      title: {
-        text: 'Number of validations in particular time periods',
-        font: {
-          family: title_font_type,
-          size: title_font_size},
-      yref: 'container',
-      y: 0.85
+        marker:
+        {color: basic_color,
+            line:
+            {width: 0,
+            color:'rgb(150, 150, 150)'}
         },
-      xaxis: {
-        type: 'date',
-        autorange: false,
-        range: [first_epoch, last_epoch],
+        name: 'date',
+        type:'histogram',
+        xbins:{
+        end: last_epoch,
+        size: H1,
+        start: first_epoch}}];
+
+    var validations_in_time_layout = {
+        plot_bgcolor: plot_bgcolor,
         title: {
-          text:'Date range',
-          font: {
-            family: axis_font_type,
-            size: axis_font_size}
-          },
-        font: {
-          family: axis_font_type,
-          size: axis_font_size}
-      },
-      yaxis: {
-        autorange: true,
-        title: {
-          text:'Number of validations',
-          font: {
-            family: axis_font_type,
-            size: axis_font_size}},
-        type: 'linear'
-      },
-      updatemenus: [{
+            text: 'Number of validations in particular time periods',
+            font: {
+                family: title_font_type,
+                size: title_font_size
+            },
+            yref: 'container',
+            y: 0.85
+        },
+        xaxis: {
+            type: 'date',
+            autorange: false,
+            range: [first_epoch, last_epoch],
+            title: {
+                text: 'Date range',
+                font: {
+                    family: axis_font_type,
+                    size: axis_font_size
+                },
+                y: -0.3
+            },
+            font: {
+                family: axis_font_type,
+                size: axis_font_size
+            },
+            dtick: M1,
+            tickangle: 45,
+            tickfont: {
+                size: tick_font_size,
+                family: tick_font_type
+            },
+        },
+        yaxis: {
+            autorange: true,
+            title: {
+                text: 'Number of validations',
+                font: {
+                    family: axis_font_type,
+                    size: axis_font_size
+                }
+            },
+            type: 'linear',
+            tickfont: {
+                size: tick_font_size,
+                family: tick_font_type
+            },
+        },
+        updatemenus: [{
             x: 0.1,
             y: 1.15,
             xref: 'paper',
@@ -305,38 +373,182 @@ function dataset_barplot_layout(){
             active: 0,
             showactive: true,
             buttons: [{
-                args: ['xbins.size', H1],
+                args: [{'xbins.size': [H1], 'marker.line.width': [0.1]}],
                 label: 'Hour',
                 method: 'restyle',
-            },{
-                args: ['xbins.size', D1],
+            }, {
+                args: [{'xbins.size': [D1], 'marker.line.width': [0.1]}],
                 label: 'Day',
                 method: 'restyle',
             }, {
-                args: ['xbins.size', W1],
+                args: [{'xbins.size': [W1], "marker.line.width": [0.5]}],
                 label: 'Week',
                 method: 'restyle',
             }, {
-                args: ['xbins.size', 'M1'],
+                args: [{'xbins.size': ['M1'], 'marker.line.width': [1]}],
                 label: 'Month',
                 method: 'restyle',
             }, {
-                args: ['xbins.size', 'M3'],
+                args: [{'xbins.size': ['M3'], "marker.line.width": [1]}],
                 label: 'Quater',
                 method: 'restyle',
             }, {
-                args: ['xbins.size', 'M6'],
+                args: [{'xbins.size': 'M6', "marker.line.width": [1]}],
                 label: 'Half Year',
                 method: 'restyle',
             }, {
-                args: ['xbins.size', 'M12'],
+                args: [{'xbins.size': 'M12', "marker.line.width": [1]}],
                 label: 'Year',
                 method: 'restyle',
             }]
-      }]
-};
+        }]
+    };
 
-Plotly.newPlot(validations_in_time, validations_in_time_data, validations_in_time_layout);
+    // console.log(validations_in_time_layout.xaxis.dtick)
+
+    Plotly.newPlot(validations_in_time, validations_in_time_data, validations_in_time_layout);
+
+    //==========================================================================================
+    // KPI's
+    function data_for_kpis_plot(data_by_agent, period, plot_mode, agent_index=null) {
+        let plot_data = [];
+        let agent_number = 0;
+        colors = [basic_color, basic_color_2];
+        if (agent_index === null){
+            data_by_agent.forEach(agent => {
+                let x_data = [];
+                let y_data = [];
+                agent_number += 1;
+                agent.forEach(item => {
+                    x_data.push(period === 'MONTHLY' ? item[0].slice(0, 7) : item[0]);
+                    y_data.push(item[1]);
+                })
+                let plot_item = {
+                    x: x_data,
+                    y: y_data,
+                    name: `Machine ${agent_number}`,
+                    type: plot_mode,
+                    marker: {
+                        color: colors[agent_number - 1]
+                    }
+                }
+                plot_data.push(plot_item)
+            })
+        } else {
+            let data_to_plot = data_by_agent[agent_index - 1];
+            let x_data = [];
+            let y_data = [];
+            data_to_plot.forEach(item => {
+                x_data.push(period === 'MONTHLY' ? item[0].slice(0, 7) : item[0]);
+                y_data.push(item[1]);
+            })
+            let plot_item = {
+                x: x_data,
+                y: y_data,
+                name: `Machine ${agent_number}`,
+                type: plot_mode,
+                marker: {
+                    color: basic_color_2
+                }
+            }
+            plot_data.push(plot_item)
+        }
+
+
+        return plot_data
+    }
+
+    function kpis_barplot_layout(plot_title, y_axis_title) {
+        // wraped this layout in a funciton because it's used at least in two places
+        var layout = {
+            barmode: 'group',
+            height: 600,
+            plot_bgcolor: plot_bgcolor,
+            title: {
+                text: plot_title,
+                font: {
+                    family: title_font_type,
+                    size: title_font_size,
+                },
+                yref: 'container',
+                y: 0.9
+            },
+            xaxis: {
+                title: {
+                    text: 'Period',
+                    font: {
+                        family: axis_font_type,
+                        size: axis_font_size
+                    },
+                    standoff: 10,
+                },
+                tickfont: {
+                    size: tick_font_size,
+                    family: tick_font_type
+                },
+                automargin: true
+            },
+            yaxis: {
+                title: {
+                    text: y_axis_title,
+                    font: {
+                        family: axis_font_type,
+                        size: axis_font_size
+                    }
+                },
+                tickfont: {
+                    size: tick_font_size,
+                    family: tick_font_type
+                },
+            },
+            legend: {
+                orientation: "v",
+                font: {
+                    size: legend_font_size
+                }
+            }
+        }
+        return layout
+    }
+
+    let monthly_outage_data = {{stats.monthly_outage | safe}};
+    let monthly_outage_plot_data = data_for_kpis_plot(monthly_outage_data, 'MONTHLY', 'bar', 1);
+    let monthly_outage_plot_layout = kpis_barplot_layout('Monthly service downtime', 'Minutes')
+
+    let monthly_uptime_data = {{stats.monthly_uptime | safe}};
+    let monthly_uptime_plot_data = data_for_kpis_plot(monthly_uptime_data, 'MONTHLY', 'bar', 1);
+    let monthly_uptime_plot_layout = kpis_barplot_layout('Monthly service uptime', '[%]')
+
+
+    let daily_outage_data = {{stats.daily_outage | safe}};
+    let daily_outage_plot_data = data_for_kpis_plot(daily_outage_data, 'DAILY', 'bar');
+    let daily_outage_plot_layout = kpis_barplot_layout('Daily service downtime', 'Minutes')
+
+    let daily_uptime_data = {{stats.daily_uptime | safe}};
+    let daily_uptime_plot_data = data_for_kpis_plot(daily_uptime_data, 'DAILY', 'bar');
+    let daily_uptime_plot_layout = kpis_barplot_layout('Daily service uptime', '[%]')
+
+
+    Plotly.react(monthly_outage, monthly_outage_plot_data, monthly_outage_plot_layout);
+    Plotly.react(monthly_uptime, monthly_uptime_plot_data, monthly_uptime_plot_layout);
+
+    Plotly.react(daily_outage, daily_outage_plot_data, daily_outage_plot_layout);
+    Plotly.react(daily_uptime, daily_uptime_plot_data, daily_uptime_plot_layout);
+
+    function toggleCountryTable() {
+        $('.country-table').toggleClass('hidden')
+        $('#show-countries').toggleClass('hidden')
+        $('#hide-countries').toggleClass('hidden')
+
+    }
+
+    // function countryTableHidden(){
+    //     let countryTable = $('.country-table')
+    //     return countryTable.hasClass('hidden')
+    // }
+
+    // let countryTableHidden = $('.country-table').hasClass('hidden')
+
 
 </script>
 
