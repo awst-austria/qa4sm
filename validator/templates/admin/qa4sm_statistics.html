@@ -227,7 +227,7 @@
 
     //==========================================================================================
     // Datasets counts - general
-    var datasets_info = {{stats.datasets_for_plot | safe}};
+    var datasets_info = {{stats.datasets_for_plot|safe}};
     var datasets = datasets_info.datasets
     var versions = datasets_info.versions
     var dataset_counts = datasets_info.dataset_count
@@ -290,8 +290,8 @@
 
     //==========================================================================================
     // Number of validations by time range:
-    var first_epoch = {{stats.validations_for_plot.first_validation | safe}}[0];
-    var last_epoch = {{stats.validations_for_plot.last_validation | safe}}[0];
+    var first_epoch = {{stats.validations_for_plot.first_validation|safe}}[0];
+    var last_epoch = {{stats.validations_for_plot.last_validation|safe}}[0];
     var H1 = 3600000; //xbins are defined in mili seconds, therefore one hour is defined this way
     var D1 = H1 * 24; // one day
     var W1 = D1 * 7; // one week
@@ -299,7 +299,7 @@
     var val_nums_by_users_div = $('#validations_in_time')[0];
 
     var validations_in_time_data = [{
-        x: {{stats.validations_for_plot.validations_time | safe}},
+        x: {{stats.validations_for_plot.validations_time|safe}},
         autobinx: false,
         autobiny: true,
         marker:
@@ -511,20 +511,20 @@
         return layout
     }
 
-    let monthly_outage_data = {{stats.monthly_outage | safe}};
+    let monthly_outage_data = {{stats.monthly_outage|safe}};
     let monthly_outage_plot_data = data_for_kpis_plot(monthly_outage_data, 'MONTHLY', 'bar', 1);
     let monthly_outage_plot_layout = kpis_barplot_layout('Monthly service downtime', 'Minutes')
 
-    let monthly_uptime_data = {{stats.monthly_uptime | safe}};
+    let monthly_uptime_data = {{stats.monthly_uptime|safe}};
     let monthly_uptime_plot_data = data_for_kpis_plot(monthly_uptime_data, 'MONTHLY', 'bar', 1);
     let monthly_uptime_plot_layout = kpis_barplot_layout('Monthly service uptime', '[%]')
 
 
-    let daily_outage_data = {{stats.daily_outage | safe}};
+    let daily_outage_data = {{stats.daily_outage|safe}};
     let daily_outage_plot_data = data_for_kpis_plot(daily_outage_data, 'DAILY', 'bar');
     let daily_outage_plot_layout = kpis_barplot_layout('Daily service downtime', 'Minutes')
 
-    let daily_uptime_data = {{stats.daily_uptime | safe}};
+    let daily_uptime_data = {{stats.daily_uptime|safe}};
     let daily_uptime_plot_data = data_for_kpis_plot(daily_uptime_data, 'DAILY', 'bar');
     let daily_uptime_plot_layout = kpis_barplot_layout('Daily service uptime', '[%]')
 
