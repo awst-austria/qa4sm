@@ -1,4 +1,5 @@
 import logging
+import datetime
 from django.contrib.admin import ModelAdmin, SimpleListFilter
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -40,6 +41,50 @@ def get_service_uptime_statistics(queryset, daily=True, monthly=False):
 
     else:
         return
+
+
+def get_kpi_info_for_plot(queryset, period, kpi):
+    uptime_reports = queryset.filter(period=period).filter(start_time__gte=datetime.date(2021, 6, 1)).distinct('start_time')
+    agents = UptimeAgent.objects.all()
+
+    otput_list = []
+    for agent in agents:
+        otput_list.append((f'{agent.description}', [[f'{item.created.date()}', check_kpi(item, kpi)] for item in
+                                                    uptime_reports.filter(agent_key=agent.agent_key)]))
+
+    return otput_list
+
+
+def verify_uptime_percentage(uptime_report):
+    if int(uptime_report.uptime_percentage) not in range(50, 101):
+        if uptime_report.period == 'DAILY':
+            reference_number_of_minutes = 24 * 60
+        else:
+            month = uptime_report.updated.date().month
+            year = uptime_report.updated.date().year
+            if month == 2:
+                reference_number_of_minutes = 28 * 24 * 60 if (year % 400 == 0) and (year % 100 == 0) else 29 * 24 * 60
+            elif month in [1, 3, 5, 7, 8, 10, 12]:
+                reference_number_of_minutes = 31 * 24 * 60
+            else:
+                reference_number_of_minutes = 30 * 24 * 60
+        downtime_minutes = uptime_report.downtime_minutes if uptime_report.downtime_minutes >= 0 else 0
+        return 100 - downtime_minutes / reference_number_of_minutes
+    return uptime_report.uptime_percentage
+
+
+def verify_downtime_minutes(downtime_minutes):
+    if downtime_minutes < 0:
+        return 0
+    else:
+        return downtime_minutes
+
+
+def check_kpi(uptime_report_item, kpi):
+    if kpi == 'downtime_minutes':
+        return verify_downtime_minutes(getattr(uptime_report_item, kpi))
+    else:
+        return verify_uptime_percentage(uptime_report_item)
 
 
 def bulk_get_uptime_statistics(modeladmin, request, queryset):
@@ -103,9 +148,19 @@ class UptimeMonitoringAdmin(ModelAdmin):
             daily_statistics = get_service_uptime_statistics(queryset)
             monthly_statistics = get_service_uptime_statistics(queryset, False, True)
 
+            daily_outage = get_kpi_info_for_plot(queryset.filter(period="DAILY"), "DAILY", 'downtime_minutes')
+            daily_uptime = get_kpi_info_for_plot(queryset.filter(period="DAILY"), "DAILY", 'uptime_percentage')
+
+            monthly_outage = get_kpi_info_for_plot(queryset.filter(period="MONTHLY"), "MONTHLY", 'downtime_minutes')
+            monthly_uptime = get_kpi_info_for_plot(queryset.filter(period="MONTHLY"), "MONTHLY", 'uptime_percentage')
+
             context = {
                 'daily_statistics': daily_statistics,
-                'monthly_statistics': monthly_statistics
+                'monthly_statistics': monthly_statistics,
+                'daily_outage': daily_outage,
+                'daily_uptime': daily_uptime,
+                'monthly_outage': monthly_outage,
+                'monthly_uptime': monthly_uptime
             }
             print(context)
             return TemplateResponse(request, 'admin/uptime_report.html', context)
