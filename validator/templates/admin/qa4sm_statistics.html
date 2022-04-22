@@ -512,20 +512,20 @@
     }
 
     let monthly_outage_data = {{stats.monthly_outage|safe}};
-    let monthly_outage_plot_data = data_for_kpis_plot(monthly_outage_data, 'MONTHLY', 'bar', 1);
+    let monthly_outage_plot_data = data_for_kpis_plot(monthly_outage_data, 'MONTHLY', 'bar', 2);
     let monthly_outage_plot_layout = kpis_barplot_layout('Monthly service downtime', 'Minutes')
 
     let monthly_uptime_data = {{stats.monthly_uptime|safe}};
-    let monthly_uptime_plot_data = data_for_kpis_plot(monthly_uptime_data, 'MONTHLY', 'bar', 1);
+    let monthly_uptime_plot_data = data_for_kpis_plot(monthly_uptime_data, 'MONTHLY', 'bar', 2);
     let monthly_uptime_plot_layout = kpis_barplot_layout('Monthly service uptime', '[%]')
 
 
     let daily_outage_data = {{stats.daily_outage|safe}};
-    let daily_outage_plot_data = data_for_kpis_plot(daily_outage_data, 'DAILY', 'bar');
+    let daily_outage_plot_data = data_for_kpis_plot(daily_outage_data, 'DAILY', 'bar', 2);
     let daily_outage_plot_layout = kpis_barplot_layout('Daily service downtime', 'Minutes')
 
     let daily_uptime_data = {{stats.daily_uptime|safe}};
-    let daily_uptime_plot_data = data_for_kpis_plot(daily_uptime_data, 'DAILY', 'bar');
+    let daily_uptime_plot_data = data_for_kpis_plot(daily_uptime_data, 'DAILY', 'bar', 2);
     let daily_uptime_plot_layout = kpis_barplot_layout('Daily service uptime', '[%]')
 
 
