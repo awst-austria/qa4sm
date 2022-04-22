@@ -1,15 +1,16 @@
 import logging
+import datetime
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin import ModelAdmin
-from django.contrib.auth.admin import csrf_protect_m
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 from django.urls import path
+from django_countries import countries as base_countries
 
-from validator.models import User, ValidationRun, Dataset, DatasetConfiguration
+from validator.models import User, ValidationRun, Dataset, DatasetConfiguration, UptimeReport, UptimeAgent
 
 
 def sorted_users_validation_query():
@@ -68,6 +69,38 @@ def get_dataset_info_by_user(user=None):
     return dataset_dict
 
 
+def verify_uptime_percentage(uptime_report):
+    if int(uptime_report.uptime_percentage) not in range(50, 101):
+        if uptime_report.period == 'DAILY':
+            reference_number_of_minutes = 24 * 60
+        else:
+            month = uptime_report.updated.date().month
+            year = uptime_report.updated.date().year
+            if month == 2:
+                reference_number_of_minutes = 28 * 24 * 60 if (year % 400 == 0) and (year % 100 == 0) else 29 * 24 * 60
+            elif month in [1, 3, 5, 7, 8, 10, 12]:
+                reference_number_of_minutes = 31 * 24 * 60
+            else:
+                reference_number_of_minutes = 30 * 24 * 60
+        downtime_minutes = uptime_report.downtime_minutes if uptime_report.downtime_minutes >= 0 else 0
+        return 100 - downtime_minutes / reference_number_of_minutes
+    return uptime_report.uptime_percentage
+
+
+def verify_downtime_minutes(downtime_minutes):
+    if downtime_minutes < 0:
+        return 0
+    else:
+        return downtime_minutes
+
+
+def check_kpi(uptime_report_item, kpi):
+    if kpi == 'downtime_minutes':
+        return verify_downtime_minutes(getattr(uptime_report_item, kpi))
+    else:
+        return verify_uptime_percentage(uptime_report_item)
+
+
 class StatisticsAdmin(ModelAdmin):
     __logger = logging.getLogger(__name__)
 
@@ -122,6 +155,35 @@ class StatisticsAdmin(ModelAdmin):
 
         return validation_dict
 
+    @staticmethod
+    def get_kpis_stats():
+        uptime_monitoring = UptimeReport.objects.all()
+        daily_reports = uptime_monitoring.filter(period="DAILY")
+        monthly_reports = uptime_monitoring.filter(period="MONTHLY")
+        return monthly_reports
+
+    @staticmethod
+    def number_of_users_per_country(distinct_list_of_countries):
+        number_of_users_in_country_dict = {}
+        for country in distinct_list_of_countries:
+            number_of_users_in_country = User.objects.filter(country=country).count()
+            country_full_name = base_countries.countries[country]
+            number_of_users_in_country_dict[country_full_name] = number_of_users_in_country
+        return dict((sorted(number_of_users_in_country_dict.items())))
+
+    @staticmethod
+    def get_kpi_info_for_plot(period, kpi):
+        uptime_reports = UptimeReport.objects.all().filter(period=period).\
+            filter(start_time__gte=datetime.date(2021, 6, 1)).distinct('start_time')
+        agents = UptimeAgent.objects.all()
+
+        otput_list = []
+        for agent in agents:
+            otput_list.append((f'{agent.description}', [[f'{item.created.date()}', check_kpi(item, kpi)] for item in
+                                                        uptime_reports.filter(agent_key=agent.agent_key)]))
+
+        return otput_list
+
     # @csrf_protect_m
     def statistics(self, request):
 
@@ -129,14 +191,30 @@ class StatisticsAdmin(ModelAdmin):
             raise PermissionDenied
 
         users = User.objects.filter(is_active=True).order_by('pk')
+        distinct_list_of_countries = User.objects.filter(is_active=True).exclude(country=''). \
+            values_list('country', flat=True).distinct()
+
+        daily_outage = self.get_kpi_info_for_plot("DAILY", 'downtime_minutes')
+        daily_uptime = self.get_kpi_info_for_plot("DAILY", 'uptime_percentage')
+
+        monthly_outage = self.get_kpi_info_for_plot("MONTHLY", 'downtime_minutes')
+        monthly_uptime = self.get_kpi_info_for_plot("MONTHLY", 'uptime_percentage')
+
         if request.method == "GET":
             stats = {'users': users,
                      'number_of_users': users.count(),
+                     'number_of_staff': users.filter(is_staff=True).count(),
+                     'number_of_countries': distinct_list_of_countries.count(),
                      'number_of_validations': ValidationRun.objects.all().count(),
                      'most_frequent_user': self.most_frequent_user_info(),
                      'val_num_by_user_data': self.users_info_for_plot(),
                      'validations_for_plot': self.validation_info_for_plot(),
-                     'datasets_for_plot': get_dataset_info_by_user()}  # self.dataset_info_for_plot()}
+                     'datasets_for_plot': get_dataset_info_by_user(),
+                     'number_of_users_in_country_dict': self.number_of_users_per_country(distinct_list_of_countries),
+                     'monthly_outage': monthly_outage,
+                     'monthly_uptime': monthly_uptime,
+                     'daily_outage': daily_outage,
+                     'daily_uptime': daily_uptime}
 
             return render(request, 'admin/qa4sm_statistics.html', {'stats': stats})
 

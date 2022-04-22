@@ -233,3 +233,12 @@ div.ui-dialog-titlebar{
 .dropdown:hover .dropdown-content {display: block;}
 
 .dropdown:hover .dropdownbutton {-webkit-transform: scale(1.1);}
+
+.country-table td {
+    font-size: 1rem;
+    border: 1px solid #7F8177;
+}
+#toggle-countries{
+    cursor: pointer;
+    color: #00aae3;
+}
