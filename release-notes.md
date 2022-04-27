@@ -1,3 +1,21 @@
+QA4SM v2.0.3.4 - Release notes 2022-04-22
+=======================================================
+
+# Improvements
+1. Admin panel updated
+
+QA4SM v2.0.3.3 - Release notes 2022-04-19
+=======================================================
+
+# Improvements
+1. Sending emails updated
+
+QA4SM v2.0.3.1 - Release notes 2022-04-19
+=======================================================
+
+# Improvements
+1. Sending emails improved
+
 QA4SM v2.0.3 - Release notes 2022-04-14
 =======================================================
 
