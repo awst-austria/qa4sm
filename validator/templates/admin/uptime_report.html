@@ -2,7 +2,9 @@
 {% load static %}
 
 {% block content %}
-
+<script src="/static/js/plotly-latest.min.js"></script>
+<script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+<link href="{% static 'css/service.css' %}" rel="stylesheet">
 <div>
     <h1><b>Uptime monitoring statistics</b></h1>
 </div>
@@ -37,5 +39,157 @@
 {%endif%}
 
 <a href="{% url 'admin:validator_uptimereport_changelist' %}">Go back</a>
+
+<div id="monthly_outage" className="plot_div"></div>
+<div id="monthly_uptime" className="plot_div"></div>
+<div id="daily_outage" className="plot_div"></div>
+<div id="daily_uptime" className="plot_div"></div>
+
+<script>
+    // Common plot parameters:
+    // ============ Font size =================
+    let title_font_size = 26;
+    let axis_font_size = 20;
+    let tick_font_size = 16;
+    let legend_font_size = 14;
+    // ============ Font type =================
+    let title_font_type = 'Arial, monospace';
+    let axis_font_type = 'Arial, monospace';
+    let tick_font_type = 'Arial, monospace';
+    // ============ Colors =================
+    let plot_bgcolor = 'rgb(240, 240, 240)';
+    let basic_color = 'rgb(0, 204, 204)';//'rgb(255,20,147)';
+    let basic_color_2 = 'rgb(0, 100, 0)';//'rgb(255,20,147)';
+    let versions_colors = ['rgb(0, 204, 204)', 'rgb(0, 204, 0)', 'rgb(204, 0, 0)', 'rgb(204, 0, 204)'];
+
+
+    function data_for_kpis_plot(data_by_agent, period, plot_mode, agent_index=null) {
+        let plot_data = [];
+        let agent_number = 0;
+        colors = [basic_color, basic_color_2];
+        if (agent_index === null){
+            data_by_agent.forEach(agent => {
+                let x_data = [];
+                let y_data = [];
+                agent_number += 1;
+                agent.forEach(item => {
+                    x_data.push(period === 'MONTHLY' ? item[0].slice(0, 7) : item[0]);
+                    y_data.push(item[1]);
+                })
+                let plot_item = {
+                    x: x_data,
+                    y: y_data,
+                    name: `Machine ${agent_number}`,
+                    type: plot_mode,
+                    marker: {
+                        color: colors[agent_number - 1]
+                    }
+                }
+                plot_data.push(plot_item)
+            })
+        } else {
+            let data_to_plot = data_by_agent[agent_index - 1];
+            let x_data = [];
+            let y_data = [];
+            data_to_plot.forEach(item => {
+                x_data.push(period === 'MONTHLY' ? item[0].slice(0, 7) : item[0]);
+                y_data.push(item[1]);
+            })
+            let plot_item = {
+                x: x_data,
+                y: y_data,
+                name: `Machine ${agent_number}`,
+                type: plot_mode,
+                marker: {
+                    color: basic_color_2
+                }
+            }
+            plot_data.push(plot_item)
+        }
+
+
+        return plot_data
+    }
+
+    function kpis_barplot_layout(plot_title, y_axis_title) {
+        // wraped this layout in a funciton because it's used at least in two places
+        return {
+            barmode: 'group',
+            height: 600,
+            plot_bgcolor: plot_bgcolor,
+            title: {
+                text: plot_title,
+                font: {
+                    family: title_font_type,
+                    size: title_font_size,
+                },
+                yref: 'container',
+                y: 0.9
+            },
+            xaxis: {
+                title: {
+                    text: 'Period',
+                    font: {
+                        family: axis_font_type,
+                        size: axis_font_size
+                    },
+                    standoff: 10,
+                },
+                tickfont: {
+                    size: tick_font_size,
+                    family: tick_font_type
+                },
+                automargin: true
+            },
+            yaxis: {
+                title: {
+                    text: y_axis_title,
+                    font: {
+                        family: axis_font_type,
+                        size: axis_font_size
+                    }
+                },
+                tickfont: {
+                    size: tick_font_size,
+                    family: tick_font_type
+                },
+            },
+            legend: {
+                orientation: "v",
+                font: {
+                    size: legend_font_size
+                }
+            }
+        }
+    }
+
+    let monthly_outage_data = {{monthly_outage|safe}};
+    let monthly_outage_plot_data = data_for_kpis_plot(monthly_outage_data, 'MONTHLY', 'bar');
+    let monthly_outage_plot_layout = kpis_barplot_layout('Monthly service downtime', 'Minutes')
+
+    let monthly_uptime_data = {{monthly_uptime|safe}};
+    let monthly_uptime_plot_data = data_for_kpis_plot(monthly_uptime_data, 'MONTHLY', 'bar');
+    let monthly_uptime_plot_layout = kpis_barplot_layout('Monthly service uptime', '[%]')
+
+
+    let daily_outage_data = {{daily_outage|safe}};
+    let daily_outage_plot_data = data_for_kpis_plot(daily_outage_data, 'DAILY', 'bar');
+    let daily_outage_plot_layout = kpis_barplot_layout('Daily service downtime', 'Minutes')
+
+    let daily_uptime_data = {{daily_uptime|safe}};
+    let daily_uptime_plot_data = data_for_kpis_plot(daily_uptime_data, 'DAILY', 'bar');
+    let daily_uptime_plot_layout = kpis_barplot_layout('Daily service uptime', '[%]')
+
+    if(monthly_outage_data[0].length !== 0){
+        Plotly.react(monthly_outage, monthly_outage_plot_data, monthly_outage_plot_layout);
+        Plotly.react(monthly_uptime, monthly_uptime_plot_data, monthly_uptime_plot_layout);
+    }
+
+    if (daily_uptime_data[0].length !==  0){
+        Plotly.react(daily_outage, daily_outage_plot_data, daily_outage_plot_layout);
+        Plotly.react(daily_uptime, daily_uptime_plot_data, daily_uptime_plot_layout);
+    }
+
+</script>
 
 {% endblock %}

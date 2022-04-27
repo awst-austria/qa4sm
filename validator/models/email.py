@@ -4,6 +4,7 @@ from django.utils import timezone
 from validator.mailer import _send_email
 from django.conf import settings
 from django.template.loader import get_template
+from django.utils.html import strip_tags
 
 
 class Email(models.Model):
@@ -18,10 +19,11 @@ class Email(models.Model):
     def send_email(self):
         message_template = get_template('admin/email.html')
         html_message_content = message_template.render({'message': self.content})
+        plain_message = strip_tags(html_message_content)
 
         recipients = [user.email for user in self.send_to.all() if user.email != '']
         if len(recipients) != 0:
-            _send_email(recipients, self.subject, html_message_content, as_html_message=True)
+            _send_email(recipients, self.subject, plain_message, html_message=html_message_content)
         else:
             body = f'The email entitled {self.subject} can not be sent, as there were no recipients chosen.'
             _send_email([settings.EMAIL_FROM], 'Empty Addressees List', body)
