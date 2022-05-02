@@ -50,9 +50,6 @@ export class ValidationSelectorComponent implements OnInit {
     this.comparisonModel.multipleNonReference = this.multipleNonReference;
   }
 
-  // addDatasetToSelection(): void {
-  //   this.selectDataset(this.selectedDatasetModel);
-  // }
 
   onDatasetChange(): void{
     this.getValidations4comparison();
