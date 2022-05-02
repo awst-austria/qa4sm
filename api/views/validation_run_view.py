@@ -124,12 +124,17 @@ def get_validations_for_comparison(request):
     ref_filtered = ValidationRun.objects.filter(
         reference_configuration__dataset__short_name=ref_dataset,
         reference_configuration__version__short_name=ref_version,
-        user=current_user
     ).exclude(
         output_file='')
+
+    ref_filter_owned = ref_filtered.filter(user=current_user)
+    ref_filter_published_not_owned = ref_filtered.exclude(doi='').exclude(user=current_user)
+
+    ref_for_comparison = ref_filter_owned.union(ref_filter_published_not_owned)
+
     # filter based on the number of non-reference datasets
     eligible4comparison = []
-    for val in ref_filtered:
+    for val in ref_for_comparison:
         if val is None:
             continue
         if val.dataset_configurations.count() == max_datasets:
