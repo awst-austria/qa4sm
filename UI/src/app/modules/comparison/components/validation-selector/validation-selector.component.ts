@@ -45,14 +45,14 @@ export class ValidationSelectorComponent implements OnInit {
   ngOnInit(): void {
     // this.comparisonModel = new Validations2CompareModel();
     this.comparisonService.currentComparisonModel.subscribe(model => this.comparisonModel = model);
-    this.addDatasetToSelection();
+    this.selectDataset(this.selectedDatasetModel);
     this.comparisonModel.getIntersection = this.checkOverlapping();
     this.comparisonModel.multipleNonReference = this.multipleNonReference;
   }
 
-  addDatasetToSelection(): void {
-    this.selectDataset(this.selectedDatasetModel);
-  }
+  // addDatasetToSelection(): void {
+  //   this.selectDataset(this.selectedDatasetModel);
+  // }
 
   onDatasetChange(): void{
     this.getValidations4comparison();
@@ -61,7 +61,7 @@ export class ValidationSelectorComponent implements OnInit {
   private selectDataset(selected: DatasetConfigModel[]): void {
     const model = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
-      null, null, null, null,);
+      null, null, null, null);
     selected.push(model);
     // get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
@@ -69,7 +69,7 @@ export class ValidationSelectorComponent implements OnInit {
       this.selectValidationLabel = 'Wait for validations to be loaded';
       // then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
-        model.datasetModel.selectedVersion = versions[0];
+        model.datasetModel.selectedVersion = versions.find(version => version.pretty_name === '20210131 global');
         this.getValidations4comparison(String( model.datasetModel.selectedDataset.short_name),
           String(model.datasetModel.selectedVersion.short_name));
       });
