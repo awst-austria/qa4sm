@@ -114,6 +114,7 @@ def custom_tracked_validation_runs(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_validations_for_comparison(request):
+    current_user = request.user
     ref_dataset = request.query_params.get('ref_dataset', 'ISMN')
     ref_version = request.query_params.get('ref_version', 'ISMN_V20191211')
     # by default, take 2 datasets at maximum
@@ -125,9 +126,15 @@ def get_validations_for_comparison(request):
         reference_configuration__version__short_name=ref_version,
     ).exclude(
         output_file='')
+
+    ref_filter_owned = ref_filtered.filter(user=current_user)
+    ref_filter_published_not_owned = ref_filtered.exclude(doi='').exclude(user=current_user)
+
+    ref_for_comparison = ref_filter_owned.union(ref_filter_published_not_owned)
+
     # filter based on the number of non-reference datasets
     eligible4comparison = []
-    for val in ref_filtered:
+    for val in ref_for_comparison:
         if val is None:
             continue
         if val.dataset_configurations.count() == max_datasets:
