@@ -28,6 +28,11 @@
 
     </div>
     </div>
+    <div *ngIf="!(validationModel.validationRun|async)" class="p-d-flex p-jc-center">
+      <p class="lead text-muted">
+        Sorry, looks like the validation you are trying to open does not exist anymore.
+      </p>
+    </div>
   </div>
 </div>
   <!-- Custom modal setup -->
