@@ -540,24 +540,24 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.spatialSubsetModel.limited$.next(isGeographicallyLimited);
 
     // push the condition and the new value if conditions are met
-    if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent || maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon) {
+    if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent || (maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon)) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     }
 
-    if (minLons.length !== 0 && lonMinLimit > lonMinCurrent || minLons.length !== 0 && lonMinCurrent === this.defMinLon) {
+    if (minLons.length !== 0 && lonMinLimit > lonMinCurrent || (minLons.length !== 0 && lonMinCurrent === this.defMinLon)) {
       this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     }
 
-    if (maxLats.length !== 0 && latMaxLimit < latMaxCurrent || maxLats.length !== 0 && latMaxCurrent === this.defMaxLat) {
+    if (maxLats.length !== 0 && latMaxLimit < latMaxCurrent || (maxLats.length !== 0 && latMaxCurrent === this.defMaxLat)) {
       this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     } else if (maxLats.length !== 0){
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     }
 
-    if (minLats.length !== 0 && latMinLimit > latMinCurrent && minLats.length !== 0 && latMinCurrent === this.defMinLat) {
+    if (minLats.length !== 0 && latMinLimit > latMinCurrent || (minLats.length !== 0 && latMinCurrent === this.defMinLat)) {
       this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
     }
