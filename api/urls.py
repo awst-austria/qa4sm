@@ -49,7 +49,6 @@ urlpatterns = [
     #   GOOD:  path('my-new-endpoint', my_new_view, name='fancy stuff'),
     #   WRONG: path('my-new-endpoint/', my_new_view, name='fancy stuff'),
     #
-    re_path(r'^test$', users), # are we using this one somehow?
     re_path(r'^path_test/(?P<username>.+)$', path_var_get),
     path('auth/login', api_login, name='api-login'),
     path('auth/logout', api_logout, name='api-logout'),
