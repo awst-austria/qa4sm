@@ -21,17 +21,6 @@ def _get_querydict_from_user_data(request, userdata):
     return user_data_dict
 
 
-# this view is used only for a test path, the question is if we should use it
-#  no tests for this one
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def users(request):
-    user = User.objects.all()
-    serializer = UserSerializer(user, many=True)
-
-    return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup_post(request):
