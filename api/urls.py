@@ -13,7 +13,7 @@ from api.views.logout_view import api_logout
 from api.views.path_var_test_endpoint import path_var_get
 from api.views.validation_config_view import start_validation, get_validation_configuration
 from api.views.uptime_view import uptime_ping, get_uptime
-from api.views.user_view import signup_post, user_update, user_delete, users
+from api.views.user_view import signup_post, user_update, user_delete
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id,  \
     custom_tracked_validation_runs, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
