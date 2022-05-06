@@ -71,11 +71,11 @@ fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
 
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.8 numpy scipy pandas cython pytest pip matplotlib pyproj django=3.2 pyresample pygrib cartopy xarray dask
+conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.8 numpy scipy pandas cython pytest pip matplotlib pyproj django=3.2 pyresample pygrib shapely cartopy xarray dask
 source activate $PYTHON_ENV_DIR
 
-pip uninstall --yes shapely
-pip install --no-binary :all: shapely
+# pip uninstall --yes shapely
+# pip install --no-binary :all: shapely
 pip install sqlparse
 pip install pynetcf
 pip install ascat
