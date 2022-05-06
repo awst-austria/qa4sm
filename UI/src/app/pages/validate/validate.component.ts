@@ -122,13 +122,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
           valrun => {
             this.modelFromValidationConfig(valrun);
-            if (valrun.changes){
+            if (valrun.changes) {
               this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
                 this.messageAboutConfigurationChanges(valrun.changes));
             }
           },
           (response) => {
-            if (response.message){
+            if (response.message) {
               this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
             }
             of({}).pipe(delay(0)).subscribe(() => {
@@ -149,7 +149,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private messageAboutConfigurationChanges(changes: ConfigurationChanges): string{
+  private messageAboutConfigurationChanges(changes: ConfigurationChanges): string {
     let message = '';
     if (changes.scaling) {
       message += 'Chosen scaling method is not available anymore. "No scaling" set instead.\n';
@@ -157,7 +157,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (changes.anomalies) {
       message += '\nChosen anomalies method is not available anymore. "Do not calculate" set instead.\n';
     }
-    if (changes.filters.length !== 0){
+    if (changes.filters.length !== 0) {
       changes.filters.forEach(filter => {
         message += `\nFilters:${filter.filter_desc.map(desc => ' ' + desc)} for dataset ${filter.dataset} not available.`;
       });
@@ -171,11 +171,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
       const newDatasetConfigModel = new DatasetConfigModel(
-          new DatasetComponentSelectionModel(null, null, null),
-          null,
-          new BehaviorSubject(null),
-          new BehaviorSubject(null),
-          new BehaviorSubject(null),
+        new DatasetComponentSelectionModel(null, null, null),
+        null,
+        new BehaviorSubject(null),
+        new BehaviorSubject(null),
+        new BehaviorSubject(null),
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
@@ -216,9 +216,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const newReferenceModel = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
       null,
-        new BehaviorSubject(null),
-        new BehaviorSubject<FilterModel>(null),
-        new BehaviorSubject<FilterModel>(null));
+      new BehaviorSubject(null),
+      new BehaviorSubject<FilterModel>(null),
+      new BehaviorSubject<FilterModel>(null));
     this.validationModel.referenceConfigurations.push(newReferenceModel);
     this.datasetService.getDatasetById(validationRunConfig.reference_config.dataset_id).subscribe(dataset => {
       newReferenceModel.datasetModel.selectedDataset = dataset;
@@ -339,12 +339,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void {
     const model = new DatasetConfigModel(
-        new DatasetComponentSelectionModel(null, null, null),
+      new DatasetComponentSelectionModel(null, null, null),
       null,
-        new BehaviorSubject(null),
-        new BehaviorSubject(null),
-        new BehaviorSubject(null)
-  );
+      new BehaviorSubject(null),
+      new BehaviorSubject(null),
+      new BehaviorSubject(null)
+    );
     targetArray.push(model);
     // get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
@@ -386,8 +386,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               model.ismnNetworkFilter$.next(new FilterModel(
                 filter,
                 false,
-                  false,
-                  new BehaviorSubject<string>(filter.default_parameter)));
+                false,
+                new BehaviorSubject<string>(filter.default_parameter)));
             } else if (filter.id === SMOS_RFI_FILTER_ID) {
               if (model.smosRfiFilter$) {
                 model.smosRfiFilter$.next(new FilterModel(
@@ -580,32 +580,34 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     // push the condition and the new value if conditions are met
     if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent ||
-      (maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon) ||
-      (maxLons.length !== 0 && lonMaxCurrent === null) ) {
+      (maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon)) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
+      this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
+    } else if (maxLons.length !== 0) {
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     }
 
     if (minLons.length !== 0 && lonMinLimit > lonMinCurrent ||
-      (minLons.length !== 0 && lonMinCurrent === this.defMinLon) ||
-      (minLons.length !== 0 && lonMinCurrent === null)) {
+      (minLons.length !== 0 && lonMinCurrent === this.defMinLon)) {
       this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
+      this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
+    } else if (minLons.length !== 0) {
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     }
 
-    console.log(maxLats, latMaxLimit, latMaxCurrent);
-
     if (maxLats.length !== 0 && latMaxLimit < latMaxCurrent ||
-      (maxLats.length !== 0 && latMaxCurrent === this.defMaxLat) ||
-      maxLats.length !== 0 && latMaxCurrent === null){
+      (maxLats.length !== 0 && latMaxCurrent === this.defMaxLat)) {
       this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
+      this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
+    } else if (maxLats.length !== 0) {
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     }
 
     if (minLats.length !== 0 && latMinLimit > latMinCurrent ||
-      (minLats.length !== 0 && latMinCurrent === this.defMinLat) ||
-      (minLats.length !== 0 && latMinCurrent === null)) {
+      (minLats.length !== 0 && latMinCurrent === this.defMinLat)) {
       this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
+      this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
+    } else if (minLats.length !== 0) {
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
     }
 
