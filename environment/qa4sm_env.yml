@@ -153,6 +153,7 @@ dependencies:
   - qt=5.12.9
   - readline=8.1
   - scipy=1.7.3
+  - shapely=1.8.0
   - six=1.16.0
   - sortedcontainers=2.4.0
   - sqlite=3.37.0
@@ -243,7 +244,6 @@ dependencies:
     - requests==2.27.1
     - seaborn==0.11.2
     - setuptools==59.6.0
-    - shapely==1.8.0
     - smap-io==0.4
     - smecv-grid==0.3
     - smos==0.2
