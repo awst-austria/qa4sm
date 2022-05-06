@@ -543,10 +543,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent || (maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon)) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
+    } else if (maxLons.length !== 0) {
+      this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     }
 
     if (minLons.length !== 0 && lonMinLimit > lonMinCurrent || (minLons.length !== 0 && lonMinCurrent === this.defMinLon)) {
       this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
+      this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
+    } else if (minLons.length !== 0) {
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     }
 
@@ -559,6 +563,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     if (minLats.length !== 0 && latMinLimit > latMinCurrent || (minLats.length !== 0 && latMinCurrent === this.defMinLat)) {
       this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
+      this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
+    } else if (minLats.length !== 0) {
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
     }
 
