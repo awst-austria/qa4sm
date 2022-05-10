@@ -41,6 +41,11 @@ import {ModalWindowService} from '../../modules/core/services/global/modal-windo
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
 import {delay} from 'rxjs/operators';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
+import {
+  SIZE_1,
+  SIZE_1_DESC
+} from "../../modules/temporal-matching/components/temporal-matching/temporal-matching.component";
+import {TemporalMatchingModel} from "../../modules/temporal-matching/components/temporal-matching/temporal-matching-model";
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
@@ -77,6 +82,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       ANOMALIES_NONE_DESC,
       new BehaviorSubject<Date>(null),
       new BehaviorSubject<Date>(null)),
+    new TemporalMatchingModel(
+      new BehaviorSubject<number>(SIZE_1),
+      SIZE_1_DESC,
+    ),
     SCALING_METHOD_DEFAULT,
     new BehaviorSubject<string>(''));
 

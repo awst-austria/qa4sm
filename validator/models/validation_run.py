@@ -16,8 +16,6 @@ from validator.models import DatasetConfiguration, User, CopiedValidations
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
-
-
 class ValidationRun(models.Model):
     # scaling methods
     MIN_MAX = 'min_max'
@@ -32,7 +30,7 @@ class ValidationRun(models.Model):
         (LINREG, 'Linear regression'),
         (MEAN_STD, 'Mean/standard deviation'),
         (BETA_SCALING, 'CDF matching with beta distribution fitting'),
-        )
+    )
 
     # scale to
     SCALE_TO_REF = 'ref'
@@ -203,7 +201,7 @@ class ValidationRun(models.Model):
 
     @property
     def is_a_copy(self):
-        copied_runs = CopiedValidations.objects.filter(copied_run_id=self.id)\
+        copied_runs = CopiedValidations.objects.filter(copied_run_id=self.id) \
             .annotate(is_copied=ExpressionWrapper(~Q(copied_run=F('original_run')), output_field=BooleanField())) \
             .filter(is_copied=True)
 
@@ -216,21 +214,19 @@ class ValidationRun(models.Model):
             print(self.name_tag)
             return self.name_tag
 
-        configs = DatasetConfiguration.objects.filter(validation = self.id)
-        datasets = [conf.dataset.short_name+', ' for conf in configs if conf.id != self.reference_configuration.id]
+        configs = DatasetConfiguration.objects.filter(validation=self.id)
+        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.reference_configuration.id]
         t = self.start_time
         minute = str(t.minute)
         if t.minute < 10:
             minute = '0' + minute
-        label = 'Validation date: '+str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(t.hour) + ':' + minute +', Non-reference-dataset: '
+        label = 'Validation date: ' + str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(
+            t.hour) + ':' + minute + ', Non-reference-dataset: '
         for dataset in datasets:
             label += dataset
         label = label.strip(', ')
 
         return label
-
-
-
 
 
 # delete model output directory on disk when model is deleted

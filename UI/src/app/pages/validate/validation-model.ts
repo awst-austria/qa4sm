@@ -5,6 +5,7 @@ import {MetricModel} from '../../modules/metrics/components/metric/metric-model'
 import {AnomaliesModel} from '../../modules/anomalies/components/anomalies/anomalies-model';
 import {ScalingModel} from '../../modules/scaling/components/scaling/scaling-model';
 import {BehaviorSubject} from 'rxjs';
+import {TemporalMatchingModel} from "../../modules/temporal-matching/components/temporal-matching/temporal-matching-model";
 
 export class ValidationModel {
   // The reference configuration array should contain exactly one item.
@@ -14,6 +15,7 @@ export class ValidationModel {
               public validationPeriodModel: ValidationPeriodModel,
               public metrics: MetricModel[],
               public anomalies: AnomaliesModel,
+              public temporalMatchingModel: TemporalMatchingModel,
               public scalingModel: ScalingModel,
               public nameTag$: BehaviorSubject<string>) {
   }
