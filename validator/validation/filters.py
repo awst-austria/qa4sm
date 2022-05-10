@@ -193,6 +193,7 @@ def get_used_variables(filters, dataset, variable):
         for fil in filters:
             if fil.filter.name == "FIL_SMOSL3_RFI":
                 variables.append('Rfi_Prob')
+                variables.append('Ratio_RFI')
                 continue
 
     return variables
@@ -229,6 +230,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
         if pfil.filter.name == "FIL_SMOSL3_RFI":
             param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
             masking_filters.append(('Rfi_Prob', '<=', float(param)))
+            masking_filters.append(('Ratio_RFI', '<=', float(param)))
             continue
 
         inner_reader = filtered_reader

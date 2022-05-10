@@ -72,6 +72,7 @@ class TestValidation(TestCase):
         # check that the function outputs the correct objects
         f_list_should = [
             ('Rfi_Prob', '<=', self.rfi_theshold),
+            ('Ratio_RFI', '<=', self.rfi_theshold),
             ('Soil_Moisture', '>=', 0.0),
             ('Soil_Moisture', '<=', 1.0),
             ('Science_Flags', check_normalized_bits_array, [[24], [25]])
@@ -86,7 +87,7 @@ class TestValidation(TestCase):
         gpi = 542803
         out_data = self.filtered_reader.read(gpi)
         # check that the reader filters the data correctly
-        assert list(out_data.columns) == ["Soil_Moisture", "Science_Flags", "Rfi_Prob"]
+        assert list(out_data.columns) == ["Soil_Moisture", "Science_Flags", "Rfi_Prob", "Ratio_RFI"]
         assert self.smos_reader.read(gpi).Rfi_Prob.count() > out_data.Rfi_Prob.count()
         # assert Rfi threshold works
         assert (out_data.Rfi_Prob.values < self.rfi_theshold).all()
@@ -115,7 +116,7 @@ class TestValidation(TestCase):
             ("FIL_ASCAT_METOP_A", "ASCAT_sm", "sat_id", DataFilter),
             ("FIL_ERA5_TEMP_UNFROZEN", "ERA5_sm", "stl1", DataFilter),
             ("FIL_SMOSL3_STRONG_TOPO_MANDATORY", "SMOSL3_sm", "Science_Flags", DataFilter),
-            ("FIL_SMOSL3_RFI", "SMOSL3_sm", "Rfi_Prob", ParametrisedFilter),
+            ("FIL_SMOSL3_RFI", "SMOSL3_sm", ["Rfi_Prob", "Ratio_RFI"], ParametrisedFilter),
         ]
 
         for filtername, sm_variable, filter_variable_should, model in tested_data:
@@ -129,7 +130,10 @@ class TestValidation(TestCase):
             used_variables = get_used_variables(
                 filters, dataset=None, variable=variable
             )
-            used_variables_should = [variable.pretty_name, filter_variable_should]
+            if isinstance(filter_variable_should, list):
+                used_variables_should = [variable.pretty_name].extend(filter_variable_should)
+            else:
+                used_variables_should = [variable.pretty_name, filter_variable_should]
 
             assert used_variables == used_variables_should
 
