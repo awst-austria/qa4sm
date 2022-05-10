@@ -1,3 +1,4 @@
+import logging
 from os import path
 
 from ascat.read_native.cdr import AscatGriddedNcTs
@@ -14,6 +15,10 @@ from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
 
 from validator.validation import globals
 from validator.validation.util import first_file_in
+
+from pytesmo.validation_framework.adapters import TimestampAdapter
+
+__logger = logging.getLogger(__name__)
 
 
 def create_reader(dataset, version) -> GriddedNcTs:
@@ -74,3 +79,34 @@ def create_reader(dataset, version) -> GriddedNcTs:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))
 
     return reader
+
+
+def adapt_timestamp(reader, dataset):
+    """Adapt the reader to include the specified time offset"""
+
+    if dataset.short_name == globals.SMOS_L3:
+        tadapt_kwargs = {
+            'time_offset_fields': 'Mean_Acq_Time_Seconds',
+            'time_units': 's',
+            'generic_time_field': 'Mean_Acq_Time_Days',
+            'generic_time_reference': '2000-01-01',
+        }
+
+    elif dataset.short_name == globals.SMOS_IC:
+        tadapt_kwargs = {
+            'time_offset_fields': ['UTC_Seconds', 'UTC_Microseconds'],
+            'time_units': ['s', 'us'],
+            'generic_time_field': 'Days',
+            'generic_time_reference': '2000-01-01',
+        }
+
+    # No adaptation needed
+    else:
+        return reader
+
+    __logger.debug(
+        f"{dataset.short_name} adapted to account for the time offset"
+    )
+
+    # Adapt the reader with the exact timestamps
+    return TimestampAdapter(reader, **tadapt_kwargs)
