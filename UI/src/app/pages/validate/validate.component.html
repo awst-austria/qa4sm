@@ -139,20 +139,34 @@
       </div>
 
 
-      <!--      Validation period-->
-      <div class="p-col-10">
-        <qa-validation-period [validationPeriodModel]="validationModel.validationPeriodModel"></qa-validation-period>
-      </div>
+
+      <p-panel header="Temporal Subsetting" [toggleable]="true" class="validation-row p-col-10">
+        <ng-template pTemplate="icons">
+          <label class="p-panel-header-icon"
+                 pTooltip="Select validation period and temporal matching window."
+                 tooltipPosition="bottom">
+            <span class="pi pi-question-circle"></span>
+          </label>
+        </ng-template>
+
+        <!--      Validation period-->
+        <div>
+          <qa-validation-period [validationPeriodModel]="validationModel.validationPeriodModel"></qa-validation-period>
+        </div>
+        <!--      Temporal matching-->
+        <div>
+          <qa-temporal-matching [temporalMatchingModel]="validationModel.temporalMatchingModel"></qa-temporal-matching>
+        </div>
+
+      </p-panel>
+
 
       <!--      Metrics-->
       <div class="p-col-10">
         <qa-metrics [validationModel]="validationModel"></qa-metrics>
       </div>
 
-      <!--      Temporal matching-->
-      <div class="p-col-10">
-        <qa-temporal-matching [temporalMatchingModel]="validationModel.temporalMatchingModel"></qa-temporal-matching>
-      </div>
+
 
       <!--      Anomalies-->
       <div class="p-col-10">
