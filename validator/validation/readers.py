@@ -12,6 +12,7 @@ from smos.smos_ic.interface import SMOSTs
 from pynetcf.time_series import GriddedNcTs
 
 from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
+from qa4sm_preprocessing.nc_image_reader.readers import GriddedNcOrthoMultiTs
 
 from validator.validation import globals
 from validator.validation.util import first_file_in
@@ -73,7 +74,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = S1CglsTs(folder_name)
 
     if dataset.short_name == globals.SMOS_L3:
-        reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
+        reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))
