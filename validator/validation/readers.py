@@ -83,7 +83,6 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
 def adapt_timestamp(reader, dataset):
     """Adapt the reader to include the specified time offset"""
-
     if dataset.short_name == globals.SMOS_L3:
         tadapt_kwargs = {
             'time_offset_fields': 'Mean_Acq_Time_Seconds',
