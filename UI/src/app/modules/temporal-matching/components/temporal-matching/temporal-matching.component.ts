@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {TemporalMatchingModel} from "./temporal-matching-model";
-import {BehaviorSubject} from "rxjs";
+import {TemporalMatchingModel} from './temporal-matching-model';
+import {BehaviorSubject} from 'rxjs';
 
 
 export const SIZE_1 = 1;
@@ -33,11 +33,12 @@ export class TemporalMatchingComponent implements OnInit {
 
   @Input() temporalMatchingModel: TemporalMatchingModel;
 
-  constructor() {}
+  constructor() {
+  }
 
   public setSelection(sizeValue: number): void {
     this.availableTemporalMatchingModels.forEach(temporalMatchingModel => {
-      if (temporalMatchingModel.size$.getValue() == sizeValue) {
+      if (temporalMatchingModel.size$.getValue() === sizeValue) {
         this.selectedSize$.next(temporalMatchingModel);
       }
     });
@@ -50,31 +51,31 @@ export class TemporalMatchingComponent implements OnInit {
     });
   }
 
-  private prepareAnomaliesMethodModels() {
+  private prepareAnomaliesMethodModels(): void {
     this.availableTemporalMatchingModels.push(
       new TemporalMatchingModel(
         new BehaviorSubject<number>(SIZE_1),
         SIZE_1_DESC,
       )
-    )
+    );
     this.availableTemporalMatchingModels.push(
       new TemporalMatchingModel(
         new BehaviorSubject<number>(SIZE_6),
         SIZE_6_DESC,
       )
-    )
+    );
     this.availableTemporalMatchingModels.push(
       new TemporalMatchingModel(
         new BehaviorSubject<number>(SIZE_12),
         SIZE_12_DESC,
       )
-    )
+    );
     this.availableTemporalMatchingModels.push(
       new TemporalMatchingModel(
         new BehaviorSubject<number>(SIZE_24),
         SIZE_24_DESC,
       )
-    )
+    );
 
     this.selectedSize$.next(this.availableTemporalMatchingModels[0]);
   }
