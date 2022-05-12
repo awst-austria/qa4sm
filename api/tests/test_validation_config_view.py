@@ -75,7 +75,8 @@ class TestValidationConfigView(TransactionTestCase):
                      'anomalies_to': None,
                      'scaling_method': ValidationRun.MEAN_STD,
                      'scale_to': ValidationRun.SCALE_TO_REF,
-                     'name_tag': 'test_validation'}
+                     'name_tag': 'test_validation',
+                     'temporal_matching': globals.TEMP_MATCH_WINDOW}
 
         # not logged in client:
         response = self.client.post(start_validation_url, good_form, format='json')
@@ -133,7 +134,8 @@ class TestValidationConfigView(TransactionTestCase):
                       'anomalies_to': '',
                       'scaling_method': '',
                       'scale_to': '',
-                      'name_tag': ''
+                      'name_tag': '',
+                      'temporal_matching': ''
                       }
 
         response = self.client.post(start_validation_url, empty_form, format='json')
@@ -188,6 +190,7 @@ class TestValidationConfigView(TransactionTestCase):
                DatasetVersion.objects.get(short_name=globals.C3S_V202012).id
         assert val_run_dict['dataset_configs'][0]['variable_id'] == \
                DataVariable.objects.get(short_name=globals.C3S_sm).id
+        assert val_run_dict['temporal_matching'] == globals.TEMP_MATCH_WINDOW
         #  applied all existing settings, so there will be no change
         assert 'changes' not in val_run_dict.keys()
 
