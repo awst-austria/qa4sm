@@ -22,18 +22,13 @@
             id="windowSizeSelector"
             [showButtons]="true"
             [maxFractionDigits]="0"
-            [suffix]="' hour(s)'"
+            [suffix]="(temporalMatchingModel.size$|async) === 1 ? ' hour' : ' hours'"
             [ngModel]="(temporalMatchingModel.size$|async) ? (temporalMatchingModel.size$|async) : globalService.globalContext.temporal_matching_default "
             (ngModelChange)="temporalMatchingModel.size$.next($event)"
             [step]="1"
             [min]="1"
             [max]="24">
           </p-inputNumber>
-          <!--          <p-dropdown id="windowSizeSelector"-->
-          <!--                      [options]="availableTemporalMatchingModels"-->
-          <!--                      [ngModel]="selectedSize$|async"-->
-          <!--                      (ngModelChange)="selectedSize$.next($event)"-->
-          <!--                      optionLabel="description"></p-dropdown>-->
           <label for="windowSizeSelector">Select</label>
         </div>
       </div>
