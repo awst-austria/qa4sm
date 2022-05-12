@@ -44,8 +44,10 @@ import {SettingsService} from '../../modules/core/services/global/settings.servi
 import {
   SIZE_1,
   SIZE_1_DESC
-} from "../../modules/temporal-matching/components/temporal-matching/temporal-matching.component";
-import {TemporalMatchingModel} from "../../modules/temporal-matching/components/temporal-matching/temporal-matching-model";
+} from '../../modules/temporal-matching/components/temporal-matching/temporal-matching.component';
+import {
+  TemporalMatchingModel
+} from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
@@ -276,6 +278,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (validationRunConfig.interval_to != null) {
       this.validationModel.validationPeriodModel.intervalTo$.next(new Date(validationRunConfig.interval_to));
     }
+    // Temporal matching window size
+    this.validationModel.temporalMatchingModel.size$.next(validationRunConfig.temporal_matching);
 
     // Metrics
     if (validationRunConfig.metrics) {
@@ -514,7 +518,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
       scaling_method: this.validationModel.scalingModel.id,
       scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
-      name_tag: this.validationModel.nameTag$.getValue()
+      name_tag: this.validationModel.nameTag$.getValue(),
+      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
 
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
