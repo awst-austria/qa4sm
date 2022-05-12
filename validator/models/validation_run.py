@@ -59,6 +59,9 @@ class ValidationRun(models.Model):
         (AVERAGE, 'Average point measurements'),
     )
 
+    # temporal matching window size:
+    TEMP_MATCH_WINDOW = 12
+
     # fields
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -104,6 +107,8 @@ class ValidationRun(models.Model):
     bootstrap_tcol_cis = models.BooleanField(default=False)
     used_by = models.ManyToManyField(User, through=CopiedValidations, through_fields=('original_run', 'used_by_user'),
                                      related_name='copied_runs')
+    temporal_matching = models.IntegerField(default=TEMP_MATCH_WINDOW, null=False, blank=False,
+                                            validators=[MinValueValidator(1), MaxValueValidator(24)])
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -244,3 +249,5 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
         if os.path.isdir(outdir):
             rmtree(outdir)
+
+
