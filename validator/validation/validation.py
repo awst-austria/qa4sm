@@ -312,9 +312,15 @@ def create_pytesmo_validation(validation_run):
     __logger.debug(f"Scaling method: {scaling_method}")
     __logger.debug(f"Scaling dataset: {scaling_ref_name}")
 
+    temporalwindow_size = validation_run.temporal_matching
+    __logger.debug(f"Size of the temporal matching window: {temporalwindow_size}"
+                   f"{'hour' if temporalwindow_size == 1 else 'hours'}")
+
     val = Validation(
         datasets=datamanager,
-        temporal_matcher=make_combined_temporal_matcher(pd.Timedelta(12, "H")),
+        temporal_matcher=make_combined_temporal_matcher(
+            pd.Timedelta(temporalwindow_size, "H")
+        ),
         spatial_ref=ref_name,
         scaling=scaling_method,
         scaling_ref=scaling_ref_name,
