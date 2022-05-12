@@ -42,12 +42,9 @@ import {ExistingValidationDto} from '../../modules/core/services/validation-run/
 import {delay} from 'rxjs/operators';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {
-  SIZE_1,
-  SIZE_1_DESC
-} from '../../modules/temporal-matching/components/temporal-matching/temporal-matching.component';
-import {
   TemporalMatchingModel
 } from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
+import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
@@ -85,8 +82,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<Date>(null),
       new BehaviorSubject<Date>(null)),
     new TemporalMatchingModel(
-      new BehaviorSubject<number>(SIZE_1),
-      SIZE_1_DESC,
+      new BehaviorSubject<number>(this.globalService.globalContext.temporal_matching_default),
+      'hours',
     ),
     SCALING_METHOD_DEFAULT,
     new BehaviorSubject<string>(''));
@@ -113,7 +110,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private router: Router,
               private route: ActivatedRoute,
               private modalWindowService: ModalWindowService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private globalService: GlobalParamsService) {
   }
 
   ngAfterViewInit(): void {
@@ -178,7 +176,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
-    // TODO: parameterized filter setup seems to be missing
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
       const newDatasetConfigModel = new DatasetConfigModel(
@@ -525,14 +522,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
       data => {
         if (data.id) {
-          this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
+          this.router.navigate([`validation-result/${data.id}`]).then(() =>
+            this.toastService.showSuccessWithHeader('Validation started',
+              'Your validation has been started'));
         } else if (data.is_there_validation) {
           this.isThereValidation = data;
           this.modalWindowService.open();
         }
 
       },
-      error => {
+      () => {
         this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
       });
   }

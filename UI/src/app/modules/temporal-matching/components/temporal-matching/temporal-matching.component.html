@@ -3,8 +3,8 @@
     <h4 class="p-py-0 p-my-0 text-muted">
       Temporal matching
       <span class="pi pi-question-circle p-mb-1"
-        pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time. The specified temporal window is centered on the reference measurements (i.e., with edges at +- half size from each reference measurement point)."
-        tooltipPosition="bottom">
+            pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time. The specified temporal window is centered on the reference measurements (i.e., with edges at +- half size from each reference measurement point)."
+            tooltipPosition="bottom">
       </span>
     </h4>
   </div>
@@ -18,11 +18,22 @@
       </div>
       <div class="p-col-7 p-px-0">
         <div class="p-float-label">
-          <p-dropdown id="windowSizeSelector"
-                      [options]="availableTemporalMatchingModels"
-                      [ngModel]="selectedSize$|async"
-                      (ngModelChange)="selectedSize$.next($event)"
-                      optionLabel="description"></p-dropdown>
+          <p-inputNumber
+            id="windowSizeSelector"
+            [showButtons]="true"
+            [maxFractionDigits]="0"
+            [suffix]="' hour(s)'"
+            [ngModel]="(temporalMatchingModel.size$|async) ? (temporalMatchingModel.size$|async) : globalService.globalContext.temporal_matching_default "
+            (ngModelChange)="temporalMatchingModel.size$.next($event)"
+            [step]="1"
+            [min]="1"
+            [max]="24">
+          </p-inputNumber>
+          <!--          <p-dropdown id="windowSizeSelector"-->
+          <!--                      [options]="availableTemporalMatchingModels"-->
+          <!--                      [ngModel]="selectedSize$|async"-->
+          <!--                      (ngModelChange)="selectedSize$.next($event)"-->
+          <!--                      optionLabel="description"></p-dropdown>-->
           <label for="windowSizeSelector">Select</label>
         </div>
       </div>
