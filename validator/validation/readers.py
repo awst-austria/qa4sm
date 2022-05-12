@@ -88,16 +88,16 @@ def adapt_timestamp(reader, dataset):
         tadapt_kwargs = {
             'time_offset_fields': 'Mean_Acq_Time_Seconds',
             'time_units': 's',
-            'generic_time_field': 'Mean_Acq_Time_Days',
-            'generic_time_reference': '2000-01-01',
+            'base_time_field': 'Mean_Acq_Time_Days',
+            'base_time_reference': '2000-01-01',
         }
 
     elif dataset.short_name == globals.SMOS_IC:
         tadapt_kwargs = {
             'time_offset_fields': ['UTC_Seconds', 'UTC_Microseconds'],
             'time_units': ['s', 'us'],
-            'generic_time_field': 'Days',
-            'generic_time_reference': '2000-01-01',
+            'base_time_field': 'Days',
+            'base_time_reference': '2000-01-01',
         }
 
     # No adaptation needed
