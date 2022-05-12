@@ -102,7 +102,7 @@ NOT_AS_REFERENCE = []
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
 VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to']
+             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to', 'temporal_matching']
 DS_FIELDS = ['dataset', 'version']
 
 IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
