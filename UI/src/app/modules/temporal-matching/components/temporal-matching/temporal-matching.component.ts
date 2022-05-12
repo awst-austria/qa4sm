@@ -17,4 +17,9 @@ export class TemporalMatchingComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  getDefaultSize(): number{
+    this.temporalMatchingModel.size$.next(this.globalService.globalContext.temporal_matching_default);
+    return this.globalService.globalContext.temporal_matching_default;
+  }
+
 }

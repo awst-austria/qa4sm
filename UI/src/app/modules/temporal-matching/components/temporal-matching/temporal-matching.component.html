@@ -23,7 +23,7 @@
             [showButtons]="true"
             [maxFractionDigits]="0"
             [suffix]="(temporalMatchingModel.size$|async) === 1 ? ' hour' : ' hours'"
-            [ngModel]="(temporalMatchingModel.size$|async) ? (temporalMatchingModel.size$|async) : globalService.globalContext.temporal_matching_default "
+            [ngModel]="(temporalMatchingModel.size$|async) ? (temporalMatchingModel.size$|async) : getDefaultSize() "
             (ngModelChange)="temporalMatchingModel.size$.next($event)"
             [step]="1"
             [min]="1"

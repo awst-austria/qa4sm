@@ -44,7 +44,6 @@ import {SettingsService} from '../../modules/core/services/global/settings.servi
 import {
   TemporalMatchingModel
 } from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
-import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
@@ -82,7 +81,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<Date>(null),
       new BehaviorSubject<Date>(null)),
     new TemporalMatchingModel(
-      new BehaviorSubject<number>(this.globalService.globalContext.temporal_matching_default),
+      new BehaviorSubject<number>(null),
       'hours',
     ),
     SCALING_METHOD_DEFAULT,
@@ -110,8 +109,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private router: Router,
               private route: ActivatedRoute,
               private modalWindowService: ModalWindowService,
-              private settingsService: SettingsService,
-              private globalService: GlobalParamsService) {
+              private settingsService: SettingsService) {
   }
 
   ngAfterViewInit(): void {
