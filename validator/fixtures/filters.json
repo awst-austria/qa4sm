@@ -520,7 +520,7 @@
             "help_text": "Values affected by single- and multi-orbit Radio Frequency Interference (RFI) probability above the selected threshold will be filtered out. The probability is expressed in fractional units, with allowed range [0.0, 1.0]. NOTE: mandatory filter",
             "parameterised": true,
             "dialog_name": null,
-            "default_parameter": "0.80",
+            "default_parameter": "0.10",
             "to_include": null,
             "disable_filter": null,
             "default_set_active": true,
