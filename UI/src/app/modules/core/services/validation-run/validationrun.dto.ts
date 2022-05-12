@@ -36,6 +36,7 @@ export class ValidationrunDto{
               public copied_run: number[],
               public is_a_copy: boolean,
               public bootstrap_tcol_cis: boolean,
+              public temporal_matching: number,
               public comparison_label?: string) {
   }
 }

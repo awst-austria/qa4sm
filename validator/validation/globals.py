@@ -2,6 +2,7 @@ from django.conf import settings
 from datetime import datetime
 import pandas as pd
 import numpy as np
+from validator.models import ValidationRun
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
@@ -101,7 +102,7 @@ NOT_AS_REFERENCE = []
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
 VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to']
+             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to', 'temporal_matching']
 DS_FIELDS = ['dataset', 'version']
 
 IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
@@ -145,3 +146,5 @@ METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
                        "Climate classification": "metadata_climate_KG",
                        "Soil type classification": "metadata_instrument_depth_and_soil_type",
                        }
+
+TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
