@@ -2,6 +2,7 @@ from django.conf import settings
 from datetime import datetime
 import pandas as pd
 import numpy as np
+from validator.models import ValidationRun
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
@@ -145,3 +146,5 @@ METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
                        "Climate classification": "metadata_climate_KG",
                        "Soil type classification": "metadata_instrument_depth_and_soil_type",
                        }
+
+TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
