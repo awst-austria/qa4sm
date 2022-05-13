@@ -6,6 +6,7 @@
     <a pageScroll="" [pageScrollDuration]="1" href="#results">Validation Results Page</a><br/>
     <a pageScroll="" [pageScrollDuration]="1" href="#publishing">Publishing</a><br/>
     <a pageScroll="" [pageScrollDuration]="1" href="#published">Published Validations Page</a><br/>
+    <a pageScroll="" [pageScrollDuration]="1" href="#comparison">Validation Comparison</a><br/>
   </p>
 
   <a id="manual"></a>
@@ -42,12 +43,14 @@
     The filters available depend on the data contained within the chosen dataset. For example,
     you can filter the C3S data to include only data with no inconsistencies detected (flag = 0).
     Details of the filter options provided for each dataset are given on the
-    <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">supported datasets page</a>. You can also
+    <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">supported datasets page</a>. You
+    can also
     hover your mouse pointer over the question mark next to a filter to get a short explanation.
   </p>
   <p>
     <b>Step 3 [optional]</b> - If you want to intercompare several datasets, you can add more datasets to the validation
-    using the <b>Add dataset</b> button, up to a maximum of five. Configure the settings for the additional datasets by selecting
+    using the <b>Add dataset</b> button, up to a maximum of five. Configure the settings for the additional datasets by
+    selecting
     the respective tab and repeating steps 1 and 2 above.<br/>
   </p>
   <p class="alert alert-info">
@@ -84,10 +87,12 @@
     To do that you have to open an appropriate window by clicking a 'select...' link next to the filter you want to parameterised.
     </span>
   </p>
-  <img  alt='ismn networks' class="scaled_image mb-3" [src]="ismnNetworks">
+  <img alt='ismn networks' class="scaled_image mb-3" [src]="ismnNetworks">
   <p>
-    The window for choosing networks contains a list of continents. When clicking an arrow next to a continent name a list of networks that belong to the continent unfolds.
-    Next to each network there is the name of the country it belongs to. To toggle the particular network it is enough to click on its name.
+    The window for choosing networks contains a list of continents. When clicking an arrow next to a continent name a
+    list of networks that belong to the continent unfolds.
+    Next to each network there is the name of the country it belongs to. To toggle the particular network it is enough
+    to click on its name.
     The choice doesn't have to be approved, it is enough to close the dialog window and the choice will be saved.
   </p>
   <img alt="ismn depths" class="scaled_image mb-3" [src]="ismnDepths">
@@ -137,7 +142,8 @@
   <p>
     <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed. Accepted formats
     are: YYYY*MM*DD
-    or DD*MM*YYYY where * can be any of &quot;.&quot;, &quot;/&quot; or &quot;-&quot;. If you leave the fields empty, the validation period
+    or DD*MM*YYYY where * can be any of &quot;.&quot;, &quot;/&quot; or &quot;-&quot;. If you leave the fields empty,
+    the validation period
     will be
     implicitly determined through temporal matching of the data and reference selected. For the time range covered by
     the various
@@ -147,7 +153,8 @@
     <img alt="validation period" class="scaled_image p-mb-3" [src]="validationPeriod">
   </div>
   <p>
-    <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC) and Bootstrapping Triple Collocation confidence intervals (BTC). By default, QA4SM calculates validation
+    <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC) and Bootstrapping Triple Collocation confidence
+    intervals (BTC). By default, QA4SM calculates validation
     metrics between dataset pairs (the reference and each candidate data set). If more than 3 datasets
     are selected (including the reference), the switch to activate TC becomes available. If
     TC is selected, in addition to the basic metrics between dataset pairs, TC metrics between
@@ -156,7 +163,8 @@
     (this is evident from the metric name). TC metrics are affected by all 3 used datasets. Only results from TC with
     independent datasets should be used. <br><br>
     The bootstrapping option is enabled only if TC is selected.
-    When it is chosen confidence intervals are calculated via bootstrapping with 1000 repetitions, however the validation time might be up to 5 times longer.
+    When it is chosen confidence intervals are calculated via bootstrapping with 1000 repetitions, however the
+    validation time might be up to 5 times longer.
   </p>
   <div>
     <img alt="triple collocation" class="scaled_image p-mb-3" [src]="tca">
@@ -270,18 +278,21 @@
         produced for the validation (in png and svg formats) in a zip archive.
       </li>
       <li>
-        <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> The Download NetCDF File option allows you to download
+        <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> The Download NetCDF File option allows you to
+        download
         the
         validation result (metrics computed).
       </li>
 
       <li>
-        <span class="pi pi-replay"></span> With Load Validation Settings option you can load settings of the particular validations;
+        <span class="pi pi-replay"></span> With Load Validation Settings option you can load settings of the particular
+        validations;
         you will be redirected to the validate page.
       </li>
 
       <li>
-        <span class="pi pi-times"></span> The Remove Validation Run option is only visible once the validation has finished
+        <span class="pi pi-times"></span> The Remove Validation Run option is only visible once the validation has
+        finished
         or was aborted and will permanently delete the result.
       </li>
 
@@ -295,9 +306,9 @@
     </ul>
 
   </ul>
-<!--  <div>-->
-<!--    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">-->
-<!--  </div>-->
+  <!--  <div>-->
+  <!--    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">-->
+  <!--  </div>-->
 
   <h1 id="results" class="h3 p-mb-3 font-weight-normal">Validation Results Page</h1>
 
@@ -500,6 +511,93 @@
 
   <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so
     at {{ this.getAdminMail() }}.</p>
+
+  <h1 id="comparison" class="h3 p-mb-3 font-weight-normal">Validation Comparison</h1>
+
+  <p>
+    With the QA4SM version 2.1 (and later) it is possible to compare existing validations that belong to the currently
+    logged-in user or have been published.
+    The comparison module is available for a logged-in user under the “Compare validations” button in the navigation
+    bar.
+  </p>
+  <p>
+    The module enables two comparison modes - a comparison of two validations with the same reference data set and
+    one non-reference dataset or a comparison between two non-reference datasets used in one validation. The module
+    consists of three main components: Dataset Configuration, Validations selection and Spatial extent (see pictures
+    below).
+
+  </p>
+  <p>
+    The Datasets configuration component enables choosing the dataset that was used as the reference one
+    (including its version and the variable name) and selecting the comparison mode. Checking ‘Multiple non-reference
+    datasets’ switches on the ‘one validation’ comparison mode.
+  </p>
+  <div>
+    <img alt="datest-configuration" class="scaled_image p-mb-3" [src]="datsetConfigurationComparison">
+  </div>
+  <p>
+    The Validations selection component gets updated with every change of the reference dataset and shows validations
+    available for comparison. A selected validation has to be added by clicking the ‘Add validation’ button.
+    If the maximum number of validations has been added, the ‘Add validation’ button gets disabled. Added validations
+    are listed below the selection box as red ‘Remove validation’ buttons. Clicking a remove button will remove the
+    appropriate validation from the list.
+  </p>
+  <div>
+    <img alt="validation-selection" class="scaled_image p-mb-3" [src]="validationSelectionsComparison">
+  </div>
+  <p>
+    In general it is possible to compare any two validations that have the same reference dataset.
+    If additionally the two validations have a common spatial extent, a user can choose if the comparison should be
+    performed on all points or only on the common ones. If validations have no common points, the option
+    ‘Include all points...’ is disabled.
+  </p>
+  <div>
+    <img alt="spatial-extent" class="scaled_image p-mb-3" [src]="spatialExtentComparison">
+  </div>
+  <p>
+    The comparison is started by clicking the ‘Compare’ button. As a result users get four components:
+  </p>
+  <ol>
+    <li>
+      Comparison summary containing summaries, of chosen validations or validation (if ‘one validation’ mode was used);
+    </li>
+    <li>
+      Selected comparison extent containing a plot with marked area for which comparison was performed;
+    </li>
+    <li>
+      Comparison statistics containing a table of validation statistics calculated for both validations and differences between them;
+    </li>
+    <li>
+      Comparison plots containing:
+      <ul>
+        <li>
+          a drop down list for metric selection,
+        </li>
+        <li>
+          a box plot depicting particular metric for each validation (if there is no common
+          spatial extent between compared validations or if ‘Include all points from the selected validations’ option was
+          chosen),
+        </li>
+        <li>
+          or a box plot depicting particular metric for each validation and the difference between them, a map depicting
+          differences between the chosen metric on all points for which the comparison was performed
+          (if there was a common spatial extent between validations).
+        </li>
+      </ul>
+    </li>
+  </ol>
+  <p>
+    All the plots and the statistics table can be downloaded using appropriate buttons placed next to each object.
+  </p>
+  <p>
+    Please note, that since the comparison module is still being developed and the comparison is done on the fly,
+    there is a risk that a particular comparison may not be performed due to too big validation results file.
+    If that is the case the user is advised to run smaller (in terms of spatial subsetting) validations and compare them one more time.
+  </p>
+
+
+
+
   <qa-scroll-to-top></qa-scroll-to-top>
 </main>
 
