@@ -206,7 +206,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
     # figure out which variables we have to load because we want to use them
     load_vars = get_used_variables(filters, dataset, variable)
     load_vars.extend(get_used_variables(param_filters, dataset, variable))
-    print(f"Loaded filter variables: {load_vars}")
+    __logger.debug(f"Loaded filter variables: {load_vars}")
 
     # restrict the variables that are read from file in the reader
     if hasattr(reader, 'parameters'):

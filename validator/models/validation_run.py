@@ -216,7 +216,6 @@ class ValidationRun(models.Model):
     def comparison_label(self):
         # check name tag has been given and it's not empty
         if self.name_tag is not None and self.name_tag:
-            print(self.name_tag)
             return self.name_tag
 
         configs = DatasetConfiguration.objects.filter(validation=self.id)

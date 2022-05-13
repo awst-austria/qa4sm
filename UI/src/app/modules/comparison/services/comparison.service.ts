@@ -73,7 +73,6 @@ export class ComparisonService {
       params += `&extent=${extent}`;
     }
     const fileUrl = `${downloadComparisonTableUrl}${params}`;
-    console.log(fileUrl);
     saveAs(fileUrl);
   }
 
