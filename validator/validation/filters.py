@@ -79,6 +79,9 @@ def check_normalized_bits_array(
     if type(numbers) is pd.Series:
         numbers = numbers.values
 
+    # Make sure the correct format is passed
+    numbers = numbers.astype(int)
+
     return ~np.any(
         np.array([
             np.all(
