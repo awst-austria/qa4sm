@@ -313,7 +313,7 @@ def create_pytesmo_validation(validation_run):
     __logger.debug(f"Scaling dataset: {scaling_ref_name}")
 
     temporalwindow_size = validation_run.temporal_matching
-    __logger.debug(f"Size of the temporal matching window: {temporalwindow_size}"
+    __logger.debug(f"Size of the temporal matching window: {temporalwindow_size} "
                    f"{'hour' if temporalwindow_size == 1 else 'hours'}")
 
     val = Validation(
