@@ -37,6 +37,9 @@ export class HelpComponent implements OnInit {
   publishingDialog: string;
   ismnNetworks: string;
   ismnDepths: string;
+  datsetConfigurationComparison: string;
+  validationSelectionsComparison: string;
+  spatialExtentComparison: string;
 
   constructor(private globalParamsService: GlobalParamsService) {
   }
@@ -65,6 +68,9 @@ export class HelpComponent implements OnInit {
     this.publishingDialog = plotsUrlPrefix + 'publishing_dialog.png';
     this.ismnNetworks = plotsUrlPrefix + 'networks.png';
     this.ismnDepths = plotsUrlPrefix + 'depths.png';
+    this.datsetConfigurationComparison = plotsUrlPrefix + 'dataset-configuration-for-comparison.png';
+    this.validationSelectionsComparison = plotsUrlPrefix + 'validation-selection-comparison.png';
+    this.spatialExtentComparison = plotsUrlPrefix + 'spatial-extent-comparison.png';
   }
 
   getAdminMail(): string {
