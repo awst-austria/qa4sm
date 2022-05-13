@@ -150,10 +150,11 @@ class TestValidation(TestCase):
             used_variables = get_used_variables(
                 filters, dataset=None, variable=variable
             )
+            used_variables_should = [variable.pretty_name]
             if isinstance(filter_variable_should, list):
-                used_variables_should = [variable.pretty_name].extend(filter_variable_should)
+                used_variables_should.extend(filter_variable_should)
             else:
-                used_variables_should = [variable.pretty_name, filter_variable_should]
+                used_variables_should.append(filter_variable_should)
 
             assert used_variables == used_variables_should
 
