@@ -232,7 +232,8 @@
       You can see the expiration date by hovering your mouse over the icon.
     </li>
     <li>
-      <span class="pi pi-book"></span> The validation has been archived and won't be automatically removed
+      <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> The validation has been archived and won't be
+      automatically removed
       by the cleanup process.
     </li>
     <li>
@@ -240,6 +241,10 @@
       {{ this.getWarningPeriod() }} days and will then be removed by the auto-cleanup process, unless you extend or
       archive it.
       You can see the expiration date by hovering your mouse over the icon.
+    </li>
+    <li>
+      <span class="pi pi-book"></span>
+      This result has been published with zenodo. It will NOT be automatically removed during cleanup.
     </li>
   </ul>
 
@@ -565,7 +570,8 @@
       Selected comparison extent containing a plot with marked area for which comparison was performed;
     </li>
     <li>
-      Comparison statistics containing a table of validation statistics calculated for both validations and differences between them;
+      Comparison statistics containing a table of validation statistics calculated for both validations and differences
+      between them;
     </li>
     <li>
       Comparison plots containing:
@@ -575,7 +581,8 @@
         </li>
         <li>
           a box plot depicting particular metric for each validation (if there is no common
-          spatial extent between compared validations or if ‘Include all points from the selected validations’ option was
+          spatial extent between compared validations or if ‘Include all points from the selected validations’ option
+          was
           chosen),
         </li>
         <li>
@@ -592,10 +599,9 @@
   <p>
     Please note, that since the comparison module is still being developed and the comparison is done on the fly,
     there is a risk that a particular comparison may not be performed due to too big validation results file.
-    If that is the case the user is advised to run smaller (in terms of spatial subsetting) validations and compare them one more time.
+    If that is the case the user is advised to run smaller (in terms of spatial subsetting) validations and compare them
+    one more time.
   </p>
-
-
 
 
   <qa-scroll-to-top></qa-scroll-to-top>
