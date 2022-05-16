@@ -38,7 +38,7 @@ from validator.tests.auxiliary_functions import (
     generate_ismn_upscaling_validation,
 )
 from validator.tests.testutils import set_dataset_paths
-from validator.validation import globals
+from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import METRICS, TC_METRICS
@@ -1157,6 +1157,30 @@ class TestValidation(TestCase):
                 ref_reader,
                 run.reference_configuration
             )
+
+    def test_temporal_adapter(self):
+        # test that the offset is used for the following datasets and versions
+        for dt, ver, field, unit in [
+            (globals.SMOS_L3, globals.SMOSL3_Level3_DESC, "Mean_Acq_Time_Seconds", "s"),
+            (globals.SMOS_L3, globals.SMOSL3_Level3_ASC, "Mean_Acq_Time_Seconds", "s"),
+            (globals.SMOS_IC, globals.SMOS_105_ASC, "UTC_Seconds", "s"),
+        ]:
+            dataset = Dataset.objects.get(short_name=dt)
+            version = DatasetVersion.objects.get(short_name=ver)
+
+            reader = val.create_reader(dataset, version)
+            midnight_tstamp = reader.read(-155.42, 19.78,)
+
+            t_adaped_reader = adapt_timestamp(reader, dataset)
+            exact_tstamp = t_adaped_reader.read(-155.42, 19.78,)
+
+            # Check that the values where the exact date is missing are dropped
+            assert exact_tstamp.index.shape == \
+                   midnight_tstamp[~np.isnan(midnight_tstamp[field])].index.shape
+            # Check the index type
+            assert exact_tstamp.index.dtype == np.dtype('<M8[ns]')
+            # Check that the offset field is not in the output
+            assert field not in exact_tstamp.columns
 
     # test all combinations of datasets, versions, variables, and filters
     @pytest.mark.long_running

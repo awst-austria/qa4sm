@@ -18,6 +18,7 @@ describe('HelpComponent', () => {
         app_version: '1.6.0',
         expiry_period: '7',
         warning_period: '60',
+        temporal_matching_default: 0
       }
     };
 

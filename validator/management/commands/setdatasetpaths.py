@@ -48,7 +48,6 @@ class Command(BaseCommand):
             else:
                 val = default_path
 
-            print(val)
             dataset.storage_path = val
             dataset.save()
             change_counter += 1

@@ -47,7 +47,7 @@ class TestValidation(TestCase):
 
             config.save()
 
-        self.rfi_theshold = 0.016  # needs to be low as testdata have low values
+        self.rfi_theshold = 0.01  # needs to be low as testdata have low values
         pfilter = ParametrisedFilter(
             filter=DataFilter.objects.get(name="FIL_SMOSL3_RFI"),
             parameters=self.rfi_theshold,
@@ -59,6 +59,18 @@ class TestValidation(TestCase):
             self.smos_config.dataset,
             self.smos_config.version
         )
+
+        # Create a custom DataFrame to test the functions
+        # take real data
+        data = self.smos_reader.read(542803)
+        data["Soil_Moisture"] = data.apply(
+            lambda row: np.random.uniform(0, 1) if ~np.isnan(row["Rfi_Prob"]) else np.nan, axis=1
+        )
+
+        def _read():
+            return data
+
+        setattr(self.smos_reader, "read", _read)
 
         self.filtered_reader, self.read_name, self.read_kwargs = setup_filtering(
             self.smos_reader,
@@ -72,6 +84,7 @@ class TestValidation(TestCase):
         # check that the function outputs the correct objects
         f_list_should = [
             ('Rfi_Prob', '<=', self.rfi_theshold),
+            ('Ratio_RFI', '<=', self.rfi_theshold),
             ('Soil_Moisture', '>=', 0.0),
             ('Soil_Moisture', '<=', 1.0),
             ('Science_Flags', check_normalized_bits_array, [[24], [25]])
@@ -82,12 +95,20 @@ class TestValidation(TestCase):
         assert self.read_name == 'read'
         assert not self.read_kwargs
 
-        # take an hawaiian gpi
-        gpi = 542803
-        out_data = self.filtered_reader.read(gpi)
+        out_data = self.filtered_reader.read()
         # check that the reader filters the data correctly
-        assert list(out_data.columns) == ["Soil_Moisture", "Science_Flags", "Rfi_Prob"]
-        assert self.smos_reader.read(gpi).Rfi_Prob.count() > out_data.Rfi_Prob.count()
+        assert list(out_data.columns) == [
+            'Soil_Moisture',
+            'Soil_Moisture_Dqx',
+            'Chi_2',
+            'Science_Flags',
+            'Rfi_Prob',
+            'Mean_Acq_Time_Days',
+            'Mean_Acq_Time_Seconds',
+            'Ratio_RFI',
+            'Optical_Thickness_Nad'
+        ]
+        assert self.smos_reader.read().Rfi_Prob.count() > out_data.Rfi_Prob.count()
         # assert Rfi threshold works
         assert (out_data.Rfi_Prob.values < self.rfi_theshold).all()
 
@@ -100,7 +121,7 @@ class TestValidation(TestCase):
         df_filtered = out_data.Science_Flags.apply(
             lambda x: return_index(x, -26)
         )
-        df_unfiltered = self.smos_reader.read(gpi).Science_Flags.apply(
+        df_unfiltered = self.smos_reader.read().Science_Flags.apply(
             lambda x: return_index(x, -26)
         )
         # assert one gets filtered, the other doesn't
@@ -115,7 +136,7 @@ class TestValidation(TestCase):
             ("FIL_ASCAT_METOP_A", "ASCAT_sm", "sat_id", DataFilter),
             ("FIL_ERA5_TEMP_UNFROZEN", "ERA5_sm", "stl1", DataFilter),
             ("FIL_SMOSL3_STRONG_TOPO_MANDATORY", "SMOSL3_sm", "Science_Flags", DataFilter),
-            ("FIL_SMOSL3_RFI", "SMOSL3_sm", "Rfi_Prob", ParametrisedFilter),
+            ("FIL_SMOSL3_RFI", "SMOSL3_sm", ["Rfi_Prob", "Ratio_RFI"], ParametrisedFilter),
         ]
 
         for filtername, sm_variable, filter_variable_should, model in tested_data:
@@ -129,7 +150,11 @@ class TestValidation(TestCase):
             used_variables = get_used_variables(
                 filters, dataset=None, variable=variable
             )
-            used_variables_should = [variable.pretty_name, filter_variable_should]
+            used_variables_should = [variable.pretty_name]
+            if isinstance(filter_variable_should, list):
+                used_variables_should.extend(filter_variable_should)
+            else:
+                used_variables_should.append(filter_variable_should)
 
             assert used_variables == used_variables_should
 

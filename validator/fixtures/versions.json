@@ -127,7 +127,7 @@
             "pretty_name": "20191211 global",
             "help_text": "ISMN from 2019-12-11",
             "time_range_start": "",
-            "time_range_end": "",
+            "time_range_end": "2019-12-11",
             "geographical_range": null
         }
     },
@@ -247,7 +247,7 @@
             "pretty_name": "20210131 global",
             "help_text": "ISMN from 2021-01-31",
             "time_range_start": "",
-            "time_range_end": "",
+            "time_range_end": "2021-01-31",
             "geographical_range": null
         }
     },
@@ -342,7 +342,7 @@
             "pretty_name": "version 339 Ascending",
             "help_text": "SMOS L3-SM (CATDS) Descending Obs.",
             "time_range_start": "2010-07-01",
-            "time_range_end": "2022-02-14",
+            "time_range_end": "2022-05-07",
             "geographical_range": null
         }
     },
@@ -354,7 +354,7 @@
             "pretty_name": "version 339 Descending",
             "help_text": "SMOS L3-SM (CATDS) Ascending Obs.",
             "time_range_start": "2010-07-01",
-            "time_range_end": "2022-02-14",
+            "time_range_end": "2022-05-07",
             "geographical_range": null
         }
     }
