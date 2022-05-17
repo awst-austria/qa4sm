@@ -140,17 +140,20 @@
     <img alt="map selection" class="scaled_image p-mb-3" [src]="mapSelection">
   </div>
   <p>
-    <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed. Accepted formats
-    are: YYYY*MM*DD
-    or DD*MM*YYYY where * can be any of &quot;.&quot;, &quot;/&quot; or &quot;-&quot;. If you leave the fields empty,
-    the validation period
-    will be
-    implicitly determined through temporal matching of the data and reference selected. For the time range covered by
-    the various
+    <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed and temporal matching
+    window size.
+    The only accepted date format for the validation period is: YYYY-MM-DD. It is also possible to choose a date from
+    a calendar, available when clicking the date input field.     By default, the date range is determined through temporal matching of the data and reference selected.
+    If the validation period fields are left empty, the validation will not be started.  For the time range covered by the various
     datasets, see the <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">datasets page</a>.
+    <br>
+
+    For temporal matching window size, the default (and recommended) value is 12 hours and possible choices are integer
+    numbers between 1 and 24 hours.
+
   </p>
   <div>
-    <img alt="validation period" class="scaled_image p-mb-3" [src]="validationPeriod">
+    <img alt="validation period" class="scaled_image p-mb-3" [src]="temporalSubsetting">
   </div>
   <p>
     <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC) and Bootstrapping Triple Collocation confidence

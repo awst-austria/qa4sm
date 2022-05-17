@@ -26,7 +26,7 @@ export class HelpComponent implements OnInit {
   anomalies: string;
   spatialSubsetting: string;
   mapSelection: string;
-  validationPeriod: string;
+  temporalSubsetting: string;
   tca: string;
   scaling: string;
   nameYourValidation: string;
@@ -57,7 +57,7 @@ export class HelpComponent implements OnInit {
     this.anomalies = plotsUrlPrefix + 'anomalies.png';
     this.spatialSubsetting = plotsUrlPrefix + 'spatial_subsetting.png';
     this.mapSelection = plotsUrlPrefix + 'map_selection.png';
-    this.validationPeriod = plotsUrlPrefix + 'validation_period.png';
+    this.temporalSubsetting = plotsUrlPrefix + 'temporal_subsetting.png';
     this.tca = plotsUrlPrefix + 'metrics.png';
     this.scaling = plotsUrlPrefix + 'scaling.png';
     this.nameYourValidation = plotsUrlPrefix + 'name_your_validation.png';
