@@ -14,6 +14,7 @@ export interface ValidationRunConfigDto {
   scaling_method: string;
   scale_to: string;
   name_tag: string;
+  temporal_matching: number;
   changes?: ConfigurationChanges;
 }
 

@@ -18,6 +18,7 @@ export class GlobalParamsService {
   app_version: '',
   expiry_period: '',
   warning_period: '',
+  temporal_matching_default: null
   };
 
   tooltipLifetime = 2000; // needed to set it somewhere global;
@@ -26,7 +27,7 @@ export class GlobalParamsService {
     this.init();
   }
 
-  private init() {
+  private init(): void{
     this.httpClient
       .get<GlobalParamsDto>(globalContextUrl)
       .subscribe(

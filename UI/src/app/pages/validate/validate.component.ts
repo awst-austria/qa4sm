@@ -41,6 +41,9 @@ import {ModalWindowService} from '../../modules/core/services/global/modal-windo
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
 import {delay} from 'rxjs/operators';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
+import {
+  TemporalMatchingModel
+} from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
@@ -77,6 +80,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       ANOMALIES_NONE_DESC,
       new BehaviorSubject<Date>(null),
       new BehaviorSubject<Date>(null)),
+    new TemporalMatchingModel(
+      new BehaviorSubject<number>(null),
+      'hours',
+    ),
     SCALING_METHOD_DEFAULT,
     new BehaviorSubject<string>(''));
 
@@ -167,7 +174,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
-    // TODO: parameterized filter setup seems to be missing
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
       const newDatasetConfigModel = new DatasetConfigModel(
@@ -267,6 +273,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (validationRunConfig.interval_to != null) {
       this.validationModel.validationPeriodModel.intervalTo$.next(new Date(validationRunConfig.interval_to));
     }
+    // Temporal matching window size
+    this.validationModel.temporalMatchingModel.size$.next(validationRunConfig.temporal_matching);
 
     // Metrics
     if (validationRunConfig.metrics) {
@@ -505,20 +513,23 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
       scaling_method: this.validationModel.scalingModel.id,
       scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
-      name_tag: this.validationModel.nameTag$.getValue()
+      name_tag: this.validationModel.nameTag$.getValue(),
+      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
 
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
       data => {
         if (data.id) {
-          this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
+          this.router.navigate([`validation-result/${data.id}`]).then(() =>
+            this.toastService.showSuccessWithHeader('Validation started',
+              'Your validation has been started'));
         } else if (data.is_there_validation) {
           this.isThereValidation = data;
           this.modalWindowService.open();
         }
 
       },
-      error => {
+      () => {
         this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
       });
   }
