@@ -28,11 +28,16 @@ def start_validation(request):
     check_for_existing_validation = request.query_params.get('check_for_existing_validation', False)
 
     ser = ValidationConfigurationSerializer(data=request.data)
-    ser.is_valid(raise_exception=True)
+    try:
+        ser.is_valid(raise_exception=True)
+    except:
+        print(ser.errors)
+        return JsonResponse(ser.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
     new_val_run.save()
-    print(new_val_run.temporal_matching)
+
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 

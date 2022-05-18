@@ -529,8 +529,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         }
 
       },
-      () => {
-        this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
+      errors => {
+        const validationErrorMessage = this.messageAboutValidationErrors(errors);
+        this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
       });
   }
 
@@ -665,6 +666,34 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     this.validationModel.validationPeriodModel.intervalFrom$.next(this.validationStart);
     this.validationModel.validationPeriodModel.intervalTo$.next(this.validationEnd);
+  }
+
+  private getValidationFieldFriendlyName(fieldName): string{
+    const fieldsFriendlyNames = {
+      name_tag: 'validation name',
+      interval_from: 'validation period "From"',
+      interval_to: 'validation period "To"',
+      anomalies: 'anomalies',
+      min_lat: 'minimum latitude',
+      max_lat: 'maximum latitude',
+      min_lon: 'minimum longitude',
+      max_lon: 'maximum longitude',
+    };
+    return fieldsFriendlyNames[fieldName];
+  }
+
+  private messageAboutValidationErrors(errors: any): string {
+    let message = 'Please fix following problems: \n';
+
+    Object.entries(errors.error).forEach(([key]) => {
+      if (this.getValidationFieldFriendlyName(key)){
+        message += `\n Field ${this.getValidationFieldFriendlyName(key)}: ${errors.error[key]} \n`;
+      } else {
+        message += `\n ${errors.error[key]}`;
+      }
+    });
+
+    return message.toString();
   }
 
 }
