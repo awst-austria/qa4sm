@@ -1,63 +1,18 @@
-QA4SM v2.0.3.4 - Release notes 2022-04-22
+QA4SM v2.1.0 - Release notes 2022-0*-**
 =======================================================
-
-# Improvements
-1. Admin panel updated
-
-QA4SM v2.0.3.3 - Release notes 2022-04-19
-=======================================================
-
-# Improvements
-1. Sending emails updated
-
-QA4SM v2.0.3.1 - Release notes 2022-04-19
-=======================================================
-
-# Improvements
-1. Sending emails improved
-
-QA4SM v2.0.3 - Release notes 2022-04-14
-=======================================================
-
-# Bug Fixing
-1. Setting automatic bounding box fixed,
-2. Showing plots for dataset with updated names fixed,
-
-# Improvements
-1. Reloading settings improved to handle missing variables,
-2. Admin panel updated
-
-QA4SM v2.0.2 - Release notes 2022-03-30
-=======================================================
-
-# Updates
-1. Dataset names updated,
-2. Dataset filter lists updated
-
-# Improvements
-1. Admin panel improved to monitor service downtime
-
-
-QA4SM v2.0.1 - Release notes 2022-03-14
-=======================================================
-
 # New features
 
-1. High resolution datasets available as a reference
+1. Validation comparison module added
+2. SMOS Level 3 dataset now available
+3. Metadata plots created when ISMN dataset used as reference
+4. Temporal matching window size filter added
 
-# Fixes
+# Improvements
 
-1. Notification about adjusted spatial subsetting fixed - it doesn't show up when coordinates haven't changed.
+1. Admin panel developed
+2. Code refinement done and not needed urls removed
+3. Help page and User Manual updated
+4. Handling errors when starting a validation added
 
-
-QA4SM v2.0.0 - Release notes 2022-02-17
-=======================================================
-
-# Major changes
-
-1. New User Interface
-
-# New features
-
-1. Automatic update of validation progress
-2. Possibility of copying a validation belonging to another user
+# Bug fixing 
+1. Problem with adjusting bounding box for HR datasets fixed
