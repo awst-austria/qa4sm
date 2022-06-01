@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
+import {SettingsService} from '../../modules/core/services/global/settings.service';
 
 const plotsUrlPrefix = '/static/images/help/';
 
@@ -41,7 +42,8 @@ export class HelpComponent implements OnInit {
   validationSelectionsComparison: string;
   spatialExtentComparison: string;
 
-  constructor(private globalParamsService: GlobalParamsService) {
+  constructor(private globalParamsService: GlobalParamsService,
+              public settingsService: SettingsService) {
   }
 
   ngOnInit(): void {
