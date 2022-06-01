@@ -11,11 +11,10 @@
 
   <a id="manual"></a>
   <h1 class="h3 mb-3 font-weight-normal">User Manual</h1>
-  <p>
+  <p *ngIf="settingsService.getAllSettings()|async as settings">
     This page contains a quick user tutorial. More comprehensive information can be found in our
     <a target="_blank"
-       href="https://www.geo.tuwien.ac.at/media/filer_public/15/6c/156cd163-cd29-4dd3-a132-820bcb653817/frm4sm_dt3-1_qa4sm_sum_v11.pdf">User
-      Manual</a>.
+       [href]="settings[0].sum_link">User Manual</a>.
   </p>
 
   <h1 id="validation" class="h3 p-mb-3 font-weight-normal">Validate Page</h1>

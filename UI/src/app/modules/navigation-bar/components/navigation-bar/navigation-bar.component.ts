@@ -3,6 +3,7 @@ import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import {SettingsService} from '../../../core/services/global/settings.service';
 
 @Component({
   selector: 'navigation-bar',
@@ -16,7 +17,11 @@ export class NavigationBarComponent implements OnInit {
   logoutMenuItem: MenuItem;
   userProfileMenuItem: MenuItem;
 
-  constructor(private authService: AuthService, private router: Router, private toastService: ToastService) {
+  constructor(private authService: AuthService,
+              private router: Router,
+              private toastService: ToastService,
+              private settingsService: SettingsService) {
+
     this.loginMenuItem = {
       label: 'Log in',
       icon: 'pi pi-fw pi-sign-in',
@@ -48,7 +53,7 @@ export class NavigationBarComponent implements OnInit {
           {
             label: 'User Manual',
             icon: 'pi pi-fw pi-book',
-            url: 'https://www.geo.tuwien.ac.at/media/filer_public/15/6c/156cd163-cd29-4dd3-a132-820bcb653817/frm4sm_dt3-1_qa4sm_sum_v11.pdf',
+            url: '',
             target: '_blank'
           },
           {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']},
@@ -68,6 +73,7 @@ export class NavigationBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.authStatusChanged(authenticated));
+    this.setSumLink();
   }
 
   private authStatusChanged(authenticated: boolean): void {
@@ -88,6 +94,14 @@ export class NavigationBarComponent implements OnInit {
 
   setPreviousUrl(prevUrl: string): void {
     this.authService.setPreviousUrl(prevUrl);
+  }
+
+  setSumLink(): void {
+    const userManualItem =  this.items.find(item => item.label === 'Info')
+      .items.find(item => item.label === 'User Manual');
+    this.settingsService.getAllSettings().subscribe(data => {
+      userManualItem.url = data[0].sum_link;
+    });
   }
 
 }
