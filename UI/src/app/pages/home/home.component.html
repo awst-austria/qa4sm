@@ -99,6 +99,17 @@
       <p>QA4SM was created thanks to  support of the <a href="https://www.ffg.at/en" target="_blank">Austrian Space Application Programme</a>.
         From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European Space Agency</a>.</p>
 
+
+      <div *ngIf="settings$|async as settings">
+        <div *ngIf="settings[0].feed_link">
+          <h4 class="featurette-heading"> Share with us your opinion </h4>
+
+            If you think we could improve something or you see a missing functionality, please let us know using
+            this feedback <a target="_blank" [href]="settings[0].feed_link">form</a>.
+
+        </div>
+      </div>
+
     </div>
     <div class="p-md-5">
       <div *ngIf="settings$|async as settings">
@@ -116,7 +127,6 @@
              style="max-width: 80%">
       </div>
     </div>
-
   </div>
 
   <hr class="featurette-divider">

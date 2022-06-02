@@ -81,6 +81,10 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
     this.settings$ = this.settingsService.getAllSettings();
+    this.settings$.subscribe(data => {
+      console.log(data);
+    }
+    );
   }
 
   showGallery(index: number = 0, imagesListObject): void {
