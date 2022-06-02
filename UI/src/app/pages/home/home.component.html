@@ -100,12 +100,12 @@
         From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European Space Agency</a>.</p>
 
 
-      <div *ngIf="settings$|async as settings">
+      <div *ngIf="settings$|async as settings" class="card news card-body">
         <div *ngIf="settings[0].feed_link">
-          <h4 class="featurette-heading"> Share with us your opinion </h4>
+          <h4 class="featurette-heading"> Share with us your <span class="text-muted">opinion</span> </h4>
 
             If you think we could improve something or you see a missing functionality, please let us know using
-            this feedback <a target="_blank" [href]="settings[0].feed_link">form</a>.
+            this <b>  <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
 
         </div>
       </div>
