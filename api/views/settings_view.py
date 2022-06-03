@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 
+from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import Settings
 
 
@@ -20,7 +21,4 @@ def settings(request):
 class SettingsSerializer(ModelSerializer):
     class Meta:
         model = Settings
-        fields = ['id',
-                  'news',
-                  'maintenance_mode'
-                  ]
+        fields = get_fields_as_list(model)

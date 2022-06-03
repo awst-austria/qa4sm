@@ -38,7 +38,7 @@ from validator.tests.auxiliary_functions import (
     generate_ismn_upscaling_validation,
 )
 from validator.tests.testutils import set_dataset_paths
-from validator.validation import globals
+from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import METRICS, TC_METRICS
@@ -86,7 +86,7 @@ class TestValidation(TestCase):
 
         set_dataset_paths()
 
-    ## check output of validation
+    # check output of validation
     def check_results(self, run, is_tcol_run=False):
         assert run is not None
         assert run.end_time is not None
@@ -105,7 +105,7 @@ class TestValidation(TestCase):
         pair_metrics = [m for m in list(METRICS.keys()) if m.lower() != 'n_obs']
         comm_metrics = [m for m in self.metrics if m not in pair_metrics]
 
-        ## check netcdf output
+        # check netcdf output
         length = -1
         num_vars = -1
         with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
@@ -114,7 +114,7 @@ class TestValidation(TestCase):
             assert str(run.id) in ds.url
             assert settings.SITE_URL in ds.url
 
-            ## check the metrics contained in the file
+            # check the metrics contained in the file
             for metric in self.metrics + tcol_metrics:  # we dont test lon, lat, time etc.
                 ## This gets all variables in the netcdf file that start with the name of the current metric
                 if metric in tcol_metrics:
@@ -126,7 +126,7 @@ class TestValidation(TestCase):
 
                 self.__logger.debug(f'Metric variables for metric {metric} are {[m.name for m in metric_vars]}')
 
-                ## check that all metrics have the same number of variables (depends on number of input datasets)
+                # check that all metrics have the same number of variables (depends on number of input datasets)
                 if metric in comm_metrics:
                     num_vars = 1
                 elif metric in pair_metrics:
@@ -144,7 +144,7 @@ class TestValidation(TestCase):
                     metric_vars) == num_vars, 'Number of variables for metric {} doesn\'t match number for other metrics'.format(
                     metric)
 
-                ## check the values of the variables for formal criteria (not empty, matches lenght of other variables, doesn't have too many NaNs)
+                # check the values of the variables for formal criteria (not empty, matches lenght of other variables, doesn't have too many NaNs)
                 for m_var in metric_vars:
                     values = m_var[:]
                     assert values is not None
@@ -160,20 +160,20 @@ class TestValidation(TestCase):
                     nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
                     assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
 
-            if (run.interval_from is None):
+            if run.interval_from is None:
                 assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
             else:
                 assert ds.val_interval_from == run.interval_from.strftime(
                     '%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_from]'
 
-            if (run.interval_to is None):
+            if run.interval_to is None:
                 assert ds.val_interval_to == "N/A", 'Wrong validation config attribute. [interval_to]'
             else:
                 assert ds.val_interval_to == run.interval_to.strftime(
                     '%Y-%m-%d %H:%M'), 'Wrong validation config attribute. [interval_to]'
 
             assert run.anomalies == ds.val_anomalies, 'Wrong validation config attribute. [anomalies]'
-            if (run.anomalies == ValidationRun.CLIMATOLOGY):
+            if run.anomalies == ValidationRun.CLIMATOLOGY:
                 assert ds.val_anomalies_from == run.anomalies_from.strftime(
                     '%Y-%m-%d %H:%M'), 'Anomalies baseline start wrong'
                 assert ds.val_anomalies_to == run.anomalies_to.strftime(
@@ -189,7 +189,7 @@ class TestValidation(TestCase):
             i = 0
             for dataset_config in run.dataset_configurations.all():
 
-                if ((run.reference_configuration) and
+                if (run.reference_configuration and
                         (dataset_config.id == run.reference_configuration.id)):
                     d_index = 0
                 else:
@@ -255,7 +255,7 @@ class TestValidation(TestCase):
         # n_obs + one for each data set for all other metrics
         assert len(overview_pngs) == 1 + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
 
-    ## delete output of test validations, clean up after ourselves
+    # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
         # let's see if the output file gets cleaned up when the model is deleted
 
@@ -345,7 +345,7 @@ class TestValidation(TestCase):
 
         run_id = run.id
 
-        ## run the validation
+        # run the validation
         val.run_validation(run_id)
         new_run = ValidationRun.objects.get(pk=run_id)
 
@@ -1158,6 +1158,30 @@ class TestValidation(TestCase):
                 run.reference_configuration
             )
 
+    def test_temporal_adapter(self):
+        # test that the offset is used for the following datasets and versions
+        for dt, ver, field, unit in [
+            (globals.SMOS_L3, globals.SMOSL3_Level3_DESC, "Mean_Acq_Time_Seconds", "s"),
+            (globals.SMOS_L3, globals.SMOSL3_Level3_ASC, "Mean_Acq_Time_Seconds", "s"),
+            (globals.SMOS_IC, globals.SMOS_105_ASC, "UTC_Seconds", "s"),
+        ]:
+            dataset = Dataset.objects.get(short_name=dt)
+            version = DatasetVersion.objects.get(short_name=ver)
+
+            reader = val.create_reader(dataset, version)
+            midnight_tstamp = reader.read(-155.42, 19.78,)
+
+            t_adaped_reader = adapt_timestamp(reader, dataset)
+            exact_tstamp = t_adaped_reader.read(-155.42, 19.78,)
+
+            # Check that the values where the exact date is missing are dropped
+            assert exact_tstamp.index.shape == \
+                   midnight_tstamp[~np.isnan(midnight_tstamp[field])].index.shape
+            # Check the index type
+            assert exact_tstamp.index.dtype == np.dtype('<M8[ns]')
+            # Check that the offset field is not in the output
+            assert field not in exact_tstamp.columns
+
     # test all combinations of datasets, versions, variables, and filters
     @pytest.mark.long_running
     def test_setup_filtering_max(self):
@@ -1195,8 +1219,12 @@ class TestValidation(TestCase):
                         assert data is not None
                         assert variable.pretty_name in data.columns
                         assert isinstance(data, pd.DataFrame)
-                        assert len(data.index) > 1
-                        assert not data[variable.pretty_name].empty
+
+                        # handles the case where all values are flagged (i.e. for SMOS L3)
+                        if not len(data.index) > 1 or data[variable.pretty_name].empty:
+                            unfiltered = reader.read(-155.42, 19.78, **read_kwargs)
+
+                            assert unfiltered.count()[variable.pretty_name] == len(unfiltered)
 
         print("Test duration: {}".format(time.time() - start_time))
 

@@ -242,3 +242,6 @@ div.ui-dialog-titlebar{
     cursor: pointer;
     color: #00aae3;
 }
+input.vTextField{
+    width: 900px;
+}

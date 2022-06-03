@@ -97,10 +97,10 @@ pip install smap-io
 pip install django-countries
 pip install seaborn
 pip install --upgrade --force-reinstall netcdf4
-pip install pytesmo
+pip install pytesmo>=0.14.0
 pip install ismn
 pip install requests
-pip install qa4sm-reader>=0.7.1
+pip install qa4sm-reader>=0.7.4
 pip install qa4sm-preprocessing
 pip install djangorestframework
 pip install django_rest_passwordreset

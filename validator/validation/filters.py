@@ -1,5 +1,7 @@
 import logging
+from typing import List, Union
 
+import numpy as np
 import pandas as pd
 
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter, BasicAdapter
@@ -14,6 +16,25 @@ Bitmask filter for SMOS, you can only exclude data on set bits (not on unset bit
 
 
 def smos_exclude_bitmask(data, bitmask):
+    """
+    Returns boolean iterable of the same size as 'data', where False
+    indicates that the value is flagged according to the given bitmask
+
+    For a value in 'data' to be flagged, the function bit(value) should return
+    exactly 'bitmask'
+
+    Parameters
+    ----------
+    data: pd.Series
+        Data with the flag values
+    bitmask: int
+        in of type e.g. 0b0001
+
+    Returns
+    -------
+    mask: np.array
+        array of booleans
+    """
     thedata = data
 
     if type(thedata) is pd.Series:
@@ -21,6 +42,53 @@ def smos_exclude_bitmask(data, bitmask):
 
     mask = (thedata & bitmask) != bitmask
     return mask
+
+
+def check_normalized_bits_array(
+        numbers: Union[pd.Series, np.ndarray],
+        bit_indices: List[list]
+) -> bool:
+    """
+    Takes a list of bit_indices ([0] is the first bit only, [0,1] are the first
+    two bits) and a number and checks if the bit(s) is (are) active for this
+    number.
+
+    If multiple combinations are passed in bit_indices, ANY of them
+    must be fulfilled.
+
+    Parameters
+    ----------
+    numbers: pd.Series or np.array
+        Numbers (integer) for which we compare the bits to the passed ones.
+    bit_indices: list of lists
+        A list of bit indices that are checked. Each sub list is a bit
+        combination that is compared to the number
+        e.g [[0]] means the 1st bit only must be active, e.g. 0b1 or 0b101
+            (for the passed number in bin format).
+        e.g [[0],[1]] means that 1st OR 2nd bit must be active e.g. 0b01 or 0b10
+        e.g [[0, 1]] means that the first AND second bit must be active: 0b11
+        e.g [[2],[0,1]] mean that the (3rd OR (1st AND 2nd)) must be active
+            e.g. True for 0b100, 0b1011 etc.
+    Returns
+    -------
+    flags: np.array
+        Whether the passed bits fulfilled were active in the passed numbers.
+        boolean array of the same shape as the input numbers array.
+        In this array, False indicates a value that should not be kept (i.e. a flagged value)
+    """
+    if type(numbers) is pd.Series:
+        numbers = numbers.values
+
+    # Make sure the correct format is passed
+    numbers = numbers.astype(int)
+
+    return ~np.any(
+        np.array([
+            np.all(
+                np.array([(numbers >> i) & 1 for i in bit_index]),
+                axis=0)
+            for bit_index in bit_indices]),
+        axis=0)
 
 
 '''
@@ -34,79 +102,102 @@ def get_used_variables(filters, dataset, variable):
     if not filters:
         return variables
 
-    for fil in filters:
-        if fil.name == "FIL_ISMN_GOOD":
-            variables.append('soil_moisture_flag')
-            continue
+    try:
+        for fil in filters:
+            if fil.name == "FIL_ISMN_GOOD":
+                variables.append('soil_moisture_flag')
+                continue
 
-        if ((fil.name == "FIL_C3S_FLAG_0") or
-                (fil.name == "FIL_C3S_NO_FLAG_1") or
-                (fil.name == "FIL_C3S_NO_FLAG_2")):
-            variables.append('flag')
-            continue
+            if ((fil.name == "FIL_C3S_FLAG_0") or
+                    (fil.name == "FIL_C3S_NO_FLAG_1") or
+                    (fil.name == "FIL_C3S_NO_FLAG_2")):
+                variables.append('flag')
+                continue
 
-        if ((fil.name == "FIL_C3S_MODE_ASC") or
-                (fil.name == "FIL_C3S_MODE_DESC")):
-            variables.append('mode')
-            continue
+            if ((fil.name == "FIL_C3S_MODE_ASC") or
+                    (fil.name == "FIL_C3S_MODE_DESC")):
+                variables.append('mode')
+                continue
 
-        if fil.name == "FIL_GLDAS_UNFROZEN":
-            temp_variable = variable.pretty_name.replace("Moi", "TMP")
-            variables.append(temp_variable)
-            variables.append('SWE_inst')
-            continue
+            if fil.name == "FIL_GLDAS_UNFROZEN":
+                temp_variable = variable.pretty_name.replace("Moi", "TMP")
+                variables.append(temp_variable)
+                variables.append('SWE_inst')
+                continue
 
-        if ((fil.name == "FIL_ASCAT_METOP_A") or
-                (fil.name == "FIL_ASCAT_METOP_B")):
-            variables.append('sat_id')
-            continue
+            if ((fil.name == "FIL_ASCAT_METOP_A") or
+                    (fil.name == "FIL_ASCAT_METOP_B")):
+                variables.append('sat_id')
+                continue
 
-        if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN":
-            variables.append('ssf')
-            continue
+            if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN":
+                variables.append('ssf')
+                continue
 
-        if fil.name == "FIL_ASCAT_NO_CONF_FLAGS":
-            variables.append('conf_flag')
-            continue
+            if fil.name == "FIL_ASCAT_NO_CONF_FLAGS":
+                variables.append('conf_flag')
+                continue
 
-        if fil.name == "FIL_ASCAT_NO_PROC_FLAGS":
-            variables.append('proc_flag')
-            continue
+            if fil.name == "FIL_ASCAT_NO_PROC_FLAGS":
+                variables.append('proc_flag')
+                continue
 
-        if fil.name == "FIL_SMOS_QUAL_RECOMMENDED":
-            variables.append('Quality_Flag')
-            continue
+            if fil.name == "FIL_SMOS_QUAL_RECOMMENDED":
+                variables.append('Quality_Flag')
+                continue
 
-        if fil.name == "FIL_SMOS_UNFROZEN":
-            variables.append('Scene_Flags')
-            variables.append('Soil_Temperature_Level1')
-            continue
+            if fil.name == "FIL_SMOS_UNFROZEN":
+                variables.append('Scene_Flags')
+                variables.append('Soil_Temperature_Level1')
+                continue
 
-        if fil.name == "FIL_SMOS_UNPOLLUTED":
-            variables.append('Scene_Flags')
-            continue
+            if fil.name == "FIL_SMOS_UNPOLLUTED":
+                variables.append('Scene_Flags')
+                continue
 
-        if fil.name == "FIL_SMOS_BRIGHTNESS":
-            variables.append('Processing_Flags')
-            continue
+            if fil.name == "FIL_SMOS_BRIGHTNESS":
+                variables.append('Processing_Flags')
+                continue
 
-        if fil.name == "FIL_SMOS_TOPO_NO_MODERATE":
-            variables.append('Processing_Flags')
-            continue
+            if fil.name == "FIL_SMOS_TOPO_NO_MODERATE":
+                variables.append('Processing_Flags')
+                continue
 
-        if fil.name == "FIL_SMOS_TOPO_NO_STRONG":
-            variables.append('Processing_Flags')
-            continue
+            if fil.name == "FIL_SMOS_TOPO_NO_STRONG":
+                variables.append('Processing_Flags')
+                continue
 
-        if fil.name == "FIL_ERA5_TEMP_UNFROZEN":
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            variables.append(era_temp_variable)
-            continue
+            if fil.name == "FIL_ERA5_TEMP_UNFROZEN":
+                era_temp_variable = variable.pretty_name.replace("wv", "t")
+                variables.append(era_temp_variable)
+                continue
 
-        if fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN":
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
-            variables.append(era_temp_variable)
-            continue
+            if fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN":
+                era_temp_variable = variable.pretty_name.replace("wv", "t")
+                variables.append(era_temp_variable)
+                continue
+
+            if fil.name in (
+                    "FIL_SMOSL3_STRONG_TOPO_MANDATORY",
+                    "FIL_SMOSL3_MODERATE_TOPO",
+                    "FIL_SMOSL3_ICE_MANDATORY",
+                    "FIL_SMOSL3_FROZEN",
+                    "FIL_SMOSL3_URBAN_LOW",
+                    "FIL_SMOSL3_URBAN_HIGH",
+                    "FIL_SMOSL3_WATER",
+                    "FIL_SMOSL3_EXTERNAL",
+                    "FIL_SMOSL3_TAU_FO",
+            ):
+                variables.append('Science_Flags')
+                continue
+
+    # meaning these are parametrized filters
+    except AttributeError:
+        for fil in filters:
+            if fil.filter.name == "FIL_SMOSL3_RFI":
+                variables.append('Rfi_Prob')
+                variables.append('Ratio_RFI')
+                continue
 
     return variables
 
@@ -114,6 +205,8 @@ def get_used_variables(filters, dataset, variable):
 def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
     # figure out which variables we have to load because we want to use them
     load_vars = get_used_variables(filters, dataset, variable)
+    load_vars.extend(get_used_variables(param_filters, dataset, variable))
+    __logger.debug(f"Loaded filter variables: {load_vars}")
 
     # restrict the variables that are read from file in the reader
     if hasattr(reader, 'parameters'):
@@ -129,10 +222,19 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
     filtered_reader = reader
 
+    masking_filters = []
+
     for pfil in param_filters:
         __logger.debug(
-            "Setting up parametrised filter {} for dataset {} with parameter {}".format(pfil.filter.name, dataset,
-                                                                                        pfil.parameters))
+            f"Setting up parametrised filter {pfil.filter.name} for "
+            f"dataset {dataset} with parameter {pfil.parameters}"
+        )
+
+        if pfil.filter.name == "FIL_SMOSL3_RFI":
+            param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
+            masking_filters.append(('Rfi_Prob', '<=', float(param)))
+            masking_filters.append(('Ratio_RFI', '<=', float(param)))
+            continue
 
         inner_reader = filtered_reader
         while hasattr(inner_reader, 'cls'):
@@ -149,9 +251,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
                 __logger.debug('Selected networks: ' + ';'.join(networks))
                 inner_reader.activate_network(networks)
             continue
-
-
-    masking_filters = []
 
     for fil in filters:
         __logger.debug("Setting up filter {} for dataset {}.".format(fil.name, dataset))
@@ -216,24 +315,67 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             masking_filters.append(('Quality_Flag', '==', 0))
             continue
 
+        # The BIT-based flagging needs to correspond between the bit index value of the dataset
+        # and that give here. In the following, bit index values to be flagged (i.e. the third
+        # value passed in the tuples) are 0-based indexed, e.g.:
+        # 0b00010 -> [[1]]
+        # 0b01010 -> [[1], [3]]
+        # =======================================================================================
+
         if fil.name == "FIL_SMOS_TOPO_NO_MODERATE":
-            masking_filters.append(('Processing_Flags', smos_exclude_bitmask, 0b00000001))
+            masking_filters.append(('Processing_Flags', check_normalized_bits_array, [[0]]))
             continue
 
         if fil.name == "FIL_SMOS_TOPO_NO_STRONG":
-            masking_filters.append(('Processing_Flags', smos_exclude_bitmask, 0b00000010))
+            masking_filters.append(('Processing_Flags', check_normalized_bits_array, [[1]]))
             continue
 
         if fil.name == "FIL_SMOS_UNPOLLUTED":
-            masking_filters.append(('Scene_Flags', smos_exclude_bitmask, 0b00000100))
+            masking_filters.append(('Scene_Flags', check_normalized_bits_array, [[2]]))
             continue
 
         if fil.name == "FIL_SMOS_UNFROZEN":
-            masking_filters.append(('Scene_Flags', smos_exclude_bitmask, 0b00001000))
+            masking_filters.append(('Scene_Flags', check_normalized_bits_array, [[3]]))
             continue
 
         if fil.name == "FIL_SMOS_BRIGHTNESS":
-            masking_filters.append(('Processing_Flags', smos_exclude_bitmask, 0b00000001))
+            masking_filters.append(('Processing_Flags', check_normalized_bits_array, [[0]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_STRONG_TOPO_MANDATORY":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[3]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_MODERATE_TOPO":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[4]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_ICE_MANDATORY":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[12]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_FROZEN":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[6], [7], [8], [11]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_URBAN_LOW":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[15]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_URBAN_HIGH":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[16]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_WATER":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[5], [13], [14]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_EXTERNAL":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[24], [25]]))
+            continue
+
+        if fil.name == "FIL_SMOSL3_TAU_FO":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[27]]))
             continue
 
         # snow depth in the nc file yet, this is the preliminary one.
@@ -246,7 +388,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             era_temp_variable = variable.pretty_name.replace("wv", "t")
             masking_filters.append((era_temp_variable, '>', 274.15))
             continue
-
 
     if len(masking_filters):
         filtered_reader = AdvancedMaskingAdapter(filtered_reader, masking_filters,

@@ -1,6 +1,6 @@
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -8,9 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
-from validator.forms import PublishingForm
 from validator.models import ValidationRun, CopiedValidations
-
 
 
 
@@ -114,11 +112,47 @@ def custom_tracked_validation_runs(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_validations_for_comparison(request):
+    current_user = request.user
+    ref_dataset = request.query_params.get('ref_dataset', 'ISMN')
+    ref_version = request.query_params.get('ref_version', 'ISMN_V20191211')
+    # by default, take 2 datasets at maximum
+    max_non_reference_datasets = int(request.query_params.get('max_datasets', 1))
+    max_datasets = max_non_reference_datasets + 1  # add the reference
+    # filter the validation runs based on the reference dataset/version
+    ref_filtered = ValidationRun.objects.filter(
+        reference_configuration__dataset__short_name=ref_dataset,
+        reference_configuration__version__short_name=ref_version,
+    ).exclude(
+        output_file='')
+
+    ref_filter_owned = ref_filtered.filter(user=current_user)
+    ref_filter_published_not_owned = ref_filtered.exclude(doi='').exclude(user=current_user)
+
+    ref_for_comparison = ref_filter_owned.union(ref_filter_published_not_owned)
+
+    # filter based on the number of non-reference datasets
+    eligible4comparison = []
+    for val in ref_for_comparison:
+        if val is None:
+            continue
+        if val.dataset_configurations.count() == max_datasets:
+            eligible4comparison.append(val)
+
+    if not eligible4comparison:
+        return JsonResponse(None, status=status.HTTP_200_OK, safe=False)
+
+    serializer = ValidationRunSerializer(eligible4comparison, many=True)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+
+
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def get_copied_validations(request, **kwargs):
     copied_run = get_object_or_404(CopiedValidations, copied_run_id=kwargs['id'])
     serializer = CopiedValidationRunSerializer(copied_run)
-    return  JsonResponse(serializer.data, status=status.HTTP_200_OK)
+    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
 class ValidationRunSerializer(ModelSerializer):

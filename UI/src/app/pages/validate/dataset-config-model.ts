@@ -5,13 +5,16 @@ import {BehaviorSubject} from 'rxjs';
 
 export const ISMN_NETWORK_FILTER_ID = 18;
 export const ISMN_DEPTH_FILTER_ID = 24;
+export const SMOS_RFI_FILTER_ID = 34;
 
 export class DatasetConfigModel {
 
   constructor(public datasetModel: DatasetComponentSelectionModel,
               public basicFilters: FilterModel[],
+              public smosRfiFilter$: BehaviorSubject<FilterModel>,
               public ismnNetworkFilter$: BehaviorSubject<FilterModel>,
-              public ismnDepthFilter$: BehaviorSubject<FilterModel>) {
+              public ismnDepthFilter$: BehaviorSubject<FilterModel>,
+  ) {
   }
 
   /**
@@ -34,14 +37,16 @@ export class DatasetConfigModel {
       parameterisedFilters.push({id: ISMN_DEPTH_FILTER_ID, parameters: this.ismnDepthFilter$.value.parameters$.value});
     }
 
-    const newValDatasetConfigDto: ValidationRunDatasetConfigDto = {
+    if (this.smosRfiFilter$.value != null) {
+      parameterisedFilters.push({id: SMOS_RFI_FILTER_ID, parameters: this.smosRfiFilter$.value.parameters$.value});
+    }
+
+    return {
       dataset_id: this.datasetModel.selectedDataset.id,
       variable_id: this.datasetModel.selectedVariable.id,
       version_id: this.datasetModel.selectedVersion.id,
       basic_filters: enabledBasicFilters,
       parametrised_filters: parameterisedFilters
     };
-
-    return newValDatasetConfigDto;
   }
 }

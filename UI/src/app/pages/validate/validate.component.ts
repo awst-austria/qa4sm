@@ -5,7 +5,12 @@ import {
 } from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../modules/core/services/dataset/dataset-variable.service';
-import {DatasetConfigModel, ISMN_DEPTH_FILTER_ID, ISMN_NETWORK_FILTER_ID} from './dataset-config-model';
+import {
+  DatasetConfigModel,
+  ISMN_DEPTH_FILTER_ID,
+  ISMN_NETWORK_FILTER_ID,
+  SMOS_RFI_FILTER_ID
+} from './dataset-config-model';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ValidationModel} from './validation-model';
@@ -36,6 +41,9 @@ import {ModalWindowService} from '../../modules/core/services/global/modal-windo
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
 import {delay} from 'rxjs/operators';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
+import {
+  TemporalMatchingModel
+} from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
@@ -72,6 +80,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       ANOMALIES_NONE_DESC,
       new BehaviorSubject<Date>(null),
       new BehaviorSubject<Date>(null)),
+    new TemporalMatchingModel(
+      new BehaviorSubject<number>(null),
+      'hours',
+    ),
     SCALING_METHOD_DEFAULT,
     new BehaviorSubject<string>(''));
 
@@ -85,6 +97,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   defMinLon = -11.2;
   defMaxLat = 71.6;
   defMinLat = 34.0;
+
+  smosThresholdFilter = SMOS_RFI_FILTER_ID;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -115,13 +129,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
           valrun => {
             this.modelFromValidationConfig(valrun);
-            if (valrun.changes){
+            if (valrun.changes) {
               this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
                 this.messageAboutConfigurationChanges(valrun.changes));
             }
           },
           (response) => {
-            if (response.message){
+            if (response.message) {
               this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
             }
             of({}).pipe(delay(0)).subscribe(() => {
@@ -142,7 +156,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private messageAboutConfigurationChanges(changes: ConfigurationChanges): string{
+  private messageAboutConfigurationChanges(changes: ConfigurationChanges): string {
     let message = '';
     if (changes.scaling) {
       message += 'Chosen scaling method is not available anymore. "No scaling" set instead.\n';
@@ -150,7 +164,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (changes.anomalies) {
       message += '\nChosen anomalies method is not available anymore. "Do not calculate" set instead.\n';
     }
-    if (changes.filters.length !== 0){
+    if (changes.filters.length !== 0) {
       changes.filters.forEach(filter => {
         message += `\nFilters:${filter.filter_desc.map(desc => ' ' + desc)} for dataset ${filter.dataset} not available.`;
       });
@@ -160,11 +174,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
-    // TODO: parameterized filter setup seems to be missing
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
-      const newDatasetConfigModel = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
-        null, new BehaviorSubject(null), new BehaviorSubject(null));
+      const newDatasetConfigModel = new DatasetConfigModel(
+        new DatasetComponentSelectionModel(null, null, null),
+        null,
+        new BehaviorSubject(null),
+        new BehaviorSubject(null),
+        new BehaviorSubject(null),
+      );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
         newDatasetConfigModel.datasetModel.selectedDataset = dataset;
@@ -178,9 +196,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               });
             });
             datasetConfig.parametrised_filters.forEach(paramFilter => {
+              if (paramFilter.id === SMOS_RFI_FILTER_ID) {
+                datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
+              }
               if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
                 datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
-
               }
               if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
                 datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
@@ -200,8 +220,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     // Prepare reference
     const newReferenceModel = new DatasetConfigModel(
-      new DatasetComponentSelectionModel(null, null, null), null,
-      new BehaviorSubject<FilterModel>(null), new BehaviorSubject<FilterModel>(null));
+      new DatasetComponentSelectionModel(null, null, null),
+      null,
+      new BehaviorSubject(null),
+      new BehaviorSubject<FilterModel>(null),
+      new BehaviorSubject<FilterModel>(null));
     this.validationModel.referenceConfigurations.push(newReferenceModel);
     this.datasetService.getDatasetById(validationRunConfig.reference_config.dataset_id).subscribe(dataset => {
       newReferenceModel.datasetModel.selectedDataset = dataset;
@@ -220,6 +243,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             }
             if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
               referenceConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
+            }
+            if (paramFilter.id === SMOS_RFI_FILTER_ID) {
+              referenceConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
             }
           });
         });
@@ -247,6 +273,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (validationRunConfig.interval_to != null) {
       this.validationModel.validationPeriodModel.intervalTo$.next(new Date(validationRunConfig.interval_to));
     }
+    // Temporal matching window size
+    this.validationModel.temporalMatchingModel.size$.next(validationRunConfig.temporal_matching);
 
     // Metrics
     if (validationRunConfig.metrics) {
@@ -318,8 +346,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void {
-    const model = new DatasetConfigModel(new DatasetComponentSelectionModel(null, null, null),
-      null, new BehaviorSubject(null), new BehaviorSubject(null));
+    const model = new DatasetConfigModel(
+      new DatasetComponentSelectionModel(null, null, null),
+      null,
+      new BehaviorSubject(null),
+      new BehaviorSubject(null),
+      new BehaviorSubject(null)
+    );
     targetArray.push(model);
     // get all datasets
     this.datasetService.getAllDatasets().subscribe(datasets => {
@@ -352,6 +385,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     const updatedModel$ = new ReplaySubject<DatasetConfigModel>();
     this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
         model.basicFilters = [];
+        model.smosRfiFilter$.next(null);
         model.ismnNetworkFilter$.next(null);
         model.ismnDepthFilter$.next(null);
         filters.forEach(filter => {
@@ -362,6 +396,21 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                 false,
                 false,
                 new BehaviorSubject<string>(filter.default_parameter)));
+            } else if (filter.id === SMOS_RFI_FILTER_ID) {
+              if (model.smosRfiFilter$) {
+                model.smosRfiFilter$.next(new FilterModel(
+                  filter,
+                  false,
+                  false,
+                  new BehaviorSubject<string>(filter.default_parameter)));
+              } else {
+                model.smosRfiFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+                  filter,
+                  false,
+                  false,
+                  new BehaviorSubject<string>(filter.default_parameter))
+                );
+              }
             } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
               if (model.ismnDepthFilter$) {
                 model.ismnDepthFilter$.next(new FilterModel(
@@ -390,13 +439,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             model.basicFilters.push(newFilter);
           }
         });
-
         updatedModel$.next(model);
       },
       error => {
         updatedModel$.error(error);
       });
-
     return updatedModel$;
   }
 
@@ -466,21 +513,25 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
       scaling_method: this.validationModel.scalingModel.id,
       scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
-      name_tag: this.validationModel.nameTag$.getValue()
+      name_tag: this.validationModel.nameTag$.getValue(),
+      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
 
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
       data => {
         if (data.id) {
-          this.router.navigate([`validation-result/${data.id}`]).then(value => this.toastService.showSuccessWithHeader('Validation started', 'Your validation has been started'));
+          this.router.navigate([`validation-result/${data.id}`]).then(() =>
+            this.toastService.showSuccessWithHeader('Validation started',
+              'Your validation has been started'));
         } else if (data.is_there_validation) {
           this.isThereValidation = data;
           this.modalWindowService.open();
         }
 
       },
-      error => {
-        this.toastService.showErrorWithHeader('Error', 'Your validation could not be started');
+      errors => {
+        const validationErrorMessage = this.messageAboutValidationErrors(errors);
+        this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
       });
   }
 
@@ -540,28 +591,32 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.spatialSubsetModel.limited$.next(isGeographicallyLimited);
 
     // push the condition and the new value if conditions are met
-    if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent || (maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon)) {
+    if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent ||
+      (maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon)) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     } else if (maxLons.length !== 0) {
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     }
 
-    if (minLons.length !== 0 && lonMinLimit > lonMinCurrent || (minLons.length !== 0 && lonMinCurrent === this.defMinLon)) {
+    if (minLons.length !== 0 && lonMinLimit > lonMinCurrent ||
+      (minLons.length !== 0 && lonMinCurrent === this.defMinLon)) {
       this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     } else if (minLons.length !== 0) {
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     }
 
-    if (maxLats.length !== 0 && latMaxLimit < latMaxCurrent || (maxLats.length !== 0 && latMaxCurrent === this.defMaxLat)) {
+    if (maxLats.length !== 0 && latMaxLimit < latMaxCurrent ||
+      (maxLats.length !== 0 && latMaxCurrent === this.defMaxLat)) {
       this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
-    } else if (maxLats.length !== 0){
+    } else if (maxLats.length !== 0) {
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     }
 
-    if (minLats.length !== 0 && latMinLimit > latMinCurrent || (minLats.length !== 0 && latMinCurrent === this.defMinLat)) {
+    if (minLats.length !== 0 && latMinLimit > latMinCurrent ||
+      (minLats.length !== 0 && latMinCurrent === this.defMinLat)) {
       this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
     } else if (minLats.length !== 0) {
@@ -611,6 +666,34 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     this.validationModel.validationPeriodModel.intervalFrom$.next(this.validationStart);
     this.validationModel.validationPeriodModel.intervalTo$.next(this.validationEnd);
+  }
+
+  private getValidationFieldFriendlyName(fieldName): string{
+    const fieldsFriendlyNames = {
+      name_tag: 'validation name',
+      interval_from: 'validation period "From"',
+      interval_to: 'validation period "To"',
+      anomalies: 'anomalies',
+      min_lat: 'minimum latitude',
+      max_lat: 'maximum latitude',
+      min_lon: 'minimum longitude',
+      max_lon: 'maximum longitude',
+    };
+    return fieldsFriendlyNames[fieldName];
+  }
+
+  private messageAboutValidationErrors(errors: any): string {
+    let message = 'Please fix following problems: \n';
+
+    Object.entries(errors.error).forEach(([key]) => {
+      if (this.getValidationFieldFriendlyName(key)){
+        message += `\n Field ${this.getValidationFieldFriendlyName(key)}: ${errors.error[key]} \n`;
+      } else {
+        message += `\n ${errors.error[key]}`;
+      }
+    });
+
+    return message.toString();
   }
 
 }

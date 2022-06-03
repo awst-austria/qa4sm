@@ -8,7 +8,8 @@ export class FilterDto {
               public default_parameter: string,
               public to_include: string,
               public disable_filter: number,
-              public default_set_active: boolean
+              public default_set_active: boolean,
+              public readonly: boolean,
               ) {
   }
 }

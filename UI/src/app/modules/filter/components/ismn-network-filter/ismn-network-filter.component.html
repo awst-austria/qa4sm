@@ -1,7 +1,7 @@
 <div class="p-grid no-gutters"  *ngIf="filterModel$|async as filterModel">
   <div class="p-col-11">
     <p-checkbox label="{{filterModel.filterDto.description}}: "
-                [binary]="true" [ngModel]="true" readonly="true" class="param-filter-checkbox">
+                [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly class="readonly-filter-checkbox">
     </p-checkbox>
     <a (click)="showNetworkSelector()"><span style="padding-left: 5px;cursor: pointer;">select...</span></a>
   </div>

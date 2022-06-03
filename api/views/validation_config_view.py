@@ -14,7 +14,7 @@ from api.views.auxiliary_functions import get_fields_as_list
 from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset, \
     DatasetVersion, DataVariable
-from validator.validation import run_validation
+from validator.validation import run_validation, globals
 from validator.validation.validation import compare_validation_runs
 
 
@@ -28,10 +28,16 @@ def start_validation(request):
     check_for_existing_validation = request.query_params.get('check_for_existing_validation', False)
 
     ser = ValidationConfigurationSerializer(data=request.data)
-    ser.is_valid(raise_exception=True)
+    try:
+        ser.is_valid(raise_exception=True)
+    except:
+        print(ser.errors)
+        return JsonResponse(ser.errors, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
     new_val_run = ser.save(user=request.user)
     new_val_run.user = request.user
     new_val_run.save()
+
     # need to close all db connections before forking, see
     # https://stackoverflow.com/questions/8242837/django-multiprocessing-and-database-connections/10684672#10684672
 
@@ -96,6 +102,9 @@ def get_validation_configuration(request, **kwargs):
             val_run_dict['interval_to'] = val_run.interval_to.date()
         else:
             val_run_dict['interval_to'] = None
+
+        # temporal matching window:
+        val_run_dict['temporal_matching'] = val_run.temporal_matching
 
         # if the anomaly method doesn't exist anymore, set 'none'
         if val_run.anomalies is not None and val_run.anomalies in dict(ValidationRun.ANOMALIES_METHODS).keys():
@@ -256,6 +265,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             new_val_run.max_lon = validated_data.get('max_lon', None)
             new_val_run.scaling_method = validated_data.get('scaling_method', None)
             new_val_run.name_tag = validated_data.get('name_tag', None)
+            new_val_run.temporal_matching = validated_data.get('temporal_matching', None)
 
             for metric in validated_data.get('metrics'):
                 if metric.get('id') == 'tcol':
@@ -318,6 +328,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     max_lat = serializers.FloatField(required=False, allow_null=True, default=90)
     max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
     name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
+    temporal_matching = serializers.IntegerField(allow_null=False, default=globals.TEMP_MATCH_WINDOW)
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):

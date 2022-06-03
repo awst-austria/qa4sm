@@ -1,0 +1,16 @@
+<div class="p-grid">
+  <div class="p-col-12">
+    <p-checkbox label="Include all points from the selected validations"
+                [binary]="true"
+                [disabled]="this.disabled"
+                [ngModel]="!this.disabled && 0"
+                (ngModelChange)="spatialExtentChange($event)">
+    </p-checkbox>
+    <label class="p-panel-header-icon"
+           pTooltip="{{'By default, only common points between the validations are considered ' +
+            '(unless the validations are non-overlapping)'}}"
+           tooltipPosition="bottom">
+      <span class="pi pi-question-circle p-ml-2"></span>
+    </label>
+  </div>
+</div>

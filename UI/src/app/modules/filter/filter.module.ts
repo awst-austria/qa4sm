@@ -10,15 +10,17 @@ import {TreeModule} from 'primeng/tree';
 import {TooltipModule} from 'primeng/tooltip';
 import {IsmnDepthFilterComponent} from './components/ismn-depth-filter/ismn-depth-filter.component';
 import {InputNumberModule} from 'primeng/inputnumber';
+import { ThresholdFilterComponent } from './components/threshold-filter/threshold-filter.component';
 
 
 @NgModule({
-  declarations: [BasicFilterComponent, IsmnNetworkFilterComponent, IsmnDepthFilterComponent],
-  exports: [
-    BasicFilterComponent,
-    IsmnNetworkFilterComponent,
-    IsmnDepthFilterComponent
-  ],
+  declarations: [BasicFilterComponent, IsmnNetworkFilterComponent, IsmnDepthFilterComponent, ThresholdFilterComponent],
+    exports: [
+        BasicFilterComponent,
+        IsmnNetworkFilterComponent,
+        IsmnDepthFilterComponent,
+        ThresholdFilterComponent
+    ],
     imports: [
         CommonModule,
         CheckboxModule,

@@ -388,6 +388,40 @@
                 "unit": "km"
             }
         }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 14,
+        "fields": {
+            "short_name": "SMOS_L3",
+            "pretty_name": "SMOS Level 3",
+            "help_text": "Soil Moisture and Ocean Salinity (SMOS) Mission",
+            "storage_path": "testdata/input_data/SMOS_L3",
+            "detailed_description": "Daily global maps of soil moisture retrieved from the ESA L1B product with a multi-orbit approach.",
+            "source_reference": "Data is available <a target=\"_blank\" href=\"https://www.catds.fr/Products/Available-products-from-CPDC/\"> here</a>.",
+            "citation": "<a target=\"_blank\" href=\"https://essd.copernicus.org/articles/9/293/2017/essd-9-293-2017.pdf\">ATBD</a>",
+            "is_only_reference": false,
+            "versions": [
+                37,
+                38
+            ],
+            "variables": [
+                18
+            ],
+            "filters": [
+                1,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                31,
+                32,
+                33,
+                34
+            ]
+        }
     }
 
 ]

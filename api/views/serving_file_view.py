@@ -9,13 +9,14 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from validator.models import ValidationRun
+from validator.models import ValidationRun, DatasetConfiguration
 from django.conf import settings
 
 import mimetypes
 from wsgiref.util import FileWrapper
 
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
+from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
 
 
 @api_view(['GET'])
@@ -77,6 +78,8 @@ def get_csv_with_statistics(request):
 def get_metric_names_and_associated_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
+    ref_dataset_name = DatasetConfiguration.objects.get(id=validation.reference_configuration_id).dataset.pretty_name
+
     try:
         file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
     except AttributeError:
@@ -94,7 +97,7 @@ def get_metric_names_and_associated_files(request):
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
     response = []
 
-    for ind, key in enumerate(metrics):
+    for metric_ind, key in enumerate(metrics):
         boxplot_file = ''
         boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
 
@@ -113,12 +116,25 @@ def get_metric_names_and_associated_files(request):
 
         overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if file_dict['file_name'] in files]
         datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if file_dict['file_name'] in files]
-        metric_dict = {'ind': ind,
+
+        # for ISMN there might be also metadata plots
+        boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
+        if ref_dataset_name == ISMN:
+            metadata_plots = [{'file_name': 'boxplot_'+ metrics[key] + '_' + metadata_name + '.png'}
+                              for metadata_name in METADATA_PLOT_NAMES.values()]
+            for meta_ind, file_dict in enumerate(metadata_plots):
+                if file_dict['file_name'] in files:
+                    boxplot_dicts.append({'ind': meta_ind + 1, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
+                                          'file': file_path + file_dict['file_name']})
+
+        metric_dict = {'ind': metric_ind,
                        'metric_query_name': metrics[key],
                        'metric_pretty_name': key,
-                       'boxplot_file': boxplot_file,
+                       'boxplot_dicts': boxplot_dicts,
                        'overview_files': overview_files,
-                       'datasets': datasets}
+                       'metadata_files': [],
+                       'datasets': datasets,
+                       }
         response.append(metric_dict)
     #
     return JsonResponse(response, status=200, safe=False)

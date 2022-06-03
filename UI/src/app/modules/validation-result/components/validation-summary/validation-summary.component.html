@@ -1,6 +1,12 @@
 <main class="p-grid p-mx-0">
-  <p-panel class="p-col-12">
-    <ng-template pTemplate="header">
+  <p-panel class="p-col-12 p-py-0 p-px-1"
+           [ngClass]="{'for-comparison-body': forComparison}">
+    <ng-template *ngIf="forComparison" pTemplate="header">
+      <div class="text-center" style="width:100%">
+        <h4 class="p-my-0 comparison-header">Description of validation {{validationRun.id}}</h4>
+      </div>
+    </ng-template>
+    <ng-template *ngIf="!forComparison" pTemplate="header">
       <div class="text-center" style="width:100%">
         <h4 class="p-my-0 font-weight-normal">
           Summary:
@@ -57,7 +63,7 @@
       </div>
     </ng-template>
     <div *ngIf="configurations$| async as configurations" class="card-body">
-      <ul>
+      <ul [ngClass]="{'for-comparison-list': forComparison}">
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
           original validation run on {{this.originalDate| date: 'mediumDate' :timeZone }}.
@@ -99,6 +105,11 @@
         <ng-template #elseTemporal>
           <li>Validated over entire available timespan.</li>
         </ng-template>
+
+        <li *ngIf="validationRun.temporal_matching">
+          Temporal matching window size set to {{ validationRun.temporal_matching }}
+          {{validationRun.temporal_matching === 1 ? 'hour' : 'hours'}}.
+        </li>
 
 
         <li *ngIf="validationRun.anomalies != 'none'; else elseAnomalies">
@@ -149,19 +160,16 @@
         </ng-template>
         <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
-
-        <li>Processing took {{ runTime }} minutes (wall time).</li>
-
+        <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 
         <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
         <ng-template #elseProgress>
-          <li [ngClass]="{'alert-danger': errorRate > 0}">
-            {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
-            of {{ validationRun.total_points }}) of the processed locations (grid points) produced errors during
-            calculation.
+          <li *ngIf="!forComparison" [ngClass]="{'alert-danger': errorRate > 0}">
+            for {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
+            of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could not be calculated.
           </li>
         </ng-template>
-        <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user">
+        <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user  && !forComparison">
           <span *ngIf="isNearExpiry$|async">
             <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
             This validation will SOON be automatically removed during cleanup
@@ -175,7 +183,7 @@
           </span>
 
         </li>
-        <li *ngIf="(isArchived$|async) && validationRun.is_unpublished">
+        <li *ngIf="(isArchived$|async) && validationRun.is_unpublished && !forComparison">
               <span
                 class="p-panel-header-icon pi expiry-icons">
                 <fa-icon [icon]="faIcons.faArchive"></fa-icon>
@@ -183,12 +191,12 @@
           This validation has been archived. It will NOT be automatically removed during cleanup.
 
         </li>
-        <li *ngIf="!validationRun.is_unpublished">
+        <li *ngIf="!validationRun.is_unpublished && !forComparison">
           <span class="pi pi-book"></span> This result was published on zenodo with DOI
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons *ngIf="validationModel.validationRun|async as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
+      <qa-buttons *ngIf="!forComparison && (validationModel.validationRun|async) as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
     </div>
   </p-panel>
 </main>
