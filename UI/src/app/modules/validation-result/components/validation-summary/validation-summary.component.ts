@@ -24,6 +24,7 @@ export class ValidationSummaryComponent implements OnInit {
 
   @Input() validationModel: ValidationResultModel;
   @Input() validationRun: ValidationrunDto;
+  @Input() forComparison = false;
   @Output() doRefresh = new EventEmitter();
 
   configurations$: Observable<any>;

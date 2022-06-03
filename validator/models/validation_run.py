@@ -16,8 +16,6 @@ from validator.models import DatasetConfiguration, User, CopiedValidations
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
-
-
 class ValidationRun(models.Model):
     # scaling methods
     MIN_MAX = 'min_max'
@@ -32,7 +30,7 @@ class ValidationRun(models.Model):
         (LINREG, 'Linear regression'),
         (MEAN_STD, 'Mean/standard deviation'),
         (BETA_SCALING, 'CDF matching with beta distribution fitting'),
-        )
+    )
 
     # scale to
     SCALE_TO_REF = 'ref'
@@ -60,6 +58,9 @@ class ValidationRun(models.Model):
         (NO_UPSCALE, 'Do not upscale point measurements'),
         (AVERAGE, 'Average point measurements'),
     )
+
+    # temporal matching window size:
+    TEMP_MATCH_WINDOW = 12
 
     # fields
 
@@ -106,6 +107,8 @@ class ValidationRun(models.Model):
     bootstrap_tcol_cis = models.BooleanField(default=False)
     used_by = models.ManyToManyField(User, through=CopiedValidations, through_fields=('original_run', 'used_by_user'),
                                      related_name='copied_runs')
+    temporal_matching = models.IntegerField(default=TEMP_MATCH_WINDOW, null=False, blank=False,
+                                            validators=[MinValueValidator(1), MaxValueValidator(24)])
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
@@ -203,12 +206,31 @@ class ValidationRun(models.Model):
 
     @property
     def is_a_copy(self):
-        copied_runs = CopiedValidations.objects.filter(copied_run_id=self.id)\
+        copied_runs = CopiedValidations.objects.filter(copied_run_id=self.id) \
             .annotate(is_copied=ExpressionWrapper(~Q(copied_run=F('original_run')), output_field=BooleanField())) \
             .filter(is_copied=True)
 
         return len(copied_runs) != 0
 
+    @property
+    def comparison_label(self):
+        # check name tag has been given and it's not empty
+        if self.name_tag is not None and self.name_tag:
+            return self.name_tag
+
+        configs = DatasetConfiguration.objects.filter(validation=self.id)
+        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.reference_configuration.id]
+        t = self.start_time
+        minute = str(t.minute)
+        if t.minute < 10:
+            minute = '0' + minute
+        label = 'Validation date: ' + str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(
+            t.hour) + ':' + minute + ', Non-reference-dataset: '
+        for dataset in datasets:
+            label += dataset
+        label = label.strip(', ')
+
+        return label
 
 
 # delete model output directory on disk when model is deleted
@@ -226,3 +248,5 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
         if os.path.isdir(outdir):
             rmtree(outdir)
+
+

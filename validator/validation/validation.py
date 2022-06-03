@@ -36,7 +36,7 @@ from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS
 from validator.validation.graphics import generate_all_graphs
-from validator.validation.readers import create_reader
+from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 from api.frontend_urls import get_angular_url
@@ -73,10 +73,12 @@ def _get_reference_reader(val_run) -> ('Reader', str, dict):
     ref_reader = create_reader(val_run.reference_configuration.dataset,
                                val_run.reference_configuration.version)
 
+    time_adapted_ref_reader = adapt_timestamp(ref_reader, val_run.reference_configuration.dataset,)
+
     # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
     filtered_reader, read_name, read_kwargs = \
         setup_filtering(
-            reader=ref_reader,
+            reader=time_adapted_ref_reader,
             filters=list(val_run.reference_configuration.filters.all()),
             param_filters=list(val_run.reference_configuration.parametrisedfilter_set.all()),
             dataset=val_run.reference_configuration.dataset,
@@ -86,7 +88,6 @@ def _get_reference_reader(val_run) -> ('Reader', str, dict):
         ref_reader = ref_reader.cls
 
     return ref_reader, read_name, read_kwargs
-
 
 
 def set_outfile(validation_run, run_dir):
@@ -201,14 +202,15 @@ def create_pytesmo_validation(validation_run):
         reader = create_reader(dataset_config.dataset,
                                dataset_config.version)
 
+        time_adapted_reader = adapt_timestamp(reader, dataset_config.dataset,)
+
         reader, read_name, read_kwargs = \
             setup_filtering(
-                reader=reader,
+                reader=time_adapted_reader,
                 filters=list(dataset_config.filters.all()),
                 param_filters=list(dataset_config.parametrisedfilter_set.all()),
                 dataset=dataset_config.dataset,
                 variable=dataset_config.variable)
-
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
             reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name],
@@ -310,9 +312,15 @@ def create_pytesmo_validation(validation_run):
     __logger.debug(f"Scaling method: {scaling_method}")
     __logger.debug(f"Scaling dataset: {scaling_ref_name}")
 
+    temporalwindow_size = validation_run.temporal_matching
+    __logger.debug(f"Size of the temporal matching window: {temporalwindow_size} "
+                   f"{'hour' if temporalwindow_size == 1 else 'hours'}")
+
     val = Validation(
         datasets=datamanager,
-        temporal_matcher=make_combined_temporal_matcher(pd.Timedelta(12, "H")),
+        temporal_matcher=make_combined_temporal_matcher(
+            pd.Timedelta(temporalwindow_size, "H")
+        ),
         spatial_ref=ref_name,
         scaling=scaling_method,
         scaling_ref=scaling_ref_name,
@@ -342,7 +350,7 @@ def execute_job(self, validation_id, job):
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run)
 
-        result = val.calc(*job, rename_cols=False, only_with_temporal_ref=True)
+        result = val.calc(*job, rename_cols=False, only_with_reference=True)
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + duration.seconds
@@ -643,7 +651,8 @@ def _compare_datasets(new_run_config, old_run_config):
             ds_ind = 0
             new_dataset = new_run_config[conf_ind]
             old_dataset = old_run_config[conf_ind]
-            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset, ds_fields[ds_ind]):
+            while ds_ind < max_ds_ind and getattr(new_dataset, ds_fields[ds_ind]) == getattr(old_dataset,
+                                                                                             ds_fields[ds_ind]):
                 ds_ind += 1
             if ds_ind == max_ds_ind:
                 the_same = _compare_filters(new_dataset, old_dataset)
@@ -688,7 +697,7 @@ def compare_validation_runs(new_run, runs_set, user):
         where is_the_same migh be True or False and val_id might be None or the appropriate id ov a validation run
     """
     vr_fields = VR_FIELDS
-    is_the_same = False # set to False because it looks for the first found validation run
+    is_the_same = False  # set to False because it looks for the first found validation run
     is_published = False
     old_user = None
     max_vr_ind = len(vr_fields)
@@ -714,7 +723,7 @@ def compare_validation_runs(new_run, runs_set, user):
         'val_id': val_id,
         'belongs_to_user': old_user == user,
         'is_published': is_published
-        }
+    }
     return response
 
 

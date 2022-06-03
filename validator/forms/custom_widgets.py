@@ -28,6 +28,10 @@ class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
                     duper['default_parameter'] = fil.default_parameter
                     duper['to_include'] = fil.to_include
                     duper['disable_filter'] = fil.disable_filter
+                    duper['threshold'] = fil.threshold,
+                    duper['default_threshold'] = fil.default_threshold,
+                    duper['min_threshold'] = fil.min_threshold,
+                    duper['max_threshold'] = fil.max_threshold,
                     if ("initial_params" in attrs
                             and attrs["initial_params"] is not None):
                         duper["initial_params"] = attrs["initial_params"][index]

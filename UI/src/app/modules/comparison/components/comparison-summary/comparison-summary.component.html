@@ -1,0 +1,30 @@
+<div *ngIf="this.valResModels.length > 0" class="p-grid no-gutters">
+  <!--  use different if condition-->
+  <div class="p-col-12">
+    <p-panel [toggleable]="true" [collapsed]="true">
+      <ng-template pTemplate="header">
+        <div class="text-center my-1" style="width: 92%">
+          <h4 class="my-0 font-weight-normal">Comparison summary</h4>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="icons">
+        <label class="mb-0"
+               pTooltip="Expand this section to inspect a table with the metric-wise difference of the two datasets."
+               tooltipPosition="bottom">
+          <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+        </label>
+      </ng-template>
+      <!--  description of the comparison-->
+      <table id="comparison_table{% if {{isSingle}} %}_single{% else %}_double{% endif %}"
+             class="table">
+        <tbody>
+        <tr>
+          <td *ngFor="let validationModel of valResModels" class="p-py-0 p-px-0">
+            <qa-validation-summary *ngIf="validationModel.validationRun|async as valRun" [validationModel]="validationModel" [validationRun]="valRun" [forComparison]="true"></qa-validation-summary>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </p-panel>
+  </div>
+</div>

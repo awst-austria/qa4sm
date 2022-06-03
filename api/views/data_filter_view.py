@@ -66,6 +66,7 @@ class DataFilterSerializer(ModelSerializer):
                   'to_include',
                   'disable_filter',
                   'default_set_active',
+                  'readonly'
                   ]
 
 

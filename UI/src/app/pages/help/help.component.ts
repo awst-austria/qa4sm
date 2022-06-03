@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
+import {SettingsService} from '../../modules/core/services/global/settings.service';
 
 const plotsUrlPrefix = '/static/images/help/';
 
@@ -26,7 +27,7 @@ export class HelpComponent implements OnInit {
   anomalies: string;
   spatialSubsetting: string;
   mapSelection: string;
-  validationPeriod: string;
+  temporalSubsetting: string;
   tca: string;
   scaling: string;
   nameYourValidation: string;
@@ -37,8 +38,12 @@ export class HelpComponent implements OnInit {
   publishingDialog: string;
   ismnNetworks: string;
   ismnDepths: string;
+  datsetConfigurationComparison: string;
+  validationSelectionsComparison: string;
+  spatialExtentComparison: string;
 
-  constructor(private globalParamsService: GlobalParamsService) {
+  constructor(private globalParamsService: GlobalParamsService,
+              public settingsService: SettingsService) {
   }
 
   ngOnInit(): void {
@@ -54,7 +59,7 @@ export class HelpComponent implements OnInit {
     this.anomalies = plotsUrlPrefix + 'anomalies.png';
     this.spatialSubsetting = plotsUrlPrefix + 'spatial_subsetting.png';
     this.mapSelection = plotsUrlPrefix + 'map_selection.png';
-    this.validationPeriod = plotsUrlPrefix + 'validation_period.png';
+    this.temporalSubsetting = plotsUrlPrefix + 'temporal_subsetting.png';
     this.tca = plotsUrlPrefix + 'metrics.png';
     this.scaling = plotsUrlPrefix + 'scaling.png';
     this.nameYourValidation = plotsUrlPrefix + 'name_your_validation.png';
@@ -65,6 +70,9 @@ export class HelpComponent implements OnInit {
     this.publishingDialog = plotsUrlPrefix + 'publishing_dialog.png';
     this.ismnNetworks = plotsUrlPrefix + 'networks.png';
     this.ismnDepths = plotsUrlPrefix + 'depths.png';
+    this.datsetConfigurationComparison = plotsUrlPrefix + 'dataset-configuration-for-comparison.png';
+    this.validationSelectionsComparison = plotsUrlPrefix + 'validation-selection-comparison.png';
+    this.spatialExtentComparison = plotsUrlPrefix + 'spatial-extent-comparison.png';
   }
 
   getAdminMail(): string {

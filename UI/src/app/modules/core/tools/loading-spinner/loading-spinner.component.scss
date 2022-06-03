@@ -1,0 +1,18 @@
+@keyframes spinAndChangeColor {
+  from {color: #9CF2F6}
+  to {color: #00AAE3;}
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
+  }
+}
+
+.loading-spinner{
+  font-size: 10rem;
+  margin: 1rem;
+  animation-name: spinAndChangeColor;
+  animation-duration: 10s;
+  animation-iteration-count: infinite;
+}
