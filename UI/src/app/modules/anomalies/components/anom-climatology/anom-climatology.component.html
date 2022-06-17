@@ -9,12 +9,21 @@
       <div class="p-col-7 p-px-0 p-mx-0">
         <div class="p-fluid">
           <div class="p-float-label">
-            <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                        yearRange="1970:2100" [ngModel]="anomaliesModel.anomaliesFrom$|async"
-                        (ngModelChange)="anomaliesModel.anomaliesFrom$.next($event)"
-                        [maxDate]="anomaliesModel.anomaliesTo$|async"
-            ></p-calendar>
-            <label for="fromDateInput">Choose a date</label>
+            <div class="p-float-label">
+              <p-inputNumber
+                id="yearFrom"
+                [useGrouping]="false"
+                [showButtons]="true"
+                [maxFractionDigits]="0"
+                [ngModel]="getYearFrom()"
+                (ngModelChange)="anomaliesModel.anomaliesFrom$.next(setDate($event))"
+                [step]="1"
+                [min]="minYear"
+                [max]="maxYear">
+              </p-inputNumber>
+              <label for="yearFrom">Choose year</label>
+            </div>
+
           </div>
         </div>
       </div>
@@ -31,13 +40,18 @@
       <div class="p-col-7 p-px-0 p-mx-0">
         <div class="p-fluid">
           <div class="p-float-label">
-            <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                        yearRange="1970:2100"
-                        [ngModel]="anomaliesModel.anomaliesTo$|async"
-                        (ngModelChange)="anomaliesModel.anomaliesTo$.next($event)"
-                        [minDate]="anomaliesModel.anomaliesFrom$|async"
-            ></p-calendar>
-            <label for="toDateInput">Choose a date</label>
+            <p-inputNumber
+              id="yearTo"
+              [useGrouping]="false"
+              [showButtons]="true"
+              [maxFractionDigits]="0"
+              [ngModel]="getYearTo()"
+              (ngModelChange)="anomaliesModel.anomaliesTo$.next(setDate($event))"
+              [step]="1"
+              [min]="minYear"
+              [max]="maxYear">
+            </p-inputNumber>
+            <label for="yearTo">Choose year</label>
           </div>
         </div>
       </div>

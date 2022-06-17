@@ -118,7 +118,7 @@ def get_validation_configuration(request, **kwargs):
         else:
             val_run_dict['anomalies_from'] = None
 
-        if val_run.anomalies_from is not None:
+        if val_run.anomalies_to is not None:
             val_run_dict['anomalies_to'] = val_run.anomalies_to.date()
         else:
             val_run_dict['anomalies_to'] = None

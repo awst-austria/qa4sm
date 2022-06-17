@@ -7,6 +7,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {CalendarModule} from 'primeng/calendar';
+import {InputNumberModule} from 'primeng/inputnumber';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import {CalendarModule} from 'primeng/calendar';
     TooltipModule,
     DropdownModule,
     FormsModule,
-    CalendarModule
+    CalendarModule,
+    InputNumberModule
   ]
 })
 export class AnomaliesModule {
