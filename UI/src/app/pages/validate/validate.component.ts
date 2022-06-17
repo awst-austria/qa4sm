@@ -295,7 +295,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.validationModel.anomalies.anomaliesFrom$.next(new Date(validationRunConfig.anomalies_from));
       }
       if (validationRunConfig.anomalies_to != null) {
-        this.validationModel.anomalies.anomaliesTo$.next(new Date(validationRunConfig.anomalies_from));
+        this.validationModel.anomalies.anomaliesTo$.next(new Date(validationRunConfig.anomalies_to));
       }
     }
 
