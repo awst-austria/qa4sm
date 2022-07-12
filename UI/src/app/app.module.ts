@@ -68,7 +68,7 @@ import {
   PasswordResetValidateTokenComponent
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {InputNumberModule} from 'primeng/inputnumber';
-
+import {UserFileUploadComponent} from './modules/user-file-upload/user-file-upload.component';
 
 @NgModule({
   declarations: [
@@ -94,6 +94,7 @@ import {InputNumberModule} from 'primeng/inputnumber';
     SetPasswordComponent,
     PasswordResetValidateTokenComponent,
     TemporalMatchingComponent,
+    UserFileUploadComponent,
   ],
     imports: [
         LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -132,7 +133,7 @@ import {InputNumberModule} from 'primeng/inputnumber';
         NgxPageScrollModule,
         CoreModule,
         UserModule,
-        InputNumberModule
+        InputNumberModule,
     ],
   providers: [
     {
