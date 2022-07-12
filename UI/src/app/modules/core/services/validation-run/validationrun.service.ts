@@ -134,35 +134,37 @@ export class ValidationrunService {
     return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
   }
 
-  getPublishingFormData(params: any): Observable<PublishingFormDto>{
+  getPublishingFormData(params: any): Observable<PublishingFormDto> {
     return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params});
   }
 
-  refreshComponent(validationIdOrPage: string): void{
+  refreshComponent(validationIdOrPage: string): void {
     // here we can give or validation id or the word 'page' if entire page should be reloaded (e.g. when a validation is removed)
     this.refresh.next(validationIdOrPage);
   }
 
-  copyValidation(params: any): Observable<any>{
+  copyValidation(params: any): Observable<any> {
     return this.httpClient.get(copyValidationUrl, {params});
   }
 
-  getCopiedRunRecord(validationId: string): Observable<any>{
+  getCopiedRunRecord(validationId: string): Observable<any> {
     const urlWithParam = copiedValidationRecordUrl + '/' + validationId;
     return this.httpClient.get(urlWithParam);
   }
 
-  checkPublishingInProgress(): Observable<boolean>{
+  checkPublishingInProgress(): Observable<boolean> {
     return this.publishingInProgress.asObservable();
   }
 
-  changePublishingStatus(inProgress: boolean): void{
+  changePublishingStatus(inProgress: boolean): void {
     this.publishingInProgress.next(inProgress);
   }
 
-  userFileUpload(formData): Observable<any>{
-   console.log(uploadUserDataUrl);
-   return this.httpClient.post(uploadUserDataUrl, formData);
+  userFileUpload(name, file, filename): Observable<any> {
+    const formData = new FormData();
+    formData.append(name, file, filename);
+
+    return this.httpClient.post(uploadUserDataUrl, formData.getAll(name));
   }
 
 }
