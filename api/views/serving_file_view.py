@@ -1,4 +1,5 @@
 import base64
+import http
 import os
 from collections import OrderedDict
 
@@ -17,7 +18,7 @@ from wsgiref.util import FileWrapper
 
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
-
+from rest_framework.serializers import Serializer, FileField
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -196,3 +197,18 @@ def get_summary_statistics(request):
             classes=['table', 'table-bordered', 'table-striped'],
             index=False
         ))
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_user_data(request):
+    print('Monika')
+    response = {'message': 'Monika'}
+    return JsonResponse(response, status=200, safe=False)
+
+
+# Serializers define the API representation.
+class UploadSerializer(Serializer):
+    file_uploaded = FileField()
+    class Meta:
+        fields = ['file_uploaded']
