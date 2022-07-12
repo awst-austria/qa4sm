@@ -21,6 +21,7 @@ const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comp
 const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
+const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
 
 const csrfToken = '{{csrf_token}}';
 const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
@@ -157,6 +158,11 @@ export class ValidationrunService {
 
   changePublishingStatus(inProgress: boolean): void{
     this.publishingInProgress.next(inProgress);
+  }
+
+  userFileUpload(formData): Observable<any>{
+   console.log(uploadUserDataUrl);
+   return this.httpClient.post(uploadUserDataUrl, formData);
   }
 
 }
