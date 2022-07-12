@@ -1,7 +1,12 @@
 .file-input {
   display: none;
 }
-.upload-btn {
-  width: 30px;
-  height: 30px;
+.center{
+  display: flex;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+button{
+  margin-left: -20px;
+  width: 15rem;
 }

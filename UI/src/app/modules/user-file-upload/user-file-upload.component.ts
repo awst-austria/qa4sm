@@ -9,6 +9,7 @@ import {ValidationrunService} from '../core/services/validation-run/validationru
 })
 export class UserFileUploadComponent implements OnInit {
   fileName = '';
+  name = '';
   constructor(private validationService: ValidationrunService) { }
 
   ngOnInit(): void {
@@ -18,10 +19,11 @@ export class UserFileUploadComponent implements OnInit {
     const file: File = event.target.files[0];
     if (file) {
       this.fileName = file.name;
-      const formData = new FormData();
-      formData.append('thumbnail', file);
-      const upload$ = this.validationService.userFileUpload(formData);
-      upload$.subscribe();
+      this.name = 'uploadedFile';
+      const upload$ = this.validationService.userFileUpload(this.name, file, this.fileName);
+      upload$.subscribe(data => {
+        console.log(data);
+      });
     }
   }
 
