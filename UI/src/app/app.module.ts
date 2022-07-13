@@ -69,6 +69,7 @@ import {
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {InputNumberModule} from 'primeng/inputnumber';
 import {UserFileUploadComponent} from './modules/user-file-upload/user-file-upload.component';
+import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import {UserFileUploadComponent} from './modules/user-file-upload/user-file-uplo
     PasswordResetValidateTokenComponent,
     TemporalMatchingComponent,
     UserFileUploadComponent,
+    MyDatasetsComponent,
   ],
     imports: [
         LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
