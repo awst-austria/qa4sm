@@ -1,1 +1,21 @@
-<qa-user-file-upload></qa-user-file-upload>
+<main>
+  <div class="center">
+<!--    <div class="p-col-9 p-text-center">-->
+      <h1>My datasets</h1>
+<!--    </div>-->
+  </div>
+  <hr class="featurette-divider">
+
+  <div class="p-text-center">
+    <qa-user-file-upload></qa-user-file-upload>
+  </div>
+  <hr class="featurette-divider">
+  <div class="center">
+    <p *ngIf="!userDatasets.length" class="lead text-muted">
+      You have not uploaded any data yet. Click the 'Upload file' button to add your own data.
+    </p>
+  </div>
+
+</main>
+
+

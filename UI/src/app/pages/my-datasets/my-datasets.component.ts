@@ -6,7 +6,7 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./my-datasets.component.scss']
 })
 export class MyDatasetsComponent implements OnInit {
-
+  userDatasets = [];
   constructor() { }
 
   ngOnInit(): void {
