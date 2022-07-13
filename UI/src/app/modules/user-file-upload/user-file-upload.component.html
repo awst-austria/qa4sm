@@ -3,15 +3,16 @@
     <input type="file" class="file-input"
            (change)="onFileSelected($event)" #fileUpload>
 
-    <div class="file-upload">
+    <div class="center" style="margin-top: 10px">
+      {{fileName || "No file uploaded yet."}}
+    </div>
+    <div class="file-upload center">
       <button pButton
               label="Upload file"
               (click)="fileUpload.click()">
       </button>
     </div>
-    <div class="center" style="margin-top: 10px">
-      {{fileName || "No file uploaded yet."}}
-    </div>
+
 
   </div>
 </div>
