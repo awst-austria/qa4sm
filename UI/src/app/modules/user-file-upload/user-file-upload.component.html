@@ -1,18 +1,32 @@
-<div class="center">
-  <div>
-    <input type="file" class="file-input"
-           (change)="onFileSelected($event)" #fileUpload>
+<div class="p-grid">
 
-    <div class="center" style="margin-top: 10px">
-      {{fileName || "No file uploaded yet."}}
+
+  <div class="p-col-12">
+    <div class="p-grid">
+      <div class="p-col-4">
+        <!--        this one here is to add the grid structure -->
+      </div>
+      <div class="p-col-2 p-sm-2">
+        <input type="file" class="file-input"
+               (change)="onFileSelected($event)" #fileUpload>
+<!--        <div class="p-fluid label">-->
+<!--          {{fileName || "No file uploaded yet."}}-->
+          <span class="label-button">{{fileName || "No file uploaded yet."}}</span>
+<!--        </div>-->
+      </div>
+      <div class="p-col-2 p-sm-2">
+        <div class="p-fluid">
+          <button pButton
+                  label="Upload file"
+                  (click)="fileUpload.click()">
+          </button>
+        </div>
+      </div>
+      <div class="p-col-2">
+        <!--        this one here is to add the grid structure -->
+      </div>
     </div>
-    <div class="file-upload center">
-      <button pButton
-              label="Upload file"
-              (click)="fileUpload.click()">
-      </button>
-    </div>
-
-
   </div>
+
 </div>
+
