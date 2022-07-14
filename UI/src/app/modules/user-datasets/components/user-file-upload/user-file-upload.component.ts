@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {ValidationrunService} from '../core/services/validation-run/validationrun.service';
+import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 
 @Component({
   selector: 'qa-user-file-upload',

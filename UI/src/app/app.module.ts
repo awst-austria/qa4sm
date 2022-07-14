@@ -52,7 +52,7 @@ import {ComparisonModule} from './modules/comparison/comparison.module';
 import {
   TemporalMatchingComponent
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
-import {TemporalMatchingModule} from "./modules/temporal-matching/temporal-matching.module";
+import {TemporalMatchingModule} from './modules/temporal-matching/temporal-matching.module';
 import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
@@ -68,8 +68,8 @@ import {
   PasswordResetValidateTokenComponent
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {InputNumberModule} from 'primeng/inputnumber';
-import {UserFileUploadComponent} from './modules/user-file-upload/user-file-upload.component';
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
+import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
 
 @NgModule({
   declarations: [
@@ -95,7 +95,6 @@ import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
     SetPasswordComponent,
     PasswordResetValidateTokenComponent,
     TemporalMatchingComponent,
-    UserFileUploadComponent,
     MyDatasetsComponent,
   ],
     imports: [
@@ -136,6 +135,7 @@ import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
         CoreModule,
         UserModule,
         InputNumberModule,
+        UserDatasetsModule,
     ],
   providers: [
     {
