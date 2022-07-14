@@ -14,16 +14,22 @@
           <span class="label-button">{{fileName || "No file uploaded yet."}}</span>
 <!--        </div>-->
       </div>
-      <div class="p-col-2 p-sm-2">
+      <div class="p-col-2 p-sm-1">
         <div class="p-fluid">
           <button pButton
-                  label="Upload file"
+                  label="Select file"
                   (click)="fileUpload.click()">
           </button>
         </div>
       </div>
-      <div class="p-col-2">
-        <!--        this one here is to add the grid structure -->
+      <div class="p-col-2 p-sm-1">
+        <div class="p-fluid">
+          <button pButton
+                  [disabled]="!file"
+                  label="Upload file"
+                  (click)="sendFile()">
+          </button>
+        </div>
       </div>
     </div>
   </div>

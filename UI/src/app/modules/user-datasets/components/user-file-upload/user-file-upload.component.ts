@@ -7,6 +7,7 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
   styleUrls: ['./user-file-upload.component.scss']
 })
 export class UserFileUploadComponent implements OnInit {
+  file: File;
   fileName = '';
   name = '';
   constructor(private validationService: ValidationrunService) { }
@@ -15,11 +16,14 @@ export class UserFileUploadComponent implements OnInit {
   }
 
   onFileSelected(event): void{
-    const file: File = event.target.files[0];
-    if (file) {
-      this.fileName = file.name;
+    this.file = event.target.files[0];
+    this.fileName = this.file.name;
+  }
+
+  sendFile(): void{
+    if (this.file) {
       this.name = 'uploadedFile';
-      const upload$ = this.validationService.userFileUpload(this.name, file, this.fileName);
+      const upload$ = this.validationService.userFileUpload(this.name, this.file, this.fileName);
       upload$.subscribe(data => {
         console.log(data);
       });
