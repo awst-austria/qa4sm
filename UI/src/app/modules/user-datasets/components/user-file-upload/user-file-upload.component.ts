@@ -18,12 +18,15 @@ export class UserFileUploadComponent implements OnInit {
   // dataset file form
   userDataForm = this.formBuilder.group({
     dataset_name: ['', [Validators.required, Validators.maxLength(30)]],
+    dataset_pretty_name: ['',  Validators.maxLength(30)],
     version_name: ['', [Validators.required, Validators.maxLength(30)]],
+    version_pretty_name: ['', Validators.maxLength(30)],
     variable_name: ['', Validators.required], // dropdown
     variable_units: [''],
     variable_value_range: [''],
     dimension_name: ['', Validators.required]
   });
+  formErrors: any;
 
   // so far I put some values that will be replaced later
   variableOptions = [

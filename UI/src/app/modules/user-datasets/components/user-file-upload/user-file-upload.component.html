@@ -42,13 +42,27 @@
     <div class="center p-col">
       <form [formGroup]="userDataForm" (ngSubmit)="onSubmit()">
         <div class="p-py-3">
-        <span class="p-float-label">
-          <input class="form-field" id="dataset-name" type="text" pInputText formControlName="dataset_name">
-          <label for="dataset-name">Dataset name</label>
-          <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-                class="pi pi-question-circle">
+          <span class="p-float-label">
+            <input class="form-field" id="dataset-name" type="text" pInputText formControlName="dataset_name">
+            <label for="dataset-name">Dataset name</label>
+            <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+                  class="pi pi-question-circle">
+            </span>
           </span>
-        </span>
+          <!--        <div *ngIf="formErrors && formErrors.username"-->
+          <!--             class="alert">-->
+          <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
+          <!--        </div>-->
+        </div>
+
+        <div class="p-py-3">
+          <span class="p-float-label">
+            <input class="form-field" id="dataset-pretty-name" type="text" pInputText formControlName="dataset_pretty_name">
+            <label for="dataset-pretty-name">Dataset display name (optional)</label>
+            <span pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
+                  class="pi pi-question-circle">
+            </span>
+          </span>
           <!--        <div *ngIf="formErrors && formErrors.username"-->
           <!--             class="alert">-->
           <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
@@ -70,10 +84,24 @@
         </div>
 
         <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="version-pretty-name" type="text" pInputText formControlName="version_pretty_name">
+          <label for="version-pretty-name">Version display name (optional)</label>
+          <span pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+          <!--        <div *ngIf="formErrors && formErrors.username"-->
+          <!--             class="alert">-->
+          <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
+          <!--        </div>-->
+        </div>
+
+        <div class="p-py-3">
           <div class="p-float-label">
             <p-dropdown class="form-field"
                         [options]="variableOptions"
-                        [style]="{'width':'15rem', 'height': '2.5rem'}"
+                        [style]="{'width':'16rem', 'height': '2.5rem'}"
                         formControlName="variable_name"
                         optionLabel="name"
                         optionValue="query_name"
@@ -108,14 +136,14 @@
           <div class="p-float-label">
             <p-dropdown class="form-field"
                         [options]="dimensionOptions"
-                        [style]="{'width':'15rem', 'height': '2.5rem'}"
+                        [style]="{'width':'16rem', 'height': '2.5rem'}"
                         formControlName="dimension_name"
                         optionLabel="name"
                         optionValue="query_name"
                         placeholder=" "
                         ngDefaultControl>
             </p-dropdown>
-            <label>Variable name</label>
+            <label>Dimension name</label>
             <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
                   [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userDataForm.controls.dimension_name.value==''}"
                   id="dimensionHelp">
