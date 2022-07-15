@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {FormBuilder, Validators} from '@angular/forms';
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -7,10 +8,36 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
   styleUrls: ['./user-file-upload.component.scss']
 })
 export class UserFileUploadComponent implements OnInit {
+  // variables to store file information
   file: File;
   fileName = '';
   name = '';
-  constructor(private validationService: ValidationrunService) { }
+  // variable to open the form
+  dialogVisible = false;
+
+  // dataset file form
+  userDataForm = this.formBuilder.group({
+    dataset_name: ['', [Validators.required, Validators.maxLength(30)]],
+    version_name: ['', [Validators.required, Validators.maxLength(30)]],
+    variable_name: ['', Validators.required], // dropdown
+    variable_units: [''],
+    variable_value_range: [''],
+    dimension_name: ['', Validators.required]
+  });
+
+  // so far I put some values that will be replaced later
+  variableOptions = [
+    {name: 'Soil moisture', query_name: 'sm'},
+    {name: 'From file', query_name: 'file'}
+  ];
+
+  dimensionOptions = [
+    {name: 'X-Y-Z', query_name: 'XYZ'},
+    {name: 'Lat-Lon-Time', query_name: 'LLT'}
+  ];
+
+  constructor(private validationService: ValidationrunService,
+              private formBuilder: FormBuilder) { }
 
   ngOnInit(): void {
   }
@@ -18,6 +45,7 @@ export class UserFileUploadComponent implements OnInit {
   onFileSelected(event): void{
     this.file = event.target.files[0];
     this.fileName = this.file.name;
+    this.dialogVisible = true;
   }
 
   sendFile(): void{
@@ -29,5 +57,10 @@ export class UserFileUploadComponent implements OnInit {
       });
     }
   }
+
+  onSubmit(): void{
+    console.log('Hoorray');
+    this.dialogVisible = false;
+}
 
 }
