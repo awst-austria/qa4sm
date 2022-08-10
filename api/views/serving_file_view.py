@@ -1,24 +1,25 @@
 import base64
-import http
+import json
 import os
 from collections import OrderedDict
 
+from django.conf import settings
 from django.core.files import File
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from validator.models import ValidationRun, DatasetConfiguration, UserDatasetFile
 
-from validator.models import ValidationRun, DatasetConfiguration
-from django.conf import settings
 
 import mimetypes
 from wsgiref.util import FileWrapper
-
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
 from rest_framework.serializers import Serializer, FileField
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -102,7 +103,7 @@ def get_metric_names_and_associated_files(request):
         boxplot_file = ''
         boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
 
-        # 'n_obs' doesn't refer to datasets so I create a list with independent metrics, if there are other similar
+        # 'n_obs' doesn't refer to datasets, so I create a list with independent metrics, if there are other similar
         # metrics it's just enough to add them here:
         independent_metrics = ['n_obs']
 
@@ -115,13 +116,15 @@ def get_metric_names_and_associated_files(request):
         if boxplot_file_name in files:
             boxplot_file = file_path + boxplot_file_name
 
-        overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if file_dict['file_name'] in files]
-        datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if file_dict['file_name'] in files]
+        overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if
+                          file_dict['file_name'] in files]
+        datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if
+                    file_dict['file_name'] in files]
 
         # for ISMN there might be also metadata plots
         boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
         if ref_dataset_name == ISMN:
-            metadata_plots = [{'file_name': 'boxplot_'+ metrics[key] + '_' + metadata_name + '.png'}
+            metadata_plots = [{'file_name': 'boxplot_' + metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
             for meta_ind, file_dict in enumerate(metadata_plots):
                 if file_dict['file_name'] in files:
@@ -199,16 +202,37 @@ def get_summary_statistics(request):
         ))
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def upload_user_data(request):
-    print('Monika')
+@api_view(['PUT', 'POST'])
+@permission_classes([AllowAny])
+@parser_classes([FileUploadParser])
+def upload_user_data(request, filename):
+    file = request.data['file']
+
+    # retrieving metadata
+    with file.open() as f:
+        metadata = json.loads(f.read().decode('UTF-8'))['metadata']
+
+    file_serializer = UploadSerializer(data=request.data)
+    print(file_serializer, file_serializer.is_valid())
     response = {'message': 'Monika'}
     return JsonResponse(response, status=200, safe=False)
 
 
-# Serializers define the API representation.
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# @parser_classes([FileUploadParser])
+# def validate_user_data(request, format=None):
+#     serializer_class = UploadSerializer
+#     print(dir(request.FILES), request.FILES.keys(), request.data)
+#     response = {'message': 'Monika'}
+#     return JsonResponse(response, status=200, safe=False)
+
+
 class UploadSerializer(Serializer):
-    file_uploaded = FileField()
+    # file_uploaded = FileField()
     class Meta:
-        fields = ['file_uploaded']
+        model = UserDatasetFile
+        fields = ['file', 'file_name']
+
+class FileSerializer(Serializer):
+    file = FileField(max_length=None, allow_empty_file=False)
