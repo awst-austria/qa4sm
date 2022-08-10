@@ -16,7 +16,7 @@ export class UserFileUploadComponent implements OnInit {
   dialogVisible = false;
 
   // dataset file form
-  userDataForm = this.formBuilder.group({
+  metadataForm = this.formBuilder.group({
     dataset_name: ['', [Validators.required, Validators.maxLength(30)]],
     dataset_pretty_name: ['',  Validators.maxLength(30)],
     version_name: ['', [Validators.required, Validators.maxLength(30)]],
@@ -51,17 +51,17 @@ export class UserFileUploadComponent implements OnInit {
     this.dialogVisible = true;
   }
 
-  sendFile(): void{
+  sendForm(): void{
     if (this.file) {
       this.name = 'uploadedFile';
-      const upload$ = this.validationService.userFileUpload(this.name, this.file, this.fileName);
+      const upload$ = this.validationService.userFileUpload(this.name, this.file, this.metadataForm.value);
       upload$.subscribe(data => {
         console.log(data);
       });
     }
   }
 
-  onSubmit(): void{
+  onSaveData(): void{
     console.log('Hoorray');
     this.dialogVisible = false;
 }

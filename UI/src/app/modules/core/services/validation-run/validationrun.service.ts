@@ -22,6 +22,7 @@ const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
+// const validateUserDataUrl: string = urlPrefix + '/validate-user-data';
 
 const csrfToken = '{{csrf_token}}';
 const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
@@ -160,11 +161,18 @@ export class ValidationrunService {
     this.publishingInProgress.next(inProgress);
   }
 
-  userFileUpload(name, file, filename): Observable<any> {
+  userFileUpload(name, file, metadata): Observable<any> {
     const formData = new FormData();
-    formData.append(name, file, filename);
-
-    return this.httpClient.post(uploadUserDataUrl, formData.getAll(name));
+    formData.append(name, file, file.name);
+    const uploadUrl = uploadUserDataUrl  + '/' + file.name + '/';
+    return this.httpClient.post(uploadUrl, {formData, metadata}, {headers});
   }
+
+  // userFileValidate(name, file, filename): Observable<any> {
+  //   const formData = new FormData();
+  //   formData.append(name, file, filename);
+  //   const validateUserDataUrlWithFileName = validateUserDataUrl + '/' + file.name + '/';
+  //   return this.httpClient.put(validateUserDataUrlWithFileName, {file: formData.getAll(name)});
+  // }
 
 }

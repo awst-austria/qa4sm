@@ -23,9 +23,9 @@
       <div class="p-col-2 p-sm-1">
         <div class="p-fluid">
           <button pButton
-                  [disabled]="!file || !userDataForm.valid"
+                  [disabled]="!file || !metadataForm.valid"
                   label="Upload file"
-                  (click)="sendFile()">
+                  (click)="sendForm()">
           </button>
         </div>
       </div>
@@ -39,8 +39,26 @@
                                                                                                       [routerLink]="['/help', {pageSec: 'file-standard'}]">standard</a>
   </div>
   <div class="p-grid" style="display: flex">
-    <div class="center p-col">
-      <form [formGroup]="userDataForm" (ngSubmit)="onSubmit()">
+
+    <div class="center p-col-12 p-pb-0 p-pr-4">
+      <!--      <div class="form-field">{{fileName || "No file chosen yet."}}</div>-->
+
+      <div class="form-field">
+        {{fileName || "No file chosen yet."}}
+      </div>
+    </div>
+
+    <div class="center p-col-12 p-pt-0 p-pr-4">
+      <div class="form-field">
+        <button pButton
+                label="Add file"
+                (click)="fileUpload.click()">
+        </button>
+      </div>
+    </div>
+
+    <div class="center p-col-12">
+      <form *ngIf="file" [formGroup]="metadataForm" (ngSubmit)="onSaveData()">
         <div class="p-py-3">
           <span class="p-float-label">
             <input class="form-field" id="dataset-name" type="text" pInputText formControlName="dataset_name">
@@ -57,10 +75,12 @@
 
         <div class="p-py-3">
           <span class="p-float-label">
-            <input class="form-field" id="dataset-pretty-name" type="text" pInputText formControlName="dataset_pretty_name">
+            <input class="form-field" id="dataset-pretty-name" type="text" pInputText
+                   formControlName="dataset_pretty_name">
             <label for="dataset-pretty-name">Dataset display name (optional)</label>
-            <span pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
-                  class="pi pi-question-circle">
+            <span
+              pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
+              class="pi pi-question-circle">
             </span>
           </span>
           <!--        <div *ngIf="formErrors && formErrors.username"-->
@@ -85,10 +105,12 @@
 
         <div class="p-py-3">
         <span class="p-float-label">
-          <input class="form-field" id="version-pretty-name" type="text" pInputText formControlName="version_pretty_name">
+          <input class="form-field" id="version-pretty-name" type="text" pInputText
+                 formControlName="version_pretty_name">
           <label for="version-pretty-name">Version display name (optional)</label>
-          <span pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
-                class="pi pi-question-circle">
+          <span
+            pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
+            class="pi pi-question-circle">
           </span>
         </span>
           <!--        <div *ngIf="formErrors && formErrors.username"-->
@@ -110,7 +132,7 @@
             </p-dropdown>
             <label>Variable name</label>
             <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
-                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userDataForm.controls.variable_name.value==''}"
+                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.variable_name.value==''}"
                   id="variableHelp">
           </span>
           </div>
@@ -145,26 +167,26 @@
             </p-dropdown>
             <label>Dimension name</label>
             <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
-                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userDataForm.controls.dimension_name.value==''}"
+                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.dimension_name.value==''}"
                   id="dimensionHelp">
           </span>
           </div>
         </div>
 
-        <span class="label-button">{{fileName || "No file chosen yet."}}</span>
+        <!--        <span class="label-button">{{fileName || "No file chosen yet."}}</span>-->
 
-        <div class="form-field">
-          <button pButton
-                  label="Add file"
-                  (click)="fileUpload.click()">
-          </button>
-        </div>
+        <!--        <div class="form-field">-->
+        <!--          <button pButton-->
+        <!--                  label="Add file"-->
+        <!--                  (click)="fileUpload.click()">-->
+        <!--          </button>-->
+        <!--        </div>-->
 
         <div class="form-field">
           <button pButton
                   type="submit"
                   label="Save"
-                  [disabled]="!userDataForm.valid">
+                  [disabled]="!metadataForm.valid">
           </button>
 
         </div>
