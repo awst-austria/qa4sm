@@ -1,14 +1,22 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import FileUploadParser
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 
 from validator.models import UserDatasetFile
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_list_of_user_data_files(request):
+    list_of_files = UserDatasetFile.objects.filter(owner=request.user)
+    serializer = UploadSerializer(list_of_files, many=True)
+    return JsonResponse(serializer.data, status=200, safe=False)
+
+
 @api_view(['PUT', 'POST'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
     file = request.FILES['file']
@@ -47,9 +55,3 @@ class UploadSerializer(ModelSerializer):
         model = UserDatasetFile
         fields = '__all__'
 
-
-
-class FileSerializer(ModelSerializer):
-    class Meta:
-        model = UserDatasetFile
-        fields = '__all__'
