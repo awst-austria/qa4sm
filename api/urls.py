@@ -25,6 +25,7 @@ from api.views.modify_validation_view import stop_validation, delete_result, cha
 from api.views.serving_file_view import *
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import settings
+from api.views.upload_user_data_view import *
 
 # schema_view = get_schema_view(
 #     openapi.Info(
