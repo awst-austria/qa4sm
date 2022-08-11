@@ -13,13 +13,11 @@ from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from validator.models import ValidationRun, DatasetConfiguration, UserDatasetFile
 
-
 import mimetypes
 from wsgiref.util import FileWrapper
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
-from rest_framework.serializers import Serializer, FileField
-
+from rest_framework.serializers import Serializer, ModelSerializer
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -206,16 +204,25 @@ def get_summary_statistics(request):
 @permission_classes([AllowAny])
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
-    file = request.data['file']
+    file = request.FILES['file']
+    file_owner = request.user
 
-    # retrieving metadata
-    with file.open() as f:
-        metadata = json.loads(f.read().decode('UTF-8'))['metadata']
+    file_data = {
+        'file': file,
+        'owner': file_owner.pk,
+        'file_name': filename
+    }
 
-    file_serializer = UploadSerializer(data=request.data)
-    print(file_serializer, file_serializer.is_valid())
-    response = {'message': 'Monika'}
-    return JsonResponse(response, status=200, safe=False)
+    file_serializer = UploadSerializer(data=file_data)
+    if file_serializer.is_valid():
+        file_serializer.save()
+
+        print('i am the king of the world')
+    else:
+        print('you suck')
+        print(file_serializer.errors)
+
+    return JsonResponse(file_serializer.data, status=200, safe=False)
 
 
 # @api_view(['POST'])
@@ -228,11 +235,14 @@ def upload_user_data(request, filename):
 #     return JsonResponse(response, status=200, safe=False)
 
 
-class UploadSerializer(Serializer):
-    # file_uploaded = FileField()
+class UploadSerializer(ModelSerializer):
     class Meta:
         model = UserDatasetFile
-        fields = ['file', 'file_name']
+        fields = '__all__'
 
-class FileSerializer(Serializer):
-    file = FileField(max_length=None, allow_empty_file=False)
+
+
+class FileSerializer(ModelSerializer):
+    class Meta:
+        model = UserDatasetFile
+        fields = '__all__'
