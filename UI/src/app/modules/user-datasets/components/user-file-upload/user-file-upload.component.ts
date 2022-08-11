@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {FormBuilder, Validators} from '@angular/forms';
+import {UserDatasetsService} from '../../services/user-datasets.service';
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -18,7 +18,7 @@ export class UserFileUploadComponent implements OnInit {
   // dataset file form
   metadataForm = this.formBuilder.group({
     dataset_name: ['', [Validators.required, Validators.maxLength(30)]],
-    dataset_pretty_name: ['',  Validators.maxLength(30)],
+    dataset_pretty_name: ['', Validators.maxLength(30)],
     version_name: ['', [Validators.required, Validators.maxLength(30)]],
     version_pretty_name: ['', Validators.maxLength(30)],
     variable_name: ['', Validators.required], // dropdown
@@ -39,31 +39,33 @@ export class UserFileUploadComponent implements OnInit {
     {name: 'Lat-Lon-Time', query_name: 'LLT'}
   ];
 
-  constructor(private validationService: ValidationrunService,
-              private formBuilder: FormBuilder) { }
+  constructor(private userDatasetService: UserDatasetsService,
+              private formBuilder: FormBuilder) {
+  }
 
   ngOnInit(): void {
   }
 
-  onFileSelected(event): void{
+  onFileSelected(event): void {
     this.file = event.target.files[0];
     this.fileName = this.file.name;
     this.dialogVisible = true;
   }
 
-  sendForm(): void{
+  sendForm(): void {
     if (this.file) {
       this.name = 'uploadedFile';
-      const upload$ = this.validationService.userFileUpload(this.name, this.file, this.metadataForm.value);
+      const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.metadataForm.value);
       upload$.subscribe(data => {
         console.log(data);
       });
     }
   }
 
-  onSaveData(): void{
+  onSaveData(): void {
     console.log('Hoorray');
     this.dialogVisible = false;
-}
+  }
+
 
 }
