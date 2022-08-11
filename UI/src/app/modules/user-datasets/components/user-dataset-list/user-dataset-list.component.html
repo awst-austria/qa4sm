@@ -1,0 +1,16 @@
+<div class="p-mb-3">
+  <table>
+    <tr *ngFor="let userDataset of userDatasetList">
+      <td>{{userDataset.file_name}}</td>
+      <td>
+        <button pButton
+                type="button"
+                label="Remove dataset"
+                pTooltip="Remove dataset and the attached file"
+                class="p-button-danger"
+                (click)="removeDataset(userDataset.id)">
+        </button>
+      </td>
+    </tr>
+  </table>
+</div>

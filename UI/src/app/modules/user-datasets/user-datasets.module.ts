@@ -8,12 +8,14 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {TooltipModule} from 'primeng/tooltip';
 import {DropdownModule} from 'primeng/dropdown';
+import {UserDatasetListComponent} from './components/user-dataset-list/user-dataset-list.component';
 
 
 @NgModule({
-  declarations: [UserFileUploadComponent],
+  declarations: [UserFileUploadComponent, UserDatasetListComponent],
   exports: [
-    UserFileUploadComponent
+    UserFileUploadComponent,
+    UserDatasetListComponent
   ],
   imports: [
     CommonModule,
