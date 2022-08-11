@@ -1,4 +1,6 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +15,19 @@ def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user)
     serializer = UploadSerializer(list_of_files, many=True)
     return JsonResponse(serializer.data, status=200, safe=False)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_user_dataset(request, dataset_id):
+    dataset = get_object_or_404(UserDatasetFile, pk=dataset_id)
+
+    if dataset.owner != request.user:
+        return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+
+    dataset.delete()
+
+    return HttpResponse(status=status.HTTP_200_OK)
 
 
 @api_view(['PUT', 'POST'])

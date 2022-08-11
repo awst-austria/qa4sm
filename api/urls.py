@@ -109,5 +109,6 @@ urlpatterns = [
     path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
     path('upload-user-data/<str:filename>/', upload_user_data, name='Upload user data'),
     path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
+    path('delete-user-dataset/<int:dataset_id>/', delete_user_dataset, name='Delete User Data Files'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

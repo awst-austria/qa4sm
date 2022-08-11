@@ -15,6 +15,11 @@ export class MyDatasetsComponent implements OnInit {
 
   ngOnInit(): void {
     this.userDatasets$ = this.userDatasetService.getUserDataList();
+    this.userDatasetService.doRefresh.subscribe(value => {
+      if (value){
+        this.userDatasets$ = this.userDatasetService.getUserDataList();
+      }
+    });
   }
 
 }

@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {UserDataFileDto} from '../../services/user-data-file.dto';
+import {UserDatasetsService} from '../../services/user-datasets.service';
 
 @Component({
   selector: 'qa-user-dataset-list',
@@ -10,11 +11,16 @@ export class UserDatasetListComponent implements OnInit {
 
   @Input() userDatasetList: UserDataFileDto[];
 
-  constructor() { }
+  constructor(private userDatasetService: UserDatasetsService) { }
 
   ngOnInit(): void {
   }
   removeDataset(datasetId): void{
-    console.log(datasetId);
+    if (!confirm('Do you really want to delete the dataset?')) {
+      return;
+    }
+    this.userDatasetService.deleteUserData(datasetId).subscribe(() => {
+      this.userDatasetService.refresh.next(true);
+    });
   }
 }
