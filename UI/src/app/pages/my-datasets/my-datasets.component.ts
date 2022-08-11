@@ -1,4 +1,7 @@
 import {Component, OnInit} from '@angular/core';
+import {UserDatasetsService} from '../../modules/user-datasets/services/user-datasets.service';
+import {Observable} from 'rxjs';
+import {UserDataFileDto} from '../../modules/user-datasets/services/user-data-file.dto';
 
 @Component({
   selector: 'qa-my-datasets',
@@ -6,10 +9,12 @@ import {Component, OnInit} from '@angular/core';
   styleUrls: ['./my-datasets.component.scss']
 })
 export class MyDatasetsComponent implements OnInit {
-  userDatasets = [];
-  constructor() { }
+  // userDatasets = [];
+  constructor(private userDatasetService: UserDatasetsService) { }
+  userDatasets$: Observable<UserDataFileDto[]>;
 
   ngOnInit(): void {
+    this.userDatasets$ = this.userDatasetService.getUserDataList();
   }
 
 }
