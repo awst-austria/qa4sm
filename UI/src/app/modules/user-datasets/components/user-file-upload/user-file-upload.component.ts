@@ -57,7 +57,7 @@ export class UserFileUploadComponent implements OnInit {
       this.name = 'uploadedFile';
       const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.metadataForm.value);
       upload$.subscribe(data => {
-        console.log(data);
+        this.userDatasetService.refresh.next(true);
       });
     }
   }
