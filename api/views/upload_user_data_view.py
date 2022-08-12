@@ -20,7 +20,7 @@ def get_list_of_user_data_files(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user_dataset(request, dataset_id):
-    dataset = get_object_or_404(UserDatasetFile, pk=dataset_id)
+    dataset = get_object_or_404(UserDatasetFile, id=dataset_id)
 
     if dataset.owner != request.user:
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
@@ -48,8 +48,8 @@ def upload_user_data(request, filename):
 
     file_serializer = UploadSerializer(data=file_data)
     if file_serializer.is_valid():
-        new_file = file_serializer.save()
-        new_file.save()
+        file_serializer.save()
+        # new_file.save()
 
         print('i am the king of the world')
     else:
