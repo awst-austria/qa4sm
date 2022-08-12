@@ -10,17 +10,20 @@
     <qa-user-file-upload></qa-user-file-upload>
   </div>
   <hr class="featurette-divider">
-
-  <div class="p-text-center">
-    <div *ngIf="!(userDatasets$|async)" class="center">
-      <p  class="lead text-muted">
-        You have not uploaded any data yet. Click the 'Upload file' button to add your own data.
-      </p>
-    </div>
-  </div>
-  <div *ngIf="(userDatasets$|async) as userDatasetList"  class="container p-mb-5 p-mt-4" style="max-width: 80rem;">
+  <div *ngIf="(userDatasets$ | async) as userDatasetList; else noData"  class="container p-mb-5 p-mt-4" style="max-width: 80rem;">
     <qa-user-dataset-list [userDatasetList]="userDatasetList"></qa-user-dataset-list>
   </div>
+  <ng-template #noData>
+    <div class="p-text-center">
+      <div class="center">
+        <p  class="lead text-muted">
+          You have not uploaded any data yet. Click the 'Upload file' button to add your own data.
+        </p>
+      </div>
+    </div>
+  </ng-template>
+
+
 </main>
 
 
