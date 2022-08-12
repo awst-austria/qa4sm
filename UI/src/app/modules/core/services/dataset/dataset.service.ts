@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {DatasetDto} from './dataset.dto';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
@@ -22,11 +22,12 @@ export class DatasetService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getAllDatasets(): Observable<DatasetDto[]> {
+  getAllDatasets(userData = false): Observable<DatasetDto[]> {
     if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS)) {
       return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS);
     } else {
-      let datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl).pipe(shareReplay());
+      const params = new HttpParams().set('userData', String(userData));
+      const datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, {params}).pipe(shareReplay());
       this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, datasets$);
       return datasets$;
     }
