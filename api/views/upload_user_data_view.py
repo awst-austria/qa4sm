@@ -40,12 +40,16 @@ def upload_user_data(request, filename):
     file_data = {
         'file': file,
         'owner': file_owner.pk,
-        'file_name': filename
+        'file_name': filename,
+        'dataset': 1,
+        'version': 1,
+        'variable': 1
     }
 
     file_serializer = UploadSerializer(data=file_data)
     if file_serializer.is_valid():
-        file_serializer.save()
+        new_file = file_serializer.save()
+        new_file.save()
 
         print('i am the king of the world')
     else:
