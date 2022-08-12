@@ -1,6 +1,21 @@
 <div class="p-mb-3">
-  <table>
+  <table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+      <th scope="col" style="width: 10%">Dataset</th>
+      <th scope="col" style="width: 20%">Version</th>
+      <th scope="col" style="width: 20%">Variable</th>
+      <th scope="col" style="width: 15%">Units</th>
+      <th scope="col" style="width: 10%">File name</th>
+      <th scope="col" style="width: 25%"></th>
+    </tr>
+    </thead>
+    <tbody>
     <tr *ngFor="let userDataset of userDatasetList">
+      <td>dataset</td>
+      <td>version</td>
+      <td>variable</td>
+      <td>units</td>
       <td>{{userDataset.file_name}}</td>
       <td>
         <button pButton
@@ -12,5 +27,6 @@
         </button>
       </td>
     </tr>
+    </tbody>
   </table>
 </div>
