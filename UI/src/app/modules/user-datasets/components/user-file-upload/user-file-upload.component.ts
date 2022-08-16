@@ -23,7 +23,7 @@ export class UserFileUploadComponent implements OnInit {
     version_pretty_name: ['', Validators.maxLength(30)],
     variable_name: ['', Validators.required], // dropdown
     variable_units: [''],
-    variable_value_range: [''],
+    // variable_value_range: [''],
     dimension_name: ['', Validators.required]
   });
   formErrors: any;
@@ -55,10 +55,12 @@ export class UserFileUploadComponent implements OnInit {
   sendForm(): void {
     if (this.file) {
       this.name = 'uploadedFile';
-      const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.metadataForm.value);
-      upload$.subscribe(data => {
-        this.userDatasetService.refresh.next(true);
+      this.userDatasetService.sendMetadata(this.metadataForm.value).subscribe( meta => {
+        this.userDatasetService.userFileUpload(this.name, this.file, meta.id).subscribe(data => {
+          this.userDatasetService.refresh.next(true);
+        });
       });
+
     }
   }
 

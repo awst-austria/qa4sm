@@ -4,9 +4,10 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, Serializer
+from rest_framework import serializers
 
-from validator.models import UserDatasetFile
+from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 
 
 @api_view(['GET'])
@@ -20,7 +21,7 @@ def get_list_of_user_data_files(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user_dataset(request, dataset_id):
-    dataset = get_object_or_404(UserDatasetFile, id=dataset_id)
+    dataset = get_object_or_404(UserDatasetFile, pk=dataset_id)
 
     if dataset.owner != request.user:
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
@@ -32,28 +33,99 @@ def delete_user_dataset(request, dataset_id):
 
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
+def post_user_file_metadata(request):
+    serializer = UserFileMetadataSerializer(data=request.data)
+    if serializer.is_valid():
+        dataset_name = request.data['dataset_name']
+        dataset_pretty_name = request.data['dataset_pretty_name']
+        version_name = request.data['version_name']
+        version_pretty_name = request.data['version_pretty_name']
+        variable_name = request.data['variable_name']
+        dimension_name = request.data['dimension_name']
+
+        # creating version entry
+        new_version_data = {
+            "short_name": version_name,
+            "pretty_name": version_pretty_name if version_pretty_name else version_name,
+            "help_text": f'Version {version_pretty_name} of dataset {dataset_pretty_name} provided by user {request.user}.',
+            "time_range_start": None,
+            "time_range_end": None,
+            "geographical_range": None,
+        }
+        new_version = DatasetVersion(**new_version_data)
+        new_version.save()
+
+        # creating variable entry
+        new_variable_data = {
+            'short_name': variable_name,
+            'pretty_name': variable_name,
+            'help_text': f'Variable {variable_name} of dataset {dataset_pretty_name} provided by  user {request.user}.',
+            'min_value': None,
+            'max_value': None
+        }
+        new_variable = DataVariable(**new_variable_data)
+        new_variable.save()
+
+        new_dataset_data = {
+            'short_name': dataset_name,
+            'pretty_name': dataset_pretty_name if dataset_pretty_name else dataset_name,
+            'help_text': f'Dataset {dataset_pretty_name} provided by user {request.user}.',
+            'storage_path': '',
+            'detailed_description': 'Data provided by a user',
+            'source_reference': 'Data provided by a user',
+            'citation': 'Data provided by a user',
+            'resolution': None,
+            'user': request.user
+        }
+        new_dataset = Dataset(**new_dataset_data)
+        new_dataset.save()
+        new_dataset.versions.set([new_version.id])
+        new_dataset.filters.set([])
+        new_dataset.variables.set([new_variable.id])
+
+        file_data = {
+            'file': None,
+            'owner': request.user.pk,
+            'file_name': None,
+            'dataset': new_dataset.id,
+            'version': new_version.id,
+            'variable': new_variable.id
+        }
+
+        file_data_serializer = UploadSerializer(data=file_data)
+        if file_data_serializer.is_valid():
+            file_data_serializer.save()
+            print(file_data_serializer.data)
+            response = file_data_serializer.data
+        else:
+            response = file_data_serializer.errors
+    else:
+        response = serializer.errors
+
+    return JsonResponse(response, status=200, safe=False)
+
+
+@api_view(['PUT', 'POST'])
+@permission_classes([IsAuthenticated])
 @parser_classes([FileUploadParser])
-def upload_user_data(request, filename):
+def upload_user_data(request, filename, file_uuid):
     file = request.FILES['file']
-    file_owner = request.user
+    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
 
     file_data = {
         'file': file,
-        'owner': file_owner.pk,
         'file_name': filename,
-        'dataset': 1,
-        'version': 1,
-        'variable': 1
     }
 
-    file_serializer = UploadSerializer(data=file_data)
-    if file_serializer.is_valid():
-        file_serializer.save()
-        # new_file.save()
+    file_serializer = UserFileSerializer(data=file_data)
 
-        print('i am the king of the world')
+    print(request.user == file_entry.owner, file_serializer.is_valid())
+    if file_serializer.is_valid() and request.user == file_entry.owner:
+        file_entry.file = file
+        file_entry.file_name = filename
+        file_entry.save()
+
     else:
-        print('you suck')
         print(file_serializer.errors)
 
     return JsonResponse(file_serializer.data, status=200, safe=False)
@@ -74,3 +146,30 @@ class UploadSerializer(ModelSerializer):
         model = UserDatasetFile
         fields = '__all__'
 
+
+class UserFileMetadataSerializer(Serializer):
+    # with this serializer I'm checking if the metadata is properly introduced, but the metadata doesn't refer to any
+    # particular model, therefore it's not a model serializer
+    dataset_name = serializers.CharField(max_length=30, required=True)
+    dataset_pretty_name = serializers.CharField(max_length=30, required=False)
+    version_name = serializers.CharField(max_length=30, required=True)
+    version_pretty_name = serializers.CharField(max_length=30, required=False)
+    variable_name = serializers.CharField(max_length=30, required=True)
+    dimension_name = serializers.CharField(required=True)
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+
+class UserFileSerializer(Serializer):
+    file = serializers.FileField(allow_null=True)
+    file_name = serializers.CharField(max_length=100, allow_null=True, allow_blank=True)
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
