@@ -18,9 +18,8 @@ def dataset(request):
     datasets = Dataset.objects.filter(user=None)
     if user_data and user.is_authenticated:
         user_datasets = Dataset.objects.filter(user=user)
-        datasets.union(user_datasets)
+        datasets = datasets.union(user_datasets)
 
-    print(datasets)
     serializer = DatasetSerializer(datasets, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
