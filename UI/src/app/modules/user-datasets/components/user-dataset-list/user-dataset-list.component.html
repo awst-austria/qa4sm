@@ -12,9 +12,9 @@
     </thead>
     <tbody>
     <tr *ngFor="let userDataset of userDatasetList">
-      <td>{{(getDataset(userDataset.dataset) | async).pretty_name}}</td>
-      <td>{{(getDatasetVersion(userDataset.version) | async).pretty_name}}</td>
-      <td>{{(getDatasetVariable(userDataset.variable) | async).pretty_name}}</td>
+      <td>{{(getDataset(userDataset.dataset) | async)?.pretty_name}}</td>
+      <td>{{(getDatasetVersion(userDataset.version) | async)?.pretty_name}}</td>
+      <td>{{(getDatasetVariable(userDataset.variable) | async)?.pretty_name}}</td>
       <td>units</td>
       <td>{{userDataset.file_name}}</td>
       <td>
