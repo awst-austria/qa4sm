@@ -5,6 +5,10 @@ from validator.models.dataset import Dataset
 from validator.models.custom_user import User
 from os import path
 import uuid
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
+from shutil import rmtree
+import os
 
 def upload_directory(instance, filename):
     # this is a temporarily fixed path, I'll update it with the proper one later:
@@ -17,6 +21,14 @@ class UserDatasetFile(models.Model):
     file = models.FileField(null=True, blank=True, upload_to=upload_directory)
     file_name = models.CharField(max_length=100, blank=True, null=True)
     owner = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE, null=True)
-    dataset = models.ForeignKey(Dataset, related_name='dataset', on_delete=models.CASCADE)
-    version = models.ForeignKey(DatasetVersion, related_name='version', on_delete=models.CASCADE)
-    variable = models.ForeignKey(DataVariable, related_name='variable', on_delete=models.CASCADE)
+    dataset = models.ForeignKey(Dataset, related_name='dataset', on_delete=models.SET_NULL, null=True)
+    version = models.ForeignKey(DatasetVersion, related_name='version', on_delete=models.SET_NULL, null=True)
+    variable = models.ForeignKey(DataVariable, related_name='variable', on_delete=models.SET_NULL, null=True)
+
+
+@receiver(post_delete, sender=UserDatasetFile)
+def auto_delete_file_on_delete(sender, instance, **kwargs):
+    if instance.file:
+        rundir = path.dirname(instance.file.path)
+        if path.isdir(rundir):
+            rmtree(rundir)
