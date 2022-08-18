@@ -14,6 +14,7 @@ export class UserFileUploadComponent implements OnInit {
   name = '';
   // variable to open the form
   dialogVisible = false;
+  spinnerVisible = false;
 
   // dataset file form
   metadataForm = this.formBuilder.group({
@@ -55,11 +56,17 @@ export class UserFileUploadComponent implements OnInit {
   sendForm(): void {
     if (this.file) {
       this.name = 'uploadedFile';
+      this.spinnerVisible = true;
       this.userDatasetService.sendMetadata(this.metadataForm.value).subscribe( meta => {
         this.userDatasetService.userFileUpload(this.name, this.file, meta.id).subscribe(data => {
           this.userDatasetService.refresh.next(true);
-        });
-      });
+        },
+          () => {},
+          () => {
+            this.spinnerVisible = false;
+          });
+      },
+        () => {});
 
     }
   }

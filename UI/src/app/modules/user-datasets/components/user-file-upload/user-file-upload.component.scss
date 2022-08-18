@@ -55,3 +55,23 @@ div.alert{
   vertical-align: 85%;
 }
 
+@keyframes changeColor {
+  from {color: #9CF2F6}
+  to {color: #00AAE3;}
+}
+
+//.loading-spinner{
+//  font-size: 10rem;
+//  margin: 1rem;
+//  animation-name: spinAndChangeColor;
+//  animation-duration: 10s;
+//  animation-iteration-count: infinite;
+//}
+
+.uploading-message{
+  margin-top: 2px;
+  font-size: 2rem;
+  animation-name: changeColor;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+}
