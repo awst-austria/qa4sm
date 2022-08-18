@@ -34,7 +34,7 @@
 
 </div>
 
-<p-dialog id="user-data-form" header="Upload your own data" position="botton" [(visible)]="dialogVisible">
+<p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible">
   <div class="p-pb-3 p-pl-0">You can upload your own data using this form. Please follow this file <a target="_blank"
                                                                                                       [routerLink]="['/help', {pageSec: 'file-standard'}]">standard</a>
   </div>
@@ -191,9 +191,13 @@
 
         </div>
 
-
       </form>
     </div>
   </div>
+</p-dialog>
+
+<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible">
+  <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
+  <div class="uploading-message">We are uploading your data..</div>
 </p-dialog>
 
