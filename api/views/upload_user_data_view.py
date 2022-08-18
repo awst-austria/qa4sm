@@ -21,12 +21,24 @@ def get_list_of_user_data_files(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_user_dataset(request, dataset_id):
-    dataset = get_object_or_404(UserDatasetFile, pk=dataset_id)
+    dataset_file = get_object_or_404(UserDatasetFile, pk=dataset_id)
 
-    if dataset.owner != request.user:
+    if dataset_file.owner != request.user:
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
+    dataset = get_object_or_404(Dataset, id=dataset_file.dataset.id)
+    version = get_object_or_404(DatasetVersion, id=dataset_file.version.id)
+    variable = get_object_or_404(DataVariable, id=dataset_file.variable.id)
+
+    dataset.variables.clear()
+    dataset.versions.clear()
+    dataset.filters.clear()
+
     dataset.delete()
+    version.delete()
+    variable.delete()
+
+    dataset_file.delete()
 
     return HttpResponse(status=status.HTTP_200_OK)
 
@@ -95,7 +107,6 @@ def post_user_file_metadata(request):
         file_data_serializer = UploadSerializer(data=file_data)
         if file_data_serializer.is_valid():
             file_data_serializer.save()
-            print(file_data_serializer.data)
             response = file_data_serializer.data
         else:
             response = file_data_serializer.errors
@@ -119,11 +130,16 @@ def upload_user_data(request, filename, file_uuid):
 
     file_serializer = UserFileSerializer(data=file_data)
 
-    print(request.user == file_entry.owner, file_serializer.is_valid())
     if file_serializer.is_valid() and request.user == file_entry.owner:
+        # adding a file
         file_entry.file = file
         file_entry.file_name = filename
         file_entry.save()
+
+        # updating dataset entry with the path to the data file
+        dataset = get_object_or_404(Dataset, id=file_entry.dataset.id)
+        dataset.storage_path = file_entry.file.path
+        dataset.save()
 
     else:
         print(file_serializer.errors)
