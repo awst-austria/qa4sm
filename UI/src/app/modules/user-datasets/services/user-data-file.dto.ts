@@ -1,5 +1,5 @@
 export class UserDataFileDto {
-  constructor(public id: number,
+  constructor(public id: string,
               public file: File,
               public file_name: string,
               public owner: number,
