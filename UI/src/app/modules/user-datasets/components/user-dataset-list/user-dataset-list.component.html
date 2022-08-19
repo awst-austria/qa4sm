@@ -26,6 +26,15 @@
                 (click)="removeDataset(userDataset.id)">
         </button>
       </td>
+      <td>
+        <button pButton
+                type="button"
+                label="Run dataset"
+                pTooltip="This is a temporal button for testing uploaded data"
+                class="p-button"
+                (click)="testDataset(userDataset.id)">
+        </button>
+      </td>
     </tr>
     </tbody>
   </table>

@@ -123,6 +123,10 @@ def upload_user_data(request, filename, file_uuid):
     file = request.FILES['file']
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
 
+    print(file)
+    print(dir(file))
+    print(file.chunks())
+
     file_data = {
         'file': file,
         'file_name': filename,
@@ -155,6 +159,40 @@ def upload_user_data(request, filename, file_uuid):
 #     print(dir(request.FILES), request.FILES.keys(), request.data)
 #     response = {'message': 'Monika'}
 #     return JsonResponse(response, status=200, safe=False)
+
+def test_user_data(request, dataset_id):
+    import netCDF4 as nc
+    from zipfile import ZipFile
+
+    data_file = get_object_or_404(UserDatasetFile, id=dataset_id)
+    file_path = data_file.file.path
+    raw_path = file_path.rstrip(data_file.file_name)
+    if '.zip' in data_file.file_name:
+
+        with ZipFile(file_path, 'r') as zipObj:
+            zipObj.extractall(raw_path)
+        nc_file_name = data_file.file_name.rstrip('.zip') + '.nc'
+        # ds = nc.Dataset(raw_path + nc_file_name)
+        # print(ds)
+
+        of = open(raw_path + nc_file_name, "r")
+        print(of.read())
+
+    elif '.nc' in data_file.file_name:
+        # zip_file = data_file.file_name.rstrip('.nc') + '.zip'
+        # zipObj = ZipFile(raw_path + zip_file, 'w')
+        # zipObj.write(file_path)
+        # zipObj.close()
+        # with ZipFile(file_path, 'r') as zipObj:
+        #     zipObj.extractall(raw_path)
+        #
+        print('Monika')
+        ds = nc.Dataset(file_path)
+        print(ds)
+        # of = open(file_path, "r")
+        # print(of.read())
+
+    return JsonResponse({'message': 'ok'}, status=200)
 
 
 class UploadSerializer(ModelSerializer):

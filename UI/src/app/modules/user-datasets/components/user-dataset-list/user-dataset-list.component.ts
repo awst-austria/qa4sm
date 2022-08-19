@@ -25,11 +25,11 @@ export class UserDatasetListComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  removeDataset(datasetId): void{
+  removeDataset(dataFileId: string): void{
     if (!confirm('Do you really want to delete the dataset?')) {
       return;
     }
-    this.userDatasetService.deleteUserData(datasetId).subscribe(() => {
+    this.userDatasetService.deleteUserData(dataFileId).subscribe(() => {
       this.userDatasetService.refresh.next(true);
     });
   }
@@ -44,6 +44,12 @@ export class UserDatasetListComponent implements OnInit {
 
   getDatasetVariable(variableId): Observable<DatasetVariableDto>{
     return this.datasetVariableService.getVariableById(variableId);
+  }
+
+  testDataset(dataFileId): void{
+    this.userDatasetService.testDataset(dataFileId).subscribe(data => {
+      console.log(data);
+    });
   }
 
 }
