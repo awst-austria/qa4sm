@@ -13,7 +13,7 @@ from validator.models import Dataset
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset(request):
-    user_data = json.loads(request.query_params.get('userData'))
+    user_data = json.loads(request.query_params.get('userData', 'false'))
     user = request.user
     datasets = Dataset.objects.filter(user=None)
     if user_data and user.is_authenticated:
