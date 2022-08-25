@@ -15,6 +15,7 @@ export class UserFileUploadComponent implements OnInit {
   // variable to open the form
   dialogVisible = false;
   spinnerVisible = false;
+  // fileContent: any;
 
   // dataset file form
   metadataForm = this.formBuilder.group({
@@ -78,6 +79,19 @@ export class UserFileUploadComponent implements OnInit {
     console.log('Hoorray');
     this.dialogVisible = false;
   }
+
+  // testFile(): void{
+  //   const fileReader: FileReader = new FileReader();
+  //   // fileReader.onloadend(() => {
+  //   //
+  //   // } )
+  //   const self = this;
+  //   // tslint:disable-next-line:only-arrow-functions typedef
+  //   fileReader.onloadend = function(x) {
+  //     self.fileContent = fileReader.result;
+  //   };
+  //   fileReader.readAsText(this.file);
+  // }
 
 
 }
