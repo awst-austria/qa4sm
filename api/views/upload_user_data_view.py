@@ -159,6 +159,7 @@ def upload_user_data(request, filename):
     return JsonResponse(response, status=200, safe=False)
 
 
+
 # @api_view(['POST', 'PUT'])
 # @permission_classes([IsAuthenticated])
 # @parser_classes([FileUploadParser])
@@ -244,3 +245,5 @@ class UserFileMetadataSerializer(Serializer):
 #
 #     def update(self, instance, validated_data):
 #         pass
+
+

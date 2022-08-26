@@ -3,6 +3,7 @@ import {FormBuilder, Validators} from '@angular/forms';
 import {UserDatasetsService} from '../../services/user-datasets.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
 
+
 @Component({
   selector: 'qa-user-file-upload',
   templateUrl: './user-file-upload.component.html',
@@ -80,7 +81,6 @@ export class UserFileUploadComponent implements OnInit {
         });
     }
   }
-
 
   onSaveData(): void {
     console.log('Hoorray');

@@ -44,6 +44,7 @@ export class UserDatasetsService {
   sendMetadata(metadataForm: any, fileId: string): Observable<any> {
     const metadataUrl = userDataMetadataUrl + '/' + fileId + '/';
     return this.httpClient.post(metadataUrl, metadataForm, {observe: 'body', responseType: 'json'});
+
   }
 
   testDataset(dataFileId: string): Observable<any>{
