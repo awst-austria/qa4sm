@@ -19,6 +19,8 @@ from valentina.version import APP_VERSION
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+USER_DATA_DIR = os.path.join(BASE_DIR, 'testdata/user_data/')
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'output/')
 
 LOGIN_REDIRECT_URL = 'validation'
