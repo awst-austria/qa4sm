@@ -1,0 +1,207 @@
+<div class="p-grid">
+
+
+  <div class="p-col-12">
+    <div class="p-grid">
+      <div class="p-col-4">
+        <!--        this one here is to add the grid structure -->
+      </div>
+      <div class="p-col-2 p-sm-2">
+        <input type="file" class="file-input"
+               (change)="onFileSelected($event)" #fileUpload>
+        <span class="label-button">{{fileName || "No file chosen yet."}}</span>
+      </div>
+      <div class="p-col-2 p-sm-1">
+        <div class="p-fluid">
+          <button pButton
+                  label="Select file"
+                  (click)="dialogVisible=true">
+            <!--                  (click)="fileUpload.click()">-->
+          </button>
+        </div>
+      </div>
+      <div class="p-col-2 p-sm-1">
+        <div class="p-fluid">
+          <button pButton
+                  [disabled]="!file || !metadataForm.valid"
+                  label="Upload file"
+                  (click)="sendForm()">
+          </button>
+        </div>
+      </div>
+<!--      <div class="p-col-2 p-sm-1">-->
+<!--        <div class="p-fluid">-->
+<!--          <button pButton-->
+<!--                  [disabled]="!file"-->
+<!--                  label="Test file"-->
+<!--                  (click)="testFile()">-->
+<!--          </button>-->
+<!--        </div>-->
+<!--      </div>-->
+    </div>
+  </div>
+<!--  <div>-->
+<!--    <h3>File Content</h3>-->
+<!--    <pre> {{fileContent}} </pre>-->
+<!--  </div>-->
+
+</div>
+
+<p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible">
+  <div class="p-pb-3 p-pl-0">You can upload your own data using this form. Please follow this file <a target="_blank"
+                                                                                                      [routerLink]="['/help', {pageSec: 'file-standard'}]">standard</a>
+  </div>
+  <div class="p-grid" style="display: flex">
+
+    <div class="center p-col-12 p-pb-0 p-pr-4">
+      <!--      <div class="form-field">{{fileName || "No file chosen yet."}}</div>-->
+
+      <div class="form-field">
+        {{fileName || "No file chosen yet."}}
+      </div>
+    </div>
+
+    <div class="center p-col-12 p-pt-0 p-pr-4">
+      <div class="form-field">
+        <button pButton
+                label="Add file"
+                (click)="fileUpload.click()">
+        </button>
+      </div>
+    </div>
+
+    <div class="center p-col-12">
+      <form *ngIf="file" [formGroup]="metadataForm" (ngSubmit)="onSaveData()">
+        <div class="p-py-3">
+          <span class="p-float-label">
+            <input class="form-field" id="dataset-name" type="text" pInputText formControlName="dataset_name">
+            <label for="dataset-name">Dataset name</label>
+            <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+                  class="pi pi-question-circle">
+            </span>
+          </span>
+          <!--        <div *ngIf="formErrors && formErrors.username"-->
+          <!--             class="alert">-->
+          <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
+          <!--        </div>-->
+        </div>
+
+        <div class="p-py-3">
+          <span class="p-float-label">
+            <input class="form-field" id="dataset-pretty-name" type="text" pInputText
+                   formControlName="dataset_pretty_name">
+            <label for="dataset-pretty-name">Dataset display name (optional)</label>
+            <span
+              pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
+              class="pi pi-question-circle">
+            </span>
+          </span>
+          <!--        <div *ngIf="formErrors && formErrors.username"-->
+          <!--             class="alert">-->
+          <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
+          <!--        </div>-->
+        </div>
+
+        <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="version-name" type="text" pInputText formControlName="version_name">
+          <label for="version-name">Version name</label>
+          <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+          <!--        <div *ngIf="formErrors && formErrors.username"-->
+          <!--             class="alert">-->
+          <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
+          <!--        </div>-->
+        </div>
+
+        <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="version-pretty-name" type="text" pInputText
+                 formControlName="version_pretty_name">
+          <label for="version-pretty-name">Version display name (optional)</label>
+          <span
+            pTooltip="Optional. 30 characters or fewer. Letters, digits and @/./+/-/_ only. If not provided, the name from the field above will be used."
+            class="pi pi-question-circle">
+          </span>
+        </span>
+          <!--        <div *ngIf="formErrors && formErrors.username"-->
+          <!--             class="alert">-->
+          <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
+          <!--        </div>-->
+        </div>
+
+        <div class="p-py-3">
+          <div class="p-float-label">
+            <p-dropdown class="form-field"
+                        [options]="variableOptions"
+                        [style]="{'width':'16rem', 'height': '2.5rem'}"
+                        formControlName="variable_name"
+                        optionLabel="name"
+                        optionValue="query_name"
+                        placeholder=" "
+                        ngDefaultControl>
+            </p-dropdown>
+            <label>Variable name</label>
+            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
+                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.variable_name.value==''}"
+                  id="variableHelp">
+          </span>
+          </div>
+        </div>
+
+        <div class="p-py-3">
+            <span class="p-float-label">
+              <input class="form-field" id="variable-units" type="text" pInputText
+                     formControlName="variable_units">
+              <label for="variable-units">Units (optional) </label>
+              <span pTooltip="Optional."
+                    class="pi pi-question-circle">
+              </span>
+            </span>
+          <!--        <div *ngIf="formErrors && formErrors.username"-->
+          <!--             class="alert">-->
+          <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
+          <!--        </div>-->
+        </div>
+
+
+        <div class="p-py-3">
+          <div class="p-float-label">
+            <p-dropdown class="form-field"
+                        [options]="dimensionOptions"
+                        [style]="{'width':'16rem', 'height': '2.5rem'}"
+                        formControlName="dimension_name"
+                        optionLabel="name"
+                        optionValue="query_name"
+                        placeholder=" "
+                        ngDefaultControl>
+            </p-dropdown>
+            <label>Dimension name</label>
+            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
+                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.dimension_name.value==''}"
+                  id="dimensionHelp">
+          </span>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <button pButton
+                  type="submit"
+                  label="Save"
+                  [disabled]="!metadataForm.valid">
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible">
+  <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
+  <div class="uploading-message">We are uploading your data..</div>
+</p-dialog>
+

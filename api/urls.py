@@ -22,10 +22,10 @@ from api.views.dataset_configuration_view import dataset_configuration, dataset_
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import stop_validation, delete_result, change_name, archive_result, \
     extend_result, publish_result, add_validation, remove_validation, get_publishing_form, copy_validation_results
-from api.views.serving_file_view import get_results, get_csv_with_statistics, get_graphic_files, \
-    get_metric_names_and_associated_files, get_graphic_file, get_summary_statistics
+from api.views.serving_file_view import *
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import settings
+from api.views.upload_user_data_view import *
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -107,4 +107,10 @@ urlpatterns = [
     re_path(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
     path('password-reset', include('django_rest_passwordreset.urls', namespace='password-reset')),
     path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
+    path('upload-user-data/<str:filename>/<uuid:file_uuid>/', upload_user_data, name='Upload user data'),
+    path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
+    path('delete-user-dataset/<str:dataset_id>/', delete_user_dataset, name='Delete User Data Files'),
+    path('user-file-metadata', post_user_file_metadata, name='Post User Data File Metadata'),
+    # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
+    # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

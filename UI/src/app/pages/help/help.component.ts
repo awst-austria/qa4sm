@@ -1,7 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
+import {HttpClient} from '@angular/common/http';
+import {ActivatedRoute} from '@angular/router';
 
 const plotsUrlPrefix = '/static/images/help/';
 
@@ -10,7 +12,7 @@ const plotsUrlPrefix = '/static/images/help/';
   templateUrl: './help.component.html',
   styleUrls: ['./help.component.scss']
 })
-export class HelpComponent implements OnInit {
+export class HelpComponent implements OnInit, AfterViewInit {
   // Icons for bullet points
   faIcons = {
     faArchive: fas.faArchive,
@@ -43,7 +45,22 @@ export class HelpComponent implements OnInit {
   spatialExtentComparison: string;
 
   constructor(private globalParamsService: GlobalParamsService,
-              public settingsService: SettingsService) {
+              public settingsService: SettingsService,
+              private http: HttpClient,
+              private activeRoute: ActivatedRoute) {
+  }
+
+  @ViewChild('helpPage') container: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void{
+    this.activeRoute.params.subscribe(param => {
+      if (param.pageSec){
+        console.log(this.container, param.pageSec);
+        const section = this.container.nativeElement.querySelector(`#${param.pageSec}`);
+        // section?.scrollTo();
+        section?.scrollIntoView();
+      }
+    });
   }
 
   ngOnInit(): void {

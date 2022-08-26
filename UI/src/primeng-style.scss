@@ -4196,6 +4196,15 @@ div.carousel-caption{
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+#uploading-data-spinner .p-dialog .p-dialog-content{
+  opacity: 1;
+  background: transparent;
+}
+
+#uploading-data-spinner .p-dialog{
+  border-color: transparent;
+}
+
 .p-overlaypanel {
   background: #ffffff;
   color: #212529;

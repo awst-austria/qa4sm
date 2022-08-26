@@ -67,7 +67,7 @@ export class ValidationSummaryComponent implements OnInit {
   private updateConfig(): void {
     this.configurations$ = combineLatest(
       this.validationModel.datasetConfigs,
-      this.datasetService.getAllDatasets(),
+      this.datasetService.getAllDatasets(true),
       this.datasetVersionService.getAllVersions(),
       this.datasetVariableService.getAllVariables(),
       this.filterService.getAllFilters(),
