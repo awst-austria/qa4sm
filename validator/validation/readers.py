@@ -84,8 +84,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
             dataset.storage_path,  # path to the netCDF file
             file.variable.short_name,  # name of the soil moisture variable
             latname=file.latname,  # e.g. "lat"
-            lonname = file.lonname,  # e.g. "lon"
-            timename = file.timename  # e.g. "time"
+            lonname=file.lonname,  # e.g. "lon"
+            timename=file.timename  # e.g. "time"
         )
         # reader = stackreader
         tsreader = stackreader.repurpose(
