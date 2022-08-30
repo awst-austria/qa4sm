@@ -83,9 +83,9 @@ def create_reader(dataset, version) -> GriddedNcTs:
         stackreader = XarrayImageStackReader(
             dataset.storage_path,  # path to the netCDF file
             file.variable.short_name,  # name of the soil moisture variable
-            latname="lat",  # e.g. "lat"
-            lonname = "lon",  # e.g. "lon"
-            timename = "time"  # e.g. "time"
+            latname=file.latname,  # e.g. "lat"
+            lonname = file.lonname,  # e.g. "lon"
+            timename = file.timename  # e.g. "time"
         )
         # reader = stackreader
         tsreader = stackreader.repurpose(
