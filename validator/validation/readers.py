@@ -12,7 +12,7 @@ from smos.smos_ic.interface import SMOSTs
 from pynetcf.time_series import GriddedNcTs
 
 from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
-from qa4sm_preprocessing.reading import XarrayImageStackReader
+from qa4sm_preprocessing.reading import StackImageReader
 from qa4sm_preprocessing.reading import GriddedNcOrthoMultiTs
 
 from validator.validation import globals
@@ -80,7 +80,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if dataset.user:
         file = UserDatasetFile.objects.get(dataset=dataset)
-        stackreader = XarrayImageStackReader(
+        stackreader = StackImageReader(
             dataset.storage_path,  # path to the netCDF file
             file.variable.short_name,  # name of the soil moisture variable
             latname=file.latname,  # e.g. "lat"
