@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {UserDatasetsService} from '../../services/user-datasets.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
+
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -42,7 +44,8 @@ export class UserFileUploadComponent implements OnInit {
   ];
 
   constructor(private userDatasetService: UserDatasetsService,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder,
+              private toastService: ToastService) {
   }
 
   ngOnInit(): void {
@@ -58,20 +61,24 @@ export class UserFileUploadComponent implements OnInit {
     if (this.file) {
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
-      this.userDatasetService.sendMetadata(this.metadataForm.value).subscribe(meta => {
-          this.userDatasetService.userFileUpload(this.name, this.file, meta.id).subscribe(() => {
+      this.userDatasetService.userFileUpload(this.name, this.file).subscribe(data => {
+          this.userDatasetService.sendMetadata(this.metadataForm.value, data.id).subscribe(() => {
               this.userDatasetService.refresh.next(true);
             },
             () => {
               this.spinnerVisible = false;
-            },
-            () => {
-              this.spinnerVisible = false;
+              this.toastService.showErrorWithHeader('Metadata not saved',
+                'Provided metadata could not be saved. Please try again or contact our team.');
             });
         },
         () => {
+          this.spinnerVisible = false;
+          this.toastService.showErrorWithHeader('File not saved',
+            'File could not be uploaded. Please try again or contact our team.');
+        },
+        () => {
+          this.spinnerVisible = false;
         });
-
     }
   }
 

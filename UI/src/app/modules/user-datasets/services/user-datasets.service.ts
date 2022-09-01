@@ -25,11 +25,11 @@ export class UserDatasetsService {
 
   constructor(private httpClient: HttpClient) { }
 
-  userFileUpload(name, file, fileId): Observable<any> {
+  userFileUpload(name, file): Observable<any> {
     const formData = new FormData();
     formData.append(name, file, file.name);
-    const uploadUrl = uploadUserDataUrl  + '/' + file.name + '/' + fileId + '/';
-    return this.httpClient.post(uploadUrl, formData.get(name), {headers});
+    const uploadUrl = uploadUserDataUrl  + '/' + file.name + '/';
+    return this.httpClient.post(uploadUrl, formData.get(name), {headers, observe: 'body', responseType: 'json'});
   }
 
   getUserDataList(): Observable<UserDataFileDto[]>{
@@ -41,8 +41,10 @@ export class UserDatasetsService {
     return this.httpClient.delete(deleteUrl, {headers});
   }
 
-  sendMetadata(metadataForm: any): Observable<any> {
-    return this.httpClient.post(userDataMetadataUrl, metadataForm, {observe: 'body', responseType: 'json'});
+  sendMetadata(metadataForm: any, fileId: string): Observable<any> {
+    const metadataUrl = userDataMetadataUrl + '/' + fileId + '/';
+    return this.httpClient.post(metadataUrl, metadataForm, {observe: 'body', responseType: 'json'});
+
   }
 
   testDataset(dataFileId: string): Observable<any>{

@@ -29,7 +29,13 @@ class UserDatasetFile(models.Model):
     dataset = models.ForeignKey(Dataset, related_name='dataset', on_delete=models.SET_NULL, null=True)
     version = models.ForeignKey(DatasetVersion, related_name='version', on_delete=models.SET_NULL, null=True)
     variable = models.ForeignKey(DataVariable, related_name='variable', on_delete=models.SET_NULL, null=True)
+    lonname = models.CharField(max_length=10, blank=True, null=True, default='lon')
+    latname = models.CharField(max_length=10, blank=True, null=True, default='lat')
+    timename = models.CharField(max_length=10, blank=True, null=True, default='time')
 
+    @property
+    def get_raw_file_path(self):
+        return self.file.path.rstrip(self.file_name)
 
 @receiver(post_delete, sender=UserDatasetFile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
