@@ -82,8 +82,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.user:
         file = UserDatasetFile.objects.get(dataset=dataset)
         stackreader = StackImageReader(
-
-            dataset.storage_path,  # path to the netCDF file
+            file.file.path,  # path to the netCDF file
             file.variable.short_name,  # name of the soil moisture variable
             latname=file.latname,  # e.g. "lat"
             lonname=file.lonname,  # e.g. "lon"
