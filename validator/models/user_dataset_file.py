@@ -35,7 +35,7 @@ class UserDatasetFile(models.Model):
 
     @property
     def get_raw_file_path(self):
-        return self.file.path.rstrip(self.file_name)
+        return self.file.path.rstrip(f'/{self.file_name}')
 
 @receiver(post_delete, sender=UserDatasetFile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

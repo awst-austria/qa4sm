@@ -87,7 +87,7 @@ def post_user_file_metadata(request, file_uuid):
             'short_name': dataset_name,
             'pretty_name': dataset_pretty_name if dataset_pretty_name else dataset_name,
             'help_text': f'Dataset {dataset_pretty_name} provided by user {request.user}.',
-            'storage_path': file_entry.file.path,
+            'storage_path': file_entry.get_raw_file_path,
             'detailed_description': 'Data provided by a user',
             'source_reference': 'Data provided by a user',
             'citation': 'Data provided by a user',

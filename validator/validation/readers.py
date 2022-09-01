@@ -89,7 +89,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
         )
         # reader = stackreader
         tsreader = stackreader.repurpose(
-            file.get_raw_file_path + "timeseries",  # path to the timeseries directory
+            file.get_raw_file_path + "/timeseries",  # path to the timeseries directory
             # if overwrite=False, it checks if the timeseries directory
             # already exists, and if it does, it just returns the reader
             # without repeating the preprocessing
