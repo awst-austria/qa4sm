@@ -17,6 +17,7 @@ export class UserFileUploadComponent implements OnInit {
   // variable to open the form
   dialogVisible = false;
   spinnerVisible = false;
+  queryNameForFile = 'file';
   // fileContent: any;
 
   // dataset file form
@@ -26,21 +27,27 @@ export class UserFileUploadComponent implements OnInit {
     version_name: ['', [Validators.required, Validators.maxLength(30)]],
     version_pretty_name: ['', Validators.maxLength(30)],
     variable_name: ['', Validators.required], // dropdown
-    variable_units: [''],
+    variable_units: ['', Validators.required],
     // variable_value_range: [''],
-    dimension_name: ['', Validators.required],
+    dimension_name_source: ['', Validators.required],
+    dimension_lon_name: ['', Validators.required],
+    dimension_lat_name: ['', Validators.required],
+    dimension_time_name: ['', Validators.required],
   });
   formErrors: any;
 
-  // so far I put some values that will be replaced later
   variableOptions = [
-    {name: 'Soil moisture', query_name: 'sm'},
-    {name: 'From file', query_name: 'file'}
+    {name: 'From file', query_name: this.queryNameForFile},
+    {name: 'Provide variable name', query_name: null}
+  ];
+  unitsOptions = [
+    {name: 'From file', query_name: this.queryNameForFile},
+    {name: 'Provide variable units', query_name: null}
   ];
 
   dimensionOptions = [
-    {name: 'X-Y-Z', query_name: 'XYZ'},
-    {name: 'Lat-Lon-Time', query_name: 'LLT'}
+    {name: 'From file', query_name: this.queryNameForFile},
+    {name: 'Provide dimension names', query_name: 'user'}
   ];
 
   constructor(private userDatasetService: UserDatasetsService,
@@ -49,6 +56,58 @@ export class UserFileUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.metadataForm.controls.variable_name.setValue(this.variableOptions[0].query_name);
+    this.metadataForm.controls.variable_units.setValue(this.unitsOptions[0].query_name);
+    this.metadataForm.controls.dimension_name_source.setValue(this.dimensionOptions[0].query_name);
+    this.setDimensionNames(this.queryNameForFile, this.queryNameForFile, this.queryNameForFile);
+
+    this.metadataForm.get('variable_name').valueChanges.subscribe(() => {
+      const varVal = this.metadataForm.controls.variable_name.value;
+      if (varVal && varVal !== this.queryNameForFile){
+        this.variableOptions[1].query_name = varVal;
+      }
+    });
+
+    this.metadataForm.get('variable_units').valueChanges.subscribe(() => {
+      const unitsVal = this.metadataForm.controls.variable_units.value;
+      if (unitsVal && unitsVal !== this.queryNameForFile){
+        this.unitsOptions[1].query_name = unitsVal;
+      }
+    });
+
+    this.metadataForm.get('dimension_name_source').valueChanges.subscribe(() => {
+        let lonName; let latName; let timeName;
+        const lonVal = this.metadataForm.controls.dimension_lon_name.value;
+        const latVal = this.metadataForm.controls.dimension_lat_name.value;
+        const timeVal = this.metadataForm.controls.dimension_time_name.value;
+
+        if (lonVal && lonVal !== this.queryNameForFile ){
+          lonName = this.metadataForm.controls.dimension_lon_name.value;
+        } else {
+          lonName = null;
+        }
+
+        if (latVal && latVal !== this.queryNameForFile){
+          latName = this.metadataForm.controls.dimension_lat_name.value;
+        } else {
+          latName = null;
+        }
+
+        if (timeVal && timeVal !== this.queryNameForFile){
+          timeName = this.metadataForm.controls.dimension_time_name.value;
+        } else {
+          timeName = null;
+        }
+        this.setDimensionNames(lonName, latName, timeName);
+
+    });
+    console.log(this.metadataForm.value);
+  }
+
+  setDimensionNames(lonName, latName, timeName): void{
+    this.metadataForm.controls.dimension_lon_name.setValue(lonName);
+    this.metadataForm.controls.dimension_lat_name.setValue(latName);
+    this.metadataForm.controls.dimension_time_name.setValue(timeName);
   }
 
   onFileSelected(event): void {
@@ -83,7 +142,6 @@ export class UserFileUploadComponent implements OnInit {
   }
 
   onSaveData(): void {
-    console.log('Hoorray');
     this.dialogVisible = false;
   }
 
