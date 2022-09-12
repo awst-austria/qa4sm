@@ -63,48 +63,49 @@ export class UserFileUploadComponent implements OnInit {
 
     this.metadataForm.get('variable_name').valueChanges.subscribe(() => {
       const varVal = this.metadataForm.controls.variable_name.value;
-      if (varVal && varVal !== this.queryNameForFile){
+      if (varVal && varVal !== this.queryNameForFile) {
         this.variableOptions[1].query_name = varVal;
       }
     });
 
     this.metadataForm.get('variable_units').valueChanges.subscribe(() => {
       const unitsVal = this.metadataForm.controls.variable_units.value;
-      if (unitsVal && unitsVal !== this.queryNameForFile){
+      if (unitsVal && unitsVal !== this.queryNameForFile) {
         this.unitsOptions[1].query_name = unitsVal;
       }
     });
 
     this.metadataForm.get('dimension_name_source').valueChanges.subscribe(() => {
-        let lonName; let latName; let timeName;
-        const lonVal = this.metadataForm.controls.dimension_lon_name.value;
-        const latVal = this.metadataForm.controls.dimension_lat_name.value;
-        const timeVal = this.metadataForm.controls.dimension_time_name.value;
+      let lonName;
+      let latName;
+      let timeName;
+      const lonVal = this.metadataForm.controls.dimension_lon_name.value;
+      const latVal = this.metadataForm.controls.dimension_lat_name.value;
+      const timeVal = this.metadataForm.controls.dimension_time_name.value;
 
-        if (lonVal && lonVal !== this.queryNameForFile ){
-          lonName = this.metadataForm.controls.dimension_lon_name.value;
-        } else {
-          lonName = null;
-        }
+      if (lonVal && lonVal !== this.queryNameForFile) {
+        lonName = this.metadataForm.controls.dimension_lon_name.value;
+      } else {
+        lonName = null;
+      }
 
-        if (latVal && latVal !== this.queryNameForFile){
-          latName = this.metadataForm.controls.dimension_lat_name.value;
-        } else {
-          latName = null;
-        }
+      if (latVal && latVal !== this.queryNameForFile) {
+        latName = this.metadataForm.controls.dimension_lat_name.value;
+      } else {
+        latName = null;
+      }
 
-        if (timeVal && timeVal !== this.queryNameForFile){
-          timeName = this.metadataForm.controls.dimension_time_name.value;
-        } else {
-          timeName = null;
-        }
-        this.setDimensionNames(lonName, latName, timeName);
+      if (timeVal && timeVal !== this.queryNameForFile) {
+        timeName = this.metadataForm.controls.dimension_time_name.value;
+      } else {
+        timeName = null;
+      }
+      this.setDimensionNames(lonName, latName, timeName);
 
     });
-    console.log(this.metadataForm.value);
   }
 
-  setDimensionNames(lonName, latName, timeName): void{
+  setDimensionNames(lonName, latName, timeName): void {
     this.metadataForm.controls.dimension_lon_name.setValue(lonName);
     this.metadataForm.controls.dimension_lat_name.setValue(latName);
     this.metadataForm.controls.dimension_time_name.setValue(timeName);
