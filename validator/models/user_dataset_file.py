@@ -32,6 +32,10 @@ class UserDatasetFile(models.Model):
     lonname = models.CharField(max_length=10, blank=True, null=True, default='lon')
     latname = models.CharField(max_length=10, blank=True, null=True, default='lat')
     timename = models.CharField(max_length=10, blank=True, null=True, default='time')
+    variable_choices = models.JSONField(blank=True, null=True)
+    lon_name_choices = models.JSONField(blank=True, null=True)
+    lat_name_choices = models.JSONField(blank=True, null=True)
+    time_name_choices = models.JSONField(blank=True, null=True)
 
     @property
     def get_raw_file_path(self):
