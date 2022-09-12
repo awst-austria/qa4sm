@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {UserDataFileDto} from '../../services/user-data-file.dto';
 import {UserDatasetsService} from '../../services/user-datasets.service';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
@@ -17,6 +17,14 @@ import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variabl
 export class UserDatasetListComponent implements OnInit {
 
   @Input() userDatasetList: UserDataFileDto[];
+  chosenVariableName: BehaviorSubject<{variable: string, standard_name: string, long_name: string}>;
+  editVariable: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  chosenLonName: BehaviorSubject<{name: string}>;
+  editLonName: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  chosenLatName: BehaviorSubject<{name: string}>;
+  editLatName: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  chosenTimeName: BehaviorSubject<{name: string}>;
+  editTimeName: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(private userDatasetService: UserDatasetsService,
               private datasetService: DatasetService,
@@ -24,6 +32,7 @@ export class UserDatasetListComponent implements OnInit {
               private datasetVariableService: DatasetVariableService) { }
 
   ngOnInit(): void {
+    console.log(this.userDatasetList);
   }
   removeDataset(dataFileId: string): void{
     if (!confirm('Do you really want to delete the dataset?')) {
@@ -50,6 +59,10 @@ export class UserDatasetListComponent implements OnInit {
     this.userDatasetService.testDataset(dataFileId).subscribe(data => {
       console.log(data);
     });
+  }
+
+  updateMetdata(userDataId): void{
+    console.log('Monika');
   }
 
 }
