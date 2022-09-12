@@ -131,125 +131,125 @@
           <!--          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>-->
           <!--        </div>-->
         </div>
-        <!--        VARIABLE NAME-->
-        <div class="p-py-3">
-          <div class="p-float-label">
-            <p-dropdown class="form-field"
-                        [options]="variableOptions"
-                        [style]="{'width':'16rem', 'height': '2.5rem'}"
-                        formControlName="variable_name"
-                        optionLabel="name"
-                        optionValue="query_name"
-                        placeholder=" "
-                        ngDefaultControl>
-            </p-dropdown>
-            <label>Variable name</label>
-            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
-                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.variable_name.value==''}"
-                  id="variableHelp">
-          </span>
-          </div>
-        </div>
+<!--        &lt;!&ndash;        VARIABLE NAME&ndash;&gt;-->
+<!--        <div class="p-py-3">-->
+<!--          <div class="p-float-label">-->
+<!--            <p-dropdown class="form-field"-->
+<!--                        [options]="variableOptions"-->
+<!--                        [style]="{'width':'16rem', 'height': '2.5rem'}"-->
+<!--                        formControlName="variable_name"-->
+<!--                        optionLabel="name"-->
+<!--                        optionValue="query_name"-->
+<!--                        placeholder=" "-->
+<!--                        ngDefaultControl>-->
+<!--            </p-dropdown>-->
+<!--            <label>Variable name</label>-->
+<!--            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."-->
+<!--                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.variable_name.value==''}"-->
+<!--                  id="variableHelp">-->
+<!--          </span>-->
+<!--          </div>-->
+<!--        </div>-->
 
-        <div class="p-py-3" *ngIf="(!(metadataForm.controls.variable_name.value == 'file'))">
-          <div class="p-float-label">
-            <input class="form-field"
-                   id="variable-name"
-                   type="text"
-                   formControlName="variable_name"
-                   pInputText>
-            <label>Variable name</label>
-            <span pTooltip="Required. The variable name that is provided in the netCDF file."
-                  [ngClass]="{'pi pi-question-circle': true}">
-          </span>
-          </div>
-        </div>
-        <!--        VARIABLE UNITS-->
+<!--        <div class="p-py-3" *ngIf="(!(metadataForm.controls.variable_name.value == 'file'))">-->
+<!--          <div class="p-float-label">-->
+<!--            <input class="form-field"-->
+<!--                   id="variable-name"-->
+<!--                   type="text"-->
+<!--                   formControlName="variable_name"-->
+<!--                   pInputText>-->
+<!--            <label>Variable name</label>-->
+<!--            <span pTooltip="Required. The variable name that is provided in the netCDF file."-->
+<!--                  [ngClass]="{'pi pi-question-circle': true}">-->
+<!--          </span>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash;        VARIABLE UNITS&ndash;&gt;-->
 
-        <div class="p-py-3">
-          <div class="p-float-label">
-            <p-dropdown class="form-field"
-                        [options]="unitsOptions"
-                        [style]="{'width':'16rem', 'height': '2.5rem'}"
-                        formControlName="variable_units"
-                        optionLabel="name"
-                        optionValue="query_name"
-                        placeholder=" "
-                        ngDefaultControl>
-            </p-dropdown>
-            <label>Variable units</label>
-            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
-                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.variable_units.value==''}"
-                  id="unitsHelp">
-          </span>
-          </div>
-        </div>
+<!--        <div class="p-py-3">-->
+<!--          <div class="p-float-label">-->
+<!--            <p-dropdown class="form-field"-->
+<!--                        [options]="unitsOptions"-->
+<!--                        [style]="{'width':'16rem', 'height': '2.5rem'}"-->
+<!--                        formControlName="variable_units"-->
+<!--                        optionLabel="name"-->
+<!--                        optionValue="query_name"-->
+<!--                        placeholder=" "-->
+<!--                        ngDefaultControl>-->
+<!--            </p-dropdown>-->
+<!--            <label>Variable units</label>-->
+<!--            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."-->
+<!--                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.variable_units.value==''}"-->
+<!--                  id="unitsHelp">-->
+<!--          </span>-->
+<!--          </div>-->
+<!--        </div>-->
 
 
-        <div class="p-py-3" *ngIf="!(metadataForm.controls.variable_units.value == 'file')">
-            <span class="p-float-label">
-              <input class="form-field" id="variable-units" type="text" pInputText
-                     formControlName="variable_units">
-              <label for="variable-units">Variable units</label>
-              <span pTooltip="Optional."
-                    class="pi pi-question-circle">
-              </span>
-            </span>
-        </div>
+<!--        <div class="p-py-3" *ngIf="!(metadataForm.controls.variable_units.value == 'file')">-->
+<!--            <span class="p-float-label">-->
+<!--              <input class="form-field" id="variable-units" type="text" pInputText-->
+<!--                     formControlName="variable_units">-->
+<!--              <label for="variable-units">Variable units</label>-->
+<!--              <span pTooltip="Optional."-->
+<!--                    class="pi pi-question-circle">-->
+<!--              </span>-->
+<!--            </span>-->
+<!--        </div>-->
 
-        <!--        DIMENSIONS    -->
-        <div class="p-py-3">
-          <div class="p-float-label">
-            <p-dropdown class="form-field"
-                        [options]="dimensionOptions"
-                        [style]="{'width':'16rem', 'height': '2.5rem'}"
-                        formControlName="dimension_name_source"
-                        optionLabel="name"
-                        optionValue="query_name"
-                        placeholder=" "
-                        ngDefaultControl>
-            </p-dropdown>
-            <label>Dimension name</label>
-            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."
-                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.dimension_name_source.value==''}"
-                  id="dimensionHelp">
-          </span>
-          </div>
-        </div>
+<!--        &lt;!&ndash;        DIMENSIONS    &ndash;&gt;-->
+<!--        <div class="p-py-3">-->
+<!--          <div class="p-float-label">-->
+<!--            <p-dropdown class="form-field"-->
+<!--                        [options]="dimensionOptions"-->
+<!--                        [style]="{'width':'16rem', 'height': '2.5rem'}"-->
+<!--                        formControlName="dimension_name_source"-->
+<!--                        optionLabel="name"-->
+<!--                        optionValue="query_name"-->
+<!--                        placeholder=" "-->
+<!--                        ngDefaultControl>-->
+<!--            </p-dropdown>-->
+<!--            <label>Dimension name</label>-->
+<!--            <span pTooltip="Required. If you choose 'From file', the value will be retrieved from the data file."-->
+<!--                  [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.metadataForm.controls.dimension_name_source.value==''}"-->
+<!--                  id="dimensionHelp">-->
+<!--          </span>-->
+<!--          </div>-->
+<!--        </div>-->
 
-        <div class="p-py-3" *ngIf="!(metadataForm.controls.dimension_name_source.value == 'file')">
-            <span class="p-float-label">
-              <input class="form-field" id="dimension-lat" type="text" pInputText
-                     formControlName="dimension_lat_name">
-              <label for="dimension-lat">Latitude dimension name.</label>
-              <span pTooltip="Dimension name for latitude used in the file (e.g. lat, latitude, x)."
-                    class="pi pi-question-circle">
-              </span>
-            </span>
-        </div>
+<!--        <div class="p-py-3" *ngIf="!(metadataForm.controls.dimension_name_source.value == 'file')">-->
+<!--            <span class="p-float-label">-->
+<!--              <input class="form-field" id="dimension-lat" type="text" pInputText-->
+<!--                     formControlName="dimension_lat_name">-->
+<!--              <label for="dimension-lat">Latitude dimension name.</label>-->
+<!--              <span pTooltip="Dimension name for latitude used in the file (e.g. lat, latitude, x)."-->
+<!--                    class="pi pi-question-circle">-->
+<!--              </span>-->
+<!--            </span>-->
+<!--        </div>-->
 
-        <div class="p-py-3" *ngIf="!(metadataForm.controls.dimension_name_source.value == 'file')">
-            <span class="p-float-label">
-              <input class="form-field" id="dimension-lon" type="text" pInputText
-                     formControlName="dimension_lon_name">
-              <label
-                for="dimension-lon">Longitude dimension name</label>
-              <span pTooltip="Dimension name for longitude used in the file (e.g. lon, longitude, y)."
-                    class="pi pi-question-circle">
-              </span>
-            </span>
-        </div>
+<!--        <div class="p-py-3" *ngIf="!(metadataForm.controls.dimension_name_source.value == 'file')">-->
+<!--            <span class="p-float-label">-->
+<!--              <input class="form-field" id="dimension-lon" type="text" pInputText-->
+<!--                     formControlName="dimension_lon_name">-->
+<!--              <label-->
+<!--                for="dimension-lon">Longitude dimension name</label>-->
+<!--              <span pTooltip="Dimension name for longitude used in the file (e.g. lon, longitude, y)."-->
+<!--                    class="pi pi-question-circle">-->
+<!--              </span>-->
+<!--            </span>-->
+<!--        </div>-->
 
-        <div class="p-py-3" *ngIf="!(metadataForm.controls.dimension_name_source.value == 'file')">
-            <span class="p-float-label">
-              <input class="form-field" id="dimension-time" type="text" pInputText
-                     formControlName="dimension_time_name">
-              <label for="dimension-time">Time dimension name</label>
-              <span pTooltip="Dimension name for time used in the file (e.g. time, t, z)."
-                    class="pi pi-question-circle">
-              </span>
-            </span>
-        </div>
+<!--        <div class="p-py-3" *ngIf="!(metadataForm.controls.dimension_name_source.value == 'file')">-->
+<!--            <span class="p-float-label">-->
+<!--              <input class="form-field" id="dimension-time" type="text" pInputText-->
+<!--                     formControlName="dimension_time_name">-->
+<!--              <label for="dimension-time">Time dimension name</label>-->
+<!--              <span pTooltip="Dimension name for time used in the file (e.g. time, t, z)."-->
+<!--                    class="pi pi-question-circle">-->
+<!--              </span>-->
+<!--            </span>-->
+<!--        </div>-->
 
 
         <div class="form-field">

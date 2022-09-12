@@ -26,13 +26,13 @@ export class UserFileUploadComponent implements OnInit {
     dataset_pretty_name: ['', Validators.maxLength(30)],
     version_name: ['', [Validators.required, Validators.maxLength(30)]],
     version_pretty_name: ['', Validators.maxLength(30)],
-    variable_name: ['', Validators.required], // dropdown
-    variable_units: ['', Validators.required],
+    // variable_name: ['', Validators.required], // dropdown
+    // variable_units: ['', Validators.required],
     // variable_value_range: [''],
-    dimension_name_source: ['', Validators.required],
-    dimension_lon_name: ['', Validators.required],
-    dimension_lat_name: ['', Validators.required],
-    dimension_time_name: ['', Validators.required],
+    // dimension_name_source: ['', Validators.required],
+    // dimension_lon_name: ['', Validators.required],
+    // dimension_lat_name: ['', Validators.required],
+    // dimension_time_name: ['', Validators.required],
   });
   formErrors: any;
 
