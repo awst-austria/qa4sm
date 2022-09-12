@@ -11,6 +11,87 @@ import io
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 
 import netCDF4 as nc
+from re import match
+import xarray as xa
+
+
+def create_variable_entry(variable_name, dataset_name, user, max_value=None, min_value=None):
+    # if variable_name and variable_name != 'file':
+    if variable_name:
+        new_variable_data = {
+            'short_name': variable_name,
+            'pretty_name': variable_name,
+            'help_text': f'Variable {variable_name} of dataset {dataset_name} provided by  user {user}.',
+            'min_value': max_value,
+            'max_value': min_value
+        }
+        new_variable = DataVariable(**new_variable_data)
+        new_variable.save()
+    else:
+        new_variable = None
+
+    return new_variable
+
+
+def extract_dimension_names(ncDataset):
+    dimensions = list(ncDataset.dims.keys())
+    longitude_values = list( filter(lambda v: match('lon', v), dimensions))
+    latitude_values = list( filter(lambda v: match('lat', v), dimensions))
+    time_values = list(filter(lambda v: match('time', v), dimensions))
+    print(longitude_values, latitude_values, time_values)
+    dimension_names = {
+        'lon_names': [{'name': val} for val in  longitude_values],
+        'lat_names': [{'name': val} for val in latitude_values],
+        'time_names': [{'name': val} for val in time_values],
+    }
+    return dimension_names
+
+
+def extract_variable_names(ncDataset):
+    variables = list(ncDataset.data_vars.keys())
+    potential_variable_names = []
+    key_sm_words = ['water', 'soil', 'moisture', 'soil_moisture', 'sm', 'ssm']
+    key_error_words = ['error', 'bias', 'uncertainty']
+    for variable in variables:
+        if len(ncDataset.variables[variable].dims) == 3:
+            try:
+                variable_long_name = ncDataset.variables[variable].attrs['long_name']
+            except KeyError:
+                variable_long_name = ''
+            try:
+                variable_standard_name = ncDataset.variables[variable].attrs['standard_name']
+            except KeyError:
+                variable_standard_name = ''
+            is_sm_word_in_long_name = any([word in variable_long_name.lower() for word in key_sm_words])
+            is_sm_word_in_standard_name = any([word in variable_standard_name.lower() for word in key_sm_words])
+            is_error_word_in_long_name = any([word in variable_long_name.lower() for word in key_error_words])
+            print(is_sm_word_in_long_name, is_sm_word_in_standard_name, is_error_word_in_long_name)
+            if (is_sm_word_in_long_name or is_sm_word_in_standard_name) and not is_error_word_in_long_name:
+                potential_variable_names.append({
+                    'variable': variable,
+                    'standard_name': variable_standard_name,
+                    'long_name': variable_long_name
+                })
+    if len(potential_variable_names) == 0:
+        potential_variable_names = variables
+
+    return potential_variable_names
+
+
+def verify_user_file_entry(file_uuid):
+    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+
+    xarray_ds = xa.open_dataset(file_entry.file.path)
+    dimensions = extract_dimension_names(xarray_ds)
+    variables = extract_variable_names(xarray_ds)
+
+    metadata_from_file = {
+        'dimensions': dimensions,
+        'variables': variables
+    }
+
+    return metadata_from_file
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -52,12 +133,14 @@ def post_user_file_metadata(request, file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
 
     if serializer.is_valid():
+        metadata_from_file = verify_user_file_entry(file_uuid)
+
         dataset_name = request.data['dataset_name']
         dataset_pretty_name = request.data['dataset_pretty_name']
         version_name = request.data['version_name']
         version_pretty_name = request.data['version_pretty_name']
-        variable_name = request.data['variable_name']
-        dimension_name = request.data['dimension_name']
+        # variable_name = request.data['variable_name']
+        # dimension_name_source = request.data['dimension_name_source']
 
         # creating version entry
         new_version_data = {
@@ -72,15 +155,12 @@ def post_user_file_metadata(request, file_uuid):
         new_version.save()
 
         # creating variable entry
-        new_variable_data = {
-            'short_name': variable_name,
-            'pretty_name': variable_name,
-            'help_text': f'Variable {variable_name} of dataset {dataset_pretty_name} provided by  user {request.user}.',
-            'min_value': None,
-            'max_value': None
-        }
-        new_variable = DataVariable(**new_variable_data)
-        new_variable.save()
+        if len(metadata_from_file['variables']) == 1:
+            variable_name = metadata_from_file['variables'][0]['variable']
+        else:
+            variable_name = 'default_name'
+
+        new_variable = create_variable_entry(variable_name, dataset_pretty_name, request.user)
 
         # creating dataset entry
         new_dataset_data = {
@@ -98,7 +178,8 @@ def post_user_file_metadata(request, file_uuid):
         new_dataset.save()
         new_dataset.versions.set([new_version.id])
         new_dataset.filters.set([])
-        new_dataset.variables.set([new_variable.id])
+        if new_variable:
+            new_dataset.variables.set([new_variable.id])
 
         # file data
         file_data = {
@@ -107,8 +188,14 @@ def post_user_file_metadata(request, file_uuid):
             'file_name': file_entry.file_name,
             'dataset': new_dataset.id,
             'version': new_version.id,
-            'variable': new_variable.id
+            'variable': new_variable.id if new_variable else None,
+            'variable_choices': metadata_from_file['variables'],
+            'lon_name_choices': metadata_from_file['dimensions']['lon_names'],
+            'lat_name_choices': metadata_from_file['dimensions']['lat_names'],
+            'time_name_choices': metadata_from_file['dimensions']['time_names']
         }
+
+        print('Monika', file_data)
 
         file_data_serializer = UploadSerializer(data=file_data)
         if file_data_serializer.is_valid() and request.user == file_entry.owner:
@@ -116,6 +203,10 @@ def post_user_file_metadata(request, file_uuid):
                 file_entry.dataset = new_dataset
                 file_entry.version = new_version
                 file_entry.variable = new_variable
+                file_entry.variable_choices = metadata_from_file['variables']
+                file_entry.lon_name_choices = metadata_from_file['dimensions']['lon_names']
+                file_entry.lat_name_choices = metadata_from_file['dimensions']['lat_names']
+                file_entry.time_name_choices = metadata_from_file['dimensions']['time_names']
                 file_entry.save()
 
             except:
@@ -157,7 +248,6 @@ def upload_user_data(request, filename):
         response = file_serializer.errors
 
     return JsonResponse(response, status=200, safe=False)
-
 
 
 # @api_view(['POST', 'PUT'])
@@ -227,14 +317,14 @@ class UserFileMetadataSerializer(Serializer):
     version_name = serializers.CharField(max_length=30, required=True)
     version_pretty_name = serializers.CharField(max_length=30, required=False)
     variable_name = serializers.CharField(max_length=30, required=True)
-    dimension_name = serializers.CharField(required=True)
+    variable_units = serializers.CharField(max_length=30, required=True)
+    dimension_name_source = serializers.CharField(required=True)
 
     def create(self, validated_data):
         pass
 
     def update(self, instance, validated_data):
         pass
-
 
 # class UserFileSerializer(Serializer):
 #     file = serializers.FileField(allow_null=True)
@@ -245,5 +335,3 @@ class UserFileMetadataSerializer(Serializer):
 #
 #     def update(self, instance, validated_data):
 #         pass
-
-
