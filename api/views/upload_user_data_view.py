@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 import io
+from django.utils import timezone
 
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 
@@ -35,12 +36,12 @@ def create_variable_entry(variable_name, dataset_name, user, max_value=None, min
 
 def extract_dimension_names(ncDataset):
     dimensions = list(ncDataset.dims.keys())
-    longitude_values = list( filter(lambda v: match('lon', v), dimensions))
-    latitude_values = list( filter(lambda v: match('lat', v), dimensions))
+    longitude_values = list(filter(lambda v: match('lon', v), dimensions))
+    latitude_values = list(filter(lambda v: match('lat', v), dimensions))
     time_values = list(filter(lambda v: match('time', v), dimensions))
     print(longitude_values, latitude_values, time_values)
     dimension_names = {
-        'lon_names': [{'name': val} for val in  longitude_values],
+        'lon_names': [{'name': val} for val in longitude_values],
         'lat_names': [{'name': val} for val in latitude_values],
         'time_names': [{'name': val} for val in time_values],
     }
@@ -96,7 +97,8 @@ def verify_user_file_entry(file_uuid):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
-    list_of_files = UserDatasetFile.objects.filter(owner=request.user)
+    list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
+    print(list_of_files)
     serializer = UploadSerializer(list_of_files, many=True)
     return JsonResponse(serializer.data, status=200, safe=False)
 
@@ -124,6 +126,25 @@ def delete_user_dataset(request, dataset_id):
     dataset_file.delete()
 
     return HttpResponse(status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_metadata(request, file_uuid):
+    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+    field_name = request.data['field_name']
+    field_value = request.data['field_value']
+
+    if field_name == 'variable_name':
+        new_variable = next(item for item in file_entry.variable_choices if item["variable"] == field_value)
+        current_variable = file_entry.variable
+        current_variable.short_name = new_variable['variable']
+        current_variable.pretty_name = new_variable['long_name']
+        current_variable.help_text = f'Variable {new_variable["variable"]} of dataset ' \
+                                     f'{file_entry.dataset.pretty_name} provided by user {request.user}.'
+        current_variable.save()
+    print(request.data['field_name'], request.data['field_value'])
+    return JsonResponse({'message': 'ok'}, status=200)
 
 
 @api_view(['PUT', 'POST'])
@@ -186,6 +207,7 @@ def post_user_file_metadata(request, file_uuid):
             'file': file_entry.file,
             'owner': request.user.pk,
             'file_name': file_entry.file_name,
+            'upload_date': file_entry.upload_date,
             'dataset': new_dataset.id,
             'version': new_version.id,
             'variable': new_variable.id if new_variable else None,
@@ -235,7 +257,8 @@ def upload_user_data(request, filename):
         'owner': request.user.pk,
         'dataset': None,
         'version': None,
-        'variable': None
+        'variable': None,
+        'upload_date': timezone.now()
     }
 
     file_serializer = UploadSerializer(data=file_data)
@@ -316,9 +339,10 @@ class UserFileMetadataSerializer(Serializer):
     dataset_pretty_name = serializers.CharField(max_length=30, required=False)
     version_name = serializers.CharField(max_length=30, required=True)
     version_pretty_name = serializers.CharField(max_length=30, required=False)
-    variable_name = serializers.CharField(max_length=30, required=True)
-    variable_units = serializers.CharField(max_length=30, required=True)
-    dimension_name_source = serializers.CharField(required=True)
+
+    # variable_name = serializers.CharField(max_length=30, required=True)
+    # variable_units = serializers.CharField(max_length=30, required=True)
+    # dimension_name_source = serializers.CharField(required=True)
 
     def create(self, validated_data):
         pass
