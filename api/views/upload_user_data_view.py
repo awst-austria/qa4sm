@@ -134,17 +134,32 @@ def update_metadata(request, file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     field_name = request.data['field_name']
     field_value = request.data['field_value']
+    current_variable = file_entry.variable
 
     if field_name == 'variable_name':
         new_variable = next(item for item in file_entry.variable_choices if item["variable"] == field_value)
-        current_variable = file_entry.variable
         current_variable.short_name = new_variable['variable']
         current_variable.pretty_name = new_variable['long_name']
         current_variable.help_text = f'Variable {new_variable["variable"]} of dataset ' \
                                      f'{file_entry.dataset.pretty_name} provided by user {request.user}.'
         current_variable.save()
-    print(request.data['field_name'], request.data['field_value'])
-    return JsonResponse({'message': 'ok'}, status=200)
+
+    if field_name == 'lat_name':
+        new_lat = next(item for item in file_entry.lat_name_choices if item["name"] == field_value)
+        file_entry.latname = new_lat['name']
+        file_entry.save()
+
+    if field_name == 'lon_name':
+        new_lon = next(item for item in file_entry.lon_name_choices if item["name"] == field_value)
+        file_entry.lonname = new_lon['name']
+        file_entry.save()
+
+    if field_name == 'time_name':
+        new_time = next(item for item in file_entry.time_name_choices if item["name"] == field_value)
+        file_entry.timename = new_time['name']
+        file_entry.save()
+
+    return JsonResponse({'variable_id': current_variable.id}, status=200)
 
 
 @api_view(['PUT', 'POST'])
