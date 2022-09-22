@@ -83,24 +83,25 @@ export class UserDataRowComponent implements OnInit {
   }
 
   updateMetadata(fieldName, fieldValue, userDataId): void {
-    this.userDatasetService.updateMetadata(fieldName, fieldValue, userDataId).subscribe((data) => {
+    this.userDatasetService.updateMetadata(fieldName, fieldValue, userDataId).subscribe(() => {
         this.toggle(fieldName, false);
         if (fieldName === this.variableFieldName) {
           this.variableName$.next(fieldValue);
         }
-        if (fieldName === this.latFieldName){
+        if (fieldName === this.latFieldName) {
           this.latitudeName$.next(fieldValue);
         }
-        if (fieldName === this.lonFieldName){
+        if (fieldName === this.lonFieldName) {
           this.longitudeName$.next(fieldValue);
         }
-        if (fieldName === this.timeFiledName){
+        if (fieldName === this.timeFiledName) {
           this.timeName$.next(fieldValue);
         }
       },
       () => {
       },
       () => {
+        this.toastService.showSuccess('Metadata has been updated');
       });
   }
 
