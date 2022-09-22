@@ -18,7 +18,8 @@ import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.
 export class UserDataRowComponent implements OnInit {
 
   @Input() userDataset: UserDataFileDto;
-  variableName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  variableName: { shortName$: BehaviorSubject<string>, prettyName$: BehaviorSubject<string> } =
+    {shortName$: new BehaviorSubject<string>(''), prettyName$: new BehaviorSubject<string>('')};
   latitudeName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   longitudeName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   timeName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -42,7 +43,8 @@ export class UserDataRowComponent implements OnInit {
 
   ngOnInit(): void {
     this.datasetVariableService.getVariableById(this.userDataset.variable).subscribe(variableData => {
-      this.variableName$.next(variableData.short_name);
+      this.variableName.shortName$.next(variableData.short_name);
+      this.variableName.prettyName$.next(variableData.pretty_name);
     });
     this.latitudeName$.next(
       this.userDataset.latname ? this.userDataset.latname : '**choose**'
@@ -86,7 +88,9 @@ export class UserDataRowComponent implements OnInit {
     this.userDatasetService.updateMetadata(fieldName, fieldValue, userDataId).subscribe(() => {
         this.toggle(fieldName, false);
         if (fieldName === this.variableFieldName) {
-          this.variableName$.next(fieldValue);
+          this.variableName.prettyName$.next(
+            this.userDataset.variable_choices.find(choice => choice.variable === fieldValue).long_name);
+          this.variableName.shortName$.next(fieldValue);
         }
         if (fieldName === this.latFieldName) {
           this.latitudeName$.next(fieldValue);
@@ -99,6 +103,7 @@ export class UserDataRowComponent implements OnInit {
         }
       },
       () => {
+        this.toastService.showError('Metadata could not be updated');
       },
       () => {
         this.toastService.showSuccess('Metadata has been updated');
