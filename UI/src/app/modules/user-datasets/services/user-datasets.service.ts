@@ -10,6 +10,7 @@ const userDataListUrl: string = urlPrefix + '/get-list-of-user-data-files';
 const userDataDeleteUrl: string = urlPrefix + '/delete-user-dataset';
 const userDataMetadataUrl: string = urlPrefix + '/user-file-metadata';
 const userDataTestUrl: string = urlPrefix + '/test-user-dataset';
+const updateMetadataUrl: string = urlPrefix + '/update-metadata';
 // const validateUserDataUrl: string = urlPrefix + '/validate-user-data';
 
 const csrfToken = '{{csrf_token}}';
@@ -50,6 +51,11 @@ export class UserDatasetsService {
   testDataset(dataFileId: string): Observable<any>{
     const testUrl = userDataTestUrl + '/' + dataFileId + '/';
     return this.httpClient.get(testUrl);
+  }
+
+  updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
+    const updateUrl = updateMetadataUrl + '/' + dataFileId + '/';
+    return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue});
   }
 
   // userFileValidate(name, file, filename): Observable<any> {
