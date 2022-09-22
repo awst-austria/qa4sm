@@ -111,6 +111,7 @@ urlpatterns = [
     path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
     path('delete-user-dataset/<str:dataset_id>/', delete_user_dataset, name='Delete User Data Files'),
     path('user-file-metadata/<uuid:file_uuid>/', post_user_file_metadata, name='Post User Data File Metadata'),
+    path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
