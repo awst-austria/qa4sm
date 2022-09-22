@@ -12,7 +12,12 @@
   <hr class="featurette-divider">
   <div *ngIf="(userDatasets$ | async) as userDatasetList">
     <div *ngIf="userDatasetList.length != 0" class="container p-mb-5 p-mt-4" style="max-width: 80rem;">
-      <qa-user-dataset-list [userDatasetList]="userDatasetList"></qa-user-dataset-list>
+<!--      <qa-user-dataset-list [userDatasetList]="userDatasetList"></qa-user-dataset-list>-->
+      <div>
+        <div *ngFor="let userDataset of userDatasetList" class="p-mb-3">
+          <qa-user-data-row [userDataset]="userDataset"></qa-user-data-row>
+        </div>
+      </div>
     </div>
 
     <div *ngIf="userDatasetList.length == 0" class="p-text-center">
