@@ -13,6 +13,7 @@ export class UserDataFileDto {
               public lon_name_choices: [{name: string}],
               public lat_name_choices: [{name: string}],
               public time_name_choices: [{name: string}],
+              public upload_date: Date
               ) {
   }
 }

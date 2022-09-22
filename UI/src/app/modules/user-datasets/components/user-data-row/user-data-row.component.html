@@ -1,0 +1,183 @@
+<p-panel class="validation-row">
+
+  <ng-template pTemplate="header">
+    <h5 class="p-my-0"><span class="font-weight-normal">File: </span> {{ userDataset.file_name}}</h5>
+  </ng-template>
+  <ng-template pTemplate="icons" class="font-weight-normal">
+    <h5 class="p-my-0"> Upload date: {{userDataset.upload_date}}
+    </h5>
+  </ng-template>
+  <div class="p-grid p-mx-0 p-px-0 p-my-0">
+    <!--    dataset -->
+    <div class="p-col">
+      <div><strong>Dataset: </strong></div>
+      <div> name: {{(getDataset(userDataset.dataset) | async)?.pretty_name}}</div>
+      <div> version: {{(getDatasetVersion(userDataset.version) | async)?.pretty_name}}</div>
+      <span
+        *ngIf="!(editVariable.opened)"
+        (click)="toggle(variableFieldName,true)"
+        style="cursor: pointer"
+        pTooltip="Click to change the name"
+      >
+        variable: {{(variableName$|async)}}
+<!--        {{((getDatasetVariable(userDataset.variable) | async)?.short_name)}}-->
+        </span>
+      <div *ngIf="(editVariable.opened)">
+        <label for="variable-dropdown">variable</label>
+        <p-dropdown
+          id="variable-dropdown"
+          class="form-field"
+          [options]="(userDataset.variable_choices)"
+          [ngModel]="(variableName$|async)"
+          (ngModelChange)="updateMetadata(variableFieldName, $event, userDataset.id)"
+          [style]="{'width':'6rem', 'height': '2rem'}"
+          optionLabel="variable"
+          optionValue="variable"
+          placeholder="Choose"
+          editable="true"
+          ngDefaultControl>
+        </p-dropdown>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ban"
+          [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+          pTooltip="Cancel"
+          (click)="toggle(variableFieldName,false)">
+        </button>
+      </div>
+      <!--      <span *ngFor="let config of configurations">-->
+      <!--        <span *ngIf="config.id !== validationRun.reference_configuration">-->
+      <!--          {{config.dataset}},-->
+      <!--          {{config.version}},-->
+      <!--          {{config.variable}} <br>-->
+      <!--        </span>-->
+      <!--      </span>-->
+    </div>
+    <!-- dimensions -->
+    <div class="p-col">
+      <div><strong>Dimensions: </strong></div>
+      <div>
+        <span
+          *ngIf="!(editLatName.opened)"
+          (click)="toggle(latFieldName, true)"
+          style="cursor: pointer"
+          pTooltip="Click to change the name">
+          latitude: {{latitudeName$|async}}
+        </span>
+        <div *ngIf="editLatName.opened">
+          <label for="latitude-dropdown">latitude</label>
+          <p-dropdown
+            id="latitude-dropdown"
+            class="form-field"
+            [options]="(userDataset.lat_name_choices)"
+            [ngModel]="latitudeName$|async"
+            (ngModelChange)="updateMetadata(latFieldName, $event, userDataset.id)"
+            [style]="{'width':'6rem', 'height': '2rem'}"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Choose"
+            editable="true"
+            ngDefaultControl>
+          </p-dropdown>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+            pTooltip="Cancel"
+            (click)="toggle(latFieldName,false)">
+          </button>
+        </div>
+      </div>
+      <div>
+        <span
+          *ngIf="!(editLonName.opened)"
+          (click)="toggle(lonFieldName, true)"
+          style="cursor: pointer"
+          pTooltip="Click to change the name">
+          longitude: {{longitudeName$|async}}
+        </span>
+        <div *ngIf="editLonName.opened">
+          <label for="longitude-dropdown">longitude</label>
+          <p-dropdown
+            id="longitude-dropdown"
+            class="form-field"
+            [options]="(userDataset.lon_name_choices)"
+            [ngModel]="longitudeName$|async"
+            (ngModelChange)="updateMetadata(lonFieldName, $event, userDataset.id)"
+            [style]="{'width':'6rem', 'height': '2rem'}"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Choose"
+            editable="true"
+            ngDefaultControl>
+          </p-dropdown>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+            pTooltip="Cancel"
+            (click)="toggle(lonFieldName,false)">
+          </button>
+        </div>
+
+      </div>
+      <div>
+        <span
+          *ngIf="!(editTimeName.opened)"
+          (click)="toggle(timeFiledName, true)"
+          style="cursor: pointer"
+          pTooltip="Click to change the name">
+          time: {{timeName$|async}}
+        </span>
+        <div *ngIf="editTimeName.opened">
+          <label for="time-dropdown">time: </label>
+          <p-dropdown
+            id="time-dropdown"
+            class="form-field"
+            [options]="(userDataset.time_name_choices)"
+            [ngModel]="timeName$|async"
+            (ngModelChange)="updateMetadata(timeFiledName, $event, userDataset.id)"
+            [style]="{'width':'6rem', 'height': '2rem'}"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Choose"
+            editable="true"
+            ngDefaultControl>
+          </p-dropdown>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+            pTooltip="Cancel"
+            (click)="toggle(timeFiledName,false)">
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <!-- actions   -->
+    <div class="p-col status">
+<!--      <div>-->
+<!--        <strong>Actions:</strong><br/>-->
+<!--      </div>-->
+      <div>
+        <button pButton
+                type="button"
+                label="Remove dataset"
+                pTooltip="Remove dataset and the attached file"
+                class="p-button-danger"
+                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+                (click)="removeDataset(userDataset.id)">
+        </button>
+      </div>
+    </div>
+
+
+  </div>
+
+</p-panel>
+
