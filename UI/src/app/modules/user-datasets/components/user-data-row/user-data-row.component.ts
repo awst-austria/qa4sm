@@ -31,7 +31,8 @@ export class UserDataRowComponent implements OnInit {
   editLatName = {opened: false};
   editLonName = {opened: false};
   editTimeName = {opened: false};
-
+  dateFormat = 'medium';
+  timeZone = 'UTC';
   // variables$: Observable<DatasetVariableDto>[] = [];
 
   constructor(private userDatasetService: UserDatasetsService,
@@ -128,4 +129,5 @@ export class UserDataRowComponent implements OnInit {
     }
     editableField.opened = open;
   }
+
 }

@@ -4,25 +4,25 @@
     <h5 class="p-my-0"><span class="font-weight-normal">File: </span> {{ userDataset.file_name}}</h5>
   </ng-template>
   <ng-template pTemplate="icons" class="font-weight-normal">
-    <h5 class="p-my-0"> Upload date: {{userDataset.upload_date}}
+    <h5 class="p-my-0"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
     </h5>
   </ng-template>
   <div class="p-grid p-mx-0 p-px-0 p-my-0">
     <!--    dataset -->
     <div class="p-col">
       <div><strong>Dataset: </strong></div>
-      <div> name: {{(getDataset(userDataset.dataset) | async)?.pretty_name}}</div>
-      <div> version: {{(getDatasetVersion(userDataset.version) | async)?.pretty_name}}</div>
+      <div> Name: <b>{{(getDataset(userDataset.dataset) | async)?.pretty_name}}</b></div>
+      <div> Version: <b>{{(getDatasetVersion(userDataset.version) | async)?.pretty_name}}</b></div>
       <span
         *ngIf="!(editVariable.opened)"
         (click)="toggle(variableFieldName,true)"
         style="cursor: pointer"
         pTooltip="Click to change the name"
       >
-        variable: {{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}})
+        Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}) </b>
         </span>
       <div *ngIf="(editVariable.opened)">
-        <label for="variable-dropdown">variable</label>
+        <label for="variable-dropdown">Variable: </label>
         <p-dropdown
           id="variable-dropdown"
           class="form-field"
@@ -55,10 +55,10 @@
           (click)="toggle(latFieldName, true)"
           style="cursor: pointer"
           pTooltip="Click to change the name">
-          latitude: {{latitudeName$|async}}
+          Latitude: <b>{{latitudeName$|async}}</b>
         </span>
         <div *ngIf="editLatName.opened">
-          <label for="latitude-dropdown">latitude</label>
+          <label for="latitude-dropdown">Latitude: </label>
           <p-dropdown
             id="latitude-dropdown"
             class="form-field"
@@ -88,10 +88,10 @@
           (click)="toggle(lonFieldName, true)"
           style="cursor: pointer"
           pTooltip="Click to change the name">
-          longitude: {{longitudeName$|async}}
+          Longitude: <b>{{longitudeName$|async}}</b>
         </span>
         <div *ngIf="editLonName.opened">
-          <label for="longitude-dropdown">longitude</label>
+          <label for="longitude-dropdown">Longitude: </label>
           <p-dropdown
             id="longitude-dropdown"
             class="form-field"
@@ -122,10 +122,10 @@
           (click)="toggle(timeFiledName, true)"
           style="cursor: pointer"
           pTooltip="Click to change the name">
-          time: {{timeName$|async}}
+          Time: <b>{{timeName$|async}}</b>
         </span>
         <div *ngIf="editTimeName.opened">
-          <label for="time-dropdown">time: </label>
+          <label for="time-dropdown">Time: </label>
           <p-dropdown
             id="time-dropdown"
             class="form-field"
@@ -153,11 +153,9 @@
     </div>
     <!-- actions   -->
     <div class="p-col status">
-<!--      <div>-->
-<!--        <strong>Actions:</strong><br/>-->
-<!--      </div>-->
       <div>
         <button pButton
+                icon="pi pi-times"
                 type="button"
                 label="Remove dataset"
                 pTooltip="Remove dataset and the attached file"
