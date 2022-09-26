@@ -8,6 +8,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 import io
 from django.utils import timezone
+from qa4sm_preprocessing.reading.cf import get_coord, get_time
 
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 
@@ -35,15 +36,10 @@ def create_variable_entry(variable_name, dataset_name, user, max_value=None, min
 
 
 def extract_dimension_names(ncDataset):
-    dimensions = list(ncDataset.dims.keys())
-    longitude_values = list(filter(lambda v: match('lon', v), dimensions))
-    latitude_values = list(filter(lambda v: match('lat', v), dimensions))
-    time_values = list(filter(lambda v: match('time', v), dimensions))
-    print(longitude_values, latitude_values, time_values)
     dimension_names = {
-        'lon_names': [{'name': val} for val in longitude_values],
-        'lat_names': [{'name': val} for val in latitude_values],
-        'time_names': [{'name': val} for val in time_values],
+        'lon_name': get_coord(ncDataset, 'longitude', ['lon', 'longitude', 'y']),
+        'lat_name':get_coord(ncDataset, 'latitude', ['lat', 'latitude', 'x']),
+        'time_name': get_time(ncDataset),
     }
     return dimension_names
 
@@ -81,14 +77,21 @@ def extract_variable_names(ncDataset):
 
 def verify_user_file_entry(file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+    try:
+        xarray_ds = xa.open_dataset(file_entry.file.path)
+    except:
+        return 'Wrong file format'
 
-    xarray_ds = xa.open_dataset(file_entry.file.path)
     dimensions = extract_dimension_names(xarray_ds)
     variables = extract_variable_names(xarray_ds)
 
+    variables_list = list(xarray_ds.variables.keys())
+    variables_dictlist = [{'name': variable} for variable in variables_list]
+
     metadata_from_file = {
         'dimensions': dimensions,
-        'variables': variables
+        'variables': variables,
+        'variables_list': variables_dictlist
     }
 
     return metadata_from_file
@@ -226,13 +229,14 @@ def post_user_file_metadata(request, file_uuid):
             'dataset': new_dataset.id,
             'version': new_version.id,
             'variable': new_variable.id if new_variable else None,
+            'lonname': metadata_from_file['dimensions']['lon_name'],
+            'latname': metadata_from_file['dimensions']['lat_name'],
+            'timename': metadata_from_file['dimensions']['time_name'],
             'variable_choices': metadata_from_file['variables'],
-            'lon_name_choices': metadata_from_file['dimensions']['lon_names'],
-            'lat_name_choices': metadata_from_file['dimensions']['lat_names'],
-            'time_name_choices': metadata_from_file['dimensions']['time_names']
+            'lon_name_choices': metadata_from_file['variables_list'],
+            'lat_name_choices': metadata_from_file['variables_list'],
+            'time_name_choices': metadata_from_file['variables_list']
         }
-
-        print('Monika', file_data)
 
         file_data_serializer = UploadSerializer(data=file_data)
         if file_data_serializer.is_valid() and request.user == file_entry.owner:
@@ -240,10 +244,13 @@ def post_user_file_metadata(request, file_uuid):
                 file_entry.dataset = new_dataset
                 file_entry.version = new_version
                 file_entry.variable = new_variable
-                file_entry.variable_choices = metadata_from_file['variables']
-                file_entry.lon_name_choices = metadata_from_file['dimensions']['lon_names']
-                file_entry.lat_name_choices = metadata_from_file['dimensions']['lat_names']
-                file_entry.time_name_choices = metadata_from_file['dimensions']['time_names']
+                file_entry.lonname = file_data['lonname']
+                file_entry.latname = file_data['latname']
+                file_entry.timename = file_data['timename']
+                file_entry.variable_choices = file_data['variable_choices']
+                file_entry.lon_name_choices = file_data['lon_name_choices']
+                file_entry.lat_name_choices = file_data['lat_name_choices']
+                file_entry.time_name_choices = file_data['time_name_choices']
                 file_entry.save()
 
             except:
