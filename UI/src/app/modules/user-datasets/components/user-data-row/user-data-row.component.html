@@ -11,13 +11,22 @@
     <!--    dataset -->
     <div class="p-col">
       <div><strong>Dataset: </strong></div>
-      <div> Name: <b>{{(getDataset(userDataset.dataset) | async)?.pretty_name}}</b></div>
-      <div> Version: <b>{{(getDatasetVersion(userDataset.version) | async)?.pretty_name}}</b></div>
+      <div
+        style="cursor: pointer"
+        pTooltip="Click on the name to change it. The new name can consist of 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+        tooltipPosition="bottom"
+      > Name: <b>{{(getDataset(userDataset.dataset) | async)?.pretty_name}} </b>
+      </div>
+      <div
+        style="cursor: pointer"
+        pTooltip="Click on the name to change it. The new name can consist of 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+        tooltipPosition="bottom"
+      > Version: <b>{{(getDatasetVersion(userDataset.version) | async)?.pretty_name}}</b></div>
       <span
         *ngIf="!(editVariable.opened)"
         (click)="toggle(variableFieldName,true)"
         style="cursor: pointer"
-        pTooltip="Click to change the name"
+        pTooltip="The variable name was retrieved from the file. If it is improper or you want to use another one, click on the name and choose a different one. Please note, if the chosen variable name is incorrect, data validation won't be possible."
       >
         Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}) </b>
         </span>
@@ -46,9 +55,13 @@
         </button>
       </div>
     </div>
-    <!-- dimensions -->
+    <!-- coordinates -->
     <div class="p-col">
-      <div><strong>Dimensions: </strong></div>
+      <div><strong>Coordinates: </strong>
+        <span class="pi pi-question-circle help-icon"
+              pTooltip="Coordinates names were retrieved from the file. If they are improper, click on the name and choose a different one. Please note, if the chosen coordinates names are incorrect, data validation won't be possible.">
+        </span>
+      </div>
       <div>
         <span
           *ngIf="!(editLatName.opened)"
