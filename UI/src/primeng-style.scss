@@ -6232,15 +6232,16 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   transform: scale(1.2);
 }
 
-.cancel_dropdown_btn.p-button{
+.cancel_black_btn.p-button, .save_name_black_btn.p-button{
   color: black;
+  font-size: 1.5rem;
   background-color: transparent;
   border-color: transparent;
-  margin-left: 0.5rem;
-  width: 1.3rem;
+  margin-left: 0.1rem;
+  width: 1.5rem;
 }
 
-.cancel_dropdown_btn.p-button:not(.disabled):hover{
+.cancel_black_btn.p-button:not(.disabled):hover, .save_name_black_btn.p-button:not(.disabled):hover{
   color: black;
   background-color: transparent;
   border-color: transparent;

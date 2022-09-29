@@ -205,7 +205,6 @@ def delete_user_dataset_and_file(request, dataset_id):
 
     return HttpResponse(status=status.HTTP_200_OK)
 
-
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_metadata(request, file_uuid):
@@ -213,15 +212,24 @@ def update_metadata(request, file_uuid):
     field_name = request.data['field_name']
     field_value = request.data['field_value']
     current_variable = file_entry.variable
+    current_dataset = file_entry.dataset
+    current_version = file_entry.version
 
-    new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
+    if field_name not in ['dataset_name', 'version_name']:
+        new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
     if field_name == 'variable_name':
         current_variable.short_name = new_item['name']
         current_variable.pretty_name = new_item['long_name']
         current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
-                                     f'{file_entry.dataset.pretty_name} provided by user {request.user}.'
+                                     f'{current_dataset.pretty_name} provided by user {request.user}.'
         current_variable.save()
+    elif field_name == 'dataset_name':
+        current_dataset.pretty_name = field_value
+        current_dataset.save()
+    elif field_name == 'version_name':
+        current_version.pretty_name = field_value
+        current_version.save()
     else:
         setattr(file_entry, field_name, new_item['name'])
         file_entry.save()

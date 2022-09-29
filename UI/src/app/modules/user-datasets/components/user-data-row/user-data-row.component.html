@@ -11,20 +11,82 @@
     <!--    dataset -->
     <div class="p-col">
       <div><strong>Dataset: </strong></div>
+
+
       <div
+        *ngIf="!editDataset.opened"
         style="cursor: pointer"
         pTooltip="Click to change the name."
         tooltipPosition="bottom"
-      > Name: <b>{{(getDataset(userDataset.dataset) | async)?.pretty_name}} </b>
+        (click)="toggle(datasetFieldName, true)"
+      > Name: <b>{{(datasetName$| async)}} </b>
         <span class="pi pi-pencil small-edit-icon"></span>
       </div>
+
+      <div *ngIf="editDataset.opened">
+        <label for="new-dataset-name">Name: </label>
+        <input id="new-dataset-name"
+               type="text"
+               value="{{datasetName$|async}}"
+               #newDatasetName
+               [ngClass]="{'edit_dataset': true}">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-save"
+          [ngClass]="{'btn-action save_name_black_btn': true}"
+          pTooltip="Save Name"
+          (click)="updateMetadata(datasetFieldName, newDatasetName.value, userDataset.id)">
+        </button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ban"
+          [ngClass]="{'btn-action cancel_black_btn': true}"
+          pTooltip="Cancel"
+          (click)="toggle(datasetFieldName, false)">
+        </button>
+      </div>
+
+
       <div
+        *ngIf="!editVersion.opened"
         style="cursor: pointer"
         pTooltip="Click to change the name."
         tooltipPosition="bottom"
-      > Version: <b>{{(getDatasetVersion(userDataset.version) | async)?.pretty_name}} </b>
+        (click)="toggle(versionFieldName, true)"
+      > Version: <b>{{(versionName$ | async)}} </b>
         <span class="pi pi-pencil small-edit-icon"></span>
       </div>
+
+      <div *ngIf="editVersion.opened">
+        <label for="new-version-name">Version: </label>
+        <input id="new-version-name"
+               type="text"
+               value="{{versionName$|async}}"
+               #newVersionName
+               [ngClass]="{'edit_dataset': true}">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-save"
+          [ngClass]="{'btn-action save_name_black_btn': true}"
+          pTooltip="Save Name"
+          (click)="updateMetadata(versionFieldName, newVersionName.value, userDataset.id)">
+        </button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ban"
+          [ngClass]="{'btn-action cancel_black_btn': true}"
+          pTooltip="Cancel"
+          (click)="toggle(versionFieldName, false)">
+        </button>
+      </div>
+
+
+
+
       <span
         *ngIf="!(editVariable.opened)"
         (click)="toggle(variableFieldName,true)"
@@ -53,7 +115,7 @@
           pButton
           type="button"
           icon="pi pi-ban"
-          [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+          [ngClass]="{'btn-action cancel_black_btn': true}"
           pTooltip="Cancel"
           (click)="toggle(variableFieldName,false)">
         </button>
@@ -62,9 +124,6 @@
     <!-- coordinates -->
     <div class="p-col">
       <div><strong>Coordinates: </strong>
-<!--        <span class="pi pi-question-circle help-icon"-->
-<!--              pTooltip="Coordinates names were retrieved from the file. If they are improper, click on the name and choose a different one. Please note, if the chosen coordinates names are incorrect, data validation won't be possible.">-->
-<!--        </span>-->
       </div>
       <div>
         <span
@@ -94,7 +153,7 @@
             pButton
             type="button"
             icon="pi pi-ban"
-            [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+            [ngClass]="{'btn-action cancel_black_btn': true}"
             pTooltip="Cancel"
             (click)="toggle(latFieldName,false)">
           </button>
@@ -128,7 +187,7 @@
             pButton
             type="button"
             icon="pi pi-ban"
-            [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+            [ngClass]="{'btn-action cancel_black_btn': true}"
             pTooltip="Cancel"
             (click)="toggle(lonFieldName,false)">
           </button>
@@ -163,7 +222,7 @@
             pButton
             type="button"
             icon="pi pi-ban"
-            [ngClass]="{'btn-action cancel_dropdown_btn': true}"
+            [ngClass]="{'btn-action cancel_black_btn': true}"
             pTooltip="Cancel"
             (click)="toggle(timeFiledName,false)">
           </button>
