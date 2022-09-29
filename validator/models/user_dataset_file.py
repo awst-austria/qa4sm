@@ -6,6 +6,7 @@ from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from validator.models.dataset import Dataset
 from validator.models.custom_user import User
+from validator.models.dataset_configuration import DatasetConfiguration
 from os import path
 import uuid
 from django.db.models.signals import post_delete
@@ -38,6 +39,12 @@ class UserDatasetFile(models.Model):
     @property
     def get_raw_file_path(self):
         return self.file.path.rstrip(f'/{self.file_name}')
+
+    @property
+    def is_used_in_validation(self):
+        configs = DatasetConfiguration.objects.all()
+        return self.dataset.id in configs.values_list('dataset', flat=True)
+
 
 @receiver(post_delete, sender=UserDatasetFile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

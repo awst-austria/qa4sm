@@ -10,7 +10,8 @@ export class UserDataFileDto {
               public lon_name: string,
               public time_name: string,
               public all_variables: [{name: string, standard_name: string, long_name: string}],
-              public upload_date: Date
+              public upload_date: Date,
+              public is_used_in_validation: boolean
               ) {
   }
 }

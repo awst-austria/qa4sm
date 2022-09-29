@@ -85,8 +85,6 @@
       </div>
 
 
-
-
       <span
         *ngIf="!(editVariable.opened)"
         (click)="toggle(variableFieldName,true)"
@@ -232,13 +230,17 @@
     </div>
     <!-- actions   -->
     <div class="p-col status">
-      <div>
+      <div
+        [pTooltip]="userDataset.is_used_in_validation ? 'Dataset has been used in a validation, it can not be removed' : ''"
+        tooltipPosition="left"
+      >
         <button pButton
                 icon="pi pi-times"
                 type="button"
                 label="Remove dataset"
                 pTooltip="Remove dataset and the attached file"
                 class="p-button-danger"
+                [disabled]="userDataset.is_used_in_validation"
                 [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
                 (click)="removeDataset(userDataset.id)">
         </button>

@@ -9,6 +9,7 @@ from rest_framework import serializers
 from django.utils import timezone
 from qa4sm_preprocessing.reading.cf import get_coord, get_time
 
+from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 import xarray as xa
 
@@ -319,7 +320,7 @@ def upload_user_data(request, filename):
 class UploadSerializer(ModelSerializer):
     class Meta:
         model = UserDatasetFile
-        fields = '__all__'
+        fields = get_fields_as_list(UserDatasetFile)
 
 
 class DatasetSerializer(ModelSerializer):
