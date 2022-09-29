@@ -35,12 +35,12 @@
         <p-dropdown
           id="variable-dropdown"
           class="form-field"
-          [options]="(userDataset.variable_choices)"
+          [options]="(userDataset.all_variables)"
           [ngModel]="(variableName.shortName$|async)"
           (ngModelChange)="updateMetadata(variableFieldName, $event, userDataset.id)"
           [style]="{'width':'6rem', 'height': '2rem'}"
-          optionLabel="variable"
-          optionValue="variable"
+          optionLabel="name"
+          optionValue="name"
           placeholder="Choose"
           editable="true"
           ngDefaultControl>
@@ -75,7 +75,7 @@
           <p-dropdown
             id="latitude-dropdown"
             class="form-field"
-            [options]="(userDataset.lat_name_choices)"
+            [options]="(userDataset.all_variables)"
             [ngModel]="latitudeName$|async"
             (ngModelChange)="updateMetadata(latFieldName, $event, userDataset.id)"
             [style]="{'width':'6rem', 'height': '2rem'}"
@@ -108,7 +108,7 @@
           <p-dropdown
             id="longitude-dropdown"
             class="form-field"
-            [options]="(userDataset.lon_name_choices)"
+            [options]="(userDataset.all_variables)"
             [ngModel]="longitudeName$|async"
             (ngModelChange)="updateMetadata(lonFieldName, $event, userDataset.id)"
             [style]="{'width':'6rem', 'height': '2rem'}"
@@ -142,7 +142,7 @@
           <p-dropdown
             id="time-dropdown"
             class="form-field"
-            [options]="(userDataset.time_name_choices)"
+            [options]="(userDataset.all_variables)"
             [ngModel]="timeName$|async"
             (ngModelChange)="updateMetadata(timeFiledName, $event, userDataset.id)"
             [style]="{'width':'6rem', 'height': '2rem'}"

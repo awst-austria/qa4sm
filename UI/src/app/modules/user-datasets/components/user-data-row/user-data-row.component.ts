@@ -48,13 +48,13 @@ export class UserDataRowComponent implements OnInit {
       this.variableName.prettyName$.next(variableData.pretty_name);
     });
     this.latitudeName$.next(
-      this.userDataset.latname ? this.userDataset.latname : '**choose**'
+      this.userDataset.lat_name ? this.userDataset.lat_name : '**choose**'
     );
     this.longitudeName$.next(
-      this.userDataset.lonname ? this.userDataset.lonname : '**choose**'
+      this.userDataset.lon_name ? this.userDataset.lon_name : '**choose**'
     );
     this.timeName$.next(
-      this.userDataset.timename ? this.userDataset.timename : '**choose**'
+      this.userDataset.time_name ? this.userDataset.time_name : '**choose**'
     );
   }
 
@@ -90,7 +90,7 @@ export class UserDataRowComponent implements OnInit {
         this.toggle(fieldName, false);
         if (fieldName === this.variableFieldName) {
           this.variableName.prettyName$.next(
-            this.userDataset.variable_choices.find(choice => choice.variable === fieldValue).long_name);
+            this.userDataset.all_variables.find(choice => choice.name === fieldValue).long_name);
           this.variableName.shortName$.next(fieldValue);
         }
         if (fieldName === this.latFieldName) {
