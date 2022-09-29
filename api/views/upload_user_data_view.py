@@ -140,20 +140,22 @@ def extract_variable_names(ncDataset):
                 variable_standard_name = ncDataset.variables[variable].attrs['standard_name']
             except KeyError:
                 variable_standard_name = ''
+            is_sm_word_in_variable_name = any([word in variable.lower() for word in key_sm_words])
             is_sm_word_in_long_name = any([word in variable_long_name.lower() for word in key_sm_words])
             is_sm_word_in_standard_name = any([word in variable_standard_name.lower() for word in key_sm_words])
             is_error_word_in_long_name = any([word in variable_long_name.lower() for word in key_error_words])
-            if (is_sm_word_in_long_name or is_sm_word_in_standard_name) and not is_error_word_in_long_name:
+            if (is_sm_word_in_long_name or is_sm_word_in_standard_name or is_sm_word_in_variable_name) and \
+                    not is_error_word_in_long_name:
                 potential_variable_names.append({
                     'name': variable,
-                    'standard_name': variable_standard_name,
-                    'long_name': variable_long_name
+                    'standard_name': variable_standard_name if variable_standard_name else variable,
+                    'long_name': variable_long_name if variable_long_name else (variable_standard_name if variable_standard_name else variable)
                 })
     if len(potential_variable_names) == 0:
         potential_variable_names = [{'name': 'default_name',
                                      'standard_name': 'default_standard_name',
                                      'long_name': 'default_long_name'}]
-
+    print(potential_variable_names)
     return potential_variable_names[0]
 
 
