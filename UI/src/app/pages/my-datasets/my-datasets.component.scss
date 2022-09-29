@@ -1,5 +1,9 @@
 @import "src/styles";
-//div {
-//  font-family: $base-font;
-//}
-
+.readMoreOrLess {
+  //font-size: 1rem;
+  cursor: pointer;
+  color: #007BFF;
+}
+li{
+  margin-top: 1.1rem;
+}
