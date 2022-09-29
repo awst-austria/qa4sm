@@ -6,6 +6,7 @@ from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from validator.models.dataset import Dataset
 from validator.models.custom_user import User
+from validator.models.dataset_configuration import DatasetConfiguration
 from os import path
 import uuid
 from django.db.models.signals import post_delete
@@ -29,13 +30,21 @@ class UserDatasetFile(models.Model):
     dataset = models.ForeignKey(Dataset, related_name='dataset', on_delete=models.SET_NULL, null=True)
     version = models.ForeignKey(DatasetVersion, related_name='version', on_delete=models.SET_NULL, null=True)
     variable = models.ForeignKey(DataVariable, related_name='variable', on_delete=models.SET_NULL, null=True)
-    lonname = models.CharField(max_length=10, blank=True, null=True, default='lon')
-    latname = models.CharField(max_length=10, blank=True, null=True, default='lat')
-    timename = models.CharField(max_length=10, blank=True, null=True, default='time')
+    lon_name = models.CharField(max_length=10, blank=True, null=True)
+    lat_name = models.CharField(max_length=10, blank=True, null=True)
+    time_name = models.CharField(max_length=10, blank=True, null=True)
+    all_variables = models.JSONField(blank=True, null=True)
+    upload_date = models.DateTimeField()
 
     @property
     def get_raw_file_path(self):
         return self.file.path.rstrip(f'/{self.file_name}')
+
+    @property
+    def is_used_in_validation(self):
+        configs = DatasetConfiguration.objects.all()
+        return self.dataset.id in configs.values_list('dataset', flat=True)
+
 
 @receiver(post_delete, sender=UserDatasetFile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

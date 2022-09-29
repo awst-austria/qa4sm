@@ -1,0 +1,252 @@
+<p-panel class="validation-row">
+
+  <ng-template pTemplate="header">
+    <h5 class="p-my-0"><span class="font-weight-normal">File: </span> {{ userDataset.file_name}}</h5>
+  </ng-template>
+  <ng-template pTemplate="icons" class="font-weight-normal">
+    <h5 class="p-my-0"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
+    </h5>
+  </ng-template>
+  <div class="p-grid p-mx-0 p-px-0 p-my-0">
+    <!--    dataset -->
+    <div class="p-col-5">
+      <div><strong>Dataset: </strong></div>
+
+
+      <div
+        *ngIf="!editDataset.opened"
+        style="cursor: pointer"
+        pTooltip="Click to change the name."
+        tooltipPosition="bottom"
+        (click)="toggle(datasetFieldName, true)"
+      > Name: <b>{{(datasetName$| async)}} </b>
+        <span class="pi pi-pencil small-edit-icon"></span>
+      </div>
+
+      <div *ngIf="editDataset.opened">
+        <label for="new-dataset-name">Name: </label>
+        <input id="new-dataset-name"
+               type="text"
+               value="{{datasetName$|async}}"
+               #newDatasetName
+               [ngClass]="{'edit_dataset': true}">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-save"
+          [ngClass]="{'btn-action save_name_black_btn': true}"
+          pTooltip="Save Name"
+          (click)="updateMetadata(datasetFieldName, newDatasetName.value, userDataset.id)">
+        </button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ban"
+          [ngClass]="{'btn-action cancel_black_btn': true}"
+          pTooltip="Cancel"
+          (click)="toggle(datasetFieldName, false)">
+        </button>
+      </div>
+
+
+      <div
+        *ngIf="!editVersion.opened"
+        style="cursor: pointer"
+        pTooltip="Click to change the name."
+        tooltipPosition="bottom"
+        (click)="toggle(versionFieldName, true)"
+      > Version: <b>{{(versionName$ | async)}} </b>
+        <span class="pi pi-pencil small-edit-icon"></span>
+      </div>
+
+      <div *ngIf="editVersion.opened">
+        <label for="new-version-name">Version: </label>
+        <input id="new-version-name"
+               type="text"
+               value="{{versionName$|async}}"
+               #newVersionName
+               [ngClass]="{'edit_dataset': true}">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-save"
+          [ngClass]="{'btn-action save_name_black_btn': true}"
+          pTooltip="Save Name"
+          (click)="updateMetadata(versionFieldName, newVersionName.value, userDataset.id)">
+        </button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ban"
+          [ngClass]="{'btn-action cancel_black_btn': true}"
+          pTooltip="Cancel"
+          (click)="toggle(versionFieldName, false)">
+        </button>
+      </div>
+
+
+      <span
+        *ngIf="!(editVariable.opened)"
+        (click)="toggle(variableFieldName,true)"
+        style="cursor: pointer"
+        pTooltip="You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation won't be possible."
+      >
+        Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}) </b>
+        <span class="pi pi-question-circle small-edit-icon"></span>
+        </span>
+      <div *ngIf="(editVariable.opened)">
+        <label for="variable-dropdown">Variable: </label>
+        <p-dropdown
+          id="variable-dropdown"
+          class="form-field"
+          [options]="(userDataset.all_variables)"
+          [ngModel]="(variableName.shortName$|async)"
+          (ngModelChange)="updateMetadata(variableFieldName, $event, userDataset.id)"
+          [style]="{'width':'6rem', 'height': '2rem'}"
+          optionLabel="name"
+          optionValue="name"
+          placeholder="Choose"
+          editable="true"
+          ngDefaultControl>
+        </p-dropdown>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-ban"
+          [ngClass]="{'btn-action cancel_black_btn': true}"
+          pTooltip="Cancel"
+          (click)="toggle(variableFieldName,false)">
+        </button>
+      </div>
+    </div>
+    <!-- coordinates -->
+    <div class="p-col">
+      <div><strong>Coordinates: </strong>
+      </div>
+      <div>
+        <span
+          *ngIf="!(editLatName.opened)"
+          (click)="toggle(latFieldName, true)"
+          style="cursor: pointer"
+          pTooltip="You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation won't be possible.">
+          Latitude: <b>{{latitudeName$|async}} </b>
+          <span class="pi pi-question-circle small-edit-icon"></span>
+        </span>
+        <div *ngIf="editLatName.opened">
+          <label for="latitude-dropdown">Latitude: </label>
+          <p-dropdown
+            id="latitude-dropdown"
+            class="form-field"
+            [options]="(userDataset.all_variables)"
+            [ngModel]="latitudeName$|async"
+            (ngModelChange)="updateMetadata(latFieldName, $event, userDataset.id)"
+            [style]="{'width':'6rem', 'height': '2rem'}"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Choose"
+            editable="true"
+            ngDefaultControl>
+          </p-dropdown>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_black_btn': true}"
+            pTooltip="Cancel"
+            (click)="toggle(latFieldName,false)">
+          </button>
+        </div>
+      </div>
+      <div>
+        <span
+          *ngIf="!(editLonName.opened)"
+          (click)="toggle(lonFieldName, true)"
+          style="cursor: pointer"
+          pTooltip="You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation won't be possible.">
+          Longitude: <b>{{longitudeName$|async}} </b>
+          <span class="pi pi-question-circle small-edit-icon"></span>
+        </span>
+        <div *ngIf="editLonName.opened">
+          <label for="longitude-dropdown">Longitude: </label>
+          <p-dropdown
+            id="longitude-dropdown"
+            class="form-field"
+            [options]="(userDataset.all_variables)"
+            [ngModel]="longitudeName$|async"
+            (ngModelChange)="updateMetadata(lonFieldName, $event, userDataset.id)"
+            [style]="{'width':'6rem', 'height': '2rem'}"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Choose"
+            editable="true"
+            ngDefaultControl>
+          </p-dropdown>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_black_btn': true}"
+            pTooltip="Cancel"
+            (click)="toggle(lonFieldName,false)">
+          </button>
+        </div>
+
+      </div>
+      <div>
+        <span
+          *ngIf="!(editTimeName.opened)"
+          (click)="toggle(timeFiledName, true)"
+          style="cursor: pointer"
+          pTooltip="You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation won't be possible.">
+          Time: <b>{{timeName$|async}} </b>
+          <span class="pi pi-question-circle small-edit-icon"></span>
+        </span>
+        <div *ngIf="editTimeName.opened">
+          <label for="time-dropdown">Time: </label>
+          <p-dropdown
+            id="time-dropdown"
+            class="form-field"
+            [options]="(userDataset.all_variables)"
+            [ngModel]="timeName$|async"
+            (ngModelChange)="updateMetadata(timeFiledName, $event, userDataset.id)"
+            [style]="{'width':'6rem', 'height': '2rem'}"
+            optionLabel="name"
+            optionValue="name"
+            placeholder="Choose"
+            editable="true"
+            ngDefaultControl>
+          </p-dropdown>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-ban"
+            [ngClass]="{'btn-action cancel_black_btn': true}"
+            pTooltip="Cancel"
+            (click)="toggle(timeFiledName,false)">
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <!-- actions   -->
+    <div class="p-col status">
+      <div
+        [pTooltip]="userDataset.is_used_in_validation ? 'Dataset has been used in a validation, it can not be removed' : ''"
+        tooltipPosition="left"
+      >
+        <button pButton
+                icon="pi pi-times"
+                type="button"
+                label="Remove dataset"
+                pTooltip="Remove dataset and the attached file"
+                class="p-button-danger"
+                [disabled]="userDataset.is_used_in_validation"
+                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+                (click)="removeDataset(userDataset.id)">
+        </button>
+      </div>
+    </div>
+  </div>
+
+</p-panel>
+

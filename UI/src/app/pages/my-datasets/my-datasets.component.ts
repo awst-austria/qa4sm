@@ -12,6 +12,7 @@ export class MyDatasetsComponent implements OnInit {
   // userDatasets = [];
   constructor(private userDatasetService: UserDatasetsService) { }
   userDatasets$: Observable<UserDataFileDto[]>;
+  readMore = false;
 
   ngOnInit(): void {
     this.userDatasets$ = this.userDatasetService.getUserDataList();
@@ -20,6 +21,10 @@ export class MyDatasetsComponent implements OnInit {
         this.userDatasets$ = this.userDatasetService.getUserDataList();
       }
     });
+  }
+
+  toggleReadMore(): void{
+    this.readMore = !this.readMore;
   }
 
 }

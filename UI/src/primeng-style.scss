@@ -6232,6 +6232,22 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   transform: scale(1.2);
 }
 
+.cancel_black_btn.p-button, .save_name_black_btn.p-button{
+  color: black;
+  font-size: 1.5rem;
+  background-color: transparent;
+  border-color: transparent;
+  margin-left: 0.1rem;
+  width: 1.5rem;
+}
+
+.cancel_black_btn.p-button:not(.disabled):hover, .save_name_black_btn.p-button:not(.disabled):hover{
+  color: black;
+  background-color: transparent;
+  border-color: transparent;
+  transform: scale(1.2);
+}
+
 .dropdown-item.p-button{
   width: 100%;
   background-color: $dropdown-buttons-background;;
