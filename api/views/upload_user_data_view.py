@@ -32,7 +32,7 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
 def create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user):
     new_version_data = {
         "short_name": version_name,
-        "pretty_name": version_pretty_name if version_pretty_name else version_name,
+        "pretty_name": version_pretty_name,
         "help_text": f'Version {version_pretty_name} of dataset {dataset_pretty_name} provided by user {user}.',
         "time_range_start": None,
         "time_range_end": None,
@@ -50,7 +50,7 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
 def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user, file_entry):
     dataset_data = {
         'short_name': dataset_name,
-        'pretty_name': dataset_pretty_name if dataset_pretty_name else dataset_name,
+        'pretty_name': dataset_pretty_name,
         'help_text': f'Dataset {dataset_pretty_name} provided by user {user}.',
         'storage_path': file_entry.get_raw_file_path,
         'detailed_description': 'Data provided by a user',
@@ -213,7 +213,6 @@ def update_metadata(request, file_uuid):
     field_name = request.data['field_name']
     field_value = request.data['field_value']
     current_variable = file_entry.variable
-    print(request.data)
 
     new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
@@ -235,7 +234,6 @@ def update_metadata(request, file_uuid):
 def post_user_file_metadata(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-
     if serializer.is_valid():
         try:
             xarray_ds = xa.open_dataset(file_entry.file.path)
@@ -257,9 +255,11 @@ def post_user_file_metadata(request, file_uuid):
         xarray_ds.close()
 
         dataset_name = request.data['dataset_name']
-        dataset_pretty_name = request.data['dataset_pretty_name']
+        dataset_pretty_name = request.data['dataset_pretty_name'] if request.data[
+            'dataset_pretty_name'] else dataset_name
         version_name = request.data['version_name']
-        version_pretty_name = request.data['version_pretty_name']
+        version_pretty_name = request.data['version_pretty_name'] if request.data[
+            'version_pretty_name'] else version_name
 
         # creating version entry
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
@@ -273,7 +273,6 @@ def post_user_file_metadata(request, file_uuid):
         new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
                                            file_entry)
         # updating file entry
-        print(metadata_from_file, 'Monika')
         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
                                               metadata_from_file)
 
@@ -349,9 +348,9 @@ class UserFileMetadataSerializer(Serializer):
     # with this serializer I'm checking if the metadata is properly introduced, but the metadata doesn't refer to any
     # particular model, therefore it's not a model serializer
     dataset_name = serializers.CharField(max_length=30, required=True)
-    dataset_pretty_name = serializers.CharField(max_length=30, required=False)
+    dataset_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
     version_name = serializers.CharField(max_length=30, required=True)
-    version_pretty_name = serializers.CharField(max_length=30, required=False)
+    version_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
 
     def create(self, validated_data):
         pass
