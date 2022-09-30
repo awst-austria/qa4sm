@@ -45,6 +45,10 @@ class UserDatasetFile(models.Model):
         configs = DatasetConfiguration.objects.all()
         return self.dataset.id in configs.values_list('dataset', flat=True)
 
+    @property
+    def file_size(self):
+        return self.file.size
+
 
 @receiver(post_delete, sender=UserDatasetFile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

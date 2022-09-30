@@ -1,5 +1,6 @@
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
+from qa4sm_preprocessing.reading import StackImageReader
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import FileUploadParser
@@ -149,7 +150,8 @@ def extract_variable_names(ncDataset):
                 potential_variable_names.append({
                     'name': variable,
                     'standard_name': variable_standard_name if variable_standard_name else variable,
-                    'long_name': variable_long_name if variable_long_name else (variable_standard_name if variable_standard_name else variable)
+                    'long_name': variable_long_name if variable_long_name else (
+                        variable_standard_name if variable_standard_name else variable)
                 })
     if len(potential_variable_names) == 0:
         potential_variable_names = [{'name': 'default_name',
@@ -208,6 +210,7 @@ def delete_user_dataset_and_file(request, dataset_id):
 
     return HttpResponse(status=status.HTTP_200_OK)
 
+
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_metadata(request, file_uuid):
@@ -242,7 +245,7 @@ def update_metadata(request, file_uuid):
 
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
-def post_user_file_metadata(request, file_uuid):
+def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     if serializer.is_valid():
@@ -285,6 +288,19 @@ def post_user_file_metadata(request, file_uuid):
         # updating file entry
         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
                                               metadata_from_file)
+
+        if file_data_updated['status'] == 200:
+            # here the preprocessing is done -> doing it here prevents from permission issues
+            StackImageReader(
+                file_entry.file.path,
+                file_entry.variable.pretty_name,
+                latname=file_entry.lat_name,
+                lonname=file_entry.lon_name,
+                timename=file_entry.time_name
+            ).repurpose(
+                file_entry.get_raw_file_path + "/timeseries",
+                overwrite=False,
+            )
 
         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
     else:
