@@ -222,8 +222,8 @@ def update_metadata(request, file_uuid):
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
     if field_name == 'variable_name':
-        current_variable.short_name = new_item['name']
-        current_variable.pretty_name = new_item['long_name']
+        current_variable.short_name = new_item['long_name']
+        current_variable.pretty_name = new_item['name']
         current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
                                      f'{current_dataset.pretty_name} provided by user {request.user}.'
         current_variable.save()
@@ -276,8 +276,8 @@ def post_user_file_metadata(request, file_uuid):
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
         # creating variable entry
 
-        new_variable = create_variable_entry(metadata_from_file['variable']['name'],
-                                             metadata_from_file['variable']['long_name'],
+        new_variable = create_variable_entry(metadata_from_file['variable']['long_name'],
+                                             metadata_from_file['variable']['name'],
                                              dataset_pretty_name,
                                              request.user)
         # creating dataset entry
