@@ -275,7 +275,6 @@ def post_user_file_metadata(request, file_uuid):
         # creating version entry
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
         # creating variable entry
-
         new_variable = create_variable_entry(metadata_from_file['variable']['long_name'],
                                              metadata_from_file['variable']['name'],
                                              dataset_pretty_name,
