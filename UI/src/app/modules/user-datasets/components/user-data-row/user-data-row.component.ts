@@ -146,4 +146,22 @@ export class UserDataRowComponent implements OnInit {
     editableField.opened = open;
   }
 
+  getTheFileSize(): string{
+    let fileSize;
+    let units;
+    const coeff = Math.pow(10, 6);
+    if (this.userDataset.file_size < coeff){
+      fileSize = this.userDataset.file_size / Math.pow(10, 3);
+      units = 'kB';
+    } else if (this.userDataset.file_size >= coeff && this.userDataset.file_size < coeff * 1000){
+      fileSize = this.userDataset.file_size / coeff;
+      units = 'MB';
+    } else {
+      fileSize = this.userDataset.file_size / Math.pow(10, 9);
+      units = 'GB';
+    }
+
+    return `${Math.round(fileSize * 10) / 10} ${units}`;
+  }
+
 }
