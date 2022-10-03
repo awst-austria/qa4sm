@@ -225,8 +225,8 @@ def update_metadata(request, file_uuid):
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
     if field_name == 'variable_name':
-        current_variable.short_name = new_item['name']
-        current_variable.pretty_name = new_item['long_name']
+        current_variable.short_name = new_item['long_name']
+        current_variable.pretty_name = new_item['name']
         current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
                                      f'{current_dataset.pretty_name} provided by user {request.user}.'
         current_variable.save()
