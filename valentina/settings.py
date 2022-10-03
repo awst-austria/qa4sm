@@ -20,9 +20,9 @@ from valentina.version import APP_VERSION
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # this is a path for uploading user data - for development it has to changed (this directory needs sudo) and migration hase to be applied
-USER_DATA_DIR = '/var/lib/qa4sm-web-val/valentina/data/user_data'
+# USER_DATA_DIR = '/var/lib/qa4sm-web-val/valentina/data/user_data'
 
-# USER_DATA_DIR = os.path.join(BASE_DIR, 'testdata/user_data')
+USER_DATA_DIR = os.path.join(BASE_DIR, 'testdata/user_data')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'output/')
 

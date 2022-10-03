@@ -46,19 +46,19 @@ class TestValidationConfigView(TransactionTestCase):
 
         basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
         good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
-                                          'variable_id': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+                                          'variable_id': DataVariable.objects.get(pretty_name=globals.C3S_sm).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
                                           'basic_filters': [basic_filter_id],
                                           'parametrised_filters': []},
                                          {'dataset_id': Dataset.objects.get(short_name=globals.SMAP_L3).id,
                                           'variable_id': DataVariable.objects.get(
-                                              short_name=globals.SMAP_soil_moisture).id,
+                                              pretty_name=globals.SMAP_soil_moisture).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.SMAP_V6_PM).id,
                                           'basic_filters': [basic_filter_id],
                                           'parametrised_filters': []}],
                      'reference_config': {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
                                           'variable_id': DataVariable.objects.get(
-                                              short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+                                              pretty_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
                                           'version_id': DatasetVersion.objects.get(
                                               short_name=globals.GLDAS_NOAH025_3H_2_1).id,
                                           'basic_filters': [basic_filter_id],
@@ -175,7 +175,7 @@ class TestValidationConfigView(TransactionTestCase):
         assert val_run_dict['reference_config']['version_id'] == \
                DatasetVersion.objects.get(short_name=globals.ISMN_V20180712_MINI).id
         assert val_run_dict['reference_config']['variable_id'] == \
-               DataVariable.objects.get(short_name=globals.ISMN_soil_moisture).id
+               DataVariable.objects.get(pretty_name=globals.ISMN_soil_moisture).id
         assert DataFilter.objects.get(name='FIL_ISMN_GOOD').id in val_run_dict['reference_config']['basic_filters']
 
         param_filters_id = [p_filter.filter_id for p_filter in
@@ -189,7 +189,7 @@ class TestValidationConfigView(TransactionTestCase):
         assert val_run_dict['dataset_configs'][0]['version_id'] == \
                DatasetVersion.objects.get(short_name=globals.C3S_V202012).id
         assert val_run_dict['dataset_configs'][0]['variable_id'] == \
-               DataVariable.objects.get(short_name=globals.C3S_sm).id
+               DataVariable.objects.get(pretty_name=globals.C3S_sm).id
         assert val_run_dict['temporal_matching'] == globals.TEMP_MATCH_WINDOW
         #  applied all existing settings, so there will be no change
         assert 'changes' not in val_run_dict.keys()
@@ -206,19 +206,19 @@ class TestValidationConfigView(TransactionTestCase):
 
         basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
         good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
-                                          'variable_id': DataVariable.objects.get(short_name=globals.C3S_sm).id,
+                                          'variable_id': DataVariable.objects.get(pretty_name=globals.C3S_sm).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
                                           'basic_filters': [basic_filter_id],
                                           'parametrised_filters': []},
                                          {'dataset_id': Dataset.objects.get(short_name=globals.SMAP_L3).id,
                                           'variable_id': DataVariable.objects.get(
-                                              short_name=globals.SMAP_soil_moisture).id,
+                                              pretty_name=globals.SMAP_soil_moisture).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.SMAP_V6_PM).id,
                                           'basic_filters': [basic_filter_id],
                                           'parametrised_filters': []}],
                      'reference_config': {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
                                           'variable_id': DataVariable.objects.get(
-                                              short_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+                                              pretty_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
                                           'version_id': DatasetVersion.objects.get(
                                               short_name=globals.GLDAS_NOAH025_3H_2_1).id,
                                           'basic_filters': [basic_filter_id],

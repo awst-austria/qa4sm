@@ -75,7 +75,7 @@ class TestMailer(TestCase):
         ref_c.validation = run
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
         ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
         ref_c.save()
 
         run.reference_configuration = ref_c

@@ -34,7 +34,7 @@ class TestDatasetVariableView(TestCase):
         # check if they are properly taken based on a variable id given
         response = self.client.get(f'{dataset_variable_url}/1')  # C3S_sm
         assert response.status_code == 200
-        assert response.json()['short_name'] == 'C3S_sm'
+        assert response.json()['pretty_name'] == 'C3S_sm'
 
         response = self.client.get(f'{dataset_variable_url}/100')  # wrong id
         assert response.status_code == 404
