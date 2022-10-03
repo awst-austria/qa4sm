@@ -293,7 +293,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
             # here the preprocessing is done -> doing it here prevents from permission issues
             StackImageReader(
                 file_entry.file.path,
-                file_entry.variable.pretty_name,
+                file_entry.variable.short_name,
                 latname=file_entry.lat_name,
                 lonname=file_entry.lon_name,
                 timename=file_entry.time_name
