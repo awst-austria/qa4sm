@@ -183,7 +183,10 @@ def retrieve_all_variables_from_netcdf(netCDF):
 def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
     serializer = UploadSerializer(list_of_files, many=True)
-    return JsonResponse(serializer.data, status=200, safe=False)
+    if serializer.is_valid():
+        return JsonResponse(serializer.data, status=200, safe=False)
+    else:
+        return JsonResponse(serializer.errors, status=500, safe=False)
 
 
 @api_view(['DELETE'])
