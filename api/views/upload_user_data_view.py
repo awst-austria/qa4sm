@@ -278,8 +278,8 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         # creating version entry
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
         # creating variable entry
-        new_variable = create_variable_entry(metadata_from_file['variable']['long_name'],
-                                             metadata_from_file['variable']['name'],
+        new_variable = create_variable_entry(metadata_from_file['variable']['name'],
+                                             metadata_from_file['variable']['long_name'],
                                              dataset_pretty_name,
                                              request.user)
         # creating dataset entry
@@ -293,7 +293,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
             # here the preprocessing is done -> doing it here prevents from permission issues
             StackImageReader(
                 file_entry.file.path,
-                file_entry.variable.pretty_name,
+                file_entry.variable.short_name,
                 latname=file_entry.lat_name,
                 lonname=file_entry.lon_name,
                 timename=file_entry.time_name

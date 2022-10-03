@@ -79,7 +79,7 @@ CGLS_SCATSAR_SWI1km_V1_0 = 'CGLS_SCATSAR_SWI1km_V1_0'
 SMOSL3_Level3_DESC = 'SMOSL3_v339_DESC'
 SMOSL3_Level3_ASC = 'SMOSL3_v339_ASC'
 
-# dataset data variables
+# dataset data variables PRETTY NAMES
 C3S_sm = 'C3S_sm'
 SMAP_soil_moisture = 'SMAP_soil_moisture'
 SMOS_sm = 'SMOS_sm'

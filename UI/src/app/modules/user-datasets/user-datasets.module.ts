@@ -8,16 +8,14 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {TooltipModule} from 'primeng/tooltip';
 import {DropdownModule} from 'primeng/dropdown';
-import {UserDatasetListComponent} from './components/user-dataset-list/user-dataset-list.component';
 import {UserDataRowComponent} from './components/user-data-row/user-data-row.component';
 import {PanelModule} from 'primeng/panel';
 
 
 @NgModule({
-  declarations: [UserFileUploadComponent, UserDatasetListComponent, UserDataRowComponent],
+  declarations: [UserFileUploadComponent, UserDataRowComponent],
   exports: [
     UserFileUploadComponent,
-    UserDatasetListComponent,
     UserDataRowComponent
   ],
     imports: [
