@@ -14,6 +14,8 @@ from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 import xarray as xa
 
+import logging
+__logger = logging.getLogger(__name__)
 
 def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, max_value=None, min_value=None):
     new_variable_data = {
@@ -181,7 +183,12 @@ def retrieve_all_variables_from_netcdf(netCDF):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
-    list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
+    try:
+        list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
+    except Exception as e:
+        __logger.debug(
+            e
+        )
     serializer = UploadSerializer(list_of_files, many=True)
     if serializer.is_valid():
         return JsonResponse(serializer.data, status=200, safe=False)
