@@ -55,7 +55,6 @@ export class HelpComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void{
     this.activeRoute.params.subscribe(param => {
       if (param.pageSec){
-        console.log(this.container, param.pageSec);
         const section = this.container.nativeElement.querySelector(`#${param.pageSec}`);
         // section?.scrollTo();
         section?.scrollIntoView();
