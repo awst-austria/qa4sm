@@ -183,17 +183,9 @@ def retrieve_all_variables_from_netcdf(netCDF):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
-    try:
-        list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
-    except Exception as e:
-        __logger.debug(
-            e
-        )
+    list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
     serializer = UploadSerializer(list_of_files, many=True)
-    if serializer.is_valid():
-        return JsonResponse(serializer.data, status=200, safe=False)
-    else:
-        return JsonResponse(serializer.errors, status=500, safe=False)
+    return JsonResponse(serializer.data, status=200, safe=False)
 
 
 @api_view(['DELETE'])
