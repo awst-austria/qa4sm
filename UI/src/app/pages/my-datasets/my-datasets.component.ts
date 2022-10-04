@@ -21,6 +21,12 @@ export class MyDatasetsComponent implements OnInit {
         this.userDatasets$ = this.userDatasetService.getUserDataList();
       }
     });
+    this.userDatasets$.subscribe(data => {
+      console.log(data);
+    },
+      error => (errorData) => {
+      console.log(errorData);
+    });
   }
 
   toggleReadMore(): void{
