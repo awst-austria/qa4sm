@@ -2,6 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {UserDatasetsService} from '../../services/user-datasets.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import {BehaviorSubject, Subscription} from 'rxjs';
+import {finalize} from 'rxjs/operators';
+import {HttpEventType} from '@angular/common/http';
 
 
 @Component({
@@ -18,6 +21,9 @@ export class UserFileUploadComponent implements OnInit {
   dialogVisible = false;
   spinnerVisible = false;
   queryNameForFile = 'file';
+
+  uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  uploadSub: Subscription;
   // fileContent: any;
 
   // dataset file form
@@ -121,29 +127,65 @@ export class UserFileUploadComponent implements OnInit {
     if (this.file) {
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
-      this.userDatasetService.userFileUpload(this.name, this.file).subscribe(data => {
-          this.userDatasetService.sendMetadata(this.metadataForm.value, data.id).subscribe(() => {
+      let upload$ = this.userDatasetService.userFileUpload(this.name, this.file)
+        .pipe(finalize(() => this.reset));
+
+      this.uploadSub = upload$.subscribe(event => {
+        if (event.type === HttpEventType.UploadProgress) {
+          this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
+        } else if (event.type === HttpEventType.Response) {
+          this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
               this.userDatasetService.refresh.next(true);
             },
             () => {
               this.spinnerVisible = false;
               this.toastService.showErrorWithHeader('Metadata not saved',
                 'Provided metadata could not be saved. Please try again or contact our team.');
+            },
+            () => {
+              this.spinnerVisible = false;
+              this.userDatasetService.refresh.next(true);
             });
-        },
+        }
+      },
         () => {
           this.spinnerVisible = false;
           this.toastService.showErrorWithHeader('File not saved',
             'File could not be uploaded. Please try again or contact our team.');
-        },
-        () => {
-          this.spinnerVisible = false;
-        });
+        }
+            // () => {
+            //   this.spinnerVisible = false;
+            // }
+        );
+      //   this.userDatasetService.userFileUpload(this.name, this.file).subscribe(data => {
+      //       this.userDatasetService.sendMetadata(this.metadataForm.value, data.id).subscribe(() => {
+      //           this.userDatasetService.refresh.next(true);
+      //         },
+      //         () => {
+      //           this.spinnerVisible = false;
+      //           this.toastService.showErrorWithHeader('Metadata not saved',
+      //             'Provided metadata could not be saved. Please try again or contact our team.');
+      //         });
+      //     },
+      //     () => {
+      //       this.spinnerVisible = false;
+      //       this.toastService.showErrorWithHeader('File not saved',
+      //         'File could not be uploaded. Please try again or contact our team.');
+      //     },
+      //     () => {
+      //       this.spinnerVisible = false;
+      //     });
     }
   }
 
   onSaveData(): void {
     this.dialogVisible = false;
+  }
+
+  reset(): void {
+    this.uploadProgress = null;
+    this.uploadSub = null;
+    // this.userDatasetService.refresh.next(true);
   }
 
   // testFile(): void{
