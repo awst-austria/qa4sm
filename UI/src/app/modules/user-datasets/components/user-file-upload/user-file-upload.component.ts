@@ -24,7 +24,6 @@ export class UserFileUploadComponent implements OnInit {
 
   uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   uploadSub: Subscription;
-  // fileContent: any;
 
   // dataset file form
   metadataForm = this.formBuilder.group({
@@ -32,13 +31,6 @@ export class UserFileUploadComponent implements OnInit {
     dataset_pretty_name: ['', Validators.maxLength(30)],
     version_name: ['', [Validators.required, Validators.maxLength(30)]],
     version_pretty_name: ['', Validators.maxLength(30)],
-    // variable_name: ['', Validators.required], // dropdown
-    // variable_units: ['', Validators.required],
-    // variable_value_range: [''],
-    // dimension_name_source: ['', Validators.required],
-    // dimension_lon_name: ['', Validators.required],
-    // dimension_lat_name: ['', Validators.required],
-    // dimension_time_name: ['', Validators.required],
   });
   formErrors: any;
 
@@ -62,60 +54,7 @@ export class UserFileUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.metadataForm.controls.variable_name.setValue(this.variableOptions[0].query_name);
-    // this.metadataForm.controls.variable_units.setValue(this.unitsOptions[0].query_name);
-    // this.metadataForm.controls.dimension_name_source.setValue(this.dimensionOptions[0].query_name);
-    // this.setDimensionNames(this.queryNameForFile, this.queryNameForFile, this.queryNameForFile);
-
-    // this.metadataForm.get('variable_name').valueChanges.subscribe(() => {
-    //   const varVal = this.metadataForm.controls.variable_name.value;
-    //   if (varVal && varVal !== this.queryNameForFile) {
-    //     this.variableOptions[1].query_name = varVal;
-    //   }
-    // });
-
-    // this.metadataForm.get('variable_units').valueChanges.subscribe(() => {
-    //   const unitsVal = this.metadataForm.controls.variable_units.value;
-    //   if (unitsVal && unitsVal !== this.queryNameForFile) {
-    //     this.unitsOptions[1].query_name = unitsVal;
-    //   }
-    // });
-
-    // this.metadataForm.get('dimension_name_source').valueChanges.subscribe(() => {
-    //   let lonName;
-    //   let latName;
-    //   let timeName;
-    //   const lonVal = this.metadataForm.controls.dimension_lon_name.value;
-    //   const latVal = this.metadataForm.controls.dimension_lat_name.value;
-    //   const timeVal = this.metadataForm.controls.dimension_time_name.value;
-    //
-    //   if (lonVal && lonVal !== this.queryNameForFile) {
-    //     lonName = this.metadataForm.controls.dimension_lon_name.value;
-    //   } else {
-    //     lonName = null;
-    //   }
-    //
-    //   if (latVal && latVal !== this.queryNameForFile) {
-    //     latName = this.metadataForm.controls.dimension_lat_name.value;
-    //   } else {
-    //     latName = null;
-    //   }
-    //
-    //   if (timeVal && timeVal !== this.queryNameForFile) {
-    //     timeName = this.metadataForm.controls.dimension_time_name.value;
-    //   } else {
-    //     timeName = null;
-    //   }
-    //   this.setDimensionNames(lonName, latName, timeName);
-    //
-    // });
   }
-
-  // setDimensionNames(lonName, latName, timeName): void {
-  //   this.metadataForm.controls.dimension_lon_name.setValue(lonName);
-  //   this.metadataForm.controls.dimension_lat_name.setValue(latName);
-  //   this.metadataForm.controls.dimension_time_name.setValue(timeName);
-  // }
 
   onFileSelected(event): void {
     this.file = event.target.files[0];
@@ -136,6 +75,8 @@ export class UserFileUploadComponent implements OnInit {
         } else if (event.type === HttpEventType.Response) {
           this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
               this.userDatasetService.refresh.next(true);
+              this.file = null;
+              this.fileName = null;
             },
             () => {
               this.spinnerVisible = false;
@@ -144,7 +85,7 @@ export class UserFileUploadComponent implements OnInit {
             },
             () => {
               this.spinnerVisible = false;
-              this.userDatasetService.refresh.next(true);
+              // this.userDatasetService.refresh.next(true);
             });
         }
       },
@@ -153,28 +94,7 @@ export class UserFileUploadComponent implements OnInit {
           this.toastService.showErrorWithHeader('File not saved',
             'File could not be uploaded. Please try again or contact our team.');
         }
-            // () => {
-            //   this.spinnerVisible = false;
-            // }
         );
-      //   this.userDatasetService.userFileUpload(this.name, this.file).subscribe(data => {
-      //       this.userDatasetService.sendMetadata(this.metadataForm.value, data.id).subscribe(() => {
-      //           this.userDatasetService.refresh.next(true);
-      //         },
-      //         () => {
-      //           this.spinnerVisible = false;
-      //           this.toastService.showErrorWithHeader('Metadata not saved',
-      //             'Provided metadata could not be saved. Please try again or contact our team.');
-      //         });
-      //     },
-      //     () => {
-      //       this.spinnerVisible = false;
-      //       this.toastService.showErrorWithHeader('File not saved',
-      //         'File could not be uploaded. Please try again or contact our team.');
-      //     },
-      //     () => {
-      //       this.spinnerVisible = false;
-      //     });
     }
   }
 
@@ -187,19 +107,5 @@ export class UserFileUploadComponent implements OnInit {
     this.uploadSub = null;
     // this.userDatasetService.refresh.next(true);
   }
-
-  // testFile(): void{
-  //   const fileReader: FileReader = new FileReader();
-  //   // fileReader.onloadend(() => {
-  //   //
-  //   // } )
-  //   const self = this;
-  //   // tslint:disable-next-line:only-arrow-functions typedef
-  //   fileReader.onloadend = function(x) {
-  //     self.fileContent = fileReader.result;
-  //   };
-  //   fileReader.readAsText(this.file);
-  // }
-
 
 }
