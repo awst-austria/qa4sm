@@ -91,7 +91,7 @@
         style="cursor: pointer"
         pTooltip="You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation won't be possible."
       >
-        Variable: <b>{{(variableName.prettyName$|async)}} ({{variableName.shortName$|async}}) </b>
+        Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}) </b>
         <span class="pi pi-question-circle small-edit-icon"></span>
         </span>
       <div *ngIf="(editVariable.opened)">
@@ -100,7 +100,7 @@
           id="variable-dropdown"
           class="form-field"
           [options]="(userDataset.all_variables)"
-          [ngModel]="(variableName.prettyName$|async)"
+          [ngModel]="(variableName.shortName$|async)"
           (ngModelChange)="updateMetadata(variableFieldName, $event, userDataset.id)"
           [style]="{'width':'6rem', 'height': '2rem'}"
           optionLabel="name"
