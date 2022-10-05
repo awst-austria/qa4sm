@@ -10,10 +10,11 @@ import {TooltipModule} from 'primeng/tooltip';
 import {DropdownModule} from 'primeng/dropdown';
 import {UserDataRowComponent} from './components/user-data-row/user-data-row.component';
 import {PanelModule} from 'primeng/panel';
+import {AllowedNameDirective} from './services/allowed-name.directive';
 
 
 @NgModule({
-  declarations: [UserFileUploadComponent, UserDataRowComponent],
+  declarations: [UserFileUploadComponent, UserDataRowComponent, AllowedNameDirective],
   exports: [
     UserFileUploadComponent,
     UserDataRowComponent

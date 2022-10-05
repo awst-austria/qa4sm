@@ -30,7 +30,7 @@ export class UserDatasetsService {
     const formData = new FormData();
     formData.append(name, file, file.name);
     const uploadUrl = uploadUserDataUrl  + '/' + file.name + '/';
-    return this.httpClient.post(uploadUrl, formData.get(name), {headers, observe: 'body', responseType: 'json'});
+    return this.httpClient.post(uploadUrl, formData.get(name), {headers, reportProgress: true, observe: 'events', responseType: 'json'});
   }
 
   getUserDataList(): Observable<UserDataFileDto[]>{
