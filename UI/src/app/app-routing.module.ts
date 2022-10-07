@@ -48,7 +48,7 @@ const routes: Routes = [
   {path: 'password-reset-done', component: PasswordResetDoneComponent},
   {path: 'password-reset/:token', component: PasswordResetValidateTokenComponent},
   {path: 'set-password', component: SetPasswordComponent},
-  {path: 'my-datasets', component: MyDatasetsComponent},
+  {path: 'my-datasets', component: MyDatasetsComponent, canActivate: [AuthGuard]},
   {path: '**', component: ErrorComponent}
 ];
 
