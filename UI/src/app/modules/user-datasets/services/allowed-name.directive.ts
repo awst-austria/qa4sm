@@ -5,9 +5,12 @@ export function allowedNameValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const chars = /[a-z|A-Z0-9@.+_\-]/i;
     const allowed = [];
-    control.value.split('').forEach(char => {
-      allowed.push(chars.test(char));
-    });
+    if (control.value){
+      control.value.split('').forEach(char => {
+        allowed.push(chars.test(char));
+      });
+    }
+
     return allowed.every(val => val) ? null : {forbiddenName: {value: control.value}};
   };
 }
