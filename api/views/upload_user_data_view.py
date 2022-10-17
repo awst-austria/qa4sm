@@ -74,6 +74,9 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, u
 
 
 def update_file_entry(file_entry, dataset, version, variable, user, metadata_from_file):
+    extension = file_entry.file_name.split('.')[-1]
+    new_file_name = f'{dataset.short_name}-{version.short_name}-{variable.short_name}-{file_entry.upload_date.date()}.{extension}'
+    print(new_file_name, file_entry.upload_date.date())
     # file data
     file_data = {
         'file': file_entry.file,
@@ -253,7 +256,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     if serializer.is_valid():
         try:
-            xarray_ds = xa.open_dataset(file_entry.file.path)
+            xarray_ds = xa.open_dataset(file_entry.file.path, engine='netcdf4')
         except:
             file_entry.delete()
             return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
@@ -316,6 +319,11 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
     file = request.FILES['file']
+    # I don't think it is possible not to meet this condition, but just in case
+    if file.name != filename:
+        return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
+    if filename.split('.')[-1] != 'nc' and filename.split('.')[-1] != 'nc4':
+        return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
 
     file_data = {
         'file': file,
@@ -377,9 +385,9 @@ class UserFileMetadataSerializer(Serializer):
     # with this serializer I'm checking if the metadata is properly introduced, but the metadata doesn't refer to any
     # particular model, therefore it's not a model serializer
     dataset_name = serializers.CharField(max_length=30, required=True)
-    dataset_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    dataset_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True, allow_null=True)
     version_name = serializers.CharField(max_length=30, required=True)
-    version_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    version_pretty_name = serializers.CharField(max_length=30, required=False, allow_blank=True, allow_null=True)
 
     def create(self, validated_data):
         pass
