@@ -21,33 +21,17 @@ export class UserFileUploadComponent implements OnInit {
   // variable to open the form
   dialogVisible = false;
   spinnerVisible = false;
-  queryNameForFile = 'file';
 
   uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   uploadSub: Subscription;
 
   // dataset file form
   metadataForm = this.formBuilder.group({
-    dataset_name: ['', [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
-    dataset_pretty_name: ['', [Validators.maxLength(30), allowedNameValidator()]],
-    version_name: ['', [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
-    version_pretty_name: ['', [Validators.maxLength(30), allowedNameValidator()]],
+    dataset_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
+    dataset_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator()]],
+    version_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
+    version_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator()]],
   });
-  formErrors: any;
-
-  variableOptions = [
-    {name: 'From file', query_name: this.queryNameForFile},
-    {name: 'Provide variable name', query_name: null}
-  ];
-  unitsOptions = [
-    {name: 'From file', query_name: this.queryNameForFile},
-    {name: 'Provide variable units', query_name: null}
-  ];
-
-  dimensionOptions = [
-    {name: 'From file', query_name: this.queryNameForFile},
-    {name: 'Provide dimension names', query_name: 'user'}
-  ];
 
   constructor(private userDatasetService: UserDatasetsService,
               private formBuilder: FormBuilder,
@@ -59,8 +43,10 @@ export class UserFileUploadComponent implements OnInit {
 
   onFileSelected(event): void {
     this.file = event.target.files[0];
-    this.fileName = this.file.name;
+    this.fileName = this.file ? this.file.name : null;
     this.dialogVisible = true;
+    // I need to clean the selected file, otherwise there will be problem with choosing the same file next time
+    event.target.value = null;
   }
 
   sendForm(): void {
@@ -76,8 +62,7 @@ export class UserFileUploadComponent implements OnInit {
         } else if (event.type === HttpEventType.Response) {
           this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
               this.userDatasetService.refresh.next(true);
-              this.file = null;
-              this.fileName = null;
+              this.resetFile();
             },
             () => {
               this.spinnerVisible = false;
@@ -86,7 +71,7 @@ export class UserFileUploadComponent implements OnInit {
             },
             () => {
               this.spinnerVisible = false;
-              // this.userDatasetService.refresh.next(true);
+              this.metadataForm.reset('');
             });
         }
       },
@@ -103,10 +88,14 @@ export class UserFileUploadComponent implements OnInit {
     this.dialogVisible = false;
   }
 
+  resetFile(): void{
+    this.file = null;
+    this.fileName = null;
+  }
+
   reset(): void {
     this.uploadProgress = null;
     this.uploadSub = null;
-    // this.userDatasetService.refresh.next(true);
   }
 
 }
