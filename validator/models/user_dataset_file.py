@@ -38,7 +38,7 @@ class UserDatasetFile(models.Model):
 
     @property
     def get_raw_file_path(self):
-        return self.file.path.rstrip(f'/{self.file_name}')
+        return self.file.path.rstrip(self.file_name)
 
     @property
     def is_used_in_validation(self):
