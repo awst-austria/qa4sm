@@ -6,7 +6,7 @@ import {BehaviorSubject, Subscription} from 'rxjs';
 import {finalize} from 'rxjs/operators';
 import {HttpEventType} from '@angular/common/http';
 import {allowedNameValidator} from '../../services/allowed-name.directive';
-
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -43,7 +43,8 @@ export class UserFileUploadComponent implements OnInit {
 
   onFileSelected(event): void {
     this.file = event.target.files[0];
-    this.fileName = this.file ? this.file.name : null;
+    const fileExtension =  this.file.name.split('.').reverse()[0];
+    this.fileName = `${uuid.v4()}.${fileExtension}`;
     this.dialogVisible = true;
     // I need to clean the selected file, otherwise there will be problem with choosing the same file next time
     event.target.value = null;
@@ -53,7 +54,7 @@ export class UserFileUploadComponent implements OnInit {
     if (this.file) {
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
-      let upload$ = this.userDatasetService.userFileUpload(this.name, this.file)
+      let upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName)
         .pipe(finalize(() => this.reset));
 
       this.uploadSub = upload$.subscribe(event => {

@@ -7,7 +7,7 @@
       <div class="p-col-2 p-sm-2">
         <input type="file" class="file-input"
                (change)="onFileSelected($event)" #fileUpload>
-        <span class="label-button">{{fileName || "No file chosen yet."}}</span>
+        <span class="label-button">{{file ? file.name : "No file chosen yet."}}</span>
       </div>
       <div class="p-col-2 p-sm-1">
         <div class="p-fluid">
@@ -40,7 +40,7 @@
 
     <div class="center p-col-12 p-pb-0 p-pr-4">
       <div class="form-field">
-        {{fileName || "No file chosen yet."}}
+        {{file ? file.name : "No file chosen yet."}}
       </div>
     </div>
 
