@@ -323,7 +323,6 @@ def upload_user_data(request, filename):
         return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
 
     file_data = {
-        'id': filename.split('.')[0],
         'file': file,
         'file_name': filename,
         'owner': request.user.pk,
