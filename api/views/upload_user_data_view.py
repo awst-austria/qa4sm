@@ -74,9 +74,6 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, u
 
 
 def update_file_entry(file_entry, dataset, version, variable, user, metadata_from_file):
-    extension = file_entry.file_name.split('.')[-1]
-    new_file_name = f'{dataset.short_name}-{version.short_name}-{variable.short_name}-{file_entry.upload_date.date()}.{extension}'
-    print(new_file_name, file_entry.upload_date.date())
     # file data
     file_data = {
         'file': file_entry.file,
@@ -326,6 +323,7 @@ def upload_user_data(request, filename):
         return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
 
     file_data = {
+        'id': filename.split('.')[0],
         'file': file,
         'file_name': filename,
         'owner': request.user.pk,
