@@ -31,6 +31,7 @@ ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"
 
 # Expected ping frequency in minutes. !Do not change this unless you fully understand the code that use this property!
 UPTIME_PING_INTERVAL = 5
+USER_DATA_DIR = USER_DATA_DIR
 
 # Default primary key field type can be set here, but only if they solve 'Migrating auto-created through tables' issue
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
