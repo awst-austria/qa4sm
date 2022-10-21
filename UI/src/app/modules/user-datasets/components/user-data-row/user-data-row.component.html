@@ -1,7 +1,7 @@
 <p-panel class="validation-row">
 
   <ng-template pTemplate="header">
-    <h5 class="p-my-0"><span class="font-weight-normal">File: </span> {{ userDataset.file_name}} (size: {{ getTheFileSize() }})</h5>
+    <h5 class="p-my-0"><span class="font-weight-normal">Size: </span> {{ getTheFileSize() }}</h5>
   </ng-template>
   <ng-template pTemplate="icons" class="font-weight-normal">
     <h5 class="p-my-0"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
