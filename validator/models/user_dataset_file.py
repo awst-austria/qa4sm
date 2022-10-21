@@ -1,7 +1,7 @@
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 
-from valentina.settings import USER_DATA_DIR
+from valentina.settings_conf import USER_DATA_DIR
 from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
 from validator.models.dataset import Dataset
