@@ -8,6 +8,7 @@ import {HttpEventType} from '@angular/common/http';
 import {allowedNameValidator} from '../../services/allowed-name.directive';
 import * as uuid from 'uuid';
 
+
 @Component({
   selector: 'qa-user-file-upload',
   templateUrl: './user-file-upload.component.html',

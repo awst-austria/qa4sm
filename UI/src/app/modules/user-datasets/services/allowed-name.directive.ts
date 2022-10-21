@@ -10,7 +10,6 @@ export function allowedNameValidator(): ValidatorFn {
         allowed.push(chars.test(char));
       });
     }
-
     return allowed.every(val => val) ? null : {forbiddenName: {value: control.value}};
   };
 }
