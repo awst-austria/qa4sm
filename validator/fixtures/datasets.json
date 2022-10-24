@@ -98,7 +98,7 @@
             "short_name": "ISMN",
             "pretty_name": "ISMN",
             "help_text": "In-situ soil moisture data from over 2600 monitoring stations worldwide",
-            "storage_path": "testdata/input_data/ISMN",
+            "storage_path": "testdata/input_data/ISMN/",
             "detailed_description": "The ISMN provides in-situ soil moisture data from over 2600 monitoring stations worldwide. The data is harmonised and quality controlled to ensure the highest quality data is provided through the portal. Data is provided from 1952 to present day (<a target=\"_blank\" href=\"https://ismn.geo.tuwien.ac.at/\" rel=\"noreferrer\">more information</a>).",
             "source_reference": "Data is freely available after registration <a target=\"_blank\" href=\"https://ismn.earth/en/\" rel=\"noreferrer\"> here</a>.",
             "citation": "<a target=\"_blank\" href=\"https://ismn.earth/en/terms-and-conditions/\" rel=\"noreferrer\">Terms and conditions</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20180830_Readme.txt\" rel=\"noreferrer\">readme (v20180830)</a>, <a target=\"_blank\" href=\"../../static/files/ISMN_v20190222_Readme.txt\" rel=\"noreferrer\">readme (v20190222)</a>, and <a target=\"_blank\" href=\"../../static/files/ISMN_v20210131_Readme.txt\" rel=\"noreferrer\">readme (v20210131)</a>",
@@ -344,7 +344,7 @@
             "storage_path": "testdata/input_data/CGLS_CSAR_SSM1km",
             "detailed_description": "The Surface Soil Moisture 1 km (SSM1km) data is retrieved from Sentinel-1 radar backscatter images, acquired in Interferometric Wade Swath (IW) mode and VV-polarization.",
             "source_reference": "Data is available <a target=\"_blank\" href=\"https://land.copernicus.eu/global/products/ssm/\"> here</a>.",
-            "citation": "<a target=\"_blank\" href=\"https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_ATBD_SSM1km-V1_I1.20.pdf\">ATBD</a>",
+            "citation": "<a target=\"_blank\" href=\"https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_ATBD_SSM1km-V1_I1.20.pdf\">Algorithm Teoretical Baseline Document (ATBD)</a>",
             "is_only_reference": false,
             "versions": [
                 35
@@ -371,7 +371,7 @@
             "storage_path": "testdata/input_data/CGLS_SCATSAR_SWI1km",
             "detailed_description": "The data are derived using a data fusion approach from microwave radar data observed by the Metop A/B/C ASCAT and the Sentinel 1 A/B CSAR satellite sensors, named SCATSAR (Scatterometer-Synthetic Aperture Radar) algorithm",
             "source_reference": "Data is available <a target=\"_blank\" href=\"https://land.copernicus.eu/global/products/swi/\"> here</a>.",
-            "citation": "<a target=\"_blank\" href=\"https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_ATBD_SWI1km-V1_I1.20.pdf\">ATBD</a>",
+            "citation": "<a target=\"_blank\" href=\"https://land.copernicus.eu/global/sites/cgls.vito.be/files/products/CGLOPS1_ATBD_SWI1km-V1_I1.20.pdf\">Algorithm Teoretical Baseline Document (ATBD)</a>",
             "is_only_reference": false,
             "versions": [
                 36
@@ -396,10 +396,10 @@
             "short_name": "SMOS_L3",
             "pretty_name": "SMOS Level 3",
             "help_text": "Soil Moisture and Ocean Salinity (SMOS) Mission",
-            "storage_path": "testdata/input_data/SMOS_L3",
-            "detailed_description": "Daily global maps of soil moisture retrieved from the ESA L1B product with a multi-orbit approach.",
+            "storage_path": "testdata/input_data/SMOS_L3/",
+            "detailed_description": "Daily global maps of soil moisture retrieved from the ESA L1B SMOS product with a multi-orbit approach.",
             "source_reference": "Data is available <a target=\"_blank\" href=\"https://www.catds.fr/Products/Available-products-from-CPDC/\"> here</a>.",
-            "citation": "<a target=\"_blank\" href=\"https://essd.copernicus.org/articles/9/293/2017/essd-9-293-2017.pdf\">ATBD</a>",
+            "citation": "<a target=\"_blank\" href=\"https://essd.copernicus.org/articles/9/293/2017/essd-9-293-2017.pdf\">Dataset paper</a>",
             "is_only_reference": false,
             "versions": [
                 37,
@@ -420,6 +420,37 @@
                 32,
                 33,
                 34
+            ]
+        }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 15,
+        "fields": {
+            "short_name": "SMOS_L2",
+            "pretty_name": "SMOS Level 2",
+            "help_text": "Soil Moisture and Ocean Salinity (SMOS) Mission",
+            "storage_path": "testdata/input_data/SMOS_L2/",
+            "detailed_description": "Half-orbit soil moisture maps on a ISEA4H9 grid, retrieved from the ESA L1B SMOS product.",
+            "source_reference": "Data is available <a target=\"_blank\" href=\"https://earth.esa.int/eogateway/catalog/smos-science-products/\"> here</a>.",
+            "citation": "<a target=\"_blank\" href=\"https://earth.esa.int/eogateway/documents/20142/37627/SMOS-L2-SM-ATBD.pdf\">Algorithm Teoretical Baseline Document (ATBD)</a>",
+            "is_only_reference": false,
+            "versions": [
+                39
+            ],
+            "variables": [
+                19
+            ],
+            "filters": [
+                1,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42
             ]
         }
     }

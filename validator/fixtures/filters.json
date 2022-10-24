@@ -517,7 +517,7 @@
         "fields": {
             "name": "FIL_SMOSL3_RFI",
             "description": "Set RFI probability threshold",
-            "help_text": "Values affected by single- and multi-orbit Radio Frequency Interference (RFI) probability above the selected threshold will be filtered out. The probability is expressed in fractional units, with allowed range [0.0, 1.0]. NOTE: mandatory filter",
+            "help_text": "Values affected by daily- and 15-daily Radio Frequency Interference (RFI) probability above the selected threshold will be filtered out. The probability is expressed in fractional units, with allowed range [0.0, 1.0]. NOTE: mandatory filter",
             "parameterised": true,
             "dialog_name": null,
             "default_parameter": "0.10",
@@ -525,6 +525,134 @@
             "disable_filter": null,
             "default_set_active": true,
             "readonly": true
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 35,
+        "fields": {
+            "name": "FIL_SMOSL2_CHI2P",
+            "description": "Set retrieval quality threshold",
+            "help_text": "Values characterised by a goodness of fit (Chi² parameter) below the selected threshold will be filtered out. The allowed range is [0.0, 1.0]. NOTE: mandatory filter",
+            "parameterised": true,
+            "dialog_name": null,
+            "default_parameter": "0.05",
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": true,
+            "readonly": true
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 36,
+        "fields": {
+            "name": "FIL_SMOSL2_RFI_high_confidence",
+            "description": "High confidence filtering of RFI",
+            "help_text": "Data affected by high (> 0.1) daily- and 15-daily Radio Frequency Interference (RFI) probability are filtered out",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": false,
+            "readonly": false
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 37,
+        "fields": {
+            "name": "FIL_SMOSL2_RFI_good_confidence",
+            "description": "Good confidence filtering of RFI",
+            "help_text": "Data affected by good (> 0.2) daily- and 15-daily Radio Frequency Interference (RFI) probability are filtered out",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": true,
+            "readonly": true
+        }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 38,
+        "fields": {
+            "name": "FIL_SMOSL2_TOPO_S",
+            "description": "Exclude strong topography in scene",
+            "help_text": "Exclude values flagged due to high strong topography surface type in scene (FL_Topo_S)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": true,
+            "readonly": false
+        }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 39,
+        "fields": {
+            "name": "FIL_SMOSL2_FROST",
+            "description": "Exclude presence of frozen ground in scene",
+            "help_text": "Exclude values flagged due to high fraction of frozen ground surface type in scene (FL_Frost)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": true,
+            "readonly": false
+        }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 40,
+        "fields": {
+            "name": "FIL_SMOSL2_ICE",
+            "description": "Exclude presence of ice in scene",
+            "help_text": "Exclude values flagged due to high fraction of ice surface type (FL_Ice)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": true,
+            "readonly": false
+        }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 41,
+        "fields": {
+            "name": "FIL_SMOSL2_SNOW",
+            "description": "Exclude presence of dry/wet/mixed snow in scene",
+            "help_text": "Exclude values flagged due to high fraction of wet, dry or mixed snow surface type in scene (FL_Snow_Mix, FL_Snow_Wet, FL_Snow_Dry)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": true,
+            "readonly": false
+        }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 42,
+        "fields": {
+            "name": "FIL_SMOSL2_OW",
+            "description": "Exclude open water in scene",
+            "help_text": "Exclude values flagged due to high fraction of open water surface type in scene (FL_OW)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "disable_filter": null,
+            "default_set_active": true,
+            "readonly": false
         }
     }
 ]

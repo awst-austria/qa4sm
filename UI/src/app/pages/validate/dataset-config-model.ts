@@ -6,12 +6,14 @@ import {BehaviorSubject} from 'rxjs';
 export const ISMN_NETWORK_FILTER_ID = 18;
 export const ISMN_DEPTH_FILTER_ID = 24;
 export const SMOS_RFI_FILTER_ID = 34;
+export const SMOS_CHI2_FILTER_ID = 35;
 
 export class DatasetConfigModel {
 
   constructor(public datasetModel: DatasetComponentSelectionModel,
               public basicFilters: FilterModel[],
               public smosRfiFilter$: BehaviorSubject<FilterModel>,
+              public smosChi2Filter$: BehaviorSubject<FilterModel>,
               public ismnNetworkFilter$: BehaviorSubject<FilterModel>,
               public ismnDepthFilter$: BehaviorSubject<FilterModel>,
   ) {
@@ -39,6 +41,10 @@ export class DatasetConfigModel {
 
     if (this.smosRfiFilter$.value != null) {
       parameterisedFilters.push({id: SMOS_RFI_FILTER_ID, parameters: this.smosRfiFilter$.value.parameters$.value});
+    }
+
+    if (this.smosChi2Filter$.value != null) {
+      parameterisedFilters.push({id: SMOS_CHI2_FILTER_ID, parameters: this.smosChi2Filter$.value.parameters$.value});
     }
 
     return {
