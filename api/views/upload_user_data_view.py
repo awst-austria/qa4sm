@@ -15,7 +15,9 @@ from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Data
 import xarray as xa
 
 import logging
+
 __logger = logging.getLogger(__name__)
+
 
 def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, max_value=None, min_value=None):
     new_variable_data = {
@@ -186,7 +188,6 @@ def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
     serializer = UploadSerializer(list_of_files, many=True)
     return JsonResponse(serializer.data, status=200, safe=False)
-
 
 
 @api_view(['DELETE'])
