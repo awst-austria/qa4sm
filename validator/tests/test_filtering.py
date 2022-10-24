@@ -49,6 +49,7 @@ class TestValidation(TestCase):
             config.save()
 
         self.rfi_theshold = 0.01  # needs to be low as testdata have low values
+        self.chi2_theshold = 0.05  # needs to be low as testdata have low values
         pfilter = ParametrisedFilter(
             filter=DataFilter.objects.get(name="FIL_SMOSL3_RFI"),
             parameters=self.rfi_theshold,
@@ -57,11 +58,10 @@ class TestValidation(TestCase):
         pfilter.save()
         pfilter = ParametrisedFilter(
             filter=DataFilter.objects.get(name="FIL_SMOSL2_CHI2P"),
-            parameters='Chi_2',
+            parameters=self.chi2_theshold,
             dataset_config=self.smos_config
         )
         pfilter.save()
-
 
         self.smos_reader = create_reader(
             self.smos_config.dataset,
@@ -93,6 +93,7 @@ class TestValidation(TestCase):
         f_list_should = [
             ('Rfi_Prob', '<=', self.rfi_theshold),
             ('Ratio_RFI', '<=', self.rfi_theshold),
+            ('Chi_2', '>=', self.chi2_theshold),
             ('Soil_Moisture', '>=', 0.0),
             ('Soil_Moisture', '<=', 1.0),
             ('Science_Flags', check_normalized_bits_array, [[24], [25]])
