@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -9,7 +10,7 @@ from validator.models import DataFilter, DataVariable
 from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter
 
 from validator.models import ParametrisedFilter
-from validator.tests.auxiliary_functions import generate_default_validation_smos
+from validator.tests.auxiliary_functions import generate_default_validation_smos, generate_default_validation_smos_l2
 
 from validator.validation.filters import setup_filtering, get_used_variables, check_normalized_bits_array
 from validator.validation.readers import create_reader
@@ -127,6 +128,71 @@ class TestValidation(TestCase):
         # assert one gets filtered, the other doesn't
         assert (df_filtered == "0").all() \
                and not (df_unfiltered == "0").all()
+
+    def test_reading_ColumnCombineAdapter(self) -> None:
+        # test that the pytesmo.validation_framework.adapters.ColumnCombineAdapter
+        # works properly for SMOS L2
+        self.run = generate_default_validation_smos_l2()
+        self.user_data = {
+            'username': 'testuser',
+            'password': 'secret',
+            'email': 'noreply@awst.at'
+        }
+
+        try:
+            self.testuser = User.objects.get(username=self.user_data['username'])
+        except User.DoesNotExist:
+            self.testuser = User.objects.create_user(**self.user_data)
+
+        self.run.user = self.testuser
+        for config in self.run.dataset_configurations.all():
+            if config == self.run.reference_configuration:
+                config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                self.smos_config = config
+                config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.filters.add(DataFilter.objects.get(name='FIL_SMOSL2_RFI_high_confidence'))
+
+            config.save()
+
+        self.smos_reader = create_reader(
+            self.smos_config.dataset,
+            self.smos_config.version
+        )
+
+        # Create a custom DataFrame to test the functions
+        # take real data
+        data = self.smos_reader.read(9129961)
+
+        def _read():
+            return data
+
+        setattr(self.smos_reader, "read", _read)
+
+        self.filtered_reader, self.read_name, self.read_kwargs = setup_filtering(
+            self.smos_reader,
+            self.smos_config.filters.all(),
+            ParametrisedFilter.objects.filter(dataset_config_id=self.smos_config.id),
+            self.smos_config.version,
+            self.smos_config.variable,
+        )
+
+        filtered = self.filtered_reader.read()
+
+        # Check that the 'COMBINED_RFI' field has been created
+        columns_should = ['Soil_Moisture', 'Soil_Moisture_DQX', 'Chi_2', 'RFI_Prob',
+                          'Science_Flags', 'Days', 'Seconds', 'N_RFI_X', 'N_RFI_Y',
+                          'M_AVA0', 'Processing_Flags', 'Confidence_Flags', 'COMBINED_RFI']
+        data_should = [[0.366221, 0.071858, 19.7451, 0.02, 542114818.0, 3.291840e+17,
+                       57914.0, 5.0, 2.0, 78.0, 4.0, 128.0, 0.089744]]
+        index_should = [pd.datetime(2010, 6, 7, 15, 18, 27)]
+
+        filtered_should = pd.DataFrame(data=data_should, index=index_should, columns=columns_should)
+
+        # check 'COMBINED_RFI' formula COMBINED_RFI = (N_RFI_X + N_RFI_Y) / M_AVA0
+        np.testing.assert_array_equal(filtered['COMBINED_RFI'].values,
+                                       ((filtered['N_RFI_X'] + filtered['N_RFI_Y']) / filtered['M_AVA0']).values)
+        pd.testing.assert_frame_equal(filtered, filtered_should)
 
     def test_get_used_variables(self) -> None:
         # provide a few filters to test
