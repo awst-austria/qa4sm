@@ -56,7 +56,7 @@ class TestValidation(TestCase):
         pfilter.save()
         pfilter = ParametrisedFilter(
             filter=DataFilter.objects.get(name="FIL_SMOSL2_CHI2P"),
-            parameters=self.rfi_theshold,
+            parameters='Chi_2',
             dataset_config=self.smos_config
         )
         pfilter.save()
