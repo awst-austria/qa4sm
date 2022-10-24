@@ -7,6 +7,7 @@ from django.conf import settings
 import shutil
 from pathlib import Path
 
+
 def _create_test_file(path):
     test_file = open(path, 'w')
     test_file.write('some test content of a no netcdf file\n')
@@ -37,6 +38,37 @@ class TestUploadUserDataView(APITestCase):
 
         self.upload_data_url_name = 'Upload user data'
         self.post_metadata_url_name = 'Post User Data File Metadata'
+        self.get_user_data_list_name = "Get User Data Files"
+
+    def test_get_list_of_user_data_files(self):
+        # post the same file 3 times, to create 3 different entries
+        self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
+                         {'file': self.netcdf_file}, format='multipart')
+        self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
+                         {'file': self.netcdf_file}, format='multipart')
+        self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
+                         {'file': self.netcdf_file}, format='multipart')
+
+        response = self.client.get(reverse(self.get_user_data_list_name))
+        existing_files = response.json()
+        assert response.status_code == 200
+        assert len(existing_files) == 3
+
+        # log out and log in as another user
+        self.client.logout()
+        self.client.login(**self.second_user_data)
+
+        # there should be no files available
+        response = self.client.get(reverse(self.get_user_data_list_name))
+        existing_files = response.json()
+        assert response.status_code == 200
+        assert len(existing_files) == 0
+
+        self.client.logout()
+        self.client.login(**self.auth_data)
+        assert len(os.listdir(self.test_user_data_path)) == 3
+
+
 
     def test_upload_user_data_correct(self):
         response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
@@ -82,17 +114,17 @@ class TestUploadUserDataView(APITestCase):
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     def test_upload_user_data_with_wrong_name(self):
-            file_to_upload = _create_test_file(self.not_netcdf_file)
-            response = self.client.post(
-                reverse(self.upload_data_url_name, kwargs={'filename': 'wrong_name'}),
-                {'file': file_to_upload}, format='multipart')
-            # assert False
-            assert response.status_code == 500
+        file_to_upload = _create_test_file(self.not_netcdf_file)
+        response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={'filename': 'wrong_name'}),
+            {'file': file_to_upload}, format='multipart')
+        # assert False
+        assert response.status_code == 500
 
-            # checking if nothing got to the db and to the data path
-            existing_files = UserDatasetFile.objects.all()
-            assert len(existing_files) == 0
-            assert len(os.listdir(self.test_user_data_path)) == 0
+        # checking if nothing got to the db and to the data path
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 0
+        assert len(os.listdir(self.test_user_data_path)) == 0
 
     def test_post_user_file_metadata_and_preprocess_file(self):
         # I am posting the file to create the proper dataset entry
