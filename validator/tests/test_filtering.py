@@ -54,6 +54,13 @@ class TestValidation(TestCase):
             dataset_config=self.smos_config
         )
         pfilter.save()
+        pfilter = ParametrisedFilter(
+            filter=DataFilter.objects.get(name="FIL_SMOSL2_CHI2P"),
+            parameters=self.rfi_theshold,
+            dataset_config=self.smos_config
+        )
+        pfilter.save()
+
 
         self.smos_reader = create_reader(
             self.smos_config.dataset,
@@ -141,7 +148,6 @@ class TestValidation(TestCase):
             ("FIL_SMOSL2_CHI2P", "SMOSL2_sm", "Chi_2", ParametrisedFilter),
             ("FIL_SMOSL2_OW", "SMOSL2_sm", "Science_Flags", DataFilter)
         ]
-
         for filtername, sm_variable, filter_variable_should, model in tested_data:
             try:
                 filters = [model.objects.get(name=filtername), ]
