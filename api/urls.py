@@ -111,7 +111,7 @@ urlpatterns = [
     path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
     path('upload-user-data/<str:filename>/', upload_user_data, name='Upload user data'),
     path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
-    path('delete-user-dataset/<str:dataset_id>/', delete_user_dataset_and_file, name='Delete User Data Files'),
+    path('delete-user-datafile/<str:file_uuid>/', delete_user_dataset_and_file, name='Delete User Data File'),
     path('user-file-metadata/<uuid:file_uuid>/', post_user_file_metadata_and_preprocess_file,
          name='Post User Data File Metadata'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),

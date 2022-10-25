@@ -197,8 +197,8 @@ def get_list_of_user_data_files(request):
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_user_dataset_and_file(request, dataset_id):
-    file_entry = get_object_or_404(UserDatasetFile, pk=dataset_id)
+def delete_user_dataset_and_file(request, file_uuid):
+    file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
 
     if file_entry.owner != request.user:
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
