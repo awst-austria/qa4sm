@@ -187,7 +187,12 @@ def retrieve_all_variables_from_netcdf(netCDF):
 def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
     serializer = UploadSerializer(list_of_files, many=True)
-    return JsonResponse(serializer.data, status=200, safe=False)
+    try:
+        return JsonResponse(serializer.data, status=200, safe=False)
+    except:
+        # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
+        # with proper path bound
+        return JsonResponse({'message': 'We could not return the list of your datafiles'}, status=500)
 
 
 @api_view(['DELETE'])
