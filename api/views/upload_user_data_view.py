@@ -203,17 +203,21 @@ def delete_user_dataset_and_file(request, file_uuid):
     if file_entry.owner != request.user:
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
-    dataset = get_object_or_404(Dataset, id=file_entry.dataset.id)
-    version = get_object_or_404(DatasetVersion, id=file_entry.version.id)
-    variable = get_object_or_404(DataVariable, id=file_entry.variable.id)
+    print(file_entry.dataset)
+    if file_entry.dataset:
+        dataset = get_object_or_404(Dataset, id=file_entry.dataset.id)
+        dataset.variables.clear()
+        dataset.versions.clear()
+        dataset.filters.clear()
+        dataset.delete()
 
-    dataset.variables.clear()
-    dataset.versions.clear()
-    dataset.filters.clear()
+    if file_entry.version:
+        version = get_object_or_404(DatasetVersion, id=file_entry.version.id)
+        version.delete()
 
-    dataset.delete()
-    version.delete()
-    variable.delete()
+    if file_entry.variable:
+        variable = get_object_or_404(DataVariable, id=file_entry.variable.id)
+        variable.delete()
 
     file_entry.delete()
 
