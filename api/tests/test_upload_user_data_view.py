@@ -10,7 +10,7 @@ from pathlib import Path
 
 def _create_test_file(path):
     test_file = open(path, 'w')
-    test_file.write('some test content of a no netcdf file\n')
+    test_file.write('some test content of a not netcdf file\n')
     test_file.close()
     test_file = open(path, 'rb')
     return test_file
@@ -23,6 +23,19 @@ def _clean_up_data(file_entry):
     file_entry.delete()
     assert not os.path.exists(outdir)
 
+
+def _update_file_entry(file_entry):
+    new_dataset = Dataset()
+    new_dataset.save()
+    new_version = DatasetVersion()
+    new_version.save()
+    new_variable = DataVariable()
+    new_variable.save()
+
+    file_entry.dataset = new_dataset
+    file_entry.version = new_version
+    file_entry.variable = new_variable
+    file_entry.save()
 
 class TestUploadUserDataView(APITestCase):
     __logger = logging.getLogger(__name__)
@@ -47,6 +60,7 @@ class TestUploadUserDataView(APITestCase):
         self.post_metadata_url_name = 'Post User Data File Metadata'
         self.get_user_data_url_list_name = "Get User Data Files"
         self.delete_data_url_name = 'Delete User Data File'
+        self.update_metadata_url_name = 'Update metadata'
 
     def _remove_user_datafiles(self, username):
         user_data_path = f'{self.user_data_path}/{username}'
@@ -100,18 +114,7 @@ class TestUploadUserDataView(APITestCase):
         file_entry_id = post_response.json()['id']
         file_entry = UserDatasetFile.objects.get(pk=file_entry_id)
 
-        # setting some fake ids to check if it returns 404
-        new_dataset = Dataset()
-        new_dataset.save()
-        new_version = DatasetVersion()
-        new_version.save()
-        new_variable = DataVariable()
-        new_variable.save()
-
-        file_entry.dataset = new_dataset
-        file_entry.version = new_version
-        file_entry.variable = new_variable
-        file_entry.save()
+        _update_file_entry(file_entry)
 
         assert len(Dataset.objects.all()) == 1
         assert len(DatasetVersion.objects.all()) == 1
@@ -249,3 +252,17 @@ class TestUploadUserDataView(APITestCase):
         assert len(os.listdir(timeseries_dir)) != 0
 
         file_entry.delete()
+
+    def test_update_metadata(self):
+        file_post_response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
+                                    {'file': self.netcdf_file}, format='multipart')
+        assert file_post_response.status_code == 200
+        file_id = file_post_response.json()['id']
+        file_entry = UserDatasetFile.objects.get(pk=file_id)
+        _update_file_entry(file_entry)
+
+        # update variable name
+        response = self.client.put(reverse(self.upload_data_url_name, kwargs={'file_uuid': file_id}),
+                                    {'field_name': 'variable_name', 'field_value': 'soil_moisture'})
+        assert response.status_code == 200
+
