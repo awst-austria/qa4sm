@@ -16,6 +16,14 @@ def _create_test_file(path):
     return test_file
 
 
+def _clean_up_data(file_entry):
+    datafile = file_entry.file.path
+    outdir = os.path.dirname(datafile)
+    assert os.path.isfile(datafile)
+    file_entry.delete()
+    assert not os.path.exists(outdir)
+
+
 class TestUploadUserDataView(APITestCase):
     __logger = logging.getLogger(__name__)
     fixtures = ['datasets', 'filters', 'versions', 'variables']
@@ -40,6 +48,10 @@ class TestUploadUserDataView(APITestCase):
         self.post_metadata_url_name = 'Post User Data File Metadata'
         self.get_user_data_list_name = "Get User Data Files"
 
+    def _remove_user_datafiles(self, username):
+        user_data_path = f'{self.user_data_path}/{username}'
+        shutil.rmtree(user_data_path)
+
     def test_get_list_of_user_data_files(self):
         # post the same file 3 times, to create 3 different entries
         self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
@@ -51,6 +63,7 @@ class TestUploadUserDataView(APITestCase):
 
         response = self.client.get(reverse(self.get_user_data_list_name))
         existing_files = response.json()
+
         assert response.status_code == 200
         assert len(existing_files) == 3
 
@@ -67,8 +80,19 @@ class TestUploadUserDataView(APITestCase):
         self.client.logout()
         self.client.login(**self.auth_data)
         assert len(os.listdir(self.test_user_data_path)) == 3
+        self._remove_user_datafiles(self.test_user)
+        assert not os.path.exists(self.test_user_data_path)
+
+        # there are no files, so there will be an error returned;
+        response = self.client.get(reverse(self.get_user_data_list_name))
+        assert response.status_code == 500
 
 
+        # cleaning
+        for entry in UserDatasetFile.objects.all():
+            entry.delete()
+
+        assert len(UserDatasetFile.objects.all()) == 0
 
     def test_upload_user_data_correct(self):
         response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
