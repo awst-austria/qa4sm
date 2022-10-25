@@ -43,6 +43,12 @@
                 [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
               </qa-threshold-filter>
 
+              <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
+                                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                   [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
+                                   [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
+            </qa-threshold-filter>
+
               <div style="width: 100%;text-align: right">
                 <button pButton type="button"
                         [disabled]="validationModel.datasetConfigurations.length < 2"
@@ -102,6 +108,12 @@
                [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
                [filterModel$]="validationModel.referenceConfigurations[0].smosRfiFilter$"
                [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">>
+            </qa-threshold-filter>
+
+            <qa-threshold-filter *ngIf="validationModel.referenceConfigurations[0].smosChi2Filter$|async"
+                                 [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
+                                 [filterModel$]="validationModel.referenceConfigurations[0].smosChi2Filter$"
+                                 [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">>
             </qa-threshold-filter>
 
             <div *ngIf="validationModel.referenceConfigurations[0].ismnNetworkFilter$|async">

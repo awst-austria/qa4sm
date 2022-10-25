@@ -357,5 +357,17 @@
             "time_range_end": "2022-05-07",
             "geographical_range": null
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 39,
+        "fields": {
+            "short_name": "SMOSL2_v700",
+            "pretty_name": "v700",
+            "help_text": "SMOS L2-SM (ESA)",
+            "time_range_start": "2010-07-01",
+            "time_range_end": "2022-06-04",
+            "geographical_range": null
+        }
     }
 ]

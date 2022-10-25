@@ -4,7 +4,7 @@ from typing import List, Union
 import numpy as np
 import pandas as pd
 
-from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter, BasicAdapter
+from pytesmo.validation_framework.adapters import AdvancedMaskingAdapter, BasicAdapter, ColumnCombineAdapter
 from ismn.interface import ISMN_Interface
 from re import sub as regex_sub
 
@@ -191,12 +191,36 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('Science_Flags')
                 continue
 
+            if fil.name in (
+                    "FIL_SMOSL2_OW",
+                    "FIL_SMOSL2_SNOW",
+                    "FIL_SMOSL2_ICE",
+                    "FIL_SMOSL2_FROST",
+                    "FIL_SMOSL2_TOPO_S",
+            ):
+                variables.append('Science_Flags')
+                continue
+
+            if fil.name in (
+                "FIL_SMOSL2_RFI_high_confidence",
+                "FIL_SMOSL2_RFI_good_confidence",
+            ):
+                variables.append('RFI_Prob')
+                variables.append('N_RFI_X')
+                variables.append('N_RFI_Y')
+                variables.append('M_AVA0')
+                continue
+
     # meaning these are parametrized filters
     except AttributeError:
         for fil in filters:
             if fil.filter.name == "FIL_SMOSL3_RFI":
                 variables.append('Rfi_Prob')
                 variables.append('Ratio_RFI')
+                continue
+
+            if fil.filter.name == "FIL_SMOSL2_CHI2P":
+                variables.append('Chi_2')
                 continue
 
     return variables
@@ -234,6 +258,11 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
             masking_filters.append(('Rfi_Prob', '<=', float(param)))
             masking_filters.append(('Ratio_RFI', '<=', float(param)))
+            continue
+
+        if pfil.filter.name == "FIL_SMOSL2_CHI2P":
+            param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
+            masking_filters.append(('Chi_2', '>=', float(param)))
             continue
 
         inner_reader = filtered_reader
@@ -315,8 +344,42 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             masking_filters.append(('Quality_Flag', '==', 0))
             continue
 
+        if fil.name == "FIL_SMOSL2_RFI_good_confidence":
+            def comb_rfi(row):
+                # 'COMBINED_RFI' is created using the formula:
+                # (N_RFI_X + N_RFI_Y) / M_AVA0 and the class
+                # pytesmo.validation_framework.adapters.ColumnCombineAdapter
+                return (row['N_RFI_X'] + row['N_RFI_Y']) / row['M_AVA0']
+
+            filtered_reader = ColumnCombineAdapter(filtered_reader,
+                                                   comb_rfi,
+                                                   func_kwargs={'axis': 1},
+                                                   columns=['N_RFI_X', 'N_RFI_Y', 'M_AVA0'],
+                                                   new_name="COMBINED_RFI")
+
+            masking_filters.append(('COMBINED_RFI', '<=', 0.2))
+            masking_filters.append(('RFI_Prob', '<=', 0.2))
+            continue
+
+        if fil.name == "FIL_SMOSL2_RFI_high_confidence":
+            def comb_rfi(row):
+                # 'COMBINED_RFI' is created using the formula:
+                # (N_RFI_X + N_RFI_Y) / M_AVA0 and the class
+                # pytesmo.validation_framework.adapters.ColumnCombineAdapter
+                return (row['N_RFI_X'] + row['N_RFI_Y']) / row['M_AVA0']
+
+            filtered_reader = ColumnCombineAdapter(filtered_reader,
+                                                   comb_rfi,
+                                                   func_kwargs={'axis': 1},
+                                                   columns=['N_RFI_X', 'N_RFI_Y', 'M_AVA0'],
+                                                   new_name="COMBINED_RFI")
+
+            masking_filters.append(('COMBINED_RFI', '<=', 0.1))
+            masking_filters.append(('RFI_Prob', '<=', 0.1))
+            continue
+
         # The BIT-based flagging needs to correspond between the bit index value of the dataset
-        # and that give here. In the following, bit index values to be flagged (i.e. the third
+        # and that given here. In the following, bit index values to be flagged (i.e. the third
         # value passed in the tuples) are 0-based indexed, e.g.:
         # 0b00010 -> [[1]]
         # 0b01010 -> [[1], [3]]
@@ -376,6 +439,26 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
         if fil.name == "FIL_SMOSL3_TAU_FO":
             masking_filters.append(('Science_Flags', check_normalized_bits_array, [[27]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_OW":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[5]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_SNOW":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[7], [8], [6]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_ICE":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[12]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_FROST":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[11]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_TOPO_S":
+            masking_filters.append(('Science_Flags', check_normalized_bits_array, [[3]]))
             continue
 
         # snow depth in the nc file yet, this is the preliminary one.
