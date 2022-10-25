@@ -7,7 +7,7 @@ import {UserDataFileDto} from './user-data-file.dto';
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
 const userDataListUrl: string = urlPrefix + '/get-list-of-user-data-files';
-const userDataDeleteUrl: string = urlPrefix + '/delete-user-dataset';
+const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
 const userDataMetadataUrl: string = urlPrefix + '/user-file-metadata';
 const userDataTestUrl: string = urlPrefix + '/test-user-dataset';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
