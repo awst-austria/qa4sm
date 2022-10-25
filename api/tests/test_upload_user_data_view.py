@@ -26,7 +26,6 @@ def _clean_up_data(file_entry):
 
 class TestUploadUserDataView(APITestCase):
     __logger = logging.getLogger(__name__)
-    fixtures = ['datasets', 'filters', 'versions', 'variables']
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()
@@ -46,7 +45,8 @@ class TestUploadUserDataView(APITestCase):
 
         self.upload_data_url_name = 'Upload user data'
         self.post_metadata_url_name = 'Post User Data File Metadata'
-        self.get_user_data_list_name = "Get User Data Files"
+        self.get_user_data_url_list_name = "Get User Data Files"
+        self.delete_data_url_name = 'Delete User Data File'
 
     def _remove_user_datafiles(self, username):
         user_data_path = f'{self.user_data_path}/{username}'
@@ -61,7 +61,7 @@ class TestUploadUserDataView(APITestCase):
         self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
                          {'file': self.netcdf_file}, format='multipart')
 
-        response = self.client.get(reverse(self.get_user_data_list_name))
+        response = self.client.get(reverse(self.get_user_data_url_list_name))
         existing_files = response.json()
 
         assert response.status_code == 200
@@ -72,7 +72,7 @@ class TestUploadUserDataView(APITestCase):
         self.client.login(**self.second_user_data)
 
         # there should be no files available
-        response = self.client.get(reverse(self.get_user_data_list_name))
+        response = self.client.get(reverse(self.get_user_data_url_list_name))
         existing_files = response.json()
         assert response.status_code == 200
         assert len(existing_files) == 0
@@ -84,15 +84,66 @@ class TestUploadUserDataView(APITestCase):
         assert not os.path.exists(self.test_user_data_path)
 
         # there are no files, so there will be an error returned;
-        response = self.client.get(reverse(self.get_user_data_list_name))
+        response = self.client.get(reverse(self.get_user_data_url_list_name))
         assert response.status_code == 500
-
 
         # cleaning
         for entry in UserDatasetFile.objects.all():
             entry.delete()
 
         assert len(UserDatasetFile.objects.all()) == 0
+
+    def test_delete_user_dataset_and_file(self):
+        # posting a file to be removed
+        post_response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
+                                         {'file': self.netcdf_file}, format='multipart')
+        file_entry_id = post_response.json()['id']
+        file_entry = UserDatasetFile.objects.get(pk=file_entry_id)
+
+        # setting some fake ids to check if it returns 404
+        new_dataset = Dataset()
+        new_dataset.save()
+        new_version = DatasetVersion()
+        new_version.save()
+        new_variable = DataVariable()
+        new_variable.save()
+
+        file_entry.dataset = new_dataset
+        file_entry.version = new_version
+        file_entry.variable = new_variable
+        file_entry.save()
+
+        assert len(Dataset.objects.all()) == 1
+        assert len(DatasetVersion.objects.all()) == 1
+        assert len(DataVariable.objects.all()) == 1
+        assert len(UserDatasetFile.objects.all()) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 1
+
+        # checking if another user can remove it:
+        self.client.logout()
+        self.client.login(**self.second_user_data)
+        delete_response = self.client.delete(
+            reverse(self.delete_data_url_name, kwargs={'file_uuid': file_entry_id}))
+
+        assert delete_response.status_code == 403
+        # nothing happened, as the user has no credentials
+        assert len(Dataset.objects.all()) == 1
+        assert len(DatasetVersion.objects.all()) == 1
+        assert len(DataVariable.objects.all()) == 1
+        assert len(UserDatasetFile.objects.all()) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 1
+
+        # loging in as the proper user:
+        self.client.login(**self.auth_data)
+        delete_response = self.client.delete(
+            reverse(self.delete_data_url_name, kwargs={'file_uuid': file_entry_id}))
+
+        assert delete_response.status_code == 200
+        assert len(Dataset.objects.all()) == 0
+        assert len(DatasetVersion.objects.all()) == 0
+        assert len(DataVariable.objects.all()) == 0
+        assert len(UserDatasetFile.objects.all()) == 0
+        assert len(os.listdir(self.test_user_data_path)) == 0
 
     def test_upload_user_data_correct(self):
         response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
