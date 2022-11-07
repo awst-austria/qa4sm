@@ -64,7 +64,7 @@ class TestValidation(TestCase):
         # take real data
         data = self.smos_reader.read(542803)
         data["Soil_Moisture"] = data.apply(
-            lambda row: np.random.uniform(0, 1) if ~np.isnan(row["Rfi_Prob"]) else np.nan, axis=1
+            lambda row: np.random.uniform(0, 1) if ~np.isnan(row["Ratio_RFI"]) else np.nan, axis=1
         )
 
         def _read():
@@ -83,7 +83,6 @@ class TestValidation(TestCase):
     def test_setup_filtering(self) -> None:
         # check that the function outputs the correct objects
         f_list_should = [
-            ('Rfi_Prob', '<=', self.rfi_theshold),
             ('Ratio_RFI', '<=', self.rfi_theshold),
             ('Soil_Moisture', '>=', 0.0),
             ('Soil_Moisture', '<=', 1.0),
@@ -108,9 +107,9 @@ class TestValidation(TestCase):
             'Ratio_RFI',
             'Optical_Thickness_Nad'
         ]
-        assert self.smos_reader.read().Rfi_Prob.count() > out_data.Rfi_Prob.count()
+        assert self.smos_reader.read().Ratio_RFI.count() > out_data.Ratio_RFI.count()
         # assert Rfi threshold works
-        assert (out_data.Rfi_Prob.values < self.rfi_theshold).all()
+        assert (out_data.Ratio_RFI.values < self.rfi_theshold).all()
 
         # assert the bit function works on data
         def return_index(x, ind):
@@ -136,7 +135,7 @@ class TestValidation(TestCase):
             ("FIL_ASCAT_METOP_A", "ASCAT_sm", "sat_id", DataFilter),
             ("FIL_ERA5_TEMP_UNFROZEN", "ERA5_sm", "stl1", DataFilter),
             ("FIL_SMOSL3_STRONG_TOPO_MANDATORY", "SMOSL3_sm", "Science_Flags", DataFilter),
-            ("FIL_SMOSL3_RFI", "SMOSL3_sm", ["Rfi_Prob", "Ratio_RFI"], ParametrisedFilter),
+            ("FIL_SMOSL3_RFI", "SMOSL3_sm", "Ratio_RFI", ParametrisedFilter),
         ]
 
         for filtername, sm_variable, filter_variable_should, model in tested_data:
