@@ -6,7 +6,10 @@ from validator.models import UserDatasetFile, DataVariable
 from django.conf import settings
 import shutil
 from pathlib import Path
+from api.variable_and_field_names import *
 
+FILE = 'file'
+FORMAT_MULTIPART = 'multipart'
 
 def _create_test_file(path):
     test_file = open(path, 'w')
@@ -39,6 +42,7 @@ def _update_file_entry(file_entry):
         {'name': 'soil_moisture', 'long_name': 'Soil Moisture'},
         {'name': 'lat', 'long_name': 'Latitude'},
         {'name': 'lon', 'long_name': 'Longitude'},
+        {'name': 'time', 'long_name': ''},
         {'name': 'none', 'long_name': 'Some weird variable'}
     ]
     file_entry.save()
@@ -75,12 +79,12 @@ class TestUploadUserDataView(APITestCase):
 
     def test_get_list_of_user_data_files(self):
         # post the same file 3 times, to create 3 different entries
-        self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-                         {'file': self.netcdf_file}, format='multipart')
-        self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-                         {'file': self.netcdf_file}, format='multipart')
-        self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-                         {'file': self.netcdf_file}, format='multipart')
+        self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+        self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+        self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
 
         response = self.client.get(reverse(self.get_user_data_url_list_name))
         existing_files = response.json()
@@ -116,8 +120,9 @@ class TestUploadUserDataView(APITestCase):
 
     def test_delete_user_dataset_and_file(self):
         # posting a file to be removed
-        post_response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-                                         {'file': self.netcdf_file}, format='multipart')
+        post_response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+            {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
         file_entry_id = post_response.json()['id']
         file_entry = UserDatasetFile.objects.get(pk=file_entry_id)
 
@@ -133,7 +138,7 @@ class TestUploadUserDataView(APITestCase):
         self.client.logout()
         self.client.login(**self.second_user_data)
         delete_response = self.client.delete(
-            reverse(self.delete_data_url_name, kwargs={'file_uuid': file_entry_id}))
+            reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
 
         assert delete_response.status_code == 403
         # nothing happened, as the user has no credentials
@@ -146,7 +151,7 @@ class TestUploadUserDataView(APITestCase):
         # loging in as the proper user:
         self.client.login(**self.auth_data)
         delete_response = self.client.delete(
-            reverse(self.delete_data_url_name, kwargs={'file_uuid': file_entry_id}))
+            reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
 
         assert delete_response.status_code == 200
         assert len(Dataset.objects.all()) == 0
@@ -156,8 +161,8 @@ class TestUploadUserDataView(APITestCase):
         assert len(os.listdir(self.test_user_data_path)) == 0
 
     def test_upload_user_data_correct(self):
-        response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-                                    {'file': self.netcdf_file}, format='multipart')
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                                    {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
 
         assert response.status_code == 200
 
@@ -188,8 +193,9 @@ class TestUploadUserDataView(APITestCase):
 
     def test_upload_user_data_not_netcdf(self):
         file_to_upload = _create_test_file(self.not_netcdf_file)
-        response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.not_netcdf_file_name}),
-                                    {'file': file_to_upload}, format='multipart')
+        response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.not_netcdf_file_name}),
+            {FILE: file_to_upload}, format=FORMAT_MULTIPART)
         # assert False
         assert response.status_code == 500
 
@@ -201,8 +207,8 @@ class TestUploadUserDataView(APITestCase):
     def test_upload_user_data_with_wrong_name(self):
         file_to_upload = _create_test_file(self.not_netcdf_file)
         response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={'filename': 'wrong_name'}),
-            {'file': file_to_upload}, format='multipart')
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: 'wrong_name'}),
+            {FILE: file_to_upload}, format=FORMAT_MULTIPART)
         # assert False
         assert response.status_code == 500
 
@@ -213,8 +219,8 @@ class TestUploadUserDataView(APITestCase):
 
     def test_post_user_file_metadata_and_preprocess_file(self):
         # I am posting the file to create the proper dataset entry
-        response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-                                    {'file': self.netcdf_file}, format='multipart')
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                                    {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
         assert response.status_code == 200
 
         # checking if the file entry got saved
@@ -227,27 +233,29 @@ class TestUploadUserDataView(APITestCase):
         shutil.copy2(self.netcdf_file, file_entry.file.path)
 
         metadata_correct = {
-            'dataset_name': 'test_dataset',
-            'dataset_pretty_name': 'test_dataset_pretty_name',
-            'version_name': 'test_version',
-            'version_pretty_name': 'test_version_pretty_name'
+            USER_DATA_DATASET_FIELD_NAME: 'test_dataset',
+            USER_DATA_DATASET_FIELD_PRETTY_NAME: 'test_dataset_pretty_name',
+            USER_DATA_VERSION_FIELD_NAME: 'test_version',
+            USER_DATA_VERSION_FIELD_PRETTY_NAME: 'test_version_pretty_name'
         }
         # posting metadata as those from the metadata form and checking if it has been done
-        response_metadata = self.client.post(reverse(self.post_metadata_url_name, kwargs={'file_uuid': file_entry.id}),
-                                             metadata_correct, format='json')
+        response_metadata = self.client.post(
+            reverse(self.post_metadata_url_name, kwargs={URL_FILE_UUID: file_entry.id}),
+            metadata_correct, format='json')
         assert response_metadata.status_code == 200
 
         # re-querying file entry
         file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
         # checking if the posted metadata is proper
-        assert file_entry.dataset.short_name == metadata_correct['dataset_name']
-        assert file_entry.dataset.pretty_name == metadata_correct['dataset_pretty_name']
+        assert file_entry.dataset.short_name == metadata_correct[USER_DATA_DATASET_FIELD_NAME]
+        assert file_entry.dataset.pretty_name == metadata_correct[USER_DATA_DATASET_FIELD_PRETTY_NAME]
         assert file_entry.dataset == Dataset.objects.all().last()
-        assert file_entry.version.short_name == metadata_correct['version_name']
-        assert file_entry.version.pretty_name == metadata_correct['version_pretty_name']
+        assert file_entry.version.short_name == metadata_correct[USER_DATA_VERSION_FIELD_NAME]
+        assert file_entry.version.pretty_name == metadata_correct[USER_DATA_VERSION_FIELD_PRETTY_NAME]
         assert file_entry.version == DatasetVersion.objects.all().last()
         # checking if the proper metadata was retrieved from the file
         assert file_entry.variable == DataVariable.objects.all().last()
+        # the values below are defined in the test file, so if we change the test file we may have to update them
         assert file_entry.variable.short_name == 'soil_moisture'
         assert file_entry.time_name == 'time'
         assert file_entry.lat_name == 'lat'
@@ -263,8 +271,8 @@ class TestUploadUserDataView(APITestCase):
 
     def test_update_metadata(self):
         file_post_response = self.client.post(
-            reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-            {'file': self.netcdf_file}, format='multipart')
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+            {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
 
         assert file_post_response.status_code == 200
 
@@ -274,17 +282,20 @@ class TestUploadUserDataView(APITestCase):
 
         # update variable name
         variable_new_name = 'soil_moisture'
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={'file_uuid': file_id}),
-                                   {'field_name': 'variable_name', 'field_value': variable_new_name})
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
+                                   {USER_DATA_FIELD_NAME: USER_DATA_VARIABLE_FIELD_NAME,
+                                    USER_DATA_FIELD_VALUE: variable_new_name})
         assert response.status_code == 200
         # check if the variable name got updated:
         variable = DataVariable.objects.get(pk=file_entry.variable_id)
         assert variable.short_name == variable_new_name
+        assert variable.pretty_name == 'Soil Moisture'
 
         # update dataset name
         datset_new_name = 'test_dataset'
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={'file_uuid': file_id}),
-                                   {'field_name': 'dataset_name', 'field_value': datset_new_name})
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
+                                   {USER_DATA_FIELD_NAME: USER_DATA_DATASET_FIELD_NAME,
+                                    USER_DATA_FIELD_VALUE: datset_new_name})
         assert response.status_code == 200
         # check if the variable name got updated:
         dataset = Dataset.objects.get(pk=file_entry.dataset_id)
@@ -292,12 +303,37 @@ class TestUploadUserDataView(APITestCase):
 
         # update version name
         version_new_name = 'test_version'
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={'file_uuid': file_id}),
-                                   {'field_name': 'version_name', 'field_value': version_new_name})
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
+                                   {USER_DATA_FIELD_NAME: USER_DATA_VERSION_FIELD_NAME,
+                                    USER_DATA_FIELD_VALUE: version_new_name})
         assert response.status_code == 200
         # check if the variable name got updated:
         version = DatasetVersion.objects.get(pk=file_entry.version_id)
         assert version.pretty_name == version_new_name
 
+        # update dimensions:
+        lon_new_name = 'lon'
+        lat_new_name = 'lat'
+        time_new_name = 'time'
+
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
+                                   {USER_DATA_FIELD_NAME: USER_DATA_LON_FIELD_NAME,
+                                    USER_DATA_FIELD_VALUE: lon_new_name})
+        assert response.status_code == 200
+
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
+                                   {USER_DATA_FIELD_NAME: USER_DATA_LAT_FIELD_NAME,
+                                    USER_DATA_FIELD_VALUE: lat_new_name})
+        assert response.status_code == 200
+
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
+                                   {USER_DATA_FIELD_NAME: USER_DATA_TIME_FIELD_NAME,
+                                    USER_DATA_FIELD_VALUE: time_new_name})
+        assert response.status_code == 200
+
+        file_entry = UserDatasetFile.objects.get(pk=file_id)
+        assert file_entry.lat_name == lat_new_name
+        assert file_entry.lon_name == lon_new_name
+        assert file_entry.time_name == time_new_name
 
         file_entry.delete()
