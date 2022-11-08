@@ -130,7 +130,7 @@ def extract_coordinates_names(ncDataset):
     }
 
 
-def extract_variable_names(ncDataset):
+def extract_sm_variable_names(ncDataset):
     variables = list(ncDataset.data_vars.keys())
     potential_variable_names = []
     key_sm_words = ['water', 'soil', 'moisture', 'soil_moisture', 'sm', 'ssm']
@@ -234,24 +234,26 @@ def update_metadata(request, file_uuid):
     current_dataset = file_entry.dataset
     current_version = file_entry.version
 
+    # for variable and dimensions we store a list of potential names and a value from this list can be chosen
     if field_name not in ['dataset_name', 'version_name']:
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
-    if field_name == 'variable_name':
-        current_variable.short_name = new_item['long_name']
-        current_variable.pretty_name = new_item['name']
-        current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
-                                     f'{current_dataset.pretty_name} provided by user {request.user}.'
-        current_variable.save()
+        if field_name == 'variable_name':
+            current_variable.pretty_name = new_item['long_name']
+            current_variable.short_name = new_item['name']
+            current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
+                                         f'{current_dataset.pretty_name} provided by user {request.user}.'
+            current_variable.save()
+        else:
+            setattr(file_entry, field_name, new_item['name'])
+            file_entry.save()
+            
     elif field_name == 'dataset_name':
         current_dataset.pretty_name = field_value
         current_dataset.save()
     elif field_name == 'version_name':
         current_version.pretty_name = field_value
         current_version.save()
-    else:
-        setattr(file_entry, field_name, new_item['name'])
-        file_entry.save()
 
     return JsonResponse({'variable_id': current_variable.id}, status=200)
 
@@ -268,7 +270,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
             file_entry.delete()
             return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
 
-        variable = extract_variable_names(xarray_ds)
+        variable = extract_sm_variable_names(xarray_ds)
         coordinates = extract_coordinates_names(xarray_ds)
 
         metadata_from_file = {
