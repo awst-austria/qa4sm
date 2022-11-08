@@ -1,9 +1,9 @@
 import {Directive} from '@angular/core';
 import {AbstractControl, NG_VALIDATORS, ValidationErrors, Validator, ValidatorFn} from '@angular/forms';
 
-export function allowedNameValidator(): ValidatorFn {
+export function allowedNameValidator(spaceAllowed= false): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    const chars = /[a-z|A-Z0-9@.+_\-]/i;
+    const chars = spaceAllowed ? /[a-z|A-Z0-9@.+_\- ]/i : /[a-z|A-Z0-9@.+_\-]/i;
     const allowed = [];
     if (control.value){
       control.value.split('').forEach(char => {

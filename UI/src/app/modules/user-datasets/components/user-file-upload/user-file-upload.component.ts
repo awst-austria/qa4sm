@@ -29,9 +29,9 @@ export class UserFileUploadComponent implements OnInit {
   // dataset file form
   metadataForm = this.formBuilder.group({
     dataset_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
-    dataset_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator()]],
+    dataset_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator(true)]],
     version_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
-    version_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator()]],
+    version_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator(true)]],
   });
 
   constructor(private userDatasetService: UserDatasetsService,
