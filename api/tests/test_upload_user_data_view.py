@@ -35,7 +35,14 @@ def _update_file_entry(file_entry):
     file_entry.dataset = new_dataset
     file_entry.version = new_version
     file_entry.variable = new_variable
+    file_entry.all_variables = [
+        {'name': 'soil_moisture', 'long_name': 'Soil Moisture'},
+        {'name': 'lat', 'long_name': 'Latitude'},
+        {'name': 'lon', 'long_name': 'Longitude'},
+        {'name': 'none', 'long_name': 'Some weird variable'}
+    ]
     file_entry.save()
+
 
 class TestUploadUserDataView(APITestCase):
     __logger = logging.getLogger(__name__)
@@ -252,17 +259,45 @@ class TestUploadUserDataView(APITestCase):
         assert len(os.listdir(timeseries_dir)) != 0
 
         file_entry.delete()
+        assert len(UserDatasetFile.objects.all()) == 0
 
     def test_update_metadata(self):
-        file_post_response = self.client.post(reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
-                                    {'file': self.netcdf_file}, format='multipart')
+        file_post_response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={'filename': self.netcdf_file_name}),
+            {'file': self.netcdf_file}, format='multipart')
+
         assert file_post_response.status_code == 200
+
         file_id = file_post_response.json()['id']
         file_entry = UserDatasetFile.objects.get(pk=file_id)
         _update_file_entry(file_entry)
 
         # update variable name
-        response = self.client.put(reverse(self.upload_data_url_name, kwargs={'file_uuid': file_id}),
-                                    {'field_name': 'variable_name', 'field_value': 'soil_moisture'})
+        variable_new_name = 'soil_moisture'
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={'file_uuid': file_id}),
+                                   {'field_name': 'variable_name', 'field_value': variable_new_name})
         assert response.status_code == 200
+        # check if the variable name got updated:
+        variable = DataVariable.objects.get(pk=file_entry.variable_id)
+        assert variable.short_name == variable_new_name
 
+        # update dataset name
+        datset_new_name = 'test_dataset'
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={'file_uuid': file_id}),
+                                   {'field_name': 'dataset_name', 'field_value': datset_new_name})
+        assert response.status_code == 200
+        # check if the variable name got updated:
+        dataset = Dataset.objects.get(pk=file_entry.dataset_id)
+        assert dataset.pretty_name == datset_new_name
+
+        # update version name
+        version_new_name = 'test_version'
+        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={'file_uuid': file_id}),
+                                   {'field_name': 'version_name', 'field_value': version_new_name})
+        assert response.status_code == 200
+        # check if the variable name got updated:
+        version = DatasetVersion.objects.get(pk=file_entry.version_id)
+        assert version.pretty_name == version_new_name
+
+
+        file_entry.delete()
