@@ -192,7 +192,7 @@ def get_list_of_user_data_files(request):
         return JsonResponse(serializer.data, status=200, safe=False)
     except:
         # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
-        # with proper path bound
+        # with proper path bound to a docker container
         return JsonResponse({'message': 'We could not return the list of your datafiles'}, status=500)
 
 
@@ -270,10 +270,14 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
             xarray_ds = xa.open_dataset(file_entry.file.path, engine='netcdf4')
         except:
             file_entry.delete()
-            return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
+            return JsonResponse({'error': 'Wrong file format or file is corrupted'}, status=500, safe=False)
 
         variable = extract_sm_variable_names(xarray_ds)
         coordinates = extract_coordinates_names(xarray_ds)
+        all_variables = retrieve_all_variables_from_netcdf(xarray_ds)
+
+        if len(all_variables) == 0:
+            return JsonResponse({'error': 'File does not contain variables'}, status=500, safe=False)
 
         metadata_from_file = {
             'lat_name': coordinates[USER_DATA_LAT_FIELD_NAME],
