@@ -12,6 +12,7 @@ from qa4sm_preprocessing.reading.cf import get_coord, get_time
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
+from api.variable_and_field_names import *
 import xarray as xa
 
 import logging
@@ -124,9 +125,9 @@ def extract_coordinates_names(ncDataset):
         time_name = ''
 
     return {
-        'lon_name': lon_name,
-        'lat_name': lat_name,
-        'time_name': time_name,
+        USER_DATA_LON_FIELD_NAME: lon_name,
+        USER_DATA_LAT_FIELD_NAME: lat_name,
+        USER_DATA_TIME_FIELD_NAME: time_name,
     }
 
 
@@ -228,17 +229,17 @@ def delete_user_dataset_and_file(request, file_uuid):
 @permission_classes([IsAuthenticated])
 def update_metadata(request, file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    field_name = request.data['field_name']
-    field_value = request.data['field_value']
+    field_name = request.data[USER_DATA_FIELD_NAME]
+    field_value = request.data[USER_DATA_FIELD_VALUE]
     current_variable = file_entry.variable
     current_dataset = file_entry.dataset
     current_version = file_entry.version
 
     # for variable and dimensions we store a list of potential names and a value from this list can be chosen
-    if field_name not in ['dataset_name', 'version_name']:
+    if field_name not in [USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME]:
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
-        if field_name == 'variable_name':
+        if field_name == USER_DATA_VARIABLE_FIELD_NAME:
             current_variable.pretty_name = new_item['long_name']
             current_variable.short_name = new_item['name']
             current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
@@ -248,13 +249,14 @@ def update_metadata(request, file_uuid):
             setattr(file_entry, field_name, new_item['name'])
             file_entry.save()
             
-    elif field_name == 'dataset_name':
+    elif field_name == USER_DATA_DATASET_FIELD_NAME:
         current_dataset.pretty_name = field_value
         current_dataset.save()
-    elif field_name == 'version_name':
+    elif field_name == USER_DATA_VERSION_FIELD_NAME:
         current_version.pretty_name = field_value
         current_version.save()
 
+    # todo Update the response
     return JsonResponse({'variable_id': current_variable.id}, status=200)
 
 
@@ -274,21 +276,21 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         coordinates = extract_coordinates_names(xarray_ds)
 
         metadata_from_file = {
-            'lat_name': coordinates['lat_name'],
-            'lon_name': coordinates['lon_name'],
-            'time_name': coordinates['time_name'],
+            'lat_name': coordinates[USER_DATA_LAT_FIELD_NAME],
+            'lon_name': coordinates[USER_DATA_LON_FIELD_NAME],
+            'time_name': coordinates[USER_DATA_TIME_FIELD_NAME],
             'variable': variable,
             'all_variables': retrieve_all_variables_from_netcdf(xarray_ds)
         }
 
         xarray_ds.close()
 
-        dataset_name = request.data['dataset_name']
-        dataset_pretty_name = request.data['dataset_pretty_name'] if request.data[
-            'dataset_pretty_name'] else dataset_name
-        version_name = request.data['version_name']
-        version_pretty_name = request.data['version_pretty_name'] if request.data[
-            'version_pretty_name'] else version_name
+        dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
+        dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
+            USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
+        version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
+        version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
+            USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
 
         # creating version entry
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
