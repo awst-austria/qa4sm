@@ -217,7 +217,7 @@ class TestUploadUserDataView(APITestCase):
         assert len(existing_files) == 0
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-    def test_post_user_file_metadata_and_preprocess_file(self):
+    def test_post_user_file_metadata_and_preprocess_file_correct(self):
         # I am posting the file to create the proper dataset entry
         response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
                                     {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
@@ -253,6 +253,7 @@ class TestUploadUserDataView(APITestCase):
         assert file_entry.version.short_name == metadata_correct[USER_DATA_VERSION_FIELD_NAME]
         assert file_entry.version.pretty_name == metadata_correct[USER_DATA_VERSION_FIELD_PRETTY_NAME]
         assert file_entry.version == DatasetVersion.objects.all().last()
+
         # checking if the proper metadata was retrieved from the file
         assert file_entry.variable == DataVariable.objects.all().last()
         # the values below are defined in the test file, so if we change the test file we may have to update them
@@ -268,6 +269,62 @@ class TestUploadUserDataView(APITestCase):
 
         file_entry.delete()
         assert len(UserDatasetFile.objects.all()) == 0
+
+    def test_post_incorrect_metadata_form(self):
+        # I am posting the file to create the proper dataset entry, I don't need to copy it, as it won't be processed
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                                    {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+        assert response.status_code == 200
+
+        # checking if the file entry got saved
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 1
+
+        file_entry = existing_files[0]
+        metadata_correct = {
+            USER_DATA_DATASET_FIELD_NAME: None,
+            USER_DATA_DATASET_FIELD_PRETTY_NAME: 'test_dataset_pretty_name',
+            USER_DATA_VERSION_FIELD_NAME: None,
+            USER_DATA_VERSION_FIELD_PRETTY_NAME: 'test_version_pretty_name'
+        }
+        # posting metadata as those from the metadata form and checking if it has been done
+        response_metadata = self.client.post(
+            reverse(self.post_metadata_url_name, kwargs={URL_FILE_UUID: file_entry.id}),
+            metadata_correct, format='json')
+        assert response_metadata.status_code == 500
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 0
+
+    def test_preprocess_corrupted_file(self):
+        """ For some reason, when a netCDF is posted with django rest client it gets corrupted, so with this test I want
+        to check two things: 1. if the corrupted file exception is handled, 2. if at some point they change something
+        and the file won't be spoiled anymore. If this test starts failing at some point that might be the indicator"""
+
+        # I am posting the file to create the proper dataset entry
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                                    {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+        assert response.status_code == 200
+
+        # checking if the file entry got saved
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 1
+
+        file_entry = existing_files[0]
+        # pretty names are not required
+        metadata_correct = {
+            USER_DATA_DATASET_FIELD_NAME: 'test_dataset',
+            USER_DATA_DATASET_FIELD_PRETTY_NAME: None,
+            USER_DATA_VERSION_FIELD_NAME: 'test_version',
+            USER_DATA_VERSION_FIELD_PRETTY_NAME: None
+        }
+        # posting metadata as those from the metadata form and checking if it has been done
+        response_metadata = self.client.post(
+            reverse(self.post_metadata_url_name, kwargs={URL_FILE_UUID: file_entry.id}),
+            metadata_correct, format='json')
+        assert response_metadata.status_code == 500
+        assert response_metadata.json()['error'] == 'Wrong file format or file is corrupted'
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 0
 
     def test_update_metadata(self):
         file_post_response = self.client.post(
