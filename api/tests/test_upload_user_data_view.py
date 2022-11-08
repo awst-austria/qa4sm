@@ -10,7 +10,7 @@ from api.variable_and_field_names import *
 
 FILE = 'file'
 FORMAT_MULTIPART = 'multipart'
-
+# todo: test for a file with no variables - file with no variables needed
 def _create_test_file(path):
     test_file = open(path, 'w')
     test_file.write('some test content of a not netcdf file\n')
