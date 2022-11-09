@@ -201,8 +201,8 @@
         "model": "validator.datavariable",
         "pk": 19,
         "fields": {
-            "short_name": "SMOSL2_sm",
-            "pretty_name": "Soil_Moisture",
+            "short_name": "Soil_Moisture",
+            "pretty_name": "SMOSL2_sm",
             "help_text": "Retrieved soil moisture value in m³/m³",
             "min_value": 0.0,
             "max_value": 1.0
