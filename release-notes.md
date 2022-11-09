@@ -1,3 +1,8 @@
+QA4SM v2.1.1 - Release notes 2022-11-09
+=======================================================
+# Bug fixing 
+1. Fixed SMOS RFI filtering
+
 QA4SM v2.1.0 - Release notes 2022-06-05
 =======================================================
 # New features
