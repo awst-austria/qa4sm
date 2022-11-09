@@ -82,7 +82,6 @@ export class HomeComponent implements OnInit {
     this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
     this.settings$ = this.settingsService.getAllSettings();
     this.settings$.subscribe(data => {
-      console.log(data);
     }
     );
   }

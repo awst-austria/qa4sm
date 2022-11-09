@@ -1,0 +1,65 @@
+<main>
+  <div class="center">
+    <!--    <div class="p-col-9 p-text-center">-->
+    <h1>My datasets</h1>
+    <!--    </div>-->
+  </div>
+  <hr class="featurette-divider">
+
+  <div class="p-text-center">
+    <qa-user-file-upload></qa-user-file-upload>
+  </div>
+  <hr class="featurette-divider">
+  <div *ngIf="(userDatasets$ | async) as userDatasetList">
+
+    <div *ngIf="userDatasetList.length != 0" class="container p-mb-5 p-mt-4" style="max-width: 70rem;">
+      <div class="lead text-muted p-pb-3">
+        <div>
+        Below you can find a list of datasets you have uploaded: <span *ngIf="!readMore">...</span>
+        <span *ngIf="!readMore" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-down">
+          Read more
+        </span>
+        </div>
+        <div *ngIf="readMore">
+          <ul>
+            <li>
+              The <b>variable</b> and <b>coordinates</b> names were retrieved from the file. <br>
+              If they are improper or you want to use another one, <b>click</b> on the name and
+              choose a different one. <br>
+              Please note, if the chosen name is incorrect, data validation will not be possible.
+            </li>
+            <li>
+              Dataset name and version can be changed by clicking on it. <br>
+              The new name can consist of max 30 characters. Letters, digits, space and @/./+/-/_ only."
+            </li>
+            <li>
+              Only datasets for which there were no validation run can be removed.
+            </li>
+          </ul>
+
+          <span style="" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-up"> Read less</span>
+        </div>
+
+      </div>
+      <hr class="featurette-divider">
+      <div>
+        <div *ngFor="let userDataset of userDatasetList" class="p-mb-3">
+          <qa-user-data-row [userDataset]="userDataset"></qa-user-data-row>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="userDatasetList.length == 0" class="p-text-center">
+      <div class="center">
+        <p class="lead text-muted">
+          You have not uploaded any data yet. Click the 'Upload file' button to add your own data.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <qa-scroll-to-top></qa-scroll-to-top>
+
+</main>
+
+

@@ -28,7 +28,8 @@
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -56,7 +57,8 @@
             "resolution": {
                 "value": 36,
                 "unit": "km"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -88,7 +90,8 @@
             "resolution": {
                 "value": 12.5,
                 "unit": "km"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -147,7 +150,8 @@
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -180,7 +184,8 @@
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -213,7 +218,8 @@
             "resolution": {
                 "value": 25,
                 "unit": "km"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -241,7 +247,8 @@
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -269,7 +276,8 @@
             "resolution": {
                 "value": 0.1,
                 "unit": "deg"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -300,7 +308,8 @@
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -331,7 +340,8 @@
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -358,7 +368,8 @@
             "resolution": {
                 "value": 1,
                 "unit": "km"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -386,7 +397,8 @@
             "resolution": {
                 "value": 1,
                 "unit": "km"
-            }
+            },
+            "user": null
         }
     },
     {
@@ -420,7 +432,8 @@
                 32,
                 33,
                 34
-            ]
+            ],
+            "user": null
         }
     },
     {

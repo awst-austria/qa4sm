@@ -22,6 +22,7 @@ const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 
+
 const csrfToken = '{{csrf_token}}';
 const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
 const archiveResultUrl = urlPrefix + '/archive-result/00000000-0000-0000-0000-000000000000';
@@ -133,30 +134,31 @@ export class ValidationrunService {
     return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
   }
 
-  getPublishingFormData(params: any): Observable<PublishingFormDto>{
+  getPublishingFormData(params: any): Observable<PublishingFormDto> {
     return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params});
   }
 
-  refreshComponent(validationIdOrPage: string): void{
+  refreshComponent(validationIdOrPage: string): void {
     // here we can give or validation id or the word 'page' if entire page should be reloaded (e.g. when a validation is removed)
     this.refresh.next(validationIdOrPage);
   }
 
-  copyValidation(params: any): Observable<any>{
+  copyValidation(params: any): Observable<any> {
     return this.httpClient.get(copyValidationUrl, {params});
   }
 
-  getCopiedRunRecord(validationId: string): Observable<any>{
+  getCopiedRunRecord(validationId: string): Observable<any> {
     const urlWithParam = copiedValidationRecordUrl + '/' + validationId;
     return this.httpClient.get(urlWithParam);
   }
 
-  checkPublishingInProgress(): Observable<boolean>{
+  checkPublishingInProgress(): Observable<boolean> {
     return this.publishingInProgress.asObservable();
   }
 
-  changePublishingStatus(inProgress: boolean): void{
+  changePublishingStatus(inProgress: boolean): void {
     this.publishingInProgress.next(inProgress);
   }
+
 
 }

@@ -73,7 +73,7 @@ def _get_reference_reader(val_run) -> ('Reader', str, dict):
     ref_reader = create_reader(val_run.reference_configuration.dataset,
                                val_run.reference_configuration.version)
 
-    time_adapted_ref_reader = adapt_timestamp(ref_reader, val_run.reference_configuration.dataset,)
+    time_adapted_ref_reader = adapt_timestamp(ref_reader, val_run.reference_configuration.dataset, )
 
     # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
     filtered_reader, read_name, read_kwargs = \
@@ -135,13 +135,15 @@ def save_validation_config(validation_run):
                 i = j
                 j += 1
 
+            # there is no error for variables!!, there were some inconsistency with short and pretty names,
+            # and it should be like that now
             ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
             ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
-            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.short_name)
+            ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.pretty_name)
 
             ds.setncattr('val_dc_dataset_pretty_name' + str(i), dataset_config.dataset.pretty_name)
             ds.setncattr('val_dc_version_pretty_name' + str(i), dataset_config.version.pretty_name)
-            ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.pretty_name)
+            ds.setncattr('val_dc_variable_pretty_name' + str(i), dataset_config.variable.short_name)
 
             ds.setncattr('val_dc_filters' + str(i), filters)
 
@@ -202,7 +204,7 @@ def create_pytesmo_validation(validation_run):
         reader = create_reader(dataset_config.dataset,
                                dataset_config.version)
 
-        time_adapted_reader = adapt_timestamp(reader, dataset_config.dataset,)
+        time_adapted_reader = adapt_timestamp(reader, dataset_config.dataset, )
 
         reader, read_name, read_kwargs = \
             setup_filtering(
@@ -213,13 +215,13 @@ def create_pytesmo_validation(validation_run):
                 variable=dataset_config.variable)
 
         if validation_run.anomalies == ValidationRun.MOVING_AVG_35_D:
-            reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.pretty_name],
+            reader = AnomalyAdapter(reader, window_size=35, columns=[dataset_config.variable.short_name],
                                     read_name=read_name)
         if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
             # make sure our baseline period is in UTC and without timezone information
             anomalies_baseline = [validation_run.anomalies_from.astimezone(tz=pytz.UTC).replace(tzinfo=None),
                                   validation_run.anomalies_to.astimezone(tz=pytz.UTC).replace(tzinfo=None)]
-            reader = AnomalyClimAdapter(reader, columns=[dataset_config.variable.pretty_name],
+            reader = AnomalyClimAdapter(reader, columns=[dataset_config.variable.short_name],
                                         timespan=anomalies_baseline, read_name=read_name)
 
         if (validation_run.reference_configuration and
@@ -230,7 +232,7 @@ def create_pytesmo_validation(validation_run):
             dataset_name = '{}-{}'.format(ds_num, dataset_config.dataset.short_name)
             ds_num += 1
 
-        ds_list.append((dataset_name, {'class': reader, 'columns': [dataset_config.variable.pretty_name],
+        ds_list.append((dataset_name, {'class': reader, 'columns': [dataset_config.variable.short_name],
                                        'kwargs': read_kwargs}))
         ds_read_names.append((dataset_name, read_name))
 
@@ -348,6 +350,7 @@ def execute_job(self, validation_id, job):
     start_time = datetime.now(tzlocal())
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
+        print('Monika')
         val = create_pytesmo_validation(validation_run)
 
         result = val.calc(*job, rename_cols=False, only_with_reference=True)
