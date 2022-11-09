@@ -20,14 +20,14 @@ class TestDatasetVariableView(TestCase):
         dataset_variable_url = reverse('Dataset variable')
         response = self.client.get(dataset_variable_url)
         assert response.status_code == 200
-        assert len(response.json()) == 18  # updated after SMOS L3
+        assert len(response.json()) == 19  # updated after SMOS L3
 
         # check availability after logging out
         self.client.logout()
 
         response = self.client.get(dataset_variable_url)
         assert response.status_code == 200
-        assert len(response.json()) == 18  # updated after SMOS L3
+        assert len(response.json()) == 19  # updated after SMOS L3
 
     def test_dataset_variable_by_id(self):
         dataset_variable_url = reverse('Dataset variable')

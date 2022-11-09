@@ -13,7 +13,6 @@ from pynetcf.time_series import GriddedNcTs
 
 from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
 from qa4sm_preprocessing.reading import StackImageReader
-
 from qa4sm_preprocessing.reading import GriddedNcOrthoMultiTs
 
 from validator.validation import globals
@@ -79,6 +78,9 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.SMOS_L3:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
 
+    if dataset.short_name == globals.SMOS_L2:
+        reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
+
     if dataset.user:
         file = UserDatasetFile.objects.get(dataset=dataset)
         stackreader = StackImageReader(
@@ -112,6 +114,15 @@ def adapt_timestamp(reader, dataset):
             'time_offset_fields': 'Mean_Acq_Time_Seconds',
             'time_units': 's',
             'base_time_field': 'Mean_Acq_Time_Days',
+            'base_time_reference': '2000-01-01',
+        }
+
+    elif dataset.short_name == globals.SMOS_L2:
+        tadapt_kwargs = {
+            'time_offset_fields': 'Seconds',
+            'time_units': 's',
+            'base_time_field': 'Days',
+            'base_time_units': 'ns',
             'base_time_reference': '2000-01-01',
         }
 

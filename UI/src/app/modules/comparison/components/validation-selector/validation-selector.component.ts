@@ -58,7 +58,7 @@ export class ValidationSelectorComponent implements OnInit {
   private selectDataset(selected: DatasetConfigModel[]): void {
     const model = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
-      null, null, null, null);
+      null, null, null, null, null);
     selected.push(model);
     // get all datasets
     this.datasetService.getAllDatasets(true).subscribe(datasets => {

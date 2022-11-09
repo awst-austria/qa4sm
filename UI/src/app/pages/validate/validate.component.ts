@@ -8,7 +8,7 @@ import {DatasetVariableService} from '../../modules/core/services/dataset/datase
 import {
   DatasetConfigModel,
   ISMN_DEPTH_FILTER_ID,
-  ISMN_NETWORK_FILTER_ID,
+  ISMN_NETWORK_FILTER_ID, SMOS_CHI2_FILTER_ID,
   SMOS_RFI_FILTER_ID
 } from './dataset-config-model';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
@@ -182,6 +182,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(null),
         new BehaviorSubject(null),
         new BehaviorSubject(null),
+        new BehaviorSubject(null),
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
@@ -223,6 +224,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new DatasetComponentSelectionModel(null, null, null),
       null,
       new BehaviorSubject(null),
+      new BehaviorSubject<FilterModel>(null),
       new BehaviorSubject<FilterModel>(null),
       new BehaviorSubject<FilterModel>(null));
     this.validationModel.referenceConfigurations.push(newReferenceModel);
@@ -351,6 +353,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       null,
       new BehaviorSubject(null),
       new BehaviorSubject(null),
+      new BehaviorSubject(null),
       new BehaviorSubject(null)
     );
     targetArray.push(model);
@@ -388,6 +391,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         model.smosRfiFilter$.next(null);
         model.ismnNetworkFilter$.next(null);
         model.ismnDepthFilter$.next(null);
+        model.smosChi2Filter$.next(null);
         filters.forEach(filter => {
           if (filter.parameterised) {
             if (filter.id === ISMN_NETWORK_FILTER_ID) {
@@ -405,6 +409,21 @@ export class ValidateComponent implements OnInit, AfterViewInit {
                   new BehaviorSubject<string>(filter.default_parameter)));
               } else {
                 model.smosRfiFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+                  filter,
+                  false,
+                  false,
+                  new BehaviorSubject<string>(filter.default_parameter))
+                );
+              }
+            } else if (filter.id === SMOS_CHI2_FILTER_ID) {
+              if (model.smosChi2Filter$) {
+                model.smosChi2Filter$.next(new FilterModel(
+                  filter,
+                  false,
+                  false,
+                  new BehaviorSubject<string>(filter.default_parameter)));
+              } else {
+                model.smosChi2Filter$ = new BehaviorSubject<FilterModel>(new FilterModel(
                   filter,
                   false,
                   false,
