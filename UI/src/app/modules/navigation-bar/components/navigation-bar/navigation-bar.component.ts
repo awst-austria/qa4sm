@@ -45,7 +45,7 @@ export class NavigationBarComponent implements OnInit {
         command: () => this.setPreviousUrl('my-validations')
       },
       {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
-      {label: 'Compare validations', icon: 'pi pi-fw pi-th-large', routerLink: ['comparison']},
+      {label: 'Compare validations', icon: 'pi pi-fw pi-th-large', routerLink: ['comparison'], command: () => this.setPreviousUrl('comparison')},
       {label: 'My datasets', icon: 'pi pi-fw pi-upload', routerLink: ['my-datasets'],  command: () => this.setPreviousUrl('my-datasets')},
       {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
