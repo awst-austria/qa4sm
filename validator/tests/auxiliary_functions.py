@@ -90,14 +90,14 @@ def generate_default_validation_smos_l2():
     data_c.validation = run
     data_c.dataset = Dataset.objects.get(short_name='SMOS_L2')
     data_c.version = DatasetVersion.objects.get(short_name='SMOSL2_v700')
-    data_c.variable = DataVariable.objects.get(short_name='SMOSL2_sm')
+    data_c.variable = DataVariable.objects.get(pretty_name='SMOSL2_sm')
     data_c.save()
 
     ref_c = DatasetConfiguration()
     ref_c.validation = run
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-    ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+    ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
     run.reference_configuration = ref_c
