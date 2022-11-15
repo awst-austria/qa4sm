@@ -45,7 +45,7 @@ export class SummaryStatisticsComponent implements OnInit {
   }
 
   getRefConfig(): void{
-    this.refConfig = this.configs.find(config => config.id === this.validationRun.reference_configuration);
+    this.refConfig = this.configs.find(config => config.id === this.validationRun.spatial_reference_configuration);
     this.refDataset$ = this.datasetService.getDatasetById(this.refConfig.dataset);
     this.refDatasetVersion$ = this.datasetVersionService.getVersionById(this.refConfig.version);
     this.refDatasetVariable$ = this.datasetVariableService.getVariableById(this.refConfig.variable);

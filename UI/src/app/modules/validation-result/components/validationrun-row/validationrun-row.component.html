@@ -110,7 +110,7 @@
     <div class="p-col">
       <strong>Data:</strong><br/>
       <span *ngFor="let config of configurations">
-        <span *ngIf="config.id !== validationRun.reference_configuration">
+        <span *ngIf="config.id !== validationRun.spatial_reference_configuration">
           {{config.dataset}},
           {{config.version}},
           {{config.variable}} <br>
@@ -121,7 +121,7 @@
     <div class="p-col">
       <strong>Reference:</strong><br/>
       <span *ngFor="let config of configurations">
-        <span *ngIf="config.id === validationRun.reference_configuration">
+        <span *ngIf="config.id === validationRun.spatial_reference_configuration">
           {{config.dataset}},
           {{config.version}},
           {{config.variable}} <br>
