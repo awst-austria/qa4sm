@@ -14,7 +14,7 @@ class DatasetConfigurationInline(TabularInline):
 # for tutorial see https://djangobook.com/customizing-change-lists-forms/
 class ValidationRunAdmin(ModelAdmin):
     list_display = ('id', 'start_time', 'end_time', 'user', 'name_tag', 'open_button', )
-    readonly_fields = ('reference_configuration', 'scaling_ref',)
+    readonly_fields = ('spatial_reference_configuration', 'scaling_ref',)
     search_fields = ('name_tag', )
     list_filter = ('start_time', 'end_time', 'user')
     ordering = ('-start_time', '-end_time',)

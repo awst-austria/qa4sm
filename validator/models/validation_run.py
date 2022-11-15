@@ -16,6 +16,10 @@ from validator.models import DatasetConfiguration, User, CopiedValidations
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
+# def get_spatial_reference_id(instance) -> int:
+#     return instance.spatial_reference_configuration.primary_key
+
+
 class ValidationRun(models.Model):
     # scaling methods
     MIN_MAX = 'min_max'
@@ -74,8 +78,12 @@ class ValidationRun(models.Model):
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
 
-    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
-                                                related_name='ref_validation_run', null=True)
+    spatial_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                        related_name='spat_ref_validation_run', null=True)
+    temporal_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                         related_name='temp_ref_validation_run', null=True)
+    scaling_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                        related_name='scal_ref_validation_run', null=True)
 
     scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
                                     related_name='scaling_ref_validation_run', null=True)
@@ -248,5 +256,3 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
         if os.path.isdir(outdir):
             rmtree(outdir)
-
-
