@@ -70,7 +70,7 @@ class TestDOI(TestCase):
         ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
         ref_c.save()
 
-        val.reference_configuration = ref_c
+        val.spatial_reference_configuration = ref_c
         val.scaling_ref = ref_c
         val.save()
 

@@ -17,10 +17,10 @@ def send_val_done_notification(val_run):
         # enumerate datasets with "and" and Oxford comma.
         dataset_string = ''
         and_position = val_run.dataset_configurations.count() - 1 - (
-            1 if val_run.reference_configuration is not None else 0)
+            1 if val_run.spatial_reference_configuration is not None else 0)
         i = 0
         for dc in val_run.dataset_configurations.all():
-            if dc.id != val_run.reference_configuration.id:
+            if dc.id != val_run.spatial_reference_configuration.id:
                 if (i != 0):
                     dataset_string += ", "
                     if (i == and_position):
@@ -33,8 +33,8 @@ def send_val_done_notification(val_run):
             val_run.user.first_name,
             val_run.user.last_name,
             dataset_string,
-            val_run.reference_configuration.dataset.pretty_name,
-            val_run.reference_configuration.version.pretty_name,
+            val_run.spatial_reference_configuration.dataset.pretty_name,
+            val_run.spatial_reference_configuration.version.pretty_name,
             url,
             val_run.expiry_date)
 

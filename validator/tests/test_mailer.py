@@ -78,7 +78,7 @@ class TestMailer(TestCase):
         ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
         ref_c.save()
 
-        run.reference_configuration = ref_c
+        run.spatial_reference_configuration = ref_c
         run.scaling_ref = ref_c
         run.save()
 

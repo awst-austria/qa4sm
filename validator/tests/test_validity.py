@@ -151,7 +151,7 @@ class TestValidity(TestCase):
         ref_c.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
         ref_c.save()
 
-        run.reference_configuration = ref_c
+        run.spatial_reference_configuration = ref_c
         run.scaling_ref = ref_c
         run.save()
 

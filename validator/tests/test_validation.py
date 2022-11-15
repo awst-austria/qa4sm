@@ -189,8 +189,8 @@ class TestValidation(TestCase):
             i = 0
             for dataset_config in run.dataset_configurations.all():
 
-                if (run.reference_configuration and
-                        (dataset_config.id == run.reference_configuration.id)):
+                if (run.spatial_reference_configuration and
+                        (dataset_config.id == run.spatial_reference_configuration.id)):
                     d_index = 0
                 else:
                     i += 1
@@ -227,12 +227,12 @@ class TestValidation(TestCase):
                         assert pfil.parameters in stored_filters, 'Wrong dataset config parametrised filters: no parameters'
 
                 # check reference
-                if dataset_config.id == run.reference_configuration.id:
-                    assert ds.val_ref == ds_name, 'Wrong validation config attribute. [reference_configuration]'
+                if dataset_config.id == run.spatial_reference_configuration.id:
+                    assert ds.val_ref == ds_name, 'Wrong validation config attribute. [spatial_reference_configuration]'
 
-                    if run.reference_configuration.dataset.short_name != "ISMN":
-                        assert ds.val_resolution == run.reference_configuration.dataset.resolution["value"]
-                        assert ds.val_resolution_unit == run.reference_configuration.dataset.resolution["unit"]
+                    if run.spatial_reference_configuration.dataset.short_name != "ISMN":
+                        assert ds.val_resolution == run.spatial_reference_configuration.dataset.resolution["value"]
+                        assert ds.val_resolution_unit == run.spatial_reference_configuration.dataset.resolution["unit"]
 
                 if dataset_config.id == run.scaling_ref.id:
                     assert ds.val_scaling_ref == ds_name, 'Wrong validation config attribute. [scaling_ref]'
@@ -282,7 +282,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -290,11 +290,11 @@ class TestValidation(TestCase):
             config.save()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
         # add filterring according to depth_range with the default values:
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         run_id = run.id
@@ -327,7 +327,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -335,12 +335,12 @@ class TestValidation(TestCase):
             config.save()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         # add filterring according to depth_range with the default values:
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         run_id = run.id
@@ -373,7 +373,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -382,7 +382,7 @@ class TestValidation(TestCase):
 
         # add filterring according to depth_range with values which cause that there is no points anymore:
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.1,0.2", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         run_id = run.id
@@ -403,12 +403,12 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name='GLDAS_SoilMoi0_10cm_inst')
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name='GLDAS_SoilMoi0_10cm_inst')
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -420,7 +420,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -444,12 +444,12 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_P_V05_2)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_P_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_P_V05_2)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_P_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
@@ -461,7 +461,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
@@ -487,12 +487,12 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V06_1)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_A_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V06_1)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_A_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
@@ -504,7 +504,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -529,12 +529,12 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.SMAP_soil_moisture)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.SMAP_soil_moisture)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -547,7 +547,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -571,12 +571,12 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ASCAT_H113)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ASCAT_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ASCAT_H113)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ASCAT_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -590,7 +590,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -613,12 +613,12 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3SC)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V202012)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.C3S_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3SC)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V202012)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.C3S_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -630,7 +630,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -654,13 +654,13 @@ class TestValidation(TestCase):
         run = generate_default_validation()
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        #        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        #        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -672,7 +672,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -699,7 +699,7 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.dataset = Dataset.objects.get(short_name='ASCAT')
                 config.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
                 config.variable = DataVariable.objects.get(pretty_name='ASCAT_sm')
@@ -755,10 +755,10 @@ class TestValidation(TestCase):
         run.anomalies = ValidationRun.MOVING_AVG_35_D
         run.save()
 
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.save()
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -786,10 +786,10 @@ class TestValidation(TestCase):
         run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59)
         run.save()
 
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.save()
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -813,12 +813,12 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         # need validation without ISMN as referebce to check resolution attributes
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -886,9 +886,9 @@ class TestValidation(TestCase):
 
         # NOTE: ISMN non-reference points need to use one of the upscaling methods
         run.upscaling = True
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=ds)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=version)
-        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=variable)
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=ds)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=version)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=variable)
         run.save()
         run_id = run.id
         # run the validation
@@ -986,10 +986,10 @@ class TestValidation(TestCase):
 
         run.save()
 
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.save()
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -1101,12 +1101,12 @@ class TestValidation(TestCase):
         ref_c.version = version
         ref_c.variable = dataset.variables.first()
         ref_c.save()
-        run.reference_configuration = ref_c
+        run.spatial_reference_configuration = ref_c
         run.save()
 
         # adding filters where depth_to is smaller than depth_from
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.2,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
@@ -1115,47 +1115,47 @@ class TestValidation(TestCase):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
         ParametrisedFilter.objects.all().delete()
 
         # adding filters with negative values
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="-0.05,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
         ParametrisedFilter.objects.all().delete()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="-0.05,-0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
         ParametrisedFilter.objects.all().delete()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.05,-0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
     def test_temporal_adapter(self):
@@ -1268,7 +1268,7 @@ class TestValidation(TestCase):
                 ref_c.variable = dataset.variables.first()
                 ref_c.save()
 
-                run.reference_configuration = ref_c
+                run.spatial_reference_configuration = ref_c
                 run.save()
 
                 ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
@@ -1276,7 +1276,7 @@ class TestValidation(TestCase):
                 total_points, jobs = val.create_jobs(
                     run,
                     ref_reader,
-                    run.reference_configuration
+                    run.spatial_reference_configuration
                 )
                 print(version)
                 print(len(jobs))
@@ -1419,8 +1419,8 @@ class TestValidation(TestCase):
         # create validation object and data folder for it
         v = generate_default_validation()
         # scatterplot
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='ISMN')
-        v.reference_configuration.save()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='ISMN')
+        v.spatial_reference_configuration.save()
         run_dir = path.join(OUTPUT_FOLDER, str(v.id))
         val.mkdir_if_not_exists(run_dir)
 
@@ -1450,8 +1450,8 @@ class TestValidation(TestCase):
         shutil.copy(infile2, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         # heatmap
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        v.reference_configuration.save()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
+        v.spatial_reference_configuration.save()
         val.generate_all_graphs(v, run_dir)
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
@@ -1471,8 +1471,8 @@ class TestValidation(TestCase):
         shutil.copy(infile3, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         # heatmap
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
-        v.reference_configuration.save()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
+        v.spatial_reference_configuration.save()
         val.generate_all_graphs(v, run_dir)
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
@@ -1554,10 +1554,10 @@ class TestValidation(TestCase):
             print('old one', config.dataset == globals.ISMN, config, config.filters.all())
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run_filt.reference_configuration)
+                                     dataset_config=run_filt.spatial_reference_configuration)
         pfilter.save()
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run_filt.reference_configuration)
+                                     dataset_config=run_filt.spatial_reference_configuration)
         pfilter.save()
 
         published_runs = ValidationRun.objects.exclude(doi='').order_by('-start_time')
@@ -1694,11 +1694,11 @@ class TestValidation(TestCase):
             new_config.save()
 
         new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                         dataset_config=run.reference_configuration)
+                                         dataset_config=run.spatial_reference_configuration)
         new_pfilter.save()
         # add filterring according to depth_range with the default values:
         new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                         dataset_config=run.reference_configuration)
+                                         dataset_config=run.spatial_reference_configuration)
         new_pfilter.save()
         is_there_one = compare_validation_runs(run, published_runs, user)
 
@@ -1743,7 +1743,7 @@ class TestValidation(TestCase):
 
         # messing up with parameterised filters:
         # ... with networks
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
                 pf.parameters = 'SCAN,OZNET'
                 pf.save()
@@ -1751,7 +1751,7 @@ class TestValidation(TestCase):
         is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
                 pf.parameters = 'OZNET'
                 pf.save()
@@ -1760,7 +1760,7 @@ class TestValidation(TestCase):
         assert not is_there_one['is_there_validation']
 
         # restoring networks
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
                 pf.parameters = 'SCAN'
                 pf.save()
@@ -1769,7 +1769,7 @@ class TestValidation(TestCase):
         assert is_there_one['is_there_validation']
 
         # with depths
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_DEPTH':
                 pf.parameters = '0.10,0.20'
                 pf.save()
@@ -1778,7 +1778,7 @@ class TestValidation(TestCase):
         assert not is_there_one['is_there_validation']
 
         # restoring depths
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_DEPTH':
                 pf.parameters = '0.0,0.1'
                 pf.save()
@@ -1850,17 +1850,17 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
         run_id = run.id
         val.run_validation(run_id)

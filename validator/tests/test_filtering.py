@@ -39,7 +39,7 @@ class TestValidation(TestCase):
         self.run.user = self.testuser
 
         for config in self.run.dataset_configurations.all():
-            if config == self.run.reference_configuration:
+            if config == self.run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 self.smos_config = config
@@ -154,7 +154,7 @@ class TestValidation(TestCase):
 
         self.run.user = self.testuser
         for config in self.run.dataset_configurations.all():
-            if config == self.run.reference_configuration:
+            if config == self.run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 self.smos_config = config
