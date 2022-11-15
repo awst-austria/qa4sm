@@ -209,11 +209,11 @@ class TestValidation(TestCase):
                 # check dataset, version, variable
                 assert stored_dataset == dataset_config.dataset.short_name, 'Wrong dataset config attribute. [dataset]'
                 assert stored_version == dataset_config.version.short_name, 'Wrong dataset config attribute. [version]'
-                assert stored_variable == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable]'
+                assert stored_variable == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable]'
 
                 assert stored_dataset_pretty == dataset_config.dataset.pretty_name, 'Wrong dataset config attribute. [dataset pretty name]'
                 assert stored_version_pretty == dataset_config.version.pretty_name, 'Wrong dataset config attribute. [version pretty name]'
-                assert stored_variable_pretty == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable pretty name]'
+                assert stored_variable_pretty == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable pretty name]'
 
                 # check filters
                 if not dataset_config.filters.all() and not dataset_config.parametrisedfilter_set.all():
@@ -405,7 +405,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
         run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
-        run.reference_configuration.variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name='GLDAS_SoilMoi0_10cm_inst')
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
         run.reference_configuration.save()
@@ -446,7 +446,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_P_V05_2)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_P_sm)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_P_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
         run.reference_configuration.save()
@@ -489,7 +489,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V06_1)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_A_sm)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_A_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
         run.reference_configuration.save()
@@ -531,7 +531,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMAP_soil_moisture)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.SMAP_soil_moisture)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
         run.reference_configuration.save()
@@ -573,7 +573,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ASCAT_H113)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ASCAT_sm)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ASCAT_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
         run.reference_configuration.save()
@@ -615,7 +615,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3SC)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V202012)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.C3S_sm)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.C3S_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
         run.reference_configuration.save()
@@ -656,7 +656,7 @@ class TestValidation(TestCase):
 
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
         #        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
 
@@ -702,7 +702,7 @@ class TestValidation(TestCase):
             if config != run.reference_configuration:
                 config.dataset = Dataset.objects.get(short_name='ASCAT')
                 config.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
-                config.variable = DataVariable.objects.get(short_name='ASCAT_sm')
+                config.variable = DataVariable.objects.get(pretty_name='ASCAT_sm')
                 config.filters.clear()
                 config.save()
 
@@ -815,7 +815,7 @@ class TestValidation(TestCase):
         # need validation without ISMN as referebce to check resolution attributes
         run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
         run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
         run.reference_configuration.save()
@@ -888,7 +888,7 @@ class TestValidation(TestCase):
         run.upscaling = True
         run.reference_configuration.dataset = Dataset.objects.get(short_name=ds)
         run.reference_configuration.version = DatasetVersion.objects.get(short_name=version)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=variable)
+        run.reference_configuration.variable = DataVariable.objects.get(pretty_name=variable)
         run.save()
         run_id = run.id
         # run the validation
@@ -929,7 +929,7 @@ class TestValidation(TestCase):
         c3s_reader = val.create_reader(dataset, version)
         dataset = Dataset.objects.get(short_name='ISMN')
         version = DatasetVersion.objects.get(short_name="ISMN_V20180712_MINI")
-        variable = DataVariable.objects.get(short_name="ISMN_soil_moisture")
+        variable = DataVariable.objects.get(pretty_name="ISMN_soil_moisture")
         ismn_reader = val.create_reader(dataset, version)
         datasets = {
             "0-C3S_combined": {"class": c3s_reader},
@@ -1050,7 +1050,7 @@ class TestValidation(TestCase):
     def test_setup_filtering_min(self):
         dataset = Dataset.objects.get(short_name='ISMN')
         version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
         reader = val.create_reader(dataset, version)
 
         no_msk_reader, read_name, read_kwargs = \
@@ -1060,7 +1060,7 @@ class TestValidation(TestCase):
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
-        assert not data[variable.pretty_name].empty
+        assert not data[variable.short_name].empty
 
         data_filters = [
             DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
@@ -1081,9 +1081,9 @@ class TestValidation(TestCase):
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
-        assert not data[variable.pretty_name].empty
-        assert not np.any(data[variable.pretty_name].values < 0)
-        assert not np.any(data[variable.pretty_name].values > 100)
+        assert not data[variable.short_name].empty
+        assert not np.any(data[variable.short_name].values < 0)
+        assert not np.any(data[variable.short_name].values > 100)
 
     # test potential depth ranges errors
     def test_depth_range_filtering_errors(self):
@@ -1217,14 +1217,14 @@ class TestValidation(TestCase):
                         else:
                             data = getattr(msk_reader, read_name)(-155.42, 19.78, **read_kwargs)  ## hawaii
                         assert data is not None
-                        assert variable.pretty_name in data.columns
+                        assert variable.short_name in data.columns
                         assert isinstance(data, pd.DataFrame)
 
                         # handles the case where all values are flagged (i.e. for SMOS L3)
-                        if not len(data.index) > 1 or data[variable.pretty_name].empty:
+                        if not len(data.index) > 1 or data[variable.short_name].empty:
                             unfiltered = reader.read(-155.42, 19.78, **read_kwargs)
 
-                            assert unfiltered.count()[variable.pretty_name] == len(unfiltered)
+                            assert unfiltered.count()[variable.short_name] == len(unfiltered)
 
         print("Test duration: {}".format(time.time() - start_time))
 
@@ -1300,7 +1300,7 @@ class TestValidation(TestCase):
         # apply Basic Adapter only
         c3s_reader, _, _ = val.setup_filtering(
             c3s_reader, filters=None, param_filters=None, dataset=dataset,
-            variable=DataVariable.objects.get(short_name='C3S_sm'))
+            variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
         gpis, lons, lats, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1324,7 +1324,7 @@ class TestValidation(TestCase):
         # apply Basic Adapter only
         c3s_reader, _, _ = val.setup_filtering(
             c3s_reader, filters=None, param_filters=None, dataset=dataset,
-            variable=DataVariable.objects.get(short_name='C3S_sm'))
+            variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1350,7 +1350,7 @@ class TestValidation(TestCase):
             # apply Basic Adapter only
             c3s_reader, _, _ = val.setup_filtering(
                 c3s_reader, filters=None, param_filters=None, dataset=dataset,
-                variable=DataVariable.objects.get(short_name='C3S_sm'))
+                variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
             gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1372,7 +1372,7 @@ class TestValidation(TestCase):
         # apply Basic Adapter only
         c3s_reader, _, _ = val.setup_filtering(
             c3s_reader, filters=None, param_filters=None, dataset=dataset,
-            variable=DataVariable.objects.get(short_name='C3S_sm'))
+            variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1791,7 +1791,7 @@ class TestValidation(TestCase):
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='ASCAT')
         data_c.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
-        data_c.variable = DataVariable.objects.get(short_name='ASCAT_sm')
+        data_c.variable = DataVariable.objects.get(pretty_name='ASCAT_sm')
         data_c.save()
 
         is_there_one = compare_validation_runs(run, published_runs, user)

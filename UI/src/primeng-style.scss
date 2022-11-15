@@ -4196,6 +4196,15 @@ div.carousel-caption{
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+#uploading-data-spinner .p-dialog .p-dialog-content{
+  opacity: 1;
+  background: transparent;
+}
+
+#uploading-data-spinner .p-dialog{
+  border-color: transparent;
+}
+
 .p-overlaypanel {
   background: #ffffff;
   color: #212529;
@@ -6220,6 +6229,22 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   color: $button-base-color;
   background-color: $base-color;
   border-color: $base-color;
+  transform: scale(1.2);
+}
+
+.cancel_black_btn.p-button, .save_name_black_btn.p-button{
+  color: black;
+  font-size: 1.5rem;
+  background-color: transparent;
+  border-color: transparent;
+  margin-left: 0.1rem;
+  width: 1.5rem;
+}
+
+.cancel_black_btn.p-button:not(.disabled):hover, .save_name_black_btn.p-button:not(.disabled):hover{
+  color: black;
+  background-color: transparent;
+  border-color: transparent;
   transform: scale(1.2);
 }
 

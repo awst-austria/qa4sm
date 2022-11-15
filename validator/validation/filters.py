@@ -97,7 +97,7 @@ Get the variables that need to be loaded for filtering the data on them.
 
 
 def get_used_variables(filters, dataset, variable):
-    variables = [variable.pretty_name]
+    variables = [variable.short_name]
 
     if not filters:
         return variables
@@ -120,7 +120,7 @@ def get_used_variables(filters, dataset, variable):
                 continue
 
             if fil.name == "FIL_GLDAS_UNFROZEN":
-                temp_variable = variable.pretty_name.replace("Moi", "TMP")
+                temp_variable = variable.short_name.replace("Moi", "TMP")
                 variables.append(temp_variable)
                 variables.append('SWE_inst')
                 continue
@@ -168,12 +168,12 @@ def get_used_variables(filters, dataset, variable):
                 continue
 
             if fil.name == "FIL_ERA5_TEMP_UNFROZEN":
-                era_temp_variable = variable.pretty_name.replace("wv", "t")
+                era_temp_variable = variable.short_name.replace("wv", "t")
                 variables.append(era_temp_variable)
                 continue
 
             if fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN":
-                era_temp_variable = variable.pretty_name.replace("wv", "t")
+                era_temp_variable = variable.short_name.replace("wv", "t")
                 variables.append(era_temp_variable)
                 continue
 
@@ -283,8 +283,8 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
         __logger.debug("Setting up filter {} for dataset {}.".format(fil.name, dataset))
 
         if fil.name == "FIL_ALL_VALID_RANGE":
-            masking_filters.append((variable.pretty_name, '>=', variable.min_value))
-            masking_filters.append((variable.pretty_name, '<=', variable.max_value))
+            masking_filters.append((variable.short_name, '>=', variable.min_value))
+            masking_filters.append((variable.short_name, '<=', variable.max_value))
             continue
 
         if fil.name == "FIL_ISMN_GOOD":
@@ -312,9 +312,9 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             continue
 
         if fil.name == "FIL_GLDAS_UNFROZEN":
-            temp_variable = variable.pretty_name.replace("Moi", "TMP")
+            temp_variable = variable.short_name.replace("Moi", "TMP")
             masking_filters.append(('SWE_inst', '<', 0.001))
-            masking_filters.append((variable.pretty_name, '>', 0.0))
+            masking_filters.append((variable.short_name, '>', 0.0))
             masking_filters.append((temp_variable, '>', 1.))
             continue
 
@@ -461,12 +461,12 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
         # snow depth in the nc file yet, this is the preliminary one.
         if fil.name == "FIL_ERA5_TEMP_UNFROZEN":
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
+            era_temp_variable = variable.short_name.replace("wv", "t")
             masking_filters.append((era_temp_variable, '>', 274.15))
             continue
 
         if fil.name == "FIL_ERA5_LAND_TEMP_UNFROZEN":
-            era_temp_variable = variable.pretty_name.replace("wv", "t")
+            era_temp_variable = variable.short_name.replace("wv", "t")
             masking_filters.append((era_temp_variable, '>', 274.15))
             continue
 

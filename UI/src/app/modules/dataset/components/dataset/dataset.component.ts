@@ -38,7 +38,8 @@ export class DatasetComponent implements OnInit {
 
     // Create dataset observable
     if (this.reference) {
-      this.datasets$ = this.datasetService.getAllDatasets().pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+      // user data can not be used as reference, so here only our data will be taken
+      this.datasets$ = this.datasetService.getAllDatasets(false).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
         let referenceDatasets: DatasetDto[] = [];
         datasets.forEach(dataset => {
           if (dataset.not_as_reference === false){
@@ -50,7 +51,7 @@ export class DatasetComponent implements OnInit {
       }));
     } else {
       // filter out datasets than can be used only as reference
-      this.datasets$ = this.datasetService.getAllDatasets().pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+      this.datasets$ = this.datasetService.getAllDatasets(true).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
         let nonOnlyReferenceDatasets: DatasetDto[] = [];
         datasets.forEach(dataset => {
           if (dataset.is_only_reference === false) {

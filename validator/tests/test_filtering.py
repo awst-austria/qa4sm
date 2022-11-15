@@ -219,11 +219,11 @@ class TestValidation(TestCase):
                 datafilter = DataFilter.objects.get(name=filtername)
                 filters = [model.objects.get(filter=datafilter), ]
 
-            variable = DataVariable.objects.get(short_name=sm_variable)
+            variable = DataVariable.objects.get(pretty_name=sm_variable)
             used_variables = get_used_variables(
                 filters, dataset=None, variable=variable
             )
-            used_variables_should = [variable.pretty_name]
+            used_variables_should = [variable.short_name]
             if isinstance(filter_variable_should, list):
                 used_variables_should.extend(filter_variable_should)
             else:

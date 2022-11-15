@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -11,7 +13,13 @@ from validator.models import Dataset
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset(request):
-    datasets = Dataset.objects.all()
+    user_data = json.loads(request.query_params.get('userData', 'false'))
+    user = request.user
+    datasets = Dataset.objects.filter(user=None)
+    if user_data and user.is_authenticated:
+        user_datasets = Dataset.objects.filter(user=user)
+        datasets = datasets.union(user_datasets)
+
     serializer = DatasetSerializer(datasets, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
@@ -39,5 +47,6 @@ class DatasetSerializer(ModelSerializer):
                   'versions',
                   'variables',
                   'filters',
-                  'not_as_reference'
+                  'not_as_reference',
+                  'user'
                   ]

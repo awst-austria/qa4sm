@@ -138,7 +138,7 @@ def create_jobs(
         )
 
         ids = reader.get_dataset_ids(
-            variable=dataset_config.variable.pretty_name,
+            variable=dataset_config.variable.short_name,
             min_depth=depth_from,
             max_depth=depth_to,
             groupby='network'

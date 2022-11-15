@@ -179,6 +179,12 @@ h5, .h5 {
   text-align: center !important;
 }
 
+.center{
+  display: flex;
+  justify-content: center;
+  font-family: $base-font;
+}
+
 .container {
   width: 100%;
   padding-right: 15px;

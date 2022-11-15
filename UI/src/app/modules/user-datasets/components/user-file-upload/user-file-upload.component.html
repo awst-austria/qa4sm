@@ -1,0 +1,122 @@
+<div class="p-grid">
+  <div class="p-col-12">
+    <div class="p-grid">
+      <div class="p-col-4">
+        <!--        this one here is to add the grid structure -->
+      </div>
+      <div class="p-col-2 p-sm-2">
+        <input type="file" class="file-input"
+               (change)="onFileSelected($event)" #fileUpload>
+        <span class="label-button">{{file ? file.name : "No file chosen yet."}}</span>
+      </div>
+      <div class="p-col-2 p-sm-1">
+        <div class="p-fluid">
+          <button pButton
+                  label="Select file"
+                  (click)="dialogVisible=true">
+            <!--                  (click)="fileUpload.click()">-->
+          </button>
+        </div>
+      </div>
+      <div class="p-col-2 p-sm-1">
+        <div class="p-fluid">
+          <button pButton
+                  [disabled]="!file || !metadataForm.valid"
+                  label="Upload file"
+                  (click)="sendForm()">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible">
+  <div class="p-pb-3 p-pl-0">You can upload your own data using this form. Please follow this file <a target="_blank"
+                                                                                                      [routerLink]="['/help', {pageSec: 'file-standard'}]">standard</a>
+  </div>
+  <div class="p-grid" style="display: flex">
+
+    <div class="center p-col-12 p-pb-0 p-pr-4">
+      <div class="form-field">
+        {{file ? file.name : "No file chosen yet."}}
+      </div>
+    </div>
+
+    <div class="center p-col-12 p-pt-0 p-pr-4">
+      <div class="form-field">
+        <button pButton
+                [label]="file ? 'Change file' :'Add file'"
+                (click)="fileUpload.click()">
+        </button>
+      </div>
+    </div>
+
+    <div class="center p-col-12">
+      <form *ngIf="file" [formGroup]="metadataForm" (ngSubmit)="onSaveData()">
+        <div class="p-py-3">
+          <span class="p-float-label">
+            <input class="form-field" id="dataset-name" type="text" pInputText formControlName="dataset_name">
+            <label for="dataset-name">Dataset name</label>
+            <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+                  class="pi pi-question-circle">
+            </span>
+          </span>
+        </div>
+
+        <div class="p-py-3">
+          <span class="p-float-label">
+            <input class="form-field" id="dataset-pretty-name" type="text" pInputText
+                   formControlName="dataset_pretty_name">
+            <label for="dataset-pretty-name">Dataset display name (optional)</label>
+            <span
+              pTooltip="Optional. 30 characters or fewer. Letters, digits, space and @/./+/-/_ only. If not provided, the name from the field above will be used."
+              class="pi pi-question-circle">
+            </span>
+          </span>
+        </div>
+
+        <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="version-name" type="text" pInputText formControlName="version_name">
+          <label for="version-name">Version name</label>
+          <span pTooltip="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+                class="pi pi-question-circle">
+          </span>
+        </span>
+        </div>
+
+        <div class="p-py-3">
+        <span class="p-float-label">
+          <input class="form-field" id="version-pretty-name" type="text" pInputText
+                 formControlName="version_pretty_name">
+          <label for="version-pretty-name">Version display name (optional)</label>
+          <span
+            pTooltip="Optional. 30 characters or fewer. Letters, digits, space and @/./+/-/_ only. If not provided, the name from the field above will be used."
+            class="pi pi-question-circle">
+          </span>
+        </span>
+        </div>
+
+        <div class="form-field">
+          <button pButton
+                  type="submit"
+                  label="Save"
+                  [disabled]="!metadataForm.valid">
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+  </div>
+</p-dialog>
+
+<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible">
+  <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
+  <div class="uploading-message">Do not close this tab. We are uploading your data... </div>
+  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message p-pt-3">Progress {{uploadProgress|async}} % </div>
+  <div *ngIf="(uploadProgress|async) == 100" class="uploading-message p-pt-3">Your file has been uploaded. We still need a few seconds to preprocess it.. </div>
+</p-dialog>
+

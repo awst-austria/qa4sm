@@ -31,9 +31,9 @@ class Command(BaseCommand):
             if ((mode == 'u') and bool(dataset.storage_path)):
                 continue
 
-            if parent_data_folder:
+            if parent_data_folder and not dataset.user:
                 default_path = path.join(parent_data_folder, dataset.short_name)
-            elif dataset.storage_path:
+            elif (parent_data_folder and dataset.user) or dataset.storage_path:
                 default_path = dataset.storage_path
             else:
                 default_path = None
