@@ -219,7 +219,7 @@ def get_used_variables(filters, dataset, variable):
                 continue
 
             if fil.filter.name == "FIL_SMOSL2_CHI2P":
-                variables.append('Chi_2')
+                variables.append('Chi_2_P')
                 continue
 
     return variables
@@ -260,7 +260,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
         if pfil.filter.name == "FIL_SMOSL2_CHI2P":
             param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)
-            masking_filters.append(('Chi_2', '>=', float(param)))
+            masking_filters.append(('Chi_2_P', '>=', float(param)))
             continue
 
         inner_reader = filtered_reader
