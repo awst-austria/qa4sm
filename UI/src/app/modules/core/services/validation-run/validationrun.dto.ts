@@ -10,6 +10,8 @@ export class ValidationrunDto{
               public progress: number,
               public dataset_configurations: number[],
               public spatial_reference_configuration: number,
+              public temporal_reference_configuration: number,
+              public scaling_reference_configuration: number,
               public scaling_ref: number,
               public scaling_method: string,
               public interval_from: Date,
