@@ -54,7 +54,7 @@ export class DatasetComponent implements OnInit {
       this.datasets$ = this.datasetService.getAllDatasets(true).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
         let nonOnlyReferenceDatasets: DatasetDto[] = [];
         datasets.forEach(dataset => {
-          if (dataset.is_only_reference === false) {
+          if (dataset.is_spatial_reference === false) {
             nonOnlyReferenceDatasets.push(dataset);
           }
         });

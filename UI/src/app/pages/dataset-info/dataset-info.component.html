@@ -31,10 +31,10 @@
       </thead>
       <tbody>
       <tr *ngFor="let dataset of datasets">
-        <th *ngIf="dataset.is_only_reference == refFlag" scope="row">{{ dataset.pretty_name }}
+        <th *ngIf="dataset.is_spatial_reference == refFlag" scope="row">{{ dataset.pretty_name }}
           <sup *ngIf="dataset.not_as_reference">*</sup></th>
-        <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.detailed_description"></td>
-        <td *ngIf="dataset.is_only_reference == refFlag">
+        <td *ngIf="dataset.is_spatial_reference == refFlag" [innerHTML]="dataset.detailed_description"></td>
+        <td *ngIf="dataset.is_spatial_reference == refFlag">
           <ul class="p-pl-0 p-my-0">
             <li *ngFor="let version of dataset.versions; let ind=index" class="p-ml-2">
               <b> {{ version }}</b> <br>
@@ -51,9 +51,9 @@
             </li>
           </ul>
         </td>
-        <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.source_reference"></td>
-        <td *ngIf="dataset.is_only_reference == refFlag" [innerHTML]="dataset.citation"></td>
-        <td *ngIf="dataset.is_only_reference == refFlag">
+        <td *ngIf="dataset.is_spatial_reference == refFlag" [innerHTML]="dataset.source_reference"></td>
+        <td *ngIf="dataset.is_spatial_reference == refFlag" [innerHTML]="dataset.citation"></td>
+        <td *ngIf="dataset.is_spatial_reference == refFlag">
           <ul class="p-pl-0  p-my-0">
             <li *ngFor="let filter of dataset.filters; let ind = index" class="p-ml-2">
               {{filter}}: {{dataset.filtersHelpText[ind]}}

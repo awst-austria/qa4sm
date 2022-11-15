@@ -51,7 +51,7 @@ class DatasetConfigurationForm(forms.ModelForm):
             # temporarily SMOS, SMAP and ASCAT are removed from the reference list
             self.fields["dataset"].queryset = Dataset.objects.exclude(short_name__in=NOT_AS_REFERENCE)
         else:
-            self.fields["dataset"].queryset = Dataset.objects.filter(is_only_reference=is_reference)
+            self.fields["dataset"].queryset = Dataset.objects.filter(is_spatial_reference=is_reference)
 
         for key in ["dataset", "version", "variable"]:
             self.fields[key].initial = self.get_initial_for_field(
