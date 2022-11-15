@@ -78,7 +78,7 @@ def generate_default_validation():
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.save()
 
@@ -111,7 +111,7 @@ def generate_default_validation_triple_coll():
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.tcol = True
     run.save()
@@ -132,7 +132,7 @@ def default_parameterized_validation_to_be_run(user, tcol=False):
     run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
     for config in run.dataset_configurations.all():
-        if config == run.reference_configuration:
+        if config == run.spatial_reference_configuration:
             config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
         else:
             config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -140,10 +140,10 @@ def default_parameterized_validation_to_be_run(user, tcol=False):
         config.save()
 
     pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',
-                                 dataset_config=run.reference_configuration)
+                                 dataset_config=run.spatial_reference_configuration)
     pfilter.save()
     pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1",
-                                 dataset_config=run.reference_configuration)
+                                 dataset_config=run.spatial_reference_configuration)
     pfilter.save()
 
     return run

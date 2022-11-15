@@ -138,7 +138,7 @@ def get_validation_configuration(request, **kwargs):
         if val_run.scaling_method is not None or val_run.scaling_method != 'none':
             val_run_dict['scale_to'] = ValidationRun.SCALE_TO_REF
             if val_run.scaling_ref is not None:
-                if val_run.scaling_ref.id != val_run.reference_configuration.id:
+                if val_run.scaling_ref.id != val_run.spatial_reference_configuration.id:
                     val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
 
         # if one day we decide to remove any of these metrics, we need to check if reloaded settings use them
@@ -187,11 +187,11 @@ def get_validation_configuration(request, **kwargs):
                 changes_in_settings['filters'].append(
                     {'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
 
-            if val_run.reference_configuration_id == ds.id:
+            if val_run.spatial_reference_configuration_id == ds.id:
                 val_run_dict['reference_config'] = {
-                    'dataset_id': val_run.reference_configuration.dataset.id,
-                    'version_id': val_run.reference_configuration.version.id,
-                    'variable_id': val_run.reference_configuration.variable.id,
+                    'dataset_id': val_run.spatial_reference_configuration.dataset.id,
+                    'version_id': val_run.spatial_reference_configuration.version.id,
+                    'variable_id': val_run.spatial_reference_configuration.variable.id,
                     'basic_filters': filters_list,
                     'parametrised_filters': parametrised_filters
                 }
@@ -301,7 +301,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 config_model.save()
                 dataset_config_models.append(config_model)
 
-            new_val_run.reference_configuration = dataset_config_models[-1]
+            new_val_run.spatial_reference_configuration = dataset_config_models[-1]
             scale_to = validated_data.get('scaling_method', None)
             if scale_to is not None:
                 if scale_to == ValidationRun.SCALE_TO_DATA:
