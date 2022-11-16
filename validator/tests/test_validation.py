@@ -1109,7 +1109,7 @@ class TestValidation(TestCase):
                                      dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
-        ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
+        ref_reader, read_name, read_kwargs = val.validation._get_spatial_reference_reader(run)
 
         with pytest.raises(ValueError, match=r".*than.*"):
             val.create_jobs(
@@ -1271,7 +1271,7 @@ class TestValidation(TestCase):
                 run.spatial_reference_configuration = ref_c
                 run.save()
 
-                ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
+                ref_reader, read_name, read_kwargs = val.validation._get_spatial_reference_reader(run)
 
                 total_points, jobs = val.create_jobs(
                     run,
