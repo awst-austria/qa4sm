@@ -1,0 +1,11 @@
+<div class="p-grid  p-align-center">
+  <div class="p-col">
+    <span class="p-float-label p-mb-4 p-mt-3">
+    <p-dropdown id="datasetSelector" (onChange)="onDatasetChange()" [options]="(datasets$|async)"
+                [(ngModel)]="selectionModel.selectedDataset"
+                optionLabel="pretty_name" [style]="{'width': '100%'}"></p-dropdown>
+      <label for="datasetSelector">Dataset</label>
+    </span>
+
+  </div>
+</div>
