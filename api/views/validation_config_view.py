@@ -203,16 +203,8 @@ def get_validation_configuration(request, **kwargs):
                     'basic_filters': filters_list,
                     'parametrised_filters': parametrised_filters
                 }
-            elif val_run.scaling_reference_configuration_id == ds.id:
-                val_run_dict['scaling_reference_config'] = {
-                    'dataset_id': val_run.scaling_reference_configuration.dataset.id,
-                    'version_id': val_run.scaling_reference_configuration.version.id,
-                    'variable_id': val_run.scaling_reference_configuration.variable.id,
-                    'basic_filters': filters_list,
-                    'parametrised_filters': parametrised_filters
-                }
-        else:
-            datasets.append(ds_dict)
+            else:
+                datasets.append(ds_dict)
 
         if changes_in_settings['anomalies'] or changes_in_settings['scaling'] or \
                 len(changes_in_settings['filters']) != 0:
