@@ -8,7 +8,8 @@ import {DatasetVariableService} from '../../modules/core/services/dataset/datase
 import {
   DatasetConfigModel,
   ISMN_DEPTH_FILTER_ID,
-  ISMN_NETWORK_FILTER_ID, SMOS_CHI2_FILTER_ID,
+  ISMN_NETWORK_FILTER_ID,
+  SMOS_CHI2_FILTER_ID,
   SMOS_RFI_FILTER_ID
 } from './dataset-config-model';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
@@ -228,18 +229,18 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<FilterModel>(null),
       new BehaviorSubject<FilterModel>(null));
     this.validationModel.referenceConfigurations.push(newReferenceModel);
-    this.datasetService.getDatasetById(validationRunConfig.reference_config.dataset_id).subscribe(dataset => {
+    this.datasetService.getDatasetById(validationRunConfig.spatial_reference_config.dataset_id).subscribe(dataset => {
       newReferenceModel.datasetModel.selectedDataset = dataset;
       this.loadFiltersForModel(newReferenceModel, true)
         .subscribe(referenceConfigModel => { // when it is loaded, set the values from the config
-          validationRunConfig.reference_config.basic_filters.forEach(basicFilterConfig => {
+          validationRunConfig.spatial_reference_config.basic_filters.forEach(basicFilterConfig => {
             referenceConfigModel.basicFilters.forEach(filter => {
               if (basicFilterConfig === filter.filterDto.id) {
                 filter.enabled = true;
               }
             });
           });
-          validationRunConfig.reference_config.parametrised_filters.forEach(paramFilter => {
+          validationRunConfig.spatial_reference_config.parametrised_filters.forEach(paramFilter => {
             if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
               referenceConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
             }
@@ -253,11 +254,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         });
     });
 
-    this.versionService.getVersionById(validationRunConfig.reference_config.version_id).subscribe(versionDto => {
+    this.versionService.getVersionById(validationRunConfig.spatial_reference_config.version_id).subscribe(versionDto => {
       newReferenceModel.datasetModel.selectedVersion = versionDto;
     });
 
-    this.variableService.getVariableById(validationRunConfig.reference_config.variable_id).subscribe(variableDto => {
+    this.variableService.getVariableById(validationRunConfig.spatial_reference_config.variable_id).subscribe(variableDto => {
       newReferenceModel.datasetModel.selectedVariable = variableDto;
     });
 
@@ -519,7 +520,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     const newValidation: ValidationRunConfigDto = {
       dataset_configs: datasets,
-      reference_config: this.validationModel.referenceConfigurations[0].toValRunDatasetConfigDto(),
+      //  UPDATE INDICES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      spatial_reference_config: this.validationModel.referenceConfigurations[0].toValRunDatasetConfigDto(),
+      temporal_reference_config: this.validationModel.referenceConfigurations[0].toValRunDatasetConfigDto(),
+      scaling_reference_config: this.validationModel.referenceConfigurations[0].toValRunDatasetConfigDto(),
+
       interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
       interval_to: this.validationModel.validationPeriodModel.intervalTo$.getValue(),
       min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
@@ -687,7 +692,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.validationPeriodModel.intervalTo$.next(this.validationEnd);
   }
 
-  private getValidationFieldFriendlyName(fieldName): string{
+  private getValidationFieldFriendlyName(fieldName): string {
     const fieldsFriendlyNames = {
       name_tag: 'validation name',
       interval_from: 'validation period "From"',
@@ -705,7 +710,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     let message = 'Please fix following problems: \n';
 
     Object.entries(errors.error).forEach(([key]) => {
-      if (this.getValidationFieldFriendlyName(key)){
+      if (this.getValidationFieldFriendlyName(key)) {
         message += `\n Field ${this.getValidationFieldFriendlyName(key)}: ${errors.error[key]} \n`;
       } else {
         message += `\n ${errors.error[key]}`;
