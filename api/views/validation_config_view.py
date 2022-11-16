@@ -188,15 +188,31 @@ def get_validation_configuration(request, **kwargs):
                     {'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
 
             if val_run.spatial_reference_configuration_id == ds.id:
-                val_run_dict['reference_config'] = {
+                val_run_dict['spatial_reference_config'] = {
                     'dataset_id': val_run.spatial_reference_configuration.dataset.id,
                     'version_id': val_run.spatial_reference_configuration.version.id,
                     'variable_id': val_run.spatial_reference_configuration.variable.id,
                     'basic_filters': filters_list,
                     'parametrised_filters': parametrised_filters
                 }
-            else:
-                datasets.append(ds_dict)
+            elif val_run.temporal_reference_configuration_id == ds.id:
+                val_run_dict['temporal_reference_config'] = {
+                    'dataset_id': val_run.temporal_reference_configuration.dataset.id,
+                    'version_id': val_run.temporal_reference_configuration.version.id,
+                    'variable_id': val_run.temporal_reference_configuration.variable.id,
+                    'basic_filters': filters_list,
+                    'parametrised_filters': parametrised_filters
+                }
+            elif val_run.scaling_reference_configuration_id == ds.id:
+                val_run_dict['scaling_reference_config'] = {
+                    'dataset_id': val_run.scaling_reference_configuration.dataset.id,
+                    'version_id': val_run.scaling_reference_configuration.version.id,
+                    'variable_id': val_run.scaling_reference_configuration.variable.id,
+                    'basic_filters': filters_list,
+                    'parametrised_filters': parametrised_filters
+                }
+        else:
+            datasets.append(ds_dict)
 
         if changes_in_settings['anomalies'] or changes_in_settings['scaling'] or \
                 len(changes_in_settings['filters']) != 0:
@@ -314,7 +330,9 @@ class ValidationConfigurationSerializer(serializers.Serializer):
         return new_val_run
 
     dataset_configs = DatasetConfigSerializer(many=True, required=True)
-    reference_config = DatasetConfigSerializer(required=True)
+    spatial_reference_config = DatasetConfigSerializer(required=True)
+    temporal_reference_config = DatasetConfigSerializer(required=True)
+    scaling_reference_config = DatasetConfigSerializer(required=True)
     interval_from = serializers.DateTimeField(required=False)
     interval_to = serializers.DateTimeField(required=False)
     metrics = MetricsSerializer(many=True, required=True)
