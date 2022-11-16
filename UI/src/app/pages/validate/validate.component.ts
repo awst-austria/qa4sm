@@ -47,7 +47,7 @@ import {
 } from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
 
 
-const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
+const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
 
 @Component({
   selector: 'app-validate',
@@ -143,7 +143,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               this.setDefaultGeographicalRange();
             });
             this.addDatasetToValidate();
-            this.addReferenceDataset();
+            this.addDatasetToValidate('ISMN', '20210131 global', true);
           }
         );
       } else {
@@ -151,7 +151,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           this.setDefaultGeographicalRange();
         });
         this.addDatasetToValidate();
-        this.addReferenceDataset();
+        this.addDatasetToValidate('ISMN', '20210131 global', true);
+        // this.addReferenceDataset();
       }
 
     });
@@ -340,12 +341,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return itDoes;
   }
 
-  addDatasetToValidate(): void {
-    this.addDataset(this.validationModel.datasetConfigurations, 'C3S_combined', 'v202012', true);
-  }
-
-  addReferenceDataset(): void {
-    this.addDataset(this.validationModel.referenceConfigurations, 'ISMN', '20210131 global', false);
+  addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = 'v202012', userData = true): void {
+    this.addDataset(this.validationModel.datasetConfigurations, defaultDatasetName, defaultVersionName, userData);
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string, userData: boolean): void {

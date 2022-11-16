@@ -25,7 +25,6 @@ export class DatasetComponent implements OnInit {
 
   @Input() selectionModel: DatasetComponentSelectionModel;
   @Input() removable = false;
-  @Input() reference = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
 
@@ -37,31 +36,34 @@ export class DatasetComponent implements OnInit {
   ngOnInit(): void {
 
     // Create dataset observable
-    if (this.reference) {
-      // user data can not be used as reference, so here only our data will be taken
-      this.datasets$ = this.datasetService.getAllDatasets(false).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-        let referenceDatasets: DatasetDto[] = [];
-        datasets.forEach(dataset => {
-          if (dataset.not_as_reference === false){
-            referenceDatasets.push(dataset);
-          }
-        });
-        referenceDatasets = this.sortById(referenceDatasets);
-        return referenceDatasets;
-      }));
-    } else {
-      // filter out datasets than can be used only as reference
-      this.datasets$ = this.datasetService.getAllDatasets(true).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-        let nonOnlyReferenceDatasets: DatasetDto[] = [];
-        datasets.forEach(dataset => {
-          if (dataset.is_spatial_reference === false) {
-            nonOnlyReferenceDatasets.push(dataset);
-          }
-        });
-        nonOnlyReferenceDatasets = this.sortById(nonOnlyReferenceDatasets);
-        return nonOnlyReferenceDatasets;
-      }));
-    }
+    this.datasets$ = this.datasetService.getAllDatasets(false).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+      return this.sortById(datasets);
+    }));
+    // if (this.reference) {
+    //   // user data can not be used as reference, so here only our data will be taken
+    //   this.datasets$ = this.datasetService.getAllDatasets(false).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+    //     let referenceDatasets: DatasetDto[] = [];
+    //     datasets.forEach(dataset => {
+    //       if (dataset.not_as_reference === false){
+    //         referenceDatasets.push(dataset);
+    //       }
+    //     });
+    //     referenceDatasets = this.sortById(referenceDatasets);
+    //     return referenceDatasets;
+    //   }));
+    // } else {
+    //   // filter out datasets than can be used only as reference
+    //   this.datasets$ = this.datasetService.getAllDatasets(true).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+    //     let nonOnlyReferenceDatasets: DatasetDto[] = [];
+    //     datasets.forEach(dataset => {
+    //       if (dataset.is_spatial_reference === false) {
+    //         nonOnlyReferenceDatasets.push(dataset);
+    //       }
+    //     });
+    //     nonOnlyReferenceDatasets = this.sortById(nonOnlyReferenceDatasets);
+    //     return nonOnlyReferenceDatasets;
+    //   }));
+    // }
 
     this.selectableDatasetVersions$ = this.sortObservableById(
       this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));

@@ -38,20 +38,32 @@
               </ng-container>
 
               <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
-                [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
-                [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
+                                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                   [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
+                                   [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
               </qa-threshold-filter>
 
               <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
                                    [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                                    [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
                                    [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
-            </qa-threshold-filter>
+              </qa-threshold-filter>
+              <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
+                <qa-ismn-network-filter
+
+                  [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
+              </div>
+              <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
+                <qa-ismn-depth-filter
+                  [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
+                </qa-ismn-depth-filter>
+              </div>
 
               <div style="width: 100%;text-align: right">
                 <button pButton type="button"
-                        [disabled]="validationModel.datasetConfigurations.length < 2"
+                        [disabled]="validationModel.datasetConfigurations.length < 3"
                         (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
                         label="Remove dataset"
                         icon="pi pi-trash"
@@ -86,49 +98,10 @@
             </label>
           </ng-template>
 
-          <div
-            *ngIf="validationModel.referenceConfigurations.length>0 && validationModel.referenceConfigurations[0].datasetModel.selectedDataset">
-            <qa-dataset
-              [reference]="true"
-              [removable]="false"
-              [selectionModel]="validationModel.referenceConfigurations[0].datasetModel"
-              (changeDataset)="onReferenceChange()"></qa-dataset>
-
-            <ng-container *ngFor="let filter of validationModel.referenceConfigurations[0].basicFilters; let i = index">
-              <qa-basic-filter *ngIf="filter.filterDto.id != smosThresholdFilter"
-                [ngClass]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters) == true ? 'ml-1' : ''"
-                [isIncluded]="isIncluded(filter.filterDto.id, validationModel.referenceConfigurations[0].basicFilters)"
-                [filterModel]="filter"
-                (onExcludeMutual)="this.excludeFilter($event, validationModel.referenceConfigurations[0].basicFilters)"
-                (onIncludeMutual)="includeFilter($event, validationModel.referenceConfigurations[0].basicFilters, filter.enabled)">
-              </qa-basic-filter>
-            </ng-container>
-
-            <qa-threshold-filter *ngIf="validationModel.referenceConfigurations[0].smosRfiFilter$|async"
-               [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
-               [filterModel$]="validationModel.referenceConfigurations[0].smosRfiFilter$"
-               [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">>
-            </qa-threshold-filter>
-
-            <qa-threshold-filter *ngIf="validationModel.referenceConfigurations[0].smosChi2Filter$|async"
-                                 [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
-                                 [filterModel$]="validationModel.referenceConfigurations[0].smosChi2Filter$"
-                                 [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">>
-            </qa-threshold-filter>
-
-            <div *ngIf="validationModel.referenceConfigurations[0].ismnNetworkFilter$|async">
-              <qa-ismn-network-filter
-
-                [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
-                [filterModel$]="validationModel.referenceConfigurations[0].ismnNetworkFilter$"></qa-ismn-network-filter>
-            </div>
-            <div *ngIf="validationModel.referenceConfigurations[0].ismnDepthFilter$|async">
-              <qa-ismn-depth-filter
-                [datasetModel]="validationModel.referenceConfigurations[0].datasetModel"
-                [filterModel$]="validationModel.referenceConfigurations[0].ismnDepthFilter$">
-              </qa-ismn-depth-filter>
-            </div>
-
+          <div>
+            <qa-dataset-reference
+              [selectionModel]="validationModel.datasetConfigurations"
+              (changeDataset)="onReferenceChange()"></qa-dataset-reference>
           </div>
 
         </p-panel>
@@ -149,7 +122,6 @@
       <div class="p-col-10">
         <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
       </div>
-
 
 
       <p-panel header="Temporal Subsetting" [toggleable]="true" class="validation-row p-col-10">
@@ -177,7 +149,6 @@
       <div class="p-col-10">
         <qa-metrics [validationModel]="validationModel"></qa-metrics>
       </div>
-
 
 
       <!--      Anomalies-->
