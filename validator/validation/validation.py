@@ -69,7 +69,7 @@ def _get_actual_time_range(val_run, dataset_version_id):
     return [actual_start, actual_end]
 
 
-def _get_reference_reader(val_run) -> ('Reader', str, dict):
+def _get_spatial_reference_reader(val_run) -> ('Reader', str, dict):
     ref_reader = create_reader(val_run.spatial_reference_configuration.dataset,
                                val_run.spatial_reference_configuration.version)
 
@@ -405,7 +405,7 @@ def run_validation(validation_id):
         run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
         mkdir_if_not_exists(run_dir)
 
-        ref_reader, read_name, read_kwargs = _get_reference_reader(validation_run)
+        ref_reader, read_name, read_kwargs = _get_spatial_reference_reader(validation_run)
 
         total_points, jobs = create_jobs(
             validation_run=validation_run,
