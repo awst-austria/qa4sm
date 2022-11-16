@@ -17,7 +17,7 @@ class DatasetConfigurationInline(TabularInline):
 class ValidationRunAdmin(ModelAdmin):
     list_display = ('id', 'start_time', 'end_time', 'user', 'name_tag', 'open_button',)
     readonly_fields = (
-        'spatial_reference_configuration', 'temporal_reference_configuration', 'scaling_reference_configuration',
+        'spatial_reference_configuration', 'temporal_reference_configuration',
         'scaling_ref',)
     search_fields = ('name_tag',)
     list_filter = ('start_time', 'end_time', 'user')

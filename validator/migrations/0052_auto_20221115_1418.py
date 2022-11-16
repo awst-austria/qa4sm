@@ -10,7 +10,6 @@ def update_scaling_and_temporal_reference_fields(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     ValidationRun.objects.using(db_alias).all().update(
         temporal_reference_configuration=F('spatial_reference_configuration'),
-        scaling_reference_configuration=F('spatial_reference_configuration')
     )
 
 
@@ -20,12 +19,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='validationrun',
-            name='scaling_reference_configuration',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL,
-                                    related_name='scal_ref_validation_run', to='validator.datasetconfiguration'),
-        ),
         migrations.AddField(
             model_name='validationrun',
             name='temporal_reference_configuration',

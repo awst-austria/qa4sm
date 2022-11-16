@@ -82,9 +82,6 @@ class ValidationRun(models.Model):
                                                         related_name='spat_ref_validation_run', null=True)
     temporal_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
                                                          related_name='temp_ref_validation_run', null=True)
-    scaling_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
-                                                        related_name='scal_ref_validation_run', null=True)
-
     scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
                                     related_name='scaling_ref_validation_run', null=True)
     scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
