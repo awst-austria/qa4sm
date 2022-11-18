@@ -98,11 +98,30 @@
             </label>
           </ng-template>
 
-          <div>
-            <qa-dataset-reference
+          <!--             spatial reference-->
+          <div class="p-pt-2">
+            <label for="spatial-reference" class="p-mb-4">Spatial reference:</label>
+            <qa-validation-reference
+              id="spatial-reference"
+              *ngIf="spatialReferenceList$|async"
+              [chosenDatasets$]= "spatialReferenceList$"
               [selectionModel]="validationModel.datasetConfigurations"
-              (changeDataset)="onReferenceChange()"></qa-dataset-reference>
+              referenceType="spatialReference"
+              (changeDataset)="onReferenceChange($event)"></qa-validation-reference>
           </div>
+
+          <!--             temporal reference-->
+          <div >
+            <label for="temporal-reference" class="p-mb-4">Temporal reference:</label>
+            <qa-validation-reference
+              id="temporal-reference"
+              *ngIf="temporalReferenceList$|async"
+              [chosenDatasets$]= "temporalReferenceList$"
+              [selectionModel]="validationModel.datasetConfigurations"
+              referenceType="temporalReference"
+              (changeDataset)="onReferenceChange($event)"></qa-validation-reference>
+          </div>
+
 
         </p-panel>
       </div>
