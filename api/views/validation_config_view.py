@@ -305,7 +305,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             scale_to = validated_data.get('scaling_method', None)
             if scale_to is not None:
                 if scale_to == ValidationRun.SCALE_TO_DATA:
-                    new_val_run.scaling_ref = dataset_config_models[1]
+                    new_val_run.scaling_ref = dataset_config_models[0]
                 else:
                     new_val_run.scaling_ref = dataset_config_models[-1]
 
