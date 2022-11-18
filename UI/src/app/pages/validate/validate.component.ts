@@ -146,6 +146,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           }
         );
       } else {
+        this.validationModel.datasetConfigurations = [];
+        this.validationModel.referenceConfigurations = [];
         of({}).pipe(delay(0)).subscribe(() => {
           this.setDefaultGeographicalRange();
         });
