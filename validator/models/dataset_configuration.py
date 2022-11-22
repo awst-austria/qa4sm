@@ -15,6 +15,8 @@ class DatasetConfiguration(models.Model):
     variable = models.ForeignKey(to=DataVariable, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     filters = models.ManyToManyField(DataFilter, related_name='dataset_configurations', blank=True)
     parametrised_filters = models.ManyToManyField(DataFilter, through='ParametrisedFilter', blank=True)
+    is_spatial_reference = models.BooleanField(null=True)
+    is_temporal_reference = models.BooleanField(null=True)
 
     def __str__(self):
         return "Data set: {}, version: {}, variable: {}".format(
