@@ -39,7 +39,6 @@
                         [options]="scaleToModels"
                         [ngModel]="selectedScaleToModel$|async"
                         (ngModelChange)="selectedScaleToModel$.next($event)"
-                        [disabled]="isScalingSelectorDisabled()"
                         optionLabel="description" [style]="{'min-width':'250px'}"></p-dropdown>
             <label for="scalingReferenceSelector">Select</label>
           </div>

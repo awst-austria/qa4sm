@@ -1,4 +1,6 @@
-import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
+import {
+  DatasetComponentSelectionModel
+} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
 import {BehaviorSubject} from 'rxjs';
@@ -16,6 +18,9 @@ export class DatasetConfigModel {
               public smosChi2Filter$: BehaviorSubject<FilterModel>,
               public ismnNetworkFilter$: BehaviorSubject<FilterModel>,
               public ismnDepthFilter$: BehaviorSubject<FilterModel>,
+              public spatialReference: BehaviorSubject<boolean>,
+              public temporalReference: BehaviorSubject<boolean>,
+              public highlighted?: BehaviorSubject<boolean>
   ) {
   }
 
