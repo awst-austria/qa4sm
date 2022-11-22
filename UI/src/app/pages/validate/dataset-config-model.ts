@@ -57,7 +57,9 @@ export class DatasetConfigModel {
       variable_id: this.datasetModel.selectedVariable.id,
       version_id: this.datasetModel.selectedVersion.id,
       basic_filters: enabledBasicFilters,
-      parametrised_filters: parameterisedFilters
+      parametrised_filters: parameterisedFilters,
+      is_spatial_reference: this.spatialReference.value,
+      is_temporal_reference: this.temporalReference.value
     };
   }
 }
