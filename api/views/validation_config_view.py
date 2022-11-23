@@ -21,6 +21,11 @@ from validator.validation.validation import compare_validation_runs
 def _check_if_settings_exist():
     pass
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_scaling_methods(request):
+    scaling_methods = dict((x, y) for x, y in globals.SCALING_METHODS)
+    return JsonResponse(scaling_methods, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -287,7 +292,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             reference_config = None
             dataset_config_models = []
             configs_to_save = validated_data.get('dataset_configs')
-            configs_to_save.append(validated_data.get('reference_config'))
+
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,
                                                                    dataset_id=config.get('dataset_id'),
@@ -309,11 +314,13 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 config_model.save()
                 dataset_config_models.append(config_model)
 
-            new_val_run.spatial_reference_configuration = dataset_config_models[-1]
+            new_val_run.spatial_reference_configuration = dataset_config_models
+
+
             scale_to = validated_data.get('scaling_method', None)
             if scale_to is not None:
                 if scale_to == ValidationRun.SCALE_TO_DATA:
-                    new_val_run.scaling_ref = dataset_config_models[1]
+                    new_val_run.scaling_ref = dataset_config_models[0]
                 else:
                     new_val_run.scaling_ref = dataset_config_models[-1]
 
@@ -322,9 +329,8 @@ class ValidationConfigurationSerializer(serializers.Serializer):
         return new_val_run
 
     dataset_configs = DatasetConfigSerializer(many=True, required=True)
-    spatial_reference_config = DatasetConfigSerializer(required=True)
-    temporal_reference_config = DatasetConfigSerializer(required=True)
-    scaling_reference_config = DatasetConfigSerializer(required=True)
+    # spatial_reference_config = DatasetConfigSerializer(required=True)
+    # temporal_reference_config = DatasetConfigSerializer(required=True)
     interval_from = serializers.DateTimeField(required=False)
     interval_to = serializers.DateTimeField(required=False)
     metrics = MetricsSerializer(many=True, required=True)
