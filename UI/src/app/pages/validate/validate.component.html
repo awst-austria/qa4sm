@@ -90,8 +90,9 @@
         </p-panel>
       </div>
 
-      <!--  reference column-->
+
       <div class="p-md-5 p-col-10">
+        <!--  reference column-->
         <p-panel header="Reference" [toggleable]="true" class="validation-small-row">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
@@ -107,7 +108,7 @@
             <qa-validation-reference
               id="spatial-reference"
               *ngIf="spatialReferenceList$|async"
-              [chosenDatasets$]= "spatialReferenceList$"
+              [chosenDatasets$]="spatialReferenceList$"
               [selectionModel]="spatialRef"
               referenceType="spatialReference"
               (hoverOverDataset)="onHoverOverReferenceDataset($event)"
@@ -115,12 +116,12 @@
           </div>
 
           <!--             temporal reference-->
-          <div >
+          <div>
             <label for="temporal-reference" class="p-mb-4">Temporal reference:</label>
             <qa-validation-reference
               id="temporal-reference"
               *ngIf="temporalReferenceList$|async"
-              [chosenDatasets$]= "temporalReferenceList$"
+              [chosenDatasets$]="temporalReferenceList$"
               [selectionModel]="temporalRef"
               referenceType="temporalReference"
               (hoverOverDataset)="onHoverOverReferenceDataset($event)"
@@ -129,6 +130,16 @@
 
 
         </p-panel>
+
+
+        <!--      Scaling-->
+<!--        <p-panel header="Reference" [toggleable]="true" class="validation-small-row">-->
+<!--          <div class="p-col-10">-->
+            <qa-scaling [validationModel]="validationModel"></qa-scaling>
+<!--          </div>-->
+<!--        </p-panel>-->
+
+
       </div>
 
       <!--      Map-->
@@ -180,10 +191,10 @@
         <qa-anomalies [anomaliesModel]="validationModel.anomalies"></qa-anomalies>
       </div>
 
-      <!--      Scaling-->
-      <div class="p-col-10">
-        <qa-scaling [validationModel]="validationModel"></qa-scaling>
-      </div>
+      <!--      &lt;!&ndash;      Scaling&ndash;&gt;-->
+      <!--      <div class="p-col-10">-->
+      <!--        <qa-scaling [validationModel]="validationModel"></qa-scaling>-->
+      <!--      </div>-->
 
       <!-- Name -->
       <div class="p-col-10">

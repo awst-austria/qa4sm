@@ -27,6 +27,7 @@ export interface ValidationRunDatasetConfigDto {
   parametrised_filters: ParametrisedFilterConfig[];
   is_spatial_reference: boolean;
   is_temporal_reference: boolean;
+  is_scaling_reference: boolean;
 
 }
 

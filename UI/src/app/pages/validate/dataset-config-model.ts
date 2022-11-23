@@ -20,6 +20,7 @@ export class DatasetConfigModel {
               public ismnDepthFilter$: BehaviorSubject<FilterModel>,
               public spatialReference: BehaviorSubject<boolean>,
               public temporalReference: BehaviorSubject<boolean>,
+              public scalingReference: BehaviorSubject<boolean>,
               public highlighted?: BehaviorSubject<boolean>
   ) {
   }
@@ -59,7 +60,8 @@ export class DatasetConfigModel {
       basic_filters: enabledBasicFilters,
       parametrised_filters: parameterisedFilters,
       is_spatial_reference: this.spatialReference.value,
-      is_temporal_reference: this.temporalReference.value
+      is_temporal_reference: this.temporalReference.value,
+      is_scaling_reference: this.scalingReference.value
     };
   }
 }

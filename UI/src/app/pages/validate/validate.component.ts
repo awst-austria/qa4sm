@@ -26,7 +26,12 @@ import {
   AnomaliesComponent
 } from '../../modules/anomalies/components/anomalies/anomalies.component';
 import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
-import {ConfigurationChanges, ValidationRunConfigDto,} from './service/validation-run-config-dto';
+import {
+  ConfigurationChanges,
+  ValidationRunConfigDto,
+  ValidationRunDatasetConfigDto,
+  ValidationRunMetricConfigDto,
+} from './service/validation-run-config-dto';
 import {ValidationRunConfigService} from './service/validation-run-config.service';
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
@@ -98,6 +103,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
   temporalReferenceList$: BehaviorSubject<DatasetConfigModel[]> = new BehaviorSubject(null);
   spatialReferenceList$: BehaviorSubject<DatasetConfigModel[]> = new BehaviorSubject(null);
+  scalingReferenceList$: BehaviorSubject<DatasetConfigModel[]> = new BehaviorSubject(null);
   temporalRef: DatasetConfigModel;
   spatialRef: DatasetConfigModel;
   highlightedDataset: DatasetConfigModel;
@@ -156,7 +162,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     of({}).pipe(delay(0)).subscribe(() => {
       this.setDefaultGeographicalRange();
     });
-    this.addDatasetToValidate('ISMN', '20210131 global', true, true, true);
+    this.addDatasetToValidate('ISMN', '20210131 global', true, true, true, true);
     this.addDatasetToValidate();
     // this.setDefaultReferenceDataset();
   }
@@ -316,7 +322,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
 
     // Scaling
-    this.scalingChild.setSelection(validationRunConfig.scaling_method, validationRunConfig.scale_to);
+    // this.scalingChild.setSelection(validationRunConfig.scaling_method, validationRunConfig.scale_to);
 
     // Name
     this.validationModel.nameTag$.next(validationRunConfig.name_tag);
@@ -354,13 +360,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = 'v202012', userData = true,
-                       spatialReference = false, temporalReference = false): void {
+                       spatialReference = false, temporalReference = false, scalingReference = false): void {
     this.addDataset(this.validationModel.datasetConfigurations, defaultDatasetName, defaultVersionName, userData,
-      spatialReference, temporalReference);
+      spatialReference, temporalReference, scalingReference);
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string,
-                     userData: boolean, spatialReference: boolean, temporalReference: boolean): void {
+                     userData: boolean, spatialReference: boolean, temporalReference: boolean, scalingReference: boolean): void {
     const model = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
       null,
@@ -370,7 +376,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject(null),
       new BehaviorSubject(spatialReference),
       new BehaviorSubject(temporalReference),
-      new BehaviorSubject(false)
+      new BehaviorSubject(scalingReference)
     );
     targetArray.push(model);
     // get all datasets
@@ -524,58 +530,64 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   public startValidation(checkForExistingValidation: boolean): void {
-    console.log(this.validationModel);
+    // console.log(this.validationModel);
     // prepare the dataset dtos (dataset, version, variable and filter settings)
-    // const datasets: ValidationRunDatasetConfigDto[] = [];
-    // this.validationModel.datasetConfigurations.forEach(datasetConfig => {
-    //   datasets.push(datasetConfig.toValRunDatasetConfigDto());
-    // });
-    //
-    // // prepare metrics
-    // const metricDtos: ValidationRunMetricConfigDto[] = [];
-    // this.validationModel.metrics.forEach(metric => {
-    //   metricDtos.push(metric.toValidationRunMetricDto());
-    // });
-    //
-    // const newValidation: ValidationRunConfigDto = {
-    //   dataset_configs: datasets,
-    //
-    //   spatial_reference_config: this.validationModel.referenceConfigurations.spatial.toValRunDatasetConfigDto(),
-    //   temporal_reference_config: this.validationModel.referenceConfigurations.temporal.toValRunDatasetConfigDto(),
-    //
-    //   interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
-    //   interval_to: this.validationModel.validationPeriodModel.intervalTo$.getValue(),
-    //   min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
-    //   min_lon: this.validationModel.spatialSubsetModel.minLon$.getValue(),
-    //   max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
-    //   max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
-    //   metrics: metricDtos,
-    //   anomalies_method: this.validationModel.anomalies.method$.getValue(),
-    //   anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
-    //   anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
-    //   scaling_method: this.validationModel.scalingModel.id,
-    //   scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
-    //   name_tag: this.validationModel.nameTag$.getValue(),
-    //   temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
-    // };
-    // console.log('scale to', newValidation.scale_to);
-    //
-    // this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
-    //   data => {
-    //     if (data.id) {
-    //       this.router.navigate([`validation-result/${data.id}`]).then(() =>
-    //         this.toastService.showSuccessWithHeader('Validation started',
-    //           'Your validation has been started'));
-    //     } else if (data.is_there_validation) {
-    //       this.isThereValidation = data;
-    //       this.modalWindowService.open();
-    //     }
-    //
-    //   },
-    //   errors => {
-    //     const validationErrorMessage = this.messageAboutValidationErrors(errors);
-    //     this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
-    //   });
+    const datasets: ValidationRunDatasetConfigDto[] = [];
+    this.validationModel.datasetConfigurations.forEach(datasetConfig => {
+      datasets.push(datasetConfig.toValRunDatasetConfigDto());
+    });
+
+    // prepare metrics
+    const metricDtos: ValidationRunMetricConfigDto[] = [];
+    this.validationModel.metrics.forEach(metric => {
+      metricDtos.push(metric.toValidationRunMetricDto());
+    });
+
+    this.validationModel.referenceConfigurations.spatial =
+      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.spatialReference);
+    this.validationModel.referenceConfigurations.temporal =
+      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.temporalReference);
+
+    const newValidation: ValidationRunConfigDto = {
+      dataset_configs: datasets,
+
+      spatial_reference_config: this.validationModel.referenceConfigurations.spatial.toValRunDatasetConfigDto(),
+      temporal_reference_config: this.validationModel.referenceConfigurations.temporal.toValRunDatasetConfigDto(),
+
+      interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
+      interval_to: this.validationModel.validationPeriodModel.intervalTo$.getValue(),
+      min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
+      min_lon: this.validationModel.spatialSubsetModel.minLon$.getValue(),
+      max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
+      max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
+      metrics: metricDtos,
+      anomalies_method: this.validationModel.anomalies.method$.getValue(),
+      anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
+      anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
+      scaling_method: this.validationModel.scalingModel.id,
+      // scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
+      scale_to: '0',
+      name_tag: this.validationModel.nameTag$.getValue(),
+      temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
+    };
+    console.log('scale to', newValidation.scale_to);
+
+    this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
+      data => {
+        if (data.id) {
+          this.router.navigate([`validation-result/${data.id}`]).then(() =>
+            this.toastService.showSuccessWithHeader('Validation started',
+              'Your validation has been started'));
+        } else if (data.is_there_validation) {
+          this.isThereValidation = data;
+          this.modalWindowService.open();
+        }
+
+      },
+      errors => {
+        const validationErrorMessage = this.messageAboutValidationErrors(errors);
+        this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
+      });
   }
 
   setDefaultGeographicalRange(): void {
@@ -720,6 +732,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   public updateReferenceList(): void {
     // for temporal reference all datasets can be chosen
     this.temporalReferenceList$.next(this.validationModel.datasetConfigurations);
+    this.scalingReferenceList$.next(this.validationModel.datasetConfigurations);
 
     // for spatial all unless there is ISMN:
     const listOfISMNDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
@@ -755,7 +768,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return information;
   }
 
-  onHoverOverReferenceDataset(event): void{
+  onHoverOverReferenceDataset(event): void {
     this.highlightedDataset = event.hoveredDataset;
     this.highlightedDataset.highlighted.next(event.highlight);
 

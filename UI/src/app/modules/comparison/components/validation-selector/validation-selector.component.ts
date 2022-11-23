@@ -68,6 +68,7 @@ export class ValidationSelectorComponent implements OnInit {
       null,
       null,
       new BehaviorSubject(false),
+      new BehaviorSubject(false),
       new BehaviorSubject(false));
 
     selected.push(model);
