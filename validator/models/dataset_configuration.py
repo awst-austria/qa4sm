@@ -17,6 +17,7 @@ class DatasetConfiguration(models.Model):
     parametrised_filters = models.ManyToManyField(DataFilter, through='ParametrisedFilter', blank=True)
     is_spatial_reference = models.BooleanField(null=True)
     is_temporal_reference = models.BooleanField(null=True)
+    is_scaling_reference = models.BooleanField(null=True)
 
     def __str__(self):
         return "Data set: {}, version: {}, variable: {}".format(

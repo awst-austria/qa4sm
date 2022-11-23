@@ -10,9 +10,12 @@ def update_scaling_and_temporal_reference_fields(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     config_ids = list(ValidationRun.objects.using(db_alias).all().values_list('spatial_reference_configuration',
                                                                               flat=True))
+    scale_to_ids = list(ValidationRun.objects.using(db_alias).all().values_list('scaling_ref',
+                                                                              flat=True))
     DatasetConfiguration.objects.using(db_alias).all().update(
         is_spatial_reference=Q(id__in=config_ids),
         is_temporal_reference=Q(id__in=config_ids),
+        is_scaling_reference=Q(id__in=scale_to_ids),
     )
 
 
@@ -30,6 +33,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='datasetconfiguration',
             name='is_temporal_reference',
+            field=models.BooleanField(null=True),
+        ),
+        migrations.AddField(
+            model_name='datasetconfiguration',
+            name='is_scaling_reference',
             field=models.BooleanField(null=True),
         ),
         migrations.RunPython(update_scaling_and_temporal_reference_fields),
