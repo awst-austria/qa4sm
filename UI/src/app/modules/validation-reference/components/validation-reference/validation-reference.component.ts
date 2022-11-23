@@ -13,7 +13,6 @@ export class ValidationReferenceComponent implements OnInit {
 
   @Input() chosenDatasets$: BehaviorSubject<DatasetConfigModel[]>;
   @Input() selectionModel: DatasetConfigModel;
-  @Input() referenceType: string;
   @Output() changeDataset = new EventEmitter<DatasetConfigModel>();
   @Output() hoverOverDataset = new EventEmitter<any>();
 
