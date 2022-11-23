@@ -15,9 +15,9 @@ def global_params(request):
     data['app_version'] = settings.APP_VERSION
     # add parameters for 'Help' page
     help_context = {
-        'expiry_period' : settings.VALIDATION_EXPIRY_DAYS,
-        'warning_period' : settings.VALIDATION_EXPIRY_WARNING_DAYS,
-        }
+        'expiry_period': settings.VALIDATION_EXPIRY_DAYS,
+        'warning_period': settings.VALIDATION_EXPIRY_WARNING_DAYS,
+    }
     data.update(help_context)
 
     # add params from globals:
@@ -27,3 +27,10 @@ def global_params(request):
     data.update(needed_globals)
 
     return JsonResponse(data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_scaling_methods(request):
+    scaling_methods = dict((x, y) for x, y in globals.SCALING_METHODS)
+    return JsonResponse(scaling_methods, status=status.HTTP_200_OK)

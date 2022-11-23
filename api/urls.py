@@ -19,7 +19,7 @@ from api.views.user_view import signup_post, user_update, user_delete
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
     custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_dataset
-from api.views.global_params_view import global_params
+from api.views.global_params_view import global_params, get_scaling_methods
 from api.views.modify_validation_view import stop_validation, delete_result, change_name, archive_result, \
     extend_result, publish_result, add_validation, remove_validation, get_publishing_form, copy_validation_results
 from api.views.serving_file_view import *
@@ -115,6 +115,7 @@ urlpatterns = [
     path('user-file-metadata/<uuid:file_uuid>/', post_user_file_metadata_and_preprocess_file,
          name='Post User Data File Metadata'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
+    path('scaling-methods', get_scaling_methods, name='Scaling methods')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
