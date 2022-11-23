@@ -152,3 +152,7 @@ METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
                        }
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
+
+# scaling methods
+SCALING_METHODS = ValidationRun.SCALING_METHODS
+
