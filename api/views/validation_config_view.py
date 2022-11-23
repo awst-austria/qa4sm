@@ -21,11 +21,13 @@ from validator.validation.validation import compare_validation_runs
 def _check_if_settings_exist():
     pass
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_scaling_methods(request):
-    scaling_methods = dict((x, y) for x, y in globals.SCALING_METHODS)
-    return JsonResponse(scaling_methods, status=status.HTTP_200_OK)
+    scaling_methods = [{'method': x, 'description': y} for x, y in globals.SCALING_METHODS]
+    return JsonResponse(scaling_methods, status=status.HTTP_200_OK, safe=False)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -315,7 +317,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 dataset_config_models.append(config_model)
 
             new_val_run.spatial_reference_configuration = dataset_config_models
-
 
             scale_to = validated_data.get('scaling_method', None)
             if scale_to is not None:
