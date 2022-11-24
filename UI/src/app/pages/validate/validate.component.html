@@ -22,7 +22,7 @@
             <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; let datasetIdx = index"
                             [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / ' +
                              ''+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.short_name)
-                             + (getInformationOnTheReference((item.spatialReference|async), (item.temporalReference|async)))"
+                             + (getInformationOnTheReference((item.spatialReference|async), (item.temporalReference|async), (item.scalingReference|async)))"
                             [selected]="datasetIdx == validationModel.datasetConfigurations.length - 1"
                             [class]="{'highlighted': (item.highlighted|async)}">
 

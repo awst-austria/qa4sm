@@ -738,23 +738,23 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
 
-  getInformationOnTheReference(isSpatialReference, isTemporalReference): string {
-    let information = '';
-    isSpatialReference && isTemporalReference ? information = ' / (spatial and temporal reference)'
-      : (isSpatialReference ? information = ' / (spatial reference)'
-        : (isTemporalReference ? information = ' / (temporal reference)' : information = ''));
+  getInformationOnTheReference(isSpatialReference, isTemporalReference, isScalingReference): string {
+    const listOfReference = [];
+    if (isSpatialReference){
+      listOfReference.push('spatial');
+    }
+    if (isTemporalReference){
+      listOfReference.push('temporal');
+    }
+    if (isScalingReference){
+      listOfReference.push('scaling');
+    }
+
+    let information: string;
+    listOfReference.length !== 0 ? information = `/ (${listOfReference.join(', ')} reference)` : information = '';
+
     return information;
   }
-
-  // getDatasetTabHeader(datasetItem: DatasetConfigModel): BehaviorSubject<string>{
-  //   const header = new BehaviorSubject<string>(null);
-  //   const dataset = `${datasetItem.datasetModel.selectedDataset?.pretty_name} /
-  //   ${datasetItem.datasetModel.selectedVersion?.pretty_name} / ${datasetItem.datasetModel.selectedVariable?.short_name}`;
-  //   const reference = this.getInformationOnTheReference(datasetItem.scalingReference.getValue(),
-  //   datasetItem.temporalReference.getValue());
-  //   header.next(dataset + reference);
-  //   return header;
-  // }
 
   onHoverOverReferenceDataset(event): void {
     this.highlightedDataset = event.hoveredDataset;
