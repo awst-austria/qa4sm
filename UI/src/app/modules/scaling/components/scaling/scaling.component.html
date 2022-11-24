@@ -7,48 +7,53 @@
     </label>
   </ng-template>
   <div class="p-grid p-pt-2">
-        <div class="p-col-12">
-            <label for="scalingMethod">Method: </label>
+    <div style="width: 100%">
+      <div class="p-col-12">
+        <label for="scalingMethod">Method: </label>
+      </div>
+      <div class="p-col-12 p-pt-3" id="scalingMethod">
+        <div class="p-float-label">
+          <p-dropdown id="scalingMethodSelector"
+                      (onChange)="updateScalingMethod()"
+                      [options]="scalingMethods"
+                      [ngModel]="selectedScalingMethod$|async"
+                      (ngModelChange)="selectedScalingMethod$.next($event)"
+                      optionLabel="description" [style]="{'width': '100%'}"></p-dropdown>
+          <label for="scalingMethodSelector">Select scaling method</label>
         </div>
-        <div class="p-col-12 p-pt-3" id="scalingMethod">
-          <div class="p-float-label">
-            <p-dropdown id="scalingMethodSelector"
-                        (onChange)="updateScalingMethod()"
-                        [options]="scalingMethods"
-                        [ngModel]="selectedScalingMethod$|async"
-                        (ngModelChange)="selectedScalingMethod$.next($event)"
-                        optionLabel="description" [style]="{'width': '100%'}"></p-dropdown>
-            <label for="scalingMethodSelector">Select scaling method</label>
-          </div>
-        </div>
-
-        <div class="p-col-12">
-          <label for="scalingTo">Scale to: </label>
-        </div>
-        <div class="p-col-12 p-pt-3" id="scalingTo">
-          <div class="p-float-label" *ngIf="(selectedScaleToModel$|async)">
-            <p-dropdown id="scalingReferenceSelector"
-                        (onChange)="updateScaleTo()"
-                        [options]="validationModel.datasetConfigurations"
-                        [ngModel]="selectedScaleToModel$|async"
-                        (ngModelChange)="selectedScaleToModel$.next($event)"
-                        optionLabel="datasetModel.selectedVersion.pretty_name" [style]="{'width': '100%'}">
-              <ng-template let-item pTemplate="item">
-                <div (mouseover)="onHoverOverDataset(item, true)" (mouseleave)="onHoverOverDataset(item, false)" (mouseup)="onHoverOverDataset(item, false)">
+      </div>
+    </div>
+    <div style="width: 100%" *ngIf="(selectedScaleToModel$|async) && (selectedScalingMethod$|async)?.method !== 'none'">
+      <div class="p-col-12">
+        <label for="scalingTo">Scale to: </label>
+      </div>
+      <div class="p-col-12 p-pt-3" id="scalingTo">
+        <div class="p-float-label">
+          <p-dropdown id="scalingReferenceSelector"
+                      (onChange)="updateScaleTo()"
+                      [options]="validationModel.datasetConfigurations"
+                      [ngModel]="selectedScaleToModel$|async"
+                      (ngModelChange)="selectedScaleToModel$.next($event)"
+                      optionLabel="datasetModel.selectedVersion.pretty_name" [style]="{'width': '100%'}">
+            <ng-template let-item pTemplate="item">
+              <div (mouseover)="onHoverOverDataset(item, true)" (mouseleave)="onHoverOverDataset(item, false)"
+                   (mouseup)="onHoverOverDataset(item, false)">
           <span>
             {{item.datasetModel.selectedDataset.pretty_name}} ({{item.datasetModel.selectedVersion.pretty_name}})
           </span>
-                </div>
-              </ng-template>
-              <ng-template let-item pTemplate="selectedItem">
-                <div>
-                  <span>{{item.datasetModel.selectedDataset.pretty_name}} ({{item.datasetModel.selectedVersion.pretty_name}}{{item.index}})</span>
-                </div>
+              </div>
+            </ng-template>
+            <ng-template let-item pTemplate="selectedItem">
+              <div>
+                <span>{{item.datasetModel.selectedDataset.pretty_name}}
+                  ({{item.datasetModel.selectedVersion.pretty_name}}{{item.index}})</span>
+              </div>
 
-              </ng-template>
-            </p-dropdown>
-            <label for="scalingReferenceSelector">Select scaling reference</label>
-          </div>
+            </ng-template>
+          </p-dropdown>
+          <label for="scalingReferenceSelector">Select scaling reference</label>
         </div>
+      </div>
     </div>
+  </div>
 </p-panel>
