@@ -26,9 +26,10 @@ export class ScalingComponent implements OnInit {
   constructor(private validationConfigService: ValidationRunConfigService) {
   }
   ngOnInit(): void {
+    console.log(this.validationModel.datasetConfigurations);
     // prepare reference choices
     this.selectedScaleToModel = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference);
-    this.selectedScaleToModel$.next(this.selectedScaleToModel);
+    this.selectedScaleToModel$.next(this.validationModel.datasetConfigurations[0]);
 
 
     // prepare method choices
@@ -51,6 +52,14 @@ export class ScalingComponent implements OnInit {
 
   onHoverOverDataset(item, highlight): void{
     this.hoverOverDataset.emit({hoveredDataset: item, highlight});
+  }
+
+  verifyScaleToModel(): BehaviorSubject<DatasetConfigModel>{
+    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference.getValue())){
+      this.validationModel.datasetConfigurations[0].scalingReference.next(true);
+      this.selectedScaleToModel$.next(this.validationModel.datasetConfigurations[0]);
+    }
+    return this.selectedScaleToModel$;
   }
 
 }
