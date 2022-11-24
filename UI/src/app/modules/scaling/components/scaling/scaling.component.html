@@ -34,7 +34,7 @@
                       [options]="validationModel.datasetConfigurations"
                       [ngModel]="verifyScaleToModel()|async"
                       (ngModelChange)="selectedScaleToModel$.next($event)"
-                      optionLabel="datasetModel.selectedVersion.pretty_name" [style]="{'width': '100%'}">
+                      optionLabel="datasetModel.selectedDataset.pretty_name" [style]="{'width': '100%'}">
             <ng-template let-item pTemplate="item">
               <div (mouseover)="onHoverOverDataset(item, true)" (mouseleave)="onHoverOverDataset(item, false)"
                    (mouseup)="onHoverOverDataset(item, false)">
@@ -46,7 +46,7 @@
             <ng-template let-item pTemplate="selectedItem">
               <div>
                 <span>{{item.datasetModel.selectedDataset.pretty_name}}
-                  ({{item.datasetModel.selectedVersion?.pretty_name}}{{item.index}})</span>
+                  ({{item.datasetModel.selectedVersion?.pretty_name}})</span>
               </div>
 
             </ng-template>

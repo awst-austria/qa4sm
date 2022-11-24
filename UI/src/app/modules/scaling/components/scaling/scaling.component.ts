@@ -27,7 +27,7 @@ export class ScalingComponent implements OnInit {
   }
   ngOnInit(): void {
     // prepare reference choices
-    this.selectedScaleToModel = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference);
+    this.selectedScaleToModel = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference.getValue());
     this.selectedScaleToModel$.next(this.selectedScaleToModel);
 
 
