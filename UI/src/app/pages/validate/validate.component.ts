@@ -494,24 +494,24 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
 
-    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference.getValue())){
-      this.validationModel.datasetConfigurations[0].scalingReference.next(true);
-    }
+    this.checkIfReferenceRemoved('spatialReference');
+    this.checkIfReferenceRemoved('temporalReference');
+    this.checkIfReferenceRemoved('scalingReference');
 
-    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.temporalReference.getValue())){
-      this.validationModel.datasetConfigurations[0].temporalReference.next(true);
-    }
+  }
 
-    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.spatialReference.getValue())){
-      const ISMNList = this.validationModel.datasetConfigurations.
-      filter(datasetConfig => datasetConfig.datasetModel.selectedDataset?.pretty_name === 'ISMN');
-      if (ISMNList.length !== 0){
-        ISMNList[0].spatialReference.next(true);
-      } else {
-        this.validationModel.datasetConfigurations[0].spatialReference.next(true);
+  checkIfReferenceRemoved(referenceType: string): void{
+    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[referenceType].getValue())){
+      let newReference = this.validationModel.datasetConfigurations[0];
+      if (referenceType === 'spatialReference'){
+        const ISMNList = this.validationModel.datasetConfigurations.
+        filter(datasetConfig => datasetConfig.datasetModel.selectedDataset?.pretty_name === 'ISMN');
+        if (ISMNList.length !== 0){
+          newReference = ISMNList[0];
+        }
       }
+      newReference[referenceType].next(true);
     }
-    // this.updateReferenceList();
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel): void {

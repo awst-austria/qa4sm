@@ -26,7 +26,6 @@ export class ScalingComponent implements OnInit {
   constructor(private validationConfigService: ValidationRunConfigService) {
   }
   ngOnInit(): void {
-
     // prepare method choices
     this.validationConfigService.getScalingMethods().subscribe(methods => {
       this.scalingMethods = methods;

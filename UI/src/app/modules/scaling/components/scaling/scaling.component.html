@@ -16,14 +16,14 @@
           <p-dropdown id="scalingMethodSelector"
                       (onChange)="updateScalingMethod()"
                       [options]="scalingMethods"
-                      [ngModel]="verifyScaleToModel()|async"
+                      [ngModel]="selectedScalingMethod$|async"
                       (ngModelChange)="selectedScalingMethod$.next($event)"
                       optionLabel="description" [style]="{'width': '100%'}"></p-dropdown>
           <label for="scalingMethodSelector">Select scaling method</label>
         </div>
       </div>
     </div>
-    <div style="width: 100%" *ngIf="(selectedScaleToModel$|async) && (selectedScalingMethod$|async)?.method !== 'none'">
+    <div style="width: 100%" *ngIf="(selectedScalingMethod$|async)?.method !== 'none'">
       <div class="p-col-12">
         <label for="scalingTo">Scale to: </label>
       </div>
