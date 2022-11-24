@@ -23,8 +23,7 @@ export class ValidationReferenceComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.selectedValue = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue());
-    this.selectionModel$.next(this.selectedValue);
+
   }
 
   onDatasetChange(event): void {
@@ -50,10 +49,8 @@ export class ValidationReferenceComponent implements OnInit {
   }
 
   verifyChosenValue(): BehaviorSubject<DatasetConfigModel>{
-    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue())){
-      this.validationModel.datasetConfigurations[0][this.referenceType].next(true);
-      this.selectionModel$.next(this.validationModel.datasetConfigurations[0]);
-    }
+    this.selectedValue = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue());
+    this.selectionModel$.next(this.selectedValue);
     return this.selectionModel$;
   }
 

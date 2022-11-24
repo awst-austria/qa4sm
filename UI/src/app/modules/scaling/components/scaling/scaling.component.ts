@@ -26,10 +26,6 @@ export class ScalingComponent implements OnInit {
   constructor(private validationConfigService: ValidationRunConfigService) {
   }
   ngOnInit(): void {
-    // prepare reference choices
-    this.selectedScaleToModel = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference.getValue());
-    this.selectedScaleToModel$.next(this.selectedScaleToModel);
-
 
     // prepare method choices
     this.validationConfigService.getScalingMethods().subscribe(methods => {
@@ -54,10 +50,8 @@ export class ScalingComponent implements OnInit {
   }
 
   verifyScaleToModel(): BehaviorSubject<DatasetConfigModel>{
-    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference.getValue())){
-      this.validationModel.datasetConfigurations[0].scalingReference.next(true);
-      this.selectedScaleToModel$.next(this.validationModel.datasetConfigurations[0]);
-    }
+    this.selectedScaleToModel = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference.getValue());
+    this.selectedScaleToModel$.next(this.selectedScaleToModel);
     return this.selectedScaleToModel$;
   }
 
