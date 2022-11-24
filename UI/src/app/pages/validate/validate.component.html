@@ -107,11 +107,9 @@
             <label for="spatial-reference" class="p-mb-4">Spatial reference:</label>
             <qa-validation-reference
               id="spatial-reference"
-              *ngIf="spatialReferenceList$|async"
-              [chosenDatasets$]="spatialReferenceList$"
-              [selectionModel]="spatialRef"
-              (hoverOverDataset)="onHoverOverReferenceDataset($event)"
-              (changeDataset)="onReferenceChange($event, 'spatialReference')"></qa-validation-reference>
+              [validationModel]="validationModel"
+              [referenceType]="'spatialReference'"
+              (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
           </div>
 
           <!--             temporal reference-->
@@ -119,11 +117,9 @@
             <label for="temporal-reference" class="p-mb-4">Temporal reference:</label>
             <qa-validation-reference
               id="temporal-reference"
-              *ngIf="temporalReferenceList$|async"
-              [chosenDatasets$]="temporalReferenceList$"
-              [selectionModel]="temporalRef"
-              (hoverOverDataset)="onHoverOverReferenceDataset($event)"
-              (changeDataset)="onReferenceChange($event, 'temporalReference')"></qa-validation-reference>
+              [validationModel]="validationModel"
+              [referenceType]="'temporalReference'"
+              (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
           </div>
 
 
