@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {DatasetConfigModel} from '../../../../pages/validate/dataset-config-model';
+import {ValidationModel} from '../../../../pages/validate/validation-model';
 
 @Component({
   selector: 'qa-validation-reference',
@@ -11,23 +12,49 @@ export class ValidationReferenceComponent implements OnInit {
 
   datasets$: Observable<any> = new Observable();
 
-  @Input() chosenDatasets$: BehaviorSubject<DatasetConfigModel[]>;
-  @Input() selectionModel: DatasetConfigModel;
-  @Output() changeDataset = new EventEmitter<DatasetConfigModel>();
+  @Input() validationModel: ValidationModel;
+  @Input() referenceType: string;
   @Output() hoverOverDataset = new EventEmitter<any>();
 
+  chosenDatasets$: BehaviorSubject<DatasetConfigModel[]> = new BehaviorSubject<DatasetConfigModel[]>(null);
+  selectionModel$: BehaviorSubject<DatasetConfigModel> = new BehaviorSubject<DatasetConfigModel>(null);
+  selectedValue: DatasetConfigModel;
   constructor() {
   }
 
   ngOnInit(): void {
+    this.selectedValue = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue());
+    this.selectionModel$.next(this.selectedValue);
   }
 
-  onDatasetChange(): void {
-    this.changeDataset.emit(this.selectionModel);
+  onDatasetChange(event): void {
+    this.selectedValue[this.referenceType].next(false);
+    this.selectedValue = this.selectionModel$.getValue();
+    this.selectedValue[this.referenceType].next(true);
   }
 
   onHoverOverDataset(item, highlight): void{
     this.hoverOverDataset.emit({hoveredDataset: item, highlight});
+  }
+
+  verifyOptions(): BehaviorSubject<DatasetConfigModel[]>{
+    this.chosenDatasets$.next(this.validationModel.datasetConfigurations);
+    if (this.referenceType === 'spatialReference'){
+      const listOfISMNDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
+        dataset.datasetModel.selectedDataset?.short_name === 'ISMN');
+      if (listOfISMNDatasets.length !== 0){
+        this.chosenDatasets$.next(listOfISMNDatasets);
+      }
+    }
+    return this.chosenDatasets$;
+  }
+
+  verifyChosenValue(): BehaviorSubject<DatasetConfigModel>{
+    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue())){
+      this.validationModel.datasetConfigurations[0][this.referenceType].next(true);
+      this.selectionModel$.next(this.validationModel.datasetConfigurations[0]);
+    }
+    return this.selectionModel$;
   }
 
 }

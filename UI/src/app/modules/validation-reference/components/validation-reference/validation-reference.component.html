@@ -2,21 +2,24 @@
   <div class="p-col">
     <span class="p-float-label p-mb-4 p-mt-3">
     <p-dropdown id="datasetSelector"
-                (onChange)="onDatasetChange()"
-                [options]="(chosenDatasets$|async)"
-                [(ngModel)]="selectionModel"
-                optionLabel="datasetModel.selectedVersion.pretty_name"
+                (onChange)="onDatasetChange($event)"
+                [options]="verifyOptions()|async"
+                [ngModel]="verifyChosenValue()|async"
+                (ngModelChange)="selectionModel$.next($event)"
+                optionLabel="datasetModel.selectedDataset.pretty_name"
                 [style]="{'width': '100%'}">
       <ng-template let-item pTemplate="item">
-        <div (mouseover)="onHoverOverDataset(item, true)" (mouseleave)="onHoverOverDataset(item, false)" (mouseup)="onHoverOverDataset(item, false)">
+        <div (mouseover)="onHoverOverDataset(item, true)"
+             (mouseleave)="onHoverOverDataset(item, false)"
+             (mouseup)="onHoverOverDataset(item, false)">
           <span>
-            {{item.datasetModel.selectedDataset.pretty_name}} ({{item.datasetModel.selectedVersion.pretty_name}})
+            {{item.datasetModel.selectedDataset.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})
           </span>
         </div>
       </ng-template>
       <ng-template let-item pTemplate="selectedItem">
         <div>
-          <span>{{item.datasetModel.selectedDataset.pretty_name}} ({{item.datasetModel.selectedVersion.pretty_name}}{{item.index}})</span>
+          <span>{{item.datasetModel.selectedDataset.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})</span>
         </div>
 
       </ng-template>
