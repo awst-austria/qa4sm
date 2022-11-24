@@ -21,7 +21,7 @@ export class ValidationModel {
               public metrics: MetricModel[],
               public anomalies: AnomaliesModel,
               public temporalMatchingModel: TemporalMatchingModel,
-              public scalingModel: ScalingModel,
+              public scalingMethod: ScalingModel,
               public nameTag$: BehaviorSubject<string>) {
   }
 }

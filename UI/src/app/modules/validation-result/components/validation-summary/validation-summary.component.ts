@@ -6,7 +6,6 @@ import {DatasetVersionService} from '../../../core/services/dataset/dataset-vers
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
 import {FilterService} from '../../../core/services/filter/filter.service';
 import {map} from 'rxjs/operators';
-import {SCALING_CHOICES} from '../../../scaling/components/scaling/scaling.component';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
@@ -30,7 +29,6 @@ export class ValidationSummaryComponent implements OnInit {
   configurations$: Observable<any>;
   dateFormat = 'medium';
   timeZone = 'UTC';
-  scalingMethods = SCALING_CHOICES;
   hideElement = true;
   originalDate: Date;
   runTime: number;

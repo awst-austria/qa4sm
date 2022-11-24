@@ -4,9 +4,11 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {ValidationRunConfigDto} from './validation-run-config-dto';
 import {ValidationrunDto} from '../../../modules/core/services/validation-run/validationrun.dto';
 import {Observable} from 'rxjs';
+import {ScalingMethodDto} from '../../../modules/scaling/components/scaling/scaling-methods.dto';
 
 const runValidationUrl: string = environment.API_URL + 'api/validation-configuration';
 const getValidationConfigUrl: string = environment.API_URL + 'api/validation-configuration';
+const getScalingMethodsUrl: string = environment.API_URL + 'api/scaling-methods';
 
 /**
  * This service -together with its DTOs- responsible for submitting new validations
@@ -27,5 +29,9 @@ export class ValidationRunConfigService {
 
   public getValidationConfig(validationRunId: string): Observable<ValidationRunConfigDto> {
     return this.httpClient.get<ValidationRunConfigDto>(getValidationConfigUrl + '/' + validationRunId);
+  }
+
+  public getScalingMethods(): Observable<ScalingMethodDto[]>{
+    return this.httpClient.get<ScalingMethodDto[]>(getScalingMethodsUrl);
   }
 }
