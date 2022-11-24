@@ -26,10 +26,9 @@ export class ScalingComponent implements OnInit {
   constructor(private validationConfigService: ValidationRunConfigService) {
   }
   ngOnInit(): void {
-    console.log(this.validationModel.datasetConfigurations);
     // prepare reference choices
     this.selectedScaleToModel = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference);
-    this.selectedScaleToModel$.next(this.validationModel.datasetConfigurations[0]);
+    this.selectedScaleToModel$.next(this.selectedScaleToModel);
 
 
     // prepare method choices
