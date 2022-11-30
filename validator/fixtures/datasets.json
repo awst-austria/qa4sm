@@ -472,7 +472,36 @@
             "resolution": {
                 "value": 15,
                 "unit": "km"
-            }
+            },
+            "user": null
+        }
+    },
+    {
+        "model": "validator.dataset",
+        "pk": 16,
+        "fields": {
+            "short_name": "SMAP_L2",
+            "pretty_name": "SMAP SPL2SMP",
+            "help_text": "NASA SMAP level 2 data",
+            "storage_path": "testdata/input_data/SMAP_L2",
+            "detailed_description": "The NASA SMAP level 2 data set provides hal-orbit soil moisture observations at a 36 km sampling (EASE grid) from the SMAP sensor (<a target=\"_blank\" href=\"https://nsidc.org/data/spl2smp/versions/8\" rel=\"noreferrer\">more information</a>).",
+            "source_reference": "The data can be downloaded from the product homepage <a target=\"_blank\" href=\"https://nsidc.org/data/spl2smp/versions/8\", rel=\"noreferrer\"> here</a>.",
+            "citation": "<a target=\"_blank\" href=\"https://nsidc.org/data/spl2smp/versions/8\" rel=\"noreferrer\">Click here</a>",
+            "is_only_reference": false,
+            "versions": [
+                40
+            ],
+            "variables": [
+                2
+            ],
+            "filters": [
+                1
+            ],
+            "resolution": {
+                "value": 36,
+                "unit": "km"
+            },
+            "user": null
         }
     }
 
