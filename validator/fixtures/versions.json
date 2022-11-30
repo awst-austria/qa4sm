@@ -369,5 +369,17 @@
             "time_range_end": "2022-06-04",
             "geographical_range": null
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 40,
+        "fields": {
+            "short_name": "SMAPL2_V8",
+            "pretty_name": "v8",
+            "help_text": "SMAP L2 v8",
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2022-08-06",
+            "geographical_range": null
+        }
     }
 ]

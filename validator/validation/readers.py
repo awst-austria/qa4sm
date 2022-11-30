@@ -79,6 +79,9 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.SMOS_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
 
+    if dataset.short_name == globals.SMAP_L2:
+        reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
+
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))
 
