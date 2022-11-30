@@ -83,7 +83,7 @@ SMOSL3_Level3_ASC = 'SMOSL3_v339_ASC'
 SMOSL2_700 = 'SMOSL2_v700'
 SMAPL2_V8 = 'SMAPL2_V8'
 
-# dataset data variables
+# dataset data variables PRETTY NAMES
 C3S_sm = 'C3S_sm'
 SMAP_soil_moisture = 'SMAP_soil_moisture'
 SMOS_sm = 'SMOS_sm'

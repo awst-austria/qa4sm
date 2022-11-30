@@ -340,14 +340,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   addDatasetToValidate(): void {
-    this.addDataset(this.validationModel.datasetConfigurations, 'C3S_combined', 'v202012');
+    this.addDataset(this.validationModel.datasetConfigurations, 'C3S_combined', 'v202012', true);
   }
 
   addReferenceDataset(): void {
-    this.addDataset(this.validationModel.referenceConfigurations, 'ISMN', '20210131 global');
+    this.addDataset(this.validationModel.referenceConfigurations, 'ISMN', '20210131 global', false);
   }
 
-  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string): void {
+  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string, userData: boolean): void {
     const model = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
       null,
@@ -358,7 +358,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     );
     targetArray.push(model);
     // get all datasets
-    this.datasetService.getAllDatasets().subscribe(datasets => {
+    this.datasetService.getAllDatasets(userData).subscribe(datasets => {
       model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === defaultDatasetName);
 
       // then get all versions for the first dataset in the result list

@@ -107,7 +107,8 @@ describe('DatasetInfoComponent', () => {
         default_parameter: null,
         to_include: null,
         disable_filter: null,
-        default_set_active: true
+        default_set_active: true,
+        readonly: false,
       },
       {
         id: 2,
@@ -119,7 +120,8 @@ describe('DatasetInfoComponent', () => {
         default_parameter: null,
         to_include: '4,5',
         disable_filter: null,
-        default_set_active: true
+        default_set_active: true,
+        readonly: false,
       },
 
     ];

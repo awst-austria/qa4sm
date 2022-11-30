@@ -20,7 +20,8 @@ angular_paths = [
     {'path': 'password-reset', 'name': 'password-reset'},
     {'path': 'password-reset-done', 'name': 'password-reset-done'},
     {'path': 'password-reset/:token', 'name': 'validate-token'},
-    {'path': 'password-reset/set-password', 'name': 'set-password'},
+    {'path': 'set-password', 'name': 'set-password'},
+    {'path': 'my-datasets', 'name': 'my-datasets'}
 ]
 
 

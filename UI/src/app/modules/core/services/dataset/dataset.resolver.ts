@@ -13,6 +13,6 @@ export class DatasetResolver implements Resolve<DatasetDto[]> {
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<DatasetDto[]> {
     const name = route.queryParamMap.get('cucc');
-    return this.datasetService.getAllDatasets();
+    return this.datasetService.getAllDatasets(true);
   }
 }

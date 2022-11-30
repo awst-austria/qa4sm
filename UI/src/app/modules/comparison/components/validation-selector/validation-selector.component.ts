@@ -61,7 +61,7 @@ export class ValidationSelectorComponent implements OnInit {
       null, null, null, null, null);
     selected.push(model);
     // get all datasets
-    this.datasetService.getAllDatasets().subscribe(datasets => {
+    this.datasetService.getAllDatasets(true).subscribe(datasets => {
       model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === 'ISMN');
       this.selectValidationLabel = 'Wait for validations to be loaded';
       // then get all versions for the first dataset in the result list

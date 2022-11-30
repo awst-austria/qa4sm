@@ -2,7 +2,7 @@ from django.db import models
 from validator.models.filter import DataFilter
 from validator.models.variable import DataVariable
 from validator.models.version import DatasetVersion
-
+from django.conf import settings
 
 
 class Dataset(models.Model):
@@ -24,6 +24,7 @@ class Dataset(models.Model):
 
     filters = models.ManyToManyField(DataFilter, related_name='filters')
     resolution = models.JSONField(null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration
