@@ -754,7 +754,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
 
     let information: string;
-    listOfReference.length !== 0 ? information = `/ (${listOfReference.join(', ')} reference)` : information = '';
+    listOfReference.length !== 0 ? information = ` (${listOfReference.join(', ')} reference)` : information = '';
 
     return information;
   }

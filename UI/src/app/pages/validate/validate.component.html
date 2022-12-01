@@ -24,7 +24,8 @@
                              ''+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.short_name)
                              + (getInformationOnTheReference((item.spatialReference|async), (item.temporalReference|async), (item.scalingReference|async)))"
                             [selected]="datasetIdx == validationModel.datasetConfigurations.length - 1"
-                            [class]="{'highlighted': (item.highlighted|async)}">
+                            [class]="{'highlighted': (item.highlighted|async),
+                            'is-reference': ((item.spatialReference|async) || (item.temporalReference|async) || (item.scalingReference|async))}">
 
               <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset"
                           [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"

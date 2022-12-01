@@ -3790,6 +3790,11 @@ div.carousel-caption{
   border-bottom-left-radius: 4px;
 }
 
+.p-accordion p-accordiontab.is-reference .p-accordion-header:not(.p-highlight):not(.p-disabled) .p-accordion-header-link,
+.p-accordion p-accordiontab.is-reference .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link{
+  color: #004085;
+}
+
 .p-card {
   background: #ffffff;
   color: #212529;
