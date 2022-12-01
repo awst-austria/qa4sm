@@ -506,8 +506,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[referenceType].getValue())){
       let newReference = this.validationModel.datasetConfigurations[0];
       if (referenceType === 'spatialReference'){
-        const ISMNList = this.validationModel.datasetConfigurations.
-        filter(datasetConfig => datasetConfig.datasetModel.selectedDataset?.pretty_name === 'ISMN');
+        const ISMNList = this.getISMN(this.validationModel.datasetConfigurations);
         if (ISMNList.length !== 0){
           newReference = ISMNList[0];
         }
@@ -517,14 +516,24 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel): void {
+    console.log(this.validationModel.datasetConfigurations);
+    const isThereISMN = this.getISMN(this.validationModel.datasetConfigurations).length !== 0;
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel === datasetConfig) {
         this.loadFiltersForModel(config);
+      }
+      if (isThereISMN){
+        config.datasetModel.selectedDataset.pretty_name === 'ISMN' ? config.spatialReference.next(true) :
+          config.spatialReference.next(false);
       }
     });
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+  }
+
+  private getISMN(configs: DatasetConfigModel[]): DatasetConfigModel[]{
+    return configs.filter(config => config.datasetModel.selectedDataset.short_name === 'ISMN');
   }
 
   excludeFilter(toExclude: number, basicFilters: any): void {
