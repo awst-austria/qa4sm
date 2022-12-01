@@ -73,7 +73,9 @@ def _get_reference_reader(val_run) -> ('Reader', str, dict):
     ref_reader = create_reader(val_run.reference_configuration.dataset,
                                val_run.reference_configuration.version)
 
-    time_adapted_ref_reader = adapt_timestamp(ref_reader, val_run.reference_configuration.dataset, )
+    time_adapted_ref_reader = adapt_timestamp(ref_reader,
+                                              val_run.reference_configuration.dataset,
+                                              val_run.reference_configuration.version)
 
     # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
     filtered_reader, read_name, read_kwargs = \
@@ -204,7 +206,7 @@ def create_pytesmo_validation(validation_run):
         reader = create_reader(dataset_config.dataset,
                                dataset_config.version)
 
-        time_adapted_reader = adapt_timestamp(reader, dataset_config.dataset, )
+        time_adapted_reader = adapt_timestamp(reader, dataset_config.dataset, dataset_config.version)
 
         reader, read_name, read_kwargs = \
             setup_filtering(
@@ -350,7 +352,6 @@ def execute_job(self, validation_id, job):
     start_time = datetime.now(tzlocal())
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
-        print('Monika')
         val = create_pytesmo_validation(validation_run)
 
         result = val.calc(*job, rename_cols=False, only_with_reference=True)
