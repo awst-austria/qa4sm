@@ -9,6 +9,7 @@ import {DatasetComponentSelectionModel} from './dataset-component-selection-mode
 import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
 import {map} from 'rxjs/operators';
+import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 
 
 @Component({
@@ -19,6 +20,7 @@ import {map} from 'rxjs/operators';
 export class DatasetComponent implements OnInit {
 
   datasets$: Observable<DatasetDto[]>;
+  allDatasets$: Observable<DatasetDto[]>;
 
   selectableDatasetVersions$: Observable<DatasetVersionDto[]>;
   selectableDatasetVariables$: Observable<DatasetVariableDto[]>;
@@ -30,40 +32,26 @@ export class DatasetComponent implements OnInit {
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
-              private datasetVariableService: DatasetVariableService) {
+              private datasetVariableService: DatasetVariableService,
+              private validationConfigService: ValidationRunConfigService) {
   }
 
-  ngOnInit(): void {
 
-    // Create dataset observable
-    this.datasets$ = this.datasetService.getAllDatasets(false).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-      return this.sortById(datasets);
-    }));
-    // if (this.reference) {
-    //   // user data can not be used as reference, so here only our data will be taken
-    //   this.datasets$ = this.datasetService.getAllDatasets(false).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-    //     let referenceDatasets: DatasetDto[] = [];
-    //     datasets.forEach(dataset => {
-    //       if (dataset.not_as_reference === false){
-    //         referenceDatasets.push(dataset);
-    //       }
-    //     });
-    //     referenceDatasets = this.sortById(referenceDatasets);
-    //     return referenceDatasets;
-    //   }));
-    // } else {
-    //   // filter out datasets than can be used only as reference
-    //   this.datasets$ = this.datasetService.getAllDatasets(true).pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-    //     let nonOnlyReferenceDatasets: DatasetDto[] = [];
-    //     datasets.forEach(dataset => {
-    //       if (dataset.is_spatial_reference === false) {
-    //         nonOnlyReferenceDatasets.push(dataset);
-    //       }
-    //     });
-    //     nonOnlyReferenceDatasets = this.sortById(nonOnlyReferenceDatasets);
-    //     return nonOnlyReferenceDatasets;
-    //   }));
-    // }
+  ngOnInit(): void {
+    this.allDatasets$ = this.datasetService.getAllDatasets(false);
+
+    this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
+      if (configs.filter(config => config.datasetModel.selectedDataset.short_name === 'ISMN').length !== 0
+        && this.selectionModel.selectedDataset.short_name !== 'ISMN'){
+        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+          return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
+        }));
+      } else {
+        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+          return this.sortById(datasets);
+        }));
+      }
+    });
 
     this.selectableDatasetVersions$ = this.sortObservableById(
       this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
@@ -72,7 +60,7 @@ export class DatasetComponent implements OnInit {
       this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
   }
 
-  private updateSelectableVersionsAndVariableAndEmmit(): void{
+  private updateSelectableVersionsAndVariableAndEmmit(): void {
     if (this.selectionModel.selectedDataset === undefined || this.selectionModel.selectedDataset.versions.length === 0) {
       return;
     }
@@ -83,7 +71,7 @@ export class DatasetComponent implements OnInit {
 
     this.selectableDatasetVersions$.subscribe(
       versions => {
-      this.selectionModel.selectedVersion = versions[0];
+        this.selectionModel.selectedVersion = versions[0];
       },
       () => {
       },
@@ -93,28 +81,30 @@ export class DatasetComponent implements OnInit {
 
         this.selectableDatasetVariables$.subscribe(
           variables => {
-          this.selectionModel.selectedVariable = variables[0];
-        },
+            this.selectionModel.selectedVariable = variables[0];
+          },
           () => {},
-          () => {this.changeDataset.emit(this.selectionModel);
+          () => {
+            this.changeDataset.emit(this.selectionModel);
           });
       });
   }
 
-  onDatasetChange(): void{
+  onDatasetChange(): void {
     this.updateSelectableVersionsAndVariableAndEmmit();
   }
-  onVersionChange(): void{
+
+  onVersionChange(): void {
     this.changeDataset.emit(this.selectionModel);
   }
 
-  sortById(listOfElements): any{
+  sortById(listOfElements): any {
     return listOfElements.sort((a, b) => {
       return a.id < b.id ? 1 : -1;
     });
   }
 
-  sortObservableById(observableOfListOfElements: Observable<any>): Observable<any>{
+  sortObservableById(observableOfListOfElements: Observable<any>): Observable<any> {
     return observableOfListOfElements.pipe(map((data) => {
       data.sort((a, b) => {
         return a.id < b.id ? 1 : -1;

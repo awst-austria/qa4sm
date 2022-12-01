@@ -152,6 +152,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         this.setDefaultDatasetSettings();
       }
     });
+    this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
   }
 
   private setDefaultDatasetSettings(): void {
@@ -498,6 +499,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.checkIfReferenceRemoved('temporalReference');
     this.checkIfReferenceRemoved('scalingReference');
 
+    this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
   }
 
   checkIfReferenceRemoved(referenceType: string): void{
@@ -522,6 +524,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
+    this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
   }
 
   excludeFilter(toExclude: number, basicFilters: any): void {

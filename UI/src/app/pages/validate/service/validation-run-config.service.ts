@@ -3,8 +3,9 @@ import {environment} from '../../../../environments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ValidationRunConfigDto} from './validation-run-config-dto';
 import {ValidationrunDto} from '../../../modules/core/services/validation-run/validationrun.dto';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {ScalingMethodDto} from '../../../modules/scaling/components/scaling/scaling-methods.dto';
+import {DatasetConfigModel} from '../dataset-config-model';
 
 const runValidationUrl: string = environment.API_URL + 'api/validation-configuration';
 const getValidationConfigUrl: string = environment.API_URL + 'api/validation-configuration';
@@ -17,6 +18,9 @@ const getScalingMethodsUrl: string = environment.API_URL + 'api/scaling-methods'
   providedIn: 'root'
 })
 export class ValidationRunConfigService {
+
+ public listOfSelectedConfigs: BehaviorSubject<DatasetConfigModel[]>
+   = new BehaviorSubject<DatasetConfigModel[]>([]);
 
   constructor(private httpClient: HttpClient) {
 
