@@ -516,7 +516,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel): void {
-    console.log(this.validationModel.datasetConfigurations);
     const isThereISMN = this.getISMN(this.validationModel.datasetConfigurations).length !== 0;
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel === datasetConfig) {
