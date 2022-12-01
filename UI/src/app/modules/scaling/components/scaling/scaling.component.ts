@@ -30,6 +30,7 @@ export class ScalingComponent implements OnInit {
     this.validationConfigService.getScalingMethods().subscribe(methods => {
       this.scalingMethods = methods;
       this.selectedScalingMethod$.next(methods.find(method => method.method === 'none'));
+      this.updateScalingMethod();
     });
   }
 
