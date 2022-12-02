@@ -18,10 +18,10 @@ export class DatasetConfigModel {
               public smosChi2Filter$: BehaviorSubject<FilterModel>,
               public ismnNetworkFilter$: BehaviorSubject<FilterModel>,
               public ismnDepthFilter$: BehaviorSubject<FilterModel>,
-              public spatialReference: BehaviorSubject<boolean>,
-              public temporalReference: BehaviorSubject<boolean>,
-              public scalingReference: BehaviorSubject<boolean>,
-              public highlighted?: BehaviorSubject<boolean>
+              public spatialReference$: BehaviorSubject<boolean>,
+              public temporalReference$: BehaviorSubject<boolean>,
+              public scalingReference$: BehaviorSubject<boolean>,
+              public highlighted$?: BehaviorSubject<boolean>
   ) {
   }
 
@@ -59,9 +59,9 @@ export class DatasetConfigModel {
       version_id: this.datasetModel.selectedVersion.id,
       basic_filters: enabledBasicFilters,
       parametrised_filters: parameterisedFilters,
-      is_spatial_reference: this.spatialReference.value,
-      is_temporal_reference: this.temporalReference.value,
-      is_scaling_reference: this.scalingReference.value
+      is_spatial_reference: this.spatialReference$.value,
+      is_temporal_reference: this.temporalReference$.value,
+      is_scaling_reference: this.scalingReference$.value
     };
   }
 }

@@ -41,8 +41,8 @@ export class DatasetComponent implements OnInit {
     this.allDatasets$ = this.datasetService.getAllDatasets(false);
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
-      if (configs.filter(config => config.datasetModel.selectedDataset.short_name === 'ISMN').length !== 0
-        && this.selectionModel.selectedDataset.short_name !== 'ISMN'){
+      if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0
+        && this.selectionModel.selectedDataset?.short_name !== 'ISMN'){
         this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
           return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
         }));
