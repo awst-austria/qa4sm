@@ -145,29 +145,6 @@ class ValidationRun(models.Model):
     def is_unpublished(self):
         return not self.doi
 
-    @property
-    def spatial_reference_config(self):
-        configs = DatasetConfiguration.objects.filter(validation_id=self.id)
-        spatial_ref_config = configs.filter(is_spatial_reference=True)
-        if len(spatial_ref_config) == 1:
-            return spatial_ref_config[0]
-        return
-
-    @property
-    def temporal_reference_config(self):
-        configs = DatasetConfiguration.objects.filter(validation_id=self.id)
-        temporal_ref_config = configs.filter(is_temporal_reference=True)
-        if len(temporal_ref_config) == 1:
-            return temporal_ref_config[0]
-        return
-
-    def scaling_reference_config(self):
-        configs = DatasetConfiguration.objects.filter(validation_id=self.id)
-        scaling_ref_config = configs.filter(is_scaling_reference=True)
-        if len(scaling_ref_config) == 1:
-            return scaling_ref_config[0]
-        return
-
 
     def archive(self, unarchive=False, commit=True):
         if unarchive:
