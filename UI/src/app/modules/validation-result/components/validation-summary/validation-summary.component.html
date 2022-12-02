@@ -139,7 +139,7 @@
 
         <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
           <span *ngFor="let config of configurations">
-                <span *ngIf="config.id === validationRun.spatial_reference_configuration">
+                <span *ngIf="config.id === validationRun.scaling_reference_configuration">
                   {{config.dataset}} ({{ config.version }}, {{ config.variable }})
 
                   <span *ngIf="config.filters || config.parameterisedFilters; else elseFilters">[Filters:
@@ -156,9 +156,9 @@
         </li>
 
         <ng-template #elseScaling>
-          <li> Scaling reference: {{ scalingMethods[validationRun.scaling_method] }}.</li>
+          <li *ngIf="scalingMethods$|async as scalingMethods"> Scaling reference: {{ scalingMethods[validationRun.scaling_method] }}.</li>
         </ng-template>
-        <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
+        <li *ngIf="scalingMethods$|async as scalingMethods"> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 

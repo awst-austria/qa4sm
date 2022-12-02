@@ -12,6 +12,8 @@ import {AuthService} from '../../../core/services/auth/auth.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {Router} from '@angular/router';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
+import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
+import {ScalingMethodDto} from '../../../scaling/components/scaling/scaling-methods.dto';
 
 
 @Component({
@@ -41,6 +43,7 @@ export class ValidationSummaryComponent implements OnInit {
   isNearExpiry$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
+  scalingMethods$: Observable<ScalingMethodDto[]>;
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -49,13 +52,15 @@ export class ValidationSummaryComponent implements OnInit {
               public globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService,
               private authService: AuthService,
-              private router: Router) {
+              private router: Router,
+              private validationConfigService: ValidationRunConfigService) {
   }
 
   ngOnInit(): void {
     this.setInitialValues();
     this.updateConfig();
     this.getOriginalDate();
+    this.scalingMethods$ = this.validationConfigService.getScalingMethods();
   }
 
   getCurrentUser(): number {

@@ -32,6 +32,10 @@ export class ScalingComponent implements OnInit {
       this.selectedScalingMethod$.next(methods.find(method => method.method === 'none'));
       this.updateScalingMethod();
     });
+
+    this.selectedScaleToModel = this.validationModel.datasetConfigurations.
+      find(datasetConfig => datasetConfig.scalingReference$.getValue());
+    this.selectedScaleToModel$.next(this.selectedScaleToModel);
   }
 
   updateScalingMethod(): void{
@@ -39,20 +43,32 @@ export class ScalingComponent implements OnInit {
     this.validationModel.scalingMethod.methodDescription = this.selectedScalingMethod$.getValue().description;
   }
 
-  updateScaleTo(): void{
-    this.selectedScaleToModel.scalingReference.next(false);
+  updateScaleTo(reference = null): void{
+    if (!reference){
+      this.selectedScaleToModel.scalingReference$.next(false);
+    }
+
     this.selectedScaleToModel = this.selectedScaleToModel$.getValue();
-    this.selectedScaleToModel.scalingReference.next(true);
+    this.selectedScaleToModel.scalingReference$.next(true);
+
   }
 
   onHoverOverDataset(item, highlight): void{
     this.hoverOverDataset.emit({hoveredDataset: item, highlight});
   }
 
-  verifyScaleToModel(): BehaviorSubject<DatasetConfigModel>{
-    this.selectedScaleToModel = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference.getValue());
-    this.selectedScaleToModel$.next(this.selectedScaleToModel);
-    return this.selectedScaleToModel$;
+  public setSelection(scalingMethodName: string, reference: DatasetConfigModel): void {
+
+    this.validationConfigService.getScalingMethods().subscribe(methods => {
+      methods.forEach(scalingMethod => {
+        if (scalingMethod.method === scalingMethodName) {
+          this.selectedScalingMethod$.next(scalingMethod);
+        }
+      });
+      this.updateScalingMethod();
+    });
+    this.selectedScaleToModel$.next(reference);
+    this.updateScaleTo(reference);
   }
 
 }
