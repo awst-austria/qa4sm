@@ -2,6 +2,7 @@ export interface ValidationRunConfigDto {
   dataset_configs: ValidationRunDatasetConfigDto[];
   spatial_reference_config?: ValidationRunDatasetConfigDto;
   temporal_reference_config?: ValidationRunDatasetConfigDto;
+  scaling_reference_config?: ValidationRunDatasetConfigDto;
   interval_from?: Date;
   interval_to?: Date;
   min_lat?: number;
