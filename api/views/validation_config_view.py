@@ -335,7 +335,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 if config_model.is_temporal_reference:
                     new_val_run.temporal_reference_configuration = config_model
 
-                if config_model.is_scaling_reference and new_val_run.scaling_method is not ValidationRun.NO_SCALING:
+                if config_model.is_scaling_reference:
                     new_val_run.scaling_ref = config_model
 
                 dataset_config_models.append(config_model)
