@@ -30,7 +30,7 @@
       <div class="p-col-12 p-pt-3" id="scalingTo">
         <div class="p-float-label">
           <p-dropdown id="scalingReferenceSelector"
-                      (onChange)="updateScaleTo()"
+                      (onChange)="updateScaleTo(true)"
                       [options]="validationModel.datasetConfigurations"
                       [ngModel]="selectedScaleToModel$|async"
                       (ngModelChange)="selectedScaleToModel$.next($event)"

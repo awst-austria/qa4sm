@@ -30,27 +30,41 @@ export class ScalingComponent implements OnInit {
     this.validationConfigService.getScalingMethods().subscribe(methods => {
       this.scalingMethods = methods;
       this.selectedScalingMethod$.next(methods.find(method => method.method === 'none'));
-      this.updateScalingMethod();
+      this.setScalingMethod();
     });
 
-    this.selectedScaleToModel = this.validationModel.datasetConfigurations.
-      find(datasetConfig => datasetConfig.scalingReference$.getValue());
-    this.selectedScaleToModel$.next(this.selectedScaleToModel);
+    // this.selectedScaleToModel = this.validationModel.datasetConfigurations.
+    //   find(datasetConfig => datasetConfig.scalingReference$.getValue());
+    // this.selectedScaleToModel$.next(this.selectedScaleToModel);
   }
 
-  updateScalingMethod(): void{
+  setScalingMethod(): void{
     this.validationModel.scalingMethod.methodName = this.selectedScalingMethod$.getValue().method;
     this.validationModel.scalingMethod.methodDescription = this.selectedScalingMethod$.getValue().description;
   }
+  updateScalingMethod(): void{
+    this.setScalingMethod();
 
-  updateScaleTo(reference = null): void{
-    if (!reference){
+    if (this.selectedScalingMethod$.getValue().method === 'none'){
+      this.selectedScaleToModel$.next(null);
+      this.selectedScaleToModel ? this.updateScaleTo(true) : this.updateScaleTo();
+    } else {
+      if (!this.selectedScaleToModel){
+        this.selectedScaleToModel$.next(this.validationModel.datasetConfigurations[0]);
+        this.updateScaleTo();
+      }
+    }
+  }
+
+  updateScaleTo(clearSelected = false): void{
+    if (clearSelected){
       this.selectedScaleToModel.scalingReference$.next(false);
     }
 
     this.selectedScaleToModel = this.selectedScaleToModel$.getValue();
-    this.selectedScaleToModel.scalingReference$.next(true);
-
+    if (this.selectedScaleToModel){
+      this.selectedScaleToModel.scalingReference$.next(true);
+    }
   }
 
   onHoverOverDataset(item, highlight): void{
@@ -68,7 +82,7 @@ export class ScalingComponent implements OnInit {
       this.updateScalingMethod();
     });
     this.selectedScaleToModel$.next(reference);
-    this.updateScaleTo(reference);
+    this.updateScaleTo();
   }
 
 }
