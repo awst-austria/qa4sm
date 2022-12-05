@@ -121,7 +121,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
               private filterService: FilterService,
-              private validationConfigService: ValidationRunConfigService,
+              public validationConfigService: ValidationRunConfigService,
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute,
@@ -721,25 +721,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
 
     return message.toString();
-  }
-
-
-  getInformationOnTheReference(isSpatialReference, isTemporalReference, isScalingReference): string {
-    const listOfReference = [];
-    if (isSpatialReference){
-      listOfReference.push('spatial');
-    }
-    if (isTemporalReference){
-      listOfReference.push('temporal');
-    }
-    if (isScalingReference){
-      listOfReference.push('scaling');
-    }
-
-    let information: string;
-    listOfReference.length !== 0 ? information = ` (${listOfReference.join(', ')} reference)` : information = '';
-
-    return information;
   }
 
   onHoverOverReferenceDataset(event): void {

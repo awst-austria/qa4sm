@@ -19,8 +19,8 @@ const getScalingMethodsUrl: string = environment.API_URL + 'api/scaling-methods'
 })
 export class ValidationRunConfigService {
 
- public listOfSelectedConfigs: BehaviorSubject<DatasetConfigModel[]>
-   = new BehaviorSubject<DatasetConfigModel[]>([]);
+  public listOfSelectedConfigs: BehaviorSubject<DatasetConfigModel[]>
+    = new BehaviorSubject<DatasetConfigModel[]>([]);
 
   constructor(private httpClient: HttpClient) {
 
@@ -35,7 +35,26 @@ export class ValidationRunConfigService {
     return this.httpClient.get<ValidationRunConfigDto>(getValidationConfigUrl + '/' + validationRunId);
   }
 
-  public getScalingMethods(): Observable<ScalingMethodDto[]>{
+  public getScalingMethods(): Observable<ScalingMethodDto[]> {
     return this.httpClient.get<ScalingMethodDto[]>(getScalingMethodsUrl);
+  }
+
+
+  public getInformationOnTheReference(isSpatialReference, isTemporalReference, isScalingReference): string {
+    const listOfReference = [];
+    if (isSpatialReference) {
+      listOfReference.push('spatial');
+    }
+    if (isTemporalReference) {
+      listOfReference.push('temporal');
+    }
+    if (isScalingReference) {
+      listOfReference.push('scaling');
+    }
+
+    let information: string;
+    listOfReference.length !== 0 ? information = ` (${listOfReference.join(', ')} reference)` : information = '';
+
+    return information;
   }
 }
