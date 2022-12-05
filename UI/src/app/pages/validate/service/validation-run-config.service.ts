@@ -40,7 +40,7 @@ export class ValidationRunConfigService {
   }
 
 
-  public getInformationOnTheReference(isSpatialReference, isTemporalReference, isScalingReference): string {
+  public getInformationOnTheReference(isSpatialReference, isTemporalReference, isScalingReference, scalingMethod): string {
     const listOfReference = [];
     if (isSpatialReference) {
       listOfReference.push('spatial');
@@ -48,7 +48,7 @@ export class ValidationRunConfigService {
     if (isTemporalReference) {
       listOfReference.push('temporal');
     }
-    if (isScalingReference) {
+    if (isScalingReference && scalingMethod !== 'none') {
       listOfReference.push('scaling');
     }
 

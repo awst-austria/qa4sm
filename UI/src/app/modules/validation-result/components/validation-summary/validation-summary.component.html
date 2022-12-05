@@ -78,7 +78,7 @@
 <!--              <em>Dataset {{ind + 1}}: </em>-->
               <span style="font-weight: 600">{{config.dataset}} ({{config.version}}, {{config.variable}})</span>
               <em>{{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
-                config.is_temporal_reference, config.is_scaling_reference)}}
+                config.is_temporal_reference, config.is_scaling_reference, validationRun.scaling_method)}}
               </em><br>
               Filters:
               <ul>
