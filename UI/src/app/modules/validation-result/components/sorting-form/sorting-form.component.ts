@@ -12,7 +12,7 @@ export const SORT_BY_NAME_QUERY_NAME = 'name_tag';
 export const SORT_BY_STATUS_DISPLAY_NAME = 'Status';
 export const SORT_BY_STATUS_QUERY_NAME = 'progress';
 
-export const SORT_BY_REFERENCE_DISPLAY_NAME = 'Reference dataset';
+export const SORT_BY_REFERENCE_DISPLAY_NAME = 'Spatial reference dataset';
 export const SORT_BY_REFERENCE_QUERY_NAME = 'spatial_reference_configuration_id__dataset__pretty_name';
 
 export const ORDER_DIRECTION_DESC = 'descending';
