@@ -74,8 +74,10 @@
         <li>Compared {{ configurations.length  }} datasets:
           <ul>
             <li *ngFor="let config of configurations; let ind = index">
-              <em *ngIf="config.id != validationRun.spatial_reference_configuration">Dataset {{ind + 1}}:</em>
-              <em *ngIf="config.id == validationRun.spatial_reference_configuration">Reference:</em>
+              <em style="font-weight: 600">Dataset {{ind + 1}}
+                {{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
+                  config.is_temporal_reference, config.is_scaling_reference)}}:
+              </em>
 
               {{config.dataset}} ({{config.version}}, {{config.variable}})
               [Filters:
@@ -139,7 +141,7 @@
 
         <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
           <span *ngFor="let config of configurations">
-                <span *ngIf="config.id === validationRun.scaling_reference_configuration">
+                <span *ngIf="config.id === validationRun.scaling_ref">
                   {{config.dataset}} ({{ config.version }}, {{ config.variable }})
 
                   <span *ngIf="config.filters || config.parameterisedFilters; else elseFilters">[Filters:

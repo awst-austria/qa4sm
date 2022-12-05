@@ -53,7 +53,7 @@ export class ValidationSummaryComponent implements OnInit {
               private validationService: ValidationrunService,
               private authService: AuthService,
               private router: Router,
-              private validationConfigService: ValidationRunConfigService) {
+              public validationConfigService: ValidationRunConfigService) {
   }
 
   ngOnInit(): void {
