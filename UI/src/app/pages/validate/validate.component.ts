@@ -333,11 +333,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = 'v202012', userData = true,
                        spatialReference = false, temporalReference = false, scalingReference = false): void {
     this.addDataset(this.validationModel.datasetConfigurations, defaultDatasetName, defaultVersionName, userData,
-      spatialReference, temporalReference, scalingReference);
+      spatialReference, temporalReference);
   }
 
   private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string,
-                     userData: boolean, spatialReference: boolean, temporalReference: boolean, scalingReference: boolean): void {
+                     userData: boolean, spatialReference: boolean, temporalReference: boolean): void {
     const model = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
       null,
@@ -347,7 +347,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject(null),
       new BehaviorSubject(spatialReference),
       new BehaviorSubject(temporalReference),
-      new BehaviorSubject(scalingReference),
+      new BehaviorSubject(false),
       new BehaviorSubject(false)
     );
     targetArray.push(model);
@@ -484,7 +484,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           newReference = ISMNList[0];
         }
       }
-      newReference[referenceType].next(true);
+      if (referenceType === 'scalingReference$' && this.validationModel.scalingMethod.methodName === 'none'){
+        newReference[referenceType].next(false);
+      } else {
+        newReference[referenceType].next(true);
+      }
     }
   }
 
