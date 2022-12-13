@@ -71,6 +71,13 @@ export class ScalingComponent implements OnInit {
     this.hoverOverDataset.emit({hoveredDataset: item, highlight});
   }
 
+  verifyScaleToModel(): BehaviorSubject<DatasetConfigModel>{
+    this.selectedScaleToModel = this.validationModel.datasetConfigurations
+      .find(datasetConfig => datasetConfig.scalingReference$.getValue());
+    this.selectedScaleToModel$.next(this.selectedScaleToModel);
+    return this.selectedScaleToModel$;
+  }
+
   public setSelection(scalingMethodName: string, reference: DatasetConfigModel): void {
 
     this.validationConfigService.getScalingMethods().subscribe(methods => {

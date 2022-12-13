@@ -32,7 +32,7 @@
           <p-dropdown id="scalingReferenceSelector"
                       (onChange)="updateScaleTo(true)"
                       [options]="validationModel.datasetConfigurations"
-                      [ngModel]="selectedScaleToModel$|async"
+                      [ngModel]="verifyScaleToModel()|async"
                       (ngModelChange)="selectedScaleToModel$.next($event)"
                       optionLabel="datasetModel.selectedDataset.pretty_name" [style]="{'width': '100%'}">
             <ng-template let-item pTemplate="item">
