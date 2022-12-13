@@ -4,7 +4,7 @@
     <p-dropdown id="datasetSelector"
                 (onChange)="onDatasetChange()"
                 [options]="verifyOptions()|async"
-                [ngModel]="selectionModel$|async"
+                [ngModel]="verifyChosenValue()|async"
                 (ngModelChange)="selectionModel$.next($event)"
                 optionLabel="datasetModel.selectedDataset.pretty_name"
                 [style]="{'width': '100%'}">

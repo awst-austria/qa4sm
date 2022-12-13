@@ -51,11 +51,11 @@ export class ValidationReferenceComponent implements OnInit {
     return this.chosenDatasets$;
   }
 
-  // verifyChosenValue(): BehaviorSubject<DatasetConfigModel>{
-  //   this.selectedValue = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue());
-  //   this.selectionModel$.next(this.selectedValue);
-  //   return this.selectionModel$;
-  // }
+  verifyChosenValue(): BehaviorSubject<DatasetConfigModel>{
+    this.selectedValue = this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[this.referenceType].getValue());
+    this.selectionModel$.next(this.selectedValue);
+    return this.selectionModel$;
+  }
 
   setReference(reference: DatasetConfigModel): void{
     console.log(this.referenceType);
