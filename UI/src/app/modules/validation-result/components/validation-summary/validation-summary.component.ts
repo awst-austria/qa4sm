@@ -13,7 +13,6 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {Router} from '@angular/router';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
-import {ScalingMethodDto} from '../../../scaling/components/scaling/scaling-methods.dto';
 
 
 @Component({
@@ -43,7 +42,7 @@ export class ValidationSummaryComponent implements OnInit {
   isNearExpiry$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
-  scalingMethods$: Observable<ScalingMethodDto[]>;
+  scalingMethod: string;
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -60,7 +59,9 @@ export class ValidationSummaryComponent implements OnInit {
     this.setInitialValues();
     this.updateConfig();
     this.getOriginalDate();
-    this.scalingMethods$ = this.validationConfigService.getScalingMethods();
+    this.validationConfigService.getScalingMethods().subscribe(methods => {
+      this.scalingMethod = methods.find(method => method.method === this.validationRun.scaling_method).description;
+    });
   }
 
   getCurrentUser(): number {

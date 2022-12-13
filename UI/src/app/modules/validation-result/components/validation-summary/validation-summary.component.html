@@ -73,10 +73,10 @@
           on {{ validationRun.end_time | date: dateFormat :timeZone }} {{timeZone}}.
         </li>
         <li>Compared {{ configurations.length  }} datasets:
-          <ol>
+          <ol style="list-style: none">
             <li *ngFor="let config of configurations; let ind = index">
 <!--              <em>Dataset {{ind + 1}}: </em>-->
-              <span style="font-weight: 600">{{config.dataset}} ({{config.version}}, {{config.variable}})</span>
+              <span style="font-weight: 600">{{config.is_spatial_reference ? 0 : ind + 1}}-{{config.dataset}} ({{config.version}}, {{config.variable}})</span>
               <em>{{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
                 config.is_temporal_reference, config.is_scaling_reference)}}
               </em><br>
@@ -143,7 +143,7 @@
           <span *ngIf="!validationRun.bootstrap_tcol_cis">deactivated. </span>
         </li>
 
-        <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
+        <li *ngIf="validationRun.scaling_method != 'none'">Scaling reference:
           <span *ngFor="let config of configurations">
                 <span *ngIf="config.id === validationRun.scaling_ref">
                   {{config.dataset}} ({{ config.version }}, {{ config.variable }})
@@ -161,13 +161,8 @@
               </span>
         </li>
 
-        <ng-template #elseScaling>
-          <li *ngIf="scalingMethods$|async as scalingMethods"> Scaling
-            reference: {{ scalingMethods[validationRun.scaling_method] }}.
-          </li>
-        </ng-template>
-        <li *ngIf="scalingMethods$|async as scalingMethods"> Scaling
-          method: {{ scalingMethods[validationRun.scaling_method] }}.
+        <li> Scaling
+          method: {{scalingMethod}}.
         </li>
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
