@@ -49,7 +49,7 @@ class PublishingForm(forms.Form):
     def _formdata_from_validation(self, validation):
             title = "Validation of " + (" vs ".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in validation.dataset_configurations.all()]))
 
-            description = 'QA4SM validation of soil moisture data: ' + (" vs ".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in validation.dataset_configurations.all()])) + '. URL: ' + self._validation_url(validation.id) + '. Produced on QA4SM (' + settings.SITE_URL + ')'
+            description = 'QA4SM validation: ' + (" vs ".join(['{} {}'.format(dc.dataset.pretty_name, dc.version.pretty_name) for dc in validation.dataset_configurations.all()])) + '. URL: ' + self._validation_url(validation.id) + '. Produced on QA4SM (' + settings.SITE_URL + ')'
 
             dataset_names = set([dc.dataset.pretty_name for dc in validation.dataset_configurations.all()])
             keywords = ['soil moisture', 'validation', 'qa4sm',]
