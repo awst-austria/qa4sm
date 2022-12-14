@@ -225,7 +225,7 @@ class ValidationRun(models.Model):
             return self.name_tag
 
         configs = DatasetConfiguration.objects.filter(validation=self.id)
-        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.reference_configuration.id]
+        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.spatial_reference_configuration.id]
         t = self.start_time
         minute = str(t.minute)
         if t.minute < 10:
