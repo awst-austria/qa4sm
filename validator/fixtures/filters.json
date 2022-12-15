@@ -588,7 +588,7 @@
             "to_include": null,
             "disable_filter": null,
             "default_set_active": true,
-            "readonly": false
+            "readonly": true
         }
     },
         {
