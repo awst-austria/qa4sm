@@ -39,13 +39,13 @@
               <div (mouseover)="onHoverOverDataset(item, true)" (mouseleave)="onHoverOverDataset(item, false)"
                    (mouseup)="onHoverOverDataset(item, false)">
           <span>
-            {{item.datasetModel.selectedDataset.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})
+            {{item.datasetModel.selectedDataset?.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})
           </span>
               </div>
             </ng-template>
             <ng-template let-item pTemplate="selectedItem">
               <div>
-                <span>{{item.datasetModel.selectedDataset.pretty_name}}
+                <span>{{item.datasetModel.selectedDataset?.pretty_name}}
                   ({{item.datasetModel.selectedVersion?.pretty_name}})</span>
               </div>
 

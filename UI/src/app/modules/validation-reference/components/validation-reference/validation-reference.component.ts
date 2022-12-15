@@ -58,10 +58,8 @@ export class ValidationReferenceComponent implements OnInit {
   }
 
   setReference(reference: DatasetConfigModel): void{
-    console.log(this.referenceType);
     this.selectionModel$.next(reference);
     this.onDatasetChange(reference);
-    console.log(this.selectionModel$.getValue());
   }
 
 }

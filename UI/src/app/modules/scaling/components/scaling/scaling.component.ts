@@ -32,10 +32,6 @@ export class ScalingComponent implements OnInit {
       this.selectedScalingMethod$.next(methods.find(method => method.method === 'none'));
       this.setScalingMethod();
     });
-
-    // this.selectedScaleToModel = this.validationModel.datasetConfigurations.
-    //   find(datasetConfig => datasetConfig.scalingReference$.getValue());
-    // this.selectedScaleToModel$.next(this.selectedScaleToModel);
   }
 
   setScalingMethod(): void{
