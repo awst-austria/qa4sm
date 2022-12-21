@@ -194,7 +194,6 @@ def save_validation_config(validation_run):
 
 
 def create_pytesmo_validation(validation_run):
-    print("I am in pytesmo validation creator and I am trying to create a new validation")
     ds_list = []
     ds_read_names = []
     spatial_ref_name = None
@@ -204,7 +203,6 @@ def create_pytesmo_validation(validation_run):
 
     ds_num = 1
     for dataset_config in validation_run.dataset_configurations.all():
-        print("I am creating readers for: ", dataset_config.dataset, dataset_config.version)
         reader = create_reader(dataset_config.dataset,
                                dataset_config.version)
 
@@ -253,8 +251,6 @@ def create_pytesmo_validation(validation_run):
                 (dataset_config.id == validation_run.temporal_reference_configuration.id)):
             temporal_ref_name = dataset_name
 
-
-    print(f'Here are temporal reference: {temporal_ref_name}, spatial reference: {spatial_ref_name}, scaling reference: {scaling_ref_name}')
     datasets = dict(ds_list)
     ds_num = len(ds_list)
 
@@ -341,8 +337,6 @@ def create_pytesmo_validation(validation_run):
         period=period
     )
 
-    print("and here is a validation ready to be run")
-
     return val
 
 
@@ -363,11 +357,9 @@ def execute_job(self, validation_id, job):
     start_time = datetime.now(tzlocal())
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
-        print('Monika')
         val = create_pytesmo_validation(validation_run)
 
         result = val.calc(*job, rename_cols=False, only_with_reference=True)
-        print("and here is the validation result", result)
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + duration.seconds
@@ -410,7 +402,6 @@ def untrack_celery_task(task_id):
 def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
-    print("this is the validation I want to run: ", validation_run)
     validation_aborted = False
 
     if (not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (not settings.CELERY_TASK_ALWAYS_EAGER):
