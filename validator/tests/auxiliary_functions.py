@@ -22,7 +22,8 @@ def generate_default_validation_hires():
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.save()
 
@@ -48,7 +49,8 @@ def generate_default_validation():
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.save()
 
@@ -74,7 +76,8 @@ def generate_default_validation_smos():
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.save()
 
@@ -100,7 +103,8 @@ def generate_default_validation_smos_l2():
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.save()
 
@@ -133,7 +137,8 @@ def generate_default_validation_triple_coll():
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     ref_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.tcol = True
     run.bootstrap_tcol_cis = True
@@ -162,7 +167,8 @@ def generate_ismn_upscaling_validation():
     data_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
     data_c.save()
 
-    run.reference_configuration = ref_c
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
     run.scaling_ref = ref_c
     run.save()
 
