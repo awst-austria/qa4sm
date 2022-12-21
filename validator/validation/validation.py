@@ -34,7 +34,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -194,13 +194,17 @@ def save_validation_config(validation_run):
 
 
 def create_pytesmo_validation(validation_run):
+    print("I am in pytesmo validation creator and I am trying to create a new validation")
     ds_list = []
     ds_read_names = []
-    ref_name = None
+    spatial_ref_name = None
     scaling_ref_name = None
+    temporal_ref_name = None
+    spatial_ref_short_name = None
 
     ds_num = 1
     for dataset_config in validation_run.dataset_configurations.all():
+        print("I am creating readers for: ", dataset_config.dataset, dataset_config.version)
         reader = create_reader(dataset_config.dataset,
                                dataset_config.version)
 
@@ -238,13 +242,19 @@ def create_pytesmo_validation(validation_run):
 
         if (validation_run.spatial_reference_configuration and
                 (dataset_config.id == validation_run.spatial_reference_configuration.id)):
-            ref_name = dataset_name
-            ref_short_name = validation_run.spatial_reference_configuration.dataset.short_name
+            spatial_ref_name = dataset_name
+            spatial_ref_short_name = validation_run.spatial_reference_configuration.dataset.short_name
 
         if (validation_run.scaling_ref and
                 (dataset_config.id == validation_run.scaling_ref.id)):
             scaling_ref_name = dataset_name
 
+        if (validation_run.temporal_reference_configuration and
+                (dataset_config.id == validation_run.temporal_reference_configuration.id)):
+            temporal_ref_name = dataset_name
+
+
+    print(f'Here are temporal reference: {temporal_ref_name}, spatial reference: {spatial_ref_name}, scaling reference: {scaling_ref_name}')
     datasets = dict(ds_list)
     ds_num = len(ds_list)
 
@@ -267,7 +277,7 @@ def create_pytesmo_validation(validation_run):
         upscaling_lut = create_upscaling_lut(
             validation_run=validation_run,
             datasets=datasets,
-            ref_name=ref_name,
+            spatial_ref_name=spatial_ref_name,
         )
         upscale_parms["upscaling_lut"] = upscaling_lut
         __logger.debug(
@@ -279,7 +289,7 @@ def create_pytesmo_validation(validation_run):
 
     datamanager = DataManager(
         datasets,
-        ref_name=ref_name,
+        ref_name=spatial_ref_name,
         period=period,
         read_ts_names=dict(ds_read_names),
         upscale_parms=upscale_parms,
@@ -287,7 +297,7 @@ def create_pytesmo_validation(validation_run):
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
     # set value of the metadata template according to what reference dataset is used
-    if ref_short_name == 'ISMN':
+    if spatial_ref_short_name == ISMN:
         metadata_template = METADATA_TEMPLATE['ismn_ref']
     else:
         metadata_template = METADATA_TEMPLATE['other_ref']
@@ -300,7 +310,7 @@ def create_pytesmo_validation(validation_run):
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         tcol_metrics = TripleCollocationMetrics(
-            ref_name,
+            spatial_ref_name,
             metadata_template=metadata_template,
             bootstrap_cis=validation_run.bootstrap_tcol_cis
         )
@@ -323,12 +333,15 @@ def create_pytesmo_validation(validation_run):
         temporal_matcher=make_combined_temporal_matcher(
             pd.Timedelta(temporalwindow_size, "H")
         ),
-        spatial_ref=ref_name,
+        temporal_ref=temporal_ref_name,
+        spatial_ref=spatial_ref_name,
         scaling=scaling_method,
         scaling_ref=scaling_ref_name,
         metrics_calculators=metric_calculators,
         period=period
     )
+
+    print("and here is a validation ready to be run")
 
     return val
 
@@ -354,6 +367,7 @@ def execute_job(self, validation_id, job):
         val = create_pytesmo_validation(validation_run)
 
         result = val.calc(*job, rename_cols=False, only_with_reference=True)
+        print("and here is the validation result", result)
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + duration.seconds
@@ -396,6 +410,7 @@ def untrack_celery_task(task_id):
 def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
+    print("this is the validation I want to run: ", validation_run)
     validation_aborted = False
 
     if (not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (not settings.CELERY_TASK_ALWAYS_EAGER):

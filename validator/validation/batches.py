@@ -191,7 +191,7 @@ def create_jobs(
 def create_upscaling_lut(
         validation_run,
         datasets,
-        ref_name
+        spatial_ref_name
 ) -> dict:
     """
     Create a lookup table that aggregates the non-reference measurement points falling under the same reference
