@@ -80,6 +80,7 @@ def generate_default_validation():
 
     run.spatial_reference_configuration = ref_c
     run.scaling_ref = ref_c
+    run.temporal_reference_configuration = ref_c
     run.save()
 
     return run
