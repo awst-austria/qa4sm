@@ -487,7 +487,7 @@
             "detailed_description": "The NASA SMAP level 2 data set provides hal-orbit soil moisture observations at a 36 km sampling (EASE grid) from the SMAP sensor (<a target=\"_blank\" href=\"https://nsidc.org/data/spl2smp/versions/8\" rel=\"noreferrer\">more information</a>).",
             "source_reference": "The data can be downloaded from the product homepage <a target=\"_blank\" href=\"https://nsidc.org/data/spl2smp/versions/8\", rel=\"noreferrer\"> here</a>.",
             "citation": "<a target=\"_blank\" href=\"https://nsidc.org/data/spl2smp/versions/8\" rel=\"noreferrer\">Click here</a>",
-            "is_only_reference": false,
+            "is_spatial_reference": false,
             "versions": [
                 40
             ],
