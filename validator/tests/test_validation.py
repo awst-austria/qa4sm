@@ -1171,7 +1171,7 @@ class TestValidation(TestCase):
             reader = val.create_reader(dataset, version)
             midnight_tstamp = reader.read(-155.42, 19.78,)
 
-            t_adaped_reader = adapt_timestamp(reader, dataset)
+            t_adaped_reader = adapt_timestamp(reader, dataset, version)
             exact_tstamp = t_adaped_reader.read(-155.42, 19.78,)
 
             # Check that the values where the exact date is missing are dropped

@@ -81,6 +81,9 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.SMOS_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
 
+    if dataset.short_name == globals.SMAP_L2:
+        reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
+
     if dataset.user:
         file = UserDatasetFile.objects.get(dataset=dataset)
         stackreader = StackImageReader(
@@ -107,7 +110,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     return reader
 
 
-def adapt_timestamp(reader, dataset):
+def adapt_timestamp(reader, dataset, version):
     """Adapt the reader to include the specified time offset"""
     if dataset.short_name == globals.SMOS_L3:
         tadapt_kwargs = {
@@ -132,6 +135,24 @@ def adapt_timestamp(reader, dataset):
             'time_units': ['s', 'us'],
             'base_time_field': 'Days',
             'base_time_reference': '2000-01-01',
+        }
+
+    elif dataset.short_name == globals.SMAP_L2:
+        tadapt_kwargs = {
+            'base_time_field': 'acquisition_time',
+            'base_time_reference': '2000-01-01T12:00:00',
+            'base_time_units': 's',
+            'time_offset_fields': None,
+            'time_units': None,
+        }
+
+    elif dataset.short_name == globals.SMAP_L3 and version.short_name == globals.SMAP_V6_PM:
+        tadapt_kwargs = {
+            'base_time_field': 'tb_time_seconds',
+            'base_time_reference': '2000-01-01T12:00:00',
+            'base_time_units': 's',
+            'time_offset_fields': None,
+            'time_units': None,
         }
 
     # No adaptation needed
