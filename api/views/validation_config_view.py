@@ -325,9 +325,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
         return new_val_run
 
     dataset_configs = DatasetConfigSerializer(many=True, required=True)
-    # spatial_reference_config = DatasetConfigSerializer(required=True)
-    # temporal_reference_config = DatasetConfigSerializer(required=True)
-    # scaling_reference_config = DatasetConfigSerializer(required=True)
     interval_from = serializers.DateTimeField(required=False)
     interval_to = serializers.DateTimeField(required=False)
     metrics = MetricsSerializer(many=True, required=True)
