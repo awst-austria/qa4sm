@@ -360,8 +360,7 @@ def execute_job(self, validation_id, job):
     try:
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run)
-
-        result = val.calc(*job, rename_cols=False, only_with_reference=True)
+        result = val.calc(*job, rename_cols=False, only_with_reference=True, handle_errors='ignore')
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + duration.seconds
@@ -420,6 +419,7 @@ def run_validation(validation_id):
             reader=ref_reader,
             dataset_config=validation_run.spatial_reference_configuration
         )
+
         validation_run.total_points = total_points
         validation_run.save()  # save the number of gpis before we start
 
