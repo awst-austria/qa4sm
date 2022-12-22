@@ -939,7 +939,7 @@ class TestValidation(TestCase):
         lut = create_upscaling_lut(
             validation_run=run,
             datasets=datasets,
-            ref_name="0-C3S_combined"
+            spatial_ref_name="0-C3S_combined"
         )
         assert list(lut.keys()) == ["1-ISMN"]
         # the exact gpi number might change, so we only check that ismn points are averaged under three c3s pixels
@@ -968,7 +968,7 @@ class TestValidation(TestCase):
         lut = create_upscaling_lut(
             validation_run=run,
             datasets=datasets,
-            ref_name="0-C3S_combined"
+            spatial_ref_name="0-C3S_combined"
         )
         assert list(lut.keys()) == ["1-ISMN"]
         assert lut["1-ISMN"] == []

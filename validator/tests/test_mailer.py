@@ -79,6 +79,7 @@ class TestMailer(TestCase):
         ref_c.save()
 
         run.spatial_reference_configuration = ref_c
+        run.temporal_reference_configuration = ref_c
         run.scaling_ref = ref_c
         run.save()
 

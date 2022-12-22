@@ -13,6 +13,9 @@ def generate_default_validation_hires():
     data_c.dataset = Dataset.objects.get(short_name='CGLS_CSAR_SSM1km')
     data_c.version = DatasetVersion.objects.get(short_name='CGLS_CSAR_SSM1km_V1_1')
     data_c.variable = DataVariable.objects.get(pretty_name='CGLS_SSM')
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
+    data_c.is_scaling_reference = False
     data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -20,6 +23,9 @@ def generate_default_validation_hires():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = True
     ref_c.save()
 
     run.spatial_reference_configuration = ref_c
@@ -40,6 +46,9 @@ def generate_default_validation():
     data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V202012')
     data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
+    data_c.is_scaling_reference = False
     data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -47,6 +56,9 @@ def generate_default_validation():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = True
     ref_c.save()
 
     run.spatial_reference_configuration = ref_c
@@ -67,6 +79,9 @@ def generate_default_validation_smos():
     data_c.dataset = Dataset.objects.get(short_name='SMOS_L3')
     data_c.version = DatasetVersion.objects.get(short_name='SMOSL3_v339_DESC')
     data_c.variable = DataVariable.objects.get(pretty_name='SMOSL3_sm')
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
+    data_c.is_scaling_reference = False
     data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -74,6 +89,9 @@ def generate_default_validation_smos():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = True
     ref_c.save()
 
     run.spatial_reference_configuration = ref_c
@@ -94,6 +112,9 @@ def generate_default_validation_smos_l2():
     data_c.dataset = Dataset.objects.get(short_name='SMOS_L2')
     data_c.version = DatasetVersion.objects.get(short_name='SMOSL2_v700')
     data_c.variable = DataVariable.objects.get(pretty_name='SMOSL2_sm')
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
+    data_c.is_scaling_reference = False
     data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -101,6 +122,9 @@ def generate_default_validation_smos_l2():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = True
     ref_c.save()
 
     run.spatial_reference_configuration = ref_c
@@ -121,6 +145,9 @@ def generate_default_validation_triple_coll():
     data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V201912')
     data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
+    data_c.is_scaling_reference = False
     data_c.save()
 
     other_data_c = DatasetConfiguration()
@@ -128,6 +155,9 @@ def generate_default_validation_triple_coll():
     other_data_c.dataset = Dataset.objects.get(short_name='SMOS_IC')
     other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
     other_data_c.variable = DataVariable.objects.get(pretty_name='SMOS_sm')
+    other_data_c.is_spatial_reference = False
+    other_data_c.is_temporal_reference = False
+    other_data_c.is_scaling_reference = False
     other_data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -135,6 +165,9 @@ def generate_default_validation_triple_coll():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = True
     ref_c.save()
 
     run.spatial_reference_configuration = ref_c
@@ -158,6 +191,9 @@ def generate_ismn_upscaling_validation():
     ref_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     ref_c.version = DatasetVersion.objects.get(short_name='C3S_V202012')
     ref_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = True
     ref_c.save()
 
     data_c = DatasetConfiguration()
@@ -165,6 +201,9 @@ def generate_ismn_upscaling_validation():
     data_c.dataset = Dataset.objects.get(short_name='ISMN')
     data_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     data_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
+    data_c.is_scaling_reference = False
     data_c.save()
 
     run.spatial_reference_configuration = ref_c

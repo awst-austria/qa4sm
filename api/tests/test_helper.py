@@ -69,6 +69,9 @@ def generate_default_validation():
     data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V202012')
     data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+    data_c.is_scaling_reference = False
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
     data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -76,6 +79,9 @@ def generate_default_validation():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = False
     ref_c.save()
 
     run.spatial_reference_configuration = ref_c
@@ -96,6 +102,9 @@ def generate_default_validation_triple_coll():
     data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V201912')
     data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+    data_c.is_scaling_reference = False
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
     data_c.save()
 
     other_data_c = DatasetConfiguration()
@@ -103,6 +112,9 @@ def generate_default_validation_triple_coll():
     other_data_c.dataset = Dataset.objects.get(short_name='SMOS_IC')
     other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
     other_data_c.variable = DataVariable.objects.get(pretty_name='SMOS_sm')
+    other_data_c.is_scaling_reference = False
+    other_data_c.is_spatial_reference = False
+    other_data_c.is_temporal_reference = False
     other_data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -110,6 +122,9 @@ def generate_default_validation_triple_coll():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = False
     ref_c.save()
 
     run.spatial_reference_configuration = ref_c
