@@ -157,8 +157,10 @@ class TestValidation(TestCase):
                             m_var.name)
                     self.__logger.debug(f'Length {m_var.name} are {length}')
 
+                    # NaNs should only occur if the validation failed somehow
                     nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
-                    assert nan_ratio <= 0.75, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
+                    error_ratio = run.error_points / run.total_points
+                    assert nan_ratio <= error_ratio, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
 
             if run.interval_from is None:
                 assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
@@ -479,8 +481,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
+        assert new_run.error_points == 8, "Error points are off"
+        assert new_run.ok_points == 16, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -521,8 +523,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
+        assert new_run.error_points == 5, "Error points are off"
+        assert new_run.ok_points == 19, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -563,8 +565,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 140, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 140, "OK points are off"
+        assert new_run.error_points == 134, "Error points are off"
+        assert new_run.ok_points == 6, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -605,8 +607,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 15, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 15, "OK points are off"
+        assert new_run.error_points == 4, "Error points are off"
+        assert new_run.ok_points == 11, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -646,8 +648,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
+        assert new_run.error_points == 5, "Error points are off"
+        assert new_run.ok_points == 19, "OK points are off"
         self.check_results(new_run)
         self.delete_run(new_run)
 
@@ -724,8 +726,8 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+        assert new_run.error_points == 1
+        assert new_run.ok_points == 8
         self.check_results(new_run)
         self.delete_run(new_run)
 
