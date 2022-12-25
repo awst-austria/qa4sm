@@ -354,7 +354,7 @@ def execute_job(self, validation_id, job):
         validation_run = ValidationRun.objects.get(pk=validation_id)
         val = create_pytesmo_validation(validation_run)
 
-        result = val.calc(*job, rename_cols=False, only_with_reference=True)
+        result = val.calc(*job, rename_cols=False, only_with_reference=True, handle_errors="ignore")
         end_time = datetime.now(tzlocal())
         duration = end_time - start_time
         duration = (duration.days * 86400) + duration.seconds
@@ -461,7 +461,24 @@ def run_validation(validation_id):
                 else:
                     results = _pytesmo_to_qa4sm_results(results)
                     check_and_store_results(async_result.id, results, run_dir)
-                    validation_run.ok_points += num_gpis_from_job(job_table[async_result.id])
+                    # If the job ran successfully, we have to check the status
+                    # attribute to see if the job actually calculated something
+                    # (ok) or had an error.
+                    # In principle we might have different result status for
+                    # different dataset combinations, because it might happen
+                    # that in one case the validation fails because there is
+                    # not enough data. For "ok_points" we only count the points
+                    # where all validations fail.
+                    result_key = list(results.keys())[0]  # there is only 1 key
+                    res = results[result_key]
+                    status_result_keys = list(filter(lambda s: s.startswith("status"), res.keys()))
+                    ok = res[status_result_keys[0]] == 0
+                    for statkey in status_result_keys[1:]:
+                        ok = ok & (res[statkey] == 0)
+                    ngpis = num_gpis_from_job(job_table[async_result.id])
+                    nok = sum(ok)
+                    validation_run.ok_points += nok
+                    validation_run.error_points += ngpis - nok
 
             except Exception as e:
                 validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
