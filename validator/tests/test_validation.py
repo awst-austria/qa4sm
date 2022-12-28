@@ -158,7 +158,7 @@ class TestValidation(TestCase):
                     self.__logger.debug(f'Length {m_var.name} are {length}')
 
                     nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
-                    assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
+                    assert nan_ratio <= 0.75, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
 
             if run.interval_from is None:
                 assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
@@ -350,8 +350,10 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+        # at 5 locations the validation fails because not all datasets have data
+        assert new_run.error_points == 5
+        # the other 4 are okay
+        assert new_run.ok_points == 4
 
         self.check_results(new_run, is_tcol_run=True)
         self.delete_run(new_run)
@@ -862,8 +864,8 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
         assert new_run.total_points == 16
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 16
+        assert new_run.error_points == 12
+        assert new_run.ok_points == 4
         self.check_results(new_run)
         self.delete_run(new_run)
 
