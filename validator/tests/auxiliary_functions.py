@@ -1,14 +1,14 @@
 from validator.models import Dataset, DatasetVersion, DatasetConfiguration, ValidationRun, DataVariable
 from dateutil.tz import tzlocal
 from datetime import datetime
-from validator.validation.globals import ISMN_V20191211, ISMN, ISMN_soil_moisture, C3SC, C3S_V201912, C3S_sm
+from validator.validation.globals import ISMN_V20191211, ISMN, ISMN_soil_moisture, C3SC, C3S_sm, C3S_V202012
 
 default_reference_dataset = ISMN
 default_reference_version = ISMN_V20191211
 default_reference_variable = ISMN_soil_moisture
 
 default_non_reference_dataset = C3SC
-default_non_reference_version = C3S_V201912
+default_non_reference_version = C3S_V202012
 default_non_reference_variable = C3S_sm
 
 def generate_default_validation_hires():
