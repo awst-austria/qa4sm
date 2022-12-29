@@ -1,4 +1,4 @@
-QA4SM v2.1.1 - Release notes 2022-12-29
+QA4SM v2.1.2 - Release notes 2022-12-29
 =======================================================
 # Bug fixing 
 1. Cleaning validate form added;
