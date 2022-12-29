@@ -1,3 +1,9 @@
+QA4SM v2.1.1 - Release notes 2022-12-29
+=======================================================
+# Bug fixing 
+1. Cleaning validate form added;
+2. Setting non-reference dataset as "scale to" fixed;
+
 QA4SM v2.1.1 - Release notes 2022-11-09
 =======================================================
 # Bug fixing 
