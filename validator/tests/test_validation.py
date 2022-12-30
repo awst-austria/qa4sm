@@ -236,7 +236,7 @@ class TestValidation(TestCase):
                         assert ds.val_resolution == run.spatial_reference_configuration.dataset.resolution["value"]
                         assert ds.val_resolution_unit == run.spatial_reference_configuration.dataset.resolution["unit"]
 
-                if dataset_config.id == run.scaling_ref.id:
+                if run.scaling_ref and dataset_config.id == run.scaling_ref.id:
                     assert ds.val_scaling_ref == ds_name, 'Wrong validation config attribute. [scaling_ref]'
 
             assert ds.val_scaling_method == run.scaling_method, ' Wrong validation config attribute. [scaling_method]'
@@ -277,6 +277,9 @@ class TestValidation(TestCase):
 
         # run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -322,6 +325,9 @@ class TestValidation(TestCase):
 
         # run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -370,6 +376,9 @@ class TestValidation(TestCase):
 
         # run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -712,6 +721,8 @@ class TestValidation(TestCase):
 
         # run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -1514,6 +1525,9 @@ class TestValidation(TestCase):
                 run.anomalies_from = time_intervals_from
                 run.anomalies_to = time_intervals_to
             run.scaling_method = scaling_methods[i]
+            if run.scaling_method != 'none':
+                run.scaling_ref = run.spatial_reference_configuration
+                run.scaling_ref.is_scaling_reference = True
             run.doi = f'doi-1-2-{i}'
             run.save()
             run_ids.append(run.id)
@@ -1530,6 +1544,9 @@ class TestValidation(TestCase):
 
         run_tcol.anomalies = anomalies_methods[0][0]
         run_tcol.scaling_method = scaling_methods[0]
+        run_tcol.scaling_ref = run.spatial_reference_configuration
+        run_tcol.scaling_ref.is_scaling_reference = True
+
         run_tcol.doi = f'tcol_doi-1-2-3'
         run_tcol.save()
         run_tcol_id = run_tcol.id
@@ -1547,6 +1564,9 @@ class TestValidation(TestCase):
 
         run_filt.anomalies = anomalies_methods[0][0]
         run_filt.scaling_method = scaling_methods[0]
+        run_filt.scaling_ref = run.spatial_reference_configuration
+        run_filt.scaling_ref.is_scaling_reference = True
+
         run_filt.doi = f'doi-1-2-8'
         run_filt.save()
         run_filt_id = run_filt.id
@@ -1582,6 +1602,9 @@ class TestValidation(TestCase):
                 run.anomalies_from = time_intervals_from
                 run.anomalies_to = time_intervals_to
             run.scaling_method = scaling_methods[i]
+            if run.scaling_method != 'none':
+                run.scaling_ref = run.spatial_reference_configuration
+                run.scaling_ref.is_scaling_reference = True
             run.save()
             is_there_one = compare_validation_runs(run, published_runs, user)
 
@@ -1603,6 +1626,8 @@ class TestValidation(TestCase):
 
         run.anomalies = anomalies_methods[0][0]
         run.scaling_method = scaling_methods[0]
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
         run.save()
 
         is_there_one = compare_validation_runs(run, published_runs, user)
@@ -1648,6 +1673,8 @@ class TestValidation(TestCase):
         run.anomalies = anomalies_methods[0][0]
         # there is no run with scaling method LINREG
         run.scaling_method = ValidationRun.LINREG
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
         run.save()
         is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
@@ -1655,6 +1682,9 @@ class TestValidation(TestCase):
         # restoring existing validation
         run.anomalies = anomalies_methods[2][0]
         run.scaling_method = scaling_methods[2]
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+
         run.anomalies_from = time_intervals_from
         run.anomalies_to = time_intervals_to
         run.save()
@@ -1683,6 +1713,9 @@ class TestValidation(TestCase):
         # getting back to settings of the run with filters set adding filters for the run
         run.anomalies = anomalies_methods[0][0]
         run.scaling_method = scaling_methods[0]
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+
         run.anomalies_from = None
         run.anomalies_to = None
         run.save()
@@ -1826,6 +1859,9 @@ class TestValidation(TestCase):
 
         run_tcol.anomalies = anomalies_methods[0][0]
         run_tcol.scaling_method = scaling_methods[0]
+        run_tcol.scaling_ref = run.spatial_reference_configuration
+        run_tcol.scaling_ref.is_scaling_reference = True
+
         run_tcol.save()
         is_there_one = compare_validation_runs(run_tcol, published_runs, user)
 
@@ -1849,9 +1885,13 @@ class TestValidation(TestCase):
         run.user = self.testuser
 
         run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = run.spatial_reference_configuration
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
         run.save()
+
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         for config in run.dataset_configurations.all():
             if config == run.spatial_reference_configuration:

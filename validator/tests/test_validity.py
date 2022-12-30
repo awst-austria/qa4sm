@@ -146,6 +146,8 @@ class TestValidity(TestCase):
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
         ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
         ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+        ref_c.is_spatial_reference = True
+        ref_c.is_temporal_reference = True
         ref_c.save()
 
         ref_c.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
@@ -153,7 +155,6 @@ class TestValidity(TestCase):
 
         run.spatial_reference_configuration = ref_c
         run.temporal_reference_configuration = ref_c
-        run.scaling_ref = ref_c
         run.save()
 
         run_id = run.id
