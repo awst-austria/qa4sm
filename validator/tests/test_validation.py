@@ -557,6 +557,11 @@ class TestValidation(TestCase):
         run.max_lat = self.hawaii_coordinates[2]
         run.max_lon = self.hawaii_coordinates[3]
 
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
         run.save()
 
         for config in run.dataset_configurations.all():
@@ -600,6 +605,10 @@ class TestValidation(TestCase):
         run.max_lat = 21.33
         run.max_lon = -155.86
 
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
         run.save()
 
         for config in run.dataset_configurations.all():
@@ -723,6 +732,7 @@ class TestValidation(TestCase):
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
         run.scaling_ref = run.spatial_reference_configuration
         run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -1528,6 +1538,7 @@ class TestValidation(TestCase):
             if run.scaling_method != 'none':
                 run.scaling_ref = run.spatial_reference_configuration
                 run.scaling_ref.is_scaling_reference = True
+                run.scaling_ref.save()
             run.doi = f'doi-1-2-{i}'
             run.save()
             run_ids.append(run.id)
@@ -1546,6 +1557,7 @@ class TestValidation(TestCase):
         run_tcol.scaling_method = scaling_methods[0]
         run_tcol.scaling_ref = run.spatial_reference_configuration
         run_tcol.scaling_ref.is_scaling_reference = True
+        run_tcol.scaling_ref.save()
 
         run_tcol.doi = f'tcol_doi-1-2-3'
         run_tcol.save()
@@ -1566,6 +1578,7 @@ class TestValidation(TestCase):
         run_filt.scaling_method = scaling_methods[0]
         run_filt.scaling_ref = run.spatial_reference_configuration
         run_filt.scaling_ref.is_scaling_reference = True
+        run_filt.scaling_ref.save()
 
         run_filt.doi = f'doi-1-2-8'
         run_filt.save()
@@ -1605,6 +1618,7 @@ class TestValidation(TestCase):
             if run.scaling_method != 'none':
                 run.scaling_ref = run.spatial_reference_configuration
                 run.scaling_ref.is_scaling_reference = True
+                run.scaling_ref.save()
             run.save()
             is_there_one = compare_validation_runs(run, published_runs, user)
 
@@ -1684,6 +1698,7 @@ class TestValidation(TestCase):
         run.scaling_method = scaling_methods[2]
         run.scaling_ref = run.spatial_reference_configuration
         run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.anomalies_from = time_intervals_from
         run.anomalies_to = time_intervals_to
@@ -1715,6 +1730,7 @@ class TestValidation(TestCase):
         run.scaling_method = scaling_methods[0]
         run.scaling_ref = run.spatial_reference_configuration
         run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.anomalies_from = None
         run.anomalies_to = None
@@ -1861,6 +1877,7 @@ class TestValidation(TestCase):
         run_tcol.scaling_method = scaling_methods[0]
         run_tcol.scaling_ref = run.spatial_reference_configuration
         run_tcol.scaling_ref.is_scaling_reference = True
+        run_tcol.scaling_ref.save()
 
         run_tcol.save()
         is_there_one = compare_validation_runs(run_tcol, published_runs, user)
