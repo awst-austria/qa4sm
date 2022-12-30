@@ -172,11 +172,12 @@ def save_validation_config(validation_run):
             if ((validation_run.scaling_ref is not None) and
                     (dataset_config.id == validation_run.scaling_ref.id)):
                 ds.val_scaling_ref = 'val_dc_dataset' + str(i)
-                if dataset_config.dataset.short_name in IRREGULAR_GRIDS.keys():
-                    grid_stepsize = IRREGULAR_GRIDS[dataset_config.dataset.short_name]
-                else:
-                    grid_stepsize = 'nan'
-                ds.setncattr('val_dc_dataset' + str(i) + '_grid_stepsize', grid_stepsize)
+
+            if dataset_config.dataset.short_name in IRREGULAR_GRIDS.keys():
+                grid_stepsize = IRREGULAR_GRIDS[dataset_config.dataset.short_name]
+            else:
+                grid_stepsize = 'nan'
+            ds.setncattr('val_dc_dataset' + str(i) + '_grid_stepsize', grid_stepsize)
 
         ds.val_scaling_method = validation_run.scaling_method
 
