@@ -84,7 +84,7 @@ class ValidationRun(models.Model):
                                                          related_name='temp_ref_validation_run', null=True)
     scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
                                     related_name='scaling_ref_validation_run', null=True)
-    scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
+    scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=NO_SCALING)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
     anomalies = models.CharField(max_length=20, choices=ANOMALIES_METHODS, default=NO_ANOM)
