@@ -566,24 +566,35 @@ def _check_validation_configuration(validation: ValidationRun) -> None:
     # check if there is no scaling reference set if the method is none
     if validation.scaling_method == 'none':
         if scaling_ref:
-            if scaling_ref.is_scaling_reference or len(val_configs.filter(is_temporal_reference=True)) != 0:
+            if scaling_ref.is_scaling_reference or len(val_configs.filter(is_scaling_reference=True)) != 0:
                 raise ValueError(
-                    'Scaling method is none, but scaling reference is set and configuration is marked as reference.')
+                    'Scaling method is none, but scaling reference is set and a configuration is marked as reference.')
             raise ValueError('Scaling method is none, but scaling reference is set.')
+        else:
+            if len(val_configs.filter(is_scaling_reference=True)) != 0:
+                raise ValueError(
+                    'Scaling method is not set but at least one configuration is marked as reference.')
     else:
         if scaling_ref:
-            if len(val_configs.filter(is_temporal_reference=True)) != 1:
-                raise ValueError('Wrong number of configurations is marked as scaling reference')
+            if len(val_configs.filter(is_scaling_reference=True)) == 0:
+                raise ValueError('No configuration is marked as scaling reference.')
+            elif len(val_configs.filter(is_scaling_reference=True)) > 1:
+                raise ValueError('More than one configuration is marked as scaling reference.')
             if not scaling_ref.is_scaling_reference:
                 raise ValueError('Configuration is not marked as scaling reference.')
         else:
             raise ValueError('Scaling method is set, but scaling reference not.')
 
     # check if only one configuration has proper field set:
-    if len(val_configs.filter(is_spatial_reference=True)) != 1:
-        raise ValueError('Wrong number of configurations is marked as spatial reference')
-    if len(val_configs.filter(is_temporal_reference=True)) != 1:
-        raise ValueError('Wrong number of configurations is marked as temporal reference')
+    if len(val_configs.filter(is_spatial_reference=True)) == 0:
+        raise ValueError('No configuration is marked as spatial reference.')
+    elif len(val_configs.filter(is_spatial_reference=True)) > 1:
+        raise ValueError('More than one configuration is marked as spatial reference.')
+
+    if len(val_configs.filter(is_temporal_reference=True)) == 0:
+        raise ValueError('No configuration is marked as temporal reference.')
+    elif len(val_configs.filter(is_temporal_reference=True)) > 1:
+        raise ValueError('More than one configuration is marked as temporal reference.')
 
     # check if proper reference configurations have proper fields set
     if not validation.spatial_reference_configuration.is_spatial_reference:
