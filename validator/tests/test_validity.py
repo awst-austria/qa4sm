@@ -25,7 +25,7 @@ from validator.models import DataFilter
 from validator.models import DataVariable
 import validator.validation as val
 from validator.validation import globals
-
+from validator.validation.validation import _check_validation_configuration
 
 '''
     Tests to check that the validation process really produces valid results ;-)
@@ -176,3 +176,222 @@ class TestValidity(TestCase):
 
         self.generic_result_check(finished_run)
         self.delete_run(finished_run)
+
+
+    def test_different_reference_configurations(self):
+        run = ValidationRun()
+        run.start_time = datetime.now(tzlocal())
+        run.user = self.testuser
+        # set validation period
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+        run.save()
+
+        # add three different datasets
+        data_1 = DatasetConfiguration()
+        data_1.validation = run
+        data_1.dataset = Dataset.objects.get(short_name='C3S_combined')
+        data_1.version = DatasetVersion.objects.get(short_name='C3S_V201812')
+        data_1.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+        data_1.save()  # object needs to be saved before m2m relationship can be used
+
+        data_1.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        data_1.save()
+
+        data_2 = DatasetConfiguration()
+        data_2.validation = run
+        data_2.dataset = Dataset.objects.get(short_name='ISMN')
+        data_2.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
+        data_2.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+        data_2.save()
+
+        data_2.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+        data_2.save()
+
+        data_3 = DatasetConfiguration()
+        data_3.validation = run
+        data_3.dataset = Dataset.objects.get(short_name='GLDAS')
+        data_3.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
+        data_3.variable = DataVariable.objects.get(pretty_name='GLDAS_SoilMoi0_10cm_inst')
+        data_3.save()  # object needs to be saved before m2m relationship can be used
+
+        data_3.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        data_3.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
+        data_3.save()
+
+        run.spatial_reference_configuration = data_2
+        run.temporal_reference_configuration = data_2
+        run.save()
+
+        # test case:
+        # no dataset marked as spatial reference
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "No configuration is marked as spatial reference." in str(exc)
+
+        # assign spatial reference to data_2
+        data_2.is_spatial_reference = True
+        data_2.save()
+
+        # test case:
+        # no dataset marked as temporal reference
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "No configuration is marked as temporal reference." in str(exc)
+
+        # assign temporal reference to data_2:
+        data_2.is_temporal_reference = True
+        data_2.save()
+
+        # test case - everything ok:
+        # do not set scaling reference, as the default scaling reference method is none
+        try:
+            _check_validation_configuration(run)
+        except Exception as exc:
+            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+
+        # change spatial and temporal reference in the run, but do not change it in the dataset
+        # test case:
+        # 1 config set as spatial and temporal reference, but a different one assigned to the run
+        run.spatial_reference_configuration = data_1
+        run.temporal_reference_configuration = data_1
+        run.save()
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "Configuration is not marked as spatial reference." in str(exc)
+
+        # assign spatial reference to the proper dataset, but do not remove it from the data_2:
+        # test case:
+        # more than one config set as spatial reference, but one of them is assigned to the run
+        data_1.is_spatial_reference = True
+        data_1.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "More than one configuration is marked as spatial reference." in str(exc)
+
+        # remove spatial reference info from data_1, but do not fix temporal
+        # 1 config set as temporal reference, but a different one assigned to the run
+        data_2.is_spatial_reference = False
+        data_2.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "Configuration is not marked as temporal reference." in str(exc)
+
+        # assign temporal reference to data_1 but do not remove from data_2
+        # test case:
+        # more than one config set as temporal reference, but one of them assigned to the run
+        data_1.is_temporal_reference = True
+        data_1.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "More than one configuration is marked as temporal reference." in str(exc)
+
+        # remove temporal reference from data_2 -> again everything is ok
+        data_2.is_temporal_reference = False
+        data_2.save()
+
+        try:
+            _check_validation_configuration(run)
+        except Exception as exc:
+            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+
+        # change scaling method but do not set scaling reference:
+        # test case:
+        # scaling method set but scaling reference not
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "Scaling method is set, but scaling reference not." in str(exc)
+
+        # set scaling reference in the run but do not assign it to any config
+        # test case:
+        # no config marked as scaing reference
+        run.scaling_ref = data_1
+        run.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "No configuration is marked as scaling reference." in str(exc)
+
+        # test case:
+        # more than one config as scaling reference
+        data_1.is_scaling_reference = True
+        data_1.save()
+
+        data_2.is_scaling_reference = True
+        data_2.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "More than one configuration is marked as scaling reference." in str(exc)
+
+        # leaving data_2 as the scaling reference
+        # test case:
+        # a configuration marked as scaling reference but not the one that is assigned to the run
+        data_1.is_scaling_reference = False
+        data_1.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "Configuration is not marked as scaling reference." in str(exc)
+
+        # remove scaling method
+        # test case:
+        # scaling reference set in the run and assigned to a config, but method set to none
+        run.scaling_method = ValidationRun.NO_SCALING
+        run.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "Scaling method is none, but scaling reference is set and a configuration is marked as reference." in str(exc)
+
+        # remove scaling reference method but leave config with assigned information
+        # test case:
+        # scaling method and reference is not assigned to the run, but there is still a config marked as scaling
+        # reference
+        run.scaling_ref = None
+        run.save()
+
+        with pytest.raises(ValueError) as exc:
+            _check_validation_configuration(run)
+        assert "Scaling method is not set but at least one configuration is marked as reference." in str(exc)
+
+        # test case - everything ok:
+        # data 1 set as spatial, data 2 set as temporal, no scaling:
+        data_1.is_temporal_reference = False
+        data_1.save()
+
+        data_2.is_scaling_reference = False
+        data_2.is_temporal_reference = True
+        data_2.save()
+
+        run.temporal_reference_configuration = data_2
+        run.save()
+
+        try:
+            _check_validation_configuration(run)
+        except Exception as exc:
+            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+
+        # test case - everything ok:
+        # data 1 set as spatial, data 2 set as temporal and data 3 as the scaling reference
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = data_3
+        run.save()
+
+        data_3.is_scaling_reference = True
+        data_3.save()
+
+        try:
+            _check_validation_configuration(run)
+        except Exception as exc:
+            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+
+
