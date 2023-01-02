@@ -25,7 +25,7 @@ from validator.models import DataFilter
 from validator.models import DataVariable
 import validator.validation as val
 from validator.validation import globals
-from validator.validation.validation import _check_validation_configuration
+from validator.validation.validation import check_validation_configuration
 
 '''
     Tests to check that the validation process really produces valid results ;-)
@@ -227,7 +227,7 @@ class TestValidity(TestCase):
         # no dataset marked as spatial reference
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "No configuration is marked as spatial reference." in str(exc)
 
         # assign spatial reference to data_2
@@ -238,7 +238,7 @@ class TestValidity(TestCase):
         # no dataset marked as temporal reference
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "No configuration is marked as temporal reference." in str(exc)
 
         # assign temporal reference to data_2:
@@ -248,7 +248,7 @@ class TestValidity(TestCase):
         # test case - everything ok:
         # do not set scaling reference, as the default scaling reference method is none
         try:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         except Exception as exc:
             assert False, f"'_check_validation_configuration raised and exception {exc}'"
 
@@ -259,7 +259,7 @@ class TestValidity(TestCase):
         run.temporal_reference_configuration = data_1
         run.save()
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "Configuration is not marked as spatial reference." in str(exc)
 
         # assign spatial reference to the proper dataset, but do not remove it from the data_2:
@@ -269,7 +269,7 @@ class TestValidity(TestCase):
         data_1.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "More than one configuration is marked as spatial reference." in str(exc)
 
         # remove spatial reference info from data_1, but do not fix temporal
@@ -278,7 +278,7 @@ class TestValidity(TestCase):
         data_2.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "Configuration is not marked as temporal reference." in str(exc)
 
         # assign temporal reference to data_1 but do not remove from data_2
@@ -288,7 +288,7 @@ class TestValidity(TestCase):
         data_1.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "More than one configuration is marked as temporal reference." in str(exc)
 
         # remove temporal reference from data_2 -> again everything is ok
@@ -296,7 +296,7 @@ class TestValidity(TestCase):
         data_2.save()
 
         try:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         except Exception as exc:
             assert False, f"'_check_validation_configuration raised and exception {exc}'"
 
@@ -307,7 +307,7 @@ class TestValidity(TestCase):
         run.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "Scaling method is set, but scaling reference not." in str(exc)
 
         # set scaling reference in the run but do not assign it to any config
@@ -317,7 +317,7 @@ class TestValidity(TestCase):
         run.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "No configuration is marked as scaling reference." in str(exc)
 
         # test case:
@@ -329,7 +329,7 @@ class TestValidity(TestCase):
         data_2.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "More than one configuration is marked as scaling reference." in str(exc)
 
         # leaving data_2 as the scaling reference
@@ -339,7 +339,7 @@ class TestValidity(TestCase):
         data_1.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "Configuration is not marked as scaling reference." in str(exc)
 
         # remove scaling method
@@ -349,7 +349,7 @@ class TestValidity(TestCase):
         run.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "Scaling method is none, but scaling reference is set and a configuration is marked as reference." in str(exc)
 
         # remove scaling reference method but leave config with assigned information
@@ -360,7 +360,7 @@ class TestValidity(TestCase):
         run.save()
 
         with pytest.raises(ValueError) as exc:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         assert "Scaling method is not set but at least one configuration is marked as reference." in str(exc)
 
         # test case - everything ok:
@@ -376,7 +376,7 @@ class TestValidity(TestCase):
         run.save()
 
         try:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         except Exception as exc:
             assert False, f"'_check_validation_configuration raised and exception {exc}'"
 
@@ -390,7 +390,7 @@ class TestValidity(TestCase):
         data_3.save()
 
         try:
-            _check_validation_configuration(run)
+            check_validation_configuration(run)
         except Exception as exc:
             assert False, f"'_check_validation_configuration raised and exception {exc}'"
 

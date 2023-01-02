@@ -406,7 +406,6 @@ def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_aborted = False
-    _check_validation_configuration(validation_run)
 
     if (not hasattr(settings, 'CELERY_TASK_ALWAYS_EAGER')) or (not settings.CELERY_TASK_ALWAYS_EAGER):
         app.control.add_consumer(validation_run.user.username, reply=True)  # @UndefinedVariable
@@ -549,7 +548,7 @@ def stop_running_validation(validation_id):
         task.delete()
 
 
-def _check_validation_configuration(validation: ValidationRun) -> None:
+def check_validation_configuration(validation: ValidationRun) -> None:
     """
     Checks if validation configuration is proper, i.e. if the scaling, temporal and spatial reference configurations,
     assigned to the particular validation have proper fields set to True, if not throws an error

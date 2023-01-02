@@ -15,7 +15,7 @@ from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset, \
     DatasetVersion, DataVariable
 from validator.validation import run_validation, globals
-from validator.validation.validation import compare_validation_runs
+from validator.validation.validation import compare_validation_runs, check_validation_configuration
 
 
 def _check_if_settings_exist():
@@ -59,6 +59,7 @@ def start_validation(request):
             return response
 
     connections.close_all()
+    check_validation_configuration(new_val_run)
     p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
     p.start()
     serializer = ValidationRunSerializer(new_val_run)
