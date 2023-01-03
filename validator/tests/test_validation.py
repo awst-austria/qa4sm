@@ -88,7 +88,7 @@ class TestValidation(TestCase):
 
     # check output of validation
 
-    def _check_validation_configuration_consistency(validation: ValidationRun) -> None:
+    def _check_validation_configuration_consistency(self, validation: ValidationRun) -> None:
         """
         Checks if validation configuration is proper, i.e. if the scaling, temporal and spatial reference configurations,
         assigned to the particular validation have proper fields set to True, if not throws an error
