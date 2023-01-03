@@ -115,8 +115,8 @@ IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
                    'SMOS_L3': 0.25,
                    'SMOS_IC': 0.25,
                    'ASCAT': 0.1,
-                   'SMOS_L2': 15,
-                   'SMAP_L2': 36, }
+                   'SMOS_L2': 0.135,  # 15km
+                   'SMAP_L2': 0.35, }  # 35km
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
