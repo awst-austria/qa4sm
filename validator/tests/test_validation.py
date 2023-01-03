@@ -87,7 +87,75 @@ class TestValidation(TestCase):
         set_dataset_paths()
 
     # check output of validation
+
+    def _check_validation_configuration_consistency(validation: ValidationRun) -> None:
+        """
+        Checks if validation configuration is proper, i.e. if the scaling, temporal and spatial reference configurations,
+        assigned to the particular validation have proper fields set to True, if not throws an error
+
+        This function is used to verify if our validation test cases are properly written. After the change in
+        the way we treat reference, there were some changes to the validation and data_configuration models and now tests
+        have to be consistent with those changes.
+
+        The function is not used in the API tests, as there we do not verify a saved validation, but parameters coming
+        from the frontend, so there are slightly different conditions to check.
+        Parameters
+        ----------
+        validation: ValidationRun instance
+
+        Returns
+        -------
+        """
+        val_configs = DatasetConfiguration.objects.filter(validation=validation)
+        scaling_ref = validation.scaling_ref
+
+        # check if there is no scaling reference set if the method is none
+        if validation.scaling_method == 'none':
+            if scaling_ref:
+                if scaling_ref.is_scaling_reference or len(val_configs.filter(is_scaling_reference=True)) != 0:
+                    raise ValueError(
+                        'Scaling method is none, but scaling reference is set and a configuration is '
+                        'marked as reference.')
+                raise ValueError('Scaling method is none, but scaling reference is set.')
+            else:
+                if len(val_configs.filter(is_scaling_reference=True)) != 0:
+                    raise ValueError(
+                        'Scaling method is not set but at least one configuration is marked as reference.')
+        else:
+            if scaling_ref:
+                if len(val_configs.filter(is_scaling_reference=True)) == 0:
+                    raise ValueError('No configuration is marked as scaling reference.')
+                elif len(val_configs.filter(is_scaling_reference=True)) > 1:
+                    raise ValueError('More than one configuration is marked as scaling reference.')
+                if not scaling_ref.is_scaling_reference:
+                    raise ValueError('Configuration is not marked as scaling reference.')
+            else:
+                raise ValueError('Scaling method is set, but scaling reference not.')
+
+        # check if only one configuration has proper field set:
+        if len(val_configs.filter(is_spatial_reference=True)) == 0:
+            raise ValueError('No configuration is marked as spatial reference.')
+        elif len(val_configs.filter(is_spatial_reference=True)) > 1:
+            raise ValueError('More than one configuration is marked as spatial reference.')
+
+        if len(val_configs.filter(is_temporal_reference=True)) == 0:
+            raise ValueError('No configuration is marked as temporal reference.')
+        elif len(val_configs.filter(is_temporal_reference=True)) > 1:
+            raise ValueError('More than one configuration is marked as temporal reference.')
+
+        # check if proper reference configurations have proper fields set
+        if not validation.spatial_reference_configuration.is_spatial_reference:
+            raise ValueError('Configuration is not marked as spatial reference.')
+        if not validation.temporal_reference_configuration.is_temporal_reference:
+            raise ValueError('Configuration is not marked as temporal reference.')
+
     def check_results(self, run, is_tcol_run=False):
+
+        try:
+            self._check_validation_configuration_consistency(run)
+        except Exception as exc:
+            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+
         assert run is not None
         assert run.end_time is not None
         assert run.end_time > run.start_time

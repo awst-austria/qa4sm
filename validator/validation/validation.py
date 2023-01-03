@@ -548,60 +548,6 @@ def stop_running_validation(validation_id):
         task.delete()
 
 
-def check_validation_configuration(validation: ValidationRun) -> None:
-    """
-    Checks if validation configuration is proper, i.e. if the scaling, temporal and spatial reference configurations,
-    assigned to the particular validation have proper fields set to True, if not throws an error
-    Parameters
-    ----------
-    validation: ValidationRun instance
-
-    Returns
-    -------
-    """
-    val_configs = DatasetConfiguration.objects.filter(validation=validation)
-    scaling_ref = validation.scaling_ref
-
-    # check if there is no scaling reference set if the method is none
-    if validation.scaling_method == 'none':
-        if scaling_ref:
-            if scaling_ref.is_scaling_reference or len(val_configs.filter(is_scaling_reference=True)) != 0:
-                raise ValueError(
-                    'Scaling method is none, but scaling reference is set and a configuration is marked as reference.')
-            raise ValueError('Scaling method is none, but scaling reference is set.')
-        else:
-            if len(val_configs.filter(is_scaling_reference=True)) != 0:
-                raise ValueError(
-                    'Scaling method is not set but at least one configuration is marked as reference.')
-    else:
-        if scaling_ref:
-            if len(val_configs.filter(is_scaling_reference=True)) == 0:
-                raise ValueError('No configuration is marked as scaling reference.')
-            elif len(val_configs.filter(is_scaling_reference=True)) > 1:
-                raise ValueError('More than one configuration is marked as scaling reference.')
-            if not scaling_ref.is_scaling_reference:
-                raise ValueError('Configuration is not marked as scaling reference.')
-        else:
-            raise ValueError('Scaling method is set, but scaling reference not.')
-
-    # check if only one configuration has proper field set:
-    if len(val_configs.filter(is_spatial_reference=True)) == 0:
-        raise ValueError('No configuration is marked as spatial reference.')
-    elif len(val_configs.filter(is_spatial_reference=True)) > 1:
-        raise ValueError('More than one configuration is marked as spatial reference.')
-
-    if len(val_configs.filter(is_temporal_reference=True)) == 0:
-        raise ValueError('No configuration is marked as temporal reference.')
-    elif len(val_configs.filter(is_temporal_reference=True)) > 1:
-        raise ValueError('More than one configuration is marked as temporal reference.')
-
-    # check if proper reference configurations have proper fields set
-    if not validation.spatial_reference_configuration.is_spatial_reference:
-        raise ValueError('Configuration is not marked as spatial reference.')
-    if not validation.temporal_reference_configuration.is_temporal_reference:
-        raise ValueError('Configuration is not marked as temporal reference.')
-
-
 def _pytesmo_to_qa4sm_results(results: dict) -> dict:
     """
     Converts the new pytesmo results dictionary format to the old format that
