@@ -253,13 +253,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
         temporal_ref_configs_num = len(list(filter(lambda el: el['is_temporal_reference'], attrs['dataset_configs'])))
         scaling_ref_configs_num = len(list(filter(lambda el: el['is_scaling_reference'], attrs['dataset_configs'])))
 
-        print(scaling_ref_configs_num)
-        #
-        # scaling_condition = (scaling_ref_configs_num == 0 and (
-        #         attrs['scaling_method'] == 'none' or attrs['scaling_method'] is None)) or \
-        #                     (scaling_ref_configs_num == 1 and attrs['scaling_method'] is not None
-        #                      and attrs['scaling_method'] != 'none')
-
         if spatial_ref_configs_num == 0:
             raise serializers.ValidationError('No spatial reference provided.')
         elif spatial_ref_configs_num > 1:

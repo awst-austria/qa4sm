@@ -81,7 +81,7 @@ export class DatasetComponent implements OnInit {
 
         this.selectableDatasetVariables$.subscribe(
           variables => {
-            this.selectionModel.selectedVariable = variables[0];
+            this.selectionModel.selectedVariable = variables[variables.length - 1];
           },
           () => {},
           () => {
