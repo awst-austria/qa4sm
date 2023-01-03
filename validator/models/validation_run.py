@@ -16,6 +16,10 @@ from validator.models import DatasetConfiguration, User, CopiedValidations
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
+# def get_spatial_reference_id(instance) -> int:
+#     return instance.spatial_reference_configuration.primary_key
+
+
 class ValidationRun(models.Model):
     # scaling methods
     MIN_MAX = 'min_max'
@@ -74,12 +78,13 @@ class ValidationRun(models.Model):
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
 
-    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
-                                                related_name='ref_validation_run', null=True)
-
+    spatial_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                        related_name='spat_ref_validation_run', null=True)
+    temporal_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                         related_name='temp_ref_validation_run', null=True)
     scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
                                     related_name='scaling_ref_validation_run', null=True)
-    scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
+    scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=NO_SCALING)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
     anomalies = models.CharField(max_length=20, choices=ANOMALIES_METHODS, default=NO_ANOM)
@@ -139,6 +144,7 @@ class ValidationRun(models.Model):
     @property
     def is_unpublished(self):
         return not self.doi
+
 
     def archive(self, unarchive=False, commit=True):
         if unarchive:
@@ -219,7 +225,7 @@ class ValidationRun(models.Model):
             return self.name_tag
 
         configs = DatasetConfiguration.objects.filter(validation=self.id)
-        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.reference_configuration.id]
+        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.spatial_reference_configuration.id]
         t = self.start_time
         minute = str(t.minute)
         if t.minute < 10:
@@ -248,5 +254,3 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
         if os.path.isdir(outdir):
             rmtree(outdir)
-
-

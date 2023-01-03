@@ -10,6 +10,7 @@ import {ValidationrunDto} from '../../../core/services/validation-run/validation
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {ComparisonService} from '../../services/comparison.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import {BehaviorSubject} from 'rxjs';
 
 const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
@@ -51,14 +52,25 @@ export class ValidationSelectorComponent implements OnInit {
   }
 
 
-  onDatasetChange(): void{
+  onDatasetChange(): void {
     this.getValidations4comparison();
   }
 
   private selectDataset(selected: DatasetConfigModel[]): void {
     const model = new DatasetConfigModel(
-      new DatasetComponentSelectionModel(null, null, null),
-      null, null, null, null, null);
+      new DatasetComponentSelectionModel(
+        null,
+        null,
+        null),
+      null,
+      null,
+      null,
+      null,
+      null,
+      new BehaviorSubject(false),
+      new BehaviorSubject(false),
+      new BehaviorSubject(false));
+
     selected.push(model);
     // get all datasets
     this.datasetService.getAllDatasets(true).subscribe(datasets => {
@@ -67,14 +79,14 @@ export class ValidationSelectorComponent implements OnInit {
       // then get all versions for the first dataset in the result list
       this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
         model.datasetModel.selectedVersion = versions.find(version => version.pretty_name === '20210131 global');
-        this.getValidations4comparison(String( model.datasetModel.selectedDataset.short_name),
+        this.getValidations4comparison(String(model.datasetModel.selectedDataset.short_name),
           String(model.datasetModel.selectedVersion.short_name));
       });
     });
   }
 
-  getValidations4comparison(refDataset?, refVersion?): void{
-    if (!refDataset && !refVersion){
+  getValidations4comparison(refDataset?, refVersion?): void {
+    if (!refDataset && !refVersion) {
       refDataset = String(this.selectedDatasetModel[0].datasetModel.selectedDataset.short_name);
       refVersion = String(this.selectedDatasetModel[0].datasetModel.selectedVersion.short_name);
     }
@@ -85,11 +97,11 @@ export class ValidationSelectorComponent implements OnInit {
       .set('max_datasets', String(this.checkbox2NonReferenceNumber()));
     this.selectValidationLabel = 'Wait for validations to be loaded';
     this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
-      if (response){
+      if (response) {
         this.validations4Comparison = response;
         this.selectedValidation = response[0];
         this.selectValidationLabel = 'Select a validation';
-      } else{
+      } else {
         this.validations4Comparison = [];
         this.selectValidationLabel = 'There are no validations available';
       }
@@ -102,10 +114,10 @@ export class ValidationSelectorComponent implements OnInit {
     this.getValidations4comparison();
   }
 
-  checkbox2NonReferenceNumber(): number{
+  checkbox2NonReferenceNumber(): number {
     // convert the checkbox boolean selection to number of non-references
     this.comparisonModel.selectedValidations = []; // empty the selection in case the button is clicked
-    if (this.multipleNonReference){
+    if (this.multipleNonReference) {
       return 2;
     }
     return 1;
@@ -113,7 +125,7 @@ export class ValidationSelectorComponent implements OnInit {
 
   addValidationButtonDisabled(): boolean {
     // if the checkbox has been toggled - this shouldn't be hardcoded
-    if (this.multipleNonReference){
+    if (this.multipleNonReference) {
       return this.comparisonModel.selectedValidations.length >= 1;
     }
 
@@ -154,7 +166,7 @@ export class ValidationSelectorComponent implements OnInit {
     if (this.multipleNonReference) {
       return true;
     } else {
-     return !this.checkOverlapping();
+      return !this.checkOverlapping();
     }
   }
 
@@ -163,7 +175,7 @@ export class ValidationSelectorComponent implements OnInit {
     this.comparisonModel.getIntersection = isNotChecked;
   }
 
-  startComparison(): void{
+  startComparison(): void {
     // should start the comparison
     if (this.comparisonModel.selectedValidations.length === 0 ||
       (this.comparisonModel.selectedValidations.length === 1 && !this.comparisonModel.multipleNonReference)) {

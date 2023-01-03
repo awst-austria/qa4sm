@@ -69,13 +69,13 @@ class TestModels(TestCase):
 
         dc.save()
 
-        run.reference_configuration = dc
+        run.spatial_reference_configuration = dc
         run.scaling_ref = dc
 
         run.save()
 
         assert len(run.dataset_configurations.all()) == 1
-        assert run.reference_configuration
+        assert run.spatial_reference_configuration
         assert run.scaling_ref
         
     def test_testdata_integrity(self):
@@ -109,7 +109,7 @@ class TestModels(TestCase):
             dc.variable = dc.dataset.variables.first()
             dc.save()
 
-        run.reference_configuration = dc
+        run.spatial_reference_configuration = dc
         run.scaling_ref = dc
         run.save()
 

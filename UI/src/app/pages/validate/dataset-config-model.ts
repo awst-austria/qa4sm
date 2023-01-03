@@ -1,4 +1,6 @@
-import {DatasetComponentSelectionModel} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
+import {
+  DatasetComponentSelectionModel
+} from '../../modules/dataset/components/dataset/dataset-component-selection-model';
 import {FilterModel} from '../../modules/filter/components/basic-filter/filter-model';
 import {ParametrisedFilterConfig, ValidationRunDatasetConfigDto} from './service/validation-run-config-dto';
 import {BehaviorSubject} from 'rxjs';
@@ -16,6 +18,10 @@ export class DatasetConfigModel {
               public smosChi2Filter$: BehaviorSubject<FilterModel>,
               public ismnNetworkFilter$: BehaviorSubject<FilterModel>,
               public ismnDepthFilter$: BehaviorSubject<FilterModel>,
+              public spatialReference$: BehaviorSubject<boolean>,
+              public temporalReference$: BehaviorSubject<boolean>,
+              public scalingReference$: BehaviorSubject<boolean>,
+              public highlighted$?: BehaviorSubject<boolean>
   ) {
   }
 
@@ -52,7 +58,10 @@ export class DatasetConfigModel {
       variable_id: this.datasetModel.selectedVariable.id,
       version_id: this.datasetModel.selectedVersion.id,
       basic_filters: enabledBasicFilters,
-      parametrised_filters: parameterisedFilters
+      parametrised_filters: parameterisedFilters,
+      is_spatial_reference: this.spatialReference$.value,
+      is_temporal_reference: this.temporalReference$.value,
+      is_scaling_reference: this.scalingReference$.value
     };
   }
 }

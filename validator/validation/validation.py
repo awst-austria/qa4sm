@@ -34,7 +34,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -69,22 +69,22 @@ def _get_actual_time_range(val_run, dataset_version_id):
     return [actual_start, actual_end]
 
 
-def _get_reference_reader(val_run) -> ('Reader', str, dict):
-    ref_reader = create_reader(val_run.reference_configuration.dataset,
-                               val_run.reference_configuration.version)
+def _get_spatial_reference_reader(val_run) -> ('Reader', str, dict):
+    ref_reader = create_reader(val_run.spatial_reference_configuration.dataset,
+                               val_run.spatial_reference_configuration.version)
 
     time_adapted_ref_reader = adapt_timestamp(ref_reader,
-                                              val_run.reference_configuration.dataset,
-                                              val_run.reference_configuration.version)
+                                              val_run.spatial_reference_configuration.dataset,
+                                              val_run.spatial_reference_configuration.version)
 
     # we do the dance with the filtering below because filter may actually change the original reader, see ismn network selection
     filtered_reader, read_name, read_kwargs = \
         setup_filtering(
             reader=time_adapted_ref_reader,
-            filters=list(val_run.reference_configuration.filters.all()),
-            param_filters=list(val_run.reference_configuration.parametrisedfilter_set.all()),
-            dataset=val_run.reference_configuration.dataset,
-            variable=val_run.reference_configuration.variable)
+            filters=list(val_run.spatial_reference_configuration.filters.all()),
+            param_filters=list(val_run.spatial_reference_configuration.parametrisedfilter_set.all()),
+            dataset=val_run.spatial_reference_configuration.dataset,
+            variable=val_run.spatial_reference_configuration.variable)
 
     while hasattr(ref_reader, 'cls'):
         ref_reader = ref_reader.cls
@@ -130,8 +130,8 @@ def save_validation_config(validation_run):
             if not filters:
                 filters = 'N/A'
 
-            if (validation_run.reference_configuration and
-                    (dataset_config.id == validation_run.reference_configuration.id)):
+            if (validation_run.spatial_reference_configuration and
+                    (dataset_config.id == validation_run.spatial_reference_configuration.id)):
                 i = 0  # reference is always 0
             else:
                 i = j
@@ -153,16 +153,16 @@ def save_validation_config(validation_run):
             ds.setncattr('val_dc_actual_interval_from' + str(i), actual_interval_from)
             ds.setncattr('val_dc_actual_interval_to' + str(i), actual_interval_to)
 
-            if ((validation_run.reference_configuration is not None) and
-                    (dataset_config.id == validation_run.reference_configuration.id)):
+            if ((validation_run.spatial_reference_configuration is not None) and
+                    (dataset_config.id == validation_run.spatial_reference_configuration.id)):
                 ds.val_ref = 'val_dc_dataset' + str(i)
 
                 try:
                     ds.setncattr(
-                        'val_resolution', validation_run.reference_configuration.dataset.resolution["value"]
+                        'val_resolution', validation_run.spatial_reference_configuration.dataset.resolution["value"]
                     )
                     ds.setncattr(
-                        'val_resolution_unit', validation_run.reference_configuration.dataset.resolution["unit"]
+                        'val_resolution_unit', validation_run.spatial_reference_configuration.dataset.resolution["unit"]
                     )
                 # ISMN has null resolution attribute, therefore
                 # we write no output resolution
@@ -172,11 +172,12 @@ def save_validation_config(validation_run):
             if ((validation_run.scaling_ref is not None) and
                     (dataset_config.id == validation_run.scaling_ref.id)):
                 ds.val_scaling_ref = 'val_dc_dataset' + str(i)
-                if dataset_config.dataset.short_name in IRREGULAR_GRIDS.keys():
-                    grid_stepsize = IRREGULAR_GRIDS[dataset_config.dataset.short_name]
-                else:
-                    grid_stepsize = 'nan'
-                ds.setncattr('val_dc_dataset' + str(i) + '_grid_stepsize', grid_stepsize)
+
+            if dataset_config.dataset.short_name in IRREGULAR_GRIDS.keys():
+                grid_stepsize = IRREGULAR_GRIDS[dataset_config.dataset.short_name]
+            else:
+                grid_stepsize = 'nan'
+            ds.setncattr('val_dc_dataset' + str(i) + '_grid_stepsize', grid_stepsize)
 
         ds.val_scaling_method = validation_run.scaling_method
 
@@ -198,8 +199,10 @@ def save_validation_config(validation_run):
 def create_pytesmo_validation(validation_run):
     ds_list = []
     ds_read_names = []
-    ref_name = None
+    spatial_ref_name = None
     scaling_ref_name = None
+    temporal_ref_name = None
+    spatial_ref_short_name = None
 
     ds_num = 1
     for dataset_config in validation_run.dataset_configurations.all():
@@ -226,8 +229,8 @@ def create_pytesmo_validation(validation_run):
             reader = AnomalyClimAdapter(reader, columns=[dataset_config.variable.short_name],
                                         timespan=anomalies_baseline, read_name=read_name)
 
-        if (validation_run.reference_configuration and
-                (dataset_config.id == validation_run.reference_configuration.id)):
+        if (validation_run.spatial_reference_configuration and
+                (dataset_config.id == validation_run.spatial_reference_configuration.id)):
             # reference is always named "0-..."
             dataset_name = '{}-{}'.format(0, dataset_config.dataset.short_name)
         else:
@@ -238,14 +241,18 @@ def create_pytesmo_validation(validation_run):
                                        'kwargs': read_kwargs}))
         ds_read_names.append((dataset_name, read_name))
 
-        if (validation_run.reference_configuration and
-                (dataset_config.id == validation_run.reference_configuration.id)):
-            ref_name = dataset_name
-            ref_short_name = validation_run.reference_configuration.dataset.short_name
+        if (validation_run.spatial_reference_configuration and
+                (dataset_config.id == validation_run.spatial_reference_configuration.id)):
+            spatial_ref_name = dataset_name
+            spatial_ref_short_name = validation_run.spatial_reference_configuration.dataset.short_name
 
         if (validation_run.scaling_ref and
                 (dataset_config.id == validation_run.scaling_ref.id)):
             scaling_ref_name = dataset_name
+
+        if (validation_run.temporal_reference_configuration and
+                (dataset_config.id == validation_run.temporal_reference_configuration.id)):
+            temporal_ref_name = dataset_name
 
     datasets = dict(ds_list)
     ds_num = len(ds_list)
@@ -269,7 +276,7 @@ def create_pytesmo_validation(validation_run):
         upscaling_lut = create_upscaling_lut(
             validation_run=validation_run,
             datasets=datasets,
-            ref_name=ref_name,
+            spatial_ref_name=spatial_ref_name,
         )
         upscale_parms["upscaling_lut"] = upscaling_lut
         __logger.debug(
@@ -281,7 +288,7 @@ def create_pytesmo_validation(validation_run):
 
     datamanager = DataManager(
         datasets,
-        ref_name=ref_name,
+        ref_name=spatial_ref_name,
         period=period,
         read_ts_names=dict(ds_read_names),
         upscale_parms=upscale_parms,
@@ -289,7 +296,7 @@ def create_pytesmo_validation(validation_run):
     ds_names = get_dataset_names(datamanager.reference_name, datamanager.datasets, n=ds_num)
 
     # set value of the metadata template according to what reference dataset is used
-    if ref_short_name == 'ISMN':
+    if spatial_ref_short_name == ISMN:
         metadata_template = METADATA_TEMPLATE['ismn_ref']
     else:
         metadata_template = METADATA_TEMPLATE['other_ref']
@@ -302,7 +309,7 @@ def create_pytesmo_validation(validation_run):
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         tcol_metrics = TripleCollocationMetrics(
-            ref_name,
+            spatial_ref_name,
             metadata_template=metadata_template,
             bootstrap_cis=validation_run.bootstrap_tcol_cis
         )
@@ -325,7 +332,8 @@ def create_pytesmo_validation(validation_run):
         temporal_matcher=make_combined_temporal_matcher(
             pd.Timedelta(temporalwindow_size, "H")
         ),
-        spatial_ref=ref_name,
+        temporal_ref=temporal_ref_name,
+        spatial_ref=spatial_ref_name,
         scaling=scaling_method,
         scaling_ref=scaling_ref_name,
         metrics_calculators=metric_calculators,
@@ -406,13 +414,14 @@ def run_validation(validation_id):
         run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
         mkdir_if_not_exists(run_dir)
 
-        ref_reader, read_name, read_kwargs = _get_reference_reader(validation_run)
+        ref_reader, read_name, read_kwargs = _get_spatial_reference_reader(validation_run)
 
         total_points, jobs = create_jobs(
             validation_run=validation_run,
             reader=ref_reader,
-            dataset_config=validation_run.reference_configuration
+            dataset_config=validation_run.spatial_reference_configuration
         )
+
         validation_run.total_points = total_points
         validation_run.save()  # save the number of gpis before we start
 
@@ -808,7 +817,7 @@ def copy_validationrun(run_to_copy, new_user):
 
         # the reference configuration is always the last one:
         try:
-            run_to_copy.reference_configuration_id = conf.id
+            run_to_copy.spatial_reference_configuration_id = conf.id
             run_to_copy.save()
         except:
             pass

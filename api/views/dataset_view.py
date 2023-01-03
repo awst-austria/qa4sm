@@ -43,7 +43,7 @@ class DatasetSerializer(ModelSerializer):
                   'detailed_description',
                   'source_reference',
                   'citation',
-                  'is_only_reference',
+                  'is_spatial_reference',
                   'versions',
                   'variables',
                   'filters',

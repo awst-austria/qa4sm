@@ -9,7 +9,7 @@ class ResultsSortingForm(forms.Form):
             ("start_time", "Date"),
             ("name_tag", "Name"),
             ("progress", "Status"),
-            ("reference_configuration_id__dataset__pretty_name",
+            ("spatial_reference_configuration_id__dataset__pretty_name",
              "Reference dataset"),
         ],
         required=False,
@@ -55,7 +55,7 @@ class ResultsSortingForm(forms.Form):
         request : request
         initial_key : str, optional
             Options are: "start_time" (default), "name_tag", "progress",
-            "reference_configuration_id__dataset__pretty_name".
+            "spatial_reference_configuration_id__dataset__pretty_name".
         initial_order : str, optional
             Options are: "desc" (default), "asc"
 

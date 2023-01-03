@@ -22,6 +22,13 @@ def _check_if_settings_exist():
     pass
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_scaling_methods(request):
+    scaling_methods = [{'method': x, 'description': y} for x, y in globals.SCALING_METHODS]
+    return JsonResponse(scaling_methods, status=status.HTTP_200_OK, safe=False)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def start_validation(request):
@@ -135,12 +142,6 @@ def get_validation_configuration(request, **kwargs):
             val_run_dict['scaling_method'] = ValidationRun.NO_SCALING
             changes_in_settings['scaling'] = True
 
-        if val_run.scaling_method is not None or val_run.scaling_method != 'none':
-            val_run_dict['scale_to'] = ValidationRun.SCALE_TO_REF
-            if val_run.scaling_ref is not None:
-                if val_run.scaling_ref.id != val_run.reference_configuration.id:
-                    val_run_dict['scale_to'] = ValidationRun.SCALE_TO_DATA
-
         # if one day we decide to remove any of these metrics, we need to check if reloaded settings use them
         metrics = [{'id': 'tcol', 'value': val_run.tcol},
                    {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
@@ -159,7 +160,12 @@ def get_validation_configuration(request, **kwargs):
                                                 'are not available anymore'},
                                     status=status.HTTP_404_NOT_FOUND, safe=False)
 
-            ds_dict = {'dataset_id': dataset_id, 'version_id': ds.version_id, 'variable_id': ds.variable_id}
+            ds_dict = {'dataset_id': dataset_id,
+                       'version_id': ds.version_id,
+                       'variable_id': ds.variable_id,
+                       'is_spatial_reference': ds.is_spatial_reference,
+                       'is_temporal_reference': ds.is_temporal_reference,
+                       'is_scaling_reference': ds.is_scaling_reference}
             filters_list = []
             non_existing_filters_list = []
             ds_dict['basic_filters'] = filters_list
@@ -187,16 +193,7 @@ def get_validation_configuration(request, **kwargs):
                 changes_in_settings['filters'].append(
                     {'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
 
-            if val_run.reference_configuration_id == ds.id:
-                val_run_dict['reference_config'] = {
-                    'dataset_id': val_run.reference_configuration.dataset.id,
-                    'version_id': val_run.reference_configuration.version.id,
-                    'variable_id': val_run.reference_configuration.variable.id,
-                    'basic_filters': filters_list,
-                    'parametrised_filters': parametrised_filters
-                }
-            else:
-                datasets.append(ds_dict)
+            datasets.append(ds_dict)
 
         if changes_in_settings['anomalies'] or changes_in_settings['scaling'] or \
                 len(changes_in_settings['filters']) != 0:
@@ -231,6 +228,9 @@ class DatasetConfigSerializer(serializers.Serializer):
     variable_id = serializers.IntegerField(required=True)
     basic_filters = serializers.ListField(child=serializers.IntegerField(), required=True)
     parametrised_filters = ParameterisedFilterConfigSerializer(many=True)
+    is_spatial_reference = serializers.BooleanField(required=True)
+    is_temporal_reference = serializers.BooleanField(required=True)
+    is_scaling_reference = serializers.BooleanField(required=True)
 
 
 # Metrics DTO and serializer
@@ -246,6 +246,39 @@ class MetricsSerializer(serializers.Serializer):
 
 
 class ValidationConfigurationSerializer(serializers.Serializer):
+    requires_context = True
+
+    def validate(self, attrs):
+        spatial_ref_configs_num = len(list(filter(lambda el: el['is_spatial_reference'], attrs['dataset_configs'])))
+        temporal_ref_configs_num = len(list(filter(lambda el: el['is_temporal_reference'], attrs['dataset_configs'])))
+        scaling_ref_configs_num = len(list(filter(lambda el: el['is_scaling_reference'], attrs['dataset_configs'])))
+
+        print(scaling_ref_configs_num)
+        #
+        # scaling_condition = (scaling_ref_configs_num == 0 and (
+        #         attrs['scaling_method'] == 'none' or attrs['scaling_method'] is None)) or \
+        #                     (scaling_ref_configs_num == 1 and attrs['scaling_method'] is not None
+        #                      and attrs['scaling_method'] != 'none')
+
+        if spatial_ref_configs_num == 0:
+            raise serializers.ValidationError('No spatial reference provided.')
+        elif spatial_ref_configs_num > 1:
+            raise serializers.ValidationError('More than one spatial reference provided.')
+
+        if temporal_ref_configs_num == 0:
+            raise serializers.ValidationError('No temporal reference provided.')
+        elif temporal_ref_configs_num > 1:
+            raise serializers.ValidationError('More than one temporal reference provided.')
+
+        if scaling_ref_configs_num == 0 and attrs['scaling_method'] != 'none':
+            raise serializers.ValidationError('No scaling reference provided, but the scaling method is set.')
+        elif scaling_ref_configs_num == 1 and attrs['scaling_method'] == 'none':
+            raise serializers.ValidationError('Scaling reference set, but the scaling method not.')
+        elif scaling_ref_configs_num > 1 and attrs['scaling_method'] != 'none':
+            raise serializers.ValidationError('More than one scaling reference provided.')
+
+        return attrs
+
     def update(self, instance, validated_data):
         pass
 
@@ -279,12 +312,24 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             reference_config = None
             dataset_config_models = []
             configs_to_save = validated_data.get('dataset_configs')
-            configs_to_save.append(validated_data.get('reference_config'))
+
+            spatial_ref_index = configs_to_save.index(
+                next(filter(lambda n: n.get('is_spatial_reference'), configs_to_save)))
+            configs_to_save.append(configs_to_save.pop(spatial_ref_index))
+            # else:
+            #     return None
+
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,
                                                                    dataset_id=config.get('dataset_id'),
                                                                    version_id=config.get('version_id'),
-                                                                   variable_id=config.get('variable_id'))
+                                                                   variable_id=config.get('variable_id'),
+                                                                   is_spatial_reference=config.get(
+                                                                       'is_spatial_reference'),
+                                                                   is_temporal_reference=config.get(
+                                                                       'is_temporal_reference'),
+                                                                   is_scaling_reference=config.get(
+                                                                       'is_scaling_reference'))
                 config_model.save()
 
                 for filter_id in config.get('basic_filters'):
@@ -299,22 +344,22 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                     param_filter_model.save()
 
                 config_model.save()
-                dataset_config_models.append(config_model)
+                if config_model.is_spatial_reference:
+                    new_val_run.spatial_reference_configuration = config_model
 
-            new_val_run.reference_configuration = dataset_config_models[-1]
-            scale_to = validated_data.get('scaling_method', None)
-            if scale_to is not None:
-                if scale_to == ValidationRun.SCALE_TO_DATA:
-                    new_val_run.scaling_ref = dataset_config_models[1]
-                else:
-                    new_val_run.scaling_ref = dataset_config_models[-1]
+                if config_model.is_temporal_reference:
+                    new_val_run.temporal_reference_configuration = config_model
+
+                if config_model.is_scaling_reference:
+                    new_val_run.scaling_ref = config_model
+
+                dataset_config_models.append(config_model)
 
             new_val_run.save()
 
         return new_val_run
 
     dataset_configs = DatasetConfigSerializer(many=True, required=True)
-    reference_config = DatasetConfigSerializer(required=True)
     interval_from = serializers.DateTimeField(required=False)
     interval_to = serializers.DateTimeField(required=False)
     metrics = MetricsSerializer(many=True, required=True)
@@ -322,7 +367,6 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     anomalies_from = serializers.DateTimeField(required=False, allow_null=True)
     anomalies_to = serializers.DateTimeField(required=False, allow_null=True)
     scaling_method = serializers.ChoiceField(choices=ValidationRun.SCALING_METHODS, required=True)
-    scale_to = serializers.ChoiceField(choices=ValidationRun.SCALE_TO_OPTIONS, required=True)
     min_lat = serializers.FloatField(required=False, allow_null=True, default=-90.0)
     min_lon = serializers.FloatField(required=False, allow_null=True, default=-180)
     max_lat = serializers.FloatField(required=False, allow_null=True, default=90)

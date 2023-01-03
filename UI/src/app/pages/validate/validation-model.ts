@@ -10,17 +10,18 @@ import {BehaviorSubject} from 'rxjs';
 import {
   TemporalMatchingModel
 } from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
+import {ReferenceModel} from '../../modules/validation-reference/components/validation-reference/reference-model';
 
 export class ValidationModel {
   // The reference configuration array should contain exactly one item.
   constructor(public datasetConfigurations: DatasetConfigModel[],
-              public referenceConfigurations: DatasetConfigModel[],
+              public referenceConfigurations: ReferenceModel,
               public spatialSubsetModel: SpatialSubsetModel,
               public validationPeriodModel: ValidationPeriodModel,
               public metrics: MetricModel[],
               public anomalies: AnomaliesModel,
               public temporalMatchingModel: TemporalMatchingModel,
-              public scalingModel: ScalingModel,
+              public scalingMethod: ScalingModel,
               public nameTag$: BehaviorSubject<string>) {
   }
 }

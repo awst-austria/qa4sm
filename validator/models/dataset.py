@@ -17,7 +17,7 @@ class Dataset(models.Model):
     source_reference = models.TextField()
     citation = models.TextField()
 
-    is_only_reference = models.BooleanField(default=False)
+    is_spatial_reference = models.BooleanField(default=False)
 
     versions = models.ManyToManyField(DatasetVersion, related_name='versions')
     variables = models.ManyToManyField(DataVariable, related_name='variables')

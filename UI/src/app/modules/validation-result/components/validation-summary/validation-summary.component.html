@@ -68,23 +68,29 @@
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
           original validation run on {{this.originalDate| date: 'mediumDate' :timeZone }}.
         </li>
-        <li *ngIf="!validationRun.is_a_copy">Started validation on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
+        <li *ngIf="!validationRun.is_a_copy">Started validation
+          on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
           on {{ validationRun.end_time | date: dateFormat :timeZone }} {{timeZone}}.
         </li>
         <li>Compared {{ configurations.length  }} datasets:
-          <ul>
+          <ol style="list-style: none">
             <li *ngFor="let config of configurations; let ind = index">
-              <em *ngIf="config.id != validationRun.reference_configuration">Dataset {{ind + 1}}:</em>
-              <em *ngIf="config.id == validationRun.reference_configuration">Reference:</em>
-
-              {{config.dataset}} ({{config.version}}, {{config.variable}})
-              [Filters:
-              <span *ngFor="let filter of config.filters"> {{filter}}; </span>
-              <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
-                              {{paramFilter}} {{config.parametrisedFiltersValues[indF]}}
-              </span>]
+<!--              <em>Dataset {{ind + 1}}: </em>-->
+              <span style="font-weight: 600">{{config.is_spatial_reference ? 0 : ind + 1}}-{{config.dataset}} ({{config.version}}, {{config.variable}})</span>
+              <em>{{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
+                config.is_temporal_reference, config.is_scaling_reference)}}
+              </em><br>
+              Filters:
+              <ul>
+                <li *ngFor="let filter of config.filters">{{filter}};</li>
+              </ul>
+              <ul>
+                <li *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
+                  {{paramFilter}}: {{config.parametrisedFiltersValues[indF].split(',').join(', ')}};
+                </li>
+              </ul>
             </li>
-          </ul>
+          </ol>
         <li
           *ngIf="validationRun.min_lat && validationRun.min_lon && validationRun.max_lat && validationRun.max_lon; else elseSpatial">
           Spatial filter bounding box: [{{ validationRun.min_lat }}, {{ validationRun.min_lon }}
@@ -137,9 +143,9 @@
           <span *ngIf="!validationRun.bootstrap_tcol_cis">deactivated. </span>
         </li>
 
-        <li *ngIf="validationRun.scaling_method != 'none'; else elseScaling">Scaling reference:
+        <li *ngIf="validationRun.scaling_method != 'none'">Scaling reference:
           <span *ngFor="let config of configurations">
-                <span *ngIf="config.id === validationRun.reference_configuration">
+                <span *ngIf="config.id === validationRun.scaling_ref">
                   {{config.dataset}} ({{ config.version }}, {{ config.variable }})
 
                   <span *ngIf="config.filters || config.parameterisedFilters; else elseFilters">[Filters:
@@ -155,10 +161,9 @@
               </span>
         </li>
 
-        <ng-template #elseScaling>
-          <li> Scaling reference: {{ scalingMethods[validationRun.scaling_method] }}.</li>
-        </ng-template>
-        <li> Scaling method: {{ scalingMethods[validationRun.scaling_method] }}.</li>
+        <li> Scaling
+          method: {{scalingMethod}}.
+        </li>
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 
@@ -166,7 +171,8 @@
         <ng-template #elseProgress>
           <li *ngIf="!forComparison" [ngClass]="{'alert-danger': errorRate > 0}">
             for {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
-            of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could not be calculated.
+            of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
+            not be calculated.
           </li>
         </ng-template>
         <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user  && !forComparison">
@@ -196,7 +202,8 @@
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons *ngIf="!forComparison && (validationModel.validationRun|async) as validation" [validationList]="false" [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
+      <qa-buttons *ngIf="!forComparison && (validationModel.validationRun|async) as validation" [validationList]="false"
+                  [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
     </div>
   </p-panel>
 </main>

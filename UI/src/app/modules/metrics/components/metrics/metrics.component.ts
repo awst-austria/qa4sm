@@ -40,9 +40,9 @@ export class MetricsComponent implements OnInit {
 
   checkIfDisabled(metricName: string): boolean {
     let condition = true;
-    const conditionTcol = this.validationModel.datasetConfigurations.length < 2;
+    const conditionTcol = this.validationModel.datasetConfigurations.length < 3;
     const conditionBtcol = conditionTcol ||
-      !(this.validationModel.datasetConfigurations.length  > 1 && this. tripleCollocationMetrics.value$.getValue());
+      !(this.validationModel.datasetConfigurations.length  > 2 && this. tripleCollocationMetrics.value$.getValue());
 
     if (conditionTcol) {
       this.tripleCollocationMetrics.value$.next(false);

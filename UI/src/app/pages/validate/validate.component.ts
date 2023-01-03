@@ -8,7 +8,8 @@ import {DatasetVariableService} from '../../modules/core/services/dataset/datase
 import {
   DatasetConfigModel,
   ISMN_DEPTH_FILTER_ID,
-  ISMN_NETWORK_FILTER_ID, SMOS_CHI2_FILTER_ID,
+  ISMN_NETWORK_FILTER_ID,
+  SMOS_CHI2_FILTER_ID,
   SMOS_RFI_FILTER_ID
 } from './dataset-config-model';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
@@ -24,12 +25,12 @@ import {
   ANOMALIES_NONE_DESC,
   AnomaliesComponent
 } from '../../modules/anomalies/components/anomalies/anomalies.component';
-import {SCALING_METHOD_DEFAULT, ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
+import {ScalingComponent} from '../../modules/scaling/components/scaling/scaling.component';
 import {
   ConfigurationChanges,
   ValidationRunConfigDto,
   ValidationRunDatasetConfigDto,
-  ValidationRunMetricConfigDto
+  ValidationRunMetricConfigDto,
 } from './service/validation-run-config-dto';
 import {ValidationRunConfigService} from './service/validation-run-config.service';
 
@@ -44,25 +45,31 @@ import {SettingsService} from '../../modules/core/services/global/settings.servi
 import {
   TemporalMatchingModel
 } from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
+import {ReferenceModel} from '../../modules/validation-reference/components/validation-reference/reference-model';
+import {ScalingModel} from '../../modules/scaling/components/scaling/scaling-model';
+import {
+  ValidationReferenceComponent
+} from '../../modules/validation-reference/components/validation-reference/validation-reference.component';
 
 
-const MAX_DATASETS_FOR_VALIDATION = 5;  // TODO: this should come from either config file or the database
+const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
 
 @Component({
   selector: 'app-validate',
   templateUrl: './validate.component.html',
   styleUrls: ['./validate.component.scss'],
-  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild(MapComponent) child: MapComponent;
   @ViewChild(AnomaliesComponent) anomaliesChild: AnomaliesComponent;
   @ViewChild(ScalingComponent) scalingChild: ScalingComponent;
+  @ViewChild('spatialReference') spatialReferenceChild: ValidationReferenceComponent;
+  @ViewChild('temporalReference') temporalReferenceChild: ValidationReferenceComponent;
 
   mapVisible: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
     [],
-    [],
+    new ReferenceModel(null, null, null),
     new SpatialSubsetModel(
       new BehaviorSubject<number>(null),
       new BehaviorSubject<number>(null),
@@ -84,7 +91,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null),
       'hours',
     ),
-    SCALING_METHOD_DEFAULT,
+    new ScalingModel('', ''),
     new BehaviorSubject<string>(''));
 
   validationStart: Date = new Date('1978-01-01');
@@ -99,12 +106,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   defMinLat = 34.0;
 
   smosThresholdFilter = SMOS_RFI_FILTER_ID;
+  highlightedDataset: DatasetConfigModel;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
               private filterService: FilterService,
-              private validationConfigService: ValidationRunConfigService,
+              public validationConfigService: ValidationRunConfigService,
               private toastService: ToastService,
               private router: Router,
               private route: ActivatedRoute,
@@ -138,22 +146,22 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             if (response.message) {
               this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
             }
-            of({}).pipe(delay(0)).subscribe(() => {
-              this.setDefaultGeographicalRange();
-            });
-            this.addDatasetToValidate();
-            this.addReferenceDataset();
+            this.setDefaultDatasetSettings();
           }
         );
       } else {
-        of({}).pipe(delay(0)).subscribe(() => {
-          this.setDefaultGeographicalRange();
-        });
-        this.addDatasetToValidate();
-        this.addReferenceDataset();
+        this.setDefaultDatasetSettings();
       }
-
     });
+    this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+  }
+
+  private setDefaultDatasetSettings(): void {
+    of({}).pipe(delay(0)).subscribe(() => {
+      this.setDefaultGeographicalRange();
+    });
+    this.addDatasetToValidate('ISMN', '20210131 global', true, true, true, true);
+    this.addDatasetToValidate();
   }
 
   private messageAboutConfigurationChanges(changes: ConfigurationChanges): string {
@@ -183,33 +191,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(null),
         new BehaviorSubject(null),
         new BehaviorSubject(null),
+        new BehaviorSubject(false),
+        new BehaviorSubject(false),
+        new BehaviorSubject(false),
+        new BehaviorSubject(false)
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
-      this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
-        newDatasetConfigModel.datasetModel.selectedDataset = dataset;
-        this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
-          .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
-            datasetConfig.basic_filters.forEach(basicFilterConfig => {
-              datasetConfigModel.basicFilters.forEach(filter => {
-                if (basicFilterConfig === filter.filterDto.id) {
-                  filter.enabled = true;
-                }
-              });
-            });
-            datasetConfig.parametrised_filters.forEach(paramFilter => {
-              if (paramFilter.id === SMOS_RFI_FILTER_ID) {
-                datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
-              }
-              if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
-                datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
-              }
-              if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
-                datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
-              }
-            });
-          });
-      });
-
       this.versionService.getVersionById(datasetConfig.version_id).subscribe(versionDto => {
         newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
       });
@@ -217,48 +204,45 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       this.variableService.getVariableById(datasetConfig.variable_id).subscribe(variableDto => {
         newDatasetConfigModel.datasetModel.selectedVariable = variableDto;
       });
-    });
+      newDatasetConfigModel.spatialReference$.next(datasetConfig.is_spatial_reference);
+      newDatasetConfigModel.temporalReference$.next(datasetConfig.is_temporal_reference);
+      newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
 
-    // Prepare reference
-    const newReferenceModel = new DatasetConfigModel(
-      new DatasetComponentSelectionModel(null, null, null),
-      null,
-      new BehaviorSubject(null),
-      new BehaviorSubject<FilterModel>(null),
-      new BehaviorSubject<FilterModel>(null),
-      new BehaviorSubject<FilterModel>(null));
-    this.validationModel.referenceConfigurations.push(newReferenceModel);
-    this.datasetService.getDatasetById(validationRunConfig.reference_config.dataset_id).subscribe(dataset => {
-      newReferenceModel.datasetModel.selectedDataset = dataset;
-      this.loadFiltersForModel(newReferenceModel, true)
-        .subscribe(referenceConfigModel => { // when it is loaded, set the values from the config
-          validationRunConfig.reference_config.basic_filters.forEach(basicFilterConfig => {
-            referenceConfigModel.basicFilters.forEach(filter => {
-              if (basicFilterConfig === filter.filterDto.id) {
-                filter.enabled = true;
-              }
+      this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
+          newDatasetConfigModel.datasetModel.selectedDataset = dataset;
+          this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
+            .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
+              datasetConfig.basic_filters.forEach(basicFilterConfig => {
+                datasetConfigModel.basicFilters.forEach(filter => {
+                  if (basicFilterConfig === filter.filterDto.id) {
+                    filter.enabled = true;
+                  }
+                });
+              });
+              datasetConfig.parametrised_filters.forEach(paramFilter => {
+                if (paramFilter.id === SMOS_RFI_FILTER_ID) {
+                  datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
+                  datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
+                  datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+              });
             });
-          });
-          validationRunConfig.reference_config.parametrised_filters.forEach(paramFilter => {
-            if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
-              referenceConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
-            }
-            if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
-              referenceConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
-            }
-            if (paramFilter.id === SMOS_RFI_FILTER_ID) {
-              referenceConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
-            }
-          });
+          if (datasetConfig.is_spatial_reference) {
+            this.spatialReferenceChild.setReference(newDatasetConfigModel);
+          }
+          if (datasetConfig.is_temporal_reference) {
+            this.temporalReferenceChild.setReference(newDatasetConfigModel);
+          }
+          if (datasetConfig.is_scaling_reference) {
+            this.scalingChild.setSelection(validationRunConfig.scaling_method, newDatasetConfigModel);
+          }
         });
-    });
 
-    this.versionService.getVersionById(validationRunConfig.reference_config.version_id).subscribe(versionDto => {
-      newReferenceModel.datasetModel.selectedVersion = versionDto;
-    });
 
-    this.variableService.getVariableById(validationRunConfig.reference_config.variable_id).subscribe(variableDto => {
-      newReferenceModel.datasetModel.selectedVariable = variableDto;
     });
 
     // Spatial subset
@@ -301,8 +285,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     }
 
+
     // Scaling
-    this.scalingChild.setSelection(validationRunConfig.scaling_method, validationRunConfig.scale_to);
+    // this.scalingChild.setSelection(validationRunConfig.scaling_method, scaleTo);
+    // this.spatialReferenceChild.setReference(spatialReference);
+    // this.temporalReferenceChild.setReference(temporalReference);
 
     // Name
     this.validationModel.nameTag$.next(validationRunConfig.name_tag);
@@ -339,22 +326,25 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return itDoes;
   }
 
-  addDatasetToValidate(): void {
-    this.addDataset(this.validationModel.datasetConfigurations, 'C3S_combined', 'v202012', true);
+  addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = 'v202012', userData = true,
+                       spatialReference = false, temporalReference = false, scalingReference = false): void {
+    this.addDataset(this.validationModel.datasetConfigurations, defaultDatasetName, defaultVersionName, userData,
+      spatialReference, temporalReference);
   }
 
-  addReferenceDataset(): void {
-    this.addDataset(this.validationModel.referenceConfigurations, 'ISMN', '20210131 global', false);
-  }
-
-  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string, userData: boolean): void {
+  private addDataset(targetArray: DatasetConfigModel[], defaultDatasetName: string, defaultVersionName: string,
+                     userData: boolean, spatialReference: boolean, temporalReference: boolean): void {
     const model = new DatasetConfigModel(
       new DatasetComponentSelectionModel(null, null, null),
       null,
       new BehaviorSubject(null),
       new BehaviorSubject(null),
       new BehaviorSubject(null),
-      new BehaviorSubject(null)
+      new BehaviorSubject(null),
+      new BehaviorSubject(spatialReference),
+      new BehaviorSubject(temporalReference),
+      new BehaviorSubject(false),
+      new BehaviorSubject(false)
     );
     targetArray.push(model);
     // get all datasets
@@ -473,22 +463,49 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
+
+    this.checkIfReferenceRemoved('spatialReference$');
+    this.checkIfReferenceRemoved('temporalReference$');
+    this.checkIfReferenceRemoved('scalingReference$');
+
+    this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+  }
+
+  checkIfReferenceRemoved(referenceType: string): void {
+    if (!this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig[referenceType].getValue())) {
+      let newReference = this.validationModel.datasetConfigurations[0];
+      if (referenceType === 'spatialReference$') {
+        const ISMNList = this.getISMN(this.validationModel.datasetConfigurations);
+        if (ISMNList.length !== 0) {
+          newReference = ISMNList[0];
+        }
+      }
+      if (referenceType === 'scalingReference$' && this.validationModel.scalingMethod.methodName === 'none') {
+        newReference[referenceType].next(false);
+      } else {
+        newReference[referenceType].next(true);
+      }
+    }
   }
 
   onDatasetChange(datasetConfig: DatasetComponentSelectionModel): void {
+    const isThereISMN = this.getISMN(this.validationModel.datasetConfigurations).length !== 0;
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel === datasetConfig) {
         this.loadFiltersForModel(config);
       }
+      if (isThereISMN) {
+        config.datasetModel.selectedDataset.pretty_name === 'ISMN' ? config.spatialReference$.next(true) :
+          config.spatialReference$.next(false);
+      }
     });
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
+    this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
   }
 
-  onReferenceChange(): void {
-    this.loadFiltersForModel(this.validationModel.referenceConfigurations[0]);
-    this.setDefaultValidationPeriod();
-    this.setLimitationsOnGeographicalRange();
+  private getISMN(configs: DatasetConfigModel[]): DatasetConfigModel[] {
+    return configs.filter(config => config.datasetModel.selectedDataset.short_name === 'ISMN');
   }
 
   excludeFilter(toExclude: number, basicFilters: any): void {
@@ -517,9 +534,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       metricDtos.push(metric.toValidationRunMetricDto());
     });
 
+    this.validationModel.referenceConfigurations.spatial =
+      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.spatialReference$);
+    this.validationModel.referenceConfigurations.temporal =
+      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.temporalReference$);
+    this.validationModel.referenceConfigurations.scaling =
+      this.validationModel.datasetConfigurations.find(datasetConfig => datasetConfig.scalingReference$);
+
     const newValidation: ValidationRunConfigDto = {
       dataset_configs: datasets,
-      reference_config: this.validationModel.referenceConfigurations[0].toValRunDatasetConfigDto(),
       interval_from: this.validationModel.validationPeriodModel.intervalFrom$.getValue(),
       interval_to: this.validationModel.validationPeriodModel.intervalTo$.getValue(),
       min_lat: this.validationModel.spatialSubsetModel.minLat$.getValue(),
@@ -530,8 +553,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       anomalies_method: this.validationModel.anomalies.method$.getValue(),
       anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
-      scaling_method: this.validationModel.scalingModel.id,
-      scale_to: this.validationModel.scalingModel.scaleTo$.getValue().id,
+      scaling_method: this.validationModel.scalingMethod.methodName,
+      scale_to: '0',
       name_tag: this.validationModel.nameTag$.getValue(),
       temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
@@ -570,17 +593,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     // check if there are geographical limits in both reference and non-reference datasets
     if (this.validationModel.datasetConfigurations.length > 0) {
       this.validationModel.datasetConfigurations.forEach(config => {
-        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.geographical_range) {
-          maxLons.push(config.datasetModel.selectedVersion.geographical_range.max_lon);
-          minLons.push(config.datasetModel.selectedVersion.geographical_range.min_lon);
-          maxLats.push(config.datasetModel.selectedVersion.geographical_range.max_lat);
-          minLats.push(config.datasetModel.selectedVersion.geographical_range.min_lat);
-        }
-      });
-    }
-
-    if (this.validationModel.referenceConfigurations.length > 0) {
-      this.validationModel.referenceConfigurations.forEach(config => {
         if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.geographical_range) {
           maxLons.push(config.datasetModel.selectedVersion.geographical_range.max_lon);
           minLons.push(config.datasetModel.selectedVersion.geographical_range.min_lon);
@@ -665,17 +677,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
-    if (this.validationModel.referenceConfigurations.length > 0) {
-      this.validationModel.referenceConfigurations.forEach(config => {
-        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_start) {
-          datesFrom.push(new Date(config.datasetModel.selectedVersion.time_range_start));
-        }
-        if (config.datasetModel.selectedVersion && config.datasetModel.selectedVersion.time_range_end) {
-          datesTo.push(new Date(config.datasetModel.selectedVersion.time_range_end));
-        }
-      });
-    }
-
     if (datesFrom.length !== 0) {
       this.validationStart = new Date(Math.max.apply(null, datesFrom));
     }
@@ -687,7 +688,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.validationPeriodModel.intervalTo$.next(this.validationEnd);
   }
 
-  private getValidationFieldFriendlyName(fieldName): string{
+  private getValidationFieldFriendlyName(fieldName): string {
     const fieldsFriendlyNames = {
       name_tag: 'validation name',
       interval_from: 'validation period "From"',
@@ -705,7 +706,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     let message = 'Please fix following problems: \n';
 
     Object.entries(errors.error).forEach(([key]) => {
-      if (this.getValidationFieldFriendlyName(key)){
+      if (this.getValidationFieldFriendlyName(key)) {
         message += `\n Field ${this.getValidationFieldFriendlyName(key)}: ${errors.error[key]} \n`;
       } else {
         message += `\n ${errors.error[key]}`;
@@ -713,6 +714,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
 
     return message.toString();
+  }
+
+  onHoverOverReferenceDataset(event): void {
+    this.highlightedDataset = event.hoveredDataset;
+    this.highlightedDataset.highlighted$.next(event.highlight);
   }
 
 }

@@ -69,6 +69,9 @@ def generate_default_validation():
     data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V202012')
     data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+    data_c.is_scaling_reference = False
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
     data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -76,10 +79,13 @@ def generate_default_validation():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = False
     ref_c.save()
 
-    run.reference_configuration = ref_c
-    run.scaling_ref = ref_c
+    run.spatial_reference_configuration = ref_c
+    run.temporal_reference_configuration = ref_c
     run.save()
 
     return run
@@ -95,6 +101,9 @@ def generate_default_validation_triple_coll():
     data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
     data_c.version = DatasetVersion.objects.get(short_name='C3S_V201912')
     data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
+    data_c.is_scaling_reference = False
+    data_c.is_spatial_reference = False
+    data_c.is_temporal_reference = False
     data_c.save()
 
     other_data_c = DatasetConfiguration()
@@ -102,6 +111,9 @@ def generate_default_validation_triple_coll():
     other_data_c.dataset = Dataset.objects.get(short_name='SMOS_IC')
     other_data_c.version = DatasetVersion.objects.get(short_name='SMOS_105_ASC')
     other_data_c.variable = DataVariable.objects.get(pretty_name='SMOS_sm')
+    other_data_c.is_scaling_reference = False
+    other_data_c.is_spatial_reference = False
+    other_data_c.is_temporal_reference = False
     other_data_c.save()
 
     ref_c = DatasetConfiguration()
@@ -109,10 +121,12 @@ def generate_default_validation_triple_coll():
     ref_c.dataset = Dataset.objects.get(short_name='ISMN')
     ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
     ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+    ref_c.is_spatial_reference = True
+    ref_c.is_temporal_reference = True
+    ref_c.is_scaling_reference = False
     ref_c.save()
 
-    run.reference_configuration = ref_c
-    run.scaling_ref = ref_c
+    run.spatial_reference_configuration = ref_c
     run.tcol = True
     run.save()
 
@@ -132,7 +146,7 @@ def default_parameterized_validation_to_be_run(user, tcol=False):
     run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
     for config in run.dataset_configurations.all():
-        if config == run.reference_configuration:
+        if config == run.spatial_reference_configuration:
             config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
         else:
             config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -140,10 +154,10 @@ def default_parameterized_validation_to_be_run(user, tcol=False):
         config.save()
 
     pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN',
-                                 dataset_config=run.reference_configuration)
+                                 dataset_config=run.spatial_reference_configuration)
     pfilter.save()
     pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1",
-                                 dataset_config=run.reference_configuration)
+                                 dataset_config=run.spatial_reference_configuration)
     pfilter.save()
 
     return run

@@ -7,7 +7,7 @@ export class DatasetDto {
               public detailed_description: string,
               public source_reference: string,
               public citation: string,
-              public is_only_reference: boolean,
+              public is_spatial_reference: boolean,
               public versions: number[],
               public variables: number[],
               public filters: number[],

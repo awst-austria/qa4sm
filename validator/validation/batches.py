@@ -191,7 +191,7 @@ def create_jobs(
 def create_upscaling_lut(
         validation_run,
         datasets,
-        ref_name
+        spatial_ref_name
 ) -> dict:
     """
     Create a lookup table that aggregates the non-reference measurement points falling under the same reference
@@ -219,7 +219,7 @@ def create_upscaling_lut(
     lut: dict
         lookup table with shape {'other_dataset':{ref gpi: [other gpis]}}
     """
-    ref_reader = datasets[ref_name]["class"]
+    ref_reader = datasets[spatial_ref_name]["class"]
     ref_grid = ref_reader.grid
 
     lut = {}
@@ -228,7 +228,7 @@ def create_upscaling_lut(
         datasets.keys(),
         validation_run.dataset_configurations.all(),
     ):
-        if other_name == ref_name:
+        if other_name == spatial_ref_name:
             continue
         else:
             other_reader = datasets[other_name]["class"]

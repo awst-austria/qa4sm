@@ -4,18 +4,17 @@
     <p-panel header="Datasets configuration" [toggleable]="false">
       <ng-template pTemplate="icons">
         <label class="mb-0"
-               pTooltip="Select the reference dataset from the menu below to access a list of validations available for comparison."
+               pTooltip="Select the spatial reference dataset from the menu below to access a list of validations available for comparison."
                tooltipPosition="bottom">
           <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
         </label>
       </ng-template>
       <p-accordion multiple="true" activeIndex="0">
         <!-- here dataset/version selection -->
-        <p-accordionTab [header]=" 'Reference selection: ' + (selectedDatasetModel[0].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[0].datasetModel.selectedVersion?.pretty_name)">
+        <p-accordionTab [header]=" 'Spatial reference selection: ' + (selectedDatasetModel[0].datasetModel.selectedDataset?.pretty_name)+' / '+(selectedDatasetModel[0].datasetModel.selectedVersion?.pretty_name)">
 
           <qa-dataset *ngIf="selectedDatasetModel[0].datasetModel.selectedDataset"
                       [removable]="false"
-                      [reference]="true"
                       (changeDataset)="onDatasetChange()"
                       [selectionModel]="selectedDatasetModel[0].datasetModel">
 

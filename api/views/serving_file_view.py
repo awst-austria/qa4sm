@@ -75,7 +75,7 @@ def get_csv_with_statistics(request):
 def get_metric_names_and_associated_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    ref_dataset_name = DatasetConfiguration.objects.get(id=validation.reference_configuration_id).dataset.pretty_name
+    ref_dataset_name = DatasetConfiguration.objects.get(id=validation.spatial_reference_configuration_id).dataset.pretty_name
 
     try:
         file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)

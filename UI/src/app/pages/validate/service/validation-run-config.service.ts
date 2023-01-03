@@ -3,10 +3,13 @@ import {environment} from '../../../../environments/environment';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ValidationRunConfigDto} from './validation-run-config-dto';
 import {ValidationrunDto} from '../../../modules/core/services/validation-run/validationrun.dto';
-import {Observable} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {ScalingMethodDto} from '../../../modules/scaling/components/scaling/scaling-methods.dto';
+import {DatasetConfigModel} from '../dataset-config-model';
 
 const runValidationUrl: string = environment.API_URL + 'api/validation-configuration';
 const getValidationConfigUrl: string = environment.API_URL + 'api/validation-configuration';
+const getScalingMethodsUrl: string = environment.API_URL + 'api/scaling-methods';
 
 /**
  * This service -together with its DTOs- responsible for submitting new validations
@@ -15,6 +18,9 @@ const getValidationConfigUrl: string = environment.API_URL + 'api/validation-con
   providedIn: 'root'
 })
 export class ValidationRunConfigService {
+
+  public listOfSelectedConfigs: BehaviorSubject<DatasetConfigModel[]>
+    = new BehaviorSubject<DatasetConfigModel[]>([]);
 
   constructor(private httpClient: HttpClient) {
 
@@ -27,5 +33,28 @@ export class ValidationRunConfigService {
 
   public getValidationConfig(validationRunId: string): Observable<ValidationRunConfigDto> {
     return this.httpClient.get<ValidationRunConfigDto>(getValidationConfigUrl + '/' + validationRunId);
+  }
+
+  public getScalingMethods(): Observable<ScalingMethodDto[]> {
+    return this.httpClient.get<ScalingMethodDto[]>(getScalingMethodsUrl);
+  }
+
+
+  public getInformationOnTheReference(isSpatialReference, isTemporalReference, isScalingReference): string {
+    const listOfReference = [];
+    if (isSpatialReference) {
+      listOfReference.push('spatial');
+    }
+    if (isTemporalReference) {
+      listOfReference.push('temporal');
+    }
+    if (isScalingReference) {
+      listOfReference.push('scaling');
+    }
+
+    let information: string;
+    listOfReference.length !== 0 ? information = ` (${listOfReference.join(', ')} reference)` : information = '';
+
+    return information;
   }
 }

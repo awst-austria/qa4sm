@@ -26,7 +26,6 @@ from validator.models import DataVariable
 import validator.validation as val
 from validator.validation import globals
 
-
 '''
     Tests to check that the validation process really produces valid results ;-)
     This is just a stub that should be filled by TU Wien.
@@ -146,13 +145,15 @@ class TestValidity(TestCase):
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
         ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
         ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+        ref_c.is_spatial_reference = True
+        ref_c.is_temporal_reference = True
         ref_c.save()
 
         ref_c.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
         ref_c.save()
 
-        run.reference_configuration = ref_c
-        run.scaling_ref = ref_c
+        run.spatial_reference_configuration = ref_c
+        run.temporal_reference_configuration = ref_c
         run.save()
 
         run_id = run.id
@@ -174,3 +175,5 @@ class TestValidity(TestCase):
 
         self.generic_result_check(finished_run)
         self.delete_run(finished_run)
+
+
