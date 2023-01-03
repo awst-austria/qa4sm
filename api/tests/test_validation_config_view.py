@@ -41,11 +41,8 @@ class TestValidationConfigView(TransactionTestCase):
         # self.run_id = self.run.id
         self.wrong_id = 'f0000000-a000-b000-c000-d00000000000'
 
-    def test_start_validation(self):
-        start_validation_url = reverse('Run new validation')
-
         basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
-        good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
+        self.good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
                                           'variable_id': DataVariable.objects.get(pretty_name=globals.C3S_sm).id,
                                           'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
                                           'basic_filters': [basic_filter_id],
@@ -71,7 +68,7 @@ class TestValidationConfigView(TransactionTestCase):
                                           'parametrised_filters': [],
                                           'is_spatial_reference': True,
                                           'is_temporal_reference': True,
-                                          'is_scaling_reference': True}],
+                                          'is_scaling_reference': False}],
                      'interval_from': datetime(1978, 1, 1),
                      'interval_to': datetime(2020, 1, 1),
                      'min_lat': 18.022843268729,
@@ -82,9 +79,15 @@ class TestValidationConfigView(TransactionTestCase):
                      'anomalies_method': 'none',
                      'anomalies_from': None,
                      'anomalies_to': None,
-                     'scaling_method': ValidationRun.MEAN_STD,
+                     'scaling_method': ValidationRun.NO_SCALING,
                      'name_tag': 'test_validation',
                      'temporal_matching': globals.TEMP_MATCH_WINDOW}
+
+
+
+    def test_start_validation(self):
+        start_validation_url = reverse('Run new validation')
+        good_form = self.good_form.copy()
 
         # not logged in client:
         response = self.client.post(start_validation_url, good_form, format='json')
@@ -146,8 +149,59 @@ class TestValidationConfigView(TransactionTestCase):
         response = self.client.post(start_validation_url, empty_form, format='json')
         assert response.status_code == 400
 
-        # removing some fields and posting not full form
+        # changing reference settings:
+        # setting method different from none and not indicating any data config as scaling ref
+        good_form['scaling_method'] = ValidationRun.MEAN_STD
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 400
 
+        # fixing the above problem by indicating scaling ref
+        good_form['dataset_configs'][2]['is_scaling_reference'] = True
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 200
+
+        # setting more than one config as reference
+        # spatial:
+        good_form['dataset_configs'][0]['is_spatial_reference'] = True
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 400
+
+        # temporal:
+        good_form['dataset_configs'][0]['is_spatial_reference'] = False # fixing this one
+        good_form['dataset_configs'][0]['is_temporal_reference'] = True
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 400
+
+        # scaling
+        good_form['dataset_configs'][0]['is_temporal_reference'] = False # fixing this one
+        good_form['dataset_configs'][0]['is_scaling_reference'] = True
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 400
+
+        # setting no configs as reference:
+        # spatial
+        good_form['dataset_configs'][2]['is_spatial_reference'] = False
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 400
+
+        # temporal
+        good_form['dataset_configs'][2]['is_spatial_reference'] = True # fixing this one
+        good_form['dataset_configs'][2]['is_temporal_reference'] = False
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 400
+
+        # scaling
+        good_form['dataset_configs'][2]['is_temporal_reference'] = True # fixing this one
+        good_form['dataset_configs'][0]['is_scaling_reference'] = False
+        good_form['dataset_configs'][2]['is_scaling_reference'] = False
+
+        response = self.client.post(start_validation_url, good_form, format='json')
+        assert response.status_code == 400
+
+        # setting no scaling to fix the form
+        good_form['scaling_method'] = ValidationRun.NO_SCALING
+
+        # removing some fields and posting not full form
         del good_form['max_lon']  # not relevant, it can be null
         response = self.client.post(start_validation_url, good_form, format='json')
         assert response.status_code == 200
@@ -191,6 +245,8 @@ class TestValidationConfigView(TransactionTestCase):
         response = self.client.get(reverse('Validation configuration', kwargs={'id': self.wrong_id}))
         assert response.status_code == 404
 
+
+
     # stopping validation tested here, because TransactionTestCase is needed and using it in two places causes some
     # issues
     def test_stop_validation(self):
@@ -198,48 +254,7 @@ class TestValidationConfigView(TransactionTestCase):
         start_validation_url = reverse('Run new validation')
 
         basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
-        good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
-                                          'variable_id': DataVariable.objects.get(pretty_name=globals.C3S_sm).id,
-                                          'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
-                                          'basic_filters': [basic_filter_id],
-                                          'parametrised_filters': [],
-                                          'is_spatial_reference': False,
-                                          'is_temporal_reference': False,
-                                          'is_scaling_reference': False
-                                          },
-                                         {'dataset_id': Dataset.objects.get(short_name=globals.SMAP_L3).id,
-                                          'variable_id': DataVariable.objects.get(
-                                              pretty_name=globals.SMAP_soil_moisture).id,
-                                          'version_id': DatasetVersion.objects.get(short_name=globals.SMAP_V6_PM).id,
-                                          'basic_filters': [basic_filter_id],
-                                          'parametrised_filters': [],
-                                          'is_spatial_reference': False,
-                                          'is_temporal_reference': False,
-                                          'is_scaling_reference': False
-                                          },
-                                         {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
-                                          'variable_id': DataVariable.objects.get(
-                                              pretty_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
-                                          'version_id': DatasetVersion.objects.get(
-                                              short_name=globals.GLDAS_NOAH025_3H_2_1).id,
-                                          'basic_filters': [basic_filter_id],
-                                          'parametrised_filters': [],
-                                          'is_spatial_reference': True,
-                                          'is_temporal_reference': True,
-                                          'is_scaling_reference': True
-                                          }],
-                     'interval_from': datetime(1978, 1, 1),
-                     'interval_to': datetime(2020, 1, 1),
-                     'min_lat': 18.022843268729,
-                     'min_lon': -161.334244440612,
-                     'max_lat': 23.0954743716834,
-                     'max_lon': -153.802918037877,
-                     'metrics': [{'id': 'tcol', 'value': True}],
-                     'anomalies_method': 'none',
-                     'anomalies_from': None,
-                     'anomalies_to': None,
-                     'scaling_method': ValidationRun.MEAN_STD,
-                     'name_tag': 'test_validation'}
+        good_form = self.good_form.copy()
 
         # log in
         self.client.login(**self.auth_data)
@@ -259,7 +274,7 @@ class TestValidationConfigView(TransactionTestCase):
         response = self.client.delete(reverse('Stop validation', kwargs={'result_uuid': new_run.id}))
         assert response.status_code == 200
         #
-        # let's try canceling non existing validation
+        # let's try canceling non-existing validation
         response = self.client.delete(
             reverse('Stop validation', kwargs={'result_uuid': 'f0000000-a000-b000-c000-d00000000000'}))
         assert response.status_code == 404

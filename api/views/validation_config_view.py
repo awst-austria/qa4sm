@@ -15,7 +15,7 @@ from api.views.validation_run_view import ValidationRunSerializer
 from validator.models import ValidationRun, DatasetConfiguration, DataFilter, ParametrisedFilter, Dataset, \
     DatasetVersion, DataVariable
 from validator.validation import run_validation, globals
-from validator.validation.validation import compare_validation_runs, check_validation_configuration
+from validator.validation.validation import compare_validation_runs
 
 
 def _check_if_settings_exist():
@@ -59,7 +59,6 @@ def start_validation(request):
             return response
 
     connections.close_all()
-    check_validation_configuration(new_val_run)
     p = Process(target=run_validation, kwargs={"validation_id": new_val_run.id})
     p.start()
     serializer = ValidationRunSerializer(new_val_run)
@@ -247,6 +246,39 @@ class MetricsSerializer(serializers.Serializer):
 
 
 class ValidationConfigurationSerializer(serializers.Serializer):
+    requires_context = True
+
+    def validate(self, attrs):
+        spatial_ref_configs_num = len(list(filter(lambda el: el['is_spatial_reference'], attrs['dataset_configs'])))
+        temporal_ref_configs_num = len(list(filter(lambda el: el['is_temporal_reference'], attrs['dataset_configs'])))
+        scaling_ref_configs_num = len(list(filter(lambda el: el['is_scaling_reference'], attrs['dataset_configs'])))
+
+        print(scaling_ref_configs_num)
+        #
+        # scaling_condition = (scaling_ref_configs_num == 0 and (
+        #         attrs['scaling_method'] == 'none' or attrs['scaling_method'] is None)) or \
+        #                     (scaling_ref_configs_num == 1 and attrs['scaling_method'] is not None
+        #                      and attrs['scaling_method'] != 'none')
+
+        if spatial_ref_configs_num == 0:
+            raise serializers.ValidationError('No spatial reference provided.')
+        elif spatial_ref_configs_num > 1:
+            raise serializers.ValidationError('More than one spatial reference provided.')
+
+        if temporal_ref_configs_num == 0:
+            raise serializers.ValidationError('No temporal reference provided.')
+        elif temporal_ref_configs_num > 1:
+            raise serializers.ValidationError('More than one temporal reference provided.')
+
+        if scaling_ref_configs_num == 0 and attrs['scaling_method'] != 'none':
+            raise serializers.ValidationError('No scaling reference provided, but the scaling method is set.')
+        elif scaling_ref_configs_num == 1 and attrs['scaling_method'] == 'none':
+            raise serializers.ValidationError('Scaling reference set, but the scaling method not.')
+        elif scaling_ref_configs_num > 1 and attrs['scaling_method'] != 'none':
+            raise serializers.ValidationError('More than one scaling reference provided.')
+
+        return attrs
+
     def update(self, instance, validated_data):
         pass
 
@@ -284,6 +316,8 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             spatial_ref_index = configs_to_save.index(
                 next(filter(lambda n: n.get('is_spatial_reference'), configs_to_save)))
             configs_to_save.append(configs_to_save.pop(spatial_ref_index))
+            # else:
+            #     return None
 
             for config in configs_to_save:
                 config_model = DatasetConfiguration.objects.create(validation=new_val_run,
