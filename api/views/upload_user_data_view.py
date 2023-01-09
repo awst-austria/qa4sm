@@ -1,3 +1,5 @@
+import os
+
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from qa4sm_preprocessing.reading import StackImageReader
@@ -14,8 +16,9 @@ from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import xarray as xa
-
+import zipfile
 import logging
+from qa4sm_preprocessing.utils import *
 
 __logger = logging.getLogger(__name__)
 
@@ -133,6 +136,7 @@ def extract_coordinates_names(ncDataset):
 
 def extract_sm_variable_names(ncDataset):
     variables = list(ncDataset.data_vars.keys())
+    print('here are variables: ', ncDataset.variables)
     potential_variable_names = []
     key_sm_words = ['water', 'soil', 'moisture', 'soil_moisture', 'sm', 'ssm']
     key_error_words = ['error', 'bias', 'uncertainty']
@@ -248,7 +252,7 @@ def update_metadata(request, file_uuid):
         else:
             setattr(file_entry, field_name, new_item['name'])
             file_entry.save()
-            
+
     elif field_name == USER_DATA_DATASET_FIELD_NAME:
         current_dataset.pretty_name = field_value
         current_dataset.save()
@@ -260,34 +264,108 @@ def update_metadata(request, file_uuid):
     return JsonResponse({'variable_id': current_variable.id}, status=200)
 
 
+class UploadedFileError(BaseException):
+    def __init__(self, message):
+        super(BaseException, self).__init__()
+        self.message = message
+
+
+def _get_metadata_from_uploaded_netcdf(file_entry: UserDatasetFile, file_path=None) -> dict:
+    if not file_path:
+        file_path = file_entry.file.path
+
+    try:
+        xarray_ds = xa.open_dataset(file_path, engine='netcdf4')
+    except Exception:
+        file_entry.delete()
+        raise UploadedFileError('Uploaded file is corrupted.')
+
+    variable = extract_sm_variable_names(xarray_ds)
+    coordinates = extract_coordinates_names(xarray_ds)
+    all_variables = retrieve_all_variables_from_netcdf(xarray_ds)
+
+    if len(all_variables) == 0:
+        raise UploadedFileError('File does not contain variables')
+
+    metadata_from_file = {
+        'lat_name': coordinates[USER_DATA_LAT_FIELD_NAME],
+        'lon_name': coordinates[USER_DATA_LON_FIELD_NAME],
+        'time_name': coordinates[USER_DATA_TIME_FIELD_NAME],
+        'variable': variable,
+        'all_variables': retrieve_all_variables_from_netcdf(xarray_ds)
+    }
+
+    xarray_ds.close()
+
+    return metadata_from_file
+
+
+def _get_metadata_from_uploaded_zip(file_entry: UserDatasetFile) -> dict:
+    try:
+        zip_file = zipfile.ZipFile(file_entry.file.path, "r")
+    except Exception:
+        raise UploadedFileError('File corrupted')
+
+    timeseries_path = file_entry.get_raw_file_path + 'timeseries'
+    if zip_file.filelist[0].is_dir():
+        path = file_entry.get_raw_file_path
+    else:
+        path = timeseries_path
+    zip_file.extractall(path=path)
+    zip_file.close()
+
+    # check if grid file is available
+    if 'grid.nc' not in os.listdir(timeseries_path):
+        raise UploadedFileError('No grid file provided')
+
+    # quick verification
+    ind = 0
+    if os.listdir(timeseries_path)[0] == 'grid.nc':
+        ind = 1
+    file_to_verify = timeseries_path + '/' + os.listdir(timeseries_path)[ind]
+
+    print(file_to_verify)
+    metadata_from_file = _get_metadata_from_uploaded_netcdf(file_entry, file_to_verify)
+    # raise UploadedFileError('Everything is ok, just do not want to go further')
+
+    # metadata_from_file = {
+    #     'lat_name': 'lat',
+    #     'lon_name': 'lon',
+    #     'time_name': 'time',
+    #     'variable': 'sm',
+    #     'all_variables': []
+    # }
+    return metadata_from_file
+
+#
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
 def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+
+    #
+    # is_netcdf = file_entry.file_name.endswith('.nc') or file_entry.file_name.endswith('.nc')
     if serializer.is_valid():
+        # first the file will be preprocessed
+        # gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
         try:
-            xarray_ds = xa.open_dataset(file_entry.file.path, engine='netcdf4')
-        except:
+            gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
+        except Exception as e:
+            print(e, type(e))
             file_entry.delete()
-            return JsonResponse({'error': 'Wrong file format or file is corrupted'}, status=500, safe=False)
+            return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
+        #  once the file is preprocessed, a time series file can be opened and names can be taken - for now I do
+        #  everything here, once the qa4sm-preprocessing package is ready I'll update this view
+        # TODO: update the view once qa4sm-preprocessing is ready
 
-        variable = extract_sm_variable_names(xarray_ds)
-        coordinates = extract_coordinates_names(xarray_ds)
-        all_variables = retrieve_all_variables_from_netcdf(xarray_ds)
+        path_to_the_ts = file_entry.get_raw_file_path + 'timeseries'
 
-        if len(all_variables) == 0:
-            return JsonResponse({'error': 'File does not contain variables'}, status=500, safe=False)
-
-        metadata_from_file = {
-            'lat_name': coordinates[USER_DATA_LAT_FIELD_NAME],
-            'lon_name': coordinates[USER_DATA_LON_FIELD_NAME],
-            'time_name': coordinates[USER_DATA_TIME_FIELD_NAME],
-            'variable': variable,
-            'all_variables': retrieve_all_variables_from_netcdf(xarray_ds)
-        }
-
-        xarray_ds.close()
+        ind = 0
+        if os.listdir(path_to_the_ts)[0] == 'grid.nc':
+            ind = 1
+        file_to_verify = path_to_the_ts + '/' + os.listdir(path_to_the_ts)[ind]
+        metadata_from_file = _get_metadata_from_uploaded_netcdf(file_entry, file_to_verify)
 
         dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
         dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
@@ -295,7 +373,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
         version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
             USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
-
+    #
         # creating version entry
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
         # creating variable entry
@@ -310,23 +388,74 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
                                               metadata_from_file)
 
-        if file_data_updated['status'] == 200:
-            # here the preprocessing is done -> doing it here prevents from permission issues
-            StackImageReader(
-                file_entry.file.path,
-                file_entry.variable.short_name,
-                latname=file_entry.lat_name,
-                lonname=file_entry.lon_name,
-                timename=file_entry.time_name
-            ).repurpose(
-                file_entry.get_raw_file_path + "/timeseries",
-                overwrite=False,
-            )
-
         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
     else:
         file_entry.delete()
         return JsonResponse(serializer.errors, status=500, safe=False)
+
+
+# @api_view(['PUT', 'POST'])
+# @permission_classes([IsAuthenticated])
+# def post_user_file_metadata_and_preprocess_file(request, file_uuid):
+#     serializer = UserFileMetadataSerializer(data=request.data)
+#     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+#     is_netcdf = file_entry.file_name.endswith('.nc') or file_entry.file_name.endswith('.nc')
+#     if serializer.is_valid():
+#         if is_netcdf:
+#             try:
+#                 metadata_from_file = _get_metadata_from_uploaded_netcdf(file_entry)
+#             except UploadedFileError as exc:
+#                 return JsonResponse({'error': str(exc)}, status=500, safe=False)
+#         else:
+#             try:
+#                 metadata_from_file = _get_metadata_from_uploaded_zip(file_entry)
+#             except UploadedFileError as exc:
+#                 return JsonResponse({'error': str(exc)}, status=500, safe=False)
+#
+#         dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
+#         dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
+#             USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
+#         version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
+#         version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
+#             USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+#
+#         # creating version entry
+#         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+#         # creating variable entry
+#         new_variable = create_variable_entry(metadata_from_file['variable']['name'],
+#                                              metadata_from_file['variable']['long_name'],
+#                                              dataset_pretty_name,
+#                                              request.user)
+#         # creating dataset entry
+#         new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
+#                                            file_entry)
+#         # updating file entry
+#         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
+#                                               metadata_from_file)
+#
+#         # ------------------- netcdf ----------------------------------
+#         if file_data_updated['status'] == 200 and is_netcdf:
+#             # here the preprocessing is done -> doing it here prevents from permission issues
+#             StackImageReader(
+#                 file_entry.file.path,
+#                 file_entry.variable.short_name,
+#                 latname=file_entry.lat_name,
+#                 lonname=file_entry.lon_name,
+#                 timename=file_entry.time_name
+#             ).repurpose(
+#                 file_entry.get_raw_file_path + "/timeseries",
+#                 overwrite=False,
+#             )
+#         # ------------------- netcdf ----------------------------------
+#
+#         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
+#     else:
+#         file_entry.delete()
+#         return JsonResponse(serializer.errors, status=500, safe=False)
+
+
+def _verify_file_extension(file_name):
+    return file_name.endswith('.nc4') or file_name.endswith('.nc') or file_name.endswith('.zip')
 
 
 @api_view(['PUT', 'POST'])
@@ -337,7 +466,7 @@ def upload_user_data(request, filename):
     # I don't think it is possible not to meet this condition, but just in case
     if file.name != filename:
         return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
-    if filename.split('.')[-1] != 'nc' and filename.split('.')[-1] != 'nc4':
+    if not _verify_file_extension(filename):
         return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
 
     file_data = {
