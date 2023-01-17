@@ -387,7 +387,7 @@
         "pk": 41,
         "fields": {
             "short_name": "ISMN_VRelease2_Verification",
-            "pretty_name": "ISMN QA4SM Release 2 verification data",
+            "pretty_name": "ISMN QA4SM verification data",
             "help_text": "Dataset used for the cross-validation exercise in the verification report of QA4SM release 2",
             "time_range_start": "2010-06-01",
             "time_range_end": "2020-01-01",
