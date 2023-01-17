@@ -381,5 +381,17 @@
             "time_range_end": "2022-08-06",
             "geographical_range": null
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 41,
+        "fields": {
+            "short_name": "ISMN_V20230110",
+            "pretty_name": "20230110 global",
+            "help_text": "ISMN from 2023-01-10 (FRM4SM version with added quality indicators)",
+            "time_range_start": "",
+            "time_range_end": "2023-01-10",
+            "geographical_range": null
+        }
     }
 ]

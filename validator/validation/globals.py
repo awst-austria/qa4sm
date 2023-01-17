@@ -56,6 +56,7 @@ C3S_V202012 = 'C3S_V202012'
 ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
 ISMN_V20191211 = 'ISMN_V20191211'
 ISMN_V20210131 = 'ISMN_V20210131'
+ISMN_V20230110 = 'ISMN_V20230110'
 SMAP_V5_PM = 'SMAP_V5_PM'
 SMAP_V6_PM = 'SMAP_V6_PM'
 SMOS_105_ASC = 'SMOS_105_ASC'
@@ -102,6 +103,12 @@ SMOSL3_sm = 'SMOSL3_sm'
 SMOSL2_sm = 'SMOSL2_sm'
 SMAPL2_soil_moisture = 'SMAPL2_soil_moisture'
 
+# ISMN FRM4SM metadata files where custom metadata reader is required
+# relative to dataset path
+ISMN_FRM_CSV = {
+    'ISMN_v20230110': 'frm_classification.csv'
+}
+
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
@@ -143,7 +150,9 @@ METADATA_TEMPLATE = {'other_ref': None,
                                   'timerange_to': np.array([' ' * 256]),
                                   'variable': np.array([' ' * 256]),
                                   'instrument_depthfrom': np.float32([np.nan]),
-                                  'instrument_depthto': np.float32([np.nan])
+                                  'instrument_depthto': np.float32([np.nan]),
+                                  # only available for FRM4SM ISMN version(s)
+                                  #'frm_class': np.array([' ' * 256]),
                                   }
                      }
 
@@ -153,6 +162,7 @@ MEASURE_DEPTH_TO = "instrument_depthto"
 METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
                        "Climate classification": "metadata_climate_KG",
                        "Soil type classification": "metadata_instrument_depth_and_soil_type",
+                       "FRM classification": "metadata_frm_class",
                        }
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
