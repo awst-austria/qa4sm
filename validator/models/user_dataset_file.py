@@ -30,9 +30,6 @@ class UserDatasetFile(models.Model):
     dataset = models.ForeignKey(Dataset, related_name='dataset', on_delete=models.SET_NULL, null=True)
     version = models.ForeignKey(DatasetVersion, related_name='version', on_delete=models.SET_NULL, null=True)
     variable = models.ForeignKey(DataVariable, related_name='variable', on_delete=models.SET_NULL, null=True)
-    lon_name = models.CharField(max_length=10, blank=True, null=True)
-    lat_name = models.CharField(max_length=10, blank=True, null=True)
-    time_name = models.CharField(max_length=10, blank=True, null=True)
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
 
