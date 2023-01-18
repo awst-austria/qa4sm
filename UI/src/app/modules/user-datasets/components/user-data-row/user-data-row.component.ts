@@ -21,9 +21,6 @@ export class UserDataRowComponent implements OnInit {
   versionName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   variableName: { shortName$: BehaviorSubject<string>, prettyName$: BehaviorSubject<string> } =
     {shortName$: new BehaviorSubject<string>(''), prettyName$: new BehaviorSubject<string>('')};
-  latitudeName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  longitudeName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  timeName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
   datasetFieldName = 'dataset_name';
   versionFieldName = 'version_name';
@@ -61,15 +58,6 @@ export class UserDataRowComponent implements OnInit {
       this.variableName.shortName$.next(variableData.short_name);
       this.variableName.prettyName$.next(variableData.pretty_name);
     });
-    this.latitudeName$.next(
-      this.userDataset.lat_name ? this.userDataset.lat_name : '**choose**'
-    );
-    this.longitudeName$.next(
-      this.userDataset.lon_name ? this.userDataset.lon_name : '**choose**'
-    );
-    this.timeName$.next(
-      this.userDataset.time_name ? this.userDataset.time_name : '**choose**'
-    );
   }
 
   removeDataset(dataFileId: string): void {
@@ -102,15 +90,6 @@ export class UserDataRowComponent implements OnInit {
           this.variableName.prettyName$.next(
             this.userDataset.all_variables.find(choice => choice.name === fieldValue).long_name);
           this.variableName.shortName$.next(fieldValue);
-        }
-        if (fieldName === this.latFieldName) {
-          this.latitudeName$.next(fieldValue);
-        }
-        if (fieldName === this.lonFieldName) {
-          this.longitudeName$.next(fieldValue);
-        }
-        if (fieldName === this.timeFiledName) {
-          this.timeName$.next(fieldValue);
         }
       },
       () => {
