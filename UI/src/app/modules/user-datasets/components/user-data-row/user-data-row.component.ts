@@ -112,15 +112,6 @@ export class UserDataRowComponent implements OnInit {
       case this.variableFieldName:
         editableField = this.editVariable;
         break;
-      case this.lonFieldName:
-        editableField = this.editLonName;
-        break;
-      case this.latFieldName:
-        editableField = this.editLatName;
-        break;
-      case this.timeFiledName:
-        editableField = this.editTimeName;
-        break;
     }
     editableField.opened = open;
   }
