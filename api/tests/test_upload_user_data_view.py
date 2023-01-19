@@ -313,7 +313,7 @@ class TestUploadUserDataView(APITestCase):
             reverse(self.post_metadata_url_name, kwargs={URL_FILE_UUID: file_entry.id}),
             metadata_correct, format='json')
         assert response_metadata.status_code == 500
-        assert response_metadata.json()['error'] == 'Wrong file format or file is corrupted'
+        assert response_metadata.json()['error'] == 'Provided file does not fulfill requirements.'
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
 
