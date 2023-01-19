@@ -386,6 +386,18 @@
         "model": "validator.datasetversion",
         "pk": 41,
         "fields": {
+            "short_name": "ISMN_VRelease2_Verification",
+            "pretty_name": "ISMN QA4SM verification data",
+            "help_text": "Dataset used for the cross-validation exercise in the verification report of QA4SM release 2",
+            "time_range_start": "2010-06-01",
+            "time_range_end": "2020-01-01",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 42,
+        "fields": {
             "short_name": "ISMN_V20230110",
             "pretty_name": "20230110 global",
             "help_text": "ISMN from 2023-01-10 (FRM4SM version with added quality indicators)",
@@ -394,4 +406,6 @@
             "geographical_range": null
         }
     }
+
+
 ]

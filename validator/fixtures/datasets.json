@@ -108,7 +108,9 @@
             "is_spatial_reference": true,
             "versions": [
                 18,
-                30
+                30,
+                41,
+                42
             ],
             "variables": [
                 4

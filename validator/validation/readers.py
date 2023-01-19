@@ -35,18 +35,17 @@ def create_reader(dataset, version) -> GriddedNcTs:
     folder_name = path.join(dataset.storage_path, version.short_name)
 
     if dataset.short_name == globals.ISMN:
-        if version.short_name in globals.ISMN_FRM_CSV.keys():
+        if path.isfile(path.join(folder_name, 'frm_classification.csv')):
             custom_meta_readers = [
                 CustomSensorMetadataCsv(
-                    path.join(folder_name,
-                              globals.ISMN_FRM_CSV[version.short_name]),
+                    path.join(folder_name, 'frm_classification.csv'),
                     fill_values={'frm_class': 'undeducible'},
                 ),
             ]
-            reader = ISMN_Interface(folder_name,
-                                    custom_meta_reader=custom_meta_readers)
         else:
-            reader = ISMN_Interface(folder_name)
+            custom_meta_readers = None
+        reader = ISMN_Interface(folder_name,
+                                custom_meta_reader=custom_meta_readers)
 
     if dataset.short_name == globals.C3SC:
         c3s_data_folder = path.join(folder_name, 'TCDR/063_images_to_ts/combined-daily')

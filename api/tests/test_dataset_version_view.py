@@ -20,14 +20,14 @@ class TestDatasetVersionView(TestCase):
         # check all the versions
         response = self.client.get(dataset_version_url)
         assert response.status_code == 200
-        assert len(response.json()) == 32  # todo: drop check
+        assert len(response.json()) == 33  # todo: drop check, must be changed for each new dataset?
 
         # check for logged out
         self.client.logout()
 
         response = self.client.get(dataset_version_url)
         assert response.status_code == 200
-        assert len(response.json()) == 32 # todo: drop check
+        assert len(response.json()) == 33 # todo: drop check, must be changed for each new dataset?
 
     def test_dataset_version_by_dataset(self):
         dataset_version_by_dataset_url_name = 'Dataset version by dataset'

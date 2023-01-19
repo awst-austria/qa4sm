@@ -56,6 +56,7 @@ C3S_V202012 = 'C3S_V202012'
 ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
 ISMN_V20191211 = 'ISMN_V20191211'
 ISMN_V20210131 = 'ISMN_V20210131'
+ISMN_VRelease2_Verification = 'ISMN_VRelease2_Verification'
 ISMN_V20230110 = 'ISMN_V20230110'
 SMAP_V5_PM = 'SMAP_V5_PM'
 SMAP_V6_PM = 'SMAP_V6_PM'
@@ -103,12 +104,6 @@ SMOSL3_sm = 'SMOSL3_sm'
 SMOSL2_sm = 'SMOSL2_sm'
 SMAPL2_soil_moisture = 'SMAPL2_soil_moisture'
 
-# ISMN FRM4SM metadata files where custom metadata reader is required
-# relative to dataset path
-ISMN_FRM_CSV = {
-    'ISMN_v20230110': 'frm_classification.csv'
-}
-
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
 NOT_AS_REFERENCE = []
@@ -152,7 +147,7 @@ METADATA_TEMPLATE = {'other_ref': None,
                                   'instrument_depthfrom': np.float32([np.nan]),
                                   'instrument_depthto': np.float32([np.nan]),
                                   # only available for FRM4SM ISMN version(s)
-                                  #'frm_class': np.array([' ' * 256]),
+                                  'frm_class': np.array([' ' * 256]),
                                   }
                      }
 
