@@ -225,25 +225,18 @@ class UploadedFileError(BaseException):
 def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    # is_netcdf = file_entry.file_name.endswith('.nc') or file_entry.file_name.endswith('.nc')
 
     if serializer.is_valid():
         # first the file will be preprocessed
         try:
-            print('I got here', file_entry.file.path, file_entry.get_raw_file_path)
             gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
-            print('and managed to preprocess the file')
         except Exception as e:
             print(e, type(e))
             file_entry.delete()
             return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
-        #  once the file is preprocessed, a time series file can be opened and names can be taken - for now I do
-        #  everything here, once the qa4sm-preprocessing package is ready I'll update this view
-        # TODO: update the view once qa4sm-preprocessing is ready
 
         sm_variable = get_sm_variable_names(gridded_reader.variable_description())
         all_variables = get_variables_from_the_reader(gridded_reader)
-        # metadata_from_reader = _get_metadata_from_reader(gridded_reader)
 
         dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
         dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
