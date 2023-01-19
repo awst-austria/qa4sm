@@ -661,7 +661,7 @@
         "fields": {
             "name": "FIL_ISMN_FRM_representative",
             "description": "Include only representative sensors (0-10 cm)",
-            "help_text": "Only ISMN sensors marked as 'representative' or 'very representative' are used. Other sensors (not representative or undeducible) are excluded from the validation run. Sensors below 10 cm depth are always excluded!",
+            "help_text": "Only ISMN sensors marked as 'representative' or 'very representative' are used. Other sensors ('not representative' or 'undeducible') are excluded from the validation run. Sensors below 10 cm depth are always excluded!",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
