@@ -55,7 +55,7 @@ export class UserFileUploadComponent implements OnInit {
     if (this.file) {
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
-      let upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName)
+      const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName)
         .pipe(finalize(() => this.reset));
 
       this.uploadSub = upload$.subscribe(event => {
@@ -66,10 +66,10 @@ export class UserFileUploadComponent implements OnInit {
               this.userDatasetService.refresh.next(true);
               this.resetFile();
             },
-            () => {
+            (message) => {
               this.spinnerVisible = false;
-              this.toastService.showErrorWithHeader('Metadata not saved',
-                'Provided metadata could not be saved. Please try again or contact our team.');
+              this.toastService.showErrorWithHeader('Metadata not saved.',
+                `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
             },
             () => {
               this.spinnerVisible = false;
@@ -77,10 +77,10 @@ export class UserFileUploadComponent implements OnInit {
             });
         }
       },
-        () => {
+        (message) => {
           this.spinnerVisible = false;
           this.toastService.showErrorWithHeader('File not saved',
-            'File could not be uploaded. Please try again or contact our team.');
+            `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
         }
         );
     }
