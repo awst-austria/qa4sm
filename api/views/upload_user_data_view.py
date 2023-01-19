@@ -124,8 +124,8 @@ def get_variables_from_the_reader(reader):
          'long_name':
              variables[variable]['long_name']
              if 'long_name' in variables[variable].keys() else
-             (variables[variable].attrs['standard_name'] if 'standard_name' in variables[
-                 variable].attrs.keys() else variable)
+             (variables[variable]['standard_name'] if 'standard_name' in variables[
+                 variable].keys() else variable)
          }
         for variable in variables
     ]
@@ -157,7 +157,6 @@ def delete_user_dataset_and_file(request, file_uuid):
     if file_entry.owner != request.user:
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
-    print(file_entry.dataset)
     if file_entry.dataset:
         dataset = get_object_or_404(Dataset, id=file_entry.dataset.id)
         dataset.variables.clear()
@@ -249,9 +248,6 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
         # creating variable entry
 
-        print("I am trying to create variable")
-        print('smvars', sm_variable)
-
         new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
                                              request.user)
         # for sm_variable in sm_variables:
@@ -270,6 +266,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
 
     else:
+        print(serializer.errors)
         file_entry.delete()
         return JsonResponse(serializer.errors, status=500, safe=False)
 
