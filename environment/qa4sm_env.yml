@@ -248,13 +248,13 @@ dependencies:
     - psycopg2-binary==2.9.3
     - pyct==0.4.8
     - pygeobase==0.4.0
-    - pygeogrids==0.4.1
+    - pygeogrids==0.4.2
     - pynetcf==0.2.2
     - pytesmo==0.14.3
     - pytest-cov==3.0.0
     - pytest-django==4.5.2
     - pytest-mpl==0.15.1
-    - qa4sm-preprocessing==0.1.3
+    - qa4sm-preprocessing==0.1.6
     - qa4sm-reader==0.7.5
     - redis==4.3.1
     - repurpose==0.8
