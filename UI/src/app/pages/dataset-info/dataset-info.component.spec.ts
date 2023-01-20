@@ -39,7 +39,8 @@ describe('DatasetInfoComponent', () => {
         versions: [3, 4],
         variables: [2],
         filters: [1],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
       {
         id: 1,
@@ -54,7 +55,8 @@ describe('DatasetInfoComponent', () => {
         versions: [1, 2],
         variables: [1],
         filters: [1, 2],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
     ];
 

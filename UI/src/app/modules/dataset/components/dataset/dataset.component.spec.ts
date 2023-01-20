@@ -36,7 +36,8 @@ describe('DatasetComponent', () => {
         versions: [3, 4],
         variables: [2],
         filters: [1],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
       {
         id: 1,
@@ -51,7 +52,8 @@ describe('DatasetComponent', () => {
         versions: [1, 2],
         variables: [1],
         filters: [1, 2],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
     ];
 
@@ -119,7 +121,6 @@ describe('DatasetComponent', () => {
     fixture = TestBed.createComponent(DatasetComponent);
     component = fixture.componentInstance;
     component.removable = false;
-    component.reference = false;
     component.selectionModel = {
       selectedDataset: testDatasets[0],
       selectedVersion: testVersions[0],
