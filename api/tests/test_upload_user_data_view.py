@@ -40,9 +40,6 @@ def _update_file_entry(file_entry):
     file_entry.variable = new_variable
     file_entry.all_variables = [
         {'name': 'soil_moisture', 'long_name': 'Soil Moisture'},
-        {'name': 'lat', 'long_name': 'Latitude'},
-        {'name': 'lon', 'long_name': 'Longitude'},
-        {'name': 'time', 'long_name': ''},
         {'name': 'none', 'long_name': 'Some weird variable'}
     ]
     file_entry.save()
@@ -179,9 +176,6 @@ class TestUploadUserDataView(APITestCase):
         assert file_entry.dataset is None
         assert file_entry.version is None
         assert file_entry.variable is None
-        assert file_entry.lon_name is None
-        assert file_entry.lat_name is None
-        assert file_entry.time_name is None
         assert file_entry.owner == self.test_user
         file_entry.delete()
 
@@ -258,9 +252,6 @@ class TestUploadUserDataView(APITestCase):
         assert file_entry.variable == DataVariable.objects.all().last()
         # the values below are defined in the test file, so if we change the test file we may have to update them
         assert file_entry.variable.short_name == 'soil_moisture'
-        assert file_entry.time_name == 'time'
-        assert file_entry.lat_name == 'lat'
-        assert file_entry.lon_name == 'lon'
 
         # check if the timeseries files were created:
         timeseries_dir = file_entry.get_raw_file_path + '/timeseries'
@@ -322,7 +313,7 @@ class TestUploadUserDataView(APITestCase):
             reverse(self.post_metadata_url_name, kwargs={URL_FILE_UUID: file_entry.id}),
             metadata_correct, format='json')
         assert response_metadata.status_code == 500
-        assert response_metadata.json()['error'] == 'Wrong file format or file is corrupted'
+        assert response_metadata.json()['error'] == 'Provided file does not fulfill requirements.'
         existing_files = UserDatasetFile.objects.all()
         assert len(existing_files) == 0
 
@@ -367,30 +358,5 @@ class TestUploadUserDataView(APITestCase):
         # check if the variable name got updated:
         version = DatasetVersion.objects.get(pk=file_entry.version_id)
         assert version.pretty_name == version_new_name
-
-        # update dimensions:
-        lon_new_name = 'lon'
-        lat_new_name = 'lat'
-        time_new_name = 'time'
-
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
-                                   {USER_DATA_FIELD_NAME: USER_DATA_LON_FIELD_NAME,
-                                    USER_DATA_FIELD_VALUE: lon_new_name})
-        assert response.status_code == 200
-
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
-                                   {USER_DATA_FIELD_NAME: USER_DATA_LAT_FIELD_NAME,
-                                    USER_DATA_FIELD_VALUE: lat_new_name})
-        assert response.status_code == 200
-
-        response = self.client.put(reverse(self.update_metadata_url_name, kwargs={URL_FILE_UUID: file_id}),
-                                   {USER_DATA_FIELD_NAME: USER_DATA_TIME_FIELD_NAME,
-                                    USER_DATA_FIELD_VALUE: time_new_name})
-        assert response.status_code == 200
-
-        file_entry = UserDatasetFile.objects.get(pk=file_id)
-        assert file_entry.lat_name == lat_new_name
-        assert file_entry.lon_name == lon_new_name
-        assert file_entry.time_name == time_new_name
 
         file_entry.delete()

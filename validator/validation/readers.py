@@ -13,8 +13,7 @@ from smos.smos_ic.interface import SMOSTs
 from pynetcf.time_series import GriddedNcTs
 
 from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
-from qa4sm_preprocessing.reading import StackImageReader
-from qa4sm_preprocessing.reading import GriddedNcOrthoMultiTs
+from qa4sm_preprocessing.reading import GriddedNcOrthoMultiTs, GriddedNcContiguousRaggedTs
 
 from validator.validation import globals
 from validator.validation.util import first_file_in
@@ -98,23 +97,10 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if dataset.user:
         file = UserDatasetFile.objects.get(dataset=dataset)
-        stackreader = StackImageReader(
-            file.file.path,  # path to the netCDF file
-            file.variable.short_name,  # name of the soil moisture variable
-            latname=file.lat_name,  # e.g. "lat"
-            lonname=file.lon_name,  # e.g. "lon"
-            timename=file.time_name  # e.g. "time"
-        )
-        # reader = stackreader
-        tsreader = stackreader.repurpose(
-            file.get_raw_file_path + "/timeseries",  # path to the timeseries directory
-            # if overwrite=False, it checks if the timeseries directory
-            # already exists, and if it does, it just returns the reader
-            # without repeating the preprocessing
-            overwrite=False,
-        )
-
-        reader = tsreader
+        if file.file_name.endswith('nc') or file.file_name.endswith('nc4'):
+            reader = GriddedNcOrthoMultiTs(file.get_raw_file_path + "/timeseries", ioclass_kws={'read_bulk': True})
+        elif file.file_name.endswith('zip'):
+            reader = GriddedNcContiguousRaggedTs(file.get_raw_file_path + "/timeseries", ioclass_kws={'read_bulk': True})
 
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))

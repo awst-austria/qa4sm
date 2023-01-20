@@ -7,6 +7,9 @@ from validator.admin import StatisticsAdmin
 from validator.admin import EmailAdmin
 from validator.admin import UptimeMonitoringAdmin
 from validator.admin import UserDatasetFileAdmin
+from validator.admin import DatasetAdmin
+from validator.admin import DatasetVersionAdmin
+from validator.admin import DatasetVariableAdmin
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -23,9 +26,9 @@ admin.site.register(Settings, SystemSettingsAdmin)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(ValidationRun, ValidationRunAdmin)
 admin.site.register(DataFilter)
-admin.site.register(Dataset)
-admin.site.register(DatasetVersion)
-admin.site.register(DataVariable)
+admin.site.register(Dataset, DatasetAdmin)
+admin.site.register(DatasetVersion, DatasetVersionAdmin)
+admin.site.register(DataVariable, DatasetVariableAdmin)
 admin.site.register(Statistics, StatisticsAdmin)
 admin.site.register(Email, EmailAdmin)
 admin.site.register(UptimeReport, UptimeMonitoringAdmin)

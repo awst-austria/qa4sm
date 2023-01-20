@@ -101,7 +101,7 @@ pip install "pytesmo>=0.14.2"
 pip install ismn
 pip install requests
 pip install "qa4sm-reader>=0.7.4"
-pip install qa4sm-preprocessing
+pip install "qa4sm-preprocessing>=0.1.4"
 pip install djangorestframework
 pip install django_rest_passwordreset
 
