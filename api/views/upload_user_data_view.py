@@ -19,7 +19,7 @@ __logger = logging.getLogger(__name__)
 
 
 def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, max_value=None, min_value=None):
-    current_max_id = DataVariable.objects.all().last().id
+    current_max_id = DataVariable.objects.all().last().id if DataVariable.objects.all().last() else 0
     new_variable_data = {
         'short_name': variable_name,
         'pretty_name': variable_pretty_name,
@@ -44,7 +44,7 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
 
 
 def create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user):
-    current_max_id = DatasetVersion.objects.all().last().id
+    current_max_id = DatasetVersion.objects.all().last().id if DatasetVersion.objects.all().last() else 0
     new_version_data = {
         "short_name": version_name,
         "pretty_name": version_pretty_name,
@@ -72,7 +72,7 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
 
 def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user, file_entry):
     # TODO: update variables
-    current_max_id = Dataset.objects.all().last().id
+    current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
     dataset_data = {
         'short_name': dataset_name,
         'pretty_name': dataset_pretty_name,
