@@ -11,6 +11,7 @@ export class DatasetDto {
               public versions: number[],
               public variables: number[],
               public filters: number[],
-              public not_as_reference: boolean) {
+              public not_as_reference: boolean,
+              public user: string) {
   }
 }
