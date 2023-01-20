@@ -13,11 +13,13 @@ from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Data
 from api.variable_and_field_names import *
 import logging
 from qa4sm_preprocessing.utils import *
+from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
 
 __logger = logging.getLogger(__name__)
 
 
 def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, max_value=None, min_value=None):
+    current_max_id = DataVariable.objects.all().last().id
     new_variable_data = {
         'short_name': variable_name,
         'pretty_name': variable_pretty_name,
@@ -28,12 +30,21 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
     variable_serializer = DatasetVariableSerializer(data=new_variable_data)
     if variable_serializer.is_valid():
         new_variable = variable_serializer.save()
+        new_variable_id = new_variable.id
+        # need to leave some id spots for our datasets, to avoid overriding users' entries
+        if new_variable_id < USER_DATASET_VARIABLE_MIN_ID:
+            new_variable.id = USER_DATASET_VARIABLE_MIN_ID if current_max_id < USER_DATASET_VARIABLE_MIN_ID \
+                else current_max_id + 1
+            new_variable.save()
+            # need to remove this one, otherwise it will be duplicated
+            DataVariable.objects.get(id=new_variable_id).delete()
         return new_variable
     else:
         raise Exception(variable_serializer.errors)
 
 
 def create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user):
+    current_max_id = DatasetVersion.objects.all().last().id
     new_version_data = {
         "short_name": version_name,
         "pretty_name": version_pretty_name,
@@ -46,6 +57,14 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
     version_serializer = DatasetVersionSerializer(data=new_version_data)
     if version_serializer.is_valid():
         new_version = version_serializer.save()
+        new_version_id = new_version.id
+        # need to leave some id spots for our datasets, to avoid overriding users' entries
+        if new_version_id < USER_DATASET_VERSION_MIN_ID:
+            new_version.id = USER_DATASET_VERSION_MIN_ID if current_max_id < USER_DATASET_VERSION_MIN_ID \
+                else current_max_id + 1
+            new_version.save()
+            # need to remove this one, otherwise it will be duplicated
+            DatasetVersion.objects.get(id=new_version_id).delete()
         return new_version
     else:
         raise Exception(version_serializer.errors)
@@ -53,6 +72,7 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
 
 def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user, file_entry):
     # TODO: update variables
+    current_max_id = Dataset.objects.all().last().id
     dataset_data = {
         'short_name': dataset_name,
         'pretty_name': dataset_pretty_name,
@@ -69,6 +89,13 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, u
     dataset_serializer = DatasetSerializer(data=dataset_data)
     if dataset_serializer.is_valid():
         new_dataset = dataset_serializer.save()
+        new_dataset_id = new_dataset.id
+        # need to leave some id spots for our datasets, to avoid overriding users' entries
+        if new_dataset_id < USER_DATASET_MIN_ID:
+            new_dataset.id = USER_DATASET_MIN_ID if current_max_id < USER_DATASET_MIN_ID else current_max_id + 1
+            new_dataset.save()
+            # need to remove this one, otherwise it will be duplicated
+            Dataset.objects.get(id=new_dataset_id).delete()
         return new_dataset
     else:
         raise Exception(dataset_serializer.errors)
