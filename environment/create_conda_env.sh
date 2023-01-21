@@ -98,7 +98,7 @@ pip install django-countries
 pip install seaborn
 pip install --upgrade --force-reinstall netcdf4
 pip install "pytesmo>=0.14.2"
-pip install ismn
+pip install "ismn>=1.3.2"
 pip install requests
 pip install "qa4sm-reader>=0.7.4"
 pip install "qa4sm-preprocessing>=0.1.4"
