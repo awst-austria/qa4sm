@@ -14,7 +14,6 @@ import netCDF4
 import numpy as np
 import pandas as pd
 import pytest
-from parameterized import parameterized
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 
