@@ -1563,19 +1563,21 @@ class TestValidation(TestCase):
         v.save()
         val.generate_all_graphs(v, run_dir)
 
+        n_metrics = len(globals.METRICS.keys())
+        n_metas = len(globals.METADATA_PLOT_NAMES.keys())
+
         meta_boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')]
         self.__logger.debug(meta_boxplot_pngs)
-        n_meta_plots = len(globals.METADATA_PLOT_NAMES.keys())
-        assert len(meta_boxplot_pngs) == n_meta_plots
+        # no meta box plots for r_p & rho_p
+        assert len(meta_boxplot_pngs) == (n_metrics - 2) * n_metas
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        n_metric_plots = len(globals.METRICS.keys())
-        assert len(boxplot_pngs) == n_metric_plots + n_meta_plots
+        assert len(boxplot_pngs) == n_metrics + (n_metas * (n_metrics - 2))
 
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metric_plots * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
         self.delete_run(v)
 
