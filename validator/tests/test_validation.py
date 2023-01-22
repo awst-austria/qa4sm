@@ -14,6 +14,7 @@ import netCDF4
 import numpy as np
 import pandas as pd
 import pytest
+from parameterized import parameterized
 from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 
@@ -41,7 +42,7 @@ from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
-from validator.validation.globals import METRICS, TC_METRICS
+from validator.validation.globals import METRICS, TC_METRICS, METADATA_PLOT_NAMES
 from validator.validation.globals import OUTPUT_FOLDER
 from django.shortcuts import get_object_or_404
 
@@ -1504,23 +1505,92 @@ class TestValidation(TestCase):
 
     @pytest.mark.long_running
     @pytest.mark.graphs
-    def test_generate_graphs(self):
-        infile1 = 'testdata/output_data/c3s_ismn.nc'
-        infile2 = 'testdata/output_data/c3s_gldas.nc'
-        infile3 = 'testdata/output_data/c3s_era5land.nc'
+    def test_generate_graphs_ismn_no_meta(self):
+        # Note: parameterized tests don't really work in this case
+        infile, short_name = ('testdata/output_data/c3s_ismn.nc', 'ISMN')
 
         # create validation object and data folder for it
         v = generate_default_validation()
         # scatterplot
-        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='ISMN')
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
         v.spatial_reference_configuration.save()
         run_dir = path.join(OUTPUT_FOLDER, str(v.id))
         val.mkdir_if_not_exists(run_dir)
 
         # copy our netcdf data file there and link it in the validation object
         # then generate the graphs
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
+        val.set_outfile(v, run_dir)
+        v.save()
+        val.generate_all_graphs(v, run_dir)
 
-        shutil.copy(infile1, path.join(run_dir, 'results.nc'))
+        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        n_metrics = len(globals.METRICS.keys())
+        assert len(boxplot_pngs) == n_metrics
+
+        from qa4sm_reader.globals import metadata
+        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
+
+        self.delete_run(v)
+
+    @pytest.mark.long_running
+    @pytest.mark.graphs
+    def test_generate_graphs_ismn_metadata(self):
+        """
+        Create plots from example validation run that also contains the ISMN
+        metadata based plots for: LC class, KG class, soil props, frm class.
+        When more metadata plots are added (globals), exchange reference file!
+        """
+        # Note: parameterized tests don't really work in this case
+        infile, short_name = ('testdata/output_data/c3s_ismn_metadata.nc', 'ISMN')
+
+        # List of metadata classes for which box plots are created.
+
+        # create validation object and data folder for it
+        v = generate_default_validation()
+        # scatterplot
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
+        v.spatial_reference_configuration.save()
+        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+        val.mkdir_if_not_exists(run_dir)
+
+        # copy our netcdf data file there and link it in the validation object
+        # then generate the graphs
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
+        val.set_outfile(v, run_dir)
+        v.save()
+        val.generate_all_graphs(v, run_dir)
+
+        meta_boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')]
+        self.__logger.debug(meta_boxplot_pngs)
+        n_meta_plots = len(globals.METADATA_PLOT_NAMES.keys())
+        assert len(meta_boxplot_pngs) == n_meta_plots
+
+        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        n_metric_plots = len(globals.METRICS.keys())
+        assert len(boxplot_pngs) == n_metric_plots + n_meta_plots
+
+        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == n_metric_plots * (v.dataset_configurations.count() - 1)
+
+        self.delete_run(v)
+
+    @pytest.mark.long_running
+    @pytest.mark.graphs
+    def test_generate_graphs_gldas(self):
+        infile, short_name = ('testdata/output_data/c3s_gldas.nc', 'GLDAS')
+        v = generate_default_validation()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
+        v.spatial_reference_configuration.save()
+        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+        val.mkdir_if_not_exists(run_dir)
+
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
         val.generate_all_graphs(v, run_dir)
@@ -1534,42 +1604,26 @@ class TestValidation(TestCase):
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
-        # remove results from first test and recreate dir
-        shutil.rmtree(run_dir)
+        self.delete_run(v)
+
+    @pytest.mark.long_running
+    @pytest.mark.graphs
+    def test_generate_graphs_era5land(self):
+        infile, short_name = ('testdata/output_data/c3s_era5land.nc', 'ERA5_LAND')
+        v = generate_default_validation()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
+        v.spatial_reference_configuration.save()
+        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
         val.mkdir_if_not_exists(run_dir)
 
-        # do the same for the other netcdf file
-
-        shutil.copy(infile2, path.join(run_dir, 'results.nc'))
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
-        # heatmap
-        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        v.spatial_reference_configuration.save()
+        v.save()
         val.generate_all_graphs(v, run_dir)
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == n_metrics
-
-        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
-
-        # remove results from first test and recreate dir
-        shutil.rmtree(run_dir)
-        val.mkdir_if_not_exists(run_dir)
-
-        # do the same for the other netcdf file
-
-        shutil.copy(infile3, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        # heatmap
-        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
-        v.spatial_reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
-
-        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
-        self.__logger.debug(boxplot_pngs)
+        n_metrics = len(globals.METRICS.keys())
         assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]

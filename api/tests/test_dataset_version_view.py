@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from api.tests.test_helper import *
 
-
 class TestDatasetVersionView(TestCase):
     __logger = logging.getLogger(__name__)
     fixtures = ['datasets', 'filters', 'versions', 'variables']
@@ -20,14 +19,14 @@ class TestDatasetVersionView(TestCase):
         # check all the versions
         response = self.client.get(dataset_version_url)
         assert response.status_code == 200
-        assert len(response.json()) == 33  # todo: drop check, must be changed for each new dataset?
+        assert len(response.json()) > 0
 
         # check for logged out
         self.client.logout()
 
         response = self.client.get(dataset_version_url)
         assert response.status_code == 200
-        assert len(response.json()) == 33 # todo: drop check, must be changed for each new dataset?
+        assert len(response.json()) > 0
 
     def test_dataset_version_by_dataset(self):
         dataset_version_by_dataset_url_name = 'Dataset version by dataset'
