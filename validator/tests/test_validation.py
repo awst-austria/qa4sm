@@ -1528,7 +1528,6 @@ class TestValidation(TestCase):
         n_metrics = len(globals.METRICS.keys())
         assert len(boxplot_pngs) == n_metrics
 
-        from qa4sm_reader.globals import metadata
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
