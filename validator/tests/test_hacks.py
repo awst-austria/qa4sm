@@ -3,10 +3,12 @@ Because even (or especially?) hacks should be tested
 '''
 
 from pathlib import Path
+import os
 
 from c3s_sm.interface import C3STs as c3s_read
 from django.test import TestCase
 from ismn.interface import ISMN_Interface
+from ismn.custom import CustomSensorMetadataCsv
 
 import numpy as np
 from validator.hacks import TimezoneAdapter
@@ -27,6 +29,24 @@ class TestHacks(TestCase):
 
     def setUp(self):
         set_dataset_paths()
+
+    @staticmethod
+    def gen_ismn_interface(ismn_data_folder):
+        if os.path.isfile(os.path.join(ismn_data_folder, 'frm_classification.csv')):
+            custom_meta_readers = [
+                CustomSensorMetadataCsv(
+                    os.path.join(ismn_data_folder, 'frm_classification.csv'),
+                    fill_values={'frm_class': 'undeducible'},
+                ),
+            ]
+        else:
+            custom_meta_readers = None
+
+        reader = ISMN_Interface(ismn_data_folder,
+                                custom_meta_reader=custom_meta_readers)
+
+        return reader
+
 
     def test_timezone_adapter(self):
         c3s_storage_path = Path(Dataset.objects.get(short_name='C3S_combined').storage_path)
@@ -49,7 +69,7 @@ class TestHacks(TestCase):
         cleanup_metadata(ismn_storage_path)
 
         ismn_data_folder = ismn_storage_path.joinpath('ISMN_V20191211')
-        ismn_reader = ISMN_Interface(ismn_data_folder)
+        ismn_reader = self.gen_ismn_interface(ismn_data_folder)
 
         timezone_reader2 = TimezoneAdapter(ismn_reader)
 

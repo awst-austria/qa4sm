@@ -211,6 +211,7 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('M_AVA0')
                 continue
 
+
     # meaning these are parametrized filters
     except AttributeError:
         for fil in filters:

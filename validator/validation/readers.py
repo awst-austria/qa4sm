@@ -7,6 +7,7 @@ from ecmwf_models.interface import ERATs
 from esa_cci_sm.interface import CCITs
 from gldas.interface import GLDASTs
 from ismn.interface import ISMN_Interface
+from ismn.custom import CustomSensorMetadataCsv
 from smap_io.interface import SMAPTs
 from smos.smos_ic.interface import SMOSTs
 from pynetcf.time_series import GriddedNcTs
@@ -33,7 +34,17 @@ def create_reader(dataset, version) -> GriddedNcTs:
     folder_name = path.join(dataset.storage_path, version.short_name)
 
     if dataset.short_name == globals.ISMN:
-        reader = ISMN_Interface(folder_name)
+        if path.isfile(path.join(folder_name, 'frm_classification.csv')):
+            custom_meta_readers = [
+                CustomSensorMetadataCsv(
+                    path.join(folder_name, 'frm_classification.csv'),
+                    fill_values={'frm_class': 'undeducible'},
+                ),
+            ]
+        else:
+            custom_meta_readers = None
+        reader = ISMN_Interface(folder_name,
+                                custom_meta_reader=custom_meta_readers)
 
     if dataset.short_name == globals.C3SC:
         c3s_data_folder = path.join(folder_name, 'TCDR/063_images_to_ts/combined-daily')
@@ -42,7 +53,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if (dataset.short_name == globals.CCIC or
         dataset.short_name == globals.CCIA or
         dataset.short_name == globals.CCIP):
-        reader = CCITs(folder_name, ioclass_kws={'read_bulk':True})
+        reader = CCITs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.GLDAS:
         reader = GLDASTs(folder_name, ioclass_kws={'read_bulk': True})
@@ -56,7 +67,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
         ascat_grid_path = first_file_in(path.join(folder_name, 'grid'), '.nc')
         fn_format = "{:04d}"
         reader = AscatGriddedNcTs(path=ascat_data_folder, fn_format=fn_format,
-                                  grid_filename=ascat_grid_path, static_layer_path=None,
+                                  grid_filename=ascat_grid_path,
+                                  static_layer_path=None,
                                   ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_IC:
