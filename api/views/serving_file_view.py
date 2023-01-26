@@ -95,12 +95,13 @@ def get_metric_names_and_associated_files(request):
     response = []
 
     for metric_ind, key in enumerate(metrics):
-        boxplot_file = ''
-        boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
-
         # 'n_obs' doesn't refer to datasets, so I create a list with independent metrics, if there are other similar
         # metrics it's just enough to add them here:
         independent_metrics = ['n_obs']
+        no_boxplot_metric = ['status']
+
+        boxplot_file = ''
+        boxplot_file_name = 'boxplot_' + metrics[key] + '.png' if key not in no_boxplot_metric else None
 
         if metrics[key] not in independent_metrics:
             overview_plots = [{'file_name': 'overview_' + name_key + '_' + metrics[key] + '.png',
@@ -134,6 +135,8 @@ def get_metric_names_and_associated_files(request):
                        'metadata_files': [],
                        'datasets': datasets,
                        }
+        print(metric_dict)
+        print(boxplot_dicts)
         response.append(metric_dict)
     #
     return JsonResponse(response, status=200, safe=False)
