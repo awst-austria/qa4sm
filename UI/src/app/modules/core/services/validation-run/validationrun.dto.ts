@@ -39,7 +39,8 @@ export class ValidationrunDto{
               public is_a_copy: boolean,
               public bootstrap_tcol_cis: boolean,
               public temporal_matching: number,
-              public comparison_label?: string) {
+              public comparison_label?: string,
+              public contains_user_data?: boolean) {
   }
 }
 
