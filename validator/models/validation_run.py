@@ -238,6 +238,12 @@ class ValidationRun(models.Model):
 
         return label
 
+    @property
+    def contains_user_data(self):
+        user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
+        return len(user_data) > 0
+
+
 
 # delete model output directory on disk when model is deleted
 @receiver(post_delete, sender=ValidationRun)
