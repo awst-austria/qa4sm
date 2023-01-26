@@ -194,6 +194,8 @@ def create_jobs(
                 validation_run.min_lon, validation_run.max_lat, validation_run.max_lon
             )
 
+            meta_list = np.array(meta_list)[index]
+
             if len(gpis) > 0:
                 jobs.append((gpis, lons, lats, meta_list))
                 total_points += len(gpis)
