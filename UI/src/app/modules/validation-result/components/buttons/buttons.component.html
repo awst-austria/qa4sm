@@ -220,7 +220,7 @@
       </button>
     </ng-template>
 
-    <button *ngIf="validationRun.output_file"
+    <button *ngIf="validationRun.output_file && !validationRun.contains_user_data"
             pButton
             type="button"
             icon="pi pi-book"
