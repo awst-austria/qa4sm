@@ -172,7 +172,7 @@
           <li *ngIf="!forComparison" [ngClass]="{'alert-danger': errorRate > 0}">
             for {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
             of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
-            not be calculated.
+            not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the 'Result files' section.
           </li>
         </ng-template>
         <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user  && !forComparison">
