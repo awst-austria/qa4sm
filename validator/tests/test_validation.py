@@ -322,8 +322,9 @@ class TestValidation(TestCase):
 
         overview_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        # n_obs + one for each data set for all other metrics
-        assert len(overview_pngs) == 1 + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
+        # n_obs + error_plot for each non ref. dataset + one for each data set for all other metrics
+        tcol_plots = 0 if not tcol_metrics else (n_datasets - 1)
+        assert len(overview_pngs) == 2 + tcol_plots + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
