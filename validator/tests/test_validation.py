@@ -195,7 +195,9 @@ class TestValidation(TestCase):
                 self.__logger.debug(f'Metric variables for metric {metric} are {[m.name for m in metric_vars]}')
 
                 # check that all metrics have the same number of variables (depends on number of input datasets)
-                if metric in comm_metrics:
+                if metric == 'status':
+                    num_vars = 3
+                elif metric in comm_metrics:
                     num_vars = 1
                 elif metric in pair_metrics:
                     num_vars = n_datasets - 1
@@ -317,14 +319,16 @@ class TestValidation(TestCase):
 
         # check diagrams
         boxplot_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == len(globals.METRICS.keys()) + (len(tcol_metrics) * (n_datasets - 1))
+        # for status plot there is no boxplot
+        assert len(boxplot_pngs) == (len(globals.METRICS.keys()) - 1) + (len(tcol_metrics) * (n_datasets - 1))
 
         overview_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         # n_obs + error_plot for each non ref. dataset + one for each data set for all other metrics
-        tcol_plots = 0 if not tcol_metrics else (n_datasets - 1)
-        assert len(overview_pngs) == 2 + tcol_plots + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
+        # tcol_plots = 0 if not tcol_metrics else (n_datasets - 1)
+        assert len(overview_pngs) == 1 + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -549,13 +553,11 @@ class TestValidation(TestCase):
             config.save()
 
         run_id = run.id
-        print(run_id)
 
         ## run the validation
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
@@ -591,13 +593,11 @@ class TestValidation(TestCase):
             config.save()
 
         run_id = run.id
-        print(run_id)
 
         ## run the validation
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
@@ -644,7 +644,7 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
+
         assert new_run
 
         assert new_run.total_points == 140, "Number of gpis is off"
@@ -690,7 +690,7 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
+
         assert new_run
 
         assert new_run.total_points == 15, "Number of gpis is off"
@@ -731,7 +731,7 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
+
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
@@ -1110,7 +1110,6 @@ class TestValidation(TestCase):
         ## readers
         with pytest.raises(ValueError):
             no_reader = val.create_reader(dataset, version)
-            print(no_reader)
 
         ## save config
         validation_run = ValidationRun()
@@ -1372,9 +1371,7 @@ class TestValidation(TestCase):
                     ref_reader,
                     run.spatial_reference_configuration
                 )
-                print(version)
-                print(len(jobs))
-                print(total_points)
+
                 if dataset.short_name == "ISMN":
                     self._check_jobs(total_points, jobs, metadata_present=True)
                 else:
@@ -1569,18 +1566,15 @@ class TestValidation(TestCase):
         meta_boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')]
         self.__logger.debug(meta_boxplot_pngs)
         # no meta box plots for r_p & rho_p
-        # TODO: update this formula once all the plots are properly added
-        assert len(meta_boxplot_pngs) == 48 #(n_metrics - 2) * n_metas
+        assert len(meta_boxplot_pngs) == (n_metrics - 2) * n_metas
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        # TODO: update this formula once all the plots are properly added
-        assert len(boxplot_pngs) == 61 #n_metrics + (n_metas * (n_metrics - 2))
+        assert len(boxplot_pngs) == n_metrics + (n_metas * (n_metrics - 2))
 
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
-        # TODO: update this formula once all the plots are properly added
-        assert len(overview_pngs) == 14 #n_metrics * (v.dataset_configurations.count() - 1)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
         self.delete_run(v)
 
@@ -1714,7 +1708,6 @@ class TestValidation(TestCase):
             config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             if config.dataset.short_name == globals.ISMN:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            print('old one', config.dataset == globals.ISMN, config, config.filters.all())
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
                                      dataset_config=run_filt.spatial_reference_configuration)
