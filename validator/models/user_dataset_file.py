@@ -9,7 +9,7 @@ from validator.models.custom_user import User
 from validator.models.dataset_configuration import DatasetConfiguration
 from os import path
 import uuid
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, pre_delete
 from django.dispatch.dispatcher import receiver
 from shutil import rmtree
 import os
@@ -27,11 +27,12 @@ class UserDatasetFile(models.Model):
     file = models.FileField(null=True, blank=True, storage=key_store, upload_to=upload_directory)
     file_name = models.CharField(max_length=100, blank=True, null=True)
     owner = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE, null=True)
-    dataset = models.ForeignKey(Dataset, related_name='dataset', on_delete=models.SET_NULL, null=True)
-    version = models.ForeignKey(DatasetVersion, related_name='version', on_delete=models.SET_NULL, null=True)
-    variable = models.ForeignKey(DataVariable, related_name='variable', on_delete=models.SET_NULL, null=True)
+    dataset = models.ForeignKey(Dataset, related_name='user_dataset', on_delete=models.SET_NULL, null=True)
+    version = models.ForeignKey(DatasetVersion, related_name='user_version', on_delete=models.SET_NULL, null=True)
+    variable = models.ForeignKey(DataVariable, related_name='user_variable', on_delete=models.SET_NULL, null=True)
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
+
 
     @property
     def get_raw_file_path(self):
@@ -45,6 +46,16 @@ class UserDatasetFile(models.Model):
     @property
     def file_size(self):
         return self.file.size
+
+
+@receiver(pre_delete, sender=UserDatasetFile)
+def auto_delete_dataset_version_variable(sender, instance, **kwargs):
+    if instance.dataset:
+        instance.dataset.delete()
+    if instance.version:
+        instance.version.delete()
+    if instance.variable:
+        instance.variable.delete()
 
 
 @receiver(post_delete, sender=UserDatasetFile)
