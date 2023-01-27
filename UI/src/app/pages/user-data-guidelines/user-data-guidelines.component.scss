@@ -1,13 +1,14 @@
 @import "src/styles";
 
 main{
-  max-width: 60rem;
+  max-width: 50rem;
 }
 
 div {
   text-align: center;
 }
 .yml {
+  padding: 0.3rem;
   text-align: left;
   width: 15rem;
   margin-left: 5rem;
@@ -23,7 +24,9 @@ img {
 table, th, td {
   border:1px solid black;
   border-collapse: collapse;
+  padding: 0.3rem;
 }
+
 
 
 //.w3-round{

@@ -43,6 +43,13 @@ export class HelpComponent implements OnInit, AfterViewInit {
   datsetConfigurationComparison: string;
   validationSelectionsComparison: string;
   spatialExtentComparison: string;
+  chosenFile: string;
+  selectFile: string;
+  uploadFileWindow: string;
+  metadataWindow: string;
+  uploadingSpinner: string;
+  dataRow: string;
+  userDataOnTheList: string;
 
   constructor(private globalParamsService: GlobalParamsService,
               public settingsService: SettingsService,
@@ -89,6 +96,13 @@ export class HelpComponent implements OnInit, AfterViewInit {
     this.datsetConfigurationComparison = plotsUrlPrefix + 'dataset-configuration-for-comparison.png';
     this.validationSelectionsComparison = plotsUrlPrefix + 'validation-selection-comparison.png';
     this.spatialExtentComparison = plotsUrlPrefix + 'spatial-extent-comparison.png';
+    this.metadataWindow = plotsUrlPrefix + 'metadata_window.png';
+    this.uploadFileWindow = plotsUrlPrefix + 'upload_file_window.png';
+    this.selectFile = plotsUrlPrefix + 'select_file.png';
+    this.chosenFile = plotsUrlPrefix + 'chosen_file.png';
+    this.uploadingSpinner = plotsUrlPrefix + 'uploading_spinner.png';
+    this.dataRow = plotsUrlPrefix + 'data_row.png';
+    this.userDataOnTheList = plotsUrlPrefix + 'user_data_on_the_list.png';
   }
 
   getAdminMail(): string {
