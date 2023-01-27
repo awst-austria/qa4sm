@@ -71,6 +71,7 @@ import {InputNumberModule} from 'primeng/inputnumber';
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
 import {ValidationReferenceModule} from './modules/validation-reference/validation-reference.module';
+import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import {ValidationReferenceModule} from './modules/validation-reference/validati
     PasswordResetValidateTokenComponent,
     TemporalMatchingComponent,
     MyDatasetsComponent,
+    UserDataGuidelinesComponent,
   ],
   imports: [
     LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),

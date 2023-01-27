@@ -7,7 +7,7 @@
     <a pageScroll="" [pageScrollDuration]="1" href="#publishing">Publishing</a><br/>
     <a pageScroll="" [pageScrollDuration]="1" href="#published">Published Validations Page</a><br/>
     <a pageScroll="" [pageScrollDuration]="1" href="#comparison">Validation Comparison</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#file-standard">User Data File</a><br/>
+    <a pageScroll="" [pageScrollDuration]="1" href="#user-data-upload">User Data Upload</a><br/>
   </p>
 
   <a id="manual"></a>
@@ -608,12 +608,63 @@
     one more time.
   </p>
 
-  <a id="file-standard"></a>
-  <h1 class="h3 mb-3 font-weight-normal">User Data File</h1>
-
+  <a id="user-data-upload"></a>
+  <h1 class="h3 mb-3 font-weight-normal">User Data Upload Procedure</h1>
   <p>
-  Here we will provide information about the file standard for our users.
+    To upload your go to 'My datasets' page, by clicking proper button on the navigation bar.
   </p>
+  <div>
+    <img alt="select-file" class="scaled_image p-mb-3" [src]="selectFile">
+  </div>
+  <p>
+    Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be able
+    to choose only .netCDF or .zip files, both types need to follow the standard described
+    <a target="_blank" [routerLink]="['/user-data-guidelines']">here.</a>
+  </p>
+  <div>
+    <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadFileWindow">
+  </div>
+  <p>
+    When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version names.
+    Additionally you can introduce display names for both dataset and its version, which is going to be used on the list of available datasets.
+    If the display name is not provided, the basic name is going to be used.
+  </p>
+  <div>
+    <img alt="select-file" class="scaled_image p-mb-3" [src]="metadataWindow">
+  </div>
+  <p>
+    If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided information, click 'Save' button.
+    Clicking 'Save' button will close the metadata form, but won't start uploading yet. To start uploading, click the 'Upload file' button.
+  </p>
+  <div>
+    <img alt="select-file" class="scaled_image p-mb-3" [src]="chosenFile">
+  </div>
+  <p>
+    Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a blue spinner and information
+    about the percentage of uploaded file. Eventually an information will show up that the file has been uploaded, but it still needs to be pre-processed.
+  </p>
+  <div>
+    <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadingSpinner">
+  </div>
+  <p>
+    When the file gets uploaded and preprocessed, there will show up a row with basic information on the uploaded file.
+    You'll be able to change the dataset's name, the version's name and choose a different variable, if the default one is inproper.
+    By clicking 'Remove dataset' button, you will remove the uploaded file. Note, that removing is possible only if the uploaded data
+    hasn't been used for any validation.
+  </p>
+  <div>
+    <img alt="select-file" class="scaled_image p-mb-3" style="scale: 1.2" [src]="dataRow">
+  </div>
+  <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown list. Your dataset will be there.</p>
+  <div>
+    <img alt="select-file" class="scaled_image p-mb-3" style="scale: 0.9" [src]="userDataOnTheList">
+  </div>
+  <p>
+    Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation that uses private data.
+    You can still share your validation with another user, but they won't be able to rerun it, as they don't have access to your dataset.
+  </p>
+
+
   <qa-scroll-to-top></qa-scroll-to-top>
 </main>
 
