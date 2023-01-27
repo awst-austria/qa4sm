@@ -1,0 +1,23 @@
+@import "src/styles";
+
+main{
+  max-width: 40rem;
+}
+
+div {
+  text-align: center;
+}
+
+img {
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+
+table, th, td {
+  border:1px solid black;
+}
+
+//.w3-round{
+//  align-content: center;
+//}
+
