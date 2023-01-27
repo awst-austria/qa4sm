@@ -44,6 +44,7 @@ from validator.validation.batches import _geographic_subsetting, create_upscalin
 from validator.validation.globals import METRICS, TC_METRICS, METADATA_PLOT_NAMES
 from validator.validation.globals import OUTPUT_FOLDER
 from django.shortcuts import get_object_or_404
+from math import comb
 
 User = get_user_model()
 
@@ -196,7 +197,8 @@ class TestValidation(TestCase):
 
                 # check that all metrics have the same number of variables (depends on number of input datasets)
                 if metric == 'status':
-                    num_vars = 3
+                    # for status we generate 1 plot for non-spatial-reference dataset and one for each tcol combination
+                    num_vars = (n_datasets - 1) + is_tcol_run * comb(n_datasets - 1, 2)
                 elif metric in comm_metrics:
                     num_vars = 1
                 elif metric in pair_metrics:
