@@ -51,6 +51,7 @@ export class NavigationBarComponent implements OnInit {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
           {label: 'About', icon: 'pi pi-fw pi-info', routerLink: ['about']},
           {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']},
+          {label: 'Upload Data Help', icon: 'pi pi-fw pi-server', routerLink: ['user-data-guidelines']},
           {
             label: 'User Manual',
             icon: 'pi pi-fw pi-book',
