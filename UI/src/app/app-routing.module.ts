@@ -25,6 +25,7 @@ import {
   PasswordResetValidateTokenComponent
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
+import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 
 
 const routes: Routes = [
@@ -49,6 +50,7 @@ const routes: Routes = [
   {path: 'password-reset/:token', component: PasswordResetValidateTokenComponent},
   {path: 'set-password', component: SetPasswordComponent},
   {path: 'my-datasets', component: MyDatasetsComponent, canActivate: [AuthGuard]},
+  {path: 'user-data-guidelines', component: UserDataGuidelinesComponent},
   {path: '**', component: ErrorComponent}
 ];
 
