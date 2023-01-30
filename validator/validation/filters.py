@@ -249,9 +249,6 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
     masking_filters = []
     adapter_kwargs = dict()
 
-    if dataset.short_name in ["SMOSL2_v700"]:
-        adapter_kwargs.update({"ignore_nans": True})
-
     for pfil in param_filters:
         __logger.debug(
             f"Setting up parametrised filter {pfil.filter.name} for "
