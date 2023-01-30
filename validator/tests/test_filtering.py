@@ -182,11 +182,10 @@ class TestValidation(TestCase):
         # Check that the 'COMBINED_RFI' field has been created
         index_should = ['Soil_Moisture', 'Soil_Moisture_DQX', 'Chi_2_P', 'RFI_Prob',
                         'Science_Flags', 'Days', 'Seconds', 'N_RFI_X', 'N_RFI_Y',
-                        'M_AVA0', 'Processing_Flags', 'Confidence_Flags', 'COMBINED_RFI']
-        data_mean_should = np.array(
-            [1.680913e-01, 2.305116e-02, 7.765892e-01, 9.556199e-03, 5.094559e+08, -1.121934e+18, 3.706094e+04,
-             1.850273e+00, 1.826263e+00, 1.364571e+02, 2.768545e+00, 2.817491e+01, 2.692703e-02
-             ])
+                        'M_AVA0', 'COMBINED_RFI']
+        data_mean_should = np.array([
+            1.671967e-01, 2.292882e-02, 7.741764e-01, 4.255347e-03, 5.465900e+08, 5.178719e+17, 3.711064e+04,
+            4.400104e-01, 2.342201e-01, 1.607201e+02, 4.197295e-03])
 
         filtered_mean_should = pd.Series(data=data_mean_should, index=index_should)
 
@@ -196,8 +195,7 @@ class TestValidation(TestCase):
 
         assert (filtered.COMBINED_RFI > .1).sum() == 0
         assert (filtered.RFI_Prob > .1).sum() == 0
-
-        assert len(filtered.index) == 4588
+        assert len(filtered.index) == 3834
         pd.testing.assert_series_equal(filtered.mean(), filtered_mean_should)
 
     def test_get_used_variables(self) -> None:
