@@ -1,5 +1,6 @@
 import logging
 from os import path
+import numpy as np
 
 from ascat.read_native.cdr import AscatGriddedNcTs
 from c3s_sm.interface import C3STs as c3s_read
@@ -18,10 +19,41 @@ from qa4sm_preprocessing.reading import GriddedNcOrthoMultiTs, GriddedNcContiguo
 from validator.validation import globals
 from validator.validation.util import first_file_in
 
-from pytesmo.validation_framework.adapters import TimestampAdapter
+from pytesmo.validation_framework.adapters import TimestampAdapter, BasicAdapter
 from validator.models import UserDatasetFile
 
 __logger = logging.getLogger(__name__)
+
+
+class SMOSL2_FillnaAdapter(BasicAdapter):
+    """
+    Adapts the reading of SMOS L2 since NaNs should be considered
+    0.0 (special case)
+    """
+
+    def __init__(
+            self,
+            cls,
+            **kwargs,
+    ):
+        """
+        Parameters
+        ----------
+        cls : object
+            Reader object, has to have a `read_ts` or `read` method or a
+            method name must be specified in the `read_name` kwarg.
+            The same method will be available for the adapted version of the
+            reader.
+        """
+
+        super().__init__(cls, **kwargs)
+
+    def _adapt(self, data):
+        data = super()._adapt(data)
+
+        # if DataFrame is empty, needs to be returned in expected format
+        data = data[~np.isnan(data.Soil_Moisture)].fillna(.0)
+        return data
 
 
 def create_reader(dataset, version) -> GriddedNcTs:
@@ -51,8 +83,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = c3s_read(c3s_data_folder, ioclass_kws={'read_bulk': True})
 
     if (dataset.short_name == globals.CCIC or
-        dataset.short_name == globals.CCIA or
-        dataset.short_name == globals.CCIP):
+            dataset.short_name == globals.CCIA or
+            dataset.short_name == globals.CCIP):
         reader = CCITs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.GLDAS:
@@ -72,7 +104,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
                                   ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_IC:
-        reader = SMOSTs(folder_name, ioclass_kws={'read_bulk':True})
+        reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.ERA5:
         reader = ERATs(folder_name, ioclass_kws={'read_bulk': True})
@@ -91,6 +123,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if dataset.short_name == globals.SMOS_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
+        reader = SMOSL2_FillnaAdapter(reader)
 
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
@@ -100,7 +133,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
         if file.file_name.endswith('nc') or file.file_name.endswith('nc4'):
             reader = GriddedNcOrthoMultiTs(file.get_raw_file_path + "/timeseries", ioclass_kws={'read_bulk': True})
         elif file.file_name.endswith('zip'):
-            reader = GriddedNcContiguousRaggedTs(file.get_raw_file_path + "/timeseries", ioclass_kws={'read_bulk': True})
+            reader = GriddedNcContiguousRaggedTs(file.get_raw_file_path + "/timeseries",
+                                                 ioclass_kws={'read_bulk': True})
 
     if not reader:
         raise ValueError("Reader for dataset '{}' not available".format(dataset))

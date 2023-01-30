@@ -247,6 +247,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
     filtered_reader = reader
 
     masking_filters = []
+    adapter_kwargs = dict()
 
     for pfil in param_filters:
         __logger.debug(
@@ -473,7 +474,7 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
     if len(masking_filters):
         filtered_reader = AdvancedMaskingAdapter(filtered_reader, masking_filters,
-                                                 read_name=read_name)
+                                                 read_name=read_name, **adapter_kwargs)
     else:
         filtered_reader = BasicAdapter(filtered_reader, read_name=read_name)
 
