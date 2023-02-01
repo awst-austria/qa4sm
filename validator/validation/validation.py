@@ -514,7 +514,7 @@ def run_validation(validation_id):
         # once all tasks are finished:
         # only store parameters and produce graphs if validation wasn't cancelled and
         # we have metrics for at least one gpi - otherwise no netcdf output file
-        if (not validation_aborted) and (validation_run.ok_points > 0):
+        if (not validation_aborted):
             set_outfile(validation_run, run_dir)
             validation_run.save()
             save_validation_config(validation_run)
