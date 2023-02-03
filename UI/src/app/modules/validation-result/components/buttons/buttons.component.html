@@ -258,7 +258,7 @@
 
   <ng-template #elseSingleValidation>
     <div style="float: right;">
-      <button *ngIf="isLogged && validationRun.is_unpublished" pButton
+      <button *ngIf="isLogged && validationRun.is_unpublished && !validationRun.contains_user_data" pButton
               type="button"
               icon="pi pi-copy"
               class="btn-action-large"
@@ -267,8 +267,14 @@
               label="Copy validation"
               (click)="copy(validationRun.id)">
       </button>
+      <em style="color: orangered" *ngIf="validationRun.contains_user_data">You can not copy nor reload this validation, because it contains data belonging to another user.</em>
 
-      <a *ngIf="isLogged"
+
+<!--      <p-tooltip [disabled]="!buttonEnabled" [tooltipPosition]="'top'" [content]="'Button is disabled'">-->
+<!--        <button pButton type="button" label="Button" [disabled]="!buttonEnabled"></button>-->
+<!--      </p-tooltip>-->
+
+      <a *ngIf="isLogged && !validationRun.contains_user_data"
          pButton
          type="button"
          icon="pi pi-replay"
