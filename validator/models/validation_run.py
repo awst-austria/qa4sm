@@ -145,7 +145,6 @@ class ValidationRun(models.Model):
     def is_unpublished(self):
         return not self.doi
 
-
     def archive(self, unarchive=False, commit=True):
         if unarchive:
             self.extend_lifespan(commit=False)
@@ -225,24 +224,28 @@ class ValidationRun(models.Model):
             return self.name_tag
 
         configs = DatasetConfiguration.objects.filter(validation=self.id)
-        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.spatial_reference_configuration.id]
-        t = self.start_time
-        minute = str(t.minute)
-        if t.minute < 10:
-            minute = '0' + minute
-        label = 'Validation date: ' + str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(
-            t.hour) + ':' + minute + ', Non-reference-dataset: '
+        datasets = [conf.dataset.short_name + ', ' for conf in configs if
+                    conf.id != self.spatial_reference_configuration.id]
+
+        label = f"Validation date: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}, Non-reference-dataset: "
         for dataset in datasets:
             label += dataset
         label = label.strip(', ')
 
         return label
 
+    def user_data_panel_label(self):
+        if self.name_tag is not None and self.name_tag:
+            return self.name_tag
+        config = DatasetConfiguration.objects.filter(validation=self.id).get(is_spatial_reference=True)
+        label = f"Started: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}, Spatial-reference: " \
+               f"{config.dataset.short_name}"
+        return label
+
     @property
     def contains_user_data(self):
         user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
         return len(user_data) > 0
-
 
 
 # delete model output directory on disk when model is deleted

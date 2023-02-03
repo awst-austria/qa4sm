@@ -120,7 +120,28 @@
       </div>
     </div>
     <!-- coordinates - we don't show coordinates anymore, but I'll leave this space here-->
-    <div class="p-col">
+    <div class="p-col-5" [style]="{height: '100%'}">
+      <div><strong>Validation list: </strong></div>
+      <p-scrollPanel [style]="{width: '100%', height: '100px'}">
+              <div *ngFor="let validation of userDataset.validation_list">
+                  <a routerLink="/validation-result/{{validation.val_id}}"
+                     pTooltip="View validation">{{validation.val_name}}</a>
+              </div>
+      </p-scrollPanel>
+
+
+<!--      </span>-->
+<!--      <p-dropdown-->
+<!--        id="vvalidation-list"-->
+<!--        class="form-field"-->
+<!--        [options]="(userDataset.validation_list)"-->
+<!--        [style]="{'width':'6rem', 'height': '2rem'}"-->
+<!--        optionLabel="val_name"-->
+<!--        placeholder="Choose"-->
+<!--        ngDefaultControl>-->
+<!--      </p-dropdown>-->
+
+
 
     </div>
     <!-- actions   -->

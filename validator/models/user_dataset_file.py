@@ -44,6 +44,11 @@ class UserDatasetFile(models.Model):
         return self.dataset.id in configs.values_list('dataset', flat=True)
 
     @property
+    def validation_list(self):
+        configs = DatasetConfiguration.objects.filter(dataset=self.dataset)
+        return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in configs]
+
+    @property
     def file_size(self):
         return self.file.size
 
