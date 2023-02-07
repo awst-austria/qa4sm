@@ -11,6 +11,7 @@ import {DropdownModule} from 'primeng/dropdown';
 import {UserDataRowComponent} from './components/user-data-row/user-data-row.component';
 import {PanelModule} from 'primeng/panel';
 import {AllowedNameDirective} from './services/allowed-name.directive';
+import {ScrollPanelModule} from 'primeng/scrollpanel';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import {AllowedNameDirective} from './services/allowed-name.directive';
         TooltipModule,
         DropdownModule,
         FormsModule,
-        PanelModule
+        PanelModule,
+        ScrollPanelModule
     ]
 })
 export class UserDatasetsModule { }

@@ -1,4 +1,4 @@
-<p-panel class="validation-row">
+<p-panel class="user-data-row">
 
   <ng-template pTemplate="header">
     <h5 class="p-my-0"><span class="font-weight-normal">Size: </span> {{ getTheFileSize() }}</h5>
@@ -7,7 +7,7 @@
     <h5 class="p-my-0"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
     </h5>
   </ng-template>
-  <div class="p-grid p-mx-0 p-px-0 p-my-0">
+  <div class="p-grid p-mx-0 p-px-0 p-my-0" [style]="{height: '100%'}">
     <!--    dataset -->
     <div class="p-col-5">
       <div><strong>Dataset: </strong></div>
@@ -119,16 +119,24 @@
         </button>
       </div>
     </div>
-    <!-- coordinates - we don't show coordinates anymore, but I'll leave this space here-->
-    <div class="p-col">
-
+    <!-- validations -->
+    <div class="p-col-5 p-fluid" [style]="{height: '100%'}">
+      <div><strong>Validation list: </strong></div>
+      <p-scrollPanel *ngIf="userDataset.validation_list.length > 0" [style]="{width: '80%', height: '80%'}">
+              <div *ngFor="let validation of userDataset.validation_list; index as ind">
+                 {{ind + 1}}) <a routerLink="/validation-result/{{validation.val_id}}"
+                     pTooltip="View validation">{{validation.val_name}}</a>
+              </div>
+      </p-scrollPanel>
+      <div id="no-validation-box" *ngIf="userDataset.validation_list.length == 0">
+       <em> No validation has been run with this data </em>
+      </div>
     </div>
     <!-- actions   -->
     <div class="p-col status">
       <div
         [pTooltip]="userDataset.is_used_in_validation ? 'Dataset has been used in a validation, it can not be removed' : ''"
-        tooltipPosition="left"
-      >
+        tooltipPosition="left">
         <button pButton
                 icon="pi pi-times"
                 type="button"
