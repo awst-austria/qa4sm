@@ -238,7 +238,7 @@ class ValidationRun(models.Model):
         if self.name_tag is not None and self.name_tag:
             return self.name_tag
         config = DatasetConfiguration.objects.filter(validation=self.id).get(is_spatial_reference=True)
-        label = f"Started: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}, Spatial-reference: " \
+        label = f"Date: {self.start_time.strftime('%Y-%m-%d')}, Spatial-reference: " \
                f"{config.dataset.short_name}"
         return label
 
