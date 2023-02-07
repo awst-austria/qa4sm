@@ -6135,11 +6135,11 @@ div.carousel-caption{
 
 /* Customizations to the designer theme should be defined here */
 
-.validation-row .p-panel .p-panel-header{
+.validation-row .p-panel .p-panel-header, .user-data-row .p-panel .p-panel-header{
   font-size: 1.5rem;
 }
 
-.validation-row .p-panel .p-panel-title{
+.validation-row .p-panel .p-panel-title, .user-data-row .p-panel .p-panel-title{
   width: 93%;
   text-align: center;
 }
@@ -6149,12 +6149,12 @@ div.carousel-caption{
   text-align: center;
 }
 
-.validation-row .p-panel .p-panel-header .p-panel-icons{
+.validation-row .p-panel .p-panel-header .p-panel-icons, .user-data-row .p-panel .p-panel-header .p-panel-icons{
   max-width: 30rem;
   text-align: right;
 }
 
-.validation-row .p-panel .p-panel-content {
+.validation-row .p-panel .p-panel-content, .user-data-row .p-panel .p-panel-content {
   padding: 0.5rem 0.75rem;
   border: 1px solid #dee2e6;
   background: #ffffff;
@@ -6162,6 +6162,10 @@ div.carousel-caption{
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
   border-top: 0 none;
+}
+
+.user-data-row .p-panel .p-panel-content{
+  height: 150px;
 }
 
 .btn-action.p-button {
@@ -6327,7 +6331,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   //  max-width: 30rem;
   //}
 
-  .validation-row .p-panel .p-panel-header h5{
+  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5{
     font-size: 1.25rem;
     max-width: 50vw;
   }
@@ -6346,7 +6350,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
 }
 
 @media screen and (max-width: 563.9px){
-  .validation-row .p-panel .p-panel-header h5{
+  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5{
     font-size: 1.125rem;
   }
 }
