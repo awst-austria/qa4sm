@@ -15,11 +15,13 @@
           <span>
             {{item.datasetModel.selectedDataset?.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})
           </span>
+          <em style="color: #6c757d" *ngIf="referenceType=='temporalReference$' && item.datasetModel.selectedDataset?.pretty_name === 'ISMN'"> (Not recommended)</em>
         </div>
       </ng-template>
       <ng-template let-item pTemplate="selectedItem">
         <div>
           <span>{{item.datasetModel.selectedDataset?.pretty_name}} ({{item.datasetModel.selectedVersion?.pretty_name}})</span>
+           <em style="color: #6c757d" *ngIf="referenceType=='temporalReference$' && item.datasetModel.selectedDataset?.pretty_name === 'ISMN'"> (Not recommended)</em>
         </div>
 
       </ng-template>

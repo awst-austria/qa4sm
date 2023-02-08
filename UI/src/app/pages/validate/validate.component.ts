@@ -160,8 +160,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     of({}).pipe(delay(0)).subscribe(() => {
       this.setDefaultGeographicalRange();
     });
-    this.addDatasetToValidate('ISMN', '20230110 global', true, true, true, true);
-    this.addDatasetToValidate();
+    this.addDatasetToValidate('ISMN',
+      '20230110 global', true, true, false, true);
+    this.addDatasetToValidate(undefined,
+      undefined, undefined, undefined, true);
   }
 
   private messageAboutConfigurationChanges(changes: ConfigurationChanges): string {
@@ -480,6 +482,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           newReference = ISMNList[0];
         }
       }
+      if (referenceType === 'temporalReference$'){
+        const nonISMNList = this.validationModel.datasetConfigurations
+          .filter(config => config.datasetModel.selectedDataset.short_name !== 'ISMN');
+        newReference = nonISMNList[0];
+      }
       if (referenceType === 'scalingReference$' && this.validationModel.scalingMethod.methodName === 'none') {
         newReference[referenceType].next(false);
       } else {
@@ -493,12 +500,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel === datasetConfig) {
         this.loadFiltersForModel(config);
+        if (datasetConfig.selectedDataset.pretty_name === 'ISMN' && config.temporalReference$.getValue()){
+          config.temporalReference$.next(false);
+        }
       }
       if (isThereISMN) {
         config.datasetModel.selectedDataset.pretty_name === 'ISMN' ? config.spatialReference$.next(true) :
           config.spatialReference$.next(false);
       }
     });
+    this.checkIfReferenceRemoved('temporalReference$');
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
