@@ -6,7 +6,7 @@
       </div>
       <div class="p-col-2 p-sm-2">
         <input type="file" class="file-input"
-               [accept]="'.zip,.nc,.nc4'"
+               [accept]="allowedExtensions.join(',')"
                (change)="onFileSelected($event)" #fileUpload>
         <span class="label-button">{{file ? file.name : "No file chosen yet."}}</span>
       </div>

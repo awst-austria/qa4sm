@@ -7,7 +7,8 @@ import {finalize} from 'rxjs/operators';
 import {HttpEventType} from '@angular/common/http';
 import {allowedNameValidator} from '../../services/allowed-name.directive';
 import * as uuid from 'uuid';
-
+// @ts-ignore
+import JSZip from 'jszip';
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -25,6 +26,7 @@ export class UserFileUploadComponent implements OnInit {
 
   uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   uploadSub: Subscription;
+  allowedExtensions = ['.zip', '.nc', '.nc4'];
 
   // dataset file form
   metadataForm = this.formBuilder.group({
@@ -42,12 +44,36 @@ export class UserFileUploadComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  private verifyZipContent(): void {
+    const zip = new JSZip();
+    zip.loadAsync(this.file).then(contents => {
+      const files = Object.keys(contents.files).filter(key =>
+        !['nc', 'nc4', 'csv', 'yml'].includes(key.split('.').reverse()[0]));
+      if (files.length !== 0){
+        this.toastService.showErrorWithHeader('File can not be uploaded',
+          'The zip file you are trying to upload contains files with no acceptable extensions (i.e. netCDF or csv + yml');
+        this.file = null;
+      }
+    });
+  }
+
   onFileSelected(event): void {
     this.file = event.target.files[0];
-    const fileExtension =  this.file.name.split('.').reverse()[0];
+    const fileExtension = this.file.name.split('.').reverse()[0];
+
+    if (!this.allowedExtensions.includes('.' + fileExtension)) {
+      this.file = null;
+      return null;
+    }
+
+    if (fileExtension === 'zip') {
+      this.verifyZipContent();
+    }
+
     this.fileName = `${uuid.v4()}.${fileExtension}`;
     this.dialogVisible = true;
     // I need to clean the selected file, otherwise there will be problem with choosing the same file next time
+    console.log(this.fileName);
     event.target.value = null;
   }
 
@@ -59,31 +85,31 @@ export class UserFileUploadComponent implements OnInit {
         .pipe(finalize(() => this.reset));
 
       this.uploadSub = upload$.subscribe(event => {
-        if (event.type === HttpEventType.UploadProgress) {
-          this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
-        } else if (event.type === HttpEventType.Response) {
-          this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
-              this.userDatasetService.refresh.next(true);
-              this.resetFile();
-            },
-            (message) => {
-              this.spinnerVisible = false;
-              this.toastService.showErrorWithHeader('Metadata not saved.',
-                `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
-            },
-            () => {
-              this.spinnerVisible = false;
-              this.metadataForm.reset('');
-            });
-        }
-      },
+          if (event.type === HttpEventType.UploadProgress) {
+            this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
+          } else if (event.type === HttpEventType.Response) {
+            this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
+                this.userDatasetService.refresh.next(true);
+                this.resetFile();
+              },
+              (message) => {
+                this.spinnerVisible = false;
+                this.toastService.showErrorWithHeader('Metadata not saved.',
+                  `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
+              },
+              () => {
+                this.spinnerVisible = false;
+                this.metadataForm.reset('');
+              });
+          }
+        },
         (message) => {
           this.spinnerVisible = false;
           console.log(message);
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
         }
-        );
+      );
     }
   }
 
@@ -91,7 +117,7 @@ export class UserFileUploadComponent implements OnInit {
     this.dialogVisible = false;
   }
 
-  resetFile(): void{
+  resetFile(): void {
     this.file = null;
     this.fileName = null;
   }
