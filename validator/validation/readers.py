@@ -25,37 +25,6 @@ from validator.models import UserDatasetFile
 __logger = logging.getLogger(__name__)
 
 
-class SMOSL2_FillnaAdapter(BasicAdapter):
-    """
-    Adapts the reading of SMOS L2 since NaNs should be considered
-    0.0 (special case)
-    """
-
-    def __init__(
-            self,
-            cls,
-            **kwargs,
-    ):
-        """
-        Parameters
-        ----------
-        cls : object
-            Reader object, has to have a `read_ts` or `read` method or a
-            method name must be specified in the `read_name` kwarg.
-            The same method will be available for the adapted version of the
-            reader.
-        """
-
-        super().__init__(cls, **kwargs)
-
-    def _adapt(self, data):
-        data = super()._adapt(data)
-
-        # if DataFrame is empty, needs to be returned in expected format
-        data = data[~np.isnan(data.Soil_Moisture)].fillna(.0)
-        return data
-
-
 def create_reader(dataset, version) -> GriddedNcTs:
     """
     Create basic readers (without any adapters / filters) for a dataset version
@@ -123,7 +92,6 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if dataset.short_name == globals.SMOS_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
-        reader = SMOSL2_FillnaAdapter(reader)
 
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
