@@ -39,7 +39,7 @@
             "short_name": "soil_moisture",
             "pretty_name": "ISMN_soil_moisture",
             "help_text": "",
-            "min_value": 0.0,
+            "min_value": 0.001,
             "max_value": 1.0
         }
     },
