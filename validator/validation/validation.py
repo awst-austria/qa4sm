@@ -142,6 +142,7 @@ def save_validation_config(validation_run):
             ds.setncattr('val_dc_dataset' + str(i), dataset_config.dataset.short_name)
             ds.setncattr('val_dc_version' + str(i), dataset_config.version.short_name)
             ds.setncattr('val_dc_variable' + str(i), dataset_config.variable.pretty_name)
+            ds.setncattr('val_dc_unit' + str(i), dataset_config.variable.unit)
 
             ds.setncattr('val_dc_dataset_pretty_name' + str(i), dataset_config.dataset.pretty_name)
             ds.setncattr('val_dc_version_pretty_name' + str(i), dataset_config.version.pretty_name)
