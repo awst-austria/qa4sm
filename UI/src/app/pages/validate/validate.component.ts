@@ -50,6 +50,7 @@ import {ScalingModel} from '../../modules/scaling/components/scaling/scaling-mod
 import {
   ValidationReferenceComponent
 } from '../../modules/validation-reference/components/validation-reference/validation-reference.component';
+import {AuthService} from '../../modules/core/services/auth/auth.service';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
@@ -108,6 +109,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   smosThresholdFilter = SMOS_RFI_FILTER_ID;
   highlightedDataset: DatasetConfigModel;
 
+  logInToValidate = false;
+
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
               private variableService: DatasetVariableService,
@@ -117,7 +120,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private router: Router,
               private route: ActivatedRoute,
               private modalWindowService: ModalWindowService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              public authService: AuthService) {
   }
 
   ngAfterViewInit(): void {
@@ -125,6 +129,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    // this.authService.authenticated.subscribe(authenticated => {
+    //   this.logInToValidate = !authenticated;
+    // });
     this.settingsService.getAllSettings().subscribe(setting => {
       this.maintenanceMode = setting[0].maintenance_mode;
     });
@@ -583,9 +590,19 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
       },
       errors => {
-        const validationErrorMessage = this.messageAboutValidationErrors(errors);
-        this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
+        if (this.authService.authenticated.getValue()){
+          const validationErrorMessage = this.messageAboutValidationErrors(errors);
+          this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
+        } else {
+          this.logInToValidate = !this.authService.authenticated.getValue();
+        }
       });
+  }
+
+  setLoggedIn(): void{
+    this.authService.authenticated.subscribe(authenticated => {
+      this.logInToValidate = !authenticated;
+    });
   }
 
   setDefaultGeographicalRange(): void {
