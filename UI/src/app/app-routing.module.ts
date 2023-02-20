@@ -32,7 +32,7 @@ const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
   {path: 'login', component: LoginComponent},
-  {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard], resolve: {datasets: DatasetResolver}},
+  {path: 'validate', component: ValidateComponent, resolve: {datasets: DatasetResolver}},
   {path: 'validation-result/:validationId', component: ValidationResultComponent},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
