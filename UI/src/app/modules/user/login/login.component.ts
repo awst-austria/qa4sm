@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {LoginDto} from '../../modules/core/services/auth/login.dto';
+import {AuthService} from '../../core/services/auth/auth.service';
+import {LoginDto} from '../../core/services/auth/login.dto';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {ToastService} from '../../modules/core/services/toast/toast.service';
+import {ToastService} from '../../core/services/toast/toast.service';
 
 
 @Component({

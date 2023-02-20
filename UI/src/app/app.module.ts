@@ -14,7 +14,7 @@ import {ErrorComponent} from './pages/error/error.component';
 
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
-import {LoginComponent} from './pages/login/login.component';
+import {LoginComponent} from './modules/user/login/login.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
 import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
@@ -72,6 +72,8 @@ import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
 import {ValidationReferenceModule} from './modules/validation-reference/validation-reference.module';
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
+import {DialogModule} from 'primeng/dialog';
+import {LoginPageComponent} from './pages/login-page/login-page.component';
 
 @NgModule({
   declarations: [
@@ -99,48 +101,50 @@ import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-dat
     TemporalMatchingComponent,
     MyDatasetsComponent,
     UserDataGuidelinesComponent,
+    LoginPageComponent,
   ],
-  imports: [
-    LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
-    NavigationBarModule,
-    FormsModule,
-    ReactiveFormsModule,
-    BrowserModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    DatasetModule,
-    NgbModule,
-    FontAwesomeModule,
-    ToastModule,
-    DropdownModule,
-    AccordionModule,
-    PanelModule,
-    TooltipModule,
-    ButtonModule,
-    PasswordModule,
-    InputTextModule,
-    FilterModule,
-    ToastModule,
-    ValidationResultModule,
-    SpatialSubsetModule,
-    TemporalMatchingModule,
-    CarouselModule,
-    ValidationPeriodModule,
-    MetricsModule,
-    AnomaliesModule,
-    ScalingModule,
-    NgxPaginationModule,
-    MapModule,
-    ComparisonModule,
-    IvyGalleryModule,
-    NgxPageScrollModule,
-    CoreModule,
-    UserModule,
-    InputNumberModule,
-    UserDatasetsModule,
-    ValidationReferenceModule,
-  ],
+    imports: [
+        LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
+        NavigationBarModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserModule,
+        HttpClientModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        DatasetModule,
+        NgbModule,
+        FontAwesomeModule,
+        ToastModule,
+        DropdownModule,
+        AccordionModule,
+        PanelModule,
+        TooltipModule,
+        ButtonModule,
+        PasswordModule,
+        InputTextModule,
+        FilterModule,
+        ToastModule,
+        ValidationResultModule,
+        SpatialSubsetModule,
+        TemporalMatchingModule,
+        CarouselModule,
+        ValidationPeriodModule,
+        MetricsModule,
+        AnomaliesModule,
+        ScalingModule,
+        NgxPaginationModule,
+        MapModule,
+        ComparisonModule,
+        IvyGalleryModule,
+        NgxPageScrollModule,
+        CoreModule,
+        UserModule,
+        InputNumberModule,
+        UserDatasetsModule,
+        ValidationReferenceModule,
+        DialogModule,
+    ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
