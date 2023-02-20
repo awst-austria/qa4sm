@@ -249,5 +249,11 @@
                           [isThereValidation]="isThereValidation"
                           (startValidation)="startValidation(false)">
   </qa-existing-validation>
+  <p-dialog id="log-in" [modal]="true" [(visible)]="logInToValidate">
+    <div>
+      <app-login (loggedIn)="setLoggedIn()"></app-login>
+    </div>
+
+  </p-dialog>
 </div>
 <qa-scroll-to-top></qa-scroll-to-top>
