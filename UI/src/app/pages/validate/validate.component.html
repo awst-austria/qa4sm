@@ -1,4 +1,16 @@
 <div class="p-grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
+  <div *ngIf="!(authService.authenticated|async)"
+       class="p-col-12 alert center">
+    <h5 class="p-pt-2">
+      You are not logged in!
+      You can still check validation options, but can not start a validation.
+      <a [routerLink]="'/login'" class="mt-5">Click here</a>
+      to log in or use
+      <a [routerLink]="'/signup'" class="mt-5">this form</a>
+      to register
+    </h5>
+
+  </div>
   <div class="
     p-col-12
     p-md-10 p-md-offset-1
@@ -249,7 +261,7 @@
                           [isThereValidation]="isThereValidation"
                           (startValidation)="startValidation(false)">
   </qa-existing-validation>
-  <p-dialog id="log-in" [modal]="true" [(visible)]="logInToValidate">
+  <p-dialog header="You need to be logged in to start a validation" id="log-in" [modal]="true" [(visible)]="logInToValidate">
     <div>
       <app-login (loggedIn)="setLoggedIn()"></app-login>
     </div>

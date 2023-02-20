@@ -121,7 +121,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private route: ActivatedRoute,
               private modalWindowService: ModalWindowService,
               private settingsService: SettingsService,
-              private authService: AuthService) {
+              public authService: AuthService) {
   }
 
   ngAfterViewInit(): void {
