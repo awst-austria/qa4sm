@@ -330,7 +330,7 @@ def create_pytesmo_validation(validation_run):
     val = Validation(
         datasets=datamanager,
         temporal_matcher=make_combined_temporal_matcher(
-            pd.Timedelta(temporalwindow_size, "H")
+            pd.Timedelta(temporalwindow_size / 2, "H")
         ),
         temporal_ref=temporal_ref_name,
         spatial_ref=spatial_ref_name,
