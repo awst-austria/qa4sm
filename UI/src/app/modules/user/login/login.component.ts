@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {LoginDto} from '../../modules/core/services/auth/login.dto';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {AuthService} from '../../core/services/auth/auth.service';
+import {LoginDto} from '../../core/services/auth/login.dto';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {ToastService} from '../../modules/core/services/toast/toast.service';
+import {ToastService} from '../../core/services/toast/toast.service';
 
 
 @Component({
@@ -13,6 +13,8 @@ import {ToastService} from '../../modules/core/services/toast/toast.service';
   providers: []
 })
 export class LoginComponent implements OnInit {
+  @Input() navigateAfter: boolean;
+  @Output() loggedIn = new EventEmitter();
 
   loginDto = new LoginDto('', '');
   submitted = false;
@@ -42,9 +44,12 @@ export class LoginComponent implements OnInit {
 
 
     this.loginService.login(this.loginDto).subscribe(authenticated => {
-      if (authenticated) {
+      if (authenticated && this.navigateAfter) {
         this.router.navigate([this.prevUrl]).then(
           value => this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.loginService.currentUser.username));
+      } else if (authenticated && !this.navigateAfter) {
+        this.loggedIn.emit(authenticated);
+        this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.loginService.currentUser.username);
       } else {
         this.toastService.showErrorWithHeader('Login failed', 'Wrong username or password');
       }

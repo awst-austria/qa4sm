@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {AnomaliesModel} from '../anomalies/anomalies-model';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'qa-anom-climatology',
@@ -9,6 +10,7 @@ import {AnomaliesModel} from '../anomalies/anomalies-model';
 export class AnomClimatologyComponent implements OnInit {
   public minYear = 1971;
   public maxYear = 2100;
+  public yearFrom$ = new BehaviorSubject(this.minYear);
 
   @Input() anomaliesModel: AnomaliesModel;
 
@@ -16,6 +18,9 @@ export class AnomClimatologyComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.anomaliesModel);
+    console.log(this.anomaliesModel.anomaliesFrom$.getValue());
+    console.log(this.getYearFrom());
   }
 
   setDate(year): Date {
@@ -24,18 +29,26 @@ export class AnomClimatologyComponent implements OnInit {
 
   getYearFrom(): number {
     let year: number;
-    this.anomaliesModel.anomaliesFrom$.subscribe(date => {
-      date ? year = date.getFullYear() : year = this.minYear;
-    });
+    if (this.anomaliesModel.anomaliesFrom$.getValue()){
+      year = this.anomaliesModel.anomaliesFrom$.getValue().getFullYear();
+    } else {
+      year = this.minYear;
+      this.anomaliesModel.anomaliesFrom$.next(this.setDate(year));
+    }
+
     return year;
  }
 
   getYearTo(): number {
-    let year: number;
-    this.anomaliesModel.anomaliesTo$.subscribe(date => {
-      date ? year = date.getFullYear() : year = (new Date()).getFullYear();
-    });
-    return year;
+    let year: Date;
+
+    if (this.anomaliesModel.anomaliesTo$.getValue()){
+      year = this.anomaliesModel.anomaliesTo$.getValue();
+    } else {
+      year = (new Date());
+      this.anomaliesModel.anomaliesTo$.next(year);
+    }
+    return year.getFullYear();
   }
 
 }
