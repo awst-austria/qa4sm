@@ -44,4 +44,5 @@ class DatasetVariableSerializer(ModelSerializer):
                   'help_text',
                   'min_value',
                   'max_value',
+                  'unit'
                   ]

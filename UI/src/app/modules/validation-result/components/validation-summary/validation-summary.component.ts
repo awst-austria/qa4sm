@@ -96,6 +96,9 @@ export class ValidationSummaryComponent implements OnInit {
               variable: variables.find(dsVar =>
                 config.variable === dsVar.id).short_name,
 
+              variableUnit: variables.find(dsVar =>
+                config.variable === dsVar.id).unit,
+
               filters: config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
 
               parametrisedFilters: config.parametrised_filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
