@@ -354,6 +354,18 @@
     </li>
   </ul>
   <p>
+  Below is an example for the contents of a single csv time series file containing values for one soil moisture variable:
+  </p>
+  <div class="yml">
+      Time,SM<br>
+      01-Jun-2016 01:30:07,0.18278<br>
+      02-Jun-2016 00:51:39,0.2003<br>
+      02-Jun-2016 12:08:07,0.181<br>
+      04-Jun-2016 01:13:32,0.22323<br>
+      &nbsp;&#8942;<br>
+  </div>
+
+  <p>
     To test whether a file complies with the required format, you can try to read it in python with <a target="_blank"
     href="https://pandas.pydata.org/">pandas</a>.
     <b>&lt;FNAME&gt;</b> refers to the location of the CSV file in the following example:
@@ -362,16 +374,16 @@
 
   <h3 class="h3 mb-3 font-weight-normal">Metadata</h3>
   <p>
-    Metadata for the individual variables (columns) in the CSV files (e.g. units, long name) can be provided in an
+    Metadata for the individual data variables (columns) in the CSV files (e.g. units, long name) can be provided in an
     additional file with the name
     'metadata.yml' alongside the CSV files (stored in the same zip archive). This should have a similar format to this
     example for a 'metadata.yml' file:
   </p>
   <div class="yml">
-    myvarname1:<br>
-    &nbsp;&nbsp; long_name: soil moisture 1<br>
+    SM:<br>
+    &nbsp;&nbsp; long_name: soil moisture <br>
     &nbsp;&nbsp; units: m^3/m^3<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&#8942;<br>
+    &nbsp;&#8942;<br>
     myvarnameX:<br>
     &nbsp;&nbsp; long_name: soil moisture x<br>
     &nbsp;&nbsp; units: m^3/m^3<br>
