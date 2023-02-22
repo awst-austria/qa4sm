@@ -1,4 +1,16 @@
 <div class="p-grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
+  <div *ngIf="!(authService.authenticated|async)"
+       class="p-col-12 alert center">
+    <h5 class="p-pt-2">
+      You are not logged in!
+      You can still check validation options, but can not start a validation.
+      <a [routerLink]="'/login'" class="mt-5">Click here</a>
+      to log in or use
+      <a [routerLink]="'/signup'" class="mt-5">this form</a>
+      to register
+    </h5>
+
+  </div>
   <div class="
     p-col-12
     p-md-10 p-md-offset-1
@@ -97,7 +109,7 @@
         <p-panel header="Reference" [toggleable]="true" class="validation-small-row">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
-                   pTooltip="The data which is to be used as a reference in the validation. The 'Data' will be compared against this reference."
+                   pTooltip="Select which dataset chosen in the 'Data' component should be marked as spatial and temporal reference."
                    tooltipPosition="bottom">
               <span class="pi pi-question-circle"></span>
             </label>
@@ -105,7 +117,13 @@
 
           <!--             spatial reference-->
           <div class="p-pt-2">
-            <label for="spatial-reference" class="p-mb-4">Spatial reference:</label>
+            <label for="spatial-reference"
+                   class="p-mb-4"
+                   pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool, it has to be chosen as the spatial reference."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+              Spatial reference
+            </label>
             <qa-validation-reference
               id="spatial-reference"
               #spatialReference
@@ -116,7 +134,13 @@
 
           <!--             temporal reference-->
           <div>
-            <label for="temporal-reference" class="p-mb-4">Temporal reference:</label>
+            <label for="temporal-reference"
+                   class="p-mb-4"
+                   pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+              Temporal reference
+            </label>
             <qa-validation-reference
               id="temporal-reference"
               #temporalReference
@@ -237,5 +261,11 @@
                           [isThereValidation]="isThereValidation"
                           (startValidation)="startValidation(false)">
   </qa-existing-validation>
+  <p-dialog header="You need to be logged in to start a validation" id="log-in" [modal]="true" [(visible)]="logInToValidate">
+    <div>
+      <app-login (loggedIn)="setLoggedIn()"></app-login>
+    </div>
+
+  </p-dialog>
 </div>
 <qa-scroll-to-top></qa-scroll-to-top>

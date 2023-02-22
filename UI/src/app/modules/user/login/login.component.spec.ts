@@ -1,9 +1,9 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {LoginComponent} from './login.component';
-import {AuthService} from '../../modules/core/services/auth/auth.service';
+import {AuthService} from '../../core/services/auth/auth.service';
 import {Router} from '@angular/router';
-import {ToastService} from '../../modules/core/services/toast/toast.service';
+import {ToastService} from '../../core/services/toast/toast.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
