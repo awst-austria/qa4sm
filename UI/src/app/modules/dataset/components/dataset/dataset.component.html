@@ -24,7 +24,8 @@
   <div class="p-col">
     <span class="p-float-label p-mb-4">
       <p-dropdown id="versionSelector" [style]="{'width': '100%'}" [options]="(selectableDatasetVersions$|async)"
-                  [(ngModel)]="selectionModel.selectedVersion" optionLabel="pretty_name" (onChange)="onVersionChange()"></p-dropdown>
+                  [(ngModel)]="selectionModel.selectedVersion" optionLabel="pretty_name"
+                  (onChange)="onVersionChange()"></p-dropdown>
       <label for="versionSelector">Version</label>
     </span>
 
@@ -36,7 +37,18 @@
     <span class="p-float-label">
       <p-dropdown id="variableSelector" optionLabel="short_name" [style]="{'width': '100%'}"
                   [options]="(selectableDatasetVariables$|async)"
-                  [(ngModel)]="selectionModel.selectedVariable"></p-dropdown>
+                  [(ngModel)]="selectionModel.selectedVariable">
+        <ng-template let-item pTemplate="item">
+          <span>
+            <span>{{item.short_name}} {{item.unit && item.unit !== 'unknown' ? '[' +  item.unit + ']' : '(no units provided)'}}</span>
+          </span>
+      </ng-template>
+      <ng-template let-item pTemplate="selectedItem">
+         <span>{{item.short_name}} {{item.unit && item.unit !== 'unknown' ? '[' +  item.unit + ']' : '(no units provided)'}}</span>
+      </ng-template>
+
+
+      </p-dropdown>
             <label for="variableSelector">Variable</label>
     </span>
 
