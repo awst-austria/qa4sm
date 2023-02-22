@@ -5,6 +5,7 @@
         "fields": {
             "short_name": "sm",
             "pretty_name": "C3S_sm",
+            "unit": "m³/m³",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 1.0
@@ -16,6 +17,7 @@
         "fields": {
             "short_name": "soil_moisture",
             "pretty_name": "SMAP_soil_moisture",
+            "unit": "m³/m³",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 1.0
@@ -27,6 +29,7 @@
         "fields": {
             "short_name": "sm",
             "pretty_name": "ASCAT_sm",
+            "unit": "% sat.",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 100.0
@@ -38,6 +41,7 @@
         "fields": {
             "short_name": "soil_moisture",
             "pretty_name": "ISMN_soil_moisture",
+            "unit": "m³/m³",
             "help_text": "",
             "min_value": 0.001,
             "max_value": 1.0
@@ -49,6 +53,7 @@
         "fields": {
             "short_name": "SoilMoi0_10cm_inst",
             "pretty_name": "GLDAS_SoilMoi0_10cm_inst",
+            "unit": "kg/m²",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 100.0
@@ -60,6 +65,7 @@
         "fields": {
             "short_name": "SoilMoi10_40cm_inst",
             "pretty_name": "GLDAS_SoilMoi10_40cm_inst",
+            "unit": "kg/m²",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 300.0
@@ -71,6 +77,7 @@
         "fields": {
             "short_name": "SoilMoi40_100cm_inst",
             "pretty_name": "GLDAS_SoilMoi40_100cm_inst",
+            "unit": "kg/m²",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 600.0
@@ -82,6 +89,7 @@
         "fields": {
             "short_name": "SoilMoi100_200cm_inst",
             "pretty_name": "GLDAS_SoilMoi100_200cm_inst",
+            "unit": "kg/m²",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 1000.0
@@ -93,6 +101,7 @@
         "fields": {
             "short_name": "sm",
             "pretty_name": "ESA_CCI_SM_C_sm",
+            "unit": "m³/m³",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 1.0
@@ -104,6 +113,7 @@
         "fields": {
             "short_name": "Soil_Moisture",
             "pretty_name": "SMOS_sm",
+            "unit": "m³/m³",
             "help_text": "Retrieved soil moisture value in m³/m³",
             "min_value": 0.0,
             "max_value": 1.0
@@ -115,6 +125,7 @@
         "fields": {
             "short_name": "swvl1",
             "pretty_name": "ERA5_sm",
+            "unit": "m³/m³",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 1.0
@@ -126,6 +137,7 @@
         "fields": {
             "short_name": "swvl1",
             "pretty_name": "ERA5_LAND_sm",
+            "unit": "m³/m³",
             "help_text": "",
             "min_value": 0.0,
             "max_value": 1.0
@@ -137,6 +149,7 @@
         "fields": {
             "short_name": "sm",
             "pretty_name": "ESA_CCI_SM_A_sm",
+            "unit": "% sat.",
             "help_text": "-",
             "min_value": 0.0,
             "max_value": 100.0
@@ -148,6 +161,7 @@
         "fields": {
             "short_name": "sm",
             "pretty_name": "ESA_CCI_SM_P_sm",
+            "unit": "m³/m³",
             "help_text": "-",
             "min_value": 0.0,
             "max_value": 1.0
@@ -159,6 +173,7 @@
         "fields": {
             "short_name": "ssm",
             "pretty_name": "CGLS_SSM",
+            "unit": "%",
             "help_text": "-",
             "min_value": 0.0,
             "max_value": 100.0
@@ -170,6 +185,7 @@
         "fields": {
             "short_name": "SWI_005",
             "pretty_name": "CGLS_SWI_T5",
+            "unit": "%",
             "help_text": "-",
             "min_value": 0.0,
             "max_value": 100.0
@@ -181,6 +197,7 @@
         "fields": {
             "short_name": "SWI_040",
             "pretty_name": "CGLS_SWI_T40",
+            "unit": "%",
             "help_text": "-",
             "min_value": 0.0,
             "max_value": 100.0
@@ -192,6 +209,7 @@
         "fields": {
             "short_name": "Soil_Moisture",
             "pretty_name": "SMOSL3_sm",
+            "unit": "m³/m³",
             "help_text": "Retrieved soil moisture value in m³/m³",
             "min_value": 0.0,
             "max_value": 1.0
@@ -203,6 +221,7 @@
         "fields": {
             "short_name": "Soil_Moisture",
             "pretty_name": "SMOSL2_sm",
+            "unit": "m³/m³",
             "help_text": "Retrieved soil moisture value in m³/m³",
             "min_value": 0.0,
             "max_value": 1.0
