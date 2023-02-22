@@ -129,9 +129,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // this.authService.authenticated.subscribe(authenticated => {
-    //   this.logInToValidate = !authenticated;
-    // });
     this.settingsService.getAllSettings().subscribe(setting => {
       this.maintenanceMode = setting[0].maintenance_mode;
     });
@@ -218,38 +215,38 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
 
       this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
-          newDatasetConfigModel.datasetModel.selectedDataset = dataset;
-          this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
-            .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
-              datasetConfig.basic_filters.forEach(basicFilterConfig => {
-                datasetConfigModel.basicFilters.forEach(filter => {
-                  if (basicFilterConfig === filter.filterDto.id) {
-                    filter.enabled = true;
-                  }
-                });
-              });
-              datasetConfig.parametrised_filters.forEach(paramFilter => {
-                if (paramFilter.id === SMOS_RFI_FILTER_ID) {
-                  datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
-                }
-                if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
-                  datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
-                }
-                if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
-                  datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
+        newDatasetConfigModel.datasetModel.selectedDataset = dataset;
+        this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
+          .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
+            datasetConfig.basic_filters.forEach(basicFilterConfig => {
+              datasetConfigModel.basicFilters.forEach(filter => {
+                if (basicFilterConfig === filter.filterDto.id) {
+                  filter.enabled = true;
                 }
               });
             });
-          if (datasetConfig.is_spatial_reference) {
-            this.spatialReferenceChild.setReference(newDatasetConfigModel);
-          }
-          if (datasetConfig.is_temporal_reference) {
-            this.temporalReferenceChild.setReference(newDatasetConfigModel);
-          }
-          if (datasetConfig.is_scaling_reference) {
-            this.scalingChild.setSelection(validationRunConfig.scaling_method, newDatasetConfigModel);
-          }
-        });
+            datasetConfig.parametrised_filters.forEach(paramFilter => {
+              if (paramFilter.id === SMOS_RFI_FILTER_ID) {
+                datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
+              }
+              if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
+                datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
+              }
+              if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
+                datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
+              }
+            });
+          });
+        if (datasetConfig.is_spatial_reference) {
+          this.spatialReferenceChild.setReference(newDatasetConfigModel);
+        }
+        if (datasetConfig.is_temporal_reference) {
+          this.temporalReferenceChild.setReference(newDatasetConfigModel);
+        }
+        if (datasetConfig.is_scaling_reference) {
+          this.scalingChild.setSelection(validationRunConfig.scaling_method, newDatasetConfigModel);
+        }
+      });
 
 
     });
@@ -489,7 +486,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           newReference = ISMNList[0];
         }
       }
-      if (referenceType === 'temporalReference$'){
+      if (referenceType === 'temporalReference$') {
         const nonISMNList = this.validationModel.datasetConfigurations
           .filter(config => config.datasetModel.selectedDataset.short_name !== 'ISMN');
         newReference = nonISMNList[0];
@@ -507,7 +504,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel === datasetConfig) {
         this.loadFiltersForModel(config);
-        if (datasetConfig.selectedDataset.pretty_name === 'ISMN' && config.temporalReference$.getValue()){
+        if (datasetConfig.selectedDataset.pretty_name === 'ISMN' && config.temporalReference$.getValue()) {
           config.temporalReference$.next(false);
         }
       }
@@ -590,7 +587,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
       },
       errors => {
-        if (this.authService.authenticated.getValue()){
+        if (this.authService.authenticated.getValue()) {
           const validationErrorMessage = this.messageAboutValidationErrors(errors);
           this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
         } else {
@@ -599,7 +596,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
   }
 
-  setLoggedIn(): void{
+  setLoggedIn(): void {
     this.authService.authenticated.subscribe(authenticated => {
       this.logInToValidate = !authenticated;
     });
@@ -610,6 +607,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.spatialSubsetModel.minLon$.next(this.defMinLon);
     this.validationModel.spatialSubsetModel.maxLat$.next(this.defMaxLat);
     this.validationModel.spatialSubsetModel.minLat$.next(this.defMinLat);
+  }
+
+  getCurrentSpatialSubseting(): {lonMax: number, lonMin: number, latMax: number, latMin: number}{
+    return {
+      lonMax: this.validationModel.spatialSubsetModel.maxLon$.value,
+      lonMin: this.validationModel.spatialSubsetModel.minLon$.value,
+      latMax: this.validationModel.spatialSubsetModel.maxLat$.value,
+      latMin: this.validationModel.spatialSubsetModel.minLat$.value
+    };
   }
 
   setLimitationsOnGeographicalRange(): void {
@@ -630,11 +636,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
-    // get current values of the spatial subsetting
-    const lonMaxCurrent = this.validationModel.spatialSubsetModel.maxLon$.value;
-    const lonMinCurrent = this.validationModel.spatialSubsetModel.minLon$.value;
-    const latMaxCurrent = this.validationModel.spatialSubsetModel.maxLat$.value;
-    const latMinCurrent = this.validationModel.spatialSubsetModel.minLat$.value;
+    // get current values of the spatial subsetting;
+    let currentVals = this.getCurrentSpatialSubseting();
     // new limits
     const lonMaxLimit = Math.min(...maxLons);
     const lonMinLimit = Math.max(...minLons);
@@ -643,43 +646,77 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
     // conditions to verify
     const isGeographicallyLimited = minLats.length !== 0 || minLons.length !== 0 || maxLats.length !== 0 || minLats.length !== 0;
-    const hasTheSameOrSmallerRange = lonMaxLimit >= lonMaxCurrent && lonMinLimit <= lonMinCurrent &&
-      latMaxLimit >= latMaxCurrent && latMinLimit <= latMinCurrent;
+    const hasTheSameOrSmallerRange = lonMaxLimit >= currentVals.lonMax && lonMinLimit <= currentVals.lonMin &&
+      latMaxLimit >= currentVals.latMax && latMinLimit <= currentVals.latMin;
 
     // push the condition and the new value if conditions are met
     this.validationModel.spatialSubsetModel.limited$.next(isGeographicallyLimited);
 
     // push the condition and the new value if conditions are met
-    if (maxLons.length !== 0 && lonMaxLimit < lonMaxCurrent ||
-      (maxLons.length !== 0 && lonMaxCurrent === this.defMaxLon)) {
+    if (maxLons.length !== 0 && lonMaxLimit < currentVals.lonMax ||
+      (maxLons.length !== 0 && currentVals.lonMax === this.defMaxLon)) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     } else if (maxLons.length !== 0) {
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
     }
 
-    if (minLons.length !== 0 && lonMinLimit > lonMinCurrent ||
-      (minLons.length !== 0 && lonMinCurrent === this.defMinLon)) {
+    if (minLons.length !== 0 && lonMinLimit > currentVals.lonMin ||
+      (minLons.length !== 0 && currentVals.lonMin === this.defMinLon)) {
       this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     } else if (minLons.length !== 0) {
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
     }
 
-    if (maxLats.length !== 0 && latMaxLimit < latMaxCurrent ||
-      (maxLats.length !== 0 && latMaxCurrent === this.defMaxLat)) {
+    if (maxLats.length !== 0 && latMaxLimit < currentVals.latMax ||
+      (maxLats.length !== 0 && currentVals.latMax === this.defMaxLat)) {
       this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     } else if (maxLats.length !== 0) {
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     }
 
-    if (minLats.length !== 0 && latMinLimit > latMinCurrent ||
-      (minLats.length !== 0 && latMinCurrent === this.defMinLat)) {
+    if (minLats.length !== 0 && latMinLimit > currentVals.latMin ||
+      (minLats.length !== 0 && currentVals.latMin === this.defMinLat)) {
       this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
     } else if (minLats.length !== 0) {
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
+    }
+
+
+    // I need to repeat it, because there might be a case where min and max are the same, but bigger/smaller than the
+    // limit, and in such a case both needs to be updated
+// again get current values of the spatial subsetting
+    currentVals = this.getCurrentSpatialSubseting();
+
+    if (currentVals.latMin > currentVals.latMax && latMinLimit){
+      this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
+      this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
+    } else if (currentVals.latMin > currentVals.latMax && !latMinLimit){
+      this.validationModel.spatialSubsetModel.maxLat$.next(currentVals.latMax);
+    }
+
+    if (currentVals.latMax < latMinLimit && latMaxLimit){
+      this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
+      this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
+    } else if (currentVals.latMax < latMinLimit && !latMaxLimit) {
+      this.validationModel.spatialSubsetModel.maxLat$.next(latMinLimit);
+    }
+
+    if (currentVals.lonMin > currentVals.lonMax && lonMinLimit){
+      this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
+      this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
+    } else if (currentVals.lonMin > currentVals.lonMax && !lonMinLimit){
+      this.validationModel.spatialSubsetModel.minLon$.next(currentVals.lonMax);
+    }
+
+    if (currentVals.lonMax < currentVals.lonMin && lonMaxLimit){
+      this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
+      this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
+    } else if (currentVals.lonMax < currentVals.lonMin && !lonMaxLimit){
+      this.validationModel.spatialSubsetModel.maxLon$.next(currentVals.lonMin);
     }
 
     // inform a user about the automatic change
