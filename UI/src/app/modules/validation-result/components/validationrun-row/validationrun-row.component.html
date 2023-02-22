@@ -114,6 +114,7 @@
           {{config.dataset}},
           {{config.version}},
           {{config.variable}}
+          {{config.variableUnit ? '[' + config.variableUnit + ']': ''}}
           <span style="font-weight: 600">
             {{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
             config.is_temporal_reference, config.is_scaling_reference)}}</span>

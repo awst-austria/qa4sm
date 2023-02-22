@@ -40,11 +40,11 @@
                   [(ngModel)]="selectionModel.selectedVariable">
         <ng-template let-item pTemplate="item">
           <span>
-            <span>{{item.short_name}} {{item.unit && item.unit !== 'unknown' ? '[' +  item.unit + ']' : '(no units provided)'}}</span>
+            <span>{{item.short_name}} [{{item.unit ? item.unit: 'n.a.'}}]</span>
           </span>
       </ng-template>
       <ng-template let-item pTemplate="selectedItem">
-         <span>{{item.short_name}} {{item.unit && item.unit !== 'unknown' ? '[' +  item.unit + ']' : '(no units provided)'}}</span>
+         <span>{{item.short_name}} [{{item.unit ? item.unit : 'n.a.'}}]</span>
       </ng-template>
 
 

@@ -72,6 +72,9 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
               variable: variables.find(dsVar =>
                 config.variable === dsVar.id).short_name,
+
+              variableUnit: variables.find(dsVar =>
+                config.variable === dsVar.id).unit,
             })
         )
       )
