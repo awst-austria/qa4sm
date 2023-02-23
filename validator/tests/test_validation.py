@@ -1570,12 +1570,12 @@ class TestValidation(TestCase):
         meta_boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')]
         self.__logger.debug(meta_boxplot_pngs)
         # no meta box plots for r_p & rho_p
-        assert len(meta_boxplot_pngs) == (n_metrics - 2) * n_metas
+        assert len(meta_boxplot_pngs) == (n_metrics - 3) * n_metas
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
         # no boxplot for status
-        assert len(boxplot_pngs) == n_metrics - 1 + (n_metas * (n_metrics - 2))
+        assert len(boxplot_pngs) == n_metrics - 1 + (n_metas * (n_metrics - 3))
 
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
