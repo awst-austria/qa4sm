@@ -46,7 +46,9 @@
             "is_spatial_reference": false,
             "versions": [
                 2,
-                29
+                29,
+                43,
+                44
             ],
             "variables": [
                 2
