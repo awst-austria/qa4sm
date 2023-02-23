@@ -27,7 +27,7 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
         'help_text': f'Variable {variable_name} of dataset {dataset_name} provided by  user {user}.',
         'min_value': max_value,
         'max_value': min_value,
-        'unit': variable_unit
+        'unit': variable_unit if variable_unit else 'n.a.'
     }
     variable_serializer = DatasetVariableSerializer(data=new_variable_data)
     if variable_serializer.is_valid():
@@ -141,7 +141,7 @@ def get_sm_variable_names(variables):
     sm_variables = [{
         'name': var,
         'long_name': variables[var].get("long_name", var),
-        'units': variables[var].get("units")
+        'units': variables[var].get("units") if variables[var].get("units") else 'n.a.'
     } for var in candidates]
 
     return sm_variables[0]
@@ -152,7 +152,7 @@ def get_variables_from_the_reader(reader):
     variables_dict_list = [
         {'name': variable,
          'long_name': variables[variable].get("long_name", variables[variable].get("standard_name", variable)),
-         'units': variables[variable].get("units"),
+         'units': variables[variable].get("units") if variables[variable].get("units") else 'n.a.'
          }
         for variable in variables
     ]
@@ -204,15 +204,13 @@ def update_metadata(request, file_uuid):
     if field_name not in [USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME]:
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
-        if field_name == USER_DATA_VARIABLE_FIELD_NAME:
-            current_variable.pretty_name = new_item['long_name']
-            current_variable.short_name = new_item['name']
-            current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
-                                         f'{current_dataset.pretty_name} provided by user {request.user}.'
-            current_variable.save()
-        else:
-            setattr(file_entry, field_name, new_item['name'])
-            file_entry.save()
+        current_variable.pretty_name = new_item['long_name']
+        current_variable.short_name = new_item['name']
+        # can't simply use .get, because the key may exist but the unit assigned can be None
+        current_variable.unit = new_item.get('units') if new_item.get('units') else 'n.a.'
+        current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
+                                     f'{current_dataset.pretty_name} provided by user {request.user}.'
+        current_variable.save()
 
     elif field_name == USER_DATA_DATASET_FIELD_NAME:
         current_dataset.pretty_name = field_value
