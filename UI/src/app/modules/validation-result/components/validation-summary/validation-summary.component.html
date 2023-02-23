@@ -76,7 +76,9 @@
           <ol style="list-style: none">
             <li *ngFor="let config of configurations; let ind = index">
 <!--              <em>Dataset {{ind + 1}}: </em>-->
-              <span style="font-weight: 600">{{config.is_spatial_reference ? 0 : ind + 1}}-{{config.dataset}} ({{config.version}}, {{config.variable}})</span>
+              <span style="font-weight: 600">{{config.is_spatial_reference ? 0 : ind + 1}}-{{config.dataset}} ({{config.version}}, {{config.variable}}
+                {{config.variableUnit ? '[' + config.variableUnit + ']': ''}}
+                )</span>
               <em>{{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
                 config.is_temporal_reference, config.is_scaling_reference)}}
               </em><br>

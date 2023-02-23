@@ -15,18 +15,19 @@ import logging
 from qa4sm_preprocessing.utils import *
 from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
 
-
 __logger = logging.getLogger(__name__)
 
 
-def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, max_value=None, min_value=None):
+def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, variable_unit=None, max_value=None,
+                          min_value=None):
     current_max_id = DataVariable.objects.all().last().id if DataVariable.objects.all().last() else 0
     new_variable_data = {
         'short_name': variable_name,
         'pretty_name': variable_pretty_name,
         'help_text': f'Variable {variable_name} of dataset {dataset_name} provided by  user {user}.',
         'min_value': max_value,
-        'max_value': min_value
+        'max_value': min_value,
+        'unit': variable_unit if variable_unit else 'n.a.'
     }
     variable_serializer = DatasetVariableSerializer(data=new_variable_data)
     if variable_serializer.is_valid():
@@ -139,7 +140,8 @@ def get_sm_variable_names(variables):
 
     sm_variables = [{
         'name': var,
-        'long_name': var if 'long_name' not in variables[var].keys() else variables[var]['long_name']
+        'long_name': variables[var].get("long_name", var),
+        'units': variables[var].get("units") if variables[var].get("units") else 'n.a.'
     } for var in candidates]
 
     return sm_variables[0]
@@ -149,11 +151,8 @@ def get_variables_from_the_reader(reader):
     variables = reader.variable_description()
     variables_dict_list = [
         {'name': variable,
-         'long_name':
-             variables[variable]['long_name']
-             if 'long_name' in variables[variable].keys() else
-             (variables[variable]['standard_name'] if 'standard_name' in variables[
-                 variable].keys() else variable)
+         'long_name': variables[variable].get("long_name", variables[variable].get("standard_name", variable)),
+         'units': variables[variable].get("units") if variables[variable].get("units") else 'n.a.'
          }
         for variable in variables
     ]
@@ -205,15 +204,13 @@ def update_metadata(request, file_uuid):
     if field_name not in [USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME]:
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
-        if field_name == USER_DATA_VARIABLE_FIELD_NAME:
-            current_variable.pretty_name = new_item['long_name']
-            current_variable.short_name = new_item['name']
-            current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
-                                         f'{current_dataset.pretty_name} provided by user {request.user}.'
-            current_variable.save()
-        else:
-            setattr(file_entry, field_name, new_item['name'])
-            file_entry.save()
+        current_variable.pretty_name = new_item['long_name']
+        current_variable.short_name = new_item['name']
+        # can't simply use .get, because the key may exist but the unit assigned can be None
+        current_variable.unit = new_item.get('units') if new_item.get('units') else 'n.a.'
+        current_variable.help_text = f'Variable {new_item["name"]} of dataset ' \
+                                     f'{current_dataset.pretty_name} provided by user {request.user}.'
+        current_variable.save()
 
     elif field_name == USER_DATA_DATASET_FIELD_NAME:
         current_dataset.pretty_name = field_value
@@ -262,7 +259,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         # creating variable entry
 
         new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
-                                             request.user)
+                                             request.user, sm_variable['units'])
         # for sm_variable in sm_variables:
         #     new_variable = create_variable_entry(
         #             sm_variable['name'],

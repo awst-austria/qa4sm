@@ -19,8 +19,13 @@ export class UserDataRowComponent implements OnInit {
   @Input() userDataset: UserDataFileDto;
   datasetName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   versionName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  variableName: { shortName$: BehaviorSubject<string>, prettyName$: BehaviorSubject<string> } =
-    {shortName$: new BehaviorSubject<string>(''), prettyName$: new BehaviorSubject<string>('')};
+  variableName: { shortName$: BehaviorSubject<string>, prettyName$: BehaviorSubject<string>, unit$: BehaviorSubject<string> } =
+    {
+      shortName$: new BehaviorSubject<string>(''),
+      prettyName$: new BehaviorSubject<string>(''),
+      unit$: new BehaviorSubject<string>('')
+    };
+  variableUnit: string;
 
   datasetFieldName = 'dataset_name';
   versionFieldName = 'version_name';
@@ -38,6 +43,7 @@ export class UserDataRowComponent implements OnInit {
 
   dateFormat = 'medium';
   timeZone = 'UTC';
+
   // variables$: Observable<DatasetVariableDto>[] = [];
 
   constructor(private userDatasetService: UserDatasetsService,
@@ -57,6 +63,8 @@ export class UserDataRowComponent implements OnInit {
     this.datasetVariableService.getVariableById(this.userDataset.variable).subscribe(variableData => {
       this.variableName.shortName$.next(variableData.short_name);
       this.variableName.prettyName$.next(variableData.pretty_name);
+      this.variableName.unit$.next(variableData.unit);
+      // this.variableUnit = variableData.unit;
     });
   }
 
@@ -80,15 +88,16 @@ export class UserDataRowComponent implements OnInit {
   updateMetadata(fieldName, fieldValue, userDataId): void {
     this.userDatasetService.updateMetadata(fieldName, fieldValue, userDataId).subscribe(() => {
         this.toggle(fieldName, false);
-        if (fieldName === this.datasetFieldName){
+        if (fieldName === this.datasetFieldName) {
           this.datasetName$.next(fieldValue);
         }
-        if (fieldName === this.versionFieldName){
+        if (fieldName === this.versionFieldName) {
           this.versionName$.next(fieldValue);
         }
         if (fieldName === this.variableFieldName) {
           this.variableName.prettyName$.next(
             this.userDataset.all_variables.find(choice => choice.name === fieldValue).long_name);
+          this.variableName.unit$.next(this.userDataset.all_variables.find(choice => choice.name === fieldValue).units);
           this.variableName.shortName$.next(fieldValue);
         }
       },
@@ -116,14 +125,14 @@ export class UserDataRowComponent implements OnInit {
     editableField.opened = open;
   }
 
-  getTheFileSize(): string{
+  getTheFileSize(): string {
     let fileSize;
     let units;
     const coeff = Math.pow(10, 6);
-    if (this.userDataset.file_size < coeff){
+    if (this.userDataset.file_size < coeff) {
       fileSize = this.userDataset.file_size / Math.pow(10, 3);
       units = 'kB';
-    } else if (this.userDataset.file_size >= coeff && this.userDataset.file_size < coeff * 1000){
+    } else if (this.userDataset.file_size >= coeff && this.userDataset.file_size < coeff * 1000) {
       fileSize = this.userDataset.file_size / coeff;
       units = 'MB';
     } else {

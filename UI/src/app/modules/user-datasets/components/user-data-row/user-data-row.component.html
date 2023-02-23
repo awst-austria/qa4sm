@@ -91,7 +91,7 @@
         style="cursor: pointer"
         pTooltip="You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation won't be possible."
       >
-        Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}) </b>
+        Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}) [{{variableName.unit$|async}}] </b>
         <span class="pi pi-question-circle small-edit-icon"></span>
         </span>
       <div *ngIf="(editVariable.opened)">
