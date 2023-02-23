@@ -330,7 +330,7 @@ class TestValidation(TestCase):
         self.__logger.debug(overview_pngs)
         # n_obs + error_plot for each non ref. dataset + one for each data set for all other metrics
         # TODO: verify this variable
-        tcol_plots = 0 if not tcol_metrics else (n_datasets - 2)
+        tcol_plots = 0 if not tcol_metrics else (n_datasets - 4)
         assert len(overview_pngs) == 1 + tcol_plots + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
 
     # delete output of test validations, clean up after ourselves
@@ -1570,12 +1570,12 @@ class TestValidation(TestCase):
         meta_boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')]
         self.__logger.debug(meta_boxplot_pngs)
         # no meta box plots for r_p & rho_p
-        assert len(meta_boxplot_pngs) == (n_metrics - 2) * n_metas
+        assert len(meta_boxplot_pngs) == (n_metrics - 3) * n_metas
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
         # no boxplot for status
-        assert len(boxplot_pngs) == n_metrics - 1 + (n_metas * (n_metrics - 2))
+        assert len(boxplot_pngs) == n_metrics - 1 + (n_metas * (n_metrics - 3))
 
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
