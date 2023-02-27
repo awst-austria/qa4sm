@@ -108,6 +108,10 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                     metrics['n_obs'] = METRICS['n_obs']
                     continue
 
+                if pair_metric == 'status':
+                    metrics['status'] = METRICS['status']
+                    continue
+
                 template = ''.join([METRIC_TEMPLATE[0],
                                     METRIC_TEMPLATE[1].format(metric=pair_metric)]) + '.png'
                 parsed = parse(template, f)
