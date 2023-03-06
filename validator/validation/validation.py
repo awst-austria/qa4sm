@@ -239,7 +239,7 @@ def create_pytesmo_validation(validation_run):
             ds_num += 1
 
         ds_list.append((dataset_name, {'class': reader, 'columns': [dataset_config.variable.short_name],
-                                       'kwargs': read_kwargs}))
+                                       'kwargs': read_kwargs, 'max_dist': dataset_config.dataset.resolution_in_m}))
         ds_read_names.append((dataset_name, read_name))
 
         if (validation_run.spatial_reference_configuration and
