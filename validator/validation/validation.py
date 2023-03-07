@@ -349,7 +349,6 @@ def num_gpis_from_job(job):
         num_gpis = len(job[0])
     except:
         num_gpis = 1
-
     return num_gpis
 
 
