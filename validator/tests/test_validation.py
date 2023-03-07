@@ -380,9 +380,9 @@ class TestValidation(TestCase):
         assert not os.path.exists(outdir)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation(self):
         run = generate_default_validation()
         run.plots_save_metadata = 'always'
@@ -429,9 +429,9 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_tcol(self):
         run = generate_default_validation_triple_coll()
         run.plots_save_metadata = 'always'
@@ -482,9 +482,9 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_empty_network(self):
         run = generate_default_validation()
         run.plots_save_metadata = 'always'
@@ -525,8 +525,10 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 0
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
-    @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_gldas_ref(self):
         run = generate_default_validation()
@@ -569,6 +571,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccip_ref(self):
         run = generate_default_validation()
@@ -611,6 +617,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccia_ref(self):
         run = generate_default_validation()
@@ -652,6 +662,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_smap_ref(self):
         run = generate_default_validation()
@@ -700,6 +714,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
         run = generate_default_validation()
@@ -747,6 +765,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_c3s_ref(self):
         run = generate_default_validation()
@@ -789,6 +811,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
         run = generate_default_validation()
@@ -833,7 +859,9 @@ class TestValidation(TestCase):
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat(self):
         run = generate_default_validation()
@@ -869,10 +897,13 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 1
         assert new_run.ok_points == 8
-        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
-    # test the validation with no changes to the default validation parameters
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_default(self):
         ## create default validation object
         run = generate_default_validation()
@@ -894,6 +925,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_moving_avg(self):
         run = generate_default_validation()
@@ -923,6 +958,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_climatology(self):
         run = generate_default_validation()
@@ -952,6 +991,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_nc_attributes(self):
         """
         Test correctness and completedness of netCDF attributes in the output file;
@@ -986,6 +1029,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_c3s_validation_upscaling(self):
         """
         Test a validation of CCIP with ISMN as non-reference, and upscaling option active. All ISMN points are averaged
@@ -1016,6 +1063,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def validation_upscaling_for_dataset(self, ds, version, variable):
         """
         Generate a test with ISMN as non-reference dataset and the provided dataset, version, variable as reference.
@@ -1048,6 +1099,10 @@ class TestValidation(TestCase):
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_all_datasets_validation_upscaling(self):
         """
@@ -1065,6 +1120,10 @@ class TestValidation(TestCase):
         for ds, version, variable in all_datasets:
             self.validation_upscaling_for_dataset(ds, version, variable)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_upscaling_lut(self):
         """
         Test the function `create_upscaling_lut` in validation/batched.py by checking that the lookup table
@@ -1122,6 +1181,10 @@ class TestValidation(TestCase):
         assert list(lut.keys()) == ["1-ISMN"]
         assert lut["1-ISMN"] == []
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):
         run = generate_default_validation()
@@ -1556,6 +1619,9 @@ class TestValidation(TestCase):
         num = val.num_gpis_from_job(None)
         assert num == 1
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_ismn_no_meta(self):
@@ -1589,6 +1655,9 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_ismn_metadata(self):
@@ -1636,6 +1705,9 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_gldas(self):
@@ -1663,6 +1735,9 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_era5land(self):
