@@ -27,7 +27,7 @@ from parse import *
 __logger = logging.getLogger(__name__)
 
 
-def generate_all_graphs(validation_run, outfolder):
+def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
     """
     Create all default graphs for validation run. This is done
     using the qa4sm-reader plotting library.
@@ -38,6 +38,10 @@ def generate_all_graphs(validation_run, outfolder):
         The validation run to make plots for.
     outfolder : str
         Directoy where graphs are stored.
+    save_metadata: str, optional (default: 'threshold')
+        'threshold' will only create box plots if there are enough observations
+        'all' will create all plots, even if there are not enough observations
+        'never' will never create box plots
     """
     if not validation_run.output_file:
         return None
@@ -49,13 +53,13 @@ def generate_all_graphs(validation_run, outfolder):
         validation_run.output_file.path,
         out_dir=outfolder,
         out_type='png',
-        save_metadata=True
+        save_metadata=save_metadata
     )
     fnb_svg, fnm_svg, fcsv = plot_all(
         validation_run.output_file.path,
         out_dir=outfolder,
         out_type='svg',
-        save_metadata=True
+        save_metadata=save_metadata
     )
 
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
