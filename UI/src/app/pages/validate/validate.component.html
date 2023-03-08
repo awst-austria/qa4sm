@@ -154,14 +154,14 @@
 
 
         <!--      Scaling-->
-<!--        <p-panel header="Reference" [toggleable]="true" class="validation-small-row">-->
-<!--          <div class="p-col-10">-->
-            <qa-scaling
-              [validationModel]="validationModel"
-              (hoverOverDataset)="onHoverOverReferenceDataset($event)"
-            ></qa-scaling>
-<!--          </div>-->
-<!--        </p-panel>-->
+        <!--        <p-panel header="Reference" [toggleable]="true" class="validation-small-row">-->
+        <!--          <div class="p-col-10">-->
+        <qa-scaling
+          [validationModel]="validationModel"
+          (hoverOverDataset)="onHoverOverReferenceDataset($event)"
+        ></qa-scaling>
+        <!--          </div>-->
+        <!--        </p-panel>-->
 
 
       </div>
@@ -242,8 +242,16 @@
       <div class="p-col-10">
         <div>
           <div class="p-d-flex p-jc-center">
-            <p-button id="validateButton" label="Validate" icon="pi pi-play"
-                      (onClick)="startValidation(true)"></p-button>
+            <span
+              pTooltip="{{disableValidateButton(validationModel) ? 'You can not start a validation, because one of the chosen dataset has no variable assigned.' : ''}}">
+              <p-button
+                id="validateButton"
+                label="Validate"
+                icon="pi pi-play"
+                [disabled]="disableValidateButton(validationModel)"
+                (onClick)="startValidation(true)">
+              </p-button>
+            </span>
           </div>
         </div>
       </div>
@@ -261,7 +269,8 @@
                           [isThereValidation]="isThereValidation"
                           (startValidation)="startValidation(false)">
   </qa-existing-validation>
-  <p-dialog header="You need to be logged in to start a validation" id="log-in" [modal]="true" [(visible)]="logInToValidate">
+  <p-dialog header="You need to be logged in to start a validation" id="log-in" [modal]="true"
+            [(visible)]="logInToValidate">
     <div>
       <app-login (loggedIn)="setLoggedIn()"></app-login>
     </div>
