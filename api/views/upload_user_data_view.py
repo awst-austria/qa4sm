@@ -144,7 +144,12 @@ def get_sm_variable_names(variables):
         'units': variables[var].get("units") if variables[var].get("units") else 'n.a.'
     } for var in candidates]
 
-    return sm_variables[0]
+    if len(sm_variables) > 0:
+        return sm_variables[0]
+    else:
+        return {'name': '--none--',
+                'long_name': '--none--',
+                'units': 'n.a.'}
 
 
 def get_variables_from_the_reader(reader):

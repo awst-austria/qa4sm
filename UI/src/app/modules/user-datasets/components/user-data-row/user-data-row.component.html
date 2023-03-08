@@ -89,7 +89,10 @@
         *ngIf="!(editVariable.opened)"
         (click)="toggle(variableFieldName,true)"
         style="cursor: pointer"
-        pTooltip="You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation won't be possible."
+        [class]="(variableName.shortName$|async) !== '--none--' ? '' : 'warning'"
+        pTooltip="{{(variableName.shortName$|async) !== '--none--' ?
+        'You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation will not be possible.' :
+        'We could not acquire soil moisture variable name from the file. Please choose the proper one from the list. A validation will fail if no proper variable is set.'}}"
       >
         Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}) [{{variableName.unit$|async}}] </b>
         <span class="pi pi-question-circle small-edit-icon"></span>
