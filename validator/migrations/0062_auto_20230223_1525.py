@@ -14,7 +14,7 @@ def set_unlimited_data_space_for_staff_user(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0060_alter_datavariable_unit'),
+        ('validator', '0061_validationrun_plots_save_metadata'),
     ]
 
     operations = [
