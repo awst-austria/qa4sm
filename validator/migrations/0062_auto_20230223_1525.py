@@ -8,7 +8,7 @@ import django.db.models.deletion
 def set_unlimited_data_space_for_staff_user(apps, schema_editor):
     User = apps.get_model('validator', 'user')
     db_alias = schema_editor.connection.alias
-    User.objects.using(db_alias).filter(is_staff=True).update(data_space='unlimited')
+    User.objects.using(db_alias).filter(is_staff=True).update(space_limit='unlimited')
 
 
 class Migration(migrations.Migration):
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='user',
-            name='data_space',
+            name='space_limit',
             field=models.CharField(blank=True, choices=[('no_data', 1), ('basic', 5000000000), ('extended', 10000000000), ('unlimited', None)], default='basic', max_length=25),
         ),
         migrations.AlterField(

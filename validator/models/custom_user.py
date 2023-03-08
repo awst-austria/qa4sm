@@ -6,6 +6,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django_countries.fields import CountryField
+# from validator.models import UserDatasetFile
 
 
 class User(AbstractUser):
@@ -26,7 +27,15 @@ class User(AbstractUser):
     organisation = models.CharField(max_length=50, blank=True)
     country = CountryField(blank=True, blank_label='Country')
     orcid = models.CharField(max_length=25, blank=True)
-    data_space = models.CharField(max_length=25, null=False, blank=True, choices=DATA_SPACE_LEVELS, default=BASIC)
+    space_limit = models.CharField(max_length=25, null=False, blank=True, choices=DATA_SPACE_LEVELS, default=BASIC)
+
+    @property
+    def space_left(self):
+        if self.get_space_limit_display():
+            used_space = sum(file.file_size for file in self.user_datasets.all())
+            return self.get_space_limit_display() - used_space
+
+        return
 
     def clean(self):
         super(User, self).clean()
