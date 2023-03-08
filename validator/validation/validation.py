@@ -519,7 +519,8 @@ def run_validation(validation_id):
             set_outfile(validation_run, run_dir)
             validation_run.save()
             save_validation_config(validation_run)
-            generate_all_graphs(validation_run, run_dir)
+            generate_all_graphs(validation_run, run_dir,
+                                save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(validation_run))

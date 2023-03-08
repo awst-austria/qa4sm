@@ -119,7 +119,9 @@ class TestValidity(TestCase):
         run.delete()
         assert not os.path.exists(outdir)
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_c3s_ismn(self):
         run = ValidationRun()

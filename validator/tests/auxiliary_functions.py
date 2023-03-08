@@ -13,6 +13,7 @@ default_non_reference_variable = C3S_sm
 
 def generate_default_validation_hires():
     run = ValidationRun()
+    run.plots_save_metadata = 'always'
     run.start_time = datetime.now(tzlocal())
     run.save()
 

@@ -115,9 +115,23 @@ class ValidationRun(models.Model):
     temporal_matching = models.IntegerField(default=TEMP_MATCH_WINDOW, null=False, blank=False,
                                             validators=[MinValueValidator(1), MaxValueValidator(24)])
 
+    plots_save_metadata = models.CharField(
+        max_length=10,
+        choices=(
+            ('always', 'force creating metadata box plots (e.g. for testing)'),
+            ('never', 'do not create metadata box plots at all'),
+            ('threshold', 'create metadata box plots only when the minimum '
+                          'number of required points is available '
+                          '(set in globals of qa4sm-reader'),
+            ),
+        default='threshold'
+    )
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
+
+
 
     @property
     def expiry_date(self):

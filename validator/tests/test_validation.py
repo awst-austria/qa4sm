@@ -45,6 +45,7 @@ from validator.validation.globals import METRICS, TC_METRICS, METADATA_PLOT_NAME
 from validator.validation.globals import OUTPUT_FOLDER
 from django.shortcuts import get_object_or_404
 from math import comb
+from qa4sm_reader.globals import out_metadata_plots
 
 User = get_user_model()
 
@@ -150,7 +151,7 @@ class TestValidation(TestCase):
         if not validation.temporal_reference_configuration.is_temporal_reference:
             raise ValueError('Configuration is not marked as temporal reference.')
 
-    def check_results(self, run, is_tcol_run=False):
+    def check_results(self, run, is_tcol_run=False, meta_plots=True):
 
         try:
             self._check_validation_configuration_consistency(run)
@@ -171,8 +172,9 @@ class TestValidation(TestCase):
         n_datasets = run.dataset_configurations.count()
 
         tcol_metrics = self.tcol_metrics if is_tcol_run else []
-        pair_metrics = [m for m in list(METRICS.keys()) if m.lower() != 'n_obs']
-        comm_metrics = [m for m in self.metrics if m not in pair_metrics]
+        non_metrics = ['gpi', 'lon', 'lat']
+        comm_metrics = ['n_obs', 'status']
+        pair_metrics = [m for m in list(METRICS.keys()) if m.lower() not in comm_metrics]
 
         # check netcdf output
         length = -1
@@ -199,7 +201,7 @@ class TestValidation(TestCase):
                 if metric == 'status':
                     # for status we generate 1 plot for non-spatial-reference dataset and one for each tcol combination
                     num_vars = (n_datasets - 1) + is_tcol_run * comb(n_datasets - 1, 2)
-                elif metric in comm_metrics:
+                elif (metric in comm_metrics) or (metric in non_metrics):
                     num_vars = 1
                 elif metric in pair_metrics:
                     num_vars = n_datasets - 1
@@ -320,18 +322,52 @@ class TestValidation(TestCase):
             assert myzip.testzip() is None
 
         # check diagrams
-        boxplot_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        for metric in pair_metrics + comm_metrics + tcol_metrics:
+            """
+            For each pairwise metric: - n-1 overview maps (not for spat. ref.)
+                                      - 1 boxplot
+                                      - 4 metadata boxplots (not for pvalues)
+            For each tcol metric: - n-1 overview maps
+                                  - n-1 boxplots
+                                  - 4 metadata boxplots
+            For status: - 1 overview map
+            """
+            if metric in ['status']:
+                continue
 
-        self.__logger.debug(boxplot_pngs)
-        # for status plot there is no boxplot
-        assert len(boxplot_pngs) == (len(globals.METRICS.keys()) - 1) + (len(tcol_metrics) * (n_datasets - 1))
+            if metric in tcol_metrics:
+                n_metric_plots = (n_datasets - 1)
+            elif metric in pair_metrics + comm_metrics:
+                n_metric_plots = 1
+            else:
+                raise ValueError(f'Unknown metric: {metric}')
 
-        overview_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
-        self.__logger.debug(overview_pngs)
-        # n_obs + error_plot for each non ref. dataset + one for each data set for all other metrics
-        # TODO: verify this variable
-        tcol_plots = 0 if not tcol_metrics else (n_datasets - 4)
-        assert len(overview_pngs) == 1 + tcol_plots + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
+            if (metric in ['p_R', 'p_rho']) or (meta_plots is False):
+                n_metadata_plots = 0
+            else:
+                n_metadata_plots = len(out_metadata_plots)
+
+            patterns = [f"boxplot_{metric}_metadata_{'_and_'.join(meta_var)}.png"
+                        for meta_var in out_metadata_plots.values()] + \
+                       [f'boxplot_{metric}.png', f'boxplot_{metric}_for_*.png']
+            boxplot_pngs = [x for x in os.listdir(outdir) if
+                            any([fnmatch.fnmatch(x, p) for p in patterns])]
+
+            self.__logger.debug(f"{metric}: Plots are {len(boxplot_pngs)}, "
+                                f"should: {n_metadata_plots + n_metric_plots}")
+
+            assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
+
+            overview_pngs = [x for x in os.listdir(outdir)
+                             if fnmatch.fnmatch(x, f'overview*_{metric}.png')]
+
+            self.__logger.debug(f"{metric}: Plots are {len(overview_pngs)}, "
+                                f"should: {(n_datasets - 1)}")
+
+        if is_tcol_run:
+            assert os.path.isfile(os.path.join(outdir, 'overview_status_tc.png'))
+        else:
+            assert os.path.isfile(os.path.join(outdir, 'overview_status.png'))
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -344,11 +380,12 @@ class TestValidation(TestCase):
         assert not os.path.exists(outdir)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
@@ -388,18 +425,20 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_tcol(self):
         run = generate_default_validation_triple_coll()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
+        run.plots_save_metadata = 'always'
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
         run.scaling_ref = run.spatial_reference_configuration
         run.scaling_ref.is_scaling_reference = True
@@ -439,15 +478,16 @@ class TestValidation(TestCase):
         # the other 4 are okay
         assert new_run.ok_points == 4
 
-        self.check_results(new_run, is_tcol_run=True)
+        self.check_results(new_run, is_tcol_run=True, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_empty_network(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
@@ -485,11 +525,14 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 0
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
-    @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_gldas_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
@@ -525,12 +568,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 19
         assert new_run.error_points == 0
         assert new_run.ok_points == 19
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccip_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
@@ -566,12 +614,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 24, "Number of gpis is off"
         assert new_run.error_points == 8, "Error points are off"
         assert new_run.ok_points == 16, "OK points are off"
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccia_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
@@ -606,12 +659,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 24, "Number of gpis is off"
         assert new_run.error_points == 5, "Error points are off"
         assert new_run.ok_points == 19, "OK points are off"
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_smap_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
@@ -653,12 +711,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 140, "Number of gpis is off"
         assert new_run.error_points == 134, "Error points are off"
         assert new_run.ok_points == 6, "OK points are off"
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
@@ -699,12 +762,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 15, "Number of gpis is off"
         assert new_run.error_points == 4, "Error points are off"
         assert new_run.ok_points == 11, "OK points are off"
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_c3s_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3SC)
@@ -740,12 +808,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 24, "Number of gpis is off"
         assert new_run.error_points == 5, "Error points are off"
         assert new_run.ok_points == 19, "OK points are off"
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
@@ -782,14 +855,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 11, "Number of gpis is off"
         assert new_run.error_points == 0, "Too many error gpis"
         assert new_run.ok_points == 11, "OK points are off"
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         for config in run.dataset_configurations.all():
@@ -821,13 +897,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 1
         assert new_run.ok_points == 8
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
-    # test the validation with no changes to the default validation parameters
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_default(self):
         ## create default validation object
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.save()
@@ -842,12 +922,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_moving_avg(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
         run.anomalies = ValidationRun.MOVING_AVG_35_D
         run.save()
@@ -870,12 +955,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_climatology(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
@@ -898,15 +988,20 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_nc_attributes(self):
         """
         Test correctness and completedness of netCDF attributes in the output file;
         a validation that doesn't involve ISMN ref is used to check the resolution attributes
         """
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # need validation without ISMN as referebce to check resolution attributes
@@ -931,9 +1026,13 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_c3s_validation_upscaling(self):
         """
         Test a validation of CCIP with ISMN as non-reference, and upscaling option active. All ISMN points are averaged
@@ -961,9 +1060,13 @@ class TestValidation(TestCase):
         assert new_run.total_points == 16
         assert new_run.error_points == 12
         assert new_run.ok_points == 4
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def validation_upscaling_for_dataset(self, ds, version, variable):
         """
         Generate a test with ISMN as non-reference dataset and the provided dataset, version, variable as reference.
@@ -993,9 +1096,13 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_all_datasets_validation_upscaling(self):
         """
@@ -1013,6 +1120,10 @@ class TestValidation(TestCase):
         for ds, version, variable in all_datasets:
             self.validation_upscaling_for_dataset(ds, version, variable)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_upscaling_lut(self):
         """
         Test the function `create_upscaling_lut` in validation/batched.py by checking that the lookup table
@@ -1070,9 +1181,14 @@ class TestValidation(TestCase):
         assert list(lut.keys()) == ["1-ISMN"]
         assert lut["1-ISMN"] == []
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # hawaii bounding box
@@ -1101,7 +1217,7 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     def test_errors(self):
@@ -1503,6 +1619,9 @@ class TestValidation(TestCase):
         num = val.num_gpis_from_job(None)
         assert num == 1
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_ismn_no_meta(self):
@@ -1522,7 +1641,7 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, save_metadata='never')
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
@@ -1536,6 +1655,9 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_ismn_metadata(self):
@@ -1562,7 +1684,7 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, save_metadata='always')
 
         n_metrics = len(globals.METRICS.keys())
         n_metas = len(globals.METADATA_PLOT_NAMES.keys())
@@ -1583,6 +1705,9 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_gldas(self):
@@ -1596,7 +1721,7 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, save_metadata='never')
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
@@ -1610,6 +1735,9 @@ class TestValidation(TestCase):
 
         self.delete_run(v)
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
     def test_generate_graphs_era5land(self):
@@ -1623,7 +1751,7 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, save_metadata='never')
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
@@ -1648,6 +1776,7 @@ class TestValidation(TestCase):
         # preparing a few validations, so that there is a base to be searched
         for i in range(3):
             run = generate_default_validation()
+            run.plots_save_metadata = 'always'
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -1727,6 +1856,7 @@ class TestValidation(TestCase):
         # here will be validations for asserting, I start with exactly the same validations and check if it finds them:
         for i in range(3):
             run = generate_default_validation()
+            run.plots_save_metadata = 'always'
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -1753,6 +1883,7 @@ class TestValidation(TestCase):
 
         # runs to fail:
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
         run.interval_from = time_intervals_from
         run.interval_to = time_intervals_to
@@ -2024,6 +2155,7 @@ class TestValidation(TestCase):
     def test_copy_validation(self):
         # create a validation to copy:
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.scaling_method = ValidationRun.MEAN_STD
@@ -2080,7 +2212,7 @@ class TestValidation(TestCase):
         assert copied_run.total_points == 9
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
-        self.check_results(copied_run)
+        self.check_results(copied_run, is_tcol_run=False, meta_plots=True)
 
         # copying again, so to check CopiedValidations model
         new_run = get_object_or_404(ValidationRun, pk=run_id)
