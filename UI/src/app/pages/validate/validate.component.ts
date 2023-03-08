@@ -158,6 +158,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+
+    console.log(this.validationModel);
   }
 
   private setDefaultDatasetSettings(): void {
@@ -784,6 +786,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   onHoverOverReferenceDataset(event): void {
     this.highlightedDataset = event.hoveredDataset;
     this.highlightedDataset.highlighted$.next(event.highlight);
+  }
+
+  disableValidateButton(validationModel): boolean{
+    return validationModel.datasetConfigurations
+      .filter(config => config.datasetModel?.selectedVariable?.short_name === '--none--').length !== 0;
   }
 
 }
