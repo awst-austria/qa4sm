@@ -239,7 +239,7 @@ def create_pytesmo_validation(validation_run):
             ds_num += 1
 
         ds_list.append((dataset_name, {'class': reader, 'columns': [dataset_config.variable.short_name],
-                                       'kwargs': read_kwargs}))
+                                       'kwargs': read_kwargs, 'max_dist': dataset_config.dataset.resolution_in_m}))
         ds_read_names.append((dataset_name, read_name))
 
         if (validation_run.spatial_reference_configuration and
@@ -519,7 +519,8 @@ def run_validation(validation_id):
             set_outfile(validation_run, run_dir)
             validation_run.save()
             save_validation_config(validation_run)
-            generate_all_graphs(validation_run, run_dir)
+            generate_all_graphs(validation_run, run_dir,
+                                save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(validation_run))
