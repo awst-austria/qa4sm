@@ -30,6 +30,10 @@ class User(AbstractUser):
     space_limit = models.CharField(max_length=25, null=False, blank=True, choices=DATA_SPACE_LEVELS, default=BASIC)
 
     @property
+    def space_limit_value(self):
+        # this property is added to be able to use it in api
+        return self.get_space_limit_display()
+    @property
     def space_left(self):
         if self.get_space_limit_display():
             used_space = sum(file.file_size for file in self.user_datasets.all())

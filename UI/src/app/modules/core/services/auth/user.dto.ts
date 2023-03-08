@@ -8,4 +8,7 @@ export interface UserDto{
   organisation: string;
   country: string;
   orcid: string;
+  space_limit: string;
+  space_limit_value: number;
+  space_left: number;
 }

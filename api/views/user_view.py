@@ -86,4 +86,18 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = get_fields_as_list(model)
+        fields = ['username',
+                  'password',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'organisation',
+                  'last_login',
+                  'date_joined',
+                  'country',
+                  'orcid',
+                  'id',
+                  'copied_runs',
+                  'space_limit',
+                  'space_limit_value',
+                  'space_left']
