@@ -43,6 +43,8 @@ export class MyDatasetsComponent implements OnInit {
     return message;
   }
 
-
+  getSpaceLeft(): number{
+    return Math.round((1 - this.authService.currentUser.space_left / this.authService.currentUser.space_limit_value) * 100);
+  }
 
 }

@@ -15,6 +15,14 @@
     <div class="p-text-center lead text-muted p-pt-3">
      {{getLimitMessage()}}
     </div>
+    <div class="center lead text-muted p-pt-3" style="width: 100%">
+      <div style="width: 30%">
+        <p-progressBar
+          style="background-color: #FF6C5C"
+          value="{{getSpaceLeft()}}">
+        </p-progressBar>
+      </div>
+    </div>
     <hr class="featurette-divider">
 
     <div class="p-text-center">
