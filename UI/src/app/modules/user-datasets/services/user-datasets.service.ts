@@ -58,6 +58,24 @@ export class UserDatasetsService {
     return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue});
   }
 
+  getTheFileSize(uploadedFileSize): string {
+    let fileSize;
+    let units;
+    const coeff = Math.pow(10, 6);
+    if (uploadedFileSize < coeff) {
+      fileSize = uploadedFileSize / Math.pow(10, 3);
+      units = 'kB';
+    } else if (uploadedFileSize >= coeff && uploadedFileSize < coeff * 1000) {
+      fileSize = uploadedFileSize / coeff;
+      units = 'MB';
+    } else {
+      fileSize = uploadedFileSize / Math.pow(10, 9);
+      units = 'GB';
+    }
+
+    return `${Math.round(fileSize * 10) / 10} ${units}`;
+  }
+
   // userFileValidate(name, file, filename): Observable<any> {
   //   const formData = new FormData();
   //   formData.append(name, file, filename);
