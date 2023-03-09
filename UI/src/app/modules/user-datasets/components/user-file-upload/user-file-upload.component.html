@@ -42,10 +42,14 @@
   <div class="p-grid" style="display: flex">
 
     <div class="center p-col-12 p-pb-0 p-pr-3">
-      <div [ngClass]="{'form-field' : true, 'warning': isFileTooBig}">
-        {{file ? file.name : (isFileTooBig ? 'This file is too big, please choose another one.' : "No file chosen yet.")}}
+      <div
+        [ngClass]="{'form-field' : true, 'warning': isFileTooBig}"
+      >
+        {{file ? file.name : (isFileTooBig ? 'This file is too big, please choose another one. You still have ' + getTheFileSize() + ' available*'
+        : "No file chosen yet.")}}
       </div>
     </div>
+    <div *ngIf="isFileTooBig" class="p-col-12" style="color: red">*{{authService.currentUser.space_left }} bytes</div>
 
     <div class="center p-col-12 p-pt-1 p-pr-4">
       <div class="form-field">

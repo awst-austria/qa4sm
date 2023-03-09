@@ -129,7 +129,7 @@ export class UserDataRowComponent implements OnInit {
   }
 
   getTheFileSize(): string {
-    return this.userDatasetService.getTheFileSize(this.userDataset.file_size);
+    return this.userDatasetService.getTheSizeInProperUnits(this.userDataset.file_size);
   }
 
 }

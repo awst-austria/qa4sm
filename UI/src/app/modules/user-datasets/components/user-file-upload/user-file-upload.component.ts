@@ -101,6 +101,7 @@ export class UserFileUploadComponent implements OnInit {
           } else if (event.type === HttpEventType.Response) {
             this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
                 this.userDatasetService.refresh.next(true);
+                this.authService.init();
                 this.resetFile();
               },
               (message) => {
@@ -136,5 +137,10 @@ export class UserFileUploadComponent implements OnInit {
     this.uploadProgress = null;
     this.uploadSub = null;
   }
+
+  getTheFileSize(): string {
+    return this.userDatasetService.getTheSizeInProperUnits(this.authService.currentUser.space_left);
+  }
+
 
 }
