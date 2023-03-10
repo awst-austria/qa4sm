@@ -38,13 +38,9 @@ export class MyDatasetsComponent implements OnInit {
     this.hasNoSpaceLimit ?
       message = 'You have no space limit for your data.' :
       message = `You can use up to ${this.authService.currentUser.space_limit_value / Math.pow(10, 9)}
-      GB space for your data.`;
+      GB space for your data. You still have ${this.userDatasetService.getTheSizeInProperUnits(this.authService.currentUser.space_left)} available.`;
 
     return message;
-  }
-
-  getSpaceLeft(): number{
-    return Math.round((1 - this.authService.currentUser.space_left / this.authService.currentUser.space_limit_value) * 100);
   }
 
 }
