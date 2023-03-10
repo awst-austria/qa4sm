@@ -300,6 +300,8 @@ def upload_user_data(request, filename):
         return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
     if not _verify_file_extension(filename):
         return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
+    if file.size > request.user.space_left:
+        return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
 
     file_data = {
         'file': file,
