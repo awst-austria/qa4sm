@@ -32,7 +32,10 @@ export class AuthService {
     last_name: '',
     organisation: '',
     country: '',
-    orcid: ''
+    orcid: '',
+    space_limit: '',
+    space_limit_value: null,
+    space_left: null
   };
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;

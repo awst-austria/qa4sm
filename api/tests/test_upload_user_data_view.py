@@ -10,6 +10,8 @@ from api.variable_and_field_names import *
 
 FILE = 'file'
 FORMAT_MULTIPART = 'multipart'
+
+
 # todo: test for a file with no variables - file with no variables needed
 def _create_test_file(path):
     test_file = open(path, 'w')
@@ -59,9 +61,13 @@ class TestUploadUserDataView(APITestCase):
         Path(self.test_user_data_path).mkdir(exist_ok=True, parents=True)
 
         self.netcdf_file_name = 'teststack_c3s_2dcoords_min_attrs.nc'
+        self.zipped_netcdf_file_name = 'test_data.zip'
+        self.zipped_csv_file_name = 'test_data_csv.zip'
         self.not_netcdf_file_name = 'test_file.txt'
 
         self.netcdf_file = f'{self.user_data_path}/{self.netcdf_file_name}'
+        self.zipped_netcdf = f'{self.user_data_path}/{self.zipped_netcdf_file_name}'
+        self.zipped_csv = f'{self.user_data_path}/{self.zipped_csv_file_name}'
         self.not_netcdf_file = f'{self.user_data_path}/{self.not_netcdf_file_name}'
 
         self.upload_data_url_name = 'Upload user data'
@@ -73,6 +79,29 @@ class TestUploadUserDataView(APITestCase):
     def _remove_user_datafiles(self, username):
         user_data_path = f'{self.user_data_path}/{username}'
         shutil.rmtree(user_data_path)
+
+    def test_file_size_limit(self):
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+        print(dir(self.test_user))
+        file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
+
+        # check the size limit assigned to the user
+        assert self.test_user.space_limit == 'basic'
+        # check how much space left
+        assert self.test_user.space_left == self.test_user.get_space_limit_display() - file_entry.file.size
+        # remove the file
+        file_entry.delete()
+
+        # change the limit
+        self.test_user.space_limit = 'no_data'
+        self.test_user.save()
+
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+
+        assert response.json()['error'] == 'File is too big'
+        assert response.status_code == 500
 
     def test_get_list_of_user_data_files(self):
         # post the same file 3 times, to create 3 different entries
@@ -157,7 +186,7 @@ class TestUploadUserDataView(APITestCase):
         assert len(UserDatasetFile.objects.all()) == 0
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-    def test_upload_user_data_correct(self):
+    def test_upload_user_data_nc_correct(self):
         response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
                                     {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
 
@@ -185,7 +214,55 @@ class TestUploadUserDataView(APITestCase):
         assert not os.path.exists(file_dir)
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-    def test_upload_user_data_not_netcdf(self):
+    def test_upload_user_data_zip_netcdf_correct(self):
+        response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.zipped_netcdf_file_name}),
+            {FILE: self.zipped_netcdf}, format=FORMAT_MULTIPART)
+
+        assert response.status_code == 200
+
+        existing_files = UserDatasetFile.objects.all()
+
+        assert len(existing_files) == 1
+        file_entry = existing_files[0]
+        file_dir = file_entry.get_raw_file_path
+
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert os.path.exists(file_dir)
+
+        file_entry.delete()
+
+        # check if the entry got removed along with the entire file directory
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 0
+        assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 0
+
+    def test_upload_user_data_zip_csv_correct(self):
+        response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.zipped_csv_file_name}),
+            {FILE: self.zipped_csv}, format=FORMAT_MULTIPART)
+
+        assert response.status_code == 200
+
+        existing_files = UserDatasetFile.objects.all()
+
+        assert len(existing_files) == 1
+        file_entry = existing_files[0]
+        file_dir = file_entry.get_raw_file_path
+
+        assert len(os.listdir(self.test_user_data_path)) == 1
+        assert os.path.exists(file_dir)
+
+        file_entry.delete()
+
+        # check if the entry got removed along with the entire file directory
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 0
+        assert not os.path.exists(file_dir)
+        assert len(os.listdir(self.test_user_data_path)) == 0
+
+    def test_upload_user_data_not_porper_extension(self):
         file_to_upload = _create_test_file(self.not_netcdf_file)
         response = self.client.post(
             reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.not_netcdf_file_name}),
@@ -225,6 +302,108 @@ class TestUploadUserDataView(APITestCase):
         # I need to replace the posted file with the original one, because the api post method somehow corrupts netCDFs
         # which is not the problem when I post them via angular and I don't want to deal with it right now.
         shutil.copy2(self.netcdf_file, file_entry.file.path)
+
+        metadata_correct = {
+            USER_DATA_DATASET_FIELD_NAME: 'test_dataset',
+            USER_DATA_DATASET_FIELD_PRETTY_NAME: 'test_dataset_pretty_name',
+            USER_DATA_VERSION_FIELD_NAME: 'test_version',
+            USER_DATA_VERSION_FIELD_PRETTY_NAME: 'test_version_pretty_name'
+        }
+        # posting metadata as those from the metadata form and checking if it has been done
+        response_metadata = self.client.post(
+            reverse(self.post_metadata_url_name, kwargs={URL_FILE_UUID: file_entry.id}),
+            metadata_correct, format='json')
+        assert response_metadata.status_code == 200
+
+        # re-querying file entry
+        file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
+        # checking if the posted metadata is proper
+        assert file_entry.dataset.short_name == metadata_correct[USER_DATA_DATASET_FIELD_NAME]
+        assert file_entry.dataset.pretty_name == metadata_correct[USER_DATA_DATASET_FIELD_PRETTY_NAME]
+        assert file_entry.dataset == Dataset.objects.all().last()
+        assert file_entry.version.short_name == metadata_correct[USER_DATA_VERSION_FIELD_NAME]
+        assert file_entry.version.pretty_name == metadata_correct[USER_DATA_VERSION_FIELD_PRETTY_NAME]
+        assert file_entry.version == DatasetVersion.objects.all().last()
+
+        # checking if the proper metadata was retrieved from the file
+        assert file_entry.variable == DataVariable.objects.all().last()
+        # the values below are defined in the test file, so if we change the test file we may have to update them
+        assert file_entry.variable.short_name == 'soil_moisture'
+
+        # check if the timeseries files were created:
+        timeseries_dir = file_entry.get_raw_file_path + '/timeseries'
+        assert os.path.exists(timeseries_dir)
+        assert len(os.listdir(timeseries_dir)) != 0
+
+        file_entry.delete()
+        assert len(UserDatasetFile.objects.all()) == 0
+
+    def test_post_metadata_and_preprocess_file_zip_netcdf(self):
+        # I am posting the file to create the proper dataset entry
+        response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.zipped_netcdf_file_name}),
+            {FILE: self.zipped_netcdf}, format=FORMAT_MULTIPART)
+        assert response.status_code == 200
+
+        # checking if the file entry got saved
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 1
+
+        file_entry = existing_files[0]
+        # I need to replace the posted file with the original one, because the api post method somehow corrupts files
+        # which is not the problem when I post them via angular and I don't want to deal with it right now.
+        shutil.copy2(self.zipped_netcdf, file_entry.file.path)
+
+        metadata_correct = {
+            USER_DATA_DATASET_FIELD_NAME: 'test_dataset',
+            USER_DATA_DATASET_FIELD_PRETTY_NAME: 'test_dataset_pretty_name',
+            USER_DATA_VERSION_FIELD_NAME: 'test_version',
+            USER_DATA_VERSION_FIELD_PRETTY_NAME: 'test_version_pretty_name'
+        }
+        # posting metadata as those from the metadata form and checking if it has been done
+        response_metadata = self.client.post(
+            reverse(self.post_metadata_url_name, kwargs={URL_FILE_UUID: file_entry.id}),
+            metadata_correct, format='json')
+        assert response_metadata.status_code == 200
+
+        # re-querying file entry
+        file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
+        # checking if the posted metadata is proper
+        assert file_entry.dataset.short_name == metadata_correct[USER_DATA_DATASET_FIELD_NAME]
+        assert file_entry.dataset.pretty_name == metadata_correct[USER_DATA_DATASET_FIELD_PRETTY_NAME]
+        assert file_entry.dataset == Dataset.objects.all().last()
+        assert file_entry.version.short_name == metadata_correct[USER_DATA_VERSION_FIELD_NAME]
+        assert file_entry.version.pretty_name == metadata_correct[USER_DATA_VERSION_FIELD_PRETTY_NAME]
+        assert file_entry.version == DatasetVersion.objects.all().last()
+
+        # checking if the proper metadata was retrieved from the file
+        assert file_entry.variable == DataVariable.objects.all().last()
+        # the values below are defined in the test file, so if we change the test file we may have to update them
+        assert file_entry.variable.short_name == 'sm'
+
+        # check if the timeseries files were created:
+        timeseries_dir = file_entry.get_raw_file_path + '/timeseries'
+        assert os.path.exists(timeseries_dir)
+        assert len(os.listdir(timeseries_dir)) != 0
+
+        file_entry.delete()
+        assert len(UserDatasetFile.objects.all()) == 0
+
+    def test_post_metadata_and_preprocess_file_zip_csv(self):
+        # I am posting the file to create the proper dataset entry
+        response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.zipped_csv_file_name}),
+            {FILE: self.zipped_csv}, format=FORMAT_MULTIPART)
+        assert response.status_code == 200
+
+        # checking if the file entry got saved
+        existing_files = UserDatasetFile.objects.all()
+        assert len(existing_files) == 1
+
+        file_entry = existing_files[0]
+        # I need to replace the posted file with the original one, because the api post method somehow corrupts files
+        # which is not the problem when I post them via angular and I don't want to deal with it right now.
+        shutil.copy2(self.zipped_csv, file_entry.file.path)
 
         metadata_correct = {
             USER_DATA_DATASET_FIELD_NAME: 'test_dataset',

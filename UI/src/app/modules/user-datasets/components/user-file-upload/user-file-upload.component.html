@@ -14,6 +14,7 @@
         <div class="p-fluid">
           <button pButton
                   label="Select file"
+                  [disabled]="authService.currentUser.space_left === 0"
                   (click)="dialogVisible=true">
             <!--                  (click)="fileUpload.click()">-->
           </button>
@@ -34,18 +35,22 @@
 </div>
 
 <p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible">
-  <div class="p-pb-3 p-pl-0">You can upload your own data using this form. Please follow this file <a target="_blank"
-                                                                                                      [routerLink]="['/user-data-guidelines']">standard</a>
+  <div class="p-pb-3 p-pl-0">
+    You can upload your own data using this form. Please follow this file
+    <a target="_blank" [routerLink]="['/user-data-guidelines']">standard</a>
   </div>
   <div class="p-grid" style="display: flex">
 
-    <div class="center p-col-12 p-pb-0 p-pr-4">
-      <div class="form-field">
-        {{file ? file.name : "No file chosen yet."}}
+    <div class="center p-col-12 p-pb-0 p-pr-3">
+      <div
+        [ngClass]="{'form-field' : true, 'warning': isFileTooBig}"
+      >
+        {{file ? file.name : (isFileTooBig ? 'This file is too big, please choose another one. You still have ' + getTheFileSize() + ' available*'
+        : "No file chosen yet.")}}
       </div>
     </div>
 
-    <div class="center p-col-12 p-pt-0 p-pr-4">
+    <div class="center p-col-12 p-pt-1 p-pr-4">
       <div class="form-field">
         <button pButton
                 [label]="file ? 'Change file' :'Add file'"

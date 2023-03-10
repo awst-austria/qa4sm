@@ -9,6 +9,7 @@ import {allowedNameValidator} from '../../services/allowed-name.directive';
 import * as uuid from 'uuid';
 // @ts-ignore
 import JSZip from 'jszip';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -23,6 +24,7 @@ export class UserFileUploadComponent implements OnInit {
   // variable to open the form
   dialogVisible = false;
   spinnerVisible = false;
+  isFileTooBig = false;
 
   uploadProgress: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   uploadSub: Subscription;
@@ -38,7 +40,8 @@ export class UserFileUploadComponent implements OnInit {
 
   constructor(private userDatasetService: UserDatasetsService,
               private formBuilder: FormBuilder,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              public authService: AuthService) {
   }
 
   ngOnInit(): void {
@@ -59,6 +62,15 @@ export class UserFileUploadComponent implements OnInit {
 
   onFileSelected(event): void {
     this.file = event.target.files[0];
+    this.isFileTooBig = false;
+
+    if (this.file.size > this.authService.currentUser.space_left){
+      this.isFileTooBig = true;
+      this.file = null;
+      return null;
+    }
+
+
     const fileExtension = this.file.name.split('.').reverse()[0];
 
     if (!this.allowedExtensions.includes('.' + fileExtension)) {
@@ -73,7 +85,6 @@ export class UserFileUploadComponent implements OnInit {
     this.fileName = `${uuid.v4()}.${fileExtension}`;
     this.dialogVisible = true;
     // I need to clean the selected file, otherwise there will be problem with choosing the same file next time
-    console.log(this.fileName);
     event.target.value = null;
   }
 
@@ -90,6 +101,7 @@ export class UserFileUploadComponent implements OnInit {
           } else if (event.type === HttpEventType.Response) {
             this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
                 this.userDatasetService.refresh.next(true);
+                this.authService.init();
                 this.resetFile();
               },
               (message) => {
@@ -105,7 +117,6 @@ export class UserFileUploadComponent implements OnInit {
         },
         (message) => {
           this.spinnerVisible = false;
-          console.log(message);
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
         }
@@ -126,5 +137,10 @@ export class UserFileUploadComponent implements OnInit {
     this.uploadProgress = null;
     this.uploadSub = null;
   }
+
+  getTheFileSize(): string {
+    return this.userDatasetService.getTheSizeInProperUnits(this.authService.currentUser.space_left);
+  }
+
 
 }

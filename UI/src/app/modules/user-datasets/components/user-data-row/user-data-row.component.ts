@@ -8,6 +8,7 @@ import {DatasetVariableService} from '../../../core/services/dataset/dataset-var
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'qa-user-data-row',
@@ -50,7 +51,8 @@ export class UserDataRowComponent implements OnInit {
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              public authService: AuthService) {
   }
 
   ngOnInit(): void {
@@ -74,6 +76,7 @@ export class UserDataRowComponent implements OnInit {
     }
     this.userDatasetService.deleteUserData(dataFileId).subscribe(() => {
       this.userDatasetService.refresh.next(true);
+      this.authService.init();
     });
   }
 
@@ -126,21 +129,7 @@ export class UserDataRowComponent implements OnInit {
   }
 
   getTheFileSize(): string {
-    let fileSize;
-    let units;
-    const coeff = Math.pow(10, 6);
-    if (this.userDataset.file_size < coeff) {
-      fileSize = this.userDataset.file_size / Math.pow(10, 3);
-      units = 'kB';
-    } else if (this.userDataset.file_size >= coeff && this.userDataset.file_size < coeff * 1000) {
-      fileSize = this.userDataset.file_size / coeff;
-      units = 'MB';
-    } else {
-      fileSize = this.userDataset.file_size / Math.pow(10, 9);
-      units = 'GB';
-    }
-
-    return `${Math.round(fileSize * 10) / 10} ${units}`;
+    return this.userDatasetService.getTheSizeInProperUnits(this.userDataset.file_size);
   }
 
 }

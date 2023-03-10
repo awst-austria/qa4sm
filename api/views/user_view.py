@@ -12,7 +12,7 @@ from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
 from validator.models import User
 from django.contrib.auth import update_session_auth_hash
-
+from api.views.auxiliary_functions import get_fields_as_list
 
 def _get_querydict_from_user_data(request, userdata):
     user_data_dict = QueryDict(mutable=True)
@@ -97,4 +97,7 @@ class UserSerializer(ModelSerializer):
                   'country',
                   'orcid',
                   'id',
-                  'copied_runs']
+                  'copied_runs',
+                  'space_limit',
+                  'space_limit_value',
+                  'space_left']

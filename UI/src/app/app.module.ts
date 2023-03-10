@@ -74,6 +74,7 @@ import {ValidationReferenceModule} from './modules/validation-reference/validati
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 import {DialogModule} from 'primeng/dialog';
 import {LoginPageComponent} from './pages/login-page/login-page.component';
+import {ProgressBarModule} from 'primeng/progressbar';
 
 @NgModule({
   declarations: [
@@ -144,6 +145,7 @@ import {LoginPageComponent} from './pages/login-page/login-page.component';
         UserDatasetsModule,
         ValidationReferenceModule,
         DialogModule,
+        ProgressBarModule,
     ],
   providers: [
     {

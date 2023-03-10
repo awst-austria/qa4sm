@@ -21,7 +21,7 @@ class CustomUserAdmin(UserAdmin):
 
     ## define which columns appear in the list view. Add the action buttons at the end.
     readonly_fields = ('user_actions', )
-    list_display = ('username', 'email', 'first_name', 'last_name', 'organisation', 'orcid', 'is_active', 'is_staff', 'date_joined', 'user_actions', )
+    list_display = ('username', 'email', 'first_name', 'last_name', 'organisation', 'orcid', 'is_active', 'is_staff', 'date_joined', 'user_actions', 'space_limit')
     ordering = ('-date_joined', )
 
     def __init__(self, model, admin_site):
