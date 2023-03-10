@@ -2,24 +2,30 @@
 
   <div *ngIf="hasNoSpaceAssigned">
     <div class="p-text-center lead text-muted p-pt-3">
-      You have no space for uploading data assigned. Please contact our team (support(at)qa4sm.eu) to solve this problem.
+      You have no space for uploading data assigned. Please contact our team (support(at)qa4sm.eu) to solve this
+      problem.
     </div>
   </div>
 
   <div *ngIf="!hasNoSpaceAssigned">
     <div class="center">
       <!--    <div class="p-col-9 p-text-center">-->
-      <h1>My datasets</h1>
+      <h1>Upload your data</h1>
       <!--    </div>-->
     </div>
     <div class="p-text-center lead text-muted p-pt-3">
-     {{getLimitMessage()}}
+      {{getLimitMessage()}}
     </div>
-    <hr class="featurette-divider">
-    <div class="p-text-center">
+<!--    <hr class="featurette-divider">-->
+    <div class="p-text-center p-pt-5">
       <qa-user-file-upload></qa-user-file-upload>
     </div>
     <hr class="featurette-divider">
+    <div class="center">
+      <!--    <div class="p-col-9 p-text-center">-->
+      <h2>Uploaded data sets</h2>
+      <!--    </div>-->
+    </div>
     <div *ngIf="(userDatasets$ | async) as userDatasetList">
 
       <div *ngIf="userDatasetList.length != 0" class="container p-mb-5 p-mt-4" style="max-width: 70rem;">
