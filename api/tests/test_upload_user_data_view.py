@@ -80,6 +80,29 @@ class TestUploadUserDataView(APITestCase):
         user_data_path = f'{self.user_data_path}/{username}'
         shutil.rmtree(user_data_path)
 
+    def test_file_size_limit(self):
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+        print(dir(self.test_user))
+        file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
+
+        # check the size limit assigned to the user
+        assert self.test_user.space_limit == 'basic'
+        # check how much space left
+        assert self.test_user.space_left == self.test_user.get_space_limit_display() - file_entry.file.size
+        # remove the file
+        file_entry.delete()
+
+        # change the limit
+        self.test_user.space_limit = 'no_data'
+        self.test_user.save()
+
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+
+        assert response.json()['error'] == 'File is too big'
+        assert response.status_code == 500
+
     def test_get_list_of_user_data_files(self):
         # post the same file 3 times, to create 3 different entries
         self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
