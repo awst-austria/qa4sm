@@ -295,12 +295,14 @@ def _verify_file_extension(file_name):
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
     file = request.FILES['file']
+    print(file.size, type(file.size))
+    print(request.user.space_left, type(request.user.space_left))
     # I don't think it is possible not to meet this condition, but just in case
     if file.name != filename:
         return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
     if not _verify_file_extension(filename):
         return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
-    if file.size > request.user.space_left:
+    if request.user.space_left and file.size > request.user.space_left:
         return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
 
     file_data = {

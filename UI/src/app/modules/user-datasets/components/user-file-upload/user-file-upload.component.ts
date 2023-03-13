@@ -64,7 +64,10 @@ export class UserFileUploadComponent implements OnInit {
     this.file = event.target.files[0];
     this.isFileTooBig = false;
 
-    if (this.file.size > this.authService.currentUser.space_left){
+    console.log(this.file.size);
+    console.log(this.authService.currentUser);
+
+    if (this.authService.currentUser.space_left && this.file.size > this.authService.currentUser.space_left){
       this.isFileTooBig = true;
       this.file = null;
       return null;
