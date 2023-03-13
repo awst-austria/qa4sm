@@ -103,6 +103,19 @@ class TestUploadUserDataView(APITestCase):
         assert response.json()['error'] == 'File is too big'
         assert response.status_code == 500
 
+        self.test_user.space_limit = 'unlimited'
+        self.test_user.save()
+
+        response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+                         {FILE: self.netcdf_file}, format=FORMAT_MULTIPART)
+
+        assert response.status_code == 200
+
+        assert not self.test_user.space_left
+
+        file_entry = UserDatasetFile.objects.get(id=response.json()['id'])
+        file_entry.delete()
+
     def test_get_list_of_user_data_files(self):
         # post the same file 3 times, to create 3 different entries
         self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
