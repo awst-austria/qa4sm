@@ -11,6 +11,7 @@ import {ExtentModel} from '../spatial-extent/extent-model';
 import {ComparisonService} from '../../services/comparison.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {BehaviorSubject} from 'rxjs';
+import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
 
 const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
@@ -40,7 +41,8 @@ export class ValidationSelectorComponent implements OnInit {
               private versionService: DatasetVersionService,
               private validationrunService: ValidationrunService,
               private comparisonService: ComparisonService,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              private datasetVariableService: DatasetVariableService) {
   }
 
   ngOnInit(): void {
@@ -81,6 +83,10 @@ export class ValidationSelectorComponent implements OnInit {
         model.datasetModel.selectedVersion = versions.find(version => version.pretty_name === '20210131 global');
         this.getValidations4comparison(String(model.datasetModel.selectedDataset.short_name),
           String(model.datasetModel.selectedVersion.short_name));
+        // get all variables
+        this.datasetVariableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
+          model.datasetModel.selectedVariable = variables[0];
+        });
       });
     });
   }
