@@ -364,10 +364,7 @@ class TestValidation(TestCase):
             self.__logger.debug(f"{metric}: Plots are {len(overview_pngs)}, "
                                 f"should: {(n_datasets - 1)}")
 
-        if is_tcol_run:
-            assert os.path.isfile(os.path.join(outdir, 'overview_status_tc.png'))
-        else:
-            assert os.path.isfile(os.path.join(outdir, 'overview_status.png'))
+        assert os.path.isfile(os.path.join(outdir, 'overview_status.png'))
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
