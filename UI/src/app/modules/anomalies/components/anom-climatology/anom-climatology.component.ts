@@ -18,9 +18,6 @@ export class AnomClimatologyComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.anomaliesModel);
-    console.log(this.anomaliesModel.anomaliesFrom$.getValue());
-    console.log(this.getYearFrom());
   }
 
   setDate(year): Date {

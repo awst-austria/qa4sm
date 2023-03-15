@@ -158,8 +158,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
-
-    console.log(this.validationModel);
   }
 
   private setDefaultDatasetSettings(): void {

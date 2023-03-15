@@ -37,6 +37,10 @@ export class ResultFilesComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateMetricsWithPlots();
+    this.updatedMetrics$.subscribe(metrics => {
+      this.selectedMetrics = metrics[0];
+      this.selectedBoxplot = metrics[0].boxplot_dicts[0];
+    });
   }
 
   private updateMetricsWithPlots(): void {
@@ -55,7 +59,8 @@ export class ResultFilesComponent implements OnInit {
     );
   }
 
-  onMetricChange(): void {
+  onMetricChange(option): void {
+    console.log(option);
     this.metricIndx = this.selectedMetrics.ind;
     // resetting boxplot index
     this.boxplotIndx = 0;
