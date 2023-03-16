@@ -119,6 +119,11 @@ export class UserFileUploadComponent implements OnInit {
           this.spinnerVisible = false;
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
+        },
+        () => {
+          this.userDatasetService.cleanRedundantDatasets().subscribe(response => {
+            console.log(response);
+          });
         }
       );
     }

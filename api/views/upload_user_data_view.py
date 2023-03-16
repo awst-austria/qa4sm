@@ -321,6 +321,23 @@ def upload_user_data(request, filename):
         return JsonResponse(file_serializer.errors, status=500, safe=False)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def clean_redundant_datasets(request):
+    user_datasets = Dataset.objects.filter(user=request.user)
+    for dataset in user_datasets:
+        if len(dataset.user_dataset.all()) == 0:
+            versions = dataset.versions.all()
+            variables = dataset.variables.all()
+            dataset.versions.clear()
+            dataset.variables.clear()
+            dataset.delete()
+            for version in versions:
+                version.delete()
+            for variable in variables:
+                variable.delete()
+    return JsonResponse({'message': 'cleaned'}, status=200)
+
 # SERIALIZERS
 class UploadSerializer(ModelSerializer):
     class Meta:
