@@ -52,6 +52,7 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
     current_max_id = DatasetVersion.objects.all().last().id if DatasetVersion.objects.all().last() else 0
     print('Max version id', current_max_id)
     new_version_data = {
+        "id": 1000,
         "short_name": version_name,
         "pretty_name": version_pretty_name,
         "help_text": f'Version {version_pretty_name} of dataset {dataset_pretty_name} provided by user {user}.',
@@ -84,6 +85,7 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, u
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
     print('current dataset max id', current_max_id)
     dataset_data = {
+        'id': 1000,
         'short_name': dataset_name,
         'pretty_name': dataset_pretty_name,
         'help_text': f'Dataset {dataset_pretty_name} provided by user {user}.',
