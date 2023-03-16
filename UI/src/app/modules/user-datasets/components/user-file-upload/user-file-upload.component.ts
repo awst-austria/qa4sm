@@ -99,8 +99,10 @@ export class UserFileUploadComponent implements OnInit {
           if (event.type === HttpEventType.UploadProgress) {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
-            this.userDatasetService.preprocessFile(event.body.id).subscribe((data) => {
-                console.log(data);
+            this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
+                this.userDatasetService.refresh.next(true);
+                this.authService.init();
+                this.resetFile();
               },
               () => {
               console.log('error');
@@ -128,6 +130,11 @@ export class UserFileUploadComponent implements OnInit {
           this.spinnerVisible = false;
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
+        },
+        () => {
+          this.userDatasetService.cleanRedundantDatasets().subscribe(response => {
+            console.log(response);
+          });
         }
       );
     }

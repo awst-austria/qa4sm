@@ -117,7 +117,8 @@ urlpatterns = [
     path('user-file-preprocess/<uuid:file_uuid>/', preprocess_file,
          name='Preprocess User File'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
-    path('scaling-methods', get_scaling_methods, name='Scaling methods')
+    path('scaling-methods', get_scaling_methods, name='Scaling methods'),
+    path('clean-redundant-datasets', clean_redundant_datasets, name='Clean Datasets')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
