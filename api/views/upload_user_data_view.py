@@ -236,9 +236,13 @@ class UploadedFileError(BaseException):
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
 def post_user_file_metadata_and_preprocess_file(request, file_uuid):
-    print('I got a request and want to post metadata', request)
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+
+    if file_entry.dataset and file_entry.version and file_entry.variable:
+        print('I am here trying to update it one more time, dont really know why')
+        print(file_entry, request.data)
+        return JsonResponse({'message': 'ok'}, status=200)
 
     if serializer.is_valid():
         # first the file will be preprocessed
