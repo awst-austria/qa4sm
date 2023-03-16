@@ -74,7 +74,7 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         #     new_version.save()
         #     # need to remove this one, otherwise it will be duplicated
         #     DatasetVersion.objects.get(id=new_version_id).delete()
-        # return new_version
+        return new_version
     else:
         raise Exception(version_serializer.errors)
 
