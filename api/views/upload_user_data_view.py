@@ -36,13 +36,13 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
         new_variable_id = new_variable.id
         print('new var id', new_variable_id, USER_DATASET_VARIABLE_MIN_ID)
         # need to leave some id spots for our datasets, to avoid overriding users' entries
-        # if new_variable_id < USER_DATASET_VARIABLE_MIN_ID:
-        #     print('I should not be here')
-        #     new_variable.id = USER_DATASET_VARIABLE_MIN_ID if current_max_id < USER_DATASET_VARIABLE_MIN_ID \
-        #         else current_max_id + 1
-        #     new_variable.save()
-        #     # need to remove this one, otherwise it will be duplicated
-        #     DataVariable.objects.get(id=new_variable_id).delete()
+        if new_variable_id < USER_DATASET_VARIABLE_MIN_ID:
+            print('I should not be here')
+            new_variable.id = USER_DATASET_VARIABLE_MIN_ID if current_max_id < USER_DATASET_VARIABLE_MIN_ID \
+                else current_max_id + 1
+            new_variable.save()
+            # need to remove this one, otherwise it will be duplicated
+            DataVariable.objects.get(id=new_variable_id).delete()
         return new_variable
     else:
         raise Exception(variable_serializer.errors)
@@ -67,13 +67,13 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         new_version_id = new_version.id
         print('new version id ', new_version_id, USER_DATASET_VERSION_MIN_ID)
         # need to leave some id spots for our datasets, to avoid overriding users' entries
-        # if new_version_id < USER_DATASET_VERSION_MIN_ID:
-        #     print('I should not be here')
-        #     new_version.id = USER_DATASET_VERSION_MIN_ID if current_max_id < USER_DATASET_VERSION_MIN_ID \
-        #         else current_max_id + 1
-        #     new_version.save()
-        #     # need to remove this one, otherwise it will be duplicated
-        #     DatasetVersion.objects.get(id=new_version_id).delete()
+        if new_version_id < USER_DATASET_VERSION_MIN_ID:
+            print('I should not be here')
+            new_version.id = USER_DATASET_VERSION_MIN_ID if current_max_id < USER_DATASET_VERSION_MIN_ID \
+                else current_max_id + 1
+            new_version.save()
+            # need to remove this one, otherwise it will be duplicated
+            DatasetVersion.objects.get(id=new_version_id).delete()
         return new_version
     else:
         raise Exception(version_serializer.errors)
@@ -102,12 +102,12 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, u
         new_dataset_id = new_dataset.id
         print('new dataset id ', new_dataset_id, USER_DATASET_MIN_ID)
         # need to leave some id spots for our datasets, to avoid overriding users' entries
-        # if new_dataset_id < USER_DATASET_MIN_ID:
-        #     print('I should not be here')
-        #     new_dataset.id = USER_DATASET_MIN_ID if current_max_id < USER_DATASET_MIN_ID else current_max_id + 1
-        #     new_dataset.save()
-        #     # need to remove this one, otherwise it will be duplicated
-        #     Dataset.objects.get(id=new_dataset_id).delete()
+        if new_dataset_id < USER_DATASET_MIN_ID:
+            print('I should not be here')
+            new_dataset.id = USER_DATASET_MIN_ID if current_max_id < USER_DATASET_MIN_ID else current_max_id + 1
+            new_dataset.save()
+            # need to remove this one, otherwise it will be duplicated
+            Dataset.objects.get(id=new_dataset_id).delete()
         return new_dataset
     else:
         raise Exception(dataset_serializer.errors)
