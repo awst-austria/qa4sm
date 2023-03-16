@@ -239,6 +239,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
 
+    print('I am here', file_entry.dataset, file_entry.version, file_entry.variable)
     if file_entry.dataset and file_entry.version and file_entry.variable:
         print('I am here trying to update it one more time, dont really know why')
         print(file_entry, request.data)
