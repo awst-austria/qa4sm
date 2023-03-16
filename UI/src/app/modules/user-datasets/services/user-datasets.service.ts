@@ -55,11 +55,6 @@ export class UserDatasetsService {
     return this.httpClient.get(testUrl);
   }
 
-  preprocessFile(fileId: string): Observable<any>{
-    const preprocessUrl = preprocessFileUrl + '/' + fileId + '/';
-    return this.httpClient.get(preprocessUrl);
-  }
-
   updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
     const updateUrl = updateMetadataUrl + '/' + dataFileId + '/';
     return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue});
