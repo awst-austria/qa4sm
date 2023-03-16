@@ -99,29 +99,20 @@ export class UserFileUploadComponent implements OnInit {
           if (event.type === HttpEventType.UploadProgress) {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
-            this.userDatasetService.preprocessFile(event.body.id).subscribe((data) => {
-                console.log(data);
+            this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
+                this.userDatasetService.refresh.next(true);
+                this.authService.init();
+                this.resetFile();
+              },
+              (message) => {
+                this.spinnerVisible = false;
+                this.toastService.showErrorWithHeader('Metadata not saved.',
+                  `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
               },
               () => {
-              console.log('error');
-              },
-              () => {
-                this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
-                    this.userDatasetService.refresh.next(true);
-                    this.authService.init();
-                    this.resetFile();
-                  },
-                  (message) => {
-                    this.spinnerVisible = false;
-                    this.toastService.showErrorWithHeader('Metadata not saved.',
-                      `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
-                  },
-                  () => {
-                    this.spinnerVisible = false;
-                    this.metadataForm.reset('');
-                  });
-              }
-            );
+                this.spinnerVisible = false;
+                this.metadataForm.reset('');
+              });
           }
         },
         (message) => {

@@ -11,7 +11,6 @@ const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
 const userDataMetadataUrl: string = urlPrefix + '/user-file-metadata';
 const userDataTestUrl: string = urlPrefix + '/test-user-dataset';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
-const preprocessFileUrl: string = urlPrefix + '/user-file-preprocess';
 // const validateUserDataUrl: string = urlPrefix + '/validate-user-data';
 
 const csrfToken = '{{csrf_token}}';
@@ -52,11 +51,6 @@ export class UserDatasetsService {
   testDataset(dataFileId: string): Observable<any>{
     const testUrl = userDataTestUrl + '/' + dataFileId + '/';
     return this.httpClient.get(testUrl);
-  }
-
-  preprocessFile(fileId: string): Observable<any>{
-    const preprocessUrl = preprocessFileUrl + '/' + fileId + '/';
-    return this.httpClient.get(preprocessUrl);
   }
 
   updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
