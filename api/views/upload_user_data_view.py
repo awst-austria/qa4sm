@@ -21,7 +21,6 @@ __logger = logging.getLogger(__name__)
 def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, variable_unit=None, max_value=None,
                           min_value=None):
     current_max_id = DataVariable.objects.all().last().id if DataVariable.objects.all().last() else 0
-    print('Max var id', current_max_id)
     new_variable_data = {
         'short_name': variable_name,
         'pretty_name': variable_pretty_name,
@@ -34,10 +33,8 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
     if variable_serializer.is_valid():
         new_variable = variable_serializer.save()
         new_variable_id = new_variable.id
-        print('new var id', new_variable_id, USER_DATASET_VARIABLE_MIN_ID)
         # need to leave some id spots for our datasets, to avoid overriding users' entries
         if new_variable_id < USER_DATASET_VARIABLE_MIN_ID:
-            print('I should not be here')
             new_variable.id = USER_DATASET_VARIABLE_MIN_ID if current_max_id < USER_DATASET_VARIABLE_MIN_ID \
                 else current_max_id + 1
             new_variable.save()
@@ -50,7 +47,6 @@ def create_variable_entry(variable_name, variable_pretty_name, dataset_name, use
 
 def create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user):
     current_max_id = DatasetVersion.objects.all().last().id if DatasetVersion.objects.all().last() else 0
-    print('Max version id', current_max_id)
     new_version_data = {
         "short_name": version_name,
         "pretty_name": version_pretty_name,
@@ -62,13 +58,10 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
 
     version_serializer = DatasetVersionSerializer(data=new_version_data)
     if version_serializer.is_valid():
-        print(version_serializer.validated_data)
         new_version = version_serializer.save()
         new_version_id = new_version.id
-        print('new version id ', new_version_id, USER_DATASET_VERSION_MIN_ID)
         # need to leave some id spots for our datasets, to avoid overriding users' entries
         if new_version_id < USER_DATASET_VERSION_MIN_ID:
-            print('I should not be here')
             new_version.id = USER_DATASET_VERSION_MIN_ID if current_max_id < USER_DATASET_VERSION_MIN_ID \
                 else current_max_id + 1
             new_version.save()
@@ -82,7 +75,6 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
 def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user, file_entry):
     # TODO: update variables
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
-    print('current dataset max id', current_max_id)
     dataset_data = {
         'short_name': dataset_name,
         'pretty_name': dataset_pretty_name,
@@ -100,10 +92,8 @@ def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, u
     if dataset_serializer.is_valid():
         new_dataset = dataset_serializer.save()
         new_dataset_id = new_dataset.id
-        print('new dataset id ', new_dataset_id, USER_DATASET_MIN_ID)
         # need to leave some id spots for our datasets, to avoid overriding users' entries
         if new_dataset_id < USER_DATASET_MIN_ID:
-            print('I should not be here')
             new_dataset.id = USER_DATASET_MIN_ID if current_max_id < USER_DATASET_MIN_ID else current_max_id + 1
             new_dataset.save()
             # need to remove this one, otherwise it will be duplicated
@@ -304,8 +294,6 @@ def _verify_file_extension(file_name):
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
     file = request.FILES['file']
-    print(file.size, type(file.size))
-    print(request.user.space_left, type(request.user.space_left))
     # I don't think it is possible not to meet this condition, but just in case
     if file.name != filename:
         return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
