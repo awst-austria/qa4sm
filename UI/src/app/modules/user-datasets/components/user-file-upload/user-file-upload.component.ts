@@ -100,6 +100,7 @@ export class UserFileUploadComponent implements OnInit {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
             this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
+                console.log('I am sending a request to post metadata');
                 this.userDatasetService.refresh.next(true);
                 this.authService.init();
                 this.resetFile();
