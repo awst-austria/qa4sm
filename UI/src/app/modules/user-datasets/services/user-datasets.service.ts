@@ -11,7 +11,6 @@ const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
 const userDataMetadataUrl: string = urlPrefix + '/user-file-metadata';
 const userDataTestUrl: string = urlPrefix + '/test-user-dataset';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
-const cleanDatasetsUrl: string = urlPrefix + '/clean-redundant-datasets';
 
 // const validateUserDataUrl: string = urlPrefix + '/validate-user-data';
 
@@ -58,10 +57,6 @@ export class UserDatasetsService {
   updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
     const updateUrl = updateMetadataUrl + '/' + dataFileId + '/';
     return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue});
-  }
-
-  cleanRedundantDatasets(): Observable<any>{
-    return this.httpClient.get(cleanDatasetsUrl);
   }
 
   getTheSizeInProperUnits(sizeInBites): string {
