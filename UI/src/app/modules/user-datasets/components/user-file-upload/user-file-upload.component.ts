@@ -104,26 +104,15 @@ export class UserFileUploadComponent implements OnInit {
                 this.authService.init();
                 this.resetFile();
               },
-              () => {
-              console.log('error');
+              (message) => {
+                this.spinnerVisible = false;
+                this.toastService.showErrorWithHeader('Metadata not saved.',
+                  `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
               },
               () => {
-                this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
-                    this.userDatasetService.refresh.next(true);
-                    this.authService.init();
-                    this.resetFile();
-                  },
-                  (message) => {
-                    this.spinnerVisible = false;
-                    this.toastService.showErrorWithHeader('Metadata not saved.',
-                      `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
-                  },
-                  () => {
-                    this.spinnerVisible = false;
-                    this.metadataForm.reset('');
-                  });
-              }
-            );
+                this.spinnerVisible = false;
+                this.metadataForm.reset('');
+              });
           }
         },
         (message) => {
@@ -134,6 +123,7 @@ export class UserFileUploadComponent implements OnInit {
       );
     }
   }
+
 
   onSaveData(): void {
     this.dialogVisible = false;
