@@ -11,7 +11,6 @@ def get_fields_as_list(model):
 
 def clean_redundant_datasets(user):
     user_datasets_without_file = Dataset.objects.filter(user=user).filter(user_dataset__isnull=True)
-    print(user_datasets_without_file)
     for dataset in user_datasets_without_file:
         versions = dataset.versions.all()
         variables = dataset.variables.all()
