@@ -171,7 +171,7 @@ def get_variables_from_the_reader(reader):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
-    clean_redundant_datasets(request.user)
+    # clean_redundant_datasets(request.user)
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
     serializer = UploadSerializer(list_of_files, many=True)
     try:
@@ -244,11 +244,13 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         # first the file will be preprocessed
         try:
             gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
+            print('1')
         except Exception as e:
             print(e, type(e))
             file_entry.delete()
             return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
 
+        print('2')
         sm_variable = get_sm_variable_names(gridded_reader.variable_description())
         all_variables = get_variables_from_the_reader(gridded_reader)
 
@@ -263,8 +265,11 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
         # creating variable entry
 
+        print('3', new_version)
+
         new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
                                              request.user, sm_variable['units'])
+        print('4', new_variable)
         # for sm_variable in sm_variables:
         #     new_variable = create_variable_entry(
         #             sm_variable['name'],
@@ -274,10 +279,11 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         # creating dataset entry
         new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
                                            file_entry)
+        print('5', new_dataset)
         # updating file entry
         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
                                               all_variables)
-
+        print('6', file_data_updated['data'])
         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
 
     else:
