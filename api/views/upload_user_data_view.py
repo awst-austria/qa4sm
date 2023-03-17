@@ -8,7 +8,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 from django.utils import timezone
 
-from api.views.auxiliary_functions import get_fields_as_list
+from api.views.auxiliary_functions import get_fields_as_list, clean_redundant_datasets
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import logging
@@ -320,23 +320,6 @@ def upload_user_data(request, filename):
         print(file_serializer.errors)
         return JsonResponse(file_serializer.errors, status=500, safe=False)
 
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def clean_redundant_datasets(request):
-    user_datasets = Dataset.objects.filter(user=request.user)
-    for dataset in user_datasets:
-        if len(dataset.user_dataset.all()) == 0:
-            versions = dataset.versions.all()
-            variables = dataset.variables.all()
-            dataset.versions.clear()
-            dataset.variables.clear()
-            dataset.delete()
-            for version in versions:
-                version.delete()
-            for variable in variables:
-                variable.delete()
-    return JsonResponse({'message': 'cleaned'}, status=200)
 
 # SERIALIZERS
 class UploadSerializer(ModelSerializer):
