@@ -171,6 +171,7 @@ def get_variables_from_the_reader(reader):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
+    clean_redundant_datasets(request.user)
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
     serializer = UploadSerializer(list_of_files, many=True)
     try:
