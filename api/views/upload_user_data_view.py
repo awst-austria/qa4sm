@@ -10,7 +10,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 from django.utils import timezone
 
-from api.views.auxiliary_functions import get_fields_as_list, clean_redundant_datasets
+from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import logging
