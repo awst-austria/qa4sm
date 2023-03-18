@@ -118,6 +118,7 @@ export class UserFileUploadComponent implements OnInit {
         },
         (message) => {
           this.spinnerVisible = false;
+          console.log(message)
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
         },

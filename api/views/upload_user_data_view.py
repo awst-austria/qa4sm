@@ -293,27 +293,32 @@ def _verify_file_extension(file_name):
 
 def preprocess_file_and_save_metadata(file_entry, metadata, user):
     serializer = UserFileMetadataSerializer(data=metadata)
+    print('I am trying to save metadata')
     if serializer.is_valid():
         # first the file will be preprocessed
         try:
             gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
+            print('I managed to preprocess file')
         except Exception as e:
             print(e, type(e))
             file_entry.delete()
             return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
 
         sm_variable = get_sm_variable_names(gridded_reader.variable_description())
+        print('5')
         all_variables = get_variables_from_the_reader(gridded_reader)
+        print('4')
         dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
         dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
             USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
         version_name = metadata[USER_DATA_VERSION_FIELD_NAME]
         version_pretty_name = metadata[USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
             USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
-
+        print(version_name, dataset_name)
         # creating version entry
         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user)
         # creating variable entry
+        print('3')
 
         new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
                                              user, sm_variable['units'])
@@ -324,11 +329,14 @@ def preprocess_file_and_save_metadata(file_entry, metadata, user):
         #             dataset_pretty_name,
         #             request.user)
         # creating dataset entry
+        print('2')
         new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, user,
                                            file_entry)
         # updating file entry
+        print('1')
         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, user,
                                               all_variables)
+        print('I got to the end')
         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
 
     else:
@@ -367,6 +375,7 @@ def upload_and_preprocess_file(request, filename):
     file_serializer = UploadSerializer(data=file_data)
     if file_serializer.is_valid():
         file_serializer.save()
+        print('file saved')
         file_entry = get_object_or_404(UserDatasetFile, id=file_serializer.data['id'])
         response = preprocess_file_and_save_metadata(file_entry, metadata, request.user)
         return response
