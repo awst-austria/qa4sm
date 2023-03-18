@@ -92,33 +92,41 @@ export class UserFileUploadComponent implements OnInit {
     if (this.file) {
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
-      const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName)
+      const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName, this.metadataForm.value)
         .pipe(finalize(() => this.reset));
 
       this.uploadSub = upload$.subscribe(event => {
           if (event.type === HttpEventType.UploadProgress) {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
-            this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
-                this.userDatasetService.refresh.next(true);
-                this.authService.init();
-                this.resetFile();
-              },
-              (message) => {
-                this.spinnerVisible = false;
-                this.toastService.showErrorWithHeader('Metadata not saved.',
-                  `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
-              },
-              () => {
-                this.spinnerVisible = false;
-                this.metadataForm.reset('');
-              });
+            console.log('Done');
+            // this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
+            //     this.userDatasetService.refresh.next(true);
+            //     this.authService.init();
+            //     this.resetFile();
+            //   },
+            //   (message) => {
+            //     this.spinnerVisible = false;
+            //     this.toastService.showErrorWithHeader('Metadata not saved.',
+            //       `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
+            //   },
+            //   () => {
+            //     this.spinnerVisible = false;
+            //     this.metadataForm.reset('');
+            //   });
           }
         },
         (message) => {
           this.spinnerVisible = false;
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
+        },
+        () => {
+              this.userDatasetService.refresh.next(true);
+              this.authService.init();
+              this.resetFile();
+              this.spinnerVisible = false;
+              this.metadataForm.reset('');
         }
       );
     }

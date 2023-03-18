@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -234,42 +236,87 @@ class UploadedFileError(BaseException):
         self.message = message
 
 
-@api_view(['PUT', 'POST'])
-@permission_classes([IsAuthenticated])
-def post_user_file_metadata_and_preprocess_file(request, file_uuid):
-    serializer = UserFileMetadataSerializer(data=request.data)
-    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    print('0', file_entry.dataset, file_entry.version, file_entry.variable)
+# @api_view(['PUT', 'POST'])
+# @permission_classes([IsAuthenticated])
+# def post_user_file_metadata_and_preprocess_file(request, file_uuid):
+#     serializer = UserFileMetadataSerializer(data=request.data)
+#     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+#     if serializer.is_valid():
+#         # first the file will be preprocessed
+#         try:
+#             gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
+#         except Exception as e:
+#             print(e, type(e))
+#             file_entry.delete()
+#             return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
+#
+#         sm_variable = get_sm_variable_names(gridded_reader.variable_description())
+#         all_variables = get_variables_from_the_reader(gridded_reader)
+#
+#         dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
+#         dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
+#             USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
+#         version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
+#         version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
+#             USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+#         #
+#         # creating version entry
+#         new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+#         # creating variable entry
+#
+#
+#         new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
+#                                              request.user, sm_variable['units'])
+#         # for sm_variable in sm_variables:
+#         #     new_variable = create_variable_entry(
+#         #             sm_variable['name'],
+#         #             sm_variable['long_name'],
+#         #             dataset_pretty_name,
+#         #             request.user)
+#         # creating dataset entry
+#         new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
+#                                            file_entry)
+#         # updating file entry
+#         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
+#                                               all_variables)
+#         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
+#
+#     else:
+#         print(serializer.errors)
+#         file_entry.delete()
+#         return JsonResponse(serializer.errors, status=500, safe=False)
+
+
+def _verify_file_extension(file_name):
+    return file_name.endswith('.nc4') or file_name.endswith('.nc') or file_name.endswith('.zip')
+
+
+def preprocess_file_and_save_metadata(file_entry, metadata, user):
+    serializer = UserFileMetadataSerializer(data=metadata)
     if serializer.is_valid():
         # first the file will be preprocessed
         try:
             gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
-            print('1')
         except Exception as e:
             print(e, type(e))
             file_entry.delete()
             return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
 
-        print('2')
         sm_variable = get_sm_variable_names(gridded_reader.variable_description())
         all_variables = get_variables_from_the_reader(gridded_reader)
-
-        dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
-        dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
+        dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
+        dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
             USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
-        version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
-        version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
+        version_name = metadata[USER_DATA_VERSION_FIELD_NAME]
+        version_pretty_name = metadata[USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
             USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
-        #
+
         # creating version entry
-        new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+        new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, user)
         # creating variable entry
 
-        print('3', new_version)
-
         new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
-                                             request.user, sm_variable['units'])
-        print('4', new_variable)
+                                             user, sm_variable['units'])
         # for sm_variable in sm_variables:
         #     new_variable = create_variable_entry(
         #             sm_variable['name'],
@@ -277,31 +324,28 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         #             dataset_pretty_name,
         #             request.user)
         # creating dataset entry
-        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
+        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, user,
                                            file_entry)
-        print('5', new_dataset)
         # updating file entry
-        file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
+        file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, user,
                                               all_variables)
-        print('6', file_data_updated['data'])
         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
 
     else:
+        print(serializer)
         print(serializer.errors)
         file_entry.delete()
         return JsonResponse(serializer.errors, status=500, safe=False)
 
 
-def _verify_file_extension(file_name):
-    return file_name.endswith('.nc4') or file_name.endswith('.nc') or file_name.endswith('.zip')
-
-
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
 @parser_classes([FileUploadParser])
-def upload_user_data(request, filename):
+def upload_and_preprocess_file(request, filename):
     file = request.FILES['file']
-    # I don't think it is possible not to meet this condition, but just in case
+    metadata = json.loads(request.META['HTTP_X_METADATA'])
+
+    # check file
     if file.name != filename:
         return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
     if not _verify_file_extension(filename):
@@ -309,6 +353,7 @@ def upload_user_data(request, filename):
     if request.user.space_left and file.size > request.user.space_left:
         return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
 
+    # prepare file entry
     file_data = {
         'file': file,
         'file_name': filename,
@@ -322,10 +367,45 @@ def upload_user_data(request, filename):
     file_serializer = UploadSerializer(data=file_data)
     if file_serializer.is_valid():
         file_serializer.save()
-        return JsonResponse(file_serializer.data, status=200, safe=False)
+        file_entry = get_object_or_404(UserDatasetFile, id=file_serializer.data['id'])
+        response = preprocess_file_and_save_metadata(file_entry, metadata, request.user)
+        return response
     else:
         print(file_serializer.errors)
         return JsonResponse(file_serializer.errors, status=500, safe=False)
+
+
+# @api_view(['PUT', 'POST'])
+# @permission_classes([IsAuthenticated])
+# @parser_classes([FileUploadParser])
+# def upload_user_data(request, filename):
+#     file = request.FILES['file']
+#     print('monika', request.META['HTTP_X_METADATA'])
+#     # I don't think it is possible not to meet this condition, but just in case
+#     if file.name != filename:
+#         return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
+#     if not _verify_file_extension(filename):
+#         return JsonResponse({'error': 'Wrong file format'}, status=500, safe=False)
+#     if request.user.space_left and file.size > request.user.space_left:
+#         return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
+#
+#     file_data = {
+#         'file': file,
+#         'file_name': filename,
+#         'owner': request.user.pk,
+#         'dataset': None,
+#         'version': None,
+#         'variable': None,
+#         'upload_date': timezone.now()
+#     }
+#
+#     file_serializer = UploadSerializer(data=file_data)
+#     if file_serializer.is_valid():
+#         file_serializer.save()
+#         return JsonResponse(file_serializer.data, status=200, safe=False)
+#     else:
+#         print(file_serializer.errors)
+#         return JsonResponse(file_serializer.errors, status=500, safe=False)
 
 
 # SERIALIZERS
