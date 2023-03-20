@@ -20,8 +20,12 @@ def clean_redundant_datasets(user):
         print(versions, variables)
         dataset.versions.clear()
         dataset.variables.clear()
-        dataset.delete()
+
         for version in versions:
+            print(version)
             version.delete()
         for variable in variables:
+            print(variable)
             variable.delete()
+
+        dataset.delete()
