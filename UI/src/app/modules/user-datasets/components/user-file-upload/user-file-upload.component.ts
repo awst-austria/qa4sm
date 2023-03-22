@@ -99,10 +99,24 @@ export class UserFileUploadComponent implements OnInit {
           if (event.type === HttpEventType.UploadProgress) {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
-            this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
-                this.userDatasetService.refresh.next(true);
-                this.authService.init();
-                this.resetFile();
+            this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe((response) => {
+                if (response.status === 202) {
+                  // Request accepted for processing, show a processing message
+                  this.toastService.showAlertWithHeader('Metadata processing in progress.',
+                    'The metadata is being processed. Please wait for a moment.');
+                } else {
+                  // Final response received, reset the form and refresh the view
+                  this.spinnerVisible = false;
+                  this.metadataForm.reset('');
+                  this.userDatasetService.refresh.next(true);
+                  this.authService.init();
+                  this.resetFile();
+                }
+                // this.userDatasetService.refresh.next(true);
+                // this.authService.init();
+                // this.resetFile();
+                // this.spinnerVisible = false;
+                // this.metadataForm.reset('');
               },
               (message) => {
                 this.spinnerVisible = false;
