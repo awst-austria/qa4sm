@@ -18,4 +18,6 @@ QA4SM v2.2.0 - Release notes 2023-03-..
 
 1. Setting default dates for 'Climatology' method of Anomalies computation fixed
 2. Setting default geographical range fixed for the case when the introduced min latitude or longitude is bigger than the maximum, and vice versa
-3. Styling improved
+
+ # Other changes
+1. Styling improved
