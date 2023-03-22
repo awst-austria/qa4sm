@@ -1,3 +1,6 @@
+from validator.models import Dataset
+
+
 def get_fields_as_list(model):
     fields = []
     for field in model._meta.get_fields():
@@ -5,3 +8,15 @@ def get_fields_as_list(model):
     for property_name in list(model._meta._property_names):
         fields.append(property_name)
     return fields
+
+
+def clean_redundant_datasets(user_datasets_without_file):
+    for dataset in user_datasets_without_file:
+        versions = dataset.versions.all()
+        variables = dataset.variables.all()
+        for version in versions:
+            version.delete()
+        for variable in variables:
+            variable.delete()
+
+        dataset.delete()

@@ -8,7 +8,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 from django.utils import timezone
 
-from api.views.auxiliary_functions import get_fields_as_list
+from api.views.auxiliary_functions import get_fields_as_list, clean_redundant_datasets
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import logging
@@ -172,6 +172,14 @@ def get_variables_from_the_reader(reader):
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
+    user_datasets_without_file = Dataset.objects.filter(user=request.user).filter(user_dataset__isnull=True)
+    if len(user_datasets_without_file) != 0:
+        print(user_datasets_without_file)
+        try:
+            clean_redundant_datasets(user_datasets_without_file)
+        except:
+            print(f'Could not remove datasets, versions and variables for user {request.user}')
+
     serializer = UploadSerializer(list_of_files, many=True)
     try:
         return JsonResponse(serializer.data, status=200, safe=False)
@@ -185,7 +193,6 @@ def get_list_of_user_data_files(request):
 @permission_classes([IsAuthenticated])
 def delete_user_dataset_and_file(request, file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
-
     if file_entry.owner != request.user:
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
@@ -295,8 +302,6 @@ def _verify_file_extension(file_name):
 @parser_classes([FileUploadParser])
 def upload_user_data(request, filename):
     file = request.FILES['file']
-    print(file.size, type(file.size))
-    print(request.user.space_left, type(request.user.space_left))
     # I don't think it is possible not to meet this condition, but just in case
     if file.name != filename:
         return JsonResponse({'error': 'Wrong file name'}, status=500, safe=False)
