@@ -32,6 +32,8 @@ class UserDatasetFile(models.Model):
     variable = models.ForeignKey(DataVariable, related_name='user_variable', on_delete=models.SET_NULL, null=True)
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
+    metadata_submitted = models.BooleanField(default=False)
+
 
 
     @property
