@@ -100,11 +100,16 @@ export class UserFileUploadComponent implements OnInit {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
             this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe((response) => {
+              if (response.status === 202){
+                this.spinnerVisible = true;
+              } else {
                 this.userDatasetService.refresh.next(true);
                 this.authService.init();
                 this.resetFile();
                 this.spinnerVisible = false;
                 this.metadataForm.reset('');
+              }
+
               },
               (message) => {
                 this.spinnerVisible = false;
