@@ -171,8 +171,15 @@ def get_variables_from_the_reader(reader):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
-    clean_redundant_datasets(request.user)
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
+    user_datasets_without_file = Dataset.objects.filter(user=request.user).filter(user_dataset__isnull=True)
+    if len(user_datasets_without_file) != 0:
+        print(user_datasets_without_file)
+        try:
+            clean_redundant_datasets(user_datasets_without_file)
+        except:
+            print(f'Could not remove datasets, versions and variables for user {request.user}')
+
     serializer = UploadSerializer(list_of_files, many=True)
     try:
         return JsonResponse(serializer.data, status=200, safe=False)
