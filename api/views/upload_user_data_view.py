@@ -246,8 +246,12 @@ class UploadedFileError(BaseException):
 def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    print(request.session.keys())
-    print(dir(request.session))
+    if file_entry.metadata_submitted:
+        return JsonResponse({'message': 'Metadata submitted'}, status=200, safe=False)
+
+    file_entry.metadata_submitted = True
+    file_entry.save()
+
     if serializer.is_valid():
         # first the file will be preprocessed
         try:
