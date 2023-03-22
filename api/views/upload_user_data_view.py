@@ -247,56 +247,55 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     if file_entry.metadata_submitted:
-        pass
-    else:
-        # return JsonResponse({'message': 'Metadata submission process started.'}, status=202, safe=False)
-        file_entry.metadata_submitted = True
-        file_entry.save()
+        return JsonResponse({'message': 'Metadata submission process started.'}, status=204, safe=False)
 
-        if serializer.is_valid():
-            # first the file will be preprocessed
-            try:
-                gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
-            except Exception as e:
-                print(e, type(e))
-                file_entry.delete()
-                return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
+    file_entry.metadata_submitted = True
+    file_entry.save()
 
-            sm_variable = get_sm_variable_names(gridded_reader.variable_description())
-            all_variables = get_variables_from_the_reader(gridded_reader)
-
-            dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
-            dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
-                USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
-            version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
-            version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
-                USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
-            #
-            # creating version entry
-            new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
-            # creating variable entry
-
-            new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
-                                                 request.user, sm_variable['units'])
-            # for sm_variable in sm_variables:
-            #     new_variable = create_variable_entry(
-            #             sm_variable['name'],
-            #             sm_variable['long_name'],
-            #             dataset_pretty_name,
-            #             request.user)
-            # creating dataset entry
-            new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
-                                               file_entry)
-            # updating file entry
-            file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
-                                                  all_variables)
-
-            return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
-
-        else:
-            print(serializer.errors)
+    if serializer.is_valid():
+        # first the file will be preprocessed
+        try:
+            gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
+        except Exception as e:
+            print(e, type(e))
             file_entry.delete()
-            return JsonResponse(serializer.errors, status=500, safe=False)
+            return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
+
+        sm_variable = get_sm_variable_names(gridded_reader.variable_description())
+        all_variables = get_variables_from_the_reader(gridded_reader)
+
+        dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
+        dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
+            USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
+        version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
+        version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
+            USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+        #
+        # creating version entry
+        new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+        # creating variable entry
+
+        new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
+                                             request.user, sm_variable['units'])
+        # for sm_variable in sm_variables:
+        #     new_variable = create_variable_entry(
+        #             sm_variable['name'],
+        #             sm_variable['long_name'],
+        #             dataset_pretty_name,
+        #             request.user)
+        # creating dataset entry
+        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
+                                           file_entry)
+        # updating file entry
+        file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
+                                              all_variables)
+
+        return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
+
+    else:
+        print(serializer.errors)
+        file_entry.delete()
+        return JsonResponse(serializer.errors, status=500, safe=False)
 
 
 def _verify_file_extension(file_name):
