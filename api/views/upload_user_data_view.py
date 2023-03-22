@@ -247,7 +247,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     if file_entry.metadata_submitted:
-        return JsonResponse({'message': 'Metadata submitted'}, status=200, safe=False)
+        return JsonResponse({'message': 'Metadata submission process started.'}, status=202, safe=False)
 
     file_entry.metadata_submitted = True
     file_entry.save()
