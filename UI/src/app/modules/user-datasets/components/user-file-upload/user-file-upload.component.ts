@@ -52,7 +52,7 @@ export class UserFileUploadComponent implements OnInit {
     zip.loadAsync(this.file).then(contents => {
       const files = Object.keys(contents.files).filter(key =>
         !['nc', 'nc4', 'csv', 'yml'].includes(key.split('.').reverse()[0]));
-      if (files.length !== 0){
+      if (files.length !== 0) {
         this.toastService.showErrorWithHeader('File can not be uploaded',
           'The zip file you are trying to upload contains files with no acceptable extensions (i.e. netCDF or csv + yml');
         this.file = null;
@@ -64,7 +64,7 @@ export class UserFileUploadComponent implements OnInit {
     this.file = event.target.files[0];
     this.isFileTooBig = false;
 
-    if (this.authService.currentUser.space_left && this.file.size > this.authService.currentUser.space_left){
+    if (this.authService.currentUser.space_left && this.file.size > this.authService.currentUser.space_left) {
       this.isFileTooBig = true;
       this.file = null;
       return null;
@@ -100,6 +100,7 @@ export class UserFileUploadComponent implements OnInit {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
             this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe((response) => {
+                console.log(response.status);
                 if (response.status === 202) {
                   // Request accepted for processing, show a processing message
                   this.toastService.showAlertWithHeader('Metadata processing in progress.',
@@ -124,8 +125,8 @@ export class UserFileUploadComponent implements OnInit {
                   `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
               },
               () => {
-                this.spinnerVisible = false;
-                this.metadataForm.reset('');
+                // this.spinnerVisible = false;
+                // this.metadataForm.reset('');
               });
           }
         },
