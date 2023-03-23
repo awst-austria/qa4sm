@@ -8,12 +8,11 @@
       </ng-template>
       <ng-template pTemplate="icons">
       </ng-template>
-
       <div *ngIf="updatedMetrics$|async as metrics" style="min-height: 400px">
         <div *ngIf="metrics[metricIndx] && metrics[metricIndx].boxplotFiles|async as boxplots">
           <div *ngIf="metrics[metricIndx].overviewFiles|async as overviewPlots">
             <div class="p-grid p-align-center">
-              <div [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
+              <div *ngIf="boxplots.length > 0" [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
                 <img width="95%"
                      height="95%"
                      [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
@@ -61,7 +60,7 @@
             <div [ngClass]="{'p-col-6': true}">
               <span class="p-float-label p-mb-4">
                 <p-dropdown id="metricSelector"
-                            (onChange)="onMetricChange()"
+                            (onChange)="onMetricChange($event)"
                             [options]="metrics"
                             [(ngModel)]="selectedMetrics"
                             optionLabel="metric_pretty_name"

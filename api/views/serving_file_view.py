@@ -2,22 +2,19 @@ import base64
 import os
 from collections import OrderedDict
 
+from django.conf import settings
 from django.core.files import File
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
+from rest_framework.permissions import AllowAny
 from validator.models import ValidationRun, DatasetConfiguration
-from django.conf import settings
 
 import mimetypes
 from wsgiref.util import FileWrapper
-
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -78,7 +75,7 @@ def get_csv_with_statistics(request):
 def get_metric_names_and_associated_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    ref_dataset_name = DatasetConfiguration.objects.get(id=validation.reference_configuration_id).dataset.pretty_name
+    ref_dataset_name = DatasetConfiguration.objects.get(id=validation.spatial_reference_configuration_id).dataset.pretty_name
 
     try:
         file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
@@ -98,12 +95,13 @@ def get_metric_names_and_associated_files(request):
     response = []
 
     for metric_ind, key in enumerate(metrics):
-        boxplot_file = ''
-        boxplot_file_name = 'boxplot_' + metrics[key] + '.png'
-
-        # 'n_obs' doesn't refer to datasets so I create a list with independent metrics, if there are other similar
+        # 'n_obs' doesn't refer to datasets, so I create a list with independent metrics, if there are other similar
         # metrics it's just enough to add them here:
-        independent_metrics = ['n_obs']
+        independent_metrics = ['n_obs', 'status']
+        barplot_metric = ['status']
+
+        boxplot_file = ''
+        boxplot_file_name = 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + metrics[key] + '.png'
 
         if metrics[key] not in independent_metrics:
             overview_plots = [{'file_name': 'overview_' + name_key + '_' + metrics[key] + '.png',
@@ -114,13 +112,15 @@ def get_metric_names_and_associated_files(request):
         if boxplot_file_name in files:
             boxplot_file = file_path + boxplot_file_name
 
-        overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if file_dict['file_name'] in files]
-        datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if file_dict['file_name'] in files]
+        overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if
+                          file_dict['file_name'] in files]
+        datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if
+                    file_dict['file_name'] in files]
 
         # for ISMN there might be also metadata plots
         boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
         if ref_dataset_name == ISMN:
-            metadata_plots = [{'file_name': 'boxplot_'+ metrics[key] + '_' + metadata_name + '.png'}
+            metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_" }' + metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
             for meta_ind, file_dict in enumerate(metadata_plots):
                 if file_dict['file_name'] in files:
@@ -196,3 +196,4 @@ def get_summary_statistics(request):
             classes=['table', 'table-bordered', 'table-striped'],
             index=False
         ))
+

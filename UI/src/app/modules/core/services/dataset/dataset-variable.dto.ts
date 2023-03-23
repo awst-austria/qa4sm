@@ -4,6 +4,7 @@ constructor(public id: number,
             public pretty_name: string,
             public help_text: string,
             public min_value: number,
-            public max_value: number) {
+            public max_value: number,
+            public unit: string) {
 }
 }

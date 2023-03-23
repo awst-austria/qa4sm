@@ -81,7 +81,7 @@ describe('ValidationrunRowComponent', () => {
         output_file_name: null,
         progress: 0,
         publishing_in_progress: false,
-        reference_configuration: 4699,
+        spatial_reference_configuration: 4699,
         scaling_method: 'mean_std',
         scaling_ref: 4699,
         start_time: new Date('2021-10-05T12:53:27.156239Z'),

@@ -1,7 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
+import {HttpClient} from '@angular/common/http';
+import {ActivatedRoute} from '@angular/router';
 
 const plotsUrlPrefix = '/static/images/help/';
 
@@ -10,7 +12,7 @@ const plotsUrlPrefix = '/static/images/help/';
   templateUrl: './help.component.html',
   styleUrls: ['./help.component.scss']
 })
-export class HelpComponent implements OnInit {
+export class HelpComponent implements OnInit, AfterViewInit {
   // Icons for bullet points
   faIcons = {
     faArchive: fas.faArchive,
@@ -41,9 +43,30 @@ export class HelpComponent implements OnInit {
   datsetConfigurationComparison: string;
   validationSelectionsComparison: string;
   spatialExtentComparison: string;
+  chosenFile: string;
+  selectFile: string;
+  uploadFileWindow: string;
+  metadataWindow: string;
+  uploadingSpinner: string;
+  dataRow: string;
+  userDataOnTheList: string;
 
   constructor(private globalParamsService: GlobalParamsService,
-              public settingsService: SettingsService) {
+              public settingsService: SettingsService,
+              private http: HttpClient,
+              private activeRoute: ActivatedRoute) {
+  }
+
+  @ViewChild('helpPage') container: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void{
+    this.activeRoute.params.subscribe(param => {
+      if (param.pageSec){
+        const section = this.container.nativeElement.querySelector(`#${param.pageSec}`);
+        // section?.scrollTo();
+        section?.scrollIntoView();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -73,6 +96,13 @@ export class HelpComponent implements OnInit {
     this.datsetConfigurationComparison = plotsUrlPrefix + 'dataset-configuration-for-comparison.png';
     this.validationSelectionsComparison = plotsUrlPrefix + 'validation-selection-comparison.png';
     this.spatialExtentComparison = plotsUrlPrefix + 'spatial-extent-comparison.png';
+    this.metadataWindow = plotsUrlPrefix + 'metadata_window.png';
+    this.uploadFileWindow = plotsUrlPrefix + 'upload_file_window.png';
+    this.selectFile = plotsUrlPrefix + 'select_file.png';
+    this.chosenFile = plotsUrlPrefix + 'chosen_file.png';
+    this.uploadingSpinner = plotsUrlPrefix + 'uploading_spinner.png';
+    this.dataRow = plotsUrlPrefix + 'data_row.png';
+    this.userDataOnTheList = plotsUrlPrefix + 'user_data_on_the_list.png';
   }
 
   getAdminMail(): string {

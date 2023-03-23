@@ -32,6 +32,23 @@ def get_depths_params(param_filters):
 
     return [depth_from, depth_to]
 
+def get_meta_filter_dict(filters) -> Union[dict, None]:
+    """
+    Convert sensor / station metadata based filters to dict used by the ISMN
+    Interface if any of the relevant filters are activated.
+
+    Parameters:
+    ----------
+    filters: list[DataFilter]
+        Filters (not parametised) to check.
+    """
+    names = [filter.name for filter in list(filters)]
+    filter_meta_dict = {}
+    if "FIL_ISMN_FRM_representative" in names:
+        filter_meta_dict['frm_class'] = ['very representative', 'representative']
+
+    return filter_meta_dict if len(filter_meta_dict) != 0 else None
+
 
 # very basic geographic subsetting with only a bounding box. simple should also be quick :-)
 def _geographic_subsetting(gpis, lons, lats, min_lat, min_lon, max_lat, max_lon):
@@ -136,16 +153,18 @@ def create_jobs(
         depth_from, depth_to = get_depths_params(
             dataset_config.parametrisedfilter_set.all()
         )
+        filter_meta_dict = get_meta_filter_dict(list(dataset_config.filters.all()))
 
         ids = reader.get_dataset_ids(
-            variable=dataset_config.variable.pretty_name,
+            variable=dataset_config.variable.short_name,
             min_depth=depth_from,
             max_depth=depth_to,
-            groupby='network'
+            filter_meta_dict=filter_meta_dict,
+            groupby='network',
         )
 
         def reshape_meta(metadata):
-            # reshape metadata disctionary to facilitate use
+            # reshape metadata dictionary to facilitate use
             reshaped = {}
             for key, value in metadata.items():
                 meta_value = value[0][0]
@@ -175,6 +194,8 @@ def create_jobs(
                 validation_run.min_lon, validation_run.max_lat, validation_run.max_lon
             )
 
+            meta_list = np.array(meta_list)[index]
+
             if len(gpis) > 0:
                 jobs.append((gpis, lons, lats, meta_list))
                 total_points += len(gpis)
@@ -191,7 +212,7 @@ def create_jobs(
 def create_upscaling_lut(
         validation_run,
         datasets,
-        ref_name
+        spatial_ref_name
 ) -> dict:
     """
     Create a lookup table that aggregates the non-reference measurement points falling under the same reference
@@ -219,7 +240,7 @@ def create_upscaling_lut(
     lut: dict
         lookup table with shape {'other_dataset':{ref gpi: [other gpis]}}
     """
-    ref_reader = datasets[ref_name]["class"]
+    ref_reader = datasets[spatial_ref_name]["class"]
     ref_grid = ref_reader.grid
 
     lut = {}
@@ -228,7 +249,7 @@ def create_upscaling_lut(
         datasets.keys(),
         validation_run.dataset_configurations.all(),
     ):
-        if other_name == ref_name:
+        if other_name == spatial_ref_name:
             continue
         else:
             other_reader = datasets[other_name]["class"]

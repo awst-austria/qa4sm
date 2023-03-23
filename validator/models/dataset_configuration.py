@@ -9,13 +9,15 @@ from validator.models.version import DatasetVersion
 class DatasetConfiguration(models.Model):
     id = models.AutoField(primary_key=True)
     # validator.models.validation_run.ValidationRun
-    id = models.AutoField(primary_key=True)
     validation = models.ForeignKey(to='ValidationRun', on_delete=models.CASCADE, related_name='dataset_configurations', null=False)
     dataset = models.ForeignKey(to=Dataset, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     version = models.ForeignKey(to=DatasetVersion, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     variable = models.ForeignKey(to=DataVariable, on_delete=models.PROTECT, related_name='dataset_configurations', null=False)
     filters = models.ManyToManyField(DataFilter, related_name='dataset_configurations', blank=True)
     parametrised_filters = models.ManyToManyField(DataFilter, through='ParametrisedFilter', blank=True)
+    is_spatial_reference = models.BooleanField(null=True)
+    is_temporal_reference = models.BooleanField(null=True)
+    is_scaling_reference = models.BooleanField(null=True)
 
     def __str__(self):
         return "Data set: {}, version: {}, variable: {}".format(

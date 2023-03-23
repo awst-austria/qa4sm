@@ -7,9 +7,9 @@ import {ButtonModule} from 'primeng/button';
 
 @NgModule({
   declarations: [DatasetComponent],
-  exports: [
-    DatasetComponent
-  ],
+    exports: [
+        DatasetComponent,
+    ],
   imports: [
     CommonModule,
     FormsModule,

@@ -24,8 +24,8 @@ def published_results(request):
                   '-start_time',
                   'progress',
                   '-progress',
-                  'reference_configuration_id__dataset__pretty_name',
-                  '-reference_configuration_id__dataset__pretty_name'
+                  'spatial_reference_configuration_id__dataset__pretty_name',
+                  '-spatial_reference_configuration_id__dataset__pretty_name'
                   ]
 
     if order and order in order_list:
@@ -63,8 +63,8 @@ def my_results(request):
                   '-start_time',
                   'progress',
                   '-progress',
-                  'reference_configuration_id__dataset__pretty_name',
-                  '-reference_configuration_id__dataset__pretty_name'
+                  'spatial_reference_configuration_id__dataset__pretty_name',
+                  '-spatial_reference_configuration_id__dataset__pretty_name'
                   ]
 
     if order and order in order_list:
@@ -122,8 +122,8 @@ def get_validations_for_comparison(request):
     max_datasets = max_non_reference_datasets + 1  # add the reference
     # filter the validation runs based on the reference dataset/version
     ref_filtered = ValidationRun.objects.filter(
-        reference_configuration__dataset__short_name=ref_dataset,
-        reference_configuration__version__short_name=ref_version,
+        spatial_reference_configuration__dataset__short_name=ref_dataset,
+        spatial_reference_configuration__version__short_name=ref_version,
     ).exclude(
         output_file='')
 

@@ -18,8 +18,8 @@ def dataset_configuration(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def dataset_configuration_by_dataset(request, **kwargs):
-    configs = DatasetConfiguration.objects.filter(validation_id=kwargs['dataset_id'])
+def dataset_configuration_by_validation(request, **kwargs):
+    configs = DatasetConfiguration.objects.filter(validation_id=kwargs['validation_id'])
     serializer = ConfigurationSerializer(configs, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -35,4 +35,7 @@ class ConfigurationSerializer(ModelSerializer):
                   'variable',
                   'filters',
                   'parametrised_filters',
-                  'parametrisedfilter_set']
+                  'parametrisedfilter_set',
+                  'is_spatial_reference',
+                  'is_temporal_reference',
+                  'is_scaling_reference']

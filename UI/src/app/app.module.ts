@@ -14,7 +14,7 @@ import {ErrorComponent} from './pages/error/error.component';
 
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
-import {LoginComponent} from './pages/login/login.component';
+import {LoginComponent} from './modules/user/login/login.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
 import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
@@ -52,7 +52,7 @@ import {ComparisonModule} from './modules/comparison/comparison.module';
 import {
   TemporalMatchingComponent
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
-import {TemporalMatchingModule} from "./modules/temporal-matching/temporal-matching.module";
+import {TemporalMatchingModule} from './modules/temporal-matching/temporal-matching.module';
 import {HelpComponent} from './pages/help/help.component';
 import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
@@ -68,7 +68,13 @@ import {
   PasswordResetValidateTokenComponent
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {InputNumberModule} from 'primeng/inputnumber';
-
+import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
+import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
+import {ValidationReferenceModule} from './modules/validation-reference/validation-reference.module';
+import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
+import {DialogModule} from 'primeng/dialog';
+import {LoginPageComponent} from './pages/login-page/login-page.component';
+import {ProgressBarModule} from 'primeng/progressbar';
 
 @NgModule({
   declarations: [
@@ -94,6 +100,9 @@ import {InputNumberModule} from 'primeng/inputnumber';
     SetPasswordComponent,
     PasswordResetValidateTokenComponent,
     TemporalMatchingComponent,
+    MyDatasetsComponent,
+    UserDataGuidelinesComponent,
+    LoginPageComponent,
   ],
     imports: [
         LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
@@ -132,7 +141,11 @@ import {InputNumberModule} from 'primeng/inputnumber';
         NgxPageScrollModule,
         CoreModule,
         UserModule,
-        InputNumberModule
+        InputNumberModule,
+        UserDatasetsModule,
+        ValidationReferenceModule,
+        DialogModule,
+        ProgressBarModule,
     ],
   providers: [
     {

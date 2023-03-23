@@ -13,6 +13,7 @@ METRICS = {'R': 'Pearson\'s r',
            'RMSD': 'Root-mean-square deviation',
            'BIAS': 'Bias (difference of means)',
            'n_obs': '# observations',
+           'status': '# status',
            'urmsd': 'Unbiased root-mean-square deviation',
            'RSS': 'Residual sum of squares',
            'mse': 'Mean square error',
@@ -45,6 +46,8 @@ ERA5_LAND = 'ERA5_LAND'
 CGLS_CSAR_SSM1km = 'CGLS_CSAR_SSM1km'
 CGLS_SCATSAR_SWI1km = 'CGLS_SCATSAR_SWI1km'
 SMOS_L3 = 'SMOS_L3'
+SMOS_L2 = 'SMOS_L2'
+SMAP_L2 = 'SMAP_L2'
 
 # dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -54,8 +57,12 @@ C3S_V202012 = 'C3S_V202012'
 ISMN_V20180712_MINI = 'ISMN_V20180712_MINI'
 ISMN_V20191211 = 'ISMN_V20191211'
 ISMN_V20210131 = 'ISMN_V20210131'
+ISMN_VRelease2_Verification = 'ISMN_VRelease2_Verification'
+ISMN_V20230110 = 'ISMN_V20230110'
 SMAP_V5_PM = 'SMAP_V5_PM'
 SMAP_V6_PM = 'SMAP_V6_PM'
+SMAP_V5_AM = 'SMAP_V5_AM'
+SMAP_V6_AM = 'SMAP_V6_AM'
 SMOS_105_ASC = 'SMOS_105_ASC'
 GLDAS_NOAH025_3H_2_1 = 'GLDAS_NOAH025_3H_2_1'
 ASCAT_H113 = 'ASCAT_H113'
@@ -78,8 +85,10 @@ CGLS_CSAR_SSM1km_V1_1 = 'CGLS_CSAR_SSM1km_V1_1'
 CGLS_SCATSAR_SWI1km_V1_0 = 'CGLS_SCATSAR_SWI1km_V1_0'
 SMOSL3_Level3_DESC = 'SMOSL3_v339_DESC'
 SMOSL3_Level3_ASC = 'SMOSL3_v339_ASC'
+SMOSL2_700 = 'SMOSL2_v700'
+SMAPL2_V8 = 'SMAPL2_V8'
 
-# dataset data variables
+# dataset data variables PRETTY NAMES
 C3S_sm = 'C3S_sm'
 SMAP_soil_moisture = 'SMAP_soil_moisture'
 SMOS_sm = 'SMOS_sm'
@@ -95,6 +104,8 @@ ESA_CCI_SM_P_sm = 'ESA_CCI_SM_P_sm'
 ESA_CCI_SM_A_sm = 'ESA_CCI_SM_A_sm'
 ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 SMOSL3_sm = 'SMOSL3_sm'
+SMOSL2_sm = 'SMOSL2_sm'
+SMAPL2_soil_moisture = 'SMAPL2_soil_moisture'
 
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
@@ -103,12 +114,14 @@ NOT_AS_REFERENCE = []
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
 VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
              'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to', 'temporal_matching']
-DS_FIELDS = ['dataset', 'version']
+DS_FIELDS = ['dataset', 'version', 'is_spatial_reference', 'is_temporal_reference']
 
 IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
                    'SMOS_L3': 0.25,
                    'SMOS_IC': 0.25,
-                   'ASCAT': 0.1}
+                   'ASCAT': 0.1,
+                   'SMOS_L2': 0.135,  # 15km
+                   'SMAP_L2': 0.35, }  # 35km
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
@@ -135,7 +148,9 @@ METADATA_TEMPLATE = {'other_ref': None,
                                   'timerange_to': np.array([' ' * 256]),
                                   'variable': np.array([' ' * 256]),
                                   'instrument_depthfrom': np.float32([np.nan]),
-                                  'instrument_depthto': np.float32([np.nan])
+                                  'instrument_depthto': np.float32([np.nan]),
+                                  # only available for FRM4SM ISMN version(s)
+                                  'frm_class': np.array([' ' * 256]),
                                   }
                      }
 
@@ -145,6 +160,16 @@ MEASURE_DEPTH_TO = "instrument_depthto"
 METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
                        "Climate classification": "metadata_climate_KG",
                        "Soil type classification": "metadata_instrument_depth_and_soil_type",
+                       "FRM classification": "metadata_frm_class",
                        }
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
+
+# scaling methods
+SCALING_METHODS = ValidationRun.SCALING_METHODS
+
+USER_DATASET_MIN_ID = 200
+USER_DATASET_VERSION_MIN_ID = 500
+USER_DATASET_VARIABLE_MIN_ID = 500
+
+

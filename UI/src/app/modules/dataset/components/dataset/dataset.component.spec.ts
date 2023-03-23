@@ -32,11 +32,12 @@ describe('DatasetComponent', () => {
         detailed_description: '',
         source_reference: '',
         citation: '',
-        is_only_reference: true,
+        is_spatial_reference: true,
         versions: [3, 4],
         variables: [2],
         filters: [1],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
       {
         id: 1,
@@ -47,11 +48,12 @@ describe('DatasetComponent', () => {
         detailed_description: '',
         source_reference: '',
         citation: '',
-        is_only_reference: false,
+        is_spatial_reference: false,
         versions: [1, 2],
         variables: [1],
         filters: [1, 2],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
     ];
 
@@ -119,7 +121,6 @@ describe('DatasetComponent', () => {
     fixture = TestBed.createComponent(DatasetComponent);
     component = fixture.componentInstance;
     component.removable = false;
-    component.reference = false;
     component.selectionModel = {
       selectedDataset: testDatasets[0],
       selectedVersion: testVersions[0],

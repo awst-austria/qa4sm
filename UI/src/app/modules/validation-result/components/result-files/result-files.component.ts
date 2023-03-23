@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {EMPTY, Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
@@ -37,6 +37,10 @@ export class ResultFilesComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateMetricsWithPlots();
+    this.updatedMetrics$.subscribe(metrics => {
+      this.selectedMetrics = metrics[0];
+      this.selectedBoxplot = metrics[0].boxplot_dicts[0];
+    });
   }
 
   private updateMetricsWithPlots(): void {
@@ -55,7 +59,8 @@ export class ResultFilesComponent implements OnInit {
     );
   }
 
-  onMetricChange(): void {
+  onMetricChange(option): void {
+    console.log(option);
     this.metricIndx = this.selectedMetrics.ind;
     // resetting boxplot index
     this.boxplotIndx = 0;
@@ -86,8 +91,8 @@ export class ResultFilesComponent implements OnInit {
   getPlots(files: any): Observable<PlotDto[]> {
     let params = new HttpParams();
     // handling an empty list added
-    if (files.length === 0){
-      return EMPTY;
+    if (files.length === 0 || files[0].length === 0){
+      return of([]);
     }
 
     files.forEach(file => {

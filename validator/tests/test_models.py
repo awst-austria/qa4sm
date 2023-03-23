@@ -69,13 +69,13 @@ class TestModels(TestCase):
 
         dc.save()
 
-        run.reference_configuration = dc
+        run.spatial_reference_configuration = dc
         run.scaling_ref = dc
 
         run.save()
 
         assert len(run.dataset_configurations.all()) == 1
-        assert run.reference_configuration
+        assert run.spatial_reference_configuration
         assert run.scaling_ref
         
     def test_testdata_integrity(self):
@@ -109,7 +109,7 @@ class TestModels(TestCase):
             dc.variable = dc.dataset.variables.first()
             dc.save()
 
-        run.reference_configuration = dc
+        run.spatial_reference_configuration = dc
         run.scaling_ref = dc
         run.save()
 
@@ -326,6 +326,14 @@ class TestModels(TestCase):
         dataset_str = str(mydataset)
         print(dataset_str)
         assert dataset_str
+
+    def test_dataset_resolution(self):
+        mydataset = Dataset()
+        assert mydataset.resolution_in_m == 30e3
+        mydataset.resolution = {"value": 0.25, "unit": "deg"}
+        assert mydataset.resolution_in_m == 25e3
+        mydataset.resolution = {"value": 0.25, "unit": "km"}
+        assert mydataset.resolution_in_m == 250
 
     def test_version_str(self):
         mydatasetversion = DatasetVersion()

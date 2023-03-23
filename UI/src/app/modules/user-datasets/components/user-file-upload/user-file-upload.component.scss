@@ -1,0 +1,83 @@
+.file-input {
+  display: none;
+}
+.center{
+  display: flex;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+button{
+  width: 15rem;
+}
+.label-button{
+  font-size: 1.2rem;
+  line-height: 1rem;
+  height: 2.25rem;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.center h1{
+  text-align: left;
+  justify-content: center;
+}
+.form-field{
+  width: 16rem;
+  height: 2.5rem;
+  margin-right: 0.5rem;
+}
+//.form-small-field{
+//  width: 10rem;
+//  height: 2.5rem;
+//  margin-right: 0.5rem;
+//}
+.p-float-label{
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 16px;
+}
+button{
+  width: 15rem;
+}
+div.alert{
+  margin-top: 1rem;
+}
+.alert{
+  background-color: #FF6C5C26;
+  color: #FF6C5C;
+  width: 15rem;
+  border: #FF6C5C30 solid 1px;
+  border-radius: 3px;
+  padding: 0.5rem;
+}
+.verticalAlign{
+  vertical-align: 85%;
+}
+
+@keyframes changeColor {
+  from {color: #9CF2F6}
+  to {color: #00AAE3;}
+}
+
+//.loading-spinner{
+//  font-size: 10rem;
+//  margin: 1rem;
+//  animation-name: spinAndChangeColor;
+//  animation-duration: 10s;
+//  animation-iteration-count: infinite;
+//}
+
+.uploading-message{
+  margin-top: 2px;
+  font-size: 2rem;
+  animation-name: changeColor;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+}
+
+.warning{
+  color: red;
+  font-weight: bold;
+  width: 80%;
+}

@@ -357,5 +357,77 @@
             "time_range_end": "2022-05-07",
             "geographical_range": null
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 39,
+        "fields": {
+            "short_name": "SMOSL2_v700",
+            "pretty_name": "v700",
+            "help_text": "SMOS L2-SM (ESA)",
+            "time_range_start": "2010-07-01",
+            "time_range_end": "2022-06-04",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 40,
+        "fields": {
+            "short_name": "SMAPL2_V8",
+            "pretty_name": "v8",
+            "help_text": "SMAP L2 v8",
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2022-08-06",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 41,
+        "fields": {
+            "short_name": "ISMN_VRelease2_Verification",
+            "pretty_name": "ISMN QA4SM verification data",
+            "help_text": "Dataset used for the cross-validation exercise in the verification report of QA4SM release 2",
+            "time_range_start": "2010-06-01",
+            "time_range_end": "2020-01-01",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 42,
+        "fields": {
+            "short_name": "ISMN_V20230110",
+            "pretty_name": "20230110 global",
+            "help_text": "ISMN from 2023-01-10 (FRM4SM version with added quality indicators)",
+            "time_range_start": "",
+            "time_range_end": "2023-01-10",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 43,
+        "fields": {
+            "short_name": "SMAP_V5_AM",
+            "pretty_name": "v5 AM/descending",
+            "help_text": "-",
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2018-12-04",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 44,
+        "fields": {
+            "short_name": "SMAP_V6_AM",
+            "pretty_name": "v6 AM/descending",
+            "help_text": "-",
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2020-05-23",
+            "geographical_range": null
+        }
     }
 ]

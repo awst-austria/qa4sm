@@ -60,17 +60,17 @@ class TestDOI(TestCase):
         data_c.validation = val
         data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
         data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
         data_c.save()
 
         ref_c = DatasetConfiguration()
         ref_c.validation = val
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
         ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20191211')
-        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
         ref_c.save()
 
-        val.reference_configuration = ref_c
+        val.spatial_reference_configuration = ref_c
         val.scaling_ref = ref_c
         val.save()
 

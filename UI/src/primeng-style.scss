@@ -1049,7 +1049,7 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-top-left-radius: 0;
 }
 
-#method .p-dropdown, #scalingMethod .p-dropdown, #scalingTo .p-dropdown, #orderSelector .p-dropdown{
+#method .p-dropdown, #orderSelector .p-dropdown{
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
@@ -3717,7 +3717,8 @@ div.carousel-caption{
   box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
 }
 
-.p-accordion .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link {
+.p-accordion p-accordiontab .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link,
+.p-accordion p-accordiontab.highlighted .p-accordion-header:not(.p-highlight):not(.p-disabled) .p-accordion-header-link{
   background: #EFEFEF;
   border-color: #dee2e6;
   color: #495057;
@@ -3733,7 +3734,8 @@ div.carousel-caption{
   border-bottom-left-radius: 0;
 }
 
-.p-accordion .p-accordion-header:not(.p-disabled).p-highlight:hover .p-accordion-header-link {
+.p-accordion p-accordiontab .p-accordion-header:not(.p-disabled).p-highlight:hover .p-accordion-header-link,
+.p-accordion p-accordiontab.highlighted .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link{
   border-color: #dee2e6;
   background: #EFEFEF;
   color: #495057;
@@ -3786,6 +3788,11 @@ div.carousel-caption{
 .p-accordion p-accordiontab:last-child .p-accordion-content {
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
+}
+
+.p-accordion p-accordiontab.is-reference .p-accordion-header:not(.p-highlight):not(.p-disabled) .p-accordion-header-link,
+.p-accordion p-accordiontab.is-reference .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link{
+  color: #004085;
 }
 
 .p-card {
@@ -4194,6 +4201,15 @@ div.carousel-caption{
 
 .p-dialog-mask.p-component-overlay {
   background-color: rgba(0, 0, 0, 0.4);
+}
+
+#uploading-data-spinner .p-dialog .p-dialog-content{
+  opacity: 1;
+  background: transparent;
+}
+
+#uploading-data-spinner .p-dialog{
+  border-color: transparent;
 }
 
 .p-overlaypanel {
@@ -6119,11 +6135,11 @@ div.carousel-caption{
 
 /* Customizations to the designer theme should be defined here */
 
-.validation-row .p-panel .p-panel-header{
+.validation-row .p-panel .p-panel-header, .user-data-row .p-panel .p-panel-header{
   font-size: 1.5rem;
 }
 
-.validation-row .p-panel .p-panel-title{
+.validation-row .p-panel .p-panel-title, .user-data-row .p-panel .p-panel-title{
   width: 93%;
   text-align: center;
 }
@@ -6133,12 +6149,12 @@ div.carousel-caption{
   text-align: center;
 }
 
-.validation-row .p-panel .p-panel-header .p-panel-icons{
+.validation-row .p-panel .p-panel-header .p-panel-icons, .user-data-row .p-panel .p-panel-header .p-panel-icons{
   max-width: 30rem;
   text-align: right;
 }
 
-.validation-row .p-panel .p-panel-content {
+.validation-row .p-panel .p-panel-content, .user-data-row .p-panel .p-panel-content {
   padding: 0.5rem 0.75rem;
   border: 1px solid #dee2e6;
   background: #ffffff;
@@ -6146,6 +6162,10 @@ div.carousel-caption{
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
   border-top: 0 none;
+}
+
+.user-data-row .p-panel .p-panel-content{
+  height: 150px;
 }
 
 .btn-action.p-button {
@@ -6223,6 +6243,22 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   transform: scale(1.2);
 }
 
+.cancel_black_btn.p-button, .save_name_black_btn.p-button{
+  color: black;
+  font-size: 1.5rem;
+  background-color: transparent;
+  border-color: transparent;
+  margin-left: 0.1rem;
+  width: 1.5rem;
+}
+
+.cancel_black_btn.p-button:not(.disabled):hover, .save_name_black_btn.p-button:not(.disabled):hover{
+  color: black;
+  background-color: transparent;
+  border-color: transparent;
+  transform: scale(1.2);
+}
+
 .dropdown-item.p-button{
   width: 100%;
   background-color: $dropdown-buttons-background;;
@@ -6295,7 +6331,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   //  max-width: 30rem;
   //}
 
-  .validation-row .p-panel .p-panel-header h5{
+  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5{
     font-size: 1.25rem;
     max-width: 50vw;
   }
@@ -6314,7 +6350,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
 }
 
 @media screen and (max-width: 563.9px){
-  .validation-row .p-panel .p-panel-header h5{
+  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5{
     font-size: 1.125rem;
   }
 }

@@ -47,3 +47,4 @@ DEFAULT_FROM_EMAIL = 'support@qa4sm.eu'
 
 #EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 #EMAIL_FILE_PATH = '/tmp/app-messages'
+USER_DATA_DIR = '/var/lib/qa4sm-web-val/valentina/data/user_data'

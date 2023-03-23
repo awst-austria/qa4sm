@@ -110,24 +110,29 @@
     <div class="p-col">
       <strong>Data:</strong><br/>
       <span *ngFor="let config of configurations">
-        <span *ngIf="config.id !== validationRun.reference_configuration">
+        <span>
           {{config.dataset}},
           {{config.version}},
-          {{config.variable}} <br>
+          {{config.variable}}
+          {{config.variableUnit ? '[' + config.variableUnit + ']': ''}}
+          <span style="font-weight: 600">
+            {{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
+            config.is_temporal_reference, config.is_scaling_reference)}}</span>
+          <br>
         </span>
       </span>
     </div>
-    <!-- Reference -->
-    <div class="p-col">
-      <strong>Reference:</strong><br/>
-      <span *ngFor="let config of configurations">
-        <span *ngIf="config.id === validationRun.reference_configuration">
-          {{config.dataset}},
-          {{config.version}},
-          {{config.variable}} <br>
-        </span>
-      </span>
-    </div>
+<!--    &lt;!&ndash; Reference &ndash;&gt;-->
+<!--    <div class="p-col">-->
+<!--      <strong>Reference:</strong><br/>-->
+<!--      <span *ngFor="let config of configurations">-->
+<!--        <span *ngIf="config.id === validationRun.spatial_reference_configuration">-->
+<!--          {{config.dataset}},-->
+<!--          {{config.version}},-->
+<!--          {{config.variable}} <br>-->
+<!--        </span>-->
+<!--      </span>-->
+<!--    </div>-->
     <!-- Status / Created   -->
     <div class="p-col status">
       <!--    PUBLISHED -->

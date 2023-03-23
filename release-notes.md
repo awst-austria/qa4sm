@@ -1,29 +1,23 @@
-QA4SM v2.1.2 - Release notes 2022-12-29
-=======================================================
-# Bug fixing 
-1. Cleaning validate form added;
-2. Setting non-reference dataset as "scale to" fixed;
-
-QA4SM v2.1.1 - Release notes 2022-11-09
-=======================================================
-# Bug fixing 
-1. Fixed SMOS RFI filtering
-
-QA4SM v2.1.0 - Release notes 2022-06-05
+QA4SM v2.2.0 - Release notes 2023-03-23
 =======================================================
 # New features
 
-1. Validation comparison module added
-2. SMOS Level 3 dataset now available
-3. Metadata plots created when ISMN dataset used as reference
-4. Temporal matching window size filter added
+1. Uploading user data possible
+2. SMOS Level 2 and SMAP SPL2SMP datasets now available
+3. Filter 'Include only representative sensors' available for ISMN dataset
 
 # Improvements
 
-1. Admin panel developed
-2. Code refinement done and not needed urls removed
-3. Help page and User Manual updated
-4. Handling errors when starting a validation added
+1. Admin panel updated 
+2. Any dataset that is validated can be used as the scaling reference 
+3. Different datasets can be selected as the spatial and temporal reference 
+4. Help page and User Manual updated 
+5. 'Status' plots added informing about the source of problem with metric computation
 
 # Bug fixing 
-1. Problem with adjusting bounding box for HR datasets fixed
+
+1. Setting default dates for 'Climatology' method of Anomalies computation fixed
+2. Setting default geographical range fixed for the case when the introduced min latitude or longitude is bigger than the maximum, and vice versa
+
+ # Other changes
+1. Styling improved

@@ -5,7 +5,6 @@ import {ValidateComponent} from './pages/validate/validate.component';
 import {ErrorComponent} from './pages/error/error.component';
 import {AuthGuard} from './auth.guard';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
-import {LoginComponent} from './pages/login/login.component';
 import {UserProfileComponent} from './pages/user-profile/user-profile.component';
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationsComponent} from './pages/validations/validations.component';
@@ -24,13 +23,16 @@ import {SetPasswordComponent} from './pages/set-password/set-password.component'
 import {
   PasswordResetValidateTokenComponent
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
+import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
+import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
+import {LoginPageComponent} from './pages/login-page/login-page.component';
 
 
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
-  {path: 'login', component: LoginComponent},
-  {path: 'validate', component: ValidateComponent, canActivate: [AuthGuard], resolve: {datasets: DatasetResolver}},
+  {path: 'login', component: LoginPageComponent},
+  {path: 'validate', component: ValidateComponent, resolve: {datasets: DatasetResolver}},
   {path: 'validation-result/:validationId', component: ValidationResultComponent},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
@@ -47,6 +49,8 @@ const routes: Routes = [
   {path: 'password-reset-done', component: PasswordResetDoneComponent},
   {path: 'password-reset/:token', component: PasswordResetValidateTokenComponent},
   {path: 'set-password', component: SetPasswordComponent},
+  {path: 'my-datasets', component: MyDatasetsComponent, canActivate: [AuthGuard]},
+  {path: 'user-data-guidelines', component: UserDataGuidelinesComponent},
   {path: '**', component: ErrorComponent}
 ];
 

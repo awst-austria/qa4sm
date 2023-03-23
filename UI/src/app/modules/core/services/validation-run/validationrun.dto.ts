@@ -9,7 +9,9 @@ export class ValidationrunDto{
               public error_points: number,
               public progress: number,
               public dataset_configurations: number[],
-              public reference_configuration: number,
+              public spatial_reference_configuration: number,
+              public temporal_reference_configuration: number,
+              public scaling_reference_configuration: number,
               public scaling_ref: number,
               public scaling_method: string,
               public interval_from: Date,
@@ -37,7 +39,8 @@ export class ValidationrunDto{
               public is_a_copy: boolean,
               public bootstrap_tcol_cis: boolean,
               public temporal_matching: number,
-              public comparison_label?: string) {
+              public comparison_label?: string,
+              public contains_user_data?: boolean) {
   }
 }
 

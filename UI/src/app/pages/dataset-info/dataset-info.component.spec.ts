@@ -35,11 +35,12 @@ describe('DatasetInfoComponent', () => {
         detailed_description: '',
         source_reference: '',
         citation: '',
-        is_only_reference: true,
+        is_spatial_reference: true,
         versions: [3, 4],
         variables: [2],
         filters: [1],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
       {
         id: 1,
@@ -50,11 +51,12 @@ describe('DatasetInfoComponent', () => {
         detailed_description: '',
         source_reference: '',
         citation: '',
-        is_only_reference: false,
+        is_spatial_reference: false,
         versions: [1, 2],
         variables: [1],
         filters: [1, 2],
-        not_as_reference: false
+        not_as_reference: false,
+        user: null
       },
     ];
 
@@ -107,7 +109,8 @@ describe('DatasetInfoComponent', () => {
         default_parameter: null,
         to_include: null,
         disable_filter: null,
-        default_set_active: true
+        default_set_active: true,
+        readonly: false,
       },
       {
         id: 2,
@@ -119,7 +122,8 @@ describe('DatasetInfoComponent', () => {
         default_parameter: null,
         to_include: '4,5',
         disable_filter: null,
-        default_set_active: true
+        default_set_active: true,
+        readonly: false,
       },
 
     ];

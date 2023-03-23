@@ -41,9 +41,11 @@ from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
-from validator.validation.globals import METRICS, TC_METRICS
+from validator.validation.globals import METRICS, TC_METRICS, METADATA_PLOT_NAMES
 from validator.validation.globals import OUTPUT_FOLDER
 from django.shortcuts import get_object_or_404
+from math import comb
+from qa4sm_reader.globals import out_metadata_plots
 
 User = get_user_model()
 
@@ -87,7 +89,75 @@ class TestValidation(TestCase):
         set_dataset_paths()
 
     # check output of validation
-    def check_results(self, run, is_tcol_run=False):
+
+    def _check_validation_configuration_consistency(self, validation: ValidationRun) -> None:
+        """
+        Checks if validation configuration is proper, i.e. if the scaling, temporal and spatial reference configurations,
+        assigned to the particular validation have proper fields set to True, if not throws an error
+
+        This function is used to verify if our validation test cases are properly written. After the change in
+        the way we treat reference, there were some changes to the validation and data_configuration models and now tests
+        have to be consistent with those changes.
+
+        The function is not used in the API tests, as there we do not verify a saved validation, but parameters coming
+        from the frontend, so there are slightly different conditions to check.
+        Parameters
+        ----------
+        validation: ValidationRun instance
+
+        Returns
+        -------
+        """
+        val_configs = DatasetConfiguration.objects.filter(validation=validation)
+        scaling_ref = validation.scaling_ref
+
+        # check if there is no scaling reference set if the method is none
+        if validation.scaling_method == 'none':
+            if scaling_ref:
+                if scaling_ref.is_scaling_reference or len(val_configs.filter(is_scaling_reference=True)) != 0:
+                    raise ValueError(
+                        'Scaling method is none, but scaling reference is set and a configuration is '
+                        'marked as reference.')
+                raise ValueError('Scaling method is none, but scaling reference is set.')
+            else:
+                if len(val_configs.filter(is_scaling_reference=True)) != 0:
+                    raise ValueError(
+                        'Scaling method is not set but at least one configuration is marked as reference.')
+        else:
+            if scaling_ref:
+                if len(val_configs.filter(is_scaling_reference=True)) == 0:
+                    raise ValueError('No configuration is marked as scaling reference.')
+                elif len(val_configs.filter(is_scaling_reference=True)) > 1:
+                    raise ValueError('More than one configuration is marked as scaling reference.')
+                if not scaling_ref.is_scaling_reference:
+                    raise ValueError('Configuration is not marked as scaling reference.')
+            else:
+                raise ValueError('Scaling method is set, but scaling reference not.')
+
+        # check if only one configuration has proper field set:
+        if len(val_configs.filter(is_spatial_reference=True)) == 0:
+            raise ValueError('No configuration is marked as spatial reference.')
+        elif len(val_configs.filter(is_spatial_reference=True)) > 1:
+            raise ValueError('More than one configuration is marked as spatial reference.')
+
+        if len(val_configs.filter(is_temporal_reference=True)) == 0:
+            raise ValueError('No configuration is marked as temporal reference.')
+        elif len(val_configs.filter(is_temporal_reference=True)) > 1:
+            raise ValueError('More than one configuration is marked as temporal reference.')
+
+        # check if proper reference configurations have proper fields set
+        if not validation.spatial_reference_configuration.is_spatial_reference:
+            raise ValueError('Configuration is not marked as spatial reference.')
+        if not validation.temporal_reference_configuration.is_temporal_reference:
+            raise ValueError('Configuration is not marked as temporal reference.')
+
+    def check_results(self, run, is_tcol_run=False, meta_plots=True):
+
+        try:
+            self._check_validation_configuration_consistency(run)
+        except Exception as exc:
+            assert False, f"'_check_validation_configuration raised and exception {exc}'"
+
         assert run is not None
         assert run.end_time is not None
         assert run.end_time > run.start_time
@@ -102,8 +172,9 @@ class TestValidation(TestCase):
         n_datasets = run.dataset_configurations.count()
 
         tcol_metrics = self.tcol_metrics if is_tcol_run else []
-        pair_metrics = [m for m in list(METRICS.keys()) if m.lower() != 'n_obs']
-        comm_metrics = [m for m in self.metrics if m not in pair_metrics]
+        non_metrics = ['gpi', 'lon', 'lat']
+        comm_metrics = ['n_obs', 'status']
+        pair_metrics = [m for m in list(METRICS.keys()) if m.lower() not in comm_metrics]
 
         # check netcdf output
         length = -1
@@ -127,7 +198,10 @@ class TestValidation(TestCase):
                 self.__logger.debug(f'Metric variables for metric {metric} are {[m.name for m in metric_vars]}')
 
                 # check that all metrics have the same number of variables (depends on number of input datasets)
-                if metric in comm_metrics:
+                if metric == 'status':
+                    # for status we generate 1 plot for non-spatial-reference dataset and one for each tcol combination
+                    num_vars = (n_datasets - 1) + is_tcol_run * comb(n_datasets - 1, 2)
+                elif (metric in comm_metrics) or (metric in non_metrics):
                     num_vars = 1
                 elif metric in pair_metrics:
                     num_vars = n_datasets - 1
@@ -157,8 +231,10 @@ class TestValidation(TestCase):
                             m_var.name)
                     self.__logger.debug(f'Length {m_var.name} are {length}')
 
+                    # NaNs should only occur if the validation failed somehow
                     nan_ratio = np.sum(np.isnan(values.data)) / float(len(values))
-                    assert nan_ratio <= 0.35, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
+                    error_ratio = run.error_points / run.total_points
+                    assert nan_ratio <= error_ratio, 'Variable {} has too many NaNs. Ratio: {}'.format(metric, nan_ratio)
 
             if run.interval_from is None:
                 assert ds.val_interval_from == "N/A", 'Wrong validation config attribute. [interval_from]'
@@ -189,8 +265,8 @@ class TestValidation(TestCase):
             i = 0
             for dataset_config in run.dataset_configurations.all():
 
-                if (run.reference_configuration and
-                        (dataset_config.id == run.reference_configuration.id)):
+                if (run.spatial_reference_configuration and
+                        (dataset_config.id == run.spatial_reference_configuration.id)):
                     d_index = 0
                 else:
                     i += 1
@@ -209,11 +285,11 @@ class TestValidation(TestCase):
                 # check dataset, version, variable
                 assert stored_dataset == dataset_config.dataset.short_name, 'Wrong dataset config attribute. [dataset]'
                 assert stored_version == dataset_config.version.short_name, 'Wrong dataset config attribute. [version]'
-                assert stored_variable == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable]'
+                assert stored_variable == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable]'
 
                 assert stored_dataset_pretty == dataset_config.dataset.pretty_name, 'Wrong dataset config attribute. [dataset pretty name]'
                 assert stored_version_pretty == dataset_config.version.pretty_name, 'Wrong dataset config attribute. [version pretty name]'
-                assert stored_variable_pretty == dataset_config.variable.pretty_name, 'Wrong dataset config attribute. [variable pretty name]'
+                assert stored_variable_pretty == dataset_config.variable.short_name, 'Wrong dataset config attribute. [variable pretty name]'
 
                 # check filters
                 if not dataset_config.filters.all() and not dataset_config.parametrisedfilter_set.all():
@@ -227,14 +303,14 @@ class TestValidation(TestCase):
                         assert pfil.parameters in stored_filters, 'Wrong dataset config parametrised filters: no parameters'
 
                 # check reference
-                if dataset_config.id == run.reference_configuration.id:
-                    assert ds.val_ref == ds_name, 'Wrong validation config attribute. [reference_configuration]'
+                if dataset_config.id == run.spatial_reference_configuration.id:
+                    assert ds.val_ref == ds_name, 'Wrong validation config attribute. [spatial_reference_configuration]'
 
-                    if run.reference_configuration.dataset.short_name != "ISMN":
-                        assert ds.val_resolution == run.reference_configuration.dataset.resolution["value"]
-                        assert ds.val_resolution_unit == run.reference_configuration.dataset.resolution["unit"]
+                    if run.spatial_reference_configuration.dataset.short_name != "ISMN":
+                        assert ds.val_resolution == run.spatial_reference_configuration.dataset.resolution["value"]
+                        assert ds.val_resolution_unit == run.spatial_reference_configuration.dataset.resolution["unit"]
 
-                if dataset_config.id == run.scaling_ref.id:
+                if run.scaling_ref and dataset_config.id == run.scaling_ref.id:
                     assert ds.val_scaling_ref == ds_name, 'Wrong validation config attribute. [scaling_ref]'
 
             assert ds.val_scaling_method == run.scaling_method, ' Wrong validation config attribute. [scaling_method]'
@@ -246,14 +322,49 @@ class TestValidation(TestCase):
             assert myzip.testzip() is None
 
         # check diagrams
-        boxplot_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'boxplot*.png')]
-        self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == len(globals.METRICS.keys()) + (len(tcol_metrics) * (n_datasets - 1))
+        for metric in pair_metrics + comm_metrics + tcol_metrics:
+            """
+            For each pairwise metric: - n-1 overview maps (not for spat. ref.)
+                                      - 1 boxplot
+                                      - 4 metadata boxplots (not for pvalues)
+            For each tcol metric: - n-1 overview maps
+                                  - n-1 boxplots
+                                  - 4 metadata boxplots
+            For status: - 1 overview map
+            """
+            if metric in ['status']:
+                continue
 
-        overview_pngs = [x for x in os.listdir(outdir) if fnmatch.fnmatch(x, 'overview*.png')]
-        self.__logger.debug(overview_pngs)
-        # n_obs + one for each data set for all other metrics
-        assert len(overview_pngs) == 1 + ((len(pair_metrics) + len(tcol_metrics)) * (n_datasets - 1))
+            if metric in tcol_metrics:
+                n_metric_plots = (n_datasets - 1)
+            elif metric in pair_metrics + comm_metrics:
+                n_metric_plots = 1
+            else:
+                raise ValueError(f'Unknown metric: {metric}')
+
+            if (metric in ['p_R', 'p_rho']) or (meta_plots is False):
+                n_metadata_plots = 0
+            else:
+                n_metadata_plots = len(out_metadata_plots)
+
+            patterns = [f"boxplot_{metric}_metadata_{'_and_'.join(meta_var)}.png"
+                        for meta_var in out_metadata_plots.values()] + \
+                       [f'boxplot_{metric}.png', f'boxplot_{metric}_for_*.png']
+            boxplot_pngs = [x for x in os.listdir(outdir) if
+                            any([fnmatch.fnmatch(x, p) for p in patterns])]
+
+            self.__logger.debug(f"{metric}: Plots are {len(boxplot_pngs)}, "
+                                f"should: {n_metadata_plots + n_metric_plots}")
+
+            assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
+
+            overview_pngs = [x for x in os.listdir(outdir)
+                             if fnmatch.fnmatch(x, f'overview*_{metric}.png')]
+
+            self.__logger.debug(f"{metric}: Plots are {len(overview_pngs)}, "
+                                f"should: {(n_datasets - 1)}")
+
+        assert os.path.isfile(os.path.join(outdir, 'overview_status.png'))
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -266,15 +377,19 @@ class TestValidation(TestCase):
         assert not os.path.exists(outdir)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -282,7 +397,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -290,11 +405,11 @@ class TestValidation(TestCase):
             config.save()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
         # add filterring according to depth_range with the default values:
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         run_id = run.id
@@ -307,19 +422,24 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_tcol(self):
         run = generate_default_validation_triple_coll()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
+        run.plots_save_metadata = 'always'
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -327,7 +447,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -335,12 +455,12 @@ class TestValidation(TestCase):
             config.save()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         # add filterring according to depth_range with the default values:
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         run_id = run.id
@@ -350,22 +470,28 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+        # at 5 locations the validation fails because not all datasets have data
+        assert new_run.error_points == 5
+        # the other 4 are okay
+        assert new_run.ok_points == 4
 
-        self.check_results(new_run, is_tcol_run=True)
+        self.check_results(new_run, is_tcol_run=True, meta_plots=True)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
-    @pytest.mark.filterwarnings(
-        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning")  # ignore pytesmo warnings about read_ts
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_empty_network(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
@@ -373,7 +499,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -382,7 +508,7 @@ class TestValidation(TestCase):
 
         # add filterring according to depth_range with values which cause that there is no points anymore:
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.1,0.2", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         run_id = run.id
@@ -396,19 +522,22 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 0
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning")
-    @pytest.mark.filterwarnings("ignore:No data for:UserWarning")
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_gldas_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
-        run.reference_configuration.variable = DataVariable.objects.get(short_name='GLDAS_SoilMoi0_10cm_inst')
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name='GLDAS_NOAH025_3H_2_1')
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name='GLDAS_SoilMoi0_10cm_inst')
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_GLDAS_UNFROZEN'))
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -420,7 +549,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -436,20 +565,25 @@ class TestValidation(TestCase):
         assert new_run.total_points == 19
         assert new_run.error_points == 0
         assert new_run.ok_points == 19
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccip_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_P_V05_2)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_P_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIP)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_P_V05_2)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_P_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
@@ -461,38 +595,41 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 #                 config.filters.add(DataFilter.objects.get(name='FIL_C3S_FLAG_0'))
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
         run_id = run.id
-        print(run_id)
 
         ## run the validation
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
-        self.check_results(new_run)
+        assert new_run.error_points == 8, "Error points are off"
+        assert new_run.ok_points == 16, "OK points are off"
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccia_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V06_1)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ESA_CCI_SM_A_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.CCIA)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ESA_CCI_SM_A_V06_1)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ESA_CCI_SM_A_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
@@ -504,37 +641,40 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
         run_id = run.id
-        print(run_id)
 
         ## run the validation
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
-        self.check_results(new_run)
+        assert new_run.error_points == 5, "Error points are off"
+        assert new_run.ok_points == 19, "OK points are off"
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_smap_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.SMAP_soil_moisture)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.SMAP_L3)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.SMAP_V5_PM)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.SMAP_soil_moisture)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -544,10 +684,15 @@ class TestValidation(TestCase):
         run.max_lat = self.hawaii_coordinates[2]
         run.max_lon = self.hawaii_coordinates[3]
 
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -557,26 +702,31 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
+
         assert new_run
 
         assert new_run.total_points == 140, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 140, "OK points are off"
-        self.check_results(new_run)
+        assert new_run.error_points == 134, "Error points are off"
+        assert new_run.ok_points == 6, "OK points are off"
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ASCAT_H113)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ASCAT_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ASCAT)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ASCAT_H113)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ASCAT_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -587,10 +737,14 @@ class TestValidation(TestCase):
         run.max_lat = 21.33
         run.max_lon = -155.86
 
+        run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -599,26 +753,31 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
+
         assert new_run
 
         assert new_run.total_points == 15, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 15, "OK points are off"
-        self.check_results(new_run)
+        assert new_run.error_points == 4, "Error points are off"
+        assert new_run.ok_points == 11, "OK points are off"
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_c3s_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3SC)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V202012)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.C3S_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.C3SC)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.C3S_V202012)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.C3S_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -630,7 +789,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -640,27 +799,32 @@ class TestValidation(TestCase):
         val.run_validation(run_id)
 
         new_run = ValidationRun.objects.get(pk=run_id)
-        print(new_run)
+
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 24, "OK points are off"
-        self.check_results(new_run)
+        assert new_run.error_points == 5, "Error points are off"
+        assert new_run.ok_points == 19, "OK points are off"
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        #        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        #        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -672,7 +836,7 @@ class TestValidation(TestCase):
         run.save()
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -688,26 +852,32 @@ class TestValidation(TestCase):
         assert new_run.total_points == 11, "Number of gpis is off"
         assert new_run.error_points == 0, "Too many error gpis"
         assert new_run.ok_points == 11, "OK points are off"
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
-        "ignore:No results for gpi:UserWarning")  # ignore pytesmo warnings about missing results
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.dataset = Dataset.objects.get(short_name='ASCAT')
                 config.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
-                config.variable = DataVariable.objects.get(short_name='ASCAT_sm')
+                config.variable = DataVariable.objects.get(pretty_name='ASCAT_sm')
                 config.filters.clear()
                 config.save()
 
         # run.scaling_ref = ValidationRun.SCALE_REF
         run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
 
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -722,15 +892,19 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run.total_points == 9
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
-        self.check_results(new_run)
+        assert new_run.error_points == 1
+        assert new_run.ok_points == 8
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
-    # test the validation with no changes to the default validation parameters
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_default(self):
         ## create default validation object
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.save()
@@ -745,20 +919,25 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_moving_avg(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
         run.anomalies = ValidationRun.MOVING_AVG_35_D
         run.save()
 
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.save()
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -773,12 +952,17 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_climatology(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
         run.anomalies = ValidationRun.CLIMATOLOGY
         # make sure there is data for the climatology time period!
@@ -786,10 +970,10 @@ class TestValidation(TestCase):
         run.anomalies_to = datetime(2018, 12, 31, 23, 59, 59)
         run.save()
 
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.save()
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -801,24 +985,29 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
 
         assert new_run
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_nc_attributes(self):
         """
         Test correctness and completedness of netCDF attributes in the output file;
         a validation that doesn't involve ISMN ref is used to check the resolution attributes
         """
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # need validation without ISMN as referebce to check resolution attributes
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=globals.ERA5_sm)
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=globals.ERA5)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=globals.ERA5_20190613)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=globals.ERA5_sm)
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.save()
 
         run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
@@ -834,9 +1023,13 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_c3s_validation_upscaling(self):
         """
         Test a validation of CCIP with ISMN as non-reference, and upscaling option active. All ISMN points are averaged
@@ -862,11 +1055,15 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
         assert new_run.total_points == 16
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 16
-        self.check_results(new_run)
+        assert new_run.error_points == 12
+        assert new_run.ok_points == 4
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def validation_upscaling_for_dataset(self, ds, version, variable):
         """
         Generate a test with ISMN as non-reference dataset and the provided dataset, version, variable as reference.
@@ -886,9 +1083,9 @@ class TestValidation(TestCase):
 
         # NOTE: ISMN non-reference points need to use one of the upscaling methods
         run.upscaling = True
-        run.reference_configuration.dataset = Dataset.objects.get(short_name=ds)
-        run.reference_configuration.version = DatasetVersion.objects.get(short_name=version)
-        run.reference_configuration.variable = DataVariable.objects.get(short_name=variable)
+        run.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=ds)
+        run.spatial_reference_configuration.version = DatasetVersion.objects.get(short_name=version)
+        run.spatial_reference_configuration.variable = DataVariable.objects.get(pretty_name=variable)
         run.save()
         run_id = run.id
         # run the validation
@@ -896,9 +1093,13 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_all_datasets_validation_upscaling(self):
         """
@@ -916,6 +1117,10 @@ class TestValidation(TestCase):
         for ds, version, variable in all_datasets:
             self.validation_upscaling_for_dataset(ds, version, variable)
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     def test_validation_upscaling_lut(self):
         """
         Test the function `create_upscaling_lut` in validation/batched.py by checking that the lookup table
@@ -929,7 +1134,7 @@ class TestValidation(TestCase):
         c3s_reader = val.create_reader(dataset, version)
         dataset = Dataset.objects.get(short_name='ISMN')
         version = DatasetVersion.objects.get(short_name="ISMN_V20180712_MINI")
-        variable = DataVariable.objects.get(short_name="ISMN_soil_moisture")
+        variable = DataVariable.objects.get(pretty_name="ISMN_soil_moisture")
         ismn_reader = val.create_reader(dataset, version)
         datasets = {
             "0-C3S_combined": {"class": c3s_reader},
@@ -939,7 +1144,7 @@ class TestValidation(TestCase):
         lut = create_upscaling_lut(
             validation_run=run,
             datasets=datasets,
-            ref_name="0-C3S_combined"
+            spatial_ref_name="0-C3S_combined"
         )
         assert list(lut.keys()) == ["1-ISMN"]
         # the exact gpi number might change, so we only check that ismn points are averaged under three c3s pixels
@@ -968,14 +1173,19 @@ class TestValidation(TestCase):
         lut = create_upscaling_lut(
             validation_run=run,
             datasets=datasets,
-            ref_name="0-C3S_combined"
+            spatial_ref_name="0-C3S_combined"
         )
         assert list(lut.keys()) == ["1-ISMN"]
         assert lut["1-ISMN"] == []
 
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:No data for:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         # hawaii bounding box
@@ -986,10 +1196,10 @@ class TestValidation(TestCase):
 
         run.save()
 
-        run.reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.reference_configuration.save()
+        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+        run.spatial_reference_configuration.save()
         for config in run.dataset_configurations.all():
-            if config != run.reference_configuration:
+            if config != run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
@@ -1004,7 +1214,7 @@ class TestValidation(TestCase):
         assert new_run.total_points == 9
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
-        self.check_results(new_run)
+        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
         self.delete_run(new_run)
 
     def test_errors(self):
@@ -1016,7 +1226,6 @@ class TestValidation(TestCase):
         ## readers
         with pytest.raises(ValueError):
             no_reader = val.create_reader(dataset, version)
-            print(no_reader)
 
         ## save config
         validation_run = ValidationRun()
@@ -1050,7 +1259,7 @@ class TestValidation(TestCase):
     def test_setup_filtering_min(self):
         dataset = Dataset.objects.get(short_name='ISMN')
         version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
         reader = val.create_reader(dataset, version)
 
         no_msk_reader, read_name, read_kwargs = \
@@ -1060,7 +1269,7 @@ class TestValidation(TestCase):
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
-        assert not data[variable.pretty_name].empty
+        assert not data[variable.short_name].empty
 
         data_filters = [
             DataFilter.objects.get(name="FIL_ALL_VALID_RANGE"),
@@ -1081,9 +1290,9 @@ class TestValidation(TestCase):
         assert data is not None
         assert isinstance(data, pd.DataFrame)
         assert len(data.index) > 1
-        assert not data[variable.pretty_name].empty
-        assert not np.any(data[variable.pretty_name].values < 0)
-        assert not np.any(data[variable.pretty_name].values > 100)
+        assert not data[variable.short_name].empty
+        assert not np.any(data[variable.short_name].values < 0)
+        assert not np.any(data[variable.short_name].values > 100)
 
     # test potential depth ranges errors
     def test_depth_range_filtering_errors(self):
@@ -1101,61 +1310,61 @@ class TestValidation(TestCase):
         ref_c.version = version
         ref_c.variable = dataset.variables.first()
         ref_c.save()
-        run.reference_configuration = ref_c
+        run.spatial_reference_configuration = ref_c
         run.save()
 
         # adding filters where depth_to is smaller than depth_from
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.2,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
-        ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
+        ref_reader, read_name, read_kwargs = val.validation._get_spatial_reference_reader(run)
 
         with pytest.raises(ValueError, match=r".*than.*"):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
         ParametrisedFilter.objects.all().delete()
 
         # adding filters with negative values
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="-0.05,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
         ParametrisedFilter.objects.all().delete()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="-0.05,-0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
         ParametrisedFilter.objects.all().delete()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.05,-0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
 
         with pytest.raises(ValueError, match=r".*negative.*"):
             val.create_jobs(
                 run,
                 ref_reader,
-                run.reference_configuration
+                run.spatial_reference_configuration
             )
 
     def test_temporal_adapter(self):
@@ -1171,7 +1380,7 @@ class TestValidation(TestCase):
             reader = val.create_reader(dataset, version)
             midnight_tstamp = reader.read(-155.42, 19.78,)
 
-            t_adaped_reader = adapt_timestamp(reader, dataset)
+            t_adaped_reader = adapt_timestamp(reader, dataset, version)
             exact_tstamp = t_adaped_reader.read(-155.42, 19.78,)
 
             # Check that the values where the exact date is missing are dropped
@@ -1217,14 +1426,14 @@ class TestValidation(TestCase):
                         else:
                             data = getattr(msk_reader, read_name)(-155.42, 19.78, **read_kwargs)  ## hawaii
                         assert data is not None
-                        assert variable.pretty_name in data.columns
+                        assert variable.short_name in data.columns
                         assert isinstance(data, pd.DataFrame)
 
                         # handles the case where all values are flagged (i.e. for SMOS L3)
-                        if not len(data.index) > 1 or data[variable.pretty_name].empty:
+                        if not len(data.index) > 1 or data[variable.short_name].empty:
                             unfiltered = reader.read(-155.42, 19.78, **read_kwargs)
 
-                            assert unfiltered.count()[variable.pretty_name] == len(unfiltered)
+                            assert unfiltered.count()[variable.short_name] == len(unfiltered)
 
         print("Test duration: {}".format(time.time() - start_time))
 
@@ -1268,19 +1477,17 @@ class TestValidation(TestCase):
                 ref_c.variable = dataset.variables.first()
                 ref_c.save()
 
-                run.reference_configuration = ref_c
+                run.spatial_reference_configuration = ref_c
                 run.save()
 
-                ref_reader, read_name, read_kwargs = val.validation._get_reference_reader(run)
+                ref_reader, read_name, read_kwargs = val.validation._get_spatial_reference_reader(run)
 
                 total_points, jobs = val.create_jobs(
                     run,
                     ref_reader,
-                    run.reference_configuration
+                    run.spatial_reference_configuration
                 )
-                print(version)
-                print(len(jobs))
-                print(total_points)
+
                 if dataset.short_name == "ISMN":
                     self._check_jobs(total_points, jobs, metadata_present=True)
                 else:
@@ -1300,7 +1507,7 @@ class TestValidation(TestCase):
         # apply Basic Adapter only
         c3s_reader, _, _ = val.setup_filtering(
             c3s_reader, filters=None, param_filters=None, dataset=dataset,
-            variable=DataVariable.objects.get(short_name='C3S_sm'))
+            variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
         gpis, lons, lats, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1324,7 +1531,7 @@ class TestValidation(TestCase):
         # apply Basic Adapter only
         c3s_reader, _, _ = val.setup_filtering(
             c3s_reader, filters=None, param_filters=None, dataset=dataset,
-            variable=DataVariable.objects.get(short_name='C3S_sm'))
+            variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1350,7 +1557,7 @@ class TestValidation(TestCase):
             # apply Basic Adapter only
             c3s_reader, _, _ = val.setup_filtering(
                 c3s_reader, filters=None, param_filters=None, dataset=dataset,
-                variable=DataVariable.objects.get(short_name='C3S_sm'))
+                variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
             gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1372,7 +1579,7 @@ class TestValidation(TestCase):
         # apply Basic Adapter only
         c3s_reader, _, _ = val.setup_filtering(
             c3s_reader, filters=None, param_filters=None, dataset=dataset,
-            variable=DataVariable.objects.get(short_name='C3S_sm'))
+            variable=DataVariable.objects.get(pretty_name='C3S_sm'))
 
         gpis, lats, lons, cells = c3s_reader.cls.grid.get_grid_points()
 
@@ -1409,74 +1616,143 @@ class TestValidation(TestCase):
         num = val.num_gpis_from_job(None)
         assert num == 1
 
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
     @pytest.mark.long_running
     @pytest.mark.graphs
-    def test_generate_graphs(self):
-        infile1 = 'testdata/output_data/c3s_ismn.nc'
-        infile2 = 'testdata/output_data/c3s_gldas.nc'
-        infile3 = 'testdata/output_data/c3s_era5land.nc'
+    def test_generate_graphs_ismn_no_meta(self):
+        # Note: parameterized tests don't really work in this case
+        infile, short_name = ('testdata/output_data/c3s_ismn.nc', 'ISMN')
 
         # create validation object and data folder for it
         v = generate_default_validation()
         # scatterplot
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='ISMN')
-        v.reference_configuration.save()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
+        v.spatial_reference_configuration.save()
         run_dir = path.join(OUTPUT_FOLDER, str(v.id))
         val.mkdir_if_not_exists(run_dir)
 
         # copy our netcdf data file there and link it in the validation object
         # then generate the graphs
-
-        shutil.copy(infile1, path.join(run_dir, 'results.nc'))
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir)
+        val.generate_all_graphs(v, run_dir, save_metadata='never')
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
+        # no boxplot for status
+        n_metrics = len(globals.METRICS.keys()) - 1
+        assert len(boxplot_pngs) == n_metrics
+
+        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
+
+        self.delete_run(v)
+
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
+    @pytest.mark.long_running
+    @pytest.mark.graphs
+    def test_generate_graphs_ismn_metadata(self):
+        """
+        Create plots from example validation run that also contains the ISMN
+        metadata based plots for: LC class, KG class, soil props, frm class.
+        When more metadata plots are added (globals), exchange reference file!
+        """
+        # Note: parameterized tests don't really work in this case
+        infile, short_name = ('testdata/output_data/c3s_ismn_metadata.nc', 'ISMN')
+
+        # List of metadata classes for which box plots are created.
+
+        # create validation object and data folder for it
+        v = generate_default_validation()
+        # scatterplot
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
+        v.spatial_reference_configuration.save()
+        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+        val.mkdir_if_not_exists(run_dir)
+
+        # copy our netcdf data file there and link it in the validation object
+        # then generate the graphs
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
+        val.set_outfile(v, run_dir)
+        v.save()
+        val.generate_all_graphs(v, run_dir, save_metadata='always')
+
         n_metrics = len(globals.METRICS.keys())
+        n_metas = len(globals.METADATA_PLOT_NAMES.keys())
+
+        meta_boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')]
+        self.__logger.debug(meta_boxplot_pngs)
+        # no meta box plots for r_p & rho_p
+        assert len(meta_boxplot_pngs) == (n_metrics - 3) * n_metas
+
+        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        # no boxplot for status
+        assert len(boxplot_pngs) == n_metrics - 1 + (n_metas * (n_metrics - 3))
+
+        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
+        self.__logger.debug(overview_pngs)
+        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
+
+        self.delete_run(v)
+
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
+    @pytest.mark.long_running
+    @pytest.mark.graphs
+    def test_generate_graphs_gldas(self):
+        infile, short_name = ('testdata/output_data/c3s_gldas.nc', 'GLDAS')
+        v = generate_default_validation()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
+        v.spatial_reference_configuration.save()
+        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+        val.mkdir_if_not_exists(run_dir)
+
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
+        val.set_outfile(v, run_dir)
+        v.save()
+        val.generate_all_graphs(v, run_dir, save_metadata='never')
+
+        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
+        self.__logger.debug(boxplot_pngs)
+        # no boxplot for status
+        n_metrics = len(globals.METRICS.keys()) - 1
         assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
 
-        # remove results from first test and recreate dir
-        shutil.rmtree(run_dir)
+        self.delete_run(v)
+
+    @pytest.mark.filterwarnings(
+        "ignore: Too few points are available to generate:UserWarning"
+    )
+    @pytest.mark.long_running
+    @pytest.mark.graphs
+    def test_generate_graphs_era5land(self):
+        infile, short_name = ('testdata/output_data/c3s_era5land.nc', 'ERA5_LAND')
+        v = generate_default_validation()
+        v.spatial_reference_configuration.dataset = Dataset.objects.get(short_name=short_name)
+        v.spatial_reference_configuration.save()
+        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
         val.mkdir_if_not_exists(run_dir)
 
-        # do the same for the other netcdf file
-
-        shutil.copy(infile2, path.join(run_dir, 'results.nc'))
+        shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
-        # heatmap
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='GLDAS')
-        v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
+        v.save()
+        val.generate_all_graphs(v, run_dir, save_metadata='never')
 
         boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
         self.__logger.debug(boxplot_pngs)
-        assert len(boxplot_pngs) == n_metrics
-
-        overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metrics * (v.dataset_configurations.count() - 1)
-
-        # remove results from first test and recreate dir
-        shutil.rmtree(run_dir)
-        val.mkdir_if_not_exists(run_dir)
-
-        # do the same for the other netcdf file
-
-        shutil.copy(infile3, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        # heatmap
-        v.reference_configuration.dataset = Dataset.objects.get(short_name='ERA5_LAND')
-        v.reference_configuration.save()
-        val.generate_all_graphs(v, run_dir)
-
-        boxplot_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'boxplot*.png')]
-        self.__logger.debug(boxplot_pngs)
+        n_metrics = len(globals.METRICS.keys()) - 1 # no boxplot for status
         assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [x for x in os.listdir(run_dir) if fnmatch.fnmatch(x, 'overview*.png')]
@@ -1497,6 +1773,7 @@ class TestValidation(TestCase):
         # preparing a few validations, so that there is a base to be searched
         for i in range(3):
             run = generate_default_validation()
+            run.plots_save_metadata = 'always'
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -1510,6 +1787,10 @@ class TestValidation(TestCase):
                 run.anomalies_from = time_intervals_from
                 run.anomalies_to = time_intervals_to
             run.scaling_method = scaling_methods[i]
+            if run.scaling_method != 'none':
+                run.scaling_ref = run.spatial_reference_configuration
+                run.scaling_ref.is_scaling_reference = True
+                run.scaling_ref.save()
             run.doi = f'doi-1-2-{i}'
             run.save()
             run_ids.append(run.id)
@@ -1526,6 +1807,10 @@ class TestValidation(TestCase):
 
         run_tcol.anomalies = anomalies_methods[0][0]
         run_tcol.scaling_method = scaling_methods[0]
+        run_tcol.scaling_ref = run.spatial_reference_configuration
+        run_tcol.scaling_ref.is_scaling_reference = True
+        run_tcol.scaling_ref.save()
+
         run_tcol.doi = f'tcol_doi-1-2-3'
         run_tcol.save()
         run_tcol_id = run_tcol.id
@@ -1543,6 +1828,10 @@ class TestValidation(TestCase):
 
         run_filt.anomalies = anomalies_methods[0][0]
         run_filt.scaling_method = scaling_methods[0]
+        run_filt.scaling_ref = run.spatial_reference_configuration
+        run_filt.scaling_ref.is_scaling_reference = True
+        run_filt.scaling_ref.save()
+
         run_filt.doi = f'doi-1-2-8'
         run_filt.save()
         run_filt_id = run_filt.id
@@ -1551,13 +1840,12 @@ class TestValidation(TestCase):
             config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             if config.dataset.short_name == globals.ISMN:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
-            print('old one', config.dataset == globals.ISMN, config, config.filters.all())
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run_filt.reference_configuration)
+                                     dataset_config=run_filt.spatial_reference_configuration)
         pfilter.save()
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run_filt.reference_configuration)
+                                     dataset_config=run_filt.spatial_reference_configuration)
         pfilter.save()
 
         published_runs = ValidationRun.objects.exclude(doi='').order_by('-start_time')
@@ -1565,6 +1853,7 @@ class TestValidation(TestCase):
         # here will be validations for asserting, I start with exactly the same validations and check if it finds them:
         for i in range(3):
             run = generate_default_validation()
+            run.plots_save_metadata = 'always'
             run.user = self.testuser
             run.interval_from = time_intervals_from
             run.interval_to = time_intervals_to
@@ -1578,6 +1867,10 @@ class TestValidation(TestCase):
                 run.anomalies_from = time_intervals_from
                 run.anomalies_to = time_intervals_to
             run.scaling_method = scaling_methods[i]
+            if run.scaling_method != 'none':
+                run.scaling_ref = run.spatial_reference_configuration
+                run.scaling_ref.is_scaling_reference = True
+                run.scaling_ref.save()
             run.save()
             is_there_one = compare_validation_runs(run, published_runs, user)
 
@@ -1587,6 +1880,7 @@ class TestValidation(TestCase):
 
         # runs to fail:
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
         run.interval_from = time_intervals_from
         run.interval_to = time_intervals_to
@@ -1599,6 +1893,8 @@ class TestValidation(TestCase):
 
         run.anomalies = anomalies_methods[0][0]
         run.scaling_method = scaling_methods[0]
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
         run.save()
 
         is_there_one = compare_validation_runs(run, published_runs, user)
@@ -1644,6 +1940,8 @@ class TestValidation(TestCase):
         run.anomalies = anomalies_methods[0][0]
         # there is no run with scaling method LINREG
         run.scaling_method = ValidationRun.LINREG
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
         run.save()
         is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
@@ -1651,6 +1949,10 @@ class TestValidation(TestCase):
         # restoring existing validation
         run.anomalies = anomalies_methods[2][0]
         run.scaling_method = scaling_methods[2]
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
         run.anomalies_from = time_intervals_from
         run.anomalies_to = time_intervals_to
         run.save()
@@ -1679,6 +1981,10 @@ class TestValidation(TestCase):
         # getting back to settings of the run with filters set adding filters for the run
         run.anomalies = anomalies_methods[0][0]
         run.scaling_method = scaling_methods[0]
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
         run.anomalies_from = None
         run.anomalies_to = None
         run.save()
@@ -1694,11 +2000,11 @@ class TestValidation(TestCase):
             new_config.save()
 
         new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                         dataset_config=run.reference_configuration)
+                                         dataset_config=run.spatial_reference_configuration)
         new_pfilter.save()
         # add filterring according to depth_range with the default values:
         new_pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                         dataset_config=run.reference_configuration)
+                                         dataset_config=run.spatial_reference_configuration)
         new_pfilter.save()
         is_there_one = compare_validation_runs(run, published_runs, user)
 
@@ -1743,7 +2049,7 @@ class TestValidation(TestCase):
 
         # messing up with parameterised filters:
         # ... with networks
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
                 pf.parameters = 'SCAN,OZNET'
                 pf.save()
@@ -1751,7 +2057,7 @@ class TestValidation(TestCase):
         is_there_one = compare_validation_runs(run, published_runs, user)
         assert not is_there_one['is_there_validation']
 
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
                 pf.parameters = 'OZNET'
                 pf.save()
@@ -1760,7 +2066,7 @@ class TestValidation(TestCase):
         assert not is_there_one['is_there_validation']
 
         # restoring networks
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_NETWORKS':
                 pf.parameters = 'SCAN'
                 pf.save()
@@ -1769,7 +2075,7 @@ class TestValidation(TestCase):
         assert is_there_one['is_there_validation']
 
         # with depths
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_DEPTH':
                 pf.parameters = '0.10,0.20'
                 pf.save()
@@ -1778,7 +2084,7 @@ class TestValidation(TestCase):
         assert not is_there_one['is_there_validation']
 
         # restoring depths
-        for pf in ParametrisedFilter.objects.filter(dataset_config=run.reference_configuration):
+        for pf in ParametrisedFilter.objects.filter(dataset_config=run.spatial_reference_configuration):
             if DataFilter.objects.get(pk=pf.filter_id).name == 'FIL_ISMN_DEPTH':
                 pf.parameters = '0.0,0.1'
                 pf.save()
@@ -1791,7 +2097,7 @@ class TestValidation(TestCase):
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='ASCAT')
         data_c.version = DatasetVersion.objects.get(short_name='ASCAT_H113')
-        data_c.variable = DataVariable.objects.get(short_name='ASCAT_sm')
+        data_c.variable = DataVariable.objects.get(pretty_name='ASCAT_sm')
         data_c.save()
 
         is_there_one = compare_validation_runs(run, published_runs, user)
@@ -1822,6 +2128,10 @@ class TestValidation(TestCase):
 
         run_tcol.anomalies = anomalies_methods[0][0]
         run_tcol.scaling_method = scaling_methods[0]
+        run_tcol.scaling_ref = run.spatial_reference_configuration
+        run_tcol.scaling_ref.is_scaling_reference = True
+        run_tcol.scaling_ref.save()
+
         run_tcol.save()
         is_there_one = compare_validation_runs(run_tcol, published_runs, user)
 
@@ -1842,25 +2152,30 @@ class TestValidation(TestCase):
     def test_copy_validation(self):
         # create a validation to copy:
         run = generate_default_validation()
+        run.plots_save_metadata = 'always'
         run.user = self.testuser
 
         run.scaling_method = ValidationRun.MEAN_STD
+        run.scaling_ref = run.spatial_reference_configuration
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
         run.save()
 
+        run.scaling_ref.is_scaling_reference = True
+        run.scaling_ref.save()
+
         for config in run.dataset_configurations.all():
-            if config == run.reference_configuration:
+            if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:
                 config.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
             config.save()
 
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
         pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
-                                     dataset_config=run.reference_configuration)
+                                     dataset_config=run.spatial_reference_configuration)
         pfilter.save()
         run_id = run.id
         val.run_validation(run_id)
@@ -1894,7 +2209,7 @@ class TestValidation(TestCase):
         assert copied_run.total_points == 9
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
-        self.check_results(copied_run)
+        self.check_results(copied_run, is_tcol_run=False, meta_plots=True)
 
         # copying again, so to check CopiedValidations model
         new_run = get_object_or_404(ValidationRun, pk=run_id)

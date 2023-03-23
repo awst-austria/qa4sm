@@ -16,6 +16,10 @@ from validator.models import DatasetConfiguration, User, CopiedValidations
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 
+# def get_spatial_reference_id(instance) -> int:
+#     return instance.spatial_reference_configuration.primary_key
+
+
 class ValidationRun(models.Model):
     # scaling methods
     MIN_MAX = 'min_max'
@@ -74,12 +78,13 @@ class ValidationRun(models.Model):
     ok_points = models.IntegerField(default=0)
     progress = models.IntegerField(default=0)
 
-    reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
-                                                related_name='ref_validation_run', null=True)
-
+    spatial_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                        related_name='spat_ref_validation_run', null=True)
+    temporal_reference_configuration = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
+                                                         related_name='temp_ref_validation_run', null=True)
     scaling_ref = models.ForeignKey(to=DatasetConfiguration, on_delete=models.SET_NULL,
                                     related_name='scaling_ref_validation_run', null=True)
-    scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=MEAN_STD)
+    scaling_method = models.CharField(max_length=20, choices=SCALING_METHODS, default=NO_SCALING)
     interval_from = models.DateTimeField(null=True)
     interval_to = models.DateTimeField(null=True)
     anomalies = models.CharField(max_length=20, choices=ANOMALIES_METHODS, default=NO_ANOM)
@@ -110,9 +115,23 @@ class ValidationRun(models.Model):
     temporal_matching = models.IntegerField(default=TEMP_MATCH_WINDOW, null=False, blank=False,
                                             validators=[MinValueValidator(1), MaxValueValidator(24)])
 
+    plots_save_metadata = models.CharField(
+        max_length=10,
+        choices=(
+            ('always', 'force creating metadata box plots (e.g. for testing)'),
+            ('never', 'do not create metadata box plots at all'),
+            ('threshold', 'create metadata box plots only when the minimum '
+                          'number of required points is available '
+                          '(set in globals of qa4sm-reader'),
+            ),
+        default='threshold'
+    )
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
+
+
 
     @property
     def expiry_date(self):
@@ -219,18 +238,28 @@ class ValidationRun(models.Model):
             return self.name_tag
 
         configs = DatasetConfiguration.objects.filter(validation=self.id)
-        datasets = [conf.dataset.short_name + ', ' for conf in configs if conf.id != self.reference_configuration.id]
-        t = self.start_time
-        minute = str(t.minute)
-        if t.minute < 10:
-            minute = '0' + minute
-        label = 'Validation date: ' + str(t.year) + '-' + str(t.month) + '-' + str(t.day) + ' ' + str(
-            t.hour) + ':' + minute + ', Non-reference-dataset: '
+        datasets = [conf.dataset.short_name + ', ' for conf in configs if
+                    conf.id != self.spatial_reference_configuration.id]
+
+        label = f"Validation date: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}, Non-reference-dataset: "
         for dataset in datasets:
             label += dataset
         label = label.strip(', ')
 
         return label
+
+    def user_data_panel_label(self):
+        if self.name_tag is not None and self.name_tag:
+            return self.name_tag
+        config = DatasetConfiguration.objects.filter(validation=self.id).get(is_spatial_reference=True)
+        label = f"Date: {self.start_time.strftime('%Y-%m-%d')}, Spatial-reference: " \
+               f"{config.dataset.short_name}"
+        return label
+
+    @property
+    def contains_user_data(self):
+        user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
+        return len(user_data) > 0
 
 
 # delete model output directory on disk when model is deleted
@@ -248,5 +277,3 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         outdir = os.path.join(OUTPUT_FOLDER, str(instance.id))
         if os.path.isdir(outdir):
             rmtree(outdir)
-
-

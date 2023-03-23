@@ -26,7 +26,6 @@ from validator.models import DataVariable
 import validator.validation as val
 from validator.validation import globals
 
-
 '''
     Tests to check that the validation process really produces valid results ;-)
     This is just a stub that should be filled by TU Wien.
@@ -120,7 +119,9 @@ class TestValidity(TestCase):
         run.delete()
         assert not os.path.exists(outdir)
 
-    @pytest.mark.filterwarnings("ignore:No results for gpi:UserWarning") # ignore pytesmo warnings about missing results
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_c3s_ismn(self):
         run = ValidationRun()
@@ -135,7 +136,7 @@ class TestValidity(TestCase):
         data_c.validation = run
         data_c.dataset = Dataset.objects.get(short_name='C3S_combined')
         data_c.version = DatasetVersion.objects.get(short_name='C3S_V201812')
-        data_c.variable = DataVariable.objects.get(short_name='C3S_sm')
+        data_c.variable = DataVariable.objects.get(pretty_name='C3S_sm')
         data_c.save() # object needs to be saved before m2m relationship can be used
 
         data_c.filters.add(DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
@@ -145,14 +146,16 @@ class TestValidity(TestCase):
         ref_c.validation = run
         ref_c.dataset = Dataset.objects.get(short_name='ISMN')
         ref_c.version = DatasetVersion.objects.get(short_name='ISMN_V20180712_MINI')
-        ref_c.variable = DataVariable.objects.get(short_name='ISMN_soil_moisture')
+        ref_c.variable = DataVariable.objects.get(pretty_name='ISMN_soil_moisture')
+        ref_c.is_spatial_reference = True
+        ref_c.is_temporal_reference = True
         ref_c.save()
 
         ref_c.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
         ref_c.save()
 
-        run.reference_configuration = ref_c
-        run.scaling_ref = ref_c
+        run.spatial_reference_configuration = ref_c
+        run.temporal_reference_configuration = ref_c
         run.save()
 
         run_id = run.id
@@ -174,3 +177,5 @@ class TestValidity(TestCase):
 
         self.generic_result_check(finished_run)
         self.delete_run(finished_run)
+
+

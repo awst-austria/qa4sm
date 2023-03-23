@@ -9,6 +9,7 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 
 
 @Component({
@@ -37,7 +38,8 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
               public globalParamsService: GlobalParamsService,
-              private validationService: ValidationrunService) {
+              private validationService: ValidationrunService,
+              public validationConfigService: ValidationRunConfigService,) {
   }
 
   ngOnInit(): void {
@@ -53,7 +55,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   private updateConfig(): void {
     this.configurations$ = combineLatest(
       this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
-      this.datasetService.getAllDatasets(),
+      this.datasetService.getAllDatasets(true),
       this.datasetVersionService.getAllVersions(),
       this.datasetVariableService.getAllVariables()
     ).pipe(
@@ -69,7 +71,10 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
                 config.version === dsVersion.id).pretty_name,
 
               variable: variables.find(dsVar =>
-                config.variable === dsVar.id).pretty_name,
+                config.variable === dsVar.id).short_name,
+
+              variableUnit: variables.find(dsVar =>
+                config.variable === dsVar.id).unit,
             })
         )
       )
