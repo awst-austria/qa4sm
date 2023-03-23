@@ -18,6 +18,20 @@ from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSI
 __logger = logging.getLogger(__name__)
 
 
+def skip_view_if_not_ready(view_func):
+    def wrapper(request, *args, **kwargs):
+        # Check if the view should be skipped
+        file_entry_id = request.path.split('/')[-2]
+        file_entries = UserDatasetFile.objects.filter(id=file_entry_id)
+        if len(file_entries) != 0 and file_entries[0].metadata_submitted:
+            print('Processing has already started')
+            return HttpResponse()
+
+        # If the view should not be skipped, proceed with the view
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+
 def create_variable_entry(variable_name, variable_pretty_name, dataset_name, user, variable_unit=None, max_value=None,
                           min_value=None):
     current_max_id = DataVariable.objects.all().last().id if DataVariable.objects.all().last() else 0
@@ -240,13 +254,14 @@ class UploadedFileError(BaseException):
         self.message = message
 
 
+@skip_view_if_not_ready
 @api_view(['PUT', 'POST'])
 @permission_classes([IsAuthenticated])
 def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    if file_entry.metadata_submitted:
-        return JsonResponse({'message': 'Metadata submission process started.'}, status=202, safe=False)
+    # if file_entry.metadata_submitted:
+    #     return JsonResponse({'message': 'Metadata submission process started.'}, status=202, safe=False)
 
     file_entry.metadata_submitted = True
     file_entry.save()
