@@ -4,6 +4,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {environment} from '../../../../environments/environment';
 import {UserDataFileDto} from './user-data-file.dto';
 
+
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
 const userDataListUrl: string = urlPrefix + '/get-list-of-user-data-files';
@@ -45,8 +46,7 @@ export class UserDatasetsService {
 
   sendMetadata(metadataForm: any, fileId: string): Observable<any> {
     const metadataUrl = userDataMetadataUrl + '/' + fileId + '/';
-    return this.httpClient.post(metadataUrl, metadataForm, {observe: 'body', responseType: 'json'});
-
+    return this.httpClient.post(metadataUrl, metadataForm, {observe: 'response', responseType: 'json'});
   }
 
   testDataset(dataFileId: string): Observable<any>{

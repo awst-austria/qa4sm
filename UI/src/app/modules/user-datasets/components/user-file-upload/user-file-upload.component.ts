@@ -113,6 +113,7 @@ export class UserFileUploadComponent implements OnInit {
                 this.spinnerVisible = false;
                 this.metadataForm.reset('');
               });
+          } else {
           }
         },
         (message) => {
