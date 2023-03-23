@@ -100,6 +100,7 @@ export class UserFileUploadComponent implements OnInit {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
             this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe((response) => {
+                console.log(response.status);
                 if (response.status === 202) {
                   // Request accepted for processing, show a processing message
                   this.toastService.showAlertWithHeader('Metadata processing in progress.',
@@ -124,8 +125,8 @@ export class UserFileUploadComponent implements OnInit {
                   `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
               },
               () => {
-                this.spinnerVisible = false;
-                this.metadataForm.reset('');
+                // this.spinnerVisible = false;
+                // this.metadataForm.reset('');
               });
           }
         },
