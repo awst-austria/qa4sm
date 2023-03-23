@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {environment} from '../../../../environments/environment';
 import {UserDataFileDto} from './user-data-file.dto';
+import {map} from 'rxjs/operators';
 
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
@@ -45,7 +46,18 @@ export class UserDatasetsService {
 
   sendMetadata(metadataForm: any, fileId: string): Observable<any> {
     const metadataUrl = userDataMetadataUrl + '/' + fileId + '/';
-    return this.httpClient.post(metadataUrl, metadataForm, {observe: 'response', responseType: 'json'});
+    return this.httpClient.post(metadataUrl, metadataForm, {observe: 'response', responseType: 'json'})
+      .pipe(
+        map((response: HttpResponse<any>) => {
+          if (response.status === 202) {
+            // Request accepted for processing, return a custom response
+            return { status: 202 };
+          } else {
+            // Final response received, return the regular response
+            return response;
+          }
+        })
+      );
 
   }
 
