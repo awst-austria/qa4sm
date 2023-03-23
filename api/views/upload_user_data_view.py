@@ -174,7 +174,6 @@ def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
     user_datasets_without_file = Dataset.objects.filter(user=request.user).filter(user_dataset__isnull=True)
     if len(user_datasets_without_file) != 0:
-        print(user_datasets_without_file)
         try:
             clean_redundant_datasets(user_datasets_without_file)
         except:
@@ -246,6 +245,8 @@ class UploadedFileError(BaseException):
 def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+    file_entry.metadata_submitted = True
+    file_entry.save()
 
     if serializer.is_valid():
         # first the file will be preprocessed
