@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {BehaviorSubject, Observable, throwError} from 'rxjs';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {environment} from '../../../../environments/environment';
 import {UserDataFileDto} from './user-data-file.dto';
-import {map} from 'rxjs/operators';
+import {catchError, delay, map, repeatWhen, takeWhile} from 'rxjs/operators';
 
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
@@ -49,16 +49,24 @@ export class UserDatasetsService {
     return this.httpClient.post(metadataUrl, metadataForm, {observe: 'response', responseType: 'json'})
       .pipe(
         map((response: HttpResponse<any>) => {
-          if (response.status === 202) {
+          if (response && response.status === 202) {
             // Request accepted for processing, return a custom response
             return { status: 202 };
           } else {
             // Final response received, return the regular response
             return response;
           }
-        })
+        }),
+        catchError((error: HttpErrorResponse) => {
+          return throwError(error);
+        }),
+        repeatWhen((obs: Observable<any>) =>
+          obs.pipe(
+            delay(5000), // Wait for 5 seconds before resubscribing
+            takeWhile((response) => response && response.status === 202) // Resubscribe only for 202 responses
+          )
+        )
       );
-
   }
 
   testDataset(dataFileId: string): Observable<any>{
