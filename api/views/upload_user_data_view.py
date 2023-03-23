@@ -172,13 +172,12 @@ def get_variables_from_the_reader(reader):
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
-    user_datasets_without_file = Dataset.objects.filter(user=request.user).filter(user_dataset__isnull=True)
-    if len(user_datasets_without_file) != 0:
-        print(user_datasets_without_file)
-        try:
-            clean_redundant_datasets(user_datasets_without_file)
-        except:
-            print(f'Could not remove datasets, versions and variables for user {request.user}')
+    # user_datasets_without_file = Dataset.objects.filter(user=request.user).filter(user_dataset__isnull=True)
+    # if len(user_datasets_without_file) != 0:
+    #     try:
+    #         clean_redundant_datasets(user_datasets_without_file)
+    #     except:
+    #         print(f'Could not remove datasets, versions and variables for user {request.user}')
 
     serializer = UploadSerializer(list_of_files, many=True)
     try:
@@ -247,7 +246,6 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
     if file_entry.metadata_submitted:
-        print('I got request for the second time')
         return JsonResponse({'message': 'Metadata submission process started.'}, status=202, safe=False)
 
     file_entry.metadata_submitted = True
@@ -290,7 +288,6 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         # updating file entry
         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
                                               all_variables)
-        print('but i am still preprocessing the previous one', file_data_updated['data'])
         return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
 
     else:
