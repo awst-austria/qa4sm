@@ -245,8 +245,6 @@ class UploadedFileError(BaseException):
 def post_user_file_metadata_and_preprocess_file(request, file_uuid):
     serializer = UserFileMetadataSerializer(data=request.data)
     file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    print(request.data)
-    print(file_uuid)
     file_entry.metadata_submitted = True
     file_entry.save()
 
@@ -294,7 +292,6 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         print(serializer.errors)
         file_entry.delete()
         return JsonResponse(serializer.errors, status=500, safe=False)
-
 
 
 def _verify_file_extension(file_name):

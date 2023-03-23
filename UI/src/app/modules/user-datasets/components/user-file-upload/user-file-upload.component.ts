@@ -96,35 +96,27 @@ export class UserFileUploadComponent implements OnInit {
         .pipe(finalize(() => this.reset));
 
       this.uploadSub = upload$.subscribe(event => {
-          console.log('first event', event);
           if (event.type === HttpEventType.UploadProgress) {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
-            console.log('1', event);
           } else if (event.type === HttpEventType.Response) {
             this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
-                console.log('2', event);
                 this.userDatasetService.refresh.next(true);
                 this.authService.init();
                 this.resetFile();
-                console.log('3', event);
               },
               (message) => {
-                console.log('4');
                 this.spinnerVisible = false;
                 this.toastService.showErrorWithHeader('Metadata not saved.',
                   `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
               },
               () => {
-                console.log('5');
                 this.spinnerVisible = false;
                 this.metadataForm.reset('');
               });
           } else {
-            console.log('unhandled event', event);
           }
         },
         (message) => {
-          console.log('6');
           this.spinnerVisible = false;
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
