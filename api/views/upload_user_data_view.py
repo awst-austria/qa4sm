@@ -8,7 +8,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 from django.utils import timezone
 
-from api.views.auxiliary_functions import get_fields_as_list
+from api.views.auxiliary_functions import get_fields_as_list, clean_redundant_datasets
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import logging
@@ -172,6 +172,13 @@ def get_variables_from_the_reader(reader):
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
+    user_datasets_without_file = Dataset.objects.filter(user=request.user).filter(user_dataset__isnull=True)
+    if len(user_datasets_without_file) != 0:
+        try:
+            clean_redundant_datasets(user_datasets_without_file)
+        except:
+            print(f'Could not remove datasets, versions and variables for user {request.user}')
+
     serializer = UploadSerializer(list_of_files, many=True)
     try:
         return JsonResponse(serializer.data, status=200, safe=False)
@@ -252,22 +259,22 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
             file_entry.delete()
             return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
 
-        if first_request:
-            sm_variable = get_sm_variable_names(gridded_reader.variable_description())
-            all_variables = get_variables_from_the_reader(gridded_reader)
+        # if first_request:
+        sm_variable = get_sm_variable_names(gridded_reader.variable_description())
+        all_variables = get_variables_from_the_reader(gridded_reader)
 
-            dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
-            dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
+        dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
+        dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
                 USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
-            version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
-            version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
+        version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
+        version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
                 USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
             #
             # creating version entry
-            new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+        new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
             # creating variable entry
 
-            new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
+        new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
                                                  request.user, sm_variable['units'])
             # for sm_variable in sm_variables:
             #     new_variable = create_variable_entry(
@@ -276,10 +283,11 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
             #             dataset_pretty_name,
             #             request.user)
             # creating dataset entry
-            new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable,
+        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable,
                                                request.user,
                                                file_entry)
             # updating file entry
+        if first_request:
             file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
                                                   all_variables)
             return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
