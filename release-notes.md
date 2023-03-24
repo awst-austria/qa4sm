@@ -1,3 +1,8 @@
+QA4SM v2.2.0.1 - Release notes 2023-03-24
+=======================================================
+# Bug fixing 
+1. Workaround to avoid duplicated db entries disabled, as it clears dependencies
+
 QA4SM v2.2.0 - Release notes 2023-03-23
 =======================================================
 # New features

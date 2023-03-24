@@ -8,7 +8,7 @@ from rest_framework.serializers import ModelSerializer, Serializer
 from rest_framework import serializers
 from django.utils import timezone
 
-from api.views.auxiliary_functions import get_fields_as_list, clean_redundant_datasets
+from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import logging
@@ -172,13 +172,6 @@ def get_variables_from_the_reader(reader):
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
     list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
-    user_datasets_without_file = Dataset.objects.filter(user=request.user).filter(user_dataset__isnull=True)
-    if len(user_datasets_without_file) != 0:
-        try:
-            clean_redundant_datasets(user_datasets_without_file)
-        except:
-            print(f'Could not remove datasets, versions and variables for user {request.user}')
-
     serializer = UploadSerializer(list_of_files, many=True)
     try:
         return JsonResponse(serializer.data, status=200, safe=False)
