@@ -28,11 +28,13 @@ export class UserDatasetsService {
 
   constructor(private httpClient: HttpClient) { }
 
-  userFileUpload(name, file, fileName): Observable<any> {
+  userFileUpload(name, file, fileName, metadata): Observable<any> {
     const formData = new FormData();
     formData.append(name, file, fileName);
     const uploadUrl = uploadUserDataUrl  + '/' + fileName + '/';
-    return this.httpClient.post(uploadUrl, formData.get(name), {headers, reportProgress: true, observe: 'events', responseType: 'json'});
+    const fileHeaders = new HttpHeaders({'X-CSRFToken': csrfToken, fileMetadata: JSON.stringify(metadata)});
+    return this.httpClient.post(uploadUrl, formData.get(name),
+      {headers: fileHeaders, reportProgress: true, observe: 'events', responseType: 'json'});
   }
 
   getUserDataList(): Observable<UserDataFileDto[]>{

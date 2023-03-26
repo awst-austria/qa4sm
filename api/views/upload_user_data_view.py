@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -72,14 +74,14 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         raise Exception(version_serializer.errors)
 
 
-def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user, file_entry):
+def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user):
     # TODO: update variables
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
     dataset_data = {
         'short_name': dataset_name,
         'pretty_name': dataset_pretty_name,
         'help_text': f'Dataset {dataset_pretty_name} provided by user {user}.',
-        'storage_path': file_entry.get_raw_file_path,
+        'storage_path': '',
         'detailed_description': 'Data provided by a user',
         'source_reference': 'Data provided by a user',
         'citation': 'Data provided by a user',
@@ -273,8 +275,7 @@ def post_user_file_metadata_and_preprocess_file(request, file_uuid):
         #             dataset_pretty_name,
         #             request.user)
         # creating dataset entry
-        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
-                                           file_entry)
+        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user)
         # updating file entry
         file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
                                               all_variables)
@@ -304,13 +305,31 @@ def upload_user_data(request, filename):
     if request.user.space_left and file.size > request.user.space_left:
         return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
 
+    #  get metadata
+    metadata = json.loads(request.META['HTTP_FILEMETADATA'])
+    print('Monika', metadata)
+
+    dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
+    dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
+        USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
+    version_name = metadata[USER_DATA_VERSION_FIELD_NAME]
+    version_pretty_name = metadata[USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
+        USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+
+    # creating version entry
+    new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+    new_variable = create_variable_entry('none', 'none', dataset_pretty_name,
+                                         request.user, 'n.a.')
+
+    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user)
+
     file_data = {
         'file': file,
         'file_name': filename,
         'owner': request.user.pk,
-        'dataset': None,
-        'version': None,
-        'variable': None,
+        'dataset': new_dataset.pk,
+        'version': new_version.pk,
+        'variable': new_variable.pk,
         'upload_date': timezone.now()
     }
 
