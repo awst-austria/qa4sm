@@ -46,9 +46,9 @@ export class DatasetVariableService {
     }
   }
 
-  getVariableById(variableId: number): Observable<DatasetVariableDto> {
+  getVariableById(variableId: number, refresh= false): Observable<DatasetVariableDto> {
     //simplified implementation for demo purposes
-    if (this.singleRequestCache.isCached(variableId)) {
+    if (this.singleRequestCache.isCached(variableId) && !refresh) {
       return this.singleRequestCache.get(variableId);
     } else {
       let getURL = DATASET_VARIABLE_URL + '/' + variableId;
