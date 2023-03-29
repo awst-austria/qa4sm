@@ -14,8 +14,11 @@ from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import logging
-from qa4sm_preprocessing.utils import *
 from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
+from multiprocessing.context import Process
+
+from validator.validation.user_data_processing import user_data_preprocessing
+from django.db import transaction, connections
 
 __logger = logging.getLogger(__name__)
 
@@ -133,43 +136,7 @@ def update_file_entry(file_entry, dataset, version, variable, user, all_variable
     return response
 
 
-def get_sm_variable_names(variables):
-    key_sm_words = ['water', 'soil', 'moisture', 'soil_moisture', 'sm', 'ssm', 'water_content', 'soil', 'moisture',
-                    'swi', 'swvl1', 'soilmoi']
-    key_error_words = ['error', 'bias', 'uncertainty']
-    candidates = [variable for variable in variables if any([word in variable.lower() for word in key_sm_words])
-                  and not any([word in variable.lower() for word in key_error_words])]
-
-    sm_variables = [{
-        'name': var,
-        'long_name': variables[var].get("long_name", var),
-        'units': variables[var].get("units") if variables[var].get("units") else 'n.a.'
-    } for var in candidates]
-
-    if len(sm_variables) > 0:
-        return sm_variables[0]
-    else:
-        return {'name': '--none--',
-                'long_name': '--none--',
-                'units': 'n.a.'}
-
-
-def get_variables_from_the_reader(reader):
-    variables = reader.variable_description()
-    variables_dict_list = [
-        {'name': variable,
-         'long_name': variables[variable].get("long_name", variables[variable].get("standard_name", variable)),
-         'units': variables[variable].get("units") if variables[variable].get("units") else 'n.a.'
-         }
-        for variable in variables
-    ]
-
-    return variables_dict_list
-
-
 # API VIEWS
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
@@ -181,6 +148,23 @@ def get_list_of_user_data_files(request):
         # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
         # with proper path bound to a docker container
         return JsonResponse({'message': 'We could not return the list of your datafiles'}, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_data_file_by_id(request, file_uuid):
+    file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
+
+    if file_entry.owner != request.user:
+        return JsonResponse({'message': 'The file does not belong to you.'}, status=status.HTTP_403_FORBIDDEN)
+
+    serializer = UploadSerializer(file_entry, many=False)
+    try:
+        return JsonResponse(serializer.data, status=200, safe=False)
+    except:
+        # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
+        # with proper path bound to a docker container
+        return JsonResponse({'message': 'We could not return your datafile'}, status=500)
 
 
 @api_view(['DELETE'])
@@ -235,59 +219,6 @@ class UploadedFileError(BaseException):
         self.message = message
 
 
-@api_view(['PUT', 'POST'])
-@permission_classes([IsAuthenticated])
-def post_user_file_metadata_and_preprocess_file(request, file_uuid):
-    serializer = UserFileMetadataSerializer(data=request.data)
-    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    file_entry.metadata_submitted = True
-    file_entry.save()
-
-    if serializer.is_valid():
-        # first the file will be preprocessed
-        try:
-            gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
-        except Exception as e:
-            print(e, type(e))
-            file_entry.delete()
-            return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
-
-        sm_variable = get_sm_variable_names(gridded_reader.variable_description())
-        all_variables = get_variables_from_the_reader(gridded_reader)
-
-        dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
-        dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
-            USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
-        version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
-        version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
-            USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
-        #
-        # creating version entry
-        new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
-        # creating variable entry
-
-        new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
-                                             request.user, sm_variable['units'])
-        # for sm_variable in sm_variables:
-        #     new_variable = create_variable_entry(
-        #             sm_variable['name'],
-        #             sm_variable['long_name'],
-        #             dataset_pretty_name,
-        #             request.user)
-        # creating dataset entry
-        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user)
-        # updating file entry
-        file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
-                                              all_variables)
-
-        return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
-
-    else:
-        print(serializer.errors)
-        file_entry.delete()
-        return JsonResponse(serializer.errors, status=500, safe=False)
-
-
 def _verify_file_extension(file_name):
     return file_name.endswith('.nc4') or file_name.endswith('.nc') or file_name.endswith('.zip')
 
@@ -307,7 +238,6 @@ def upload_user_data(request, filename):
 
     #  get metadata
     metadata = json.loads(request.META['HTTP_FILEMETADATA'])
-    print('Monika', metadata)
 
     dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
     dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
@@ -333,10 +263,18 @@ def upload_user_data(request, filename):
         'upload_date': timezone.now()
     }
 
-    file_serializer = UploadSerializer(data=file_data)
+    file_serializer = UploadFileSerializer(data=file_data)
     if file_serializer.is_valid():
         file_serializer.save()
-        return JsonResponse(file_serializer.data, status=200, safe=False)
+        file_raw_path = file_serializer.data['get_raw_file_path']
+
+        connections.close_all()
+        p = Process(target=user_data_preprocessing, kwargs={"file_uuid": file_serializer.data['id'],
+                                                            "file_path": file_raw_path + file_serializer.data[
+                                                                'file_name'],
+                                                            "file_raw_path": file_raw_path})
+        p.start()
+        return JsonResponse(file_serializer.data, status=201, safe=False)
     else:
         print(file_serializer.errors)
         return JsonResponse(file_serializer.errors, status=500, safe=False)
@@ -347,6 +285,20 @@ class UploadSerializer(ModelSerializer):
     class Meta:
         model = UserDatasetFile
         fields = get_fields_as_list(UserDatasetFile)
+
+
+class UploadFileSerializer(ModelSerializer):
+    class Meta:
+        model = UserDatasetFile
+        fields = get_fields_as_list(UserDatasetFile)
+
+    requires_context = True
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        with transaction.atomic():
+            instance.save()
+        return instance
 
 
 class DatasetSerializer(ModelSerializer):
