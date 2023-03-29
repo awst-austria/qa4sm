@@ -21,12 +21,19 @@
   font-size: 1rem;
 }
 
-#no-validation-box{
-  color: lightgray;
+.no-validation-box{
+  color: darkgray;
   height: 70%;
   display: flex;
   align-items:center;
+  justify-content: center;
 }
 .warning {
   color: red;
+}
+@import "src/styles";
+.expiry-icons{
+  cursor: auto;
+  font-size: 1.5rem;
+  padding: 5px;
 }

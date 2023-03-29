@@ -17,9 +17,7 @@ def dataset(request):
     user = request.user
     datasets = Dataset.objects.filter(user=None)
     if user_data and user.is_authenticated:
-        user_datasets = Dataset.objects.filter(user=user).filter(user_dataset__isnull=False)
-        print(user_datasets)
-        print(Dataset.objects.filter(user=user).filter(user_dataset__isnull=True))
+        user_datasets = Dataset.objects.filter(user=user).filter(user_dataset__isnull=False).exclude(storage_path='')
         datasets = datasets.union(user_datasets)
 
     serializer = DatasetSerializer(datasets, many=True)

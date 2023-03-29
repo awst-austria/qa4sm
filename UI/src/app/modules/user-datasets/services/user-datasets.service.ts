@@ -9,11 +9,9 @@ const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
 const userDataListUrl: string = urlPrefix + '/get-list-of-user-data-files';
 const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
-const userDataMetadataUrl: string = urlPrefix + '/user-file-metadata';
-const userDataTestUrl: string = urlPrefix + '/test-user-dataset';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
+const userDataFileUrl: string = urlPrefix + '/get-user-file-by-id';
 
-// const validateUserDataUrl: string = urlPrefix + '/validate-user-data';
 
 const csrfToken = '{{csrf_token}}';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -28,30 +26,27 @@ export class UserDatasetsService {
 
   constructor(private httpClient: HttpClient) { }
 
-  userFileUpload(name, file, fileName): Observable<any> {
+  userFileUpload(name, file, fileName, metadata): Observable<any> {
     const formData = new FormData();
     formData.append(name, file, fileName);
     const uploadUrl = uploadUserDataUrl  + '/' + fileName + '/';
-    return this.httpClient.post(uploadUrl, formData.get(name), {headers, reportProgress: true, observe: 'events', responseType: 'json'});
+    const fileHeaders = new HttpHeaders({'X-CSRFToken': csrfToken, fileMetadata: JSON.stringify(metadata)});
+    return this.httpClient.post(uploadUrl, formData.get(name),
+      {headers: fileHeaders, reportProgress: true, observe: 'events', responseType: 'json'});
   }
 
   getUserDataList(): Observable<UserDataFileDto[]>{
     return this.httpClient.get<UserDataFileDto[]>(userDataListUrl);
   }
 
+  getUserDataFileById(fileId: string): Observable<UserDataFileDto>{
+    const userDataFileUrlWithId = userDataFileUrl + '/'  + fileId + '/';
+    return this.httpClient.get<UserDataFileDto>(userDataFileUrlWithId);
+  }
+
   deleteUserData(dataFileId: string): Observable<any>{
     const deleteUrl = userDataDeleteUrl + '/' + dataFileId + '/';
     return this.httpClient.delete(deleteUrl, {headers});
-  }
-
-  sendMetadata(metadataForm: any, fileId: string): Observable<any> {
-    const metadataUrl = userDataMetadataUrl + '/' + fileId + '/';
-    return this.httpClient.post(metadataUrl, metadataForm, {observe: 'response', responseType: 'json'});
-  }
-
-  testDataset(dataFileId: string): Observable<any>{
-    const testUrl = userDataTestUrl + '/' + dataFileId + '/';
-    return this.httpClient.get(testUrl);
   }
 
   updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
@@ -76,12 +71,4 @@ export class UserDatasetsService {
 
     return `${Math.round(properSize * 10) / 10} ${units}`;
   }
-
-  // userFileValidate(name, file, filename): Observable<any> {
-  //   const formData = new FormData();
-  //   formData.append(name, file, filename);
-  //   const validateUserDataUrlWithFileName = validateUserDataUrl + '/' + file.name + '/';
-  //   return this.httpClient.put(validateUserDataUrlWithFileName, {file: formData.getAll(name)});
-  // }
-
 }
