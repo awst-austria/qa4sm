@@ -265,8 +265,14 @@ def upload_user_data(request, filename):
 
     file_serializer = UploadFileSerializer(data=file_data)
     if file_serializer.is_valid():
+        # saving file
         file_serializer.save()
+        # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
+        # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']
+        # now I can assign proper storage path
+        new_dataset.storage_path = file_raw_path
+        new_dataset.save()
 
         connections.close_all()
         p = Process(target=user_data_preprocessing, kwargs={"file_uuid": file_serializer.data['id'],
