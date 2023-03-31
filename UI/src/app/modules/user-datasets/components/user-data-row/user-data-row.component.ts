@@ -152,7 +152,7 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
               'File could not be preprocessed. Please make sure that you are uploading a proper file and if the ' +
               'file fulfills our requirements', 10000);
           });
-      }, 10 * 1000); // one minute
+      }, 60 * 1000); // one minute
     }
   }
 
