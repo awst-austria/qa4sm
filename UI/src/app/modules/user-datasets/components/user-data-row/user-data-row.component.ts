@@ -20,7 +20,11 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   @Input() userDataset: UserDataFileDto;
   datasetName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   versionName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  variableName: { shortName$: BehaviorSubject<string>, prettyName$: BehaviorSubject<string>, unit$: BehaviorSubject<string> } =
+  variableName: {
+    shortName$: BehaviorSubject<string>,
+    prettyName$: BehaviorSubject<string>,
+    unit$: BehaviorSubject<string>
+  } =
     {
       shortName$: new BehaviorSubject<string>(''),
       prettyName$: new BehaviorSubject<string>(''),
@@ -70,7 +74,8 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     });
   }
 
-  updateVariable(): void{
+
+  updateVariable(): void {
     this.datasetVariableService.getVariableById(this.userDataset.variable, true).subscribe(variableData => {
       this.variableName.shortName$.next(variableData.short_name);
       this.variableName.prettyName$.next(variableData.pretty_name);
@@ -131,17 +136,23 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
 
-  refreshFilePreprocessingStatus(): void{
-    if (!this.userDataset.metadata_submitted){
+  refreshFilePreprocessingStatus(): void {
+    if (!this.userDataset.metadata_submitted) {
       this.filePreprocessingStatus = setInterval(() => {
         this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe(data => {
-          if (data.metadata_submitted) {
-            this.updateVariable();
-            if (this.variableName.prettyName$.value !== 'none'){
-              this.userDatasetService.refresh.next(true);
+            if (data.metadata_submitted) {
+              this.updateVariable();
+              if (this.variableName.prettyName$.value !== 'none') {
+                this.userDatasetService.refresh.next(true);
+              }
             }
-          }
-        });
+          },
+          () => {
+            this.userDatasetService.refresh.next(true);
+            this.toastService.showErrorWithHeader('File preprocessing failed',
+              'File could not be preprocessed. Please make sure that you are uploading a proper file and if the ' +
+              'file fulfills our requirements', 10000);
+          });
       }, 60 * 1000); // one minute
     }
   }

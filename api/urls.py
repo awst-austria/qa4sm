@@ -24,7 +24,7 @@ from api.views.modify_validation_view import stop_validation, delete_result, cha
     extend_result, publish_result, add_validation, remove_validation, get_publishing_form, copy_validation_results
 from api.views.serving_file_view import *
 from api.views.local_api_view import get_list_of_countries
-from api.views.settings_view import settings
+from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
 
 # schema_view = get_schema_view(
@@ -102,7 +102,7 @@ urlpatterns = [
     path('sign-up', signup_post, name='Sign up'),
     path('user-update', user_update, name='User update'),
     path('user-delete', user_delete, name='User delete'),
-    path('settings', settings, name="Settings"),
+    path('settings', backend_settings, name="Settings"),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),

@@ -2,6 +2,8 @@ from django.shortcuts import get_object_or_404
 from qa4sm_preprocessing.utils import preprocess_user_data
 
 from validator.models import UserDatasetFile, DataVariable
+from validator.mailer import send_failed_preprocessing_notification
+
 
 
 def get_sm_variable_names(variables):
@@ -44,7 +46,9 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path):
         print('hurray!')
     except Exception as e:
         print(e, type(e))
-        get_object_or_404(UserDatasetFile, id=file_uuid).delete()
+        file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
+        send_failed_preprocessing_notification(file_entry)
+        file_entry.delete()
         return
 
     # I get file entry here and not before preprocessing, as the preprocessing takes time and if a db connection is

@@ -136,6 +136,15 @@ def update_file_entry(file_entry, dataset, version, variable, user, all_variable
     return response
 
 
+def preprocess_file(file_serializer, file_raw_path):
+    connections.close_all()
+    p = Process(target=user_data_preprocessing, kwargs={"file_uuid": file_serializer.data['id'],
+                                                        "file_path": file_raw_path + file_serializer.data[
+                                                            'file_name'],
+                                                        "file_raw_path": file_raw_path})
+    p.start()
+    return
+
 # API VIEWS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -191,6 +200,7 @@ def update_metadata(request, file_uuid):
     current_version = file_entry.version
 
     # for variable and dimensions we store a list of potential names and a value from this list can be chosen
+    print(file_entry.all_variables)
     if field_name not in [USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME]:
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
@@ -237,7 +247,14 @@ def upload_user_data(request, filename):
         return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
 
     #  get metadata
-    metadata = json.loads(request.META['HTTP_FILEMETADATA'])
+    metadata = json.loads(request.META.get('HTTP_FILEMETADATA'))
+
+    serializer = UserFileMetadataSerializer(data=metadata)
+
+    if not serializer.is_valid():
+        print(serializer.errors)
+        return JsonResponse(serializer.errors, status=500, safe=False)
+
 
     dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
     dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
@@ -265,15 +282,18 @@ def upload_user_data(request, filename):
 
     file_serializer = UploadFileSerializer(data=file_data)
     if file_serializer.is_valid():
+        # saving file
         file_serializer.save()
-        file_raw_path = file_serializer.data['get_raw_file_path']
 
-        connections.close_all()
-        p = Process(target=user_data_preprocessing, kwargs={"file_uuid": file_serializer.data['id'],
-                                                            "file_path": file_raw_path + file_serializer.data[
-                                                                'file_name'],
-                                                            "file_raw_path": file_raw_path})
-        p.start()
+        # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
+        # have to open the db connection before file preprocessing.
+        file_raw_path = file_serializer.data['get_raw_file_path']
+        # now I can assign proper storage path
+        new_dataset.storage_path = file_raw_path
+        new_dataset.save()
+
+        preprocess_file(file_serializer, file_raw_path)
+
         return JsonResponse(file_serializer.data, status=201, safe=False)
     else:
         print(file_serializer.errors)
