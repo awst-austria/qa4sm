@@ -145,6 +145,7 @@ def preprocess_file(file_serializer, file_raw_path):
     p.start()
     return
 
+
 # API VIEWS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -165,15 +166,10 @@ def get_user_data_file_by_id(request, file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
 
     if file_entry.owner != request.user:
-        return JsonResponse({'message': 'The file does not belong to you.'}, status=status.HTTP_403_FORBIDDEN)
+        return JsonResponse({'detail': 'Not found.'}, status=404)
 
     serializer = UploadSerializer(file_entry, many=False)
-    try:
-        return JsonResponse(serializer.data, status=200, safe=False)
-    except:
-        # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
-        # with proper path bound to a docker container
-        return JsonResponse({'message': 'We could not return your datafile'}, status=500)
+    return JsonResponse(serializer.data, status=200, safe=False)
 
 
 @api_view(['DELETE'])
@@ -200,7 +196,6 @@ def update_metadata(request, file_uuid):
     current_version = file_entry.version
 
     # for variable and dimensions we store a list of potential names and a value from this list can be chosen
-    print(file_entry.all_variables)
     if field_name not in [USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME]:
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 
@@ -255,7 +250,6 @@ def upload_user_data(request, filename):
         print(serializer.errors)
         return JsonResponse(serializer.errors, status=500, safe=False)
 
-
     dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
     dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
         USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
@@ -284,7 +278,6 @@ def upload_user_data(request, filename):
     if file_serializer.is_valid():
         # saving file
         file_serializer.save()
-
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']

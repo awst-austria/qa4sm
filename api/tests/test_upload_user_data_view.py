@@ -1,7 +1,7 @@
 import json
 import logging
 from api.tests.test_helper import *
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APIClient
 from django.test.testcases import TransactionTestCase
 from django.urls import reverse
 from validator.models import UserDatasetFile, DataVariable
@@ -10,7 +10,6 @@ import shutil
 from pathlib import Path
 from api.variable_and_field_names import *
 from unittest.mock import patch
-from api.views.upload_user_data_view import preprocess_file
 
 FILE = 'file'
 FORMAT_MULTIPART = 'multipart'
@@ -75,6 +74,7 @@ class TestUploadUserDataView(TransactionTestCase):
         self.get_user_data_url_list_name = "Get User Data Files"
         self.delete_data_url_name = 'Delete User Data File'
         self.update_metadata_url_name = 'Update metadata'
+        self.get_user_file_by_id_url_name = 'Get user file by ID'
 
         self.metadata_correct = {
             USER_DATA_DATASET_FIELD_NAME: 'test_dataset',
@@ -199,6 +199,47 @@ class TestUploadUserDataView(TransactionTestCase):
             entry.delete()
 
         assert len(UserDatasetFile.objects.all()) == 0
+
+    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    def test_get_user_data_file_by_id(self, mock_preprocess_file):
+        # post the same file 3 times, to create 3 different entries
+        headers = _get_headers(self.metadata_correct)
+        post_response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+            {FILE: self.netcdf_file}, format=FORMAT_MULTIPART, **headers)
+        assert post_response.status_code == 201
+
+        post_data = post_response.json()
+        file_id = post_data.get('id')
+        file_entry = UserDatasetFile.objects.get(id=file_id)
+
+        response = self.client.get(reverse(self.get_user_file_by_id_url_name, kwargs={URL_FILE_UUID: file_id}))
+
+        assert response.status_code == 200
+        assert post_data.get('file_name') == file_entry.file_name
+        assert post_data.get('owner') == file_entry.owner.id
+        assert post_data.get('dataset') == file_entry.dataset.id
+        assert post_data.get('version') == file_entry.version.id
+        assert post_data.get('all_variables') is None
+        assert post_data.get('metadata_submitted') is False  # it's submitted after running a preprocessing function
+
+        self.client.logout()
+        self.client.login(**self.second_user_data)
+
+        response = self.client.get(reverse(self.get_user_file_by_id_url_name, kwargs={URL_FILE_UUID: file_id}))
+
+        assert response.status_code == 404
+        assert response.json().get('detail') == 'Not found.'
+
+        response = self.client.get(
+            reverse(self.get_user_file_by_id_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
+
+        assert response.status_code == 404
+        assert response.json().get('detail') == 'Not found.'
+
+        self.client.logout()
+        self.client.login(**self.auth_data)
+        file_entry.delete()
 
     @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
     def test_delete_user_dataset_and_file(self, mock_preprocess_file):
@@ -385,7 +426,8 @@ class TestUploadUserDataView(TransactionTestCase):
 
         file_id = file_post_response.json()['id']
         file_entry = UserDatasetFile.objects.get(pk=file_id)
-        file_entry.all_variables = [{"name": "soil_moisture", "units": "%", "long_name": "Soil Moisture"}, {"name": "ssm_noise", "units": "%", "long_name": "Surface Soil Moisture Noise"}]
+        file_entry.all_variables = [{"name": "soil_moisture", "units": "%", "long_name": "Soil Moisture"},
+                                    {"name": "ssm_noise", "units": "%", "long_name": "Surface Soil Moisture Noise"}]
         file_entry.save()
 
         # update variable name

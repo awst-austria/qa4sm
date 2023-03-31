@@ -5,7 +5,6 @@ from validator.models import UserDatasetFile, DataVariable
 from validator.mailer import send_failed_preprocessing_notification
 
 
-
 def get_sm_variable_names(variables):
     key_sm_words = ['water', 'soil', 'moisture', 'soil_moisture', 'sm', 'ssm', 'water_content', 'soil', 'moisture',
                     'swi', 'swvl1', 'soilmoi']
@@ -43,9 +42,7 @@ def get_variables_from_the_reader(reader):
 def user_data_preprocessing(file_uuid, file_path, file_raw_path):
     try:
         gridded_reader = preprocess_user_data(file_path, file_raw_path + '/timeseries')
-        print('hurray!')
     except Exception as e:
-        print(e, type(e))
         file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
         send_failed_preprocessing_notification(file_entry)
         file_entry.delete()
@@ -58,7 +55,6 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path):
     all_variables = get_variables_from_the_reader(gridded_reader)
 
     variable_entry = DataVariable.objects.get(pk=file_entry.variable_id)
-    print(variable_entry)
     # new_variable_data = {
     #     'help_text': f'Variable {variable_name} of dataset {dataset_name} provided by  user {user}.',
     #     'min_value': max_value,
@@ -68,14 +64,13 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path):
     # update variable
     variable_entry.short_name = sm_variable['name']
     variable_entry.pretty_name = sm_variable['long_name']
-    variable_entry.help_text= f'Variable {sm_variable["long_name"]} of dataset ' \
-                              f'{file_entry.dataset.pretty_name} provided by user {file_entry.owner.username}.',
+    variable_entry.help_text = f'Variable {sm_variable["long_name"]} of dataset ' \
+                               f'{file_entry.dataset.pretty_name} provided by user {file_entry.owner.username}.',
     variable_entry.unit = sm_variable['units'] if sm_variable['units'] else 'n.a.'
     variable_entry.save()
-
-    print(variable_entry)
 
     file_entry.all_variables = all_variables
     file_entry.metadata_submitted = True
     file_entry.save()
-    print('DONE!', file_entry)
+
+    return

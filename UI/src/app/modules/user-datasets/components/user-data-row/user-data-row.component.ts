@@ -74,7 +74,6 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     });
   }
 
-
   updateVariable(): void {
     this.datasetVariableService.getVariableById(this.userDataset.variable, true).subscribe(variableData => {
       this.variableName.shortName$.next(variableData.short_name);
