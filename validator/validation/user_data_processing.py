@@ -5,6 +5,7 @@ from validator.models import UserDatasetFile, DataVariable
 from validator.mailer import send_failed_preprocessing_notification
 
 
+
 def get_sm_variable_names(variables):
     key_sm_words = ['water', 'soil', 'moisture', 'soil_moisture', 'sm', 'ssm', 'water_content', 'soil', 'moisture',
                     'swi', 'swvl1', 'soilmoi']

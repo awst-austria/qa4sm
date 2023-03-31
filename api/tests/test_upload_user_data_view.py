@@ -362,7 +362,6 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(existing_files) == 0
         assert len(os.listdir(self.test_user_data_path)) == 0
 
-
     def test_post_incorrect_metadata_form(self):
         # I am posting the file to create the proper dataset entry, I don't need to copy it, as it won't be processed
         response = self.client.post(reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),

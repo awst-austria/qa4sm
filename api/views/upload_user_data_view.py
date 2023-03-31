@@ -145,7 +145,6 @@ def preprocess_file(file_serializer, file_raw_path):
     p.start()
     return
 
-
 # API VIEWS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -256,6 +255,7 @@ def upload_user_data(request, filename):
         print(serializer.errors)
         return JsonResponse(serializer.errors, status=500, safe=False)
 
+
     dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
     dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
         USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
@@ -284,6 +284,7 @@ def upload_user_data(request, filename):
     if file_serializer.is_valid():
         # saving file
         file_serializer.save()
+
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']
