@@ -166,15 +166,10 @@ def get_user_data_file_by_id(request, file_uuid):
     file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
 
     if file_entry.owner != request.user:
-        return JsonResponse({'message': 'The file does not belong to you.'}, status=status.HTTP_403_FORBIDDEN)
+        return JsonResponse({'detail': 'Not found.'}, status=404)
 
     serializer = UploadSerializer(file_entry, many=False)
-    try:
-        return JsonResponse(serializer.data, status=200, safe=False)
-    except:
-        # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
-        # with proper path bound to a docker container
-        return JsonResponse({'message': 'We could not return your datafile'}, status=500)
+    return JsonResponse(serializer.data, status=200, safe=False)
 
 
 @api_view(['DELETE'])
