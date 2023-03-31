@@ -1,7 +1,7 @@
 import json
 import logging
 from api.tests.test_helper import *
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APIClient
 from django.test.testcases import TransactionTestCase
 from django.urls import reverse
 from validator.models import UserDatasetFile, DataVariable
@@ -10,7 +10,6 @@ import shutil
 from pathlib import Path
 from api.variable_and_field_names import *
 from unittest.mock import patch
-from api.views.upload_user_data_view import preprocess_file
 
 FILE = 'file'
 FORMAT_MULTIPART = 'multipart'
