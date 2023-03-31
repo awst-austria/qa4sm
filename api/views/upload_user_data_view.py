@@ -196,7 +196,6 @@ def update_metadata(request, file_uuid):
     current_version = file_entry.version
 
     # for variable and dimensions we store a list of potential names and a value from this list can be chosen
-    print(file_entry.all_variables)
     if field_name not in [USER_DATA_DATASET_FIELD_NAME, USER_DATA_VERSION_FIELD_NAME]:
         new_item = next(item for item in file_entry.all_variables if item["name"] == field_value)
 

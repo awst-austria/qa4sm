@@ -41,14 +41,11 @@ def get_variables_from_the_reader(reader):
 
 def user_data_preprocessing(file_uuid, file_path, file_raw_path):
     try:
-        print('Here')
         gridded_reader = preprocess_user_data(file_path, file_raw_path + '/timeseries')
-        print('Tutaj')
     except Exception as e:
         file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
         send_failed_preprocessing_notification(file_entry)
         file_entry.delete()
-        print('Problem', e)
         return
 
     # I get file entry here and not before preprocessing, as the preprocessing takes time and if a db connection is
