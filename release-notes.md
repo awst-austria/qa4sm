@@ -1,7 +1,7 @@
-QA4SM v2.2.0.1 - Release notes 2023-03-24
+QA4SM v2.2.1 - Release notes 2023-04-03
 =======================================================
-# Bug fixing 
-1. Workaround to avoid duplicated db entries disabled, as it clears dependencies
+# Improvements 
+1. Uploading file updated - file preprocessing moved outside the api view
 
 QA4SM v2.2.0 - Release notes 2023-03-23
 =======================================================
