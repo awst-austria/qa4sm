@@ -50,9 +50,10 @@ export class UserFileUploadComponent implements OnInit {
   private verifyZipContent(): void {
     const zip = new JSZip();
     zip.loadAsync(this.file).then(contents => {
+      console.log(contents.files);
       const files = Object.keys(contents.files).filter(key =>
-        !['nc', 'nc4', 'csv', 'yml'].includes(key.split('.').reverse()[0]));
-      if (files.length !== 0){
+        !['nc', 'nc4', 'csv', 'yml'].includes(key.split('.').reverse()[0]) && !contents.files[key].dir);
+      if (files.length !== 0) {
         this.toastService.showErrorWithHeader('File can not be uploaded',
           'The zip file you are trying to upload contains files with no acceptable extensions (i.e. netCDF or csv + yml');
         this.file = null;
@@ -64,7 +65,7 @@ export class UserFileUploadComponent implements OnInit {
     this.file = event.target.files[0];
     this.isFileTooBig = false;
 
-    if (this.authService.currentUser.space_left && this.file.size > this.authService.currentUser.space_left){
+    if (this.authService.currentUser.space_left && this.file.size > this.authService.currentUser.space_left) {
       this.isFileTooBig = true;
       this.file = null;
       return null;
@@ -92,34 +93,26 @@ export class UserFileUploadComponent implements OnInit {
     if (this.file) {
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
-      const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName)
+      const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName, this.metadataForm.value)
         .pipe(finalize(() => this.reset));
 
       this.uploadSub = upload$.subscribe(event => {
           if (event.type === HttpEventType.UploadProgress) {
             this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
           } else if (event.type === HttpEventType.Response) {
-            this.userDatasetService.sendMetadata(this.metadataForm.value, event.body.id).subscribe(() => {
-                this.userDatasetService.refresh.next(true);
-                this.authService.init();
-                this.resetFile();
-              },
-              (message) => {
-                this.spinnerVisible = false;
-                this.toastService.showErrorWithHeader('Metadata not saved.',
-                  `${message.error.error}.\n Provided metadata could not be saved. Please try again or contact our team.`);
-              },
-              () => {
-                this.spinnerVisible = false;
-                this.metadataForm.reset('');
-              });
-          } else {
+            this.userDatasetService.refresh.next(true);
+            this.authService.init();
+            this.resetFile();
           }
         },
         (message) => {
           this.spinnerVisible = false;
           this.toastService.showErrorWithHeader('File not saved',
             `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
+        },
+        () => {
+          this.spinnerVisible = false;
+          this.metadataForm.reset('');
         }
       );
     }

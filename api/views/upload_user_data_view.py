@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -12,8 +14,11 @@ from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
 from api.variable_and_field_names import *
 import logging
-from qa4sm_preprocessing.utils import *
 from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
+from multiprocessing.context import Process
+
+from validator.validation.user_data_processing import user_data_preprocessing
+from django.db import transaction, connections
 
 __logger = logging.getLogger(__name__)
 
@@ -72,14 +77,14 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         raise Exception(version_serializer.errors)
 
 
-def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user, file_entry):
+def create_dataset_entry(dataset_name, dataset_pretty_name, version, variable, user):
     # TODO: update variables
     current_max_id = Dataset.objects.all().last().id if Dataset.objects.all() else 0
     dataset_data = {
         'short_name': dataset_name,
         'pretty_name': dataset_pretty_name,
         'help_text': f'Dataset {dataset_pretty_name} provided by user {user}.',
-        'storage_path': file_entry.get_raw_file_path,
+        'storage_path': '',
         'detailed_description': 'Data provided by a user',
         'source_reference': 'Data provided by a user',
         'citation': 'Data provided by a user',
@@ -131,43 +136,17 @@ def update_file_entry(file_entry, dataset, version, variable, user, all_variable
     return response
 
 
-def get_sm_variable_names(variables):
-    key_sm_words = ['water', 'soil', 'moisture', 'soil_moisture', 'sm', 'ssm', 'water_content', 'soil', 'moisture',
-                    'swi', 'swvl1', 'soilmoi']
-    key_error_words = ['error', 'bias', 'uncertainty']
-    candidates = [variable for variable in variables if any([word in variable.lower() for word in key_sm_words])
-                  and not any([word in variable.lower() for word in key_error_words])]
-
-    sm_variables = [{
-        'name': var,
-        'long_name': variables[var].get("long_name", var),
-        'units': variables[var].get("units") if variables[var].get("units") else 'n.a.'
-    } for var in candidates]
-
-    if len(sm_variables) > 0:
-        return sm_variables[0]
-    else:
-        return {'name': '--none--',
-                'long_name': '--none--',
-                'units': 'n.a.'}
-
-
-def get_variables_from_the_reader(reader):
-    variables = reader.variable_description()
-    variables_dict_list = [
-        {'name': variable,
-         'long_name': variables[variable].get("long_name", variables[variable].get("standard_name", variable)),
-         'units': variables[variable].get("units") if variables[variable].get("units") else 'n.a.'
-         }
-        for variable in variables
-    ]
-
-    return variables_dict_list
+def preprocess_file(file_serializer, file_raw_path):
+    connections.close_all()
+    p = Process(target=user_data_preprocessing, kwargs={"file_uuid": file_serializer.data['id'],
+                                                        "file_path": file_raw_path + file_serializer.data[
+                                                            'file_name'],
+                                                        "file_raw_path": file_raw_path})
+    p.start()
+    return
 
 
 # API VIEWS
-
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
@@ -179,6 +158,18 @@ def get_list_of_user_data_files(request):
         # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
         # with proper path bound to a docker container
         return JsonResponse({'message': 'We could not return the list of your datafiles'}, status=500)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_data_file_by_id(request, file_uuid):
+    file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
+
+    if file_entry.owner != request.user:
+        return JsonResponse({'detail': 'Not found.'}, status=404)
+
+    serializer = UploadSerializer(file_entry, many=False)
+    return JsonResponse(serializer.data, status=200, safe=False)
 
 
 @api_view(['DELETE'])
@@ -233,60 +224,6 @@ class UploadedFileError(BaseException):
         self.message = message
 
 
-@api_view(['PUT', 'POST'])
-@permission_classes([IsAuthenticated])
-def post_user_file_metadata_and_preprocess_file(request, file_uuid):
-    serializer = UserFileMetadataSerializer(data=request.data)
-    file_entry = get_object_or_404(UserDatasetFile, id=file_uuid)
-    file_entry.metadata_submitted = True
-    file_entry.save()
-
-    if serializer.is_valid():
-        # first the file will be preprocessed
-        try:
-            gridded_reader = preprocess_user_data(file_entry.file.path, file_entry.get_raw_file_path + '/timeseries')
-        except Exception as e:
-            print(e, type(e))
-            file_entry.delete()
-            return JsonResponse({'error': 'Provided file does not fulfill requirements.'}, status=500, safe=False)
-
-        sm_variable = get_sm_variable_names(gridded_reader.variable_description())
-        all_variables = get_variables_from_the_reader(gridded_reader)
-
-        dataset_name = request.data[USER_DATA_DATASET_FIELD_NAME]
-        dataset_pretty_name = request.data[USER_DATA_DATASET_FIELD_PRETTY_NAME] if request.data[
-            USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
-        version_name = request.data[USER_DATA_VERSION_FIELD_NAME]
-        version_pretty_name = request.data[USER_DATA_VERSION_FIELD_PRETTY_NAME] if request.data[
-            USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
-        #
-        # creating version entry
-        new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
-        # creating variable entry
-
-        new_variable = create_variable_entry(sm_variable['name'], sm_variable['long_name'], dataset_pretty_name,
-                                             request.user, sm_variable['units'])
-        # for sm_variable in sm_variables:
-        #     new_variable = create_variable_entry(
-        #             sm_variable['name'],
-        #             sm_variable['long_name'],
-        #             dataset_pretty_name,
-        #             request.user)
-        # creating dataset entry
-        new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user,
-                                           file_entry)
-        # updating file entry
-        file_data_updated = update_file_entry(file_entry, new_dataset, new_version, new_variable, request.user,
-                                              all_variables)
-
-        return JsonResponse(file_data_updated['data'], status=file_data_updated['status'], safe=False)
-
-    else:
-        print(serializer.errors)
-        file_entry.delete()
-        return JsonResponse(serializer.errors, status=500, safe=False)
-
-
 def _verify_file_extension(file_name):
     return file_name.endswith('.nc4') or file_name.endswith('.nc') or file_name.endswith('.zip')
 
@@ -304,20 +241,53 @@ def upload_user_data(request, filename):
     if request.user.space_left and file.size > request.user.space_left:
         return JsonResponse({'error': 'File is too big'}, status=500, safe=False)
 
+    #  get metadata
+    metadata = json.loads(request.META.get('HTTP_FILEMETADATA'))
+
+    serializer = UserFileMetadataSerializer(data=metadata)
+
+    if not serializer.is_valid():
+        print(serializer.errors)
+        return JsonResponse(serializer.errors, status=500, safe=False)
+
+    dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
+    dataset_pretty_name = metadata[USER_DATA_DATASET_FIELD_PRETTY_NAME] if metadata[
+        USER_DATA_DATASET_FIELD_PRETTY_NAME] else dataset_name
+    version_name = metadata[USER_DATA_VERSION_FIELD_NAME]
+    version_pretty_name = metadata[USER_DATA_VERSION_FIELD_PRETTY_NAME] if metadata[
+        USER_DATA_VERSION_FIELD_PRETTY_NAME] else version_name
+
+    # creating version entry
+    new_version = create_version_entry(version_name, version_pretty_name, dataset_pretty_name, request.user)
+    new_variable = create_variable_entry('none', 'none', dataset_pretty_name,
+                                         request.user, 'n.a.')
+
+    new_dataset = create_dataset_entry(dataset_name, dataset_pretty_name, new_version, new_variable, request.user)
+
     file_data = {
         'file': file,
         'file_name': filename,
         'owner': request.user.pk,
-        'dataset': None,
-        'version': None,
-        'variable': None,
+        'dataset': new_dataset.pk,
+        'version': new_version.pk,
+        'variable': new_variable.pk,
         'upload_date': timezone.now()
     }
 
-    file_serializer = UploadSerializer(data=file_data)
+    file_serializer = UploadFileSerializer(data=file_data)
     if file_serializer.is_valid():
+        # saving file
         file_serializer.save()
-        return JsonResponse(file_serializer.data, status=200, safe=False)
+        # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
+        # have to open the db connection before file preprocessing.
+        file_raw_path = file_serializer.data['get_raw_file_path']
+        # now I can assign proper storage path
+        new_dataset.storage_path = file_raw_path
+        new_dataset.save()
+
+        preprocess_file(file_serializer, file_raw_path)
+
+        return JsonResponse(file_serializer.data, status=201, safe=False)
     else:
         print(file_serializer.errors)
         return JsonResponse(file_serializer.errors, status=500, safe=False)
@@ -328,6 +298,20 @@ class UploadSerializer(ModelSerializer):
     class Meta:
         model = UserDatasetFile
         fields = get_fields_as_list(UserDatasetFile)
+
+
+class UploadFileSerializer(ModelSerializer):
+    class Meta:
+        model = UserDatasetFile
+        fields = get_fields_as_list(UserDatasetFile)
+
+    requires_context = True
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        with transaction.atomic():
+            instance.save()
+        return instance
 
 
 class DatasetSerializer(ModelSerializer):

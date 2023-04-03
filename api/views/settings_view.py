@@ -10,7 +10,7 @@ from validator.models import Settings
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def settings(request):
+def backend_settings(request):
     settings_model = Settings.objects.all()
     serializer = SettingsSerializer(settings_model, many=True)
 

@@ -6,7 +6,24 @@ from django.urls.base import reverse
 from django.conf import settings
 from api.frontend_urls import get_angular_url
 
+# from validator.models import UserDatasetFile
+
 __logger = logging.getLogger(__name__)
+
+
+def send_failed_preprocessing_notification(file_entry):
+    __logger.info(f'Sending mail about failed preprocessing of the {file_entry.id} to user {file_entry.owner}...')
+    guidelines_url = settings.SITE_URL + get_angular_url('my-datasets')
+
+    subject = '[QA4SM] File preprocessing failed'
+    body = f"""Dear {file_entry.owner.first_name} {file_entry.owner.last_name}, \n\n
+    Your file containing data for dataset {file_entry.dataset.pretty_name}, version {file_entry.version.pretty_name} \
+    could not be processed. Please check if you uploaded proper file and if your file hs been prepared according to our\
+    guidelines ({guidelines_url}). In case of further problem, please contact our team.\n\nBest regards,\nQA4SM team'"""
+
+    _send_email(recipients=[file_entry.owner.email],
+                subject=subject,
+                body=body)
 
 
 def send_val_done_notification(val_run):

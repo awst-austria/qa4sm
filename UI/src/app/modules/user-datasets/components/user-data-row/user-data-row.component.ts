@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {UserDataFileDto} from '../../services/user-data-file.dto';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {UserDatasetsService} from '../../services/user-datasets.service';
@@ -15,35 +15,33 @@ import {AuthService} from '../../../core/services/auth/auth.service';
   templateUrl: './user-data-row.component.html',
   styleUrls: ['./user-data-row.component.scss']
 })
-export class UserDataRowComponent implements OnInit {
+export class UserDataRowComponent implements OnInit, OnDestroy {
 
   @Input() userDataset: UserDataFileDto;
   datasetName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   versionName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  variableName: { shortName$: BehaviorSubject<string>, prettyName$: BehaviorSubject<string>, unit$: BehaviorSubject<string> } =
+  variableName: {
+    shortName$: BehaviorSubject<string>,
+    prettyName$: BehaviorSubject<string>,
+    unit$: BehaviorSubject<string>
+  } =
     {
       shortName$: new BehaviorSubject<string>(''),
       prettyName$: new BehaviorSubject<string>(''),
       unit$: new BehaviorSubject<string>('')
     };
-  variableUnit: string;
 
   datasetFieldName = 'dataset_name';
   versionFieldName = 'version_name';
   variableFieldName = 'variable_name';
-  latFieldName = 'lat_name';
-  lonFieldName = 'lon_name';
-  timeFiledName = 'time_name';
 
   editDataset = {opened: false};
   editVersion = {opened: false};
   editVariable = {opened: false};
-  editLatName = {opened: false};
-  editLonName = {opened: false};
-  editTimeName = {opened: false};
 
   dateFormat = 'medium';
   timeZone = 'UTC';
+  filePreprocessingStatus: any;
 
   // variables$: Observable<DatasetVariableDto>[] = [];
 
@@ -62,12 +60,8 @@ export class UserDataRowComponent implements OnInit {
     this.datasetVersionService.getVersionById(this.userDataset.version).subscribe(versionData => {
       this.versionName$.next(versionData.pretty_name);
     });
-    this.datasetVariableService.getVariableById(this.userDataset.variable).subscribe(variableData => {
-      this.variableName.shortName$.next(variableData.short_name);
-      this.variableName.prettyName$.next(variableData.pretty_name);
-      this.variableName.unit$.next(variableData.unit);
-      // this.variableUnit = variableData.unit;
-    });
+    this.updateVariable();
+    this.refreshFilePreprocessingStatus();
   }
 
   removeDataset(dataFileId: string): void {
@@ -77,6 +71,14 @@ export class UserDataRowComponent implements OnInit {
     this.userDatasetService.deleteUserData(dataFileId).subscribe(() => {
       this.userDatasetService.refresh.next(true);
       this.authService.init();
+    });
+  }
+
+  updateVariable(): void {
+    this.datasetVariableService.getVariableById(this.userDataset.variable, true).subscribe(variableData => {
+      this.variableName.shortName$.next(variableData.short_name);
+      this.variableName.prettyName$.next(variableData.pretty_name);
+      this.variableName.unit$.next(variableData.unit);
     });
   }
 
@@ -130,6 +132,33 @@ export class UserDataRowComponent implements OnInit {
 
   getTheFileSize(): string {
     return this.userDatasetService.getTheSizeInProperUnits(this.userDataset.file_size);
+  }
+
+
+  refreshFilePreprocessingStatus(): void {
+    if (!this.userDataset.metadata_submitted) {
+      this.filePreprocessingStatus = setInterval(() => {
+        this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe(data => {
+            if (data.metadata_submitted) {
+              this.updateVariable();
+              if (this.variableName.prettyName$.value !== 'none') {
+                this.userDatasetService.refresh.next(true);
+              }
+            }
+          },
+          () => {
+            this.userDatasetService.refresh.next(true);
+            this.toastService.showErrorWithHeader('File preprocessing failed',
+              'File could not be preprocessed. Please make sure that you are uploading a proper file and if the ' +
+              'file fulfills our requirements', 10000);
+          });
+      }, 60 * 1000); // one minute
+    }
+  }
+
+
+  ngOnDestroy(): void {
+    clearInterval(this.filePreprocessingStatus);
   }
 
 }

@@ -24,7 +24,7 @@ from api.views.modify_validation_view import stop_validation, delete_result, cha
     extend_result, publish_result, add_validation, remove_validation, get_publishing_form, copy_validation_results
 from api.views.serving_file_view import *
 from api.views.local_api_view import get_list_of_countries
-from api.views.settings_view import settings
+from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
 
 # schema_view = get_schema_view(
@@ -102,7 +102,7 @@ urlpatterns = [
     path('sign-up', signup_post, name='Sign up'),
     path('user-update', user_update, name='User update'),
     path('user-delete', user_delete, name='User delete'),
-    path('settings', settings, name="Settings"),
+    path('settings', backend_settings, name="Settings"),
     path('get-graphic-file', get_graphic_file, name='Get graphic file'),
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
@@ -112,8 +112,8 @@ urlpatterns = [
     path('upload-user-data/<str:filename>/', upload_user_data, name='Upload user data'),
     path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
     path('delete-user-datafile/<str:file_uuid>/', delete_user_dataset_and_file, name='Delete User Data File'),
-    path('user-file-metadata/<uuid:file_uuid>/', post_user_file_metadata_and_preprocess_file,
-         name='Post User Data File Metadata'),
+    path('get-user-file-by-id/<uuid:file_uuid>/', get_user_data_file_by_id,
+         name='Get user file by ID'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
     path('scaling-methods', get_scaling_methods, name='Scaling methods')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
