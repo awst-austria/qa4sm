@@ -5,7 +5,7 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-import {Gallery} from 'angular-gallery';
+// import {Gallery} from 'angular-gallery';
 // import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {map} from 'rxjs/operators';
@@ -31,7 +31,6 @@ export class ResultFilesComponent implements OnInit {
 
   constructor(private validationService: ValidationrunService,
               public plotService: WebsiteGraphicsService,
-              private gallery: Gallery,
               public globals: GlobalParamsService) {
   }
 

@@ -54,7 +54,6 @@ import {
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
 import {TemporalMatchingModule} from './modules/temporal-matching/temporal-matching.module';
 import {HelpComponent} from './pages/help/help.component';
-import {IvyGalleryModule} from 'angular-gallery';
 import {NgxPageScrollModule} from 'ngx-page-scroll';
 import {CoreModule} from './modules/core/core.module';
 import {SignupComponent} from './pages/signup/signup.component';
@@ -137,7 +136,6 @@ import {ProgressBarModule} from 'primeng/progressbar';
         NgxPaginationModule,
         MapModule,
         ComparisonModule,
-        IvyGalleryModule,
         NgxPageScrollModule,
         CoreModule,
         UserModule,

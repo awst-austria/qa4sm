@@ -33,12 +33,12 @@
             }}
           </div>
           <div *ngFor="let comparisonplot of plots; let ind = index" class='p-col'>
-            <img width="95%"
-                 height="95%"
-                 [src]=sanitizePlotUrl(comparisonplot.plot)
-                 (click)="showGallery(ind, plots)"
-                 [ngClass]="{'result-plot': true, 'pcol6': true, 'small-size': plots.length == 1}"
-                 alt="An Overview map for {{selectedMetric.metric_pretty_name}}">
+<!--            <img width="95%"-->
+<!--                 height="95%"-->
+<!--                 [src]=sanitizePlotUrl(comparisonplot.plot)-->
+<!--                 (click)="showGallery(ind, plots)"-->
+<!--                 [ngClass]="{'result-plot': true, 'pcol6': true, 'small-size': plots.length == 1}"-->
+<!--                 alt="An Overview map for {{selectedMetric.metric_pretty_name}}">-->
               <!--  Download buttons for each plot -->
               <div class="p-py-3 p-pl-2" style="text-align: left">
                 <a class="btn-action-large"
