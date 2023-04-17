@@ -7,8 +7,7 @@ import {finalize} from 'rxjs/operators';
 import {HttpEventType} from '@angular/common/http';
 import {allowedNameValidator} from '../../services/allowed-name.directive';
 import * as uuid from 'uuid';
-// @ts-ignore
-import JSZip from 'jszip';
+import * as JSZip from 'jszip';
 import {AuthService} from '../../../core/services/auth/auth.service';
 
 @Component({
@@ -48,9 +47,8 @@ export class UserFileUploadComponent implements OnInit {
   }
 
   private verifyZipContent(): void {
-    const zip = new JSZip();
+    const zip = new JSZip.default();
     zip.loadAsync(this.file).then(contents => {
-      console.log(contents.files);
       const files = Object.keys(contents.files).filter(key =>
         !['nc', 'nc4', 'csv', 'yml'].includes(key.split('.').reverse()[0]) && !contents.files[key].dir);
       if (files.length !== 0) {
