@@ -6,7 +6,7 @@ import {HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {Gallery} from 'angular-gallery';
-import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
+// import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {map} from 'rxjs/operators';
 import {PlotDto} from '../../../core/services/global/plot.dto';
@@ -70,19 +70,19 @@ export class ResultFilesComponent implements OnInit {
     this.boxplotIndx = this.selectedBoxplot.ind;
 }
 
-  showGallery(index: number = 0, imagesListObject): void {
-    const imagesList = [];
-    imagesListObject.forEach(image => {
-      imagesList.push({path: this.plotService.plotPrefix + image.plot});
-
-    });
-    const prop: any = {};
-    prop.component = CarouselComponent;
-    prop.images = imagesList;
-    prop.index = index;
-    prop.arrows = imagesList.length > 1;
-    this.gallery.load(prop);
-  }
+  // showGallery(index: number = 0, imagesListObject): void {
+  //   const imagesList = [];
+  //   imagesListObject.forEach(image => {
+  //     imagesList.push({path: this.plotService.plotPrefix + image.plot});
+  //
+  //   });
+  //   const prop: any = {};
+  //   prop.component = CarouselComponent;
+  //   prop.images = imagesList;
+  //   prop.index = index;
+  //   prop.arrows = imagesList.length > 1;
+  //   this.gallery.load(prop);
+  // }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void {
     this.validationService.downloadResultFile(validationId, fileType, fileName);

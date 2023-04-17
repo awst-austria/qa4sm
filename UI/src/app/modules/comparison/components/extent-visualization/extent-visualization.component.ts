@@ -7,8 +7,8 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
-import {Gallery} from 'angular-gallery';
+// import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
+// import {Gallery} from 'angular-gallery';
 
 @Component({
   selector: 'qa-extent-visualization',
@@ -32,8 +32,7 @@ export class ExtentVisualizationComponent implements OnInit {
               private datasetConfigurationService: DatasetConfigurationService,
               private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
-              private plotService: WebsiteGraphicsService,
-              private gallery: Gallery) {
+              private plotService: WebsiteGraphicsService) {
   }
 
   ngOnInit(): void {
@@ -79,15 +78,15 @@ export class ExtentVisualizationComponent implements OnInit {
     return this.plotService.sanitizePlotUrl(plotBase64);
   }
 
-  showImage(image): void {
-    const sanitizedImage = this.sanitizePlotUrl(image);
-    const imagesList = [{path: sanitizedImage}];
-    const prop: any = {};
-    prop.component = CarouselComponent;
-    prop.images = imagesList;
-    prop.index = 0;
-    prop.arrows = imagesList.length > 1;
-    this.gallery.load(prop);
-  }
+  // showImage(image): void {
+  //   const sanitizedImage = this.sanitizePlotUrl(image);
+  //   const imagesList = [{path: sanitizedImage}];
+  //   const prop: any = {};
+  //   prop.component = CarouselComponent;
+  //   prop.images = imagesList;
+  //   prop.index = 0;
+  //   prop.arrows = imagesList.length > 1;
+  //   this.gallery.load(prop);
+  // }
 
 }

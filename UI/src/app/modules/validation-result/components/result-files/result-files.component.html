@@ -13,12 +13,12 @@
           <div *ngIf="metrics[metricIndx].overviewFiles|async as overviewPlots">
             <div class="p-grid p-align-center">
               <div *ngIf="boxplots.length > 0" [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
-                <img width="95%"
-                     height="95%"
-                     [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
-                     (click)="showGallery(boxplotIndx, boxplots)"
-                     [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
-                     alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}">
+<!--                <img width="95%"-->
+<!--                     height="95%"-->
+<!--                     [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"-->
+<!--                     (click)="showGallery(boxplotIndx, boxplots)"-->
+<!--                     [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"-->
+<!--                     alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}">-->
               </div>
               <div class="p-col">
                 <div class="p-grid">
@@ -30,11 +30,11 @@
                     <span class="image-label">
                       {{metrics[metricIndx].datasets[ind]}}
                     </span>
-                    <img width="95%" height="95%"
-                         [src]="sanitizePlotUrl(plot.plot)"
-                         (click)="showGallery(ind, overviewPlots)"
-                         [ngClass]="{'result-plot':true, 'pcol': true}"
-                         alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}">
+<!--                    <img width="95%" height="95%"-->
+<!--                         [src]="sanitizePlotUrl(plot.plot)"-->
+<!--                         (click)="showGallery(ind, overviewPlots)"-->
+<!--                         [ngClass]="{'result-plot':true, 'pcol': true}"-->
+<!--                         alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}">-->
                   </div>
                 </div>
               </div>
