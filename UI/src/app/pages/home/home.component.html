@@ -3,7 +3,7 @@
     <div>
       <p-carousel [value]="carouselFiles" [circular]="true" [autoplayInterval]="5000"
                   [numVisible]="1" [numScroll]="1">
-        <ng-template let-image pTemplate="item" >
+        <ng-template let-image pTemplate="item">
           <img alt="{{image.attrLink}}"
                [src]="image.plot"
                class="carousel-img">
@@ -68,18 +68,18 @@
 
   </div>
 
-<!--  <hr class="featurette-divider">-->
+  <!--  <hr class="featurette-divider">-->
 
 
   <div class="container-marketing p-grid">
     <div class="p-md-12">
-    <div class="overflow">
-      <div *ngFor="let logo of logoFiles">
-        <a href="{{logo.link}}" target="_blank">
-          <img alt="{{logo.link}}" [src]="logo.plot">
-        </a>
+      <div class="overflow">
+        <div *ngFor="let logo of logoFiles">
+          <a href="{{logo.link}}" target="_blank">
+            <img alt="{{logo.link}}" [src]="logo.plot">
+          </a>
+        </div>
       </div>
-    </div>
     </div>
   </div>
   <hr class="featurette-divider">
@@ -96,16 +96,18 @@
       </ul>
       The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality
       control of soil moisture data products and provider users with <b>traceable validation results</b>.
-      <p>QA4SM was created thanks to  support of the <a href="https://www.ffg.at/en" target="_blank">Austrian Space Application Programme</a>.
-        From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European Space Agency</a>.</p>
+      <p>QA4SM was created thanks to support of the <a href="https://www.ffg.at/en" target="_blank">Austrian Space
+        Application Programme</a>.
+        From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European
+          Space Agency</a>.</p>
 
 
       <div *ngIf="settings$|async as settings">
         <div *ngIf="settings[0].feed_link" class="news card-body">
-          <h4 class="featurette-heading"> Share with us your <span class="text-muted">opinion</span> </h4>
+          <h4 class="featurette-heading"> Share with us your <span class="text-muted">opinion</span></h4>
 
-            If you think we could improve something or you see a missing functionality, please let us know using
-            this <b>  <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
+          If you think we could improve something or you see a missing functionality, please let us know using
+          this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
 
         </div>
       </div>
@@ -119,13 +121,13 @@
           <div [innerHTML]=settings[0].news></div>
         </div>
       </div>
-      <div >
-<!--        <img class="scaled_image"-->
-<!--             [src]="workflowDiagram[0].plot"-->
-<!--             (click)="showGallery(0, workflowDiagram)"-->
-<!--             [alt]="workflowDiagram[0].description"-->
-<!--             id="workflow"-->
-<!--             style="max-width: 80%">-->
+      <div>
+        <!--        <img class="scaled_image"-->
+        <!--             [src]="workflowDiagram[0].plot"-->
+        <!--             (click)="showGallery(0, workflowDiagram)"-->
+        <!--             [alt]="workflowDiagram[0].description"-->
+        <!--             id="workflow"-->
+        <!--             style="max-width: 80%">-->
       </div>
     </div>
   </div>
@@ -141,10 +143,12 @@
         </p>
 
         <div>
-<!--          <img class="scaled_image img-screen"-->
-<!--               [src]="cardValidate[0].plot"-->
-<!--               (click)="showGallery(0, cardValidate)"-->
-<!--               [alt]="cardValidate[0].description">-->
+          <p-image
+            width="100%"
+            preview="true"
+            [src]="cardValidate[0].plot"
+            [alt]="cardValidate[0].description">
+          </p-image>
         </div>
       </div>
 
@@ -154,11 +158,14 @@
           Provides a list of all validation results
         </p>
         <div>
-<!--          <img-->
-<!--               class="scaled_image img-screen"-->
-<!--               [src]="cardValidateResult[0].plot"-->
-<!--               (click)="showGallery(0, cardValidateResult)"-->
-<!--               [alt]="cardValidateResult[0].description">-->
+          <p-image
+            width="100%"
+            [src]="cardValidateResult[0].plot"
+            [alt]="cardValidateResult[0].description"
+            preview="true">
+            <ng-template pTemplate="indicator">
+            </ng-template>
+          </p-image>
         </div>
       </div>
 
@@ -168,11 +175,12 @@
           Allows download of validation results in netCDF format and as graphics
         </p>
         <div>
-<!--          <img-->
-<!--               class="scaled_image img-screen"-->
-<!--               [src]="cardValidateDetails[0].plot"-->
-<!--               (click)="showGallery(0, cardValidateDetails)"-->
-<!--               [alt]="cardValidateDetails[0].description">-->
+          <p-image
+            width="100%"
+            preview="true"
+            [src]="cardValidateDetails[0].plot"
+            [alt]="cardValidateDetails[0].description">
+          </p-image>
         </div>
       </div>
     </div>
