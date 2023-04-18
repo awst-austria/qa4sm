@@ -35,6 +35,9 @@ export class PlotsComponent implements OnInit {
   errorHappened = false;
   plots: PlotDto[];
 
+  displayGallery: boolean;
+  activeIndex = 0;
+
   constructor(private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
               private plotService: WebsiteGraphicsService) {
@@ -80,18 +83,10 @@ export class PlotsComponent implements OnInit {
       });
   }
 
-  // showGallery(index: number = 0, imagesListObject): void {
-  //   const imagesList = [];
-  //   imagesListObject.forEach(image => {
-  //     imagesList.push({path: this.plotService.plotPrefix + image.plot});
-  //   });
-  //   const prop: any = {};
-  //   prop.component = CarouselComponent;
-  //   prop.images = imagesList;
-  //   prop.index = index;
-  //   prop.arrows = imagesList.length > 1;
-  //   this.gallery.load(prop);
-  // }
+  showGallery(index: number = 0): void {
+    this.activeIndex = index;
+    this.displayGallery = true;
+  }
 
   getComparisonPlots(metric: string, comparisonModel: Validations2CompareModel): void {
     // Get all the plots for a specific comparison and metric

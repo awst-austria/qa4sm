@@ -22,6 +22,7 @@ import {ValidationResultModule} from '../validation-result/validation-result.mod
 import {ExtentVisualizationComponent} from './components/extent-visualization/extent-visualization.component';
 import {CoreModule} from '../core/core.module';
 import {ImageModule} from 'primeng/image';
+import {GalleriaModule} from 'primeng/galleria';
 
 @NgModule({
   declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent,
@@ -30,24 +31,25 @@ import {ImageModule} from 'primeng/image';
     ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent,
     ComparisonSummaryComponent, ExtentVisualizationComponent, ExtentVisualizationComponent
   ],
-    imports: [
-        CommonModule,
-        PanelModule,
-        TooltipModule,
-        FontAwesomeModule,
-        NgxPaginationModule,
-        RouterModule,
-        DropdownModule,
-        FormsModule,
-        InputTextModule,
-        AccordionModule,
-        DatasetModule,
-        ButtonModule,
-        CheckboxModule,
-        NgDompurifyModule,
-        ValidationResultModule,
-        CoreModule,
-        ImageModule,
-    ]
+  imports: [
+    CommonModule,
+    PanelModule,
+    TooltipModule,
+    FontAwesomeModule,
+    NgxPaginationModule,
+    RouterModule,
+    DropdownModule,
+    FormsModule,
+    InputTextModule,
+    AccordionModule,
+    DatasetModule,
+    ButtonModule,
+    CheckboxModule,
+    NgDompurifyModule,
+    ValidationResultModule,
+    CoreModule,
+    ImageModule,
+    GalleriaModule,
+  ]
 })
 export class ComparisonModule { }
