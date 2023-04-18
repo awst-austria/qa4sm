@@ -41,8 +41,6 @@
     "jszip": "^3.10.1",
     "ng-gallery": "^5.0.0",
     "ngx-logger": "^4.1.9",
-    "ngx-page-scroll": "^7.0.4",
-    "ngx-page-scroll-core": "^7.0.4",
     "ngx-pagination": "^5.0.0",
     "ol": "^6.5.0",
     "primeflex": "^2.0.0",
