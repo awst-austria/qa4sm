@@ -21,6 +21,7 @@ import {ComparisonSummaryComponent} from './components/comparison-summary/compar
 import {ValidationResultModule} from '../validation-result/validation-result.module';
 import {ExtentVisualizationComponent} from './components/extent-visualization/extent-visualization.component';
 import {CoreModule} from '../core/core.module';
+import {ImageModule} from 'primeng/image';
 
 @NgModule({
   declarations: [ValidationSelectorComponent, PlotsComponent, SpatialExtentComponent, TableComparisonComponent,
@@ -46,6 +47,7 @@ import {CoreModule} from '../core/core.module';
         NgDompurifyModule,
         ValidationResultModule,
         CoreModule,
+        ImageModule,
     ]
 })
 export class ComparisonModule { }
