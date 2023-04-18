@@ -1,8 +1,8 @@
-<div  *ngIf="showLoadingSpinner" class="text-center">
+<div *ngIf="showLoadingSpinner" class="text-center">
   <qa-loading-spinner></qa-loading-spinner>
 </div>
 <div *ngIf="!showLoadingSpinner && errorHappened" class="center alert">
- <h4> Extent plot not available! </h4>
+  <h4> Extent plot not available! </h4>
 </div>
 
 <div *ngIf="!showLoadingSpinner && ! errorHappened" class="p-grid no-gutters">
@@ -55,12 +55,12 @@
           </div>
           <div class="p-grid center p-py-0">
             <div class='p-col'>
-<!--              <img width="95%"-->
-<!--                   height="95%"-->
-<!--                   [src]=sanitizePlotUrl(img)-->
-<!--                   [ngClass]="{'result-plot':true, 'pcol6': true}"-->
-<!--                   (click)="showImage(img)"-->
-<!--                   alt="An overview of the selected comparison extent">-->
+              <p-image width="100%"
+                       [src]="sanitizePlotUrl(img)"
+                       [ngClass]="{'result-plot':true, 'pcol6': true}"
+                       preview="true"
+                       alt="An overview of the selected comparison extent">
+              </p-image>
             </div>
           </div>
         </div>

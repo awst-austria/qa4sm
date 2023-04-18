@@ -78,15 +78,4 @@ export class ExtentVisualizationComponent implements OnInit {
     return this.plotService.sanitizePlotUrl(plotBase64);
   }
 
-  // showImage(image): void {
-  //   const sanitizedImage = this.sanitizePlotUrl(image);
-  //   const imagesList = [{path: sanitizedImage}];
-  //   const prop: any = {};
-  //   prop.component = CarouselComponent;
-  //   prop.images = imagesList;
-  //   prop.index = 0;
-  //   prop.arrows = imagesList.length > 1;
-  //   this.gallery.load(prop);
-  // }
-
 }
