@@ -1,13 +1,13 @@
 <main #helpPage>
   <h1 class="h3 p-mb-3 font-weight-normal">Go to section</h1>
   <p>
-    <a pageScroll="" [pageScrollDuration]="1" href="#validation">Validate Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#results_list">My Validations - Results List Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#results">Validation Results Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#publishing">Publishing</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#published">Published Validations Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#comparison">Validation Comparison</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#user-data-upload">User Data Upload</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="validation">Validate Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="results_list">My Validations - Results List Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="results">Validation Results Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="published">Published Validations Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="comparison">Validation Comparison</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="user-data-upload">User Data Upload</a><br/>
   </p>
 
   <a id="manual"></a>
@@ -33,7 +33,7 @@
   <p>
     <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
     and one of the soil moisture variables provided in the dataset. All the supported datasets are listed on
-    <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">datasets page here</a>. Plase note,
+    <a routerLink="/datasets" target="_blank">datasets page here</a>. Plase note,
     that there have to be at least two datasets added, as one of them will be treated as the reference one.
   </p>
   <div>
@@ -44,7 +44,7 @@
     The filters available depend on the data contained within the chosen dataset. For example,
     you can filter the C3S data to include only data with variable in valid geophysical range.
     Details of the filter options provided for each dataset are given on the
-    <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">supported datasets page</a>. You
+    <a routerLink="/datasets" target="_blank">supported datasets page</a>. You
     can also
     hover your mouse pointer over the question mark next to a filter to get a short explanation.
   </p>
@@ -56,7 +56,8 @@
   </p>
   <p class="alert alert-info">
     <b>Intercomparison:</b> The intercomparison mode of QA4SM validates up to six satellite data sets against a common
-    spatial reference data set. For each reference location (e.g. each ISMN station) it finds the nearest observation series in
+    spatial reference data set. For each reference location (e.g. each ISMN station) it finds the nearest observation
+    series in
     all selected satellite products.
     All observations series are then scaled (if selected) and temporally matched to the temporal reference series.
     For validation only the common time stamps (that are available in all satellite products) are used to calculate
@@ -71,7 +72,8 @@
   </div>
   <p>
     <b>Step 4</b> - Choose which dataset selected for validation should be used as the spatial and temporal reference.
-    Please note, that if the ISMN dataset belongs to the pool, it is set as the spatial reference automatically and there
+    Please note, that if the ISMN dataset belongs to the pool, it is set as the spatial reference automatically and
+    there
     is no possibility of changing it.
   </p>
   <div>
@@ -144,7 +146,7 @@
     matching of the data and reference selected.
     If the validation period fields are left empty, the validation will not be started. For the time range covered by
     the various
-    datasets, see the <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">datasets page</a>.
+    datasets, see the <a routerLink="/datasets" target="_blank">datasets page</a>.
     <br>
 
     For temporal matching window size, the default (and recommended) value is 12 hours and possible choices are integer
@@ -263,7 +265,7 @@
     </li>
     <li>
       <span class="pi pi-folder-open"></span> You can access the
-      <a pageScroll="" [pageScrollDuration]="1" href="#results">results details page</a>
+      <a routerLink="{{pageUrl}}" fragment="results">results details page</a>
       of a validation through its folder button.
     </li>
     <li>
@@ -359,7 +361,7 @@
       file to <a target="_blank" href="https://zenodo.org/" rel="'noreferrer">Zenodo</a>. This means the results can be
       cited
       with a <a target="_blank" href="https://www.doi.org/" rel="'noreferrer">DOI</a>. See section
-      <a pageScroll="" [pageScrollDuration]="1" href="#publishing">Publishing</a> for details.
+      <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a> for details.
     </li>
   </ul>
 
@@ -615,33 +617,42 @@
     <img alt="select-file" class="scaled_image p-mb-3" [src]="selectFile">
   </div>
   <p>
-    Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be able
+    Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be
+    able
     to choose only .netCDF or .zip files, both types need to follow the standard described
-    <a target="_blank" [routerLink]="['/user-data-guidelines']">here.</a> If the .zip file you are trying to upload contains
-    other types of files than .netCDF, .csv or .yml, you will not be able to upload the file. Please note, that you have <b> 5GB </b>
+    <a target="_blank" [routerLink]="['/user-data-guidelines']">here.</a> If the .zip file you are trying to upload
+    contains
+    other types of files than .netCDF, .csv or .yml, you will not be able to upload the file. Please note, that you have
+    <b> 5GB </b>
     space available for your files. In case you need more, please contact our team.
   </p>
   <div>
     <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadFileWindow">
   </div>
   <p>
-    When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version names.
-    Additionally you can introduce display names for both dataset and its version, which is going to be used on the list of available datasets.
+    When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version
+    names.
+    Additionally you can introduce display names for both dataset and its version, which is going to be used on the list
+    of available datasets.
     If the display name is not provided, the basic name is going to be used.
   </p>
   <div>
     <img alt="select-file" class="scaled_image p-mb-3" [src]="metadataWindow">
   </div>
   <p>
-    If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided information, click 'Save' button.
-    Clicking 'Save' button will close the metadata form, but won't start uploading yet. To start uploading, click the 'Upload file' button.
+    If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided
+    information, click 'Save' button.
+    Clicking 'Save' button will close the metadata form, but won't start uploading yet. To start uploading, click the
+    'Upload file' button.
   </p>
   <div>
     <img alt="select-file" class="scaled_image p-mb-3" [src]="chosenFile">
   </div>
   <p>
-    Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a blue spinner and information
-    about the percentage of uploaded file. Eventually an information will show up that the file has been uploaded, but it still needs to be pre-processed.
+    Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a
+    blue spinner and information
+    about the percentage of uploaded file. Eventually an information will show up that the file has been uploaded, but
+    it still needs to be pre-processed.
   </p>
   <div>
     <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadingSpinner">
@@ -650,20 +661,24 @@
     When the file gets uploaded and preprocessed, there will show up a row with basic information on the uploaded file.
     You'll be able to change the dataset's name, the version's name and choose a different variable, if the default one
     is inproper or we were not able to retrieve the proper name.
-    By clicking 'Remove dataset' button, you will remove the uploaded file. Note, that removing is possible only if the uploaded data
+    By clicking 'Remove dataset' button, you will remove the uploaded file. Note, that removing is possible only if the
+    uploaded data
     hasn't been used for any validation.
   </p>
   <div>
     <img alt="select-file" class="scaled_image p-mb-3" style="scale: 1.2" [src]="dataRow">
   </div>
 
-  <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown list. Your dataset will be there.</p>
+  <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown
+    list. Your dataset will be there.</p>
   <div>
     <img alt="select-file" class="scaled_image p-mb-3" style="scale: 0.9" [src]="userDataOnTheList">
   </div>
   <p>
-    Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation that uses private data.
-    You can still share your validation with another user, but they won't be able to rerun it, as they don't have access to your dataset.
+    Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation
+    that uses private data.
+    You can still share your validation with another user, but they won't be able to rerun it, as they don't have access
+    to your dataset.
   </p>
 
 

@@ -20,6 +20,7 @@ export class HelpComponent implements OnInit, AfterViewInit {
     faFileDownload: fas.faFileDownload,
     faRedo: fas.faRedo
   };
+  public pageUrl = '/help';
 
   menuMinus: string;
   menuPlus: string;
