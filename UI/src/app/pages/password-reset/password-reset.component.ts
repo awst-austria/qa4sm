@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {Router} from '@angular/router';
-import {PasswordResetForm} from '../../modules/core/services/form-interfaces/password';
+import {PasswordResetForm} from '../../modules/core/services/form-interfaces/password-forms';
 
 @Component({
   selector: 'qa-password-reset',

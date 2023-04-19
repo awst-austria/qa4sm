@@ -1,5 +1,5 @@
 import {FormControl, FormGroup} from '@angular/forms';
-import {PasswordValidatorForm} from '../core/services/form-interfaces/password';
+import {PasswordValidatorForm} from '../core/services/form-interfaces/password-forms';
 
 export class PasswordValidator {
   static validPasswordConfirmation(fg: FormGroup<PasswordValidatorForm>): any {
