@@ -1,5 +1,5 @@
 import {NgModule} from '@angular/core';
-import {RouterModule, Routes} from '@angular/router';
+import {ExtraOptions, RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from './pages/home/home.component';
 import {ValidateComponent} from './pages/validate/validate.component';
 import {ErrorComponent} from './pages/error/error.component';
@@ -38,7 +38,10 @@ const routes: Routes = [
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},
   {path: 'about', component: AboutComponent},
-  {path: 'help', component: HelpComponent},
+  {path: 'help', component: HelpComponent, children: [
+      { path: 'validation'},
+      { path: 'results'},
+    ]},
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
   {path: 'comparison', component: ComparisonComponent, canActivate: [AuthGuard]},
@@ -54,8 +57,14 @@ const routes: Routes = [
   {path: '**', component: ErrorComponent}
 ];
 
+const routerOptions: ExtraOptions = {
+  scrollPositionRestoration: 'enabled',
+  anchorScrolling: 'enabled',
+  scrollOffset: [0, 100],
+};
+
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, routerOptions)],
   exports: [RouterModule]
 })
 export class AppRoutingModule {
