@@ -38,10 +38,7 @@ const routes: Routes = [
   {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
   {path: 'published-validations', component: PublishedValidationsComponent},
   {path: 'about', component: AboutComponent},
-  {path: 'help', component: HelpComponent, children: [
-      { path: 'validation'},
-      { path: 'results'},
-    ]},
+  {path: 'help', component: HelpComponent},
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
   {path: 'comparison', component: ComparisonComponent, canActivate: [AuthGuard]},
