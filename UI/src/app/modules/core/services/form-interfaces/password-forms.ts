@@ -1,7 +1,7 @@
 import {AbstractControl} from '@angular/forms';
 
 
-export interface PasswordValidatorForm{
+export interface PasswordForm {
   password1: AbstractControl<string>;
   password2: AbstractControl<string>;
 }
