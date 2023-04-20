@@ -36,6 +36,11 @@ describe('SummaryStatisticsComponent', () => {
     fixture = TestBed.createComponent(SummaryStatisticsComponent);
     component = fixture.componentInstance;
     component.validationRun = {
+      temporal_reference_configuration: 1,
+      dataset_configurations: [1, 2],
+      scaling_reference_configuration: 1,
+      temporal_matching: 12,
+      bootstrap_tcol_cis: false,
       anomalies: 'none',
       anomalies_from: null,
       anomalies_to: null,
@@ -82,7 +87,10 @@ describe('SummaryStatisticsComponent', () => {
         variable: 1,
         filters: [1],
         parametrised_filters: [],
-        parametrisedfilter_set: []
+        parametrisedfilter_set: [],
+        is_scaling_reference: true,
+        is_spatial_reference: true,
+        is_temporal_reference: true
       },
       // non reference one
       {
@@ -93,7 +101,10 @@ describe('SummaryStatisticsComponent', () => {
         variable: 2,
         filters: [1, 2],
         parametrised_filters: [],
-        parametrisedfilter_set: []
+        parametrisedfilter_set: [],
+        is_scaling_reference: false,
+        is_spatial_reference: false,
+        is_temporal_reference: false
       }
     ];
     fixture.detectChanges();

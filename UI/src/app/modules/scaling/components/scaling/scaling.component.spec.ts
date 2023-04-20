@@ -19,16 +19,13 @@ describe('ScalingComponent', () => {
     component = fixture.componentInstance;
     component.validationModel = {
       datasetConfigurations: [],
-      referenceConfigurations: [],
+      referenceConfigurations: null,
       spatialSubsetModel: null,
       validationPeriodModel: null,
       metrics: [],
       anomalies: null,
-      scalingModel: {
-        id: '1',
-        description: '',
-        scaleTo$: new BehaviorSubject(null)
-      },
+      temporalMatchingModel: null,
+      scalingMethod: null,
       nameTag$: new BehaviorSubject('')
     };
     fixture.detectChanges();

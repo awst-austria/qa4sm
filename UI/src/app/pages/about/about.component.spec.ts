@@ -18,6 +18,7 @@ describe('AboutComponent', () => {
         app_version: '1.6.0',
         expiry_period: '',
         warning_period: '',
+        temporal_matching_default: 12
       }
     };
     await TestBed.configureTestingModule({
