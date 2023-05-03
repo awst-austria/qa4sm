@@ -1,6 +1,6 @@
-<div class="p-grid">
+<div class="grid">
   <!-- selection of the reference dataset -->
-  <div class="p-md-6 p-col-12">
+  <div class="md:col-6 col-12">
     <p-panel header="Datasets configuration" [toggleable]="false">
       <ng-template pTemplate="icons">
         <label class="mb-0"
@@ -24,8 +24,8 @@
       </p-accordion>
 
       <!--  here selection of single or multiple non-reference validations. How to divide?  -->
-      <div class="p-grid p-pt-2">
-        <div class="p-col-12">
+      <div class="grid pt-2">
+        <div class="col-12">
           <p-accordion multiple="true" activeIndex="0">
             <p-accordionTab [header]="'Non-reference datasets'">
               <p-checkbox label="{{'Multiple non-reference datasets'}}"
@@ -36,7 +36,7 @@
               <label class="p-panel-header-icon"
                      pTooltip="{{'Toggle to compare validations with 2 non-reference datasets'}}"
                      tooltipPosition="bottom">
-                <span class="pi pi-question-circle p-ml-2"></span>
+                <span class="pi pi-question-circle ml-2"></span>
               </label>
 
             </p-accordionTab>
@@ -48,7 +48,7 @@
   </div>
 
   <!-- selection of the validations -->
-  <div class="p-md-6 p-col-12">
+  <div class="md:col-6 col-12">
     <p-panel header="Validations selection" [toggleable]="false">
       <ng-template pTemplate="icons">
         <label class="mb-0" pTooltip="You can choose as many as one or two validations from the list, according to the number of non-reference
@@ -59,10 +59,10 @@
       </ng-template>
       <p-accordion multiple="true" activeIndex="0">
         <p-accordionTab [header]="'Validations available for comparison'">
-          <div class="p-grid">
-            <div class="p-col-12">
+          <div class="grid">
+            <div class="col-12">
 
-              <div class="p-float-label p-m-2">
+              <div class="p-float-label m-2">
 
                 <p-dropdown id="validationSelector"
                             [options]="validations4Comparison"
@@ -88,7 +88,7 @@
                   (click)="removeValidation(item)"
                   [label]="'Remove: ' + (item.comparison_label)"
                   icon="pi pi-trash"
-                  class="p-button-danger p-mt-2" style="padding: 0.2rem;">
+                  class="p-button-danger mt-2" style="padding: 0.2rem;">
           </button>
       </p-accordion>
 
@@ -96,7 +96,7 @@
   </div>
 
   <!-- selection of the spatial extent -->
-  <div class="p-col-12">
+  <div class="col-12">
     <p-panel header="Spatial extent" [toggleable]="true">
       <ng-template pTemplate="icons">
         <label class="p-panel-header-icon"
@@ -105,8 +105,8 @@
           <span class="pi pi-question-circle"></span>
         </label>
       </ng-template>
-      <div class="p-grid">
-        <div class="p-col-12">
+      <div class="grid">
+        <div class="col-12">
           <qa-spatial-extent
             [extentModel]="this.spatialExtent"
             [disabled]="this.spatialExtentDisabled()"
@@ -119,9 +119,9 @@
 </div>
 
 <!-- Start comparison button -->
-<div class="p-col-12">
+<div class="col-12">
   <div>
-    <div class="p-d-flex p-jc-center">
+    <div class="d-flex justify-content-center">
       <p-button label="Compare" (onClick)="startComparison()"></p-button>
     </div>
   </div>
