@@ -6,12 +6,12 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid p-pt-2">
+  <div class="grid pt-2">
     <div style="width: 100%">
-      <div class="p-col-12">
+      <div class="col-12">
         <label for="scalingMethod">Method: </label>
       </div>
-      <div class="p-col-12 p-pt-3" id="scalingMethod">
+      <div class="col-12 pt-3" id="scalingMethod">
         <div class="p-float-label">
           <p-dropdown id="scalingMethodSelector"
                       (onChange)="updateScalingMethod()"
@@ -24,10 +24,10 @@
       </div>
     </div>
     <div style="width: 100%" *ngIf="(selectedScalingMethod$|async)?.method !== 'none'">
-      <div class="p-col-12">
+      <div class="col-12">
         <label for="scalingTo">Scale to: </label>
       </div>
-      <div class="p-col-12 p-pt-3" id="scalingTo">
+      <div class="col-12 pt-3" id="scalingTo">
         <div class="p-float-label">
           <p-dropdown id="scalingReferenceSelector"
                       (onChange)="updateScaleTo(true)"

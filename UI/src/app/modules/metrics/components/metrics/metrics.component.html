@@ -6,12 +6,12 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid p-pt-3">
-    <div class="p-col-12">
+  <div class="grid pt-3">
+    <div class="col-12">
       <qa-metric [metricModel]="tripleCollocationMetrics"
                  [disabled]="checkIfDisabled('tcol')" (click)="switchOffBootstrap()"></qa-metric>
     </div>
-    <div class="p-col-12">
+    <div class="col-12">
       <qa-metric [metricModel]="bootstrapTripleCollocationMetrics"
                  [disabled]="checkIfDisabled('btcol')"></qa-metric>
     </div>
