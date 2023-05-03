@@ -4,7 +4,6 @@ import Draw, {createBox} from 'ol/interaction/Draw';
 import {Feature, Map} from 'ol';
 import {boundingExtent, getBottomLeft, getBottomRight, getTopLeft, getTopRight} from 'ol/extent';
 import VectorLayer from 'ol/layer/Vector';
-import GeometryType from 'ol/geom/GeometryType';
 import {transformExtent} from 'ol/proj';
 import {SpatialSubsetModel} from '../../../spatial-subset/components/spatial-subset/spatial-subset-model';
 import {NgZone} from '@angular/core';
@@ -17,29 +16,27 @@ export class BoundingBoxControl extends Control {
   currentSelectedCoordinates: number[] = [null, null, null, null];
   ngZone: NgZone;
 
+  // constructor(private map: Map, private boundingBox: SpatialSubsetModel, private toastService: ToastService, ngZone?: NgZone)
   constructor(private map: Map, private boundingBox: SpatialSubsetModel, private toastService: ToastService, ngZone?: NgZone) {
-    super({});
-    this.ngZone = ngZone;
-    //Prepare Source and Layer for the bounding box drawn by the user
-    this.boundingBoxSource = new VectorSource({wrapX: false});
-    map.addLayer(new VectorLayer({
-      source: this.boundingBoxSource,
-    }));
-
-
     // This is the actual pencil icon shown in the top left corner of the map
-    let button = document.createElement('button');
+    const button = document.createElement('button');
     button.type = 'button';
     button.innerHTML = '<i class="pi pi-pencil"></i>';
     button.title = 'Select region';
 
-    let element = document.createElement('div');
-    element.className = 'rotate-north ol-unselectable ol-control';
+    const element = document.createElement('div');
+    element.className = 'ol-control';
     element.appendChild(button);
-    Control.call(this, {
+
+    super({
       element: element
     });
-
+    this.ngZone = ngZone;
+    // Prepare Source and Layer for the bounding box drawn by the user
+    this.boundingBoxSource = new VectorSource({wrapX: false});
+    map.addLayer(new VectorLayer({
+      source: this.boundingBoxSource,
+    }));
 
     button.addEventListener('click', () => this.click());
 
@@ -53,12 +50,12 @@ export class BoundingBoxControl extends Control {
   private updateBoundingBox() {
     // Since openlayers is not an angular component, events that are coming from it wont trigger an update in
     // templates. As a workaround we run an empty method in the ngZone which then triggers the template updates.
-    //https://github.com/angular/angular/issues/35579
-    //https://github.com/angular/angular/issues/35579#issuecomment-589449820
+    // https://github.com/angular/angular/issues/35579
+    // https://github.com/angular/angular/issues/35579#issuecomment-589449820
     this.ngZone.run(() => {
     });
 
-    //remove previous selection
+    // remove previous selection
     this.boundingBoxSource.clear();
 
     if (this.isCoordinateValid(this.boundingBox.maxLat$.getValue(), this.boundingBox.maxLon$.getValue()) &&
@@ -68,11 +65,11 @@ export class BoundingBoxControl extends Control {
         this.currentSelectedCoordinates[1] == this.boundingBox.minLat$.getValue() &&
         this.currentSelectedCoordinates[2] == this.boundingBox.maxLon$.getValue() &&
         this.currentSelectedCoordinates[3] == this.boundingBox.maxLat$.getValue()) {
-        //if the coordinates are the same then no update is needed.
+        // if the coordinates are the same then no update is needed.
         return;
       }
 
-      let extent = boundingExtent([
+      const extent = boundingExtent([
         [this.boundingBox.minLon$.getValue(), this.boundingBox.minLat$.getValue()],
         [this.boundingBox.maxLon$.getValue(), this.boundingBox.maxLat$.getValue()]]);
 
@@ -86,7 +83,7 @@ export class BoundingBoxControl extends Control {
         ],
       ];
 
-      let bbox = new Polygon(boxCoordinates);
+      const bbox = new Polygon(boxCoordinates);
       bbox.transform('EPSG:4326', this.getMap().getView().getProjection().getCode());
       this.boundingBoxSource.addFeature(new Feature<Geometry>(bbox));
     }
@@ -106,9 +103,8 @@ export class BoundingBoxControl extends Control {
   }
 
   click() {
-
-    //if a draw action is in progress then just remove it from the map.
-    //this is basically cancel drawing
+    // if a draw action is in progress then just remove it from the map.
+    // this is basically cancel drawing
     if (this.bboxDraw != null) {
       this.getMap().removeInteraction(this.bboxDraw);
       this.bboxDraw = null;
@@ -123,48 +119,50 @@ export class BoundingBoxControl extends Control {
     // //remove previous selection from map
     this.boundingBoxSource.clear();
 
-    let geomFunction = createBox();
+    const geomFunction = createBox();
     this.bboxDraw = new Draw({
       source: this.boundingBoxSource,
-      type: GeometryType.CIRCLE,
+      type: 'Circle',
       geometryFunction: geomFunction,
     });
 
+    // GeometryType.CIRCLE
+
     this.getMap().addInteraction(this.bboxDraw);
     this.bboxDraw.on('drawend', evt => {
-      //the map uses EPSG:3857 projection while the backend expects the coordinates in EPSG:4326 which means first we need to transform
-      //the bounding box coordinates
+      // the map uses EPSG:3857 projection while the backend expects the coordinates in EPSG:4326 which means first we need to transform
+      // the bounding box coordinates
       this.currentSelectedCoordinates = transformExtent(evt.feature.getGeometry().getExtent(),
         this.getMap().getView().getProjection().getCode(),
         'EPSG:4326');
 
-      //then update the model.
-      if (!this.boundingBox.limited$.getValue()){
+      // then update the model.
+      if (!this.boundingBox.limited$.getValue()) {
         this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
         this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
         this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
         this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
-      } else{
+      } else {
         // checking if chosen coordinates do not exceed limitations
         let showAlert = false; // if true, the alert will be given that coordinates were adjusted to limitations
         if (this.currentSelectedCoordinates[0] > this.boundingBox.minLonLimit$.getValue()
-          && this.currentSelectedCoordinates[0] < this.boundingBox.maxLonLimit$.getValue()){
+          && this.currentSelectedCoordinates[0] < this.boundingBox.maxLonLimit$.getValue()) {
           this.boundingBox.minLon$.next(this.currentSelectedCoordinates[0]);
-        } else{
+        } else {
           this.boundingBox.minLon$.next(this.boundingBox.minLonLimit$.getValue());
           showAlert = true;
         }
 
         if (this.currentSelectedCoordinates[1] > this.boundingBox.minLatLimit$.getValue()
-          && this.currentSelectedCoordinates[1] < this.boundingBox.maxLatLimit$.getValue()){
+          && this.currentSelectedCoordinates[1] < this.boundingBox.maxLatLimit$.getValue()) {
           this.boundingBox.minLat$.next(this.currentSelectedCoordinates[1]);
-        } else{
+        } else {
           this.boundingBox.minLat$.next(this.boundingBox.minLatLimit$.getValue());
           showAlert = true;
         }
 
         if (this.currentSelectedCoordinates[2] < this.boundingBox.maxLonLimit$.getValue()
-          && this.currentSelectedCoordinates[2]  > this.boundingBox.minLonLimit$.getValue()){
+          && this.currentSelectedCoordinates[2] > this.boundingBox.minLonLimit$.getValue()) {
           this.boundingBox.maxLon$.next(this.currentSelectedCoordinates[2]);
         } else {
           this.boundingBox.maxLon$.next(this.boundingBox.maxLonLimit$.getValue());
@@ -172,13 +170,13 @@ export class BoundingBoxControl extends Control {
         }
 
         if (this.currentSelectedCoordinates[3] < this.boundingBox.maxLatLimit$.getValue()
-        && this.currentSelectedCoordinates[3] > this.boundingBox.minLatLimit$.getValue()){
+          && this.currentSelectedCoordinates[3] > this.boundingBox.minLatLimit$.getValue()) {
           this.boundingBox.maxLat$.next(this.currentSelectedCoordinates[3]);
         } else {
           this.boundingBox.maxLat$.next(this.boundingBox.maxLatLimit$.getValue());
           showAlert = true;
         }
-        if (showAlert){
+        if (showAlert) {
           // here I'm creating a new extent to create new geometry to set it to the current event
           const extent = boundingExtent([
             [this.boundingBox.minLon$.getValue(), this.boundingBox.minLat$.getValue()],

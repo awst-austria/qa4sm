@@ -4,6 +4,7 @@ import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {PasswordValidator} from '../../modules/user/password.validator';
+import {PasswordForm} from '../../modules/core/services/form-interfaces/password-forms';
 
 @Component({
   selector: 'qa-set-password',
@@ -12,10 +13,10 @@ import {PasswordValidator} from '../../modules/user/password.validator';
 })
 export class SetPasswordComponent implements OnInit {
   token: string;
-  setPasswordForm = new FormGroup({
-    password1: new FormControl('', [Validators.required]),
-    password2: new FormControl('', [Validators.required]),
-  }, (formGroup: FormGroup) => {
+  setPasswordForm = new FormGroup<PasswordForm>({
+    password1: new FormControl<string>('', [Validators.required]),
+    password2: new FormControl<string>('', [Validators.required]),
+  }, (formGroup: FormGroup<PasswordForm>) => {
     return PasswordValidator.validPasswordConfirmation(formGroup);
   });
   formErrors: any;

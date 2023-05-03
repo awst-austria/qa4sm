@@ -1,9 +1,9 @@
-<div class="p-grid p-mx-0">
-  <div class="p-col-12">
+<div class="grid mx-0">
+  <div class="col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center" style="width: 95%">
-          <h4 class="p-my-0 p-py-0 font-weight-normal">Result files</h4>
+          <h4 class="my-0 py-0 font-weight-normal">Result files</h4>
         </div>
       </ng-template>
       <ng-template pTemplate="icons">
@@ -11,28 +11,59 @@
       <div *ngIf="updatedMetrics$|async as metrics" style="min-height: 400px">
         <div *ngIf="metrics[metricIndx] && metrics[metricIndx].boxplotFiles|async as boxplots">
           <div *ngIf="metrics[metricIndx].overviewFiles|async as overviewPlots">
-            <div class="p-grid p-align-center">
-              <div *ngIf="boxplots.length > 0" [ngClass]="{'p-col-5': overviewPlots.length === 1, 'p-col-6': overviewPlots.length > 1}">
+            <div class="grid align-content-center">
+              <div *ngIf="boxplots.length > 0"
+                   [ngClass]="{'col-5': overviewPlots.length === 1, 'col-6': overviewPlots.length > 1}">
+                <p-galleria [value]="boxplots"
+                            [(visible)]="displayBoxplotGallery"
+                            [(activeIndex)]="activeBoxplotIndex"
+                            [circular]="true"
+                            [fullScreen]="true"
+                            [showItemNavigators]="boxplots.length > 1"
+                            [showThumbnails]="false"
+                            [baseZIndex]="100000">
+                  <ng-template pTemplate="item" let-item>
+                    <img [src]="sanitizePlotUrl(item.plot)"
+                         alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}"
+                         style="width: 100%;
+                             display: block;"/>
+                  </ng-template>
+                </p-galleria>
                 <img width="95%"
                      height="95%"
                      [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
-                     (click)="showGallery(boxplotIndx, boxplots)"
+                     (click)="showGallery(boxplotIndx, 'boxplot')"
                      [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
                      alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}">
               </div>
-              <div class="p-col">
-                <div class="p-grid">
+              <div class="col">
+                <div class="grid">
                   <div *ngFor="let plot of overviewPlots; let ind = index"
                        [ngClass]="{'image-container': true,
-                             'p-col': overviewPlots.length === 1,
-                             'p-col-10': overviewPlots.length === 2,
-                             'p-col-6': overviewPlots.length > 2}">
+                             'col': overviewPlots.length === 1,
+                             'col-10': overviewPlots.length === 2,
+                             'col-6': overviewPlots.length > 2}">
                     <span class="image-label">
                       {{metrics[metricIndx].datasets[ind]}}
                     </span>
+                    <p-galleria [value]="overviewPlots"
+                                [(visible)]="displayOverviewGallery"
+                                [(activeIndex)]="activeOverviewIndex"
+                                [circular]="true"
+                                [fullScreen]="true"
+                                [showItemNavigators]="overviewPlots.length > 1"
+                                [showThumbnails]="false"
+                                [baseZIndex]="100000">
+                      <ng-template pTemplate="item" let-item>
+                        <img [src]="sanitizePlotUrl(item.plot)"
+                             alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}"
+                             style="width: 100%;
+                             display: block;"/>
+                      </ng-template>
+                    </p-galleria>
                     <img width="95%" height="95%"
                          [src]="sanitizePlotUrl(plot.plot)"
-                         (click)="showGallery(ind, overviewPlots)"
+                         (click)="showGallery(ind, 'overview')"
                          [ngClass]="{'result-plot':true, 'pcol': true}"
                          alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}">
                   </div>
@@ -42,9 +73,9 @@
             </div>
 
           </div>
-          <div class="p-grid" *ngIf="boxplots.length > 1">
-            <div class="p-col-6">
-                  <span  class="p-float-label p-mb-4 p-mt-3">
+          <div class="grid" *ngIf="boxplots.length > 1">
+            <div class="col-6">
+                  <span class="p-float-label mb-4 mt-3">
                       <p-dropdown id="boxplotSelector"
                                   (onChange)="onBoxPlotChange($event)"
                                   [options]="metrics[metricIndx].boxplot_dicts"
@@ -56,9 +87,9 @@
                     </span>
             </div>
           </div>
-          <div [ngClass]="{'p-grid': true, 'p-pt-3': boxplots.length === 1}">
-            <div [ngClass]="{'p-col-6': true}">
-              <span class="p-float-label p-mb-4">
+          <div [ngClass]="{'grid': true, 'pt-3': boxplots.length === 1}">
+            <div [ngClass]="{'col-6': true}">
+              <span class="p-float-label mb-4">
                 <p-dropdown id="metricSelector"
                             (onChange)="onMetricChange($event)"
                             [options]="metrics"
@@ -69,7 +100,7 @@
                 <label for="metricSelector">Select boxplot/map metric</label>
               </span>
             </div>
-            <div class="p-col-3 px-0 center">
+            <div class="col-3 px-0 center">
               <button pButton
                       type="button"
                       icon="pi pi-download"
@@ -81,7 +112,7 @@
               </button>
             </div>
 
-            <div class="p-col-3 px-0 center">
+            <div class="col-3 px-0 center">
               <button pButton
                       type="button"
                       class="btn-action-large download-results"

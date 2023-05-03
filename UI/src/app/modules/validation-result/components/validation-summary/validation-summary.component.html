@@ -1,14 +1,14 @@
-<main class="p-grid p-mx-0">
-  <p-panel class="p-col-12 p-py-0 p-px-1"
+<main class="grid mx-0">
+  <p-panel class="col-12 py-0 px-1"
            [ngClass]="{'for-comparison-body': forComparison}">
     <ng-template *ngIf="forComparison" pTemplate="header">
       <div class="text-center" style="width:100%">
-        <h4 class="p-my-0 comparison-header">Description of validation {{validationRun.id}}</h4>
+        <h4 class="my-0 comparison-header">Description of validation {{validationRun.id}}</h4>
       </div>
     </ng-template>
     <ng-template *ngIf="!forComparison" pTemplate="header">
       <div class="text-center" style="width:100%">
-        <h4 class="p-my-0 font-weight-normal">
+        <h4 class="my-0 font-weight-normal">
           Summary:
           <span *ngIf="validationRun.is_unpublished && isOwner">
           <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{valName$|async}} </span>
@@ -50,12 +50,12 @@
           </span>
         </span>
           <span *ngIf="!validationRun.is_unpublished"
-                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
+                class="my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
           <span *ngIf="!isOwner && validationRun.is_unpublished"
-                class="p-my-0 font-weight-normal no_edit_name">{{valName$|async}}
+                class="my-0 font-weight-normal no_edit_name">{{valName$|async}}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
@@ -120,13 +120,13 @@
         </li>
 
 
-        <li *ngIf="validationRun.anomalies != 'none'; else elseAnomalies">
+        <li *ngIf="validationRun.anomalies !== 'none'; else elseAnomalies">
           Validation metrics calculated from anomalies
-          <span *ngIf="validationRun.anomalies == 'climatology'">
+          <span *ngIf="validationRun.anomalies === 'climatology'">
                 against climatology computed on years {{ validationRun.anomalies_from|date:"Y" }}
             through {{ validationRun.anomalies_to|date:"Y" }}.
               </span>
-          <span *ngIf="validationRun.anomalies == 'moving_avg_35_d'">
+          <span *ngIf="validationRun.anomalies === 'moving_avg_35_d'">
               against 35 day moving average.
               </span>
         </li>
@@ -145,7 +145,7 @@
           <span *ngIf="!validationRun.bootstrap_tcol_cis">deactivated. </span>
         </li>
 
-        <li *ngIf="validationRun.scaling_method != 'none'">Scaling reference:
+        <li *ngIf="validationRun.scaling_method !== 'none'">Scaling reference:
           <span *ngFor="let config of configurations">
                 <span *ngIf="config.id === validationRun.scaling_ref">
                   {{config.dataset}} ({{ config.version }}, {{ config.variable }})
@@ -177,14 +177,14 @@
             not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the 'Result files' section.
           </li>
         </ng-template>
-        <li *ngIf="!(isArchived$|async) && getCurrentUser() === validationRun.user  && !forComparison">
+        <li *ngIf="(isArchived$|async)===false && getCurrentUser() === validationRun.user  && !forComparison">
           <span *ngIf="isNearExpiry$|async">
             <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
             This validation will SOON be automatically removed during cleanup
             on {{ (expiryDate$|async)|date: dateFormat :timeZone}} {{timeZone}}.
           </span>
 
-          <span *ngIf="!(isNearExpiry$|async)">
+          <span *ngIf="(isNearExpiry$|async)===false">
             <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
             This validation will be automatically removed during cleanup
             on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{timeZone}}.

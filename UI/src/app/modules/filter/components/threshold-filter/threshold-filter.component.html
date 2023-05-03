@@ -1,12 +1,12 @@
-<div class="p-grid no-gutters" style="align-items: center">
-  <div class="p-col-11">
-    <div class="p-grid">
-      <div class="p-col-7 p-pt-3" *ngIf="filterModel$|async as filterModel">
+<div class="grid no-gutters" style="align-items: center">
+  <div class="col-11">
+    <div class="grid">
+      <div class="col-7 pt-3" *ngIf="filterModel$|async as filterModel">
         <p-checkbox label="{{filterModel.filterDto.description + ':'}}"
                     [binary]="true" [ngModel]="true" [readonly]=filterModel.filterDto.readonly class="readonly-filter-checkbox">
         </p-checkbox>
       </div>
-      <div class="p-col-4 p-mx-0 p-px-0 p-fluid">
+      <div class="col-4 mx-0 px-0 p-fluid">
         <p-inputNumber id="threshold_filter"
                        [minFractionDigits]="2"
                        [maxFractionDigits]="2"
@@ -21,7 +21,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="filterModel$|async as filterModel" [ngClass]="{'p-col-1': true}">
+  <div *ngIf="filterModel$|async as filterModel" [ngClass]="{'col-1': true}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
   </div>
 </div>

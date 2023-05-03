@@ -101,7 +101,8 @@ describe('DatasetComponent', () => {
         pretty_name: 'sm',
         help_text: '',
         min_value: 0.0,
-        max_value: 1.0}
+        max_value: 1.0,
+        unit: 'km'}
     ];
 
     getAllDatasetsSpy = datasetService.getAllDatasets.and.returnValue(of(testDatasets));

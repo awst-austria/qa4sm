@@ -1,5 +1,5 @@
-<div class="p-grid no-gutters">
-  <div class="p-col-11">
+<div class="grid no-gutters">
+  <div class="col-11">
     <p-checkbox [label]="filterModel.filterDto.description" [(ngModel)]="filterModel.enabled"
                 [disabled]="filterModel.readonly"
                 [readonly]=filterModel.filterDto.readonly
@@ -8,7 +8,7 @@
                 [ngClass]="{'readonly-filter-checkbox': filterModel.filterDto.readonly}"
     ></p-checkbox>
   </div>
-  <div [ngClass]="{'p-col-1': true, 'adjust-margin': isIncluded}">
+  <div [ngClass]="{'col-1': true, 'adjust-margin': isIncluded}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>
   </div>
 </div>

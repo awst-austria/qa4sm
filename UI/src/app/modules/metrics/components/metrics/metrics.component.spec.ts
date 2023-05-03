@@ -19,12 +19,13 @@ describe('MetricsComponent', () => {
     component = fixture.componentInstance;
     component.validationModel = {
       datasetConfigurations: [],
-      referenceConfigurations: [],
+      referenceConfigurations: null,
       spatialSubsetModel: null,
       validationPeriodModel: null,
       metrics: [],
       anomalies: null,
-      scalingModel: null,
+      temporalMatchingModel: null,
+      scalingMethod: null,
       nameTag$: new BehaviorSubject('')
     };
 

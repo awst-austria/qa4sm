@@ -1,13 +1,13 @@
-<div class="p-grid no-gutters">
+<div class="grid no-gutters">
   <div class="
-    p-col-12
-    p-md-10 p-md-offset-1
-    p-lg-10 p-lg-offset-1
-    p-xl-8 p-xl-offset-2">
-    <div class="p-grid" style="justify-content: center">
+    col-12
+    md:col-10 md:col-offset-1
+    lg:col-10 lg:col-offset-1
+    xl:col-8 xl:col-offset-2">
+    <div class="grid" style="justify-content: center">
 
       <!-- custom -->
-      <div *ngIf="!published" class="p-col-9 p-text-center">
+      <div *ngIf="!published" class="col-9 text-center">
         <h1>My validations</h1>
         <p *ngIf="!validations.length" class="lead text-muted">
           You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
@@ -16,7 +16,7 @@
       </div>
 
       <!-- published -->
-      <div *ngIf="published" class="p-col-9 p-text-center">
+      <div *ngIf="published" class="col-9 text-center">
         <h1>Published validations</h1>
         <p class="lead text-muted">
           The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/"
@@ -26,12 +26,12 @@
         </p>
       </div>
 
-      <div *ngIf="validations.length" class="p-col-9">
+      <div *ngIf="validations.length" class="col-9">
           <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
       </div>
 
       <!-- Rows -->
-      <div *ngIf="validations.length" class="p-col-9">
+      <div *ngIf="validations.length" class="col-9">
         <div *ngFor="let valrun of validations  | paginate :
         {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
 
@@ -42,7 +42,7 @@
         <pagination-template *ngIf="validations.length" #p="paginationApi"
                              (pageChange)="handlePageChange($event)">
 
-          <div class="p-text-center">
+          <div class="text-center">
             <ul class="custom-pagination custom-responsive custom-star-inserted justify-content-center"
                 aria-label="Pagination">
               <li class="pagination-previous" [class.disabled]="p.isFirstPage()">

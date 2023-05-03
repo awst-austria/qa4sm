@@ -24,13 +24,13 @@
           <sup *ngIf="dataset.not_as_reference">*</sup></th>
         <td [innerHTML]="dataset.detailed_description"></td>
         <td>
-          <ul class="p-pl-0 p-my-0">
-            <li *ngFor="let version of dataset.versions; let ind=index" class="p-ml-2">
+          <ul class="pl-0 my-0">
+            <li *ngFor="let version of dataset.versions; let ind=index" class="ml-2">
               <b> {{ version }}</b> <br>
-              <span *ngIf="dataset.versionsHelpText[ind] != '-' && dataset.versionsHelpText[ind] !=''">
+              <span *ngIf="dataset.versionsHelpText[ind] !== '-' && dataset.versionsHelpText[ind] !==''">
                 ({{ dataset.versionsHelpText[ind] }}) <br>
               </span>
-              <span *ngIf="dataset.versionsStart[ind] == '' && dataset.versionsEnd[ind] == ''; else elseTimeRange">
+              <span *ngIf="dataset.versionsStart[ind] === '' && dataset.versionsEnd[ind] === ''; else elseTimeRange">
                 Time coverage is station dependent
               </span>
               <ng-template #elseTimeRange>
@@ -43,8 +43,8 @@
         <td [innerHTML]="dataset.source_reference"></td>
         <td [innerHTML]="dataset.citation"></td>
         <td>
-          <ul class="p-pl-0  p-my-0">
-            <li *ngFor="let filter of dataset.filters; let ind = index" class="p-ml-2">
+          <ul class="pl-0  my-0">
+            <li *ngFor="let filter of dataset.filters; let ind = index" class="ml-2">
               {{filter}}: {{dataset.filtersHelpText[ind]}}
             </li>
           </ul>
@@ -54,5 +54,5 @@
     </table>
     <span><sup>*</sup> dataset temporarily excluded from the reference list for technical reasons<br> </span>
     <br>
-  <qa-scroll-to-top></qa-scroll-to-top>
+  <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>

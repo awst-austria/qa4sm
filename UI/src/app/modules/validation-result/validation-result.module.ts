@@ -5,7 +5,9 @@ import {PanelModule} from 'primeng/panel';
 import {TooltipModule} from 'primeng/tooltip';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgxPaginationModule} from 'ngx-pagination';
-import {ValidationPagePaginatedComponent} from './components/validation-page-paginated/validation-page-paginated.component';
+import {
+  ValidationPagePaginatedComponent
+} from './components/validation-page-paginated/validation-page-paginated.component';
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
@@ -20,6 +22,7 @@ import {NgDompurifyModule} from '@tinkoff/ng-dompurify';
 import {ButtonModule} from 'primeng/button';
 import {PublishingComponent} from './components/publishing/publishing.component';
 import {ExistingValidationComponent} from './components/existing-validation/existing-validation.component';
+import {GalleriaModule} from 'primeng/galleria';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -42,20 +45,21 @@ import {ExistingValidationComponent} from './components/existing-validation/exis
         PublishingComponent,
         ExistingValidationComponent,
     ],
-    imports: [
-        CommonModule,
-        PanelModule,
-        TooltipModule,
-        FontAwesomeModule,
-        NgxPaginationModule,
-        RouterModule,
-        DropdownModule,
-        FormsModule,
-        InputTextModule,
-        NgDompurifyModule,
-        ButtonModule,
-        ReactiveFormsModule
-    ]
+  imports: [
+    CommonModule,
+    PanelModule,
+    TooltipModule,
+    FontAwesomeModule,
+    NgxPaginationModule,
+    RouterModule,
+    DropdownModule,
+    FormsModule,
+    InputTextModule,
+    NgDompurifyModule,
+    ButtonModule,
+    ReactiveFormsModule,
+    GalleriaModule
+  ]
 })
 export class ValidationResultModule {
 }

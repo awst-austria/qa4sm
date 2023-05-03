@@ -1,10 +1,10 @@
-<div class="p-grid" id="sortingForm">
-  <div class="p-col-12 p-sm-2 p-px-0 p-mx-0">
+<div class="grid" id="sortingForm">
+  <div class="col-12 sm:col-2 px-0 mx-0">
     <div class="small-label">
       <span> Sort By:</span>
     </div>
   </div>
-  <div class="p-col-12 p-sm-5 p-px-0 p-mx-0">
+  <div class="col-12 sm:col-5 px-0 mx-0">
     <!--      <div class="box">-->
     <p-dropdown id="sortingChoiceSelector" (onChange)="onSortingChange()"
                 [options]="sortingChoicesModels"
@@ -14,7 +14,7 @@
     </p-dropdown>
     <!--      </div>-->
   </div>
-  <div class="p-col-12 p-sm-5 p-px-0 p-mx-0">
+  <div class="col-12 sm:col-5 px-0 mx-0">
     <div class="box">
       <p-dropdown id="orderSelector" (onChange)="onSortingChange()"
                   [options]="orderChoicesModels"

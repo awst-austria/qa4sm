@@ -3,7 +3,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ResultFilesComponent} from './result-files.component';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-import {Gallery} from 'angular-gallery';
 import {of} from 'rxjs';
 
 describe('ResultFilesComponent', () => {
@@ -36,7 +35,6 @@ describe('ResultFilesComponent', () => {
       providers: [
         {provide: ValidationrunService, useValue: validationServiceSpy},
         {provide: WebsiteGraphicsService, useValue: plotServiceSpy},
-        {provide: Gallery, useValue: galleryServiceSpy}
       ]
     })
       .compileComponents();
@@ -46,6 +44,11 @@ describe('ResultFilesComponent', () => {
     fixture = TestBed.createComponent(ResultFilesComponent);
     component = fixture.componentInstance;
     component.validation = {
+      temporal_reference_configuration: 1,
+      dataset_configurations: [1, 2],
+      scaling_reference_configuration: 1,
+      temporal_matching: 12,
+      bootstrap_tcol_cis: false,
       anomalies: 'none',
       anomalies_from: null,
       anomalies_to: null,

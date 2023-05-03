@@ -7,6 +7,7 @@ import {AuthService} from '../../core/services/auth/auth.service';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {ToastService} from '../../core/services/toast/toast.service';
+import {UserData} from '../../core/services/form-interfaces/UserDataForm';
 
 @Component({
   selector: 'qa-user-form',
@@ -14,7 +15,7 @@ import {ToastService} from '../../core/services/toast/toast.service';
   styleUrls: ['./user-form.component.scss']
 })
 export class UserFormComponent implements OnInit {
-  userForm = this.formBuilder.group({
+  userForm = this.formBuilder.group<UserData>({
       username: ['', [Validators.required, Validators.maxLength(150)]],
       password1: ['', [Validators.required]],
       password2: ['', [Validators.required]],

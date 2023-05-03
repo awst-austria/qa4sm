@@ -23,6 +23,7 @@ describe('ValidationrunRowComponent', () => {
         app_version: '1.6.0',
         expiry_period: '',
         warning_period: '',
+        temporal_matching_default: 12
       }
     };
     const datasetConfigServiceSpy = jasmine.createSpyObj('DatasetConfigurationService', ['getConfigByValidationrun']);
@@ -53,6 +54,11 @@ describe('ValidationrunRowComponent', () => {
     component = fixture.componentInstance;
     component.published = false;
     component.validationRun = {
+      temporal_reference_configuration: 1,
+      dataset_configurations: [1, 2],
+      scaling_reference_configuration: 1,
+      temporal_matching: 12,
+      bootstrap_tcol_cis: false,
         anomalies: 'none',
         anomalies_from: null,
         anomalies_to: null,

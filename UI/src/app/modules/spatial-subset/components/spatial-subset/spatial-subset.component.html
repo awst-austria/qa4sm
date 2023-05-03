@@ -6,20 +6,20 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid p-pt-1">
+  <div class="grid pt-1">
 
-    <div class="p-col-12 p-sm-5">
-      <div class="p-grid" id="lowerLeft">
-        <div class="p-col-12">
-          <div class="p-d-flex p-jc-center  p-pb-2">
+    <div class="col-12 sm:col-5">
+      <div class="grid" id="lowerLeft">
+        <div class="col-12">
+          <div class="d-flex justify-content-center  pb-2">
           </div>
         </div>
-        <div class="small-label p-col-4">
+        <div class="small-label col-4">
           <div class="p-fluid">
             <div pTooltip="Lower left bounding box corner">Lower left</div>
           </div>
         </div>
-        <div class="p-col-4 p-px-0 p-mx-0">
+        <div class="col-4 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label">
               <p-inputNumber id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
@@ -33,7 +33,7 @@
           </div>
 
         </div>
-        <div class="p-col-4  p-px-0 p-mx-0">
+        <div class="col-4  px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label ">
               <p-inputNumber id="minLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
@@ -50,28 +50,28 @@
     </div>
 
     <!--    Clear and map buttons-->
-    <div class="p-col-12 p-sm-2">
-      <div class="p-d-flex p-jc-center">
+    <div class="col-12 sm:col-2">
+      <div class="d-flex justify-content-center">
         <button pButton type="button" icon="pi pi-trash" pTooltip="Clear coordinates"
-                class="clearCoordinates p-button-info p-mr-2" style="padding: 0.2rem;"
+                class="clearCoordinates p-button-info mr-2" style="padding: 0.2rem;"
                 (click)="clearCoordinatesOrSetDefault()"></button>
       </div>
     </div>
 
     <!--    Upper right coordinates-->
-    <div class="p-col-12 p-sm-5">
-      <div class="p-grid" id="upperRight">
-        <div class="p-col-12">
-          <div class="p-d-flex p-jc-center p-pb-2">
+    <div class="col-12 sm:col-5">
+      <div class="grid" id="upperRight">
+        <div class="col-12">
+          <div class="d-flex justify-content-center pb-2">
 <!--            Upper right-->
           </div>
         </div>
-        <div class="small-label p-col-4">
+        <div class="small-label col-4">
           <div class="p-fluid">
             <div pTooltip="Upper right bounding box corner">Upper right</div>
           </div>
         </div>
-        <div class="p-col-4 p-mx-0 p-px-0">
+        <div class="col-4 mx-0 px-0">
           <div class="p-fluid">
             <div class="p-float-label ">
 
@@ -85,7 +85,7 @@
             </div>
           </div>
         </div>
-        <div class="p-col-4 p-px-0 p-mx-0">
+        <div class="col-4 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label ">
               <p-inputNumber id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"

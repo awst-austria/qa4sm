@@ -1,11 +1,11 @@
 <div class="center">
   <div>
     <div class="center">
-    <h1 *ngIf="!userData" class="h3 p-mb-3 font-weight-normal"> Sign up </h1>
-    <h1 *ngIf="userData" class="h3 p-mb-3 font-weight-normal">User profile</h1>
+    <h1 *ngIf="!userData" class="h3 mb-3 font-weight-normal"> Sign up </h1>
+    <h1 *ngIf="userData" class="h3 mb-3 font-weight-normal">User profile</h1>
     </div>
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="username" type="text" pInputText formControlName="username">
           <label for="username">Username</label>
@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="password" type="password" pInputText formControlName="password1" autocomplete="new-password">
           <label for="password">Password</label>
@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="password-confirm" type="password" pInputText formControlName="password2">
           <label for="password-confirm">Password confirmation</label>
@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="email" type="email" pInputText formControlName="email">
           <label for="email">Email address</label>
@@ -61,7 +61,7 @@
         </div>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="first-name" type="text" pInputText formControlName="first_name">
           <label for="first-name">First name (optional)</label>
@@ -71,7 +71,7 @@
         </span>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="last-name" type="text" pInputText formControlName="last_name">
           <label for="last-name">Last name (optional)</label>
@@ -81,7 +81,7 @@
         </span>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="organisation" type="text" pInputText formControlName="organisation">
           <label for="organisation">Organisation (optional)</label>
@@ -91,7 +91,7 @@
         </span>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <div class="p-float-label">
           <p-dropdown class="form-field"
                       [options]="countries$|async"
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <div class="p-py-3">
+      <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
           <label for="orcid">ORCID (optional)</label>
@@ -124,7 +124,7 @@
         </div>
       </div>
 
-      <div *ngIf="!userData" class="p-py-3" style="max-width: 15rem; line-height: 1.2rem">
+      <div *ngIf="!userData" class="py-3" style="max-width: 15rem; line-height: 1.2rem">
         <p-checkbox id="terms" formControlName="terms_consent"></p-checkbox>
         <label for="terms"> I accept the <a [routerLink]="['/terms']">terms, conditions and privacy policy</a>.</label>
       </div>

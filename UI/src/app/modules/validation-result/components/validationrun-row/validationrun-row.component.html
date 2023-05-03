@@ -2,16 +2,16 @@
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <h5 class="p-my-0"><span class="font-weight-normal">Name:</span> {{ valName$|async }}</h5>
+    <h5 class="my-0"><span class="font-weight-normal">Name:</span> {{ valName$|async }}</h5>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
-    <h5 class="p-my-0"> DOI: <a class="doilink" target="_blank"
+    <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
                                 href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
     </h5>
   </ng-template>
   <!--  CUSTOM    -->
   <ng-template *ngIf="!published" pTemplate="header">
-    <h5 class="p-my-0">
+    <h5 class="my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
           <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
@@ -52,13 +52,13 @@
     </h5>
   </ng-template>
   <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 15rem">
-    <h5 class="p-my-0">
+    <h5 class="my-0">
       <span *ngIf="hideElement"
             class=" font-weight-normal">
         Name: {{ valName$|async }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
-            class="p-my-0 font-weight-normal">
+            class="my-0 font-weight-normal">
         <span class="pi pi-question-circle help-icon"
               pTooltip="Validation has been published. There is no possibility of changing its name.">
         </span>
@@ -106,8 +106,8 @@
 
   <!-- Body -->
   <!-- Datasets -->
-  <div class="p-grid p-mx-0 p-px-0 p-my-0">
-    <div class="p-col">
+  <div class="grid mx-0 px-0 my-0">
+    <div class="col">
       <strong>Data:</strong><br/>
       <span *ngFor="let config of configurations">
         <span>
@@ -123,7 +123,7 @@
       </span>
     </div>
 <!--    &lt;!&ndash; Reference &ndash;&gt;-->
-<!--    <div class="p-col">-->
+<!--    <div class="col">-->
 <!--      <strong>Reference:</strong><br/>-->
 <!--      <span *ngFor="let config of configurations">-->
 <!--        <span *ngIf="config.id === validationRun.spatial_reference_configuration">-->
@@ -134,7 +134,7 @@
 <!--      </span>-->
 <!--    </div>-->
     <!-- Status / Created   -->
-    <div class="p-col status">
+    <div class="col status">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
@@ -148,7 +148,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="p-col-3" style="max-width: 10rem">
+    <div class="col-3" style="max-width: 10rem">
       <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"></qa-buttons>
     </div>
 
