@@ -15,7 +15,7 @@
     </div>
     <div>
       <div class="carousel-caption">
-        <div class="textbox p-mb-3">
+        <div class="textbox mb-3">
           <h1 class="carousel-desc">Quality Assurance for Soil Moisture</h1>
           <h3 class="carousel-desc d-sm-block">
             Validation of satellite soil moisture products <br>
@@ -30,7 +30,7 @@
                class="btn-action-home"
                role="button">
             </a>
-            <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
+            <span class="mx-3 carousel-desc  d-sm-inline">or</span>
             <a pButton
                label="Try it"
                routerLink="/validate"
@@ -47,14 +47,14 @@
                class="btn-action-home"
                role="button">
             </a>
-            <span class="p-mx-3 carousel-desc  d-sm-inline">or</span>
+            <span class="mx-3 carousel-desc  d-sm-inline">or</span>
             <a pButton
                label="Sign up"
                routerLink="/signup"
                class="btn-action-home"
                role="button">
             </a>
-            <span class="p-mx-3 carousel-desc d-sm-inline">or</span>
+            <span class="mx-3 carousel-desc d-sm-inline">or</span>
             <a pButton
                label="Log in"
                routerLink="/login"
@@ -71,8 +71,8 @@
   <!--  <hr class="featurette-divider">-->
 
 
-  <div class="container-marketing p-grid">
-    <div class="p-md-12">
+  <div class="container-marketing grid">
+    <div class="md:col-12">
       <div class="overflow">
         <div *ngFor="let logo of logoFiles">
           <a href="{{logo.link}}" target="_blank">
@@ -84,7 +84,7 @@
   </div>
   <hr class="featurette-divider">
   <div class="container-marketing p-grid">
-    <div class="p-md-7">
+    <div class="md:col-7">
       <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>
       The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:
       <ul class="list">
@@ -114,7 +114,7 @@
       If you have any questions or you would like to share your opinion with us, please email us at <b>support&nbsp;(at)&nbsp;qa4sm.eu.</b>
 
     </div>
-    <div class="p-md-5">
+    <div class="md:col-5">
       <div *ngIf="settings$|async as settings">
         <div class="card news card-body">
           <h5 class="card-title">News</h5>
@@ -134,7 +134,7 @@
 
   <hr class="featurette-divider">
 
-  <div class="container-marketing p-grid p-justify-center">
+  <div class="container-marketing grid  justify-content-center">
     <div class="card-deck">
       <div class="card card-body">
         <h4 class="text-center mt-0">Datasets and Settings</h4>
@@ -153,7 +153,7 @@
       </div>
 
       <div class="card card-body">
-        <h4 class="text-center p-mt-0">Results</h4>
+        <h4 class="text-center mt-0">Results</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">
           Provides a list of all validation results
         </p>
@@ -170,7 +170,7 @@
       </div>
 
       <div class="card card-body">
-        <h4 class="text-center p-mt-0">Download and Visualize</h4>
+        <h4 class="text-center mt-0">Download and Visualize</h4>
         <p class="text-muted text-center" style="min-height: 3rem;">
           Allows download of validation results in netCDF format and as graphics
         </p>

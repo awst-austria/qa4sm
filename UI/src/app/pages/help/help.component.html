@@ -1,5 +1,5 @@
 <main #helpPage>
-  <h1 class="h3 p-mb-3 font-weight-normal">Go to section</h1>
+  <h1 class="h3 mb-3 font-weight-normal">Go to section</h1>
   <p>
     <a routerLink="{{pageUrl}}" fragment="validation">Validate Page</a><br/>
     <a routerLink="{{pageUrl}}" fragment="results_list">My Validations - Results List Page</a><br/>
@@ -18,7 +18,7 @@
        [href]="settings[0].sum_link">User Manual</a>.
   </p>
 
-  <h1 id="validation" class="h3 p-mb-3 font-weight-normal">Validate Page</h1>
+  <h1 id="validation" class="h3 mb-3 font-weight-normal">Validate Page</h1>
 
   <p>
     The validate page is subdivided into areas for the various validation parameters. Each area has
@@ -26,8 +26,8 @@
     use the +/- icon to fold up or fold down the area.
   </p>
   <div>
-    <img alt="menu-minus" class="p-px-5 p-mx-5" [src]="menuMinus">
-    <img alt="menu-plus" class="p-px-5 p-mx-5" [src]="menuPlus">
+    <img alt="menu-minus" class="px-5 mx-5" [src]="menuMinus">
+    <img alt="menu-plus" class="px-5 mx-5" [src]="menuPlus">
   </div>
 
   <p>
@@ -124,7 +124,7 @@
     </li>
   </ul>
   <div>
-    <img alt="anomalies" class="scaled_image p-mb-3" [src]="anomalies">
+    <img alt="anomalies" class="scaled_image mb-3" [src]="anomalies">
   </div>
   <p>
     <b>Step 7 [optional]</b> - Chose the geographic area over which the validation should be performed. You can either
@@ -135,8 +135,8 @@
     If you don't specify an area, a global validation will be done.
   </p>
   <div>
-    <img alt="spatial subsetting" class="scaled_image p-mb-3" [src]="spatialSubsetting">
-    <img alt="map selection" class="scaled_image p-mb-3" [src]="mapSelection">
+    <img alt="spatial subsetting" class="scaled_image mb-3" [src]="spatialSubsetting">
+    <img alt="map selection" class="scaled_image mb-3" [src]="mapSelection">
   </div>
   <p>
     <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed and temporal matching
@@ -154,7 +154,7 @@
 
   </p>
   <div>
-    <img alt="validation period" class="scaled_image p-mb-3" [src]="temporalSubsetting">
+    <img alt="validation period" class="scaled_image mb-3" [src]="temporalSubsetting">
   </div>
   <p>
     <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC) and Bootstrapping Triple Collocation confidence
@@ -171,7 +171,7 @@
     validation time might be up to 5 times longer.
   </p>
   <div>
-    <img alt="triple collocation" class="scaled_image p-mb-3" [src]="tca">
+    <img alt="triple collocation" class="scaled_image mb-3" [src]="tca">
   </div>
 
   <p>
@@ -184,7 +184,7 @@
     Note that if the chosen method is 'No scaling', there is no scaling reference drop down list available.
   </p>
   <div>
-    <img alt="scaling" class="scaled_image p-mb-3" [src]="scaling">
+    <img alt="scaling" class="scaled_image mb-3" [src]="scaling">
   </div>
 
   <p>
@@ -192,7 +192,7 @@
     the list of all your validations.
   </p>
   <div>
-    <img alt="name your validation" class="scaled_image p-mb-3" [src]="nameYourValidation">
+    <img alt="name your validation" class="scaled_image mb-3" [src]="nameYourValidation">
   </div>
   <p>
     <b>Step 12</b> - Run the validation process. You'll be notified via e-mail once it's
@@ -204,13 +204,13 @@
   </div>
 
 
-  <h1 id="results_list" class="h3 p-mb-3 font-weight-normal">My Validations - Results List Page</h1>
+  <h1 id="results_list" class="h3 mb-3 font-weight-normal">My Validations - Results List Page</h1>
 
   <p>
     The list shows all your validations, including the currently running ones, sorted by date (latest first).
   </p>
   <div>
-    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">
+    <img alt="my validations" class="scaled_image mb-3" [src]="myValidations">
   </div>
 
   <p>
@@ -317,17 +317,17 @@
 
   </ul>
   <!--  <div>-->
-  <!--    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">-->
+  <!--    <img alt="my validations" class="scaled_image mb-3" [src]="myValidations">-->
   <!--  </div>-->
 
-  <h1 id="results" class="h3 p-mb-3 font-weight-normal">Validation Results Page</h1>
+  <h1 id="results" class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
 
   <p>
     Once the validation process is finished, you can see a summary of the validation run
     on the results page.
   </p>
   <div>
-    <img alt="results overview" class="scaled_image p-mb-3" [src]="resultsOverview">
+    <img alt="results overview" class="scaled_image mb-3" [src]="resultsOverview">
   </div>
   <p>
     The buttons at the bottom of the result overview have the following effects:
@@ -460,10 +460,10 @@
   </p>
 
   <div id="results_graph">
-    <img alt="results graphs" class="scaled_image p-mb-3" [src]="resultsGraphs">
+    <img alt="results graphs" class="scaled_image mb-3" [src]="resultsGraphs">
   </div>
 
-  <h2 id="publishing" class="h4 p-mb-3 font-weight-normal">Publishing</h2>
+  <h2 id="publishing" class="h4 mb-3 font-weight-normal">Publishing</h2>
 
   <p>
     This feature allows you to publish the result NetCDF file of your validation to
@@ -474,7 +474,7 @@
     which you can cite in your publications to give your readers open access to your data.
   </p>
   <div>
-    <img alt="publishing dialog" class="scaled_image p-mb-3" [src]="publishingDialog">
+    <img alt="publishing dialog" class="scaled_image mb-3" [src]="publishingDialog">
   </div>
 
   <p>
@@ -510,7 +510,7 @@
 
   </p>
 
-  <h1 id="published" class="h3 p-mb-3 font-weight-normal">Published Validations Page</h1>
+  <h1 id="published" class="h3 mb-3 font-weight-normal">Published Validations Page</h1>
 
   <p>
     The list shows validations on the QA4SM service that have been published to
@@ -522,7 +522,7 @@
   <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so
     at {{ this.getAdminMail() }}.</p>
 
-  <h1 id="comparison" class="h3 p-mb-3 font-weight-normal">Validation Comparison</h1>
+  <h1 id="comparison" class="h3 mb-3 font-weight-normal">Validation Comparison</h1>
 
   <p>
     With the QA4SM version 2.1 (and later) it is possible to compare existing validations that belong to the currently
@@ -543,7 +543,7 @@
     datasets’ switches on the ‘one validation’ comparison mode.
   </p>
   <div>
-    <img alt="datest-configuration" class="scaled_image p-mb-3" [src]="datsetConfigurationComparison">
+    <img alt="datest-configuration" class="scaled_image mb-3" [src]="datsetConfigurationComparison">
   </div>
   <p>
     The Validations selection component gets updated with every change of the reference dataset and shows validations
@@ -553,7 +553,7 @@
     appropriate validation from the list.
   </p>
   <div>
-    <img alt="validation-selection" class="scaled_image p-mb-3" [src]="validationSelectionsComparison">
+    <img alt="validation-selection" class="scaled_image mb-3" [src]="validationSelectionsComparison">
   </div>
   <p>
     In general it is possible to compare any two validations that have the same reference dataset.
@@ -562,7 +562,7 @@
     ‘Include all points...’ is disabled.
   </p>
   <div>
-    <img alt="spatial-extent" class="scaled_image p-mb-3" [src]="spatialExtentComparison">
+    <img alt="spatial-extent" class="scaled_image mb-3" [src]="spatialExtentComparison">
   </div>
   <p>
     The comparison is started by clicking the ‘Compare’ button. As a result users get four components:
@@ -614,7 +614,7 @@
     To upload your go to 'My datasets' page, by clicking proper button on the navigation bar.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="selectFile">
+    <img alt="select-file" class="scaled_image mb-3" [src]="selectFile">
   </div>
   <p>
     Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be
@@ -627,7 +627,7 @@
     space available for your files. In case you need more, please contact our team.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadFileWindow">
+    <img alt="select-file" class="scaled_image mb-3" [src]="uploadFileWindow">
   </div>
   <p>
     When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version
@@ -637,7 +637,7 @@
     If the display name is not provided, the basic name is going to be used.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="metadataWindow">
+    <img alt="select-file" class="scaled_image mb-3" [src]="metadataWindow">
   </div>
   <p>
     If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided
@@ -646,7 +646,7 @@
     'Upload file' button.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="chosenFile">
+    <img alt="select-file" class="scaled_image mb-3" [src]="chosenFile">
   </div>
   <p>
     Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a
@@ -655,7 +655,7 @@
     it still needs to be pre-processed.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadingSpinner">
+    <img alt="select-file" class="scaled_image mb-3" [src]="uploadingSpinner">
   </div>
   <p>
     When the file gets uploaded and preprocessed, there will show up a row with basic information on the uploaded file.
@@ -666,13 +666,13 @@
     hasn't been used for any validation.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" style="scale: 1.2" [src]="dataRow">
+    <img alt="select-file" class="scaled_image mb-3" style="scale: 1.2" [src]="dataRow">
   </div>
 
   <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown
     list. Your dataset will be there.</p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" style="scale: 0.9" [src]="userDataOnTheList">
+    <img alt="select-file" class="scaled_image mb-3" style="scale: 0.9" [src]="userDataOnTheList">
   </div>
   <p>
     Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation
