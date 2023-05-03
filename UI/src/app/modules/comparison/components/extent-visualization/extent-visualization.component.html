@@ -5,8 +5,8 @@
   <h4> Extent plot not available! </h4>
 </div>
 
-<div *ngIf="!showLoadingSpinner && ! errorHappened" class="p-grid no-gutters">
-  <div *ngIf="img == 'Raise message to check box', else noError" class="p-col-12">
+<div *ngIf="!showLoadingSpinner && ! errorHappened" class="grid no-gutters">
+  <div *ngIf="img === 'Raise message to check box', else noError" class="col-12">
     <p-panel>
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">
@@ -18,8 +18,8 @@
           <span class="p-panel-header-icon pi pi-exclamation-triangle help-icon"></span>
         </label>
       </ng-template>
-      <div class="p-col">
-        <div class="p-pb-3">The selected validations have a non-overlapping extent, which means that there are no
+      <div class="col">
+        <div class="pb-3">The selected validations have a non-overlapping extent, which means that there are no
           common validation points. If you wish to perform the comparison, check the 'Include all points from the
           selected validations' option in the 'Spatial extent' dialogue box and re-run the comparison. In this case
           a boxplot only will be shown, comparing the distribution of values in the two validations.
@@ -28,7 +28,7 @@
     </p-panel>
   </div>
   <ng-template #noError>
-    <div class="p-col-12">
+    <div class="col-12">
       <p-panel [toggleable]="true" [collapsed]="true">
         <ng-template pTemplate="header">
           <div class="text-center my-1" style="width: 92%">
@@ -43,8 +43,8 @@
           </label>
         </ng-template>
 
-        <div class="p-col">
-          <div class="p-pb-3">
+        <div class="col">
+          <div class="pb-3">
             {{ this.intersectionText ?
             "The comparison is performed by considering only the reference grid points that are in the common " +
             "spatial extent of the two validations, as specified in the 'Spatial extent' dialogue window. To include all " +
@@ -53,8 +53,8 @@
             "is the only option when the validations belong to the same run, e.g. multiple non-reference datasets)."
             }}
           </div>
-          <div class="p-grid center p-py-0">
-            <div class='p-col'>
+          <div class="grid center py-0">
+            <div class='col'>
               <p-image width="100%"
                        [src]="sanitizePlotUrl(img)"
                        [ngClass]="{'result-plot':true, 'pcol6': true}"
@@ -67,9 +67,9 @@
 
 
         <!--  buttons  -->
-        <div class="p-py-0">
+        <div class="py-0">
           <!--  Multiple file download  -->
-          <div class="p-py-0" style="text-align: right">
+          <div class="py-0" style="text-align: right">
             <a class="btn-action-large"
                pButton
                type="button"
