@@ -46,11 +46,11 @@
 
               <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
                 <qa-basic-filter
-                  [ngClass]="{'ml-1': isIncluded(filter.filterDto.id, item.basicFilters)}"
+                  [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
                   [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
                   [filterModel]="filter"
-                  (onExcludeMutual)="this.excludeFilter($event, item.basicFilters)"
-                  (onIncludeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
+                  (excludeMutual)="this.excludeFilter($event, item.basicFilters)"
+                  (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
                 </qa-basic-filter>
               </ng-container>
 
