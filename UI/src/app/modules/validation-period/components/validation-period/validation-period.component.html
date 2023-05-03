@@ -1,22 +1,22 @@
-<div class="p-grid p-pt-4">
-  <div class="p-col-12 text-center p-py-0 p-my-0">
-    <h4 class="p-py-0 p-my-0 text-muted">
+<div class="grid pt-4">
+  <div class="col-12 text-center py-0 my-0">
+    <h4 class="py-0 my-0 text-muted">
       Validation Period
-      <span class="pi pi-question-circle p-mb-1"
+      <span class="pi pi-question-circle mb-1"
             pTooltip="Restricts the input and reference data to the time period given. Days 'from' and 'to' are fully included in the interval. The dates are adapted to match the temporal coverage of the selected data sets."
             tooltipPosition="bottom">
       </span>
     </h4>
   </div>
-  <hr class="p-col-12 p-pt-0 p-mt-0 featurette-divider" style="max-width: 60rem">
-  <div class="p-col-12 p-sm-5">
-    <div class="p-grid" id="fromField">
-      <div class="small-label p-col-4">
+  <hr class="col-12 pt-0 mt-0 featurette-divider" style="max-width: 60rem">
+  <div class="col-12 sm-5">
+    <div class="grid" id="fromField">
+      <div class="small-label col-4">
         <div class="p-fluid">
           <div>From</div>
         </div>
       </div>
-      <div class="p-col-8 p-px-0 p-mx-0">
+      <div class="col-8 px-0 mx-0">
         <div class="p-fluid">
           <div class="p-float-label">
             <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
@@ -32,19 +32,19 @@
     </div>
   </div>
 
-  <div class="p-col-12 p-sm-2">
-    <div class="p-d-flex p-jc-center">
+  <div class="col-12 sm-2">
+    <div class="d-flex justify-content-center">
     </div>
   </div>
 
-  <div class="p-col-12 p-sm-5">
-    <div class="p-grid" id="toField">
-      <div class="small-label p-col-4">
+  <div class="col-12 sm-5">
+    <div class="grid" id="toField">
+      <div class="small-label col-4">
         <div class="p-fluid">
           <div>To</div>
         </div>
       </div>
-      <div class="p-col-8 p-px-0 p-mx-0">
+      <div class="col-8 px-0 mx-0">
         <div class="p-fluid">
           <div class="p-float-label">
             <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"

@@ -35,7 +35,7 @@
             (click)="archiveResults(validationRun.id, false)">
     </button>
 
-    <button *ngIf="!(isArchived$|async)"
+    <button *ngIf="(isArchived$|async)===false"
             pButton
             type="button"
             icon="faIcons.faArchive"
@@ -94,7 +94,7 @@
                 icon="pi pi-times"
                 (click)=deleteValidation(validationRun.id)>
         </button>
-        <button *ngIf="!(isArchived$|async)"
+        <button *ngIf="(isArchived$|async) === false"
                 pButton
                 type="button"
                 label="Extend Life Span"
@@ -128,7 +128,7 @@
             [life]="globals.tooltipLifetime"
             (click)="removeValidation(validationRun.id)">
     </button>
-    <button *ngIf="isLogged && !(isTrackedByTheUser$|async)"
+    <button *ngIf="isLogged && (isTrackedByTheUser$|async)===false"
             pButton
             type="button"
             icon="pi pi-plus"
@@ -174,7 +174,7 @@
 </div>
 
 <!--Buttons shown on the single validation page (both custom and published)-->
-<div *ngIf="!validationList && !(publishingInProgress$|async)" class="col-sm p-pb-4" style="text-align: right;">
+<div *ngIf="!validationList && (publishingInProgress$|async)===false" class="col-sm pb-4" style="text-align: right;">
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
     <button pButton
@@ -297,7 +297,7 @@
               (click)="removeValidation(validationRun.id)">
       </button>
 
-      <button *ngIf="isLogged && !(isTrackedByTheUser$|async) && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && (isTrackedByTheUser$|async)===false && !validationRun.is_unpublished"
               class="btn-action-large"
               pButton
               type="button"
@@ -311,6 +311,6 @@
     </div>
   </ng-template>
 </div>
-<div *ngIf="!validationList && (publishingInProgress$|async)" class="col-sm p-pb-4 text-muted" id="publishingInProgress">
+<div *ngIf="!validationList && (publishingInProgress$|async)" class="col-sm pb-4 text-muted" id="publishingInProgress">
   <span class="pi pi-spin pi-spinner"></span> <span> Publishing in progress... </span>
 </div>
