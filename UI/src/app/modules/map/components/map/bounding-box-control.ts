@@ -16,16 +16,8 @@ export class BoundingBoxControl extends Control {
   currentSelectedCoordinates: number[] = [null, null, null, null];
   ngZone: NgZone;
 
+  // constructor(private map: Map, private boundingBox: SpatialSubsetModel, private toastService: ToastService, ngZone?: NgZone)
   constructor(private map: Map, private boundingBox: SpatialSubsetModel, private toastService: ToastService, ngZone?: NgZone) {
-    super({});
-    this.ngZone = ngZone;
-    // Prepare Source and Layer for the bounding box drawn by the user
-    this.boundingBoxSource = new VectorSource({wrapX: false});
-    map.addLayer(new VectorLayer({
-      source: this.boundingBoxSource,
-    }));
-
-
     // This is the actual pencil icon shown in the top left corner of the map
     const button = document.createElement('button');
     button.type = 'button';
@@ -33,12 +25,18 @@ export class BoundingBoxControl extends Control {
     button.title = 'Select region';
 
     const element = document.createElement('div');
-    element.className = 'rotate-north ol-unselectable ol-control';
+    element.className = 'ol-control';
     element.appendChild(button);
-    Control.call(this, {
-      element
-    });
 
+    super({
+      element: element
+    });
+    this.ngZone = ngZone;
+    // Prepare Source and Layer for the bounding box drawn by the user
+    this.boundingBoxSource = new VectorSource({wrapX: false});
+    map.addLayer(new VectorLayer({
+      source: this.boundingBoxSource,
+    }));
 
     button.addEventListener('click', () => this.click());
 
