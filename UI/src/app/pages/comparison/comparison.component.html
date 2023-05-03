@@ -7,12 +7,12 @@
     </p>
   </div>
 
-  <div class="p-grid no-gutters">
+  <div class="grid no-gutters">
     <div class="
-    p-col-12
-    p-md-10 p-md-offset-1
-    p-lg-10 p-lg-offset-1
-    p-xl-8 p-xl-offset-2">
+    col-12
+    md:col-10 md:col-offset-1
+    lg:col-10 lg:col-offset-1
+    xl:col-8 xl:col-offset-2">
 
       <!--   validations selection   -->
       <qa-validation-selector></qa-validation-selector>
@@ -20,8 +20,8 @@
            style="max-width: 60rem;">
         <!--       summary of the selected comparison  -->
         <div *ngIf="showComparisonResults" class="comparison-result-container">
-          <div  class="p-text-center">
-            <h3 class="p-my-3">Validation comparison results</h3>
+          <div  class="text-center">
+            <h3 class="my-3">Validation comparison results</h3>
           </div>
           <qa-comparison-summary></qa-comparison-summary>
           <!--        visualize the validation extent-->
