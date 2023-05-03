@@ -1,7 +1,7 @@
-<div class="p-grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
+<div class="grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
   <div *ngIf="(authService.authenticated|async)===false"
-       class="p-col-12 alert center">
-    <h5 class="p-pt-2">
+       class="col-12 alert center">
+    <h5 class="pt-2">
       You are not logged in.
       You can check validation options, but cannot start a validation.
       <a [routerLink]="'/login'" class="mt-5">Click here</a> or on the Validate button
@@ -12,15 +12,15 @@
 
   </div>
   <div class="
-    p-col-12
-    p-md-10 p-md-offset-1
-    p-lg-10 p-lg-offset-1
-    p-xl-8 p-xl-offset-2">
+    col-12
+    md:col-10 md:col-offset-1
+    lg:col-10 lg:col-offset-1
+    xl:col-8 xl:col-offset-2">
 
-    <div *ngIf="!maintenanceMode" class="p-grid" style="justify-content: center">
+    <div *ngIf="!maintenanceMode" class="grid" style="justify-content: center">
 
       <!--  data column-->
-      <div class="p-md-5 p-col-10">
+      <div class="md:col-5 col-10">
 <!--        here toggleable is set to false, otherwise accordions won't close, that's a bug in primeng 15.4.1-->
         <p-panel header="Data" [toggleable]="false" class="validation-small-row">
           <ng-template pTemplate="icons">
@@ -84,7 +84,7 @@
                         (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
                         label="Remove dataset"
                         icon="pi pi-trash"
-                        class="removeDataset p-button-danger p-my-2"
+                        class="removeDataset p-button-danger my-2"
                         style="padding: 0.2rem;">
                 </button>
               </div>
@@ -96,7 +96,7 @@
                   label="Add dataset"
                   icon="pi pi-plus-circle"
                   (click)="addDatasetToValidate()"
-                  class="addDataset p-button-success p-my-2"
+                  class="addDataset p-button-success my-2"
                   style="padding: 0.2rem;"
                   [disabled]="addDatasetButtonDisabled()">
           </button>
@@ -105,7 +105,7 @@
       </div>
 
 
-      <div class="p-md-5 p-col-10">
+      <div class="md:col-5 col-10">
         <!--  reference column-->
         <p-panel header="Reference" [toggleable]="true" class="validation-small-row">
           <ng-template pTemplate="icons">
@@ -117,9 +117,9 @@
           </ng-template>
 
           <!--             spatial reference-->
-          <div class="p-pt-2">
+          <div class="pt-2">
             <label for="spatial-reference"
-                   class="p-mb-4"
+                   class="mb-4"
                    pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool, it has to be chosen as the spatial reference."
                    tooltipPosition="bottom">
               <span class="pi pi-question-circle"></span>
@@ -136,7 +136,7 @@
           <!--             temporal reference-->
           <div>
             <label for="temporal-reference"
-                   class="p-mb-4"
+                   class="mb-4"
                    pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
                    tooltipPosition="bottom">
               <span class="pi pi-question-circle"></span>
@@ -156,7 +156,7 @@
 
         <!--      Scaling-->
         <!--        <p-panel header="Reference" [toggleable]="true" class="validation-small-row">-->
-        <!--          <div class="p-col-10">-->
+        <!--          <div class="col-10">-->
         <qa-scaling
           [validationModel]="validationModel"
           (hoverOverDataset)="onHoverOverReferenceDataset($event)"
@@ -168,7 +168,7 @@
       </div>
 
       <!--      Map-->
-      <div class="p-col-10">
+      <div class="col-10">
         <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel" collapsed="true" class="validation-row">
           <qa-map class="map" #qwerty
                   [spatialSubset]="validationModel.spatialSubsetModel"
@@ -179,12 +179,12 @@
       </div>
 
       <!--      Spatial subsetting-->
-      <div class="p-col-10">
+      <div class="col-10">
         <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
       </div>
 
 
-      <p-panel header="Temporal Subsetting" [toggleable]="true" class="validation-row p-col-10">
+      <p-panel header="Temporal Subsetting" [toggleable]="true" class="validation-row col-10">
         <ng-template pTemplate="icons">
           <label class="p-panel-header-icon"
                  pTooltip="Select validation period and temporal matching window."
@@ -206,28 +206,28 @@
 
 
       <!--      Metrics-->
-      <div class="p-col-10">
+      <div class="col-10">
         <qa-metrics [validationModel]="validationModel"></qa-metrics>
       </div>
 
 
       <!--      Anomalies-->
-      <div class="p-col-10">
+      <div class="col-10">
         <qa-anomalies [anomaliesModel]="validationModel.anomalies"></qa-anomalies>
       </div>
 
       <!--      &lt;!&ndash;      Scaling&ndash;&gt;-->
-      <!--      <div class="p-col-10">-->
+      <!--      <div class="col-10">-->
       <!--        <qa-scaling [validationModel]="validationModel"></qa-scaling>-->
       <!--      </div>-->
 
       <!-- Name -->
-      <div class="p-col-10">
-        <div class="p-grid p-px-2">
-            <span class="label p-col-1">
+      <div class="col-10">
+        <div class="grid px-2">
+            <span class="label col-1">
               <label for="name">Name your validation</label>
             </span>
-          <input class="form-field p-col"
+          <input class="form-field col"
                  id="name"
                  type="text"
                  pInputText
@@ -235,14 +235,14 @@
                  (ngModelChange)="validationModel.nameTag$.next($event)">
           <span
             pTooltip="You can optionally name the validation to make it easier to identify in your list of validations."
-            class="pi pi-question-circle p-col-1 help-field">
+            class="pi pi-question-circle col-1 help-field">
           </span>
         </div>
       </div>
 
-      <div class="p-col-10">
+      <div class="col-10">
         <div>
-          <div class="p-d-flex p-jc-center">
+          <div class="d-flex justify-content-center">
             <span
               pTooltip="{{disableValidateButton(validationModel) ? 'You can not start a validation, because one of the chosen dataset has no variable assigned.' : ''}}">
               <p-button

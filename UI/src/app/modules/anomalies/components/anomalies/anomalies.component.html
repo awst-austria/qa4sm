@@ -6,15 +6,15 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="p-grid p-pt-4" style="justify-content: center">
-    <div class="p-col-12 p-sm-4">
-      <div class="p-grid" id="method">
-        <div class="small-label p-col-4">
+  <div class="grid pt-4" style="justify-content: center">
+    <div class="col-12 sm:col-4">
+      <div class="grid" id="method">
+        <div class="small-label col-4">
           <div class="p-fluid">
             <div>Method</div>
           </div>
         </div>
-        <div class="p-col-7 p-px-0">
+        <div class="col-7 px-0">
           <div class="p-float-label">
             <p-dropdown id="anomaliesMethodSelector"
                         [options]="availableAnomalyMethodModels"
@@ -26,8 +26,8 @@
         </div>
       </div>
     </div>
-    <div class="p-col-12 p-sm-8">
-      <qa-anom-climatology *ngIf="((selectedMethod$|async).method$|async)==anomaliesClimatology"
+    <div class="col-12 sm:col-8">
+      <qa-anom-climatology *ngIf="((selectedMethod$|async).method$|async)===anomaliesClimatology"
                            [anomaliesModel]="anomaliesModel"></qa-anom-climatology>
     </div>
   </div>
