@@ -18,7 +18,7 @@ django-widget-tweaks
 psycopg2-binary
 pytest-cov
 pytest-mpl
-celery==4.1.1
+celery==5.2.2
 celery[redis]
 gldas>=0.5
 smap-io>=0.3
