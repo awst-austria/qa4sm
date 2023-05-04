@@ -63,6 +63,12 @@ def get_dataset_info_by_user(user=None):
             version_names.append(version.short_name)
         dataset_counts.append(version_counts)
         dataset_versions.append(version_names)
+
+    dataset_names.append('User data')
+    user_datasets = Dataset.objects.exclude(user=None)
+    dataset_versions.append([f'{user_dataset.pretty_name}/{user_dataset.user.username}' for user_dataset in user_datasets])
+    dataset_counts.append([user_dataset.dataset_configurations.count() for user_dataset in user_datasets])
+
     dataset_dict = {'datasets': dataset_names,
                     'versions': dataset_versions,
                     'dataset_count': dataset_counts}
