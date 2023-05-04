@@ -4,6 +4,7 @@ import {ModalWindowService} from '../../../core/services/global/modal-window.ser
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
+import {PublishingForm} from '../../../core/services/form-interfaces/publishing-form';
 
 @Component({
   selector: 'qa-publishing',
@@ -16,7 +17,7 @@ export class PublishingComponent implements OnInit {
   publishingInProgress$: Observable<boolean>;
   @Input() validationId: string;
 
-  publishingForm = this.formBuilder.group({
+  publishingForm = this.formBuilder.group<PublishingForm>({
     title: ['', [Validators.required]],
     description: ['', [Validators.required]],
     keywords: ['', [Validators.required]],

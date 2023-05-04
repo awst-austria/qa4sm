@@ -6,7 +6,7 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
   styleUrls: ['./user-data-guidelines.component.scss']
 })
 export class UserDataGuidelinesComponent implements OnInit {
-
+  public pageUrl = '/user-data-guidelines';
   constructor() { }
   @ViewChild('userDataHelpPage') container: ElementRef<HTMLElement>;
 

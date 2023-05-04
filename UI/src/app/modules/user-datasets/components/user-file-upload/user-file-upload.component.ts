@@ -7,9 +7,9 @@ import {finalize} from 'rxjs/operators';
 import {HttpEventType} from '@angular/common/http';
 import {allowedNameValidator} from '../../services/allowed-name.directive';
 import * as uuid from 'uuid';
-// @ts-ignore
-import JSZip from 'jszip';
+import * as JSZip from 'jszip';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {UserFileMetadata} from '../../../core/services/form-interfaces/UserFileMetadataForm';
 
 @Component({
   selector: 'qa-user-file-upload',
@@ -31,7 +31,7 @@ export class UserFileUploadComponent implements OnInit {
   allowedExtensions = ['.zip', '.nc', '.nc4'];
 
   // dataset file form
-  metadataForm = this.formBuilder.group({
+  metadataForm = this.formBuilder.group<UserFileMetadata>({
     dataset_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
     dataset_pretty_name: [null, [Validators.maxLength(30), allowedNameValidator(true)]],
     version_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
@@ -48,9 +48,8 @@ export class UserFileUploadComponent implements OnInit {
   }
 
   private verifyZipContent(): void {
-    const zip = new JSZip();
+    const zip = new JSZip.default();
     zip.loadAsync(this.file).then(contents => {
-      console.log(contents.files);
       const files = Object.keys(contents.files).filter(key =>
         !['nc', 'nc4', 'csv', 'yml'].includes(key.split('.').reverse()[0]) && !contents.files[key].dir);
       if (files.length !== 0) {
@@ -112,7 +111,7 @@ export class UserFileUploadComponent implements OnInit {
         },
         () => {
           this.spinnerVisible = false;
-          this.metadataForm.reset('');
+          this.metadataForm.reset(null);
         }
       );
     }

@@ -1,5 +1,5 @@
 <ng-container *ngIf="display$ | async as display">
-  <div class="form-background" [class.open]="display === 'open' && !(publishingInProgress$|async)" (click)="close()">
+  <div class="form-background" [class.open]="display === 'open' && (publishingInProgress$|async)===false" (click)="close()">
     <p-panel class="publishing-form" (click)="$event.stopPropagation()">
       <ng-template pTemplate="header">
         <h4 class="my-0 font-weight-normal" id="publishDialogTitle">Publish results</h4>
@@ -10,50 +10,50 @@
                 (click)="close()"><b>X</b>
         </button>
       </ng-template>
-      <div class="p-px-0 p-py-0">
-        <p class="p-my-0">
+      <div class="px-0 py-0">
+        <p class="my-0">
           Please check the metadata your results will be published with. <br/>
           If you want to permanently set your author details, you can do so on your <a routerLink="/user-profile">profile
           page</a>.
         </p>
       </div>
       <form [formGroup]="publishingForm" (ngSubmit)="publish()">
-        <div class="p-pt-3 p-pb-2 p-grid">
-          <span class="label p-col-2">
+        <div class="pt-3 pb-2 grid">
+          <span class="label col-2">
             <label for="title">Title</label>
           </span>
-          <textarea class="form-field p-col"
+          <textarea class="form-field col"
                     id="title"
                     type="text"
                     pInputText
                     formControlName="title">
           </textarea>
           <span pTooltip="Title of the Zenodo entry"
-                class="pi pi-question-circle p-col-1 help-field">
+                class="pi pi-question-circle col-1 help-field">
           </span>
         </div>
 
-        <div class="p-py-2 p-grid">
-          <span class="label p-col-2">
+        <div class="py-2 grid">
+          <span class="label col-2">
             <label for="description">Description</label>
           </span>
-          <textarea class="form-field p-col"
+          <textarea class="form-field col"
                     id="description"
                     type="text"
                     pInputText
                     formControlName="description">
           </textarea>
           <span pTooltip="Description of the Zenodo entry"
-                class="pi pi-question-circle p-col-1 help-field">
+                class="pi pi-question-circle col-1 help-field">
           </span>
         </div>
 
-        <div class="p-py-2 p-grid">
-          <span class="label p-col-2">
+        <div class="py-2 grid">
+          <span class="label col-2">
             <label for="keywords">Keywords</label>
           </span>
           <textarea
-            class="form-field p-col"
+            class="form-field col"
             id="keywords"
             type="text"
             pInputText
@@ -61,7 +61,7 @@
           </textarea>
           <span
             pTooltip="Comma-separated list of keywords to make your results easily searchable; must contain keyword 'qa4sm'"
-            class="pi pi-question-circle p-col-1 help-field">
+            class="pi pi-question-circle col-1 help-field">
           </span>
         </div>
         <div *ngIf="formErrors && formErrors.keywords"
@@ -70,34 +70,34 @@
         </div>
 
 
-        <div class="p-py-2 p-grid">
-        <span class="label p-col-2">
+        <div class="py-2 grid">
+        <span class="label col-2">
           <label for="name">Name</label>
         </span>
-          <input class="form-field p-col" id="name" type="text" pInputText formControlName="name">
+          <input class="form-field col" id="name" type="text" pInputText formControlName="name">
           <span pTooltip="Your name; format: Lastname, Firstnames"
-                class="pi pi-question-circle p-col-1 help-field">
+                class="pi pi-question-circle col-1 help-field">
           </span>
 
         </div>
 
-        <div class="p-py-2 p-grid">
-        <span class="label p-col-2">
+        <div class="py-2 grid">
+        <span class="label col-2">
           <label for="affiliation">Affiliation</label>
         </span>
-          <input class="form-field p-col" id="affiliation" type="text" pInputText formControlName="affiliation">
+          <input class="form-field col" id="affiliation" type="text" pInputText formControlName="affiliation">
           <span pTooltip="Your organisation or other affiation, optional"
-                class="pi pi-question-circle p-col-1 help-field">
+                class="pi pi-question-circle col-1 help-field">
           </span>
         </div>
 
-        <div class="p-pt-2 p-mb-3 p-grid">
-        <span class="label p-col-2">
+        <div class="pt-2 mb-3 grid">
+        <span class="label col-2">
           <label for="orcid">ORCID</label>
         </span>
-          <input class="form-field p-col" id="orcid" type="text" pInputText formControlName="orcid">
+          <input class="form-field col" id="orcid" type="text" pInputText formControlName="orcid">
           <span pTooltip="Your personal ORCID id, optional"
-                class="pi pi-question-circle p-col-1 help-field">
+                class="pi pi-question-circle col-1 help-field">
           </span>
 
         </div>

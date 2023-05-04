@@ -54,8 +54,6 @@ import {
 } from './modules/temporal-matching/components/temporal-matching/temporal-matching.component';
 import {TemporalMatchingModule} from './modules/temporal-matching/temporal-matching.module';
 import {HelpComponent} from './pages/help/help.component';
-import {IvyGalleryModule} from 'angular-gallery';
-import {NgxPageScrollModule} from 'ngx-page-scroll';
 import {CoreModule} from './modules/core/core.module';
 import {SignupComponent} from './pages/signup/signup.component';
 import {UserModule} from './modules/user/user.module';
@@ -75,6 +73,8 @@ import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-dat
 import {DialogModule} from 'primeng/dialog';
 import {LoginPageComponent} from './pages/login-page/login-page.component';
 import {ProgressBarModule} from 'primeng/progressbar';
+import {ImageModule} from 'primeng/image';
+import {ScrollTopModule} from 'primeng/scrolltop';
 
 @NgModule({
   declarations: [
@@ -137,8 +137,6 @@ import {ProgressBarModule} from 'primeng/progressbar';
         NgxPaginationModule,
         MapModule,
         ComparisonModule,
-        IvyGalleryModule,
-        NgxPageScrollModule,
         CoreModule,
         UserModule,
         InputNumberModule,
@@ -146,6 +144,8 @@ import {ProgressBarModule} from 'primeng/progressbar';
         ValidationReferenceModule,
         DialogModule,
         ProgressBarModule,
+        ImageModule,
+        ScrollTopModule,
     ],
   providers: [
     {

@@ -1,12 +1,12 @@
 <main #userDataHelpPage>
-  <h1 class="h4 p-mb-3 font-weight-normal">Go to section</h1>
+  <h1 class="h4 mb-3 font-weight-normal">Go to section</h1>
   <p>
-    <a pageScroll="" [pageScrollDuration]="1" href="#ncstack">Option 1: NetCDF4 Image Stacks</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#csvfiles">Option 2: CSV Time Series Files</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#examplefiles">Example Files</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="ncstack">Option 1: NetCDF4 Image Stacks</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="csvfiles">Option 2: CSV Time Series Files</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="examplefiles">Example Files</a><br/>
   </p>
 
-  <h1 id="intro" class="h1 p-mb-3 font-weight-normal">User Data Upload</h1>
+  <h1 id="intro" class="h1 mb-3 font-weight-normal">User Data Upload</h1>
 
   <p>
     With this new, experimental feature we allow users to ingest (parts of) their own data sets into QA4SM for
@@ -60,7 +60,8 @@
     QA4SM supports image stacks in NetCDF4 format only. NetCDF is the most common format for climate data records and
     detailed CF conventions to create those files exist
     (<a target="_blank" href="https://cfconventions.org/cf-conventions/cf-conventions">available here</a>).
-    In general we use the python library <a target="_blank" href="https://xarray.dev/">xarray</a> to open netCDF files. If your data is
+    In general we use the python library <a target="_blank" href="https://xarray.dev/">xarray</a> to open netCDF files.
+    If your data is
     compatible with xarray, there are only a few more things to consider.
   </p>
   <ul>
@@ -81,7 +82,7 @@
     <li>
       Only 'coordinate data', i.e. 3-dimensional raster data, are supported as netCDF validation input.
       As data variables must be 3-dimensional, 1 coordinate variable for each dimension (latitude, longitude, time) must
-      be present in the file (see <a pageScroll="" [pageScrollDuration]="1" href="#ncdims">this section</a>).
+      be present in the file (see <a routerLink="{{pageUrl}}" fragment="ncdims">this section</a>).
     </li>
     <li>
       Latitude and Longitude coordinates assigned to soil moisture observations must always refer to the WGS84 reference
@@ -107,7 +108,7 @@
       contain the coordinate values directly (148 longitude values in the following example).
       The coordinates along the two axes then span a 2-dimension grid that contains the information on the location of
       all points. The longitude variable is structured accordingly.
-      <table class="p-my-4 variable-table">
+      <table class="my-4 variable-table">
         <tr>
           <td><b>Variable</b></td>
           <td colspan="2">lat</td>
@@ -214,7 +215,8 @@
   <p>
     Time coordinates are stored as numeric timestamps. The variable must therefore have a unit attribute assigned like
     <b>&lt;UNIT&gt; since &lt;REF DATE&gt;</b>, e.g. 'Days since 2000-01-01T00:00:00+00:00'
-    (see also the <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate">CF conventions</a>).
+    (see also the <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate">CF
+    conventions</a>).
     If multiple potential time variables are found, the variable with attribute 'axis: T', the 'standard_name: time' or
     the variable name 'time' identify the time coordinate variable.
     A calendar name should be specified in the attributes but is not required (assumes 'calendar: standard', i.e. mixed
@@ -266,7 +268,8 @@
     <li>
       Compression and packing is handled by xarray and controlled by (optional) variable encoding attributes
       'add_offset', 'scale_factor', 'zlib' and 'complevel'. For more details on compressing netCDF files see
-      <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#_reduction_of_dataset_size">this chapter</a> in
+      <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#_reduction_of_dataset_size">this
+        chapter</a> in
       the CF conventions.
     </li>
     <li>
@@ -281,7 +284,8 @@
     <li>
       Data variables in the file should have a 'long_name' and/or 'standard_name' attribute. The name given under
       'long_name' will be used in plots. If no 'long_name' is given, but a 'standard_name'
-      (see <a target="_blank" href="http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html">this
+      (see <a target="_blank"
+              href="http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html">this
       table</a> for all possible standard names),
       this will be used. If neither 'long_name' nor 'standard_name' attributes exist, the variable name will be used
       directly.
@@ -347,27 +351,29 @@
     </li>
     <li>
       A date index column in a format that dateutil can parse (see <a target="_blank"
-      href="https://dateutil.readthedocs.io/en/stable/parser.html">here</a> for more info).
+                                                                      href="https://dateutil.readthedocs.io/en/stable/parser.html">here</a>
+      for more info).
     </li>
     <li>
       A variable number of data columns (same number of columns for all files).
     </li>
   </ul>
   <p>
-  Below is an example for the contents of a single csv time series file containing values for one soil moisture variable:
+    Below is an example for the contents of a single csv time series file containing values for one soil moisture
+    variable:
   </p>
   <div class="yml">
-      Time,SM<br>
-      01-Jun-2016 01:30:07,0.18278<br>
-      02-Jun-2016 00:51:39,0.2003<br>
-      02-Jun-2016 12:08:07,0.181<br>
-      04-Jun-2016 01:13:32,0.22323<br>
-      &nbsp;&#8942;<br>
+    Time,SM<br>
+    01-Jun-2016 01:30:07,0.18278<br>
+    02-Jun-2016 00:51:39,0.2003<br>
+    02-Jun-2016 12:08:07,0.181<br>
+    04-Jun-2016 01:13:32,0.22323<br>
+    &nbsp;&#8942;<br>
   </div>
 
   <p>
     To test whether a file complies with the required format, you can try to read it in python with <a target="_blank"
-    href="https://pandas.pydata.org/">pandas</a>.
+                                                                                                       href="https://pandas.pydata.org/">pandas</a>.
     <b>&lt;FNAME&gt;</b> refers to the location of the CSV file in the following example:
   </p>
   <div><i>pandas.read_csv(<b>&lt;FNAME&gt;</b>, index_col=0, parse_dates=True)</i></div>
@@ -400,6 +406,6 @@
   Example files that fulfill the above described requirements to various degrees can be downloaded from
   <a target="_blank" href="https://github.com/awst-austria/qa4sm-testdata/tree/master/user_data">this GitHub package</a>.
 
-  <qa-scroll-to-top></qa-scroll-to-top>
+  <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>
 

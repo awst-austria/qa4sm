@@ -75,6 +75,11 @@ describe('ValidationSummaryComponent', () => {
     component = fixture.componentInstance;
     component.validationModel = {
       validationRun: of({
+        temporal_reference_configuration: 1,
+        dataset_configurations: [1, 2],
+        scaling_reference_configuration: 1,
+        temporal_matching: 12,
+        bootstrap_tcol_cis: false,
         anomalies: 'none',
         anomalies_from: null,
         anomalies_to: null,
@@ -110,7 +115,6 @@ describe('ValidationSummaryComponent', () => {
         tcol: false,
         total_points: 0,
         user: 1,
-        bootstrap_tcol_cis: false
       }),
       datasetConfigs: of([])
     };

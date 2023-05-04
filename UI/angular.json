@@ -32,10 +32,10 @@
             ],
             "styles": [
               "node_modules/primeicons/primeicons.css",
+              "node_modules/primeng/resources/themes/lara-light-blue/theme.css",
               "node_modules/primeng/resources/primeng.min.css",
               "node_modules/primeflex/primeflex.css",
               "src/styles.scss"
-
             ],
             "scripts": []
           },
@@ -105,8 +105,12 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ],
             "tsConfig": [
               "tsconfig.app.json",
               "tsconfig.spec.json",
@@ -131,6 +135,11 @@
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   },
   "defaultProject": "UI"
 }

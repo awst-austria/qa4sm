@@ -1,9 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import "primeng-style";
-@import "~ol/ol.css";
 @import "style.variables";
-// Do not add bootstrap here because it interferes with primeng. Add it to the component's scss file where you want to use it.
-//@import "~bootstrap/dist/css/bootstrap.css";
+@import "ol/ol.css";
 
 main {
   text-align: left;
@@ -498,6 +496,15 @@ img {
 
 .featurette-divider {
   max-width: 80rem;
+}
+
+.scroll-button {
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  outline: none;
+  opacity: 70%;
 }
 
 

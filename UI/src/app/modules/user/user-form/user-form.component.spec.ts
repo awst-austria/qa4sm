@@ -53,7 +53,10 @@ describe('UserFormComponent', () => {
       last_name: '',
       organisation: '',
       country: '',
-      orcid: ''
+      orcid: '',
+      space_limit: null,
+      space_limit_value: null,
+      space_left: null
     };
     component.selectedCountry = {
       code: '',

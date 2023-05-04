@@ -1,16 +1,16 @@
-<div class="p-grid">
-  <div class="p-col-12">
-    <div class="p-grid">
-      <div class="p-col-4">
+<div class="grid">
+  <div class="col-12">
+    <div class="grid">
+      <div class="col-4">
         <!--        this one here is to add the grid structure -->
       </div>
-      <div class="p-col-2 p-sm-2">
+      <div class="col-2 sm:col-2">
         <input type="file" class="file-input"
                [accept]="allowedExtensions.join(',')"
                (change)="onFileSelected($event)" #fileUpload>
         <span class="label-button">{{file ? file.name : "No file chosen yet."}}</span>
       </div>
-      <div class="p-col-2 p-sm-1">
+      <div class="col-2 sm:col-1">
         <div class="p-fluid">
           <button pButton
                   label="Select file"
@@ -20,7 +20,7 @@
           </button>
         </div>
       </div>
-      <div class="p-col-2 p-sm-1">
+      <div class="col-2 sm:col-1">
         <div class="p-fluid">
           <button pButton
                   [disabled]="!file || !metadataForm.valid"
@@ -35,13 +35,13 @@
 </div>
 
 <p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible">
-  <div class="p-pb-3 p-pl-0">
+  <div class="pb-3 pl-0">
     You can upload your own data using this form. Please follow this file
     <a target="_blank" [routerLink]="['/user-data-guidelines']">standard</a>
   </div>
-  <div class="p-grid" style="display: flex">
+  <div class="grid" style="display: flex">
 
-    <div class="center p-col-12 p-pb-0 p-pr-3">
+    <div class="center col-12 pb-0 pr-3">
       <div
         [ngClass]="{'form-field' : true, 'warning': isFileTooBig}"
       >
@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <div class="center p-col-12 p-pt-1 p-pr-4">
+    <div class="center col-12 pt-1 pr-4">
       <div class="form-field">
         <button pButton
                 [label]="file ? 'Change file' :'Add file'"
@@ -59,9 +59,9 @@
       </div>
     </div>
 
-    <div class="center p-col-12">
+    <div class="center col-12">
       <form *ngIf="file" [formGroup]="metadataForm" (ngSubmit)="onSaveData()">
-        <div class="p-py-3">
+        <div class="py-3">
           <span class="p-float-label">
             <input class="form-field" id="dataset-name" type="text" pInputText formControlName="dataset_name">
             <label for="dataset-name">Dataset name</label>
@@ -71,7 +71,7 @@
           </span>
         </div>
 
-        <div class="p-py-3">
+        <div class="py-3">
           <span class="p-float-label">
             <input class="form-field" id="dataset-pretty-name" type="text" pInputText
                    formControlName="dataset_pretty_name">
@@ -83,7 +83,7 @@
           </span>
         </div>
 
-        <div class="p-py-3">
+        <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="version-name" type="text" pInputText formControlName="version_name">
           <label for="version-name">Version name</label>
@@ -93,7 +93,7 @@
         </span>
         </div>
 
-        <div class="p-py-3">
+        <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="version-pretty-name" type="text" pInputText
                  formControlName="version_pretty_name">
@@ -122,7 +122,7 @@
 <p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible">
   <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
   <div class="uploading-message">Do not close this tab. We are uploading your data... </div>
-  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message p-pt-3">Progress {{uploadProgress|async}} % </div>
-  <div *ngIf="(uploadProgress|async) == 100" class="uploading-message p-pt-3">Your file has been uploaded. We still need a few seconds to preprocess it.. </div>
+  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{uploadProgress|async}} % </div>
+  <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need a few seconds to preprocess it.. </div>
 </p-dialog>
 

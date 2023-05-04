@@ -4,7 +4,6 @@ import {HomeComponent} from './home.component';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {SettingsDto} from '../../modules/core/services/global/settings.dto';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
-import {Gallery} from 'angular-gallery';
 import {BehaviorSubject} from 'rxjs';
 
 describe('HomeComponent', () => {
@@ -27,14 +26,15 @@ describe('HomeComponent', () => {
       id: 1,
       maintenance_mode: false,
       news: 'some news',
+      sum_link: 'link',
+      feed_link: 'link'
     };
 
     await TestBed.configureTestingModule({
       declarations: [HomeComponent],
       providers: [
         {provide: SettingsService, useValue: settingsServiceSpy},
-        {provide: AuthService, useValue: fakeAuthService},
-        {provide: Gallery, useValue: galleryServiceSpy}]
+        {provide: AuthService, useValue: fakeAuthService}]
     })
       .compileComponents();
   });

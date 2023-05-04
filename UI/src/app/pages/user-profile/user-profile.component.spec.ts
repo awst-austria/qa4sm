@@ -20,7 +20,10 @@ describe('UserProfileComponent', () => {
         last_name: 'Doe',
         organisation: '',
         country: '',
-        orcid: ''
+        orcid: '',
+        space_left: null,
+        space_limit_value: null,
+        space_limit: null
       }
     };
 

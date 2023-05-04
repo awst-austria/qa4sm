@@ -1,13 +1,13 @@
 <main #helpPage>
-  <h1 class="h3 p-mb-3 font-weight-normal">Go to section</h1>
+  <h1 class="h3 mb-3 font-weight-normal">Go to section</h1>
   <p>
-    <a pageScroll="" [pageScrollDuration]="1" href="#validation">Validate Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#results_list">My Validations - Results List Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#results">Validation Results Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#publishing">Publishing</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#published">Published Validations Page</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#comparison">Validation Comparison</a><br/>
-    <a pageScroll="" [pageScrollDuration]="1" href="#user-data-upload">User Data Upload</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="validation">Validate Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="results_list">My Validations - Results List Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="results">Validation Results Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="published">Published Validations Page</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="comparison">Validation Comparison</a><br/>
+    <a routerLink="{{pageUrl}}" fragment="user-data-upload">User Data Upload</a><br/>
   </p>
 
   <a id="manual"></a>
@@ -18,7 +18,7 @@
        [href]="settings[0].sum_link">User Manual</a>.
   </p>
 
-  <h1 id="validation" class="h3 p-mb-3 font-weight-normal">Validate Page</h1>
+  <h1 id="validation" class="h3 mb-3 font-weight-normal">Validate Page</h1>
 
   <p>
     The validate page is subdivided into areas for the various validation parameters. Each area has
@@ -26,14 +26,14 @@
     use the +/- icon to fold up or fold down the area.
   </p>
   <div>
-    <img alt="menu-minus" class="p-px-5 p-mx-5" [src]="menuMinus">
-    <img alt="menu-plus" class="p-px-5 p-mx-5" [src]="menuPlus">
+    <img alt="menu-minus" class="px-5 mx-5" [src]="menuMinus">
+    <img alt="menu-plus" class="px-5 mx-5" [src]="menuPlus">
   </div>
 
   <p>
     <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
     and one of the soil moisture variables provided in the dataset. All the supported datasets are listed on
-    <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">datasets page here</a>. Plase note,
+    <a routerLink="/datasets" target="_blank">datasets page here</a>. Plase note,
     that there have to be at least two datasets added, as one of them will be treated as the reference one.
   </p>
   <div>
@@ -44,7 +44,7 @@
     The filters available depend on the data contained within the chosen dataset. For example,
     you can filter the C3S data to include only data with variable in valid geophysical range.
     Details of the filter options provided for each dataset are given on the
-    <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">supported datasets page</a>. You
+    <a routerLink="/datasets" target="_blank">supported datasets page</a>. You
     can also
     hover your mouse pointer over the question mark next to a filter to get a short explanation.
   </p>
@@ -56,7 +56,8 @@
   </p>
   <p class="alert alert-info">
     <b>Intercomparison:</b> The intercomparison mode of QA4SM validates up to six satellite data sets against a common
-    spatial reference data set. For each reference location (e.g. each ISMN station) it finds the nearest observation series in
+    spatial reference data set. For each reference location (e.g. each ISMN station) it finds the nearest observation
+    series in
     all selected satellite products.
     All observations series are then scaled (if selected) and temporally matched to the temporal reference series.
     For validation only the common time stamps (that are available in all satellite products) are used to calculate
@@ -71,7 +72,8 @@
   </div>
   <p>
     <b>Step 4</b> - Choose which dataset selected for validation should be used as the spatial and temporal reference.
-    Please note, that if the ISMN dataset belongs to the pool, it is set as the spatial reference automatically and there
+    Please note, that if the ISMN dataset belongs to the pool, it is set as the spatial reference automatically and
+    there
     is no possibility of changing it.
   </p>
   <div>
@@ -122,7 +124,7 @@
     </li>
   </ul>
   <div>
-    <img alt="anomalies" class="scaled_image p-mb-3" [src]="anomalies">
+    <img alt="anomalies" class="scaled_image mb-3" [src]="anomalies">
   </div>
   <p>
     <b>Step 7 [optional]</b> - Chose the geographic area over which the validation should be performed. You can either
@@ -133,8 +135,8 @@
     If you don't specify an area, a global validation will be done.
   </p>
   <div>
-    <img alt="spatial subsetting" class="scaled_image p-mb-3" [src]="spatialSubsetting">
-    <img alt="map selection" class="scaled_image p-mb-3" [src]="mapSelection">
+    <img alt="spatial subsetting" class="scaled_image mb-3" [src]="spatialSubsetting">
+    <img alt="map selection" class="scaled_image mb-3" [src]="mapSelection">
   </div>
   <p>
     <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed and temporal matching
@@ -144,7 +146,7 @@
     matching of the data and reference selected.
     If the validation period fields are left empty, the validation will not be started. For the time range covered by
     the various
-    datasets, see the <a routerLink="/datasets" pageScroll="" [pageScrollDuration]="1" target="_blank">datasets page</a>.
+    datasets, see the <a routerLink="/datasets" target="_blank">datasets page</a>.
     <br>
 
     For temporal matching window size, the default (and recommended) value is 12 hours and possible choices are integer
@@ -152,7 +154,7 @@
 
   </p>
   <div>
-    <img alt="validation period" class="scaled_image p-mb-3" [src]="temporalSubsetting">
+    <img alt="validation period" class="scaled_image mb-3" [src]="temporalSubsetting">
   </div>
   <p>
     <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC) and Bootstrapping Triple Collocation confidence
@@ -169,7 +171,7 @@
     validation time might be up to 5 times longer.
   </p>
   <div>
-    <img alt="triple collocation" class="scaled_image p-mb-3" [src]="tca">
+    <img alt="triple collocation" class="scaled_image mb-3" [src]="tca">
   </div>
 
   <p>
@@ -182,7 +184,7 @@
     Note that if the chosen method is 'No scaling', there is no scaling reference drop down list available.
   </p>
   <div>
-    <img alt="scaling" class="scaled_image p-mb-3" [src]="scaling">
+    <img alt="scaling" class="scaled_image mb-3" [src]="scaling">
   </div>
 
   <p>
@@ -190,7 +192,7 @@
     the list of all your validations.
   </p>
   <div>
-    <img alt="name your validation" class="scaled_image p-mb-3" [src]="nameYourValidation">
+    <img alt="name your validation" class="scaled_image mb-3" [src]="nameYourValidation">
   </div>
   <p>
     <b>Step 12</b> - Run the validation process. You'll be notified via e-mail once it's
@@ -202,13 +204,13 @@
   </div>
 
 
-  <h1 id="results_list" class="h3 p-mb-3 font-weight-normal">My Validations - Results List Page</h1>
+  <h1 id="results_list" class="h3 mb-3 font-weight-normal">My Validations - Results List Page</h1>
 
   <p>
     The list shows all your validations, including the currently running ones, sorted by date (latest first).
   </p>
   <div>
-    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">
+    <img alt="my validations" class="scaled_image mb-3" [src]="myValidations">
   </div>
 
   <p>
@@ -263,7 +265,7 @@
     </li>
     <li>
       <span class="pi pi-folder-open"></span> You can access the
-      <a pageScroll="" [pageScrollDuration]="1" href="#results">results details page</a>
+      <a routerLink="{{pageUrl}}" fragment="results">results details page</a>
       of a validation through its folder button.
     </li>
     <li>
@@ -315,17 +317,17 @@
 
   </ul>
   <!--  <div>-->
-  <!--    <img alt="my validations" class="scaled_image p-mb-3" [src]="myValidations">-->
+  <!--    <img alt="my validations" class="scaled_image mb-3" [src]="myValidations">-->
   <!--  </div>-->
 
-  <h1 id="results" class="h3 p-mb-3 font-weight-normal">Validation Results Page</h1>
+  <h1 id="results" class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
 
   <p>
     Once the validation process is finished, you can see a summary of the validation run
     on the results page.
   </p>
   <div>
-    <img alt="results overview" class="scaled_image p-mb-3" [src]="resultsOverview">
+    <img alt="results overview" class="scaled_image mb-3" [src]="resultsOverview">
   </div>
   <p>
     The buttons at the bottom of the result overview have the following effects:
@@ -359,7 +361,7 @@
       file to <a target="_blank" href="https://zenodo.org/" rel="'noreferrer">Zenodo</a>. This means the results can be
       cited
       with a <a target="_blank" href="https://www.doi.org/" rel="'noreferrer">DOI</a>. See section
-      <a pageScroll="" [pageScrollDuration]="1" href="#publishing">Publishing</a> for details.
+      <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a> for details.
     </li>
   </ul>
 
@@ -458,10 +460,10 @@
   </p>
 
   <div id="results_graph">
-    <img alt="results graphs" class="scaled_image p-mb-3" [src]="resultsGraphs">
+    <img alt="results graphs" class="scaled_image mb-3" [src]="resultsGraphs">
   </div>
 
-  <h2 id="publishing" class="h4 p-mb-3 font-weight-normal">Publishing</h2>
+  <h2 id="publishing" class="h4 mb-3 font-weight-normal">Publishing</h2>
 
   <p>
     This feature allows you to publish the result NetCDF file of your validation to
@@ -472,7 +474,7 @@
     which you can cite in your publications to give your readers open access to your data.
   </p>
   <div>
-    <img alt="publishing dialog" class="scaled_image p-mb-3" [src]="publishingDialog">
+    <img alt="publishing dialog" class="scaled_image mb-3" [src]="publishingDialog">
   </div>
 
   <p>
@@ -508,7 +510,7 @@
 
   </p>
 
-  <h1 id="published" class="h3 p-mb-3 font-weight-normal">Published Validations Page</h1>
+  <h1 id="published" class="h3 mb-3 font-weight-normal">Published Validations Page</h1>
 
   <p>
     The list shows validations on the QA4SM service that have been published to
@@ -520,7 +522,7 @@
   <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so
     at {{ this.getAdminMail() }}.</p>
 
-  <h1 id="comparison" class="h3 p-mb-3 font-weight-normal">Validation Comparison</h1>
+  <h1 id="comparison" class="h3 mb-3 font-weight-normal">Validation Comparison</h1>
 
   <p>
     With the QA4SM version 2.1 (and later) it is possible to compare existing validations that belong to the currently
@@ -541,7 +543,7 @@
     datasets’ switches on the ‘one validation’ comparison mode.
   </p>
   <div>
-    <img alt="datest-configuration" class="scaled_image p-mb-3" [src]="datsetConfigurationComparison">
+    <img alt="datest-configuration" class="scaled_image mb-3" [src]="datsetConfigurationComparison">
   </div>
   <p>
     The Validations selection component gets updated with every change of the reference dataset and shows validations
@@ -551,7 +553,7 @@
     appropriate validation from the list.
   </p>
   <div>
-    <img alt="validation-selection" class="scaled_image p-mb-3" [src]="validationSelectionsComparison">
+    <img alt="validation-selection" class="scaled_image mb-3" [src]="validationSelectionsComparison">
   </div>
   <p>
     In general it is possible to compare any two validations that have the same reference dataset.
@@ -560,7 +562,7 @@
     ‘Include all points...’ is disabled.
   </p>
   <div>
-    <img alt="spatial-extent" class="scaled_image p-mb-3" [src]="spatialExtentComparison">
+    <img alt="spatial-extent" class="scaled_image mb-3" [src]="spatialExtentComparison">
   </div>
   <p>
     The comparison is started by clicking the ‘Compare’ button. As a result users get four components:
@@ -612,61 +614,74 @@
     To upload your go to 'My datasets' page, by clicking proper button on the navigation bar.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="selectFile">
+    <img alt="select-file" class="scaled_image mb-3" [src]="selectFile">
   </div>
   <p>
-    Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be able
+    Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be
+    able
     to choose only .netCDF or .zip files, both types need to follow the standard described
-    <a target="_blank" [routerLink]="['/user-data-guidelines']">here.</a> If the .zip file you are trying to upload contains
-    other types of files than .netCDF, .csv or .yml, you will not be able to upload the file. Please note, that you have <b> 5GB </b>
+    <a target="_blank" [routerLink]="['/user-data-guidelines']">here.</a> If the .zip file you are trying to upload
+    contains
+    other types of files than .netCDF, .csv or .yml, you will not be able to upload the file. Please note, that you have
+    <b> 5GB </b>
     space available for your files. In case you need more, please contact our team.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadFileWindow">
+    <img alt="select-file" class="scaled_image mb-3" [src]="uploadFileWindow">
   </div>
   <p>
-    When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version names.
-    Additionally you can introduce display names for both dataset and its version, which is going to be used on the list of available datasets.
+    When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version
+    names.
+    Additionally you can introduce display names for both dataset and its version, which is going to be used on the list
+    of available datasets.
     If the display name is not provided, the basic name is going to be used.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="metadataWindow">
+    <img alt="select-file" class="scaled_image mb-3" [src]="metadataWindow">
   </div>
   <p>
-    If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided information, click 'Save' button.
-    Clicking 'Save' button will close the metadata form, but won't start uploading yet. To start uploading, click the 'Upload file' button.
+    If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided
+    information, click 'Save' button.
+    Clicking 'Save' button will close the metadata form, but won't start uploading yet. To start uploading, click the
+    'Upload file' button.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="chosenFile">
+    <img alt="select-file" class="scaled_image mb-3" [src]="chosenFile">
   </div>
   <p>
-    Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a blue spinner and information
-    about the percentage of uploaded file. Eventually an information will show up that the file has been uploaded, but it still needs to be pre-processed.
+    Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a
+    blue spinner and information
+    about the percentage of uploaded file. Eventually an information will show up that the file has been uploaded, but
+    it still needs to be pre-processed.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" [src]="uploadingSpinner">
+    <img alt="select-file" class="scaled_image mb-3" [src]="uploadingSpinner">
   </div>
   <p>
     When the file gets uploaded and preprocessed, there will show up a row with basic information on the uploaded file.
     You'll be able to change the dataset's name, the version's name and choose a different variable, if the default one
     is inproper or we were not able to retrieve the proper name.
-    By clicking 'Remove dataset' button, you will remove the uploaded file. Note, that removing is possible only if the uploaded data
+    By clicking 'Remove dataset' button, you will remove the uploaded file. Note, that removing is possible only if the
+    uploaded data
     hasn't been used for any validation.
   </p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" style="scale: 1.2" [src]="dataRow">
+    <img alt="select-file" class="scaled_image mb-3" style="scale: 1.2" [src]="dataRow">
   </div>
 
-  <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown list. Your dataset will be there.</p>
+  <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown
+    list. Your dataset will be there.</p>
   <div>
-    <img alt="select-file" class="scaled_image p-mb-3" style="scale: 0.9" [src]="userDataOnTheList">
+    <img alt="select-file" class="scaled_image mb-3" style="scale: 0.9" [src]="userDataOnTheList">
   </div>
   <p>
-    Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation that uses private data.
-    You can still share your validation with another user, but they won't be able to rerun it, as they don't have access to your dataset.
+    Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation
+    that uses private data.
+    You can still share your validation with another user, but they won't be able to rerun it, as they don't have access
+    to your dataset.
   </p>
 
 
-  <qa-scroll-to-top></qa-scroll-to-top>
+  <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>
 

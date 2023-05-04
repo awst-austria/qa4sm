@@ -2,8 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {Observable} from 'rxjs';
-import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
-import {Gallery} from 'angular-gallery';
+// import {Gallery} from 'angular-gallery';
 
 
 const homeUrlPrefix = '/static/images/home/';
@@ -74,8 +73,7 @@ export class HomeComponent implements OnInit {
   userLoggedIn: boolean;
 
   constructor(private authService: AuthService,
-              private settingsService: SettingsService,
-              private gallery: Gallery) {
+              private settingsService: SettingsService) {
   }
 
   ngOnInit(): void {
@@ -86,17 +84,17 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  showGallery(index: number = 0, imagesListObject): void {
-    const imagesList = [];
-    imagesListObject.forEach(image => {
-      imagesList.push({path: image.plot});
-    });
-    const prop: any = {};
-    prop.component = CarouselComponent;
-    prop.images = imagesList;
-    prop.index = index;
-    prop.arrows = imagesList.length > 1;
-    this.gallery.load(prop);
-  }
+  // showGallery(index: number = 0, imagesListObject): void {
+  //   const imagesList = [];
+  //   imagesListObject.forEach(image => {
+  //     imagesList.push({path: image.plot});
+  //   });
+  //   const prop: any = {};
+  //   prop.component = CarouselComponent;
+  //   prop.images = imagesList;
+  //   prop.index = index;
+  //   prop.arrows = imagesList.length > 1;
+  //   this.gallery.load(prop);
+  // }
 
 }

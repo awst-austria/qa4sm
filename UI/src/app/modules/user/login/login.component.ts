@@ -4,6 +4,7 @@ import {LoginDto} from '../../core/services/auth/login.dto';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {ToastService} from '../../core/services/toast/toast.service';
+import {LoginForm} from '../../core/services/form-interfaces/login-form';
 
 
 @Component({
@@ -20,9 +21,9 @@ export class LoginComponent implements OnInit {
   submitted = false;
   prevUrl = '';
 
-  loginForm = new FormGroup({
-    username: new FormControl(this.loginDto.username, Validators.required),
-    password: new FormControl(this.loginDto.password, Validators.required),
+  loginForm = new FormGroup<LoginForm>({
+    username: new FormControl<string>(this.loginDto.username, Validators.required),
+    password: new FormControl<string>(this.loginDto.password, Validators.required),
   });
 
   formMessages = [];
