@@ -55,8 +55,8 @@ class TestHacks(TestCase):
 
         timezone_reader = TimezoneAdapter(c3s_reader)
 
-        orig_data = c3s_reader.read_ts(-155.42, 19.78)
-        data = timezone_reader.read_ts(-155.42, 19.78)
+        orig_data = c3s_reader.read(-155.42, 19.78)
+        data = timezone_reader.read(-155.42, 19.78)
         self.assertTrue(np.array_equal(orig_data.index.values, data.index.values))
         self.assertTrue(not hasattr(data.index, 'tz') or data.index.tz is None)
 
