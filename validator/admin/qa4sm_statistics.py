@@ -1,5 +1,6 @@
 import logging
 import datetime
+import time
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admin import ModelAdmin
@@ -9,6 +10,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
 from django.urls import path
 from django_countries import countries as base_countries
+from itertools import groupby
 
 from validator.models import User, ValidationRun, Dataset, DatasetConfiguration, UptimeReport, UptimeAgent
 
@@ -66,7 +68,8 @@ def get_dataset_info_by_user(user=None):
 
     dataset_names.append('User data')
     user_datasets = Dataset.objects.exclude(user=None)
-    dataset_versions.append([f'{user_dataset.pretty_name}/{user_dataset.user.username}' for user_dataset in user_datasets])
+    dataset_versions.append(
+        [f'{user_dataset.pretty_name}/{user_dataset.user.username}' for user_dataset in user_datasets])
     dataset_counts.append([user_dataset.dataset_configurations.count() for user_dataset in user_datasets])
 
     dataset_dict = {'datasets': dataset_names,
@@ -89,7 +92,7 @@ def verify_uptime_percentage(uptime_report):
             else:
                 reference_number_of_minutes = 30 * 24 * 60
         downtime_minutes = uptime_report.downtime_minutes if uptime_report.downtime_minutes >= 0 else 0
-        return 100 - downtime_minutes / reference_number_of_minutes
+        return 100 - (downtime_minutes / reference_number_of_minutes * 100)
     return uptime_report.uptime_percentage
 
 
@@ -105,6 +108,19 @@ def check_kpi(uptime_report_item, kpi):
         return verify_downtime_minutes(getattr(uptime_report_item, kpi))
     else:
         return verify_uptime_percentage(uptime_report_item)
+
+
+def get_combined_agent(uptime_reports, kpi):
+    grouped_reports = groupby(uptime_reports, key=lambda e: e.start_time)
+    kpi_smaller = ['downtime_minutes']
+    combined_agent = []
+    for timestamp, group in grouped_reports:
+        entry_group = list(group)
+        combined_entry = [str(timestamp.date()),
+                          min([check_kpi(entry, kpi) for entry in entry_group]) if kpi in kpi_smaller else max(
+                              [check_kpi(entry, kpi) for entry in entry_group])]
+        combined_agent.append(combined_entry)
+    return combined_agent
 
 
 class StatisticsAdmin(ModelAdmin):
@@ -180,15 +196,17 @@ class StatisticsAdmin(ModelAdmin):
     @staticmethod
     def get_kpi_info_for_plot(period, kpi):
         uptime_reports = UptimeReport.objects.all().filter(period=period).\
-            filter(start_time__gte=datetime.date(2021, 6, 1)).distinct('start_time')
+            filter(start_time__gte=datetime.date(2021, 6, 1)).order_by('start_time')
         agents = UptimeAgent.objects.all()
 
-        otput_list = []
+        output_list = []
         for agent in agents:
-            otput_list.append((f'{agent.description}', [[f'{item.created.date()}', check_kpi(item, kpi)] for item in
-                                                        uptime_reports.filter(agent_key=agent.agent_key)]))
+            output_list.append((f'{agent.description}', [[f'{item.created.date()}', check_kpi(item, kpi)] for item in
+                                                         uptime_reports.filter(agent_key=agent.agent_key)]))
 
-        return otput_list
+        combined_agent = get_combined_agent(uptime_reports, kpi)
+        output_list.append(('combined_agent', combined_agent))
+        return output_list
 
     # @csrf_protect_m
     def statistics(self, request):
@@ -221,7 +239,6 @@ class StatisticsAdmin(ModelAdmin):
                      'monthly_uptime': monthly_uptime,
                      'daily_outage': daily_outage,
                      'daily_uptime': daily_uptime}
-
             return render(request, 'admin/qa4sm_statistics.html', {'stats': stats})
 
 
