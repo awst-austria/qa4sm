@@ -80,7 +80,7 @@ pip install sqlparse
 pip install pynetcf
 pip install ascat
 pip install c3s_sm
-pip install "esa_cci_sm==0.1.1"
+pip install esa_cci_sm
 pip install smos
 pip install ecmwf_models
 pip install coverage
