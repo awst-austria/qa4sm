@@ -85,6 +85,8 @@ dependencies:
   - iniconfig=2.0.0
   - jasper=4.0.0
   - jinja2=3.1.2
+  - jpeg=9e
+  - json-c=0.15
   - keyutils=1.6.1
   - kiwisolver=1.4.4
   - krb5=1.20.1
@@ -270,6 +272,7 @@ dependencies:
     - c3s-sm==0.1.2
     - cadati==0.0.4
     - cdsapi==0.6.1
+    - celery==5.2.6
     - cf-xarray==0.8.0
     - cftime==1.6.2
     - click-didyoumean==0.3.0
@@ -286,6 +289,10 @@ dependencies:
     - drf-yasg==1.20.0
     - ease-grid==0.2
     - ecmwf-api-client==1.6.3
+    - ecmwf-models==0.7
+    - esa-cci-sm==0.1.1
+    - gldas==0.6.1
+    - h5netcdf==0.11.0
     - entrypoints==0.4
     - fasteners==0.18
     - h5py==3.8.0
@@ -324,4 +331,5 @@ dependencies:
     - trollsift==0.2.1
     - vine==5.0.0
     - wcwidth==0.2.6
+    - xarray==0.18.2
     - zarr==2.14.2
