@@ -166,7 +166,7 @@ dependencies:
   - qt-main
   - readline
   - scipy
-  - setuptools
+  - setuptools=62.3.2
   - shapely
   - sip
   - six
