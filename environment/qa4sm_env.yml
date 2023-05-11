@@ -1,4 +1,4 @@
-name: qa4sm-updated
+name: qa4sm
 channels:
   - conda-forge
   - defaults
