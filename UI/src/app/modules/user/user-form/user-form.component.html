@@ -125,7 +125,7 @@
       </div>
 
       <div *ngIf="!userData" class="py-3" style="max-width: 15rem; line-height: 1.2rem">
-        <p-checkbox id="terms" formControlName="terms_consent"></p-checkbox>
+        <p-checkbox id="terms" formControlName="terms_consent" binary="true"></p-checkbox>
         <label for="terms"> I accept the <a [routerLink]="['/terms']">terms, conditions and privacy policy</a>.</label>
       </div>
 
