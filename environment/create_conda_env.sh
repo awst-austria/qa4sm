@@ -80,7 +80,7 @@ pip install sqlparse
 pip install pynetcf
 pip install ascat
 pip install c3s_sm
-pip install "esa_cci_sm==0.1.1"
+pip install esa_cci_sm
 pip install smos
 pip install ecmwf_models
 pip install coverage
@@ -97,7 +97,7 @@ pip install smap-io
 pip install django-countries
 pip install seaborn
 pip install --upgrade --force-reinstall netcdf4
-pip install "pytesmo>=0.14.2"
+pip install "pytesmo>=0.15.1"
 pip install "ismn>=1.3.2"
 pip install requests
 pip install "qa4sm-reader>=0.9.0"

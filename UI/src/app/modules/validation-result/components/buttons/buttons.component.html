@@ -66,12 +66,11 @@
         <button pButton
                 type="button"
                 class="dropdown-item"
-                icon="faIcons.faFileDownload"
                 label="Download NetCDF File"
                 (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
                 pTooltip="Download validation run results as a .nc file"
                 [life]="globals.tooltipLifetime">
-          <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
+          <span style="margin-right: 0.5rem; margin-left: 0.2rem"><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
         </button>
       </div>
       <button pButton
@@ -210,13 +209,12 @@
       </button>
       <button pButton
               type="button"
-              icon="faIcons.faArchive"
               class="btn-action-large"
               label="Archive"
               pTooltip="Archived results are not removed automatically"
               [life]="globals.tooltipLifetime"
               (click)="archiveResults(validationRun.id, true)">
-        <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
+        <span class="pr-2"><fa-icon [icon]="faIcons.faArchive"></fa-icon></span>
       </button>
     </ng-template>
 
