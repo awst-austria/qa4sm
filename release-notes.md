@@ -1,3 +1,8 @@
+QA4SM v2.2.2.1 - Release notes 2023-05-17
+=======================================================
+# Improvements
+1. Admin panel updated
+
 QA4SM v2.2.2 - Release notes 2023-05-15
 =======================================================
 # Improvements 
