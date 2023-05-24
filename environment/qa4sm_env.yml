@@ -8,6 +8,7 @@ dependencies:
   - alsa-lib=1.2.8
   - asgiref=3.6.0
   - attr=2.5.1
+  - attrs=21.4.0
   - bokeh=2.4.3
   - brotli=1.0.9
   - brotli-bin=1.0.9
@@ -61,6 +62,8 @@ dependencies:
   - importlib_resources=5.12.0
   - iniconfig=2.0.0
   - jinja2=3.1.2
+  - jpeg=9e
+  - json-c=0.15
   - keyutils=1.6.1
   - kiwisolver=1.4.4
   - krb5=1.20.1
