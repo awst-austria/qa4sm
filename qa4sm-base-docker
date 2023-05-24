@@ -3,6 +3,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Vienna
 RUN apt-get update && apt-get install -y tzdata
 RUN apt-get update && apt-get -y install apt-utils
+RUN apt-get update && apt-get install -y python3.8
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
 RUN apt-get -y install curl gfortran libgeos-dev build-essential qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools rsync libproj-dev wget git
 ADD ./ /tmp/qa4sm-git
 RUN bash /tmp/qa4sm-git/docker/base/install.sh
