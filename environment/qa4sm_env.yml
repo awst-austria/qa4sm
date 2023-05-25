@@ -216,7 +216,7 @@ dependencies:
   - zstd=1.5.2
   - pip:
     - amqp==5.1.1
-    - ascat==2.1.0
+    - ascat==2.0.4
     - asciitree==0.3.3
     - async-timeout==4.0.2
     - billiard==3.6.4.0
