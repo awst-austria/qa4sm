@@ -1,6 +1,8 @@
 FROM awst/qa4sm-base:latest
 RUN apt-get update && apt-get -y install apt-utils
 RUN apt-get -y install curl gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git
+RUN apt-cache search libstdc++
+RUN apt-get update && apt-get install -y libstdc++6
 ADD ./ /tmp/qa4sm-git
 
 RUN bash /tmp/qa4sm-git/docker/celery-w/install.sh
