@@ -7,6 +7,7 @@ ADMIN_PASS="12admin34"
 
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
+export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
 # wait for the db to initialize
