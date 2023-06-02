@@ -48,7 +48,7 @@ def get_dataset_info_by_user(user=None):
         for run in user_runs:
             configs = run.dataset_configurations.all() | configs
 
-    datasets = Dataset.objects.all()
+    datasets = Dataset.objects.filter(user=None)
     dataset_names = list(datasets.values_list('short_name', flat=True))
     dataset_counts = []
     dataset_versions = []

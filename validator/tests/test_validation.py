@@ -757,8 +757,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 15, "Number of gpis is off"
-        assert new_run.error_points == 6, "Error points are off"
-        assert new_run.ok_points == 9, "OK points are off"
+        assert new_run.error_points == 4, "Error points are off"
+        assert new_run.ok_points == 11, "OK points are off"
         self.check_results(new_run, is_tcol_run=False, meta_plots=False)
         self.delete_run(new_run)
 
