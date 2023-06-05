@@ -63,6 +63,11 @@
       </div>
     </ng-template>
     <div *ngIf="configurations$| async as configurations" class="card-body">
+      <div *ngIf="!forComparison && validationRun.total_points === 0" [ngClass]="'alert-danger'">
+        <b>There were no spatial reference data points in the selected area. Please choose different geographical range or select
+          different dataset as the spatial reference. <br>
+        Please note, that if ISMN belongs to the dataset pool, it has to be used as the spatial reference.</b>
+      </div>
       <ul [ngClass]="{'for-comparison-list': forComparison}">
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
@@ -171,7 +176,7 @@
 
         <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
         <ng-template #elseProgress>
-          <li *ngIf="!forComparison" [ngClass]="{'alert-danger': errorRate > 0}">
+          <li *ngIf="!forComparison && validationRun.total_points !== 0" [ngClass]="{'alert-danger': errorRate > 0}">
             for {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
             of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
             not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the 'Result files' section.

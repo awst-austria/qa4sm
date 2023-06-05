@@ -86,14 +86,16 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   }
 
   getStatusFromProgress(valrun): string {
+    console.log(valrun)
     let status: string;
     if (valrun.progress === 0 && valrun.end_time === null) {
       status = 'Scheduled';
     } else if (valrun.progress === 100 && valrun.end_time) {
       status = 'Done';
-    } else if (valrun.progress === -1) {
+    }
+    else if (valrun.progress === -1) {
       status = 'Cancelled';
-    } else if (valrun.end_time != null) {
+    } else if (valrun.end_time != null || valrun.total_points == 0) {
       status = 'ERROR';
     } else {
       status = 'Running' + ' ' + `${valrun.progress}%`;
