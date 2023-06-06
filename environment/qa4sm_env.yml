@@ -240,7 +240,6 @@ dependencies:
     - ecmwf-api-client==1.6.3
     - ecmwf-models==0.9.2
     - entrypoints==0.4
-    - esa-cci-sm==0.1.1
     - fasteners==0.18
     - gldas==0.7.0
     - h5netcdf==1.1.0
@@ -287,3 +286,6 @@ dependencies:
     - wcwidth==0.2.6
     - xarray==2023.1.0
     - zarr==2.14.2
+    # until esa_cci_sm v0.4.0 is released:
+    - git+https://github.com/TUW-GEO/esa_cci_sm.git@33a8a453bbccb55188804bce07a37315e9a3db43
+
