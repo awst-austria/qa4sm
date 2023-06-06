@@ -64,9 +64,9 @@
     </ng-template>
     <div *ngIf="configurations$| async as configurations" class="card-body">
       <div *ngIf="!forComparison && validationRun.total_points === 0" [ngClass]="'alert-danger'">
-        <b>There were no spatial reference data points in the selected area. Please choose different geographical range or select
-          different dataset as the spatial reference. <br>
-        Please note, that if ISMN belongs to the dataset pool, it has to be used as the spatial reference.</b>
+        <b>There were no spatial reference data points in the selected area. Please select a different spatial subsetting  or select
+          different dataset as a spatial reference.
+        </b>
       </div>
       <ul [ngClass]="{'for-comparison-list': forComparison}">
         <li *ngIf="validationRun.is_a_copy">
