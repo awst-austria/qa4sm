@@ -26,6 +26,7 @@ from api.views.serving_file_view import *
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
+from api.views.support_request_view import *
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -115,7 +116,8 @@ urlpatterns = [
     path('get-user-file-by-id/<uuid:file_uuid>/', get_user_data_file_by_id,
          name='Get user file by ID'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
-    path('scaling-methods', get_scaling_methods, name='Scaling methods')
+    path('scaling-methods', get_scaling_methods, name='Scaling methods'),
+    path('support-request', send_support_request, name='Support request')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
