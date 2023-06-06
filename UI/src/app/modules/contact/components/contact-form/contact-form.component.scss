@@ -1,0 +1,14 @@
+input, textarea {
+  width: 600px;
+  border-radius: 4px;
+  border-color: #ced4da;
+}
+textarea {
+  height: 200px
+}
+
+@media screen and (max-width: 650px){
+  input, textarea {
+    width: 80vw;
+  }
+}

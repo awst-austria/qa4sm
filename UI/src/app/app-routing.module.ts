@@ -26,6 +26,7 @@ import {
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 import {LoginPageComponent} from './pages/login-page/login-page.component';
+import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 
 
 const routes: Routes = [
@@ -51,6 +52,7 @@ const routes: Routes = [
   {path: 'set-password', component: SetPasswordComponent},
   {path: 'my-datasets', component: MyDatasetsComponent, canActivate: [AuthGuard]},
   {path: 'user-data-guidelines', component: UserDataGuidelinesComponent},
+  {path: 'contact-us', component: ContactUsComponent},
   {path: '**', component: ErrorComponent}
 ];
 
