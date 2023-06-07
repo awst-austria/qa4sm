@@ -429,5 +429,89 @@
             "time_range_end": "2020-05-23",
             "geographical_range": null
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 45,
+        "fields": {
+            "short_name": "C3S_V202212",
+            "pretty_name": "v202212",
+            "help_text": "CDR v202212",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2022-12-31",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 46,
+        "fields": {
+            "short_name": "ESA_CCI_SM_P_V07_1",
+            "pretty_name": "v07.1",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2021-12-31",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 47,
+        "fields": {
+            "short_name": "ESA_CCI_SM_A_V07_1",
+            "pretty_name": "v07.1",
+            "help_text": "-",
+            "time_range_start": "1991-08-05",
+            "time_range_end": "2021-12-31",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 48,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_V07_1",
+            "pretty_name": "v07.1",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2021-12-31",
+            "geographical_range": null
+        }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 49,
+        "fields": {
+            "short_name": "ESA_CCI_SM_P_V08_1",
+            "pretty_name": "v08.1",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2022-12-31",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 50,
+        "fields": {
+            "short_name": "ESA_CCI_SM_A_V08_1",
+            "pretty_name": "v08.1",
+            "help_text": "-",
+            "time_range_start": "1991-08-05",
+            "time_range_end": "2022-12-31",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 51,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_V08_1",
+            "pretty_name": "v08.1",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2022-12-31",
+            "geographical_range": null
+        }
     }
 ]
