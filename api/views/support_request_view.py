@@ -1,8 +1,21 @@
+from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from rest_framework import status
+from valentina.settings_conf import EMAIL_HOST_USER
+
+from validator.mailer import _send_user_help_request
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_support_request(request):
-    print(request.data)
+    user_name, user_email, message = request.data.values()
+    try:
+        _send_user_help_request(user_name, user_email, message)
+        return JsonResponse({'message': 'Ok'}, status=status.HTTP_200_OK)
+    except:
+        return JsonResponse({
+                                'message': f'We could not send your message. Please try again later or send us email '
+                                           f'directly to {EMAIL_HOST_USER}'},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)

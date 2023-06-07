@@ -5,6 +5,7 @@ from django.core import mail
 from django.urls.base import reverse
 from django.conf import settings
 from api.frontend_urls import get_angular_url
+from valentina.settings_conf import EMAIL_HOST_USER
 
 # from validator.models import UserDatasetFile
 
@@ -179,6 +180,16 @@ def send_user_link_to_reset_password(user, message):
     __logger.info('Sending mail about resetting their password to user {}...'.format(user.username))
     subject = '[QA4SM] Password reset for QA4SM webservice'
     _send_email(recipients=[user.email],
+                subject=subject,
+                body=message)
+
+
+def _send_user_help_request(user_name, user_email, message):
+    __logger.info(f'Sending user request from  {user_name}')
+    subject = "[USER MESSAGE] - Send via contact form"
+    final_message = f'''{message} \n {user_name} \n {user_email}'''
+    print(final_message)
+    _send_email(recipients=[None],
                 subject=subject,
                 body=message)
 
