@@ -1,3 +1,10 @@
+QA4SM v2.2.3 - Release notes 2023-06-07
+=======================================================
+# Improvements
+1. Backend environment updated
+2. New versions datasets C3S and ESA_CCI added
+3. Explanation added to a validation with 0 points
+
 QA4SM v2.2.2.1 - Release notes 2023-05-17
 =======================================================
 # Improvements
