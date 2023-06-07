@@ -26,6 +26,9 @@ export class ContactFormComponent {
 
   public onSubmit(): void{
     console.log(this.contactForm);
+    this.authService.sendSupportRequest(this.contactForm.value).subscribe(data => {
+      this.toastService.showSuccess('Your message has been sent successfully. We will reach out to you within 3 working days.')
+    })
   }
 
 }
