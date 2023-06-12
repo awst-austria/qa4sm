@@ -1,10 +1,26 @@
+@import "src/style.variables";
 input, textarea {
   width: 600px;
   border-radius: 4px;
   border-color: #ced4da;
 }
 textarea {
-  height: 200px
+  height: 200px;
+  font-family: $base-font;
+  font-size: 1rem;
+}
+
+textarea:focus{
+  outline: 0 none;
+  outline-offset: 0;
+  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  border-color: #007bff;
+}
+
+textarea.fixed-float-label :focus ~ label,
+textarea.fixed-float-label ~ label {
+  top: -.75em!important;
+  font-size: 12px!important;
 }
 
 @media screen and (max-width: 650px){
