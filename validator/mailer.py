@@ -184,14 +184,13 @@ def send_user_link_to_reset_password(user, message):
                 body=message)
 
 
-def _send_user_help_request(user_name, user_email, message):
+def _send_user_help_request(user_name, user_email, message, send_copy_to_user):
     __logger.info(f'Sending user request from  {user_name}')
     subject = "[USER MESSAGE] - Send via contact form"
-    final_message = f'''{message} \n {user_name} \n {user_email}'''
-    print(final_message)
-    _send_email(recipients=[None],
+    final_message = f'''{message} \n {user_name} \n Reply to: {user_email}'''
+    _send_email(recipients=[EMAIL_HOST_USER, user_email] if send_copy_to_user else [EMAIL_HOST_USER],
                 subject=subject,
-                body=message)
+                body=final_message)
 
 
 def _send_email(recipients, subject, body, html_message=None):

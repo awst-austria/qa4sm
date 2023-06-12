@@ -10,9 +10,9 @@ from validator.mailer import _send_user_help_request
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_support_request(request):
-    user_name, user_email, message = request.data.values()
+    user_name, user_email, message, send_copy_to_user = request.data.values()
     try:
-        _send_user_help_request(user_name, user_email, message)
+        _send_user_help_request(user_name, user_email, message, send_copy_to_user)
         return JsonResponse({'message': 'Ok'}, status=status.HTTP_200_OK)
     except:
         return JsonResponse({

@@ -16,7 +16,14 @@ export class ContactFormComponent {
     name: ['', [Validators.required, Validators.maxLength(150)]],
     email: ['', [Validators.required, Validators.email]],
     content: ['', [Validators.required]],
+    send_copy_to_user: [false]
   });
+
+  formObserver = {
+    next: next => this.onSubmitSuccess(),
+    error: error => this.onSubmitError(error),
+    complete: () => this.onSubmitComplete()
+  };
 
   constructor(private userDatasetService: UserDatasetsService,
               private formBuilder: FormBuilder,
@@ -24,11 +31,19 @@ export class ContactFormComponent {
               public authService: AuthService) {
   }
 
-  public onSubmit(): void{
+  public onSubmit(): void {
     console.log(this.contactForm);
-    this.authService.sendSupportRequest(this.contactForm.value).subscribe(data => {
-      this.toastService.showSuccess('Your message has been sent successfully. We will reach out to you within 3 working days.')
-    })
+    this.authService.sendSupportRequest(this.contactForm.value).subscribe(this.formObserver)
+  }
+
+  onSubmitSuccess(): void {
+    this.toastService.showSuccess('Your message has been sent successfully. We will reach out to you within 3 working days.');
+  }
+  onSubmitError(error): void{
+    this.toastService.showErrorWithHeader('We could not send your message', error.message);
+  }
+  onSubmitComplete(): void{
+    this.contactForm.reset({});
   }
 
 }
