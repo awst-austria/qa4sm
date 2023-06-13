@@ -22,6 +22,7 @@ export class AuthService {
   private passwordResetUrl = this.API_URL + 'api/password-reset';
   private setPasswordUrl = this.API_URL + 'api/password-resetconfirm';
   private validateTokenUrl = this.API_URL + 'api/password-resetvalidate_token/';
+  private contactUrl = this.API_URL + 'api/support-request';
 
   emptyUser = {
     username: '',
@@ -145,4 +146,9 @@ export class AuthService {
   setPreviousUrl(prevUrl: string): void{
     this.previousUrl.next(prevUrl);
   }
+
+  sendSupportRequest(messageForm): Observable<any>{
+    return this.httpClient.post(this.contactUrl, messageForm);
+  }
+
 }

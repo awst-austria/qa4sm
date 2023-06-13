@@ -60,6 +60,7 @@ export class NavigationBarComponent implements OnInit {
           },
           {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']},
           {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']},
+          {label: 'Contact us', icon: 'pi pi-fw pi-envelope', routerLink: ['contact-us']},
 
         ]
       },

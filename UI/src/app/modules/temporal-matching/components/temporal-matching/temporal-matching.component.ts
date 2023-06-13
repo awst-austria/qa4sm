@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {TemporalMatchingModel} from './temporal-matching-model';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 
@@ -7,14 +7,11 @@ import {GlobalParamsService} from '../../../core/services/global/global-params.s
   templateUrl: './temporal-matching.component.html',
   styleUrls: ['./temporal-matching.component.scss']
 })
-export class TemporalMatchingComponent implements OnInit {
+export class TemporalMatchingComponent  {
 
   @Input() temporalMatchingModel: TemporalMatchingModel;
 
   constructor(public globalService: GlobalParamsService) {
-  }
-
-  ngOnInit(): void {
   }
 
   getDefaultSize(): number{

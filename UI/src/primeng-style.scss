@@ -1576,12 +1576,13 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 }
 
 .p-slider.p-slider-horizontal {
-  height: 0.286rem;
+  height: 2rem;
 }
 
 .p-slider.p-slider-horizontal .p-slider-handle {
-  margin-top: -0.5715rem;
-  margin-left: -0.5715rem;
+  margin-top: -1rem;
+  margin-left: -1rem;
+  opacity: 0.5;
 }
 
 .p-slider.p-slider-vertical {
@@ -1594,10 +1595,10 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 }
 
 .p-slider .p-slider-handle {
-  height: 1.143rem;
-  width: 1.143rem;
-  background: #007bff;
-  border: 2px solid #007bff;
+  height: 2rem;
+  width: 2rem;
+  background: darkgray;
+  border: 2px solid darkgray;
   border-radius: 4px;
   transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
@@ -1609,12 +1610,13 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 }
 
 .p-slider .p-slider-range {
-  background: #007bff;
+  background: darkgray;
+  border-radius: 4px;
 }
 
 .p-slider:not(.p-disabled) .p-slider-handle:hover {
-  background: #0069d9;
-  border-color: #0069d9;
+  background: #e9ecef;
+  border-color: #e9ecef;
 }
 
 .p-slider.p-slider-animate.p-slider-horizontal .p-slider-handle {
@@ -1701,11 +1703,6 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 #validateButton .p-button-icon.p-button-icon-left{
   font-size: 1.25rem;
 }
-
-
-//.p-button#validateButton{
-//  width: 100rem;
-//}
 
 .p-button:enabled:hover {
   background: #0069d9;
