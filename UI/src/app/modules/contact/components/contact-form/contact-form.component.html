@@ -21,18 +21,31 @@
 
       <div class="py-3">
         <span class="p-float-label">
-          <textarea [ngClass]="{'form-field': true, 'fixed-float-label': contactForm.value.content}" id="content" formControlName="content"> </textarea>
+          <textarea [ngClass]="{'form-field': true}" id="content"
+                    pInputTextarea formControlName="content"> </textarea>
           <label for="content">Message</label>
         </span>
       </div>
 
-      <div class="py-3" style="max-width: 15rem; line-height: 1rem">
-        <p-checkbox id="terms" formControlName="send_copy_to_user" binary="true"></p-checkbox>
-        <label for="terms"> Send a copy to me.</label>
+      <div class="py-3" style="line-height: 1rem">
+        <p-checkbox id="copy" formControlName="send_copy_to_user" binary="true"></p-checkbox>
+        <label for="copy"> Send a copy to me.</label>
       </div>
 
+      <div class="form-control-box">
+        <p-checkbox id="active" formControlName="active" binary="true"></p-checkbox>
+      </div>
 
-      <button pButton
+      <div class="py-3 " style="line-height: 1rem">
+        <span class="p-float-label">
+          <p-slider id="honeypot" formControlName="honeypot"></p-slider>
+          <label for="honeypot"> Slide to send a message <span class="pi pi-angle-double-right"></span></label>
+        </span>
+
+      </div>
+
+      <button id="sendMessageForm"
+              pButton
               type="submit"
               label="Send"
               [disabled]="!contactForm.valid">

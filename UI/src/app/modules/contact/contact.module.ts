@@ -8,6 +8,8 @@ import {InputTextModule} from 'primeng/inputtext';
 import {PaginatorModule} from 'primeng/paginator';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TooltipModule} from 'primeng/tooltip';
+import {SliderModule} from 'primeng/slider';
+import {InputTextareaModule} from 'primeng/inputtextarea';
 
 
 @NgModule({
@@ -17,15 +19,17 @@ import {TooltipModule} from 'primeng/tooltip';
   exports: [
     ContactFormComponent
   ],
-  imports: [
-    CommonModule,
-    ButtonModule,
-    CheckboxModule,
-    DropdownModule,
-    InputTextModule,
-    PaginatorModule,
-    ReactiveFormsModule,
-    TooltipModule
-  ]
+    imports: [
+        CommonModule,
+        ButtonModule,
+        CheckboxModule,
+        DropdownModule,
+        InputTextModule,
+        PaginatorModule,
+        ReactiveFormsModule,
+        TooltipModule,
+        SliderModule,
+        InputTextareaModule
+    ]
 })
 export class ContactModule { }

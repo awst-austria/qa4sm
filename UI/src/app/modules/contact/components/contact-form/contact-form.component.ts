@@ -16,7 +16,9 @@ export class ContactFormComponent {
     name: ['', [Validators.required, Validators.maxLength(150)]],
     email: ['', [Validators.required, Validators.email]],
     content: ['', [Validators.required]],
-    send_copy_to_user: [false]
+    send_copy_to_user: false,
+    active: false,
+    honeypot: [0, [Validators.min(100)]]
   });
 
   formObserver = {
@@ -32,7 +34,6 @@ export class ContactFormComponent {
   }
 
   public onSubmit(): void {
-    console.log(this.contactForm);
     this.authService.sendSupportRequest(this.contactForm.value).subscribe(this.formObserver)
   }
 
@@ -40,7 +41,7 @@ export class ContactFormComponent {
     this.toastService.showSuccess('Your message has been sent successfully. We will reach out to you within 3 working days.');
   }
   onSubmitError(error): void{
-    this.toastService.showErrorWithHeader('We could not send your message', error.message);
+    this.toastService.showErrorWithHeader('We could not send your message', error.error.message);
   }
   onSubmitComplete(): void{
     this.contactForm.reset({});
