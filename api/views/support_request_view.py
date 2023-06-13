@@ -10,7 +10,6 @@ from validator.mailer import _send_user_help_request
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_support_request(request):
-    print(request.data.values())
     user_name, user_email, message, send_copy_to_user, is_active, slider = request.data.values()
     if is_active or slider == 0:
         return JsonResponse({"message": ''}, status=status.HTTP_400_BAD_REQUEST)
