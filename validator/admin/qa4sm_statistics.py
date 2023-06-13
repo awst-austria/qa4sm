@@ -141,11 +141,28 @@ class StatisticsAdmin(ModelAdmin):
 
     @staticmethod
     def users_info_for_plot():
-        users = User.objects.filter(is_active=True).order_by('pk')
-        users_names = [user.username for user in users]
-        validations_num = [user.validationrun_set.all().count() for user in users]
+        users_sorted_by_time = User.objects.filter(is_active=True).order_by('date_joined')
+        users_names = [user.username for user in users_sorted_by_time]
+
+        users_time = list(users_sorted_by_time.values_list('date_joined', flat=True))
+        # here the date is converted to the format 'YYYY-MM-DD HH:MM' needed to plotply histogram
+        time_list = []
+        for time in users_time:
+            time_new_format = get_time_as_string(time)
+            time_list.append(time_new_format)
+
+        first_user = users_sorted_by_time.values_list('date_joined', flat=True).first()
+        first_time = [f'{first_user.year}-{first_user.month}-{first_user.day} 0:00:00']
+        last_user = users_sorted_by_time.values_list('date_joined', flat=True).last()
+        last_time = [f'{last_user.year}-{last_user.month}-{last_user.day} 23:59:59']
+
+        validations_num = [user.validationrun_set.all().count() for user in users_sorted_by_time]
         users_dict = {'users': users_names,
-                      'validations_num': validations_num}
+                      'validations_num': validations_num,
+                      'users_time': time_list,
+                      'first_user_time': first_time,
+                      'last_user_time': last_time
+                      }
         return users_dict
 
     @staticmethod
@@ -215,6 +232,7 @@ class StatisticsAdmin(ModelAdmin):
             raise PermissionDenied
 
         users = User.objects.filter(is_active=True).order_by('pk')
+
         distinct_list_of_countries = User.objects.filter(is_active=True).exclude(country=''). \
             values_list('country', flat=True).distinct()
 
@@ -231,7 +249,7 @@ class StatisticsAdmin(ModelAdmin):
                      'number_of_countries': distinct_list_of_countries.count(),
                      'number_of_validations': ValidationRun.objects.all().count(),
                      'most_frequent_user': self.most_frequent_user_info(),
-                     'val_num_by_user_data': self.users_info_for_plot(),
+                     'user_data': self.users_info_for_plot(),
                      'validations_for_plot': self.validation_info_for_plot(),
                      'datasets_for_plot': get_dataset_info_by_user(),
                      'number_of_users_in_country_dict': self.number_of_users_per_country(distinct_list_of_countries),
