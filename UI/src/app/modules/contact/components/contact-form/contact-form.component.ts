@@ -18,7 +18,7 @@ export class ContactFormComponent {
     content: ['', [Validators.required]],
     send_copy_to_user: false,
     active: false,
-    honeypot: [0, [Validators.min(100)]]
+    honeypot: [0, [Validators.required, Validators.min(100)]]
   });
 
   formObserver = {
