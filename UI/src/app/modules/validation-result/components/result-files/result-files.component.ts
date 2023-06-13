@@ -61,7 +61,6 @@ export class ResultFilesComponent implements OnInit {
   }
 
   onMetricChange(option): void {
-    console.log(option);
     this.metricIndx = this.selectedMetrics.ind;
     // resetting boxplot index
     this.boxplotIndx = 0;
