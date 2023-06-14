@@ -296,7 +296,6 @@
 
     //==========================================================================================
     // Number of users by time range:
-
     var time = {{stats.user_data.users_time|safe}};
     var users = {{stats.user_data.users|safe}};
 
@@ -435,7 +434,7 @@
                 args: [{'xbins.size': 'M12', "marker.line.width": [1], 'cumulative.enabled': true}],
                 label: 'Year -Cumulative',
                 method: 'restyle',
-            }],
+            }]
         }]
     };
 
