@@ -296,16 +296,23 @@
 
     //==========================================================================================
     // Number of users by time range:
+    var time = {{stats.user_data.users_time|safe}};
+    var users = {{stats.user_data.users|safe}};
+
     var first_user = {{stats.user_data.first_user_time|safe}}[0];
     var last_user = {{stats.user_data.last_user_time|safe}}[0];
-    var H1 = 3600000; //xbins are defined in mili seconds, therefore one hour is defined this way
+
+    var project_start_date = '2021-05-01 00:00'
+    console.log(first_user);
+    var H1 = 7200000; //xbins are defined in mili seconds, therefore one hour is defined this way
     var D1 = H1 * 24; // one day
     var W1 = D1 * 7; // one week
     var M1 = D1 * 30; // one week
     var users_num_in_time_div = $('#users_in_time')[0];
+    var enable_cumulative = true;
 
     var users_in_time_data = [{
-        x: {{stats.user_data.users_time|safe}},
+        x: time,
     autobinx: false,
         autobiny: true,
         marker:
@@ -316,6 +323,7 @@
     },
     name: 'date',
         type:'histogram',
+        cumulative: {enabled: false},
         xbins:{
         end: last_user,
             size: H1,
@@ -324,7 +332,7 @@
     var users_in_time_layout = {
         plot_bgcolor: plot_bgcolor,
         title: {
-            text: 'Number of users in particular time periods',
+            text: 'Number of users registered in particular time periods',
             font: {
                 family: title_font_type,
                 size: title_font_size
@@ -342,7 +350,7 @@
                     family: axis_font_type,
                     size: axis_font_size
                 },
-                y: -0.3
+                y: -0.5
             },
             font: {
                 family: axis_font_type,
@@ -379,32 +387,52 @@
             active: 0,
             showactive: true,
             buttons: [{
-                args: [{'xbins.size': [H1], 'marker.line.width': [0.1]}],
+                args: [{'xbins.size': [H1], 'marker.line.width': [0.1], 'cumulative.enabled': false}],
                 label: 'Hour',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': [D1], 'marker.line.width': [0.1]}],
+                args: [{'xbins.size': [D1], 'marker.line.width': [0.1], 'cumulative.enabled': false}],
                 label: 'Day',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': [W1], "marker.line.width": [0.5]}],
+                args: [{'xbins.size': [W1], "marker.line.width": [0.5], 'cumulative.enabled': false}],
                 label: 'Week',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': ['M1'], 'marker.line.width': [1]}],
+                args: [{'xbins.size': [W1], "marker.line.width": [0.5], 'cumulative.enabled': true}],
+                label: 'Week - Cumulative',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': ['M1'], 'marker.line.width': [1], 'cumulative.enabled': false}],
                 label: 'Month',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': ['M3'], "marker.line.width": [1]}],
-                label: 'Quater',
+                args: [{'xbins.size': ['M1'], 'marker.line.width': [1], 'cumulative.enabled': true}],
+                label: 'Month - Cumulated',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': 'M6', "marker.line.width": [1]}],
+                args: [{'xbins.size': ['M3'], "marker.line.width": [1], 'cumulative.enabled': false}],
+                label: 'Quater',
+                method: 'restyle',
+            },  {
+                args: [{'xbins.size': ['M3'], "marker.line.width": [1], 'cumulative.enabled': true}],
+                label: 'Quater - Cumulative',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': 'M6', "marker.line.width": [1], 'cumulative.enabled': false}],
                 label: 'Half Year',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': 'M12', "marker.line.width": [1]}],
+                args: [{'xbins.size': 'M6', "marker.line.width": [1], 'cumulative.enabled': true}],
+                label: 'Half Year - Cumulative',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': 'M12', "marker.line.width": [1], 'cumulative.enabled': false}],
                 label: 'Year',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': 'M12', "marker.line.width": [1], 'cumulative.enabled': true}],
+                label: 'Year -Cumulative',
                 method: 'restyle',
             }]
         }]
@@ -499,32 +527,52 @@
             active: 0,
             showactive: true,
             buttons: [{
-                args: [{'xbins.size': [H1], 'marker.line.width': [0.1]}],
+                args: [{'xbins.size': [H1], 'marker.line.width': [0.1], 'cumulative.enabled': false}],
                 label: 'Hour',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': [D1], 'marker.line.width': [0.1]}],
+                args: [{'xbins.size': [D1], 'marker.line.width': [0.1], 'cumulative.enabled': false}],
                 label: 'Day',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': [W1], "marker.line.width": [0.5]}],
+                args: [{'xbins.size': [W1], "marker.line.width": [0.5], 'cumulative.enabled': false}],
                 label: 'Week',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': ['M1'], 'marker.line.width': [1]}],
+                args: [{'xbins.size': [W1], "marker.line.width": [0.5], 'cumulative.enabled': true}],
+                label: 'Week - Cumulative',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': ['M1'], 'marker.line.width': [1], 'cumulative.enabled': false}],
                 label: 'Month',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': ['M3'], "marker.line.width": [1]}],
-                label: 'Quater',
+                args: [{'xbins.size': ['M1'], 'marker.line.width': [1], 'cumulative.enabled': true}],
+                label: 'Month - Cumulative',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': 'M6', "marker.line.width": [1]}],
+                args: [{'xbins.size': ['M3'], "marker.line.width": [1], 'cumulative.enabled': false}],
+                label: 'Quater',
+                method: 'restyle',
+            },  {
+                args: [{'xbins.size': ['M3'], "marker.line.width": [1], 'cumulative.enabled': true}],
+                label: 'Quater - Cumulative',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': 'M6', "marker.line.width": [1], 'cumulative.enabled': false}],
                 label: 'Half Year',
                 method: 'restyle',
             }, {
-                args: [{'xbins.size': 'M12', "marker.line.width": [1]}],
+                args: [{'xbins.size': 'M6', "marker.line.width": [1], 'cumulative.enabled': true}],
+                label: 'Half Year - Cumulative',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': 'M12', "marker.line.width": [1], 'cumulative.enabled': false}],
                 label: 'Year',
+                method: 'restyle',
+            }, {
+                args: [{'xbins.size': 'M12', "marker.line.width": [1], 'cumulative.enabled': true}],
+                label: 'Year - Cumulative',
                 method: 'restyle',
             }]
         }]
