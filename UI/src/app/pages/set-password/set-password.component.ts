@@ -21,6 +21,11 @@ export class SetPasswordComponent implements OnInit {
   });
   formErrors: any;
 
+  setPasswordObserver = {
+    next: () => this.onSetPasswordNext(),
+    error: errors => this.onSetPasswordError(errors)
+  }
+
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
               private router: Router,
@@ -38,13 +43,17 @@ export class SetPasswordComponent implements OnInit {
       token: this.token,
       password: this.setPasswordForm.controls.password1.value
     };
-    this.authService.setPassword(setPasswordFormToSubmit, this.token).subscribe(() => {
-        this.router.navigate(['/login']).then(() =>
-          this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
-      },
-      (errors) => {
-        this.formErrors = errors.error;
-      },
+    this.authService.setPassword(setPasswordFormToSubmit, this.token).subscribe(
+      this.setPasswordObserver
     );
+  }
+
+  private onSetPasswordNext(): void{
+    this.router.navigate(['/login']).then(() =>
+      this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
+  }
+
+  private onSetPasswordError(errors): void{
+    this.formErrors = errors.error;
   }
 }
