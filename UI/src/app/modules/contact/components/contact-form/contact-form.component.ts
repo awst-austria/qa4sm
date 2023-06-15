@@ -22,7 +22,7 @@ export class ContactFormComponent {
   });
 
   formObserver = {
-    next: next => this.onSubmitSuccess(),
+    next: next => this.onSubmitNext(),
     error: error => this.onSubmitError(error),
     complete: () => this.onSubmitComplete()
   };
@@ -37,7 +37,7 @@ export class ContactFormComponent {
     this.authService.sendSupportRequest(this.contactForm.value).subscribe(this.formObserver)
   }
 
-  onSubmitSuccess(): void {
+  onSubmitNext(): void {
     this.toastService.showSuccess('Your message has been sent successfully. We will reach out to you within 3 working days.');
   }
   onSubmitError(error): void{
