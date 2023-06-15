@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {
   DatasetComponentSelectionModel
@@ -60,14 +60,13 @@ const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either co
   templateUrl: './validate.component.html',
   styleUrls: ['./validate.component.scss'],
 })
-export class ValidateComponent implements OnInit, AfterViewInit {
+export class ValidateComponent implements OnInit {
   @ViewChild(MapComponent) child: MapComponent;
   @ViewChild(AnomaliesComponent) anomaliesChild: AnomaliesComponent;
   @ViewChild(ScalingComponent) scalingChild: ScalingComponent;
   @ViewChild('spatialReference') spatialReferenceChild: ValidationReferenceComponent;
   @ViewChild('temporalReference') temporalReferenceChild: ValidationReferenceComponent;
 
-  mapVisible: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   validationModel: ValidationModel = new ValidationModel(
     [],
     new ReferenceModel(null, null, null),
@@ -106,10 +105,18 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   defMaxLat = 71.6;
   defMinLat = 34.0;
 
-  smosThresholdFilter = SMOS_RFI_FILTER_ID;
   highlightedDataset: DatasetConfigModel;
-
   logInToValidate = false;
+
+  getValidationConfigObserver = {
+    next: valrun => this.onGetValidationConfigNext(valrun),
+    error: error => this.onGetValidationConfigError(error),
+  }
+
+  startValidationObserver = {
+    next: data => this.onStartValidationNext(data),
+    error: error => this.onStartValidationError(error)
+  }
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -124,9 +131,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               public authService: AuthService) {
   }
 
-  ngAfterViewInit(): void {
-    // child init could be done here
-  }
 
   ngOnInit(): void {
     this.settingsService.getAllSettings().subscribe(setting => {
@@ -139,25 +143,28 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.route.queryParams.subscribe(params => {
       if (params.validation_id) {
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
-          valrun => {
-            this.modelFromValidationConfig(valrun);
-            if (valrun.changes) {
-              this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
-                this.messageAboutConfigurationChanges(valrun.changes));
-            }
-          },
-          (response) => {
-            if (response.message) {
-              this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
-            }
-            this.setDefaultDatasetSettings();
-          }
+          this.getValidationConfigObserver
         );
       } else {
         this.setDefaultDatasetSettings();
       }
     });
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+  }
+
+  private onGetValidationConfigNext(valrun): void {
+    this.modelFromValidationConfig(valrun);
+    if (valrun.changes) {
+      this.toastService.showAlertWithHeader('Not all settings could be reloaded.',
+        this.messageAboutConfigurationChanges(valrun.changes));
+    }
+  }
+
+  private onGetValidationConfigError(response): void {
+    if (response.message) {
+      this.toastService.showErrorWithHeader('Reloading impossible', response.error.message);
+    }
+    this.setDefaultDatasetSettings();
   }
 
   private setDefaultDatasetSettings(): void {
@@ -357,16 +364,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.datasetService.getAllDatasets(userData).subscribe(datasets => {
       model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === defaultDatasetName);
 
+
+      const getVersionsByDatasetObserver = {
+        next: versions => this.onGetVersionNext(versions, model, defaultVersionName),
+        complete: () => this.onGetVersionComplete(),
+      }
+
       // then get all versions for the first dataset in the result list
-      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
-          model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
-        },
-        () => {
-        },
-        () => {
-          this.setDefaultValidationPeriod();
-          this.setLimitationsOnGeographicalRange();
-        }
+      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(
+        getVersionsByDatasetObserver
       );
 
       // at the same time get the variables too
@@ -379,87 +385,106 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     });
   }
 
+  private onGetVersionNext(versions, model, defaultVersionName): void {
+    model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
+  }
+
+  private onGetVersionComplete(): void {
+    this.setDefaultValidationPeriod();
+    this.setLimitationsOnGeographicalRange();
+  }
+
 
   private loadFiltersForModel(model: DatasetConfigModel, reloadingSettings = false): ReplaySubject<DatasetConfigModel> {
     const updatedModel$ = new ReplaySubject<DatasetConfigModel>();
-    this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(filters => {
-        model.basicFilters = [];
-        model.smosRfiFilter$.next(null);
-        model.ismnNetworkFilter$.next(null);
-        model.ismnDepthFilter$.next(null);
-        model.smosChi2Filter$.next(null);
-        filters.forEach(filter => {
-          if (filter.parameterised) {
-            if (filter.id === ISMN_NETWORK_FILTER_ID) {
-              model.ismnNetworkFilter$.next(new FilterModel(
-                filter,
-                false,
-                false,
-                new BehaviorSubject<string>(filter.default_parameter)));
-            } else if (filter.id === SMOS_RFI_FILTER_ID) {
-              if (model.smosRfiFilter$) {
-                model.smosRfiFilter$.next(new FilterModel(
-                  filter,
-                  false,
-                  false,
-                  new BehaviorSubject<string>(filter.default_parameter)));
-              } else {
-                model.smosRfiFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
-                  filter,
-                  false,
-                  false,
-                  new BehaviorSubject<string>(filter.default_parameter))
-                );
-              }
-            } else if (filter.id === SMOS_CHI2_FILTER_ID) {
-              if (model.smosChi2Filter$) {
-                model.smosChi2Filter$.next(new FilterModel(
-                  filter,
-                  false,
-                  false,
-                  new BehaviorSubject<string>(filter.default_parameter)));
-              } else {
-                model.smosChi2Filter$ = new BehaviorSubject<FilterModel>(new FilterModel(
-                  filter,
-                  false,
-                  false,
-                  new BehaviorSubject<string>(filter.default_parameter))
-                );
-              }
-            } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
-              if (model.ismnDepthFilter$) {
-                model.ismnDepthFilter$.next(new FilterModel(
-                  filter,
-                  false,
-                  false,
-                  new BehaviorSubject<string>(filter.default_parameter)));
-              } else {
-                model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
-                  filter,
-                  false,
-                  false,
-                  new BehaviorSubject<string>(filter.default_parameter))
-                );
-              }
-            }
-          } else {
-            const newFilter = (new FilterModel(
+
+    const getFiltersObserver = {
+      next: filters => this.onGetFiltersNext(filters, model, reloadingSettings, updatedModel$),
+      error: error => this.onGetFiltersError(error, updatedModel$)
+    }
+
+    this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(getFiltersObserver);
+    return updatedModel$;
+  }
+
+
+  private onGetFiltersNext(filters, model, reloadingSettings, updatedModel$): void {
+    model.basicFilters = [];
+    model.smosRfiFilter$.next(null);
+    model.ismnNetworkFilter$.next(null);
+    model.ismnDepthFilter$.next(null);
+    model.smosChi2Filter$.next(null);
+    filters.forEach(filter => {
+      if (filter.parameterised) {
+        if (filter.id === ISMN_NETWORK_FILTER_ID) {
+          model.ismnNetworkFilter$.next(new FilterModel(
+            filter,
+            false,
+            false,
+            new BehaviorSubject<string>(filter.default_parameter)));
+        } else if (filter.id === SMOS_RFI_FILTER_ID) {
+          if (model.smosRfiFilter$) {
+            model.smosRfiFilter$.next(new FilterModel(
               filter,
               false,
               false,
-              new BehaviorSubject<string>(null)));
-            if (!reloadingSettings && newFilter.filterDto.default_set_active) {
-              newFilter.enabled = true;
-            }
-            model.basicFilters.push(newFilter);
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.smosRfiFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
           }
-        });
-        updatedModel$.next(model);
-      },
-      error => {
-        updatedModel$.error(error);
-      });
-    return updatedModel$;
+        } else if (filter.id === SMOS_CHI2_FILTER_ID) {
+          if (model.smosChi2Filter$) {
+            model.smosChi2Filter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.smosChi2Filter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        } else if (filter.id === ISMN_DEPTH_FILTER_ID) {
+          if (model.ismnDepthFilter$) {
+            model.ismnDepthFilter$.next(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter)));
+          } else {
+            model.ismnDepthFilter$ = new BehaviorSubject<FilterModel>(new FilterModel(
+              filter,
+              false,
+              false,
+              new BehaviorSubject<string>(filter.default_parameter))
+            );
+          }
+        }
+      } else {
+        const newFilter = (new FilterModel(
+          filter,
+          false,
+          false,
+          new BehaviorSubject<string>(null)));
+        if (!reloadingSettings && newFilter.filterDto.default_set_active) {
+          newFilter.enabled = true;
+        }
+        model.basicFilters.push(newFilter);
+      }
+    });
+    updatedModel$.next(model);
+  }
+
+  private onGetFiltersError(error, updatedModel$): void {
+    updatedModel$.error(error);
   }
 
   removeDataset(configModel: DatasetConfigModel): void {
@@ -574,26 +599,29 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
 
-    this.validationConfigService.startValidation(newValidation, checkForExistingValidation).subscribe(
-      data => {
-        if (data.id) {
-          this.router.navigate([`validation-result/${data.id}`]).then(() =>
-            this.toastService.showSuccessWithHeader('Validation started',
-              'Your validation has been started'));
-        } else if (data.is_there_validation) {
-          this.isThereValidation = data;
-          this.modalWindowService.open();
-        }
 
-      },
-      errors => {
-        if (this.authService.authenticated.getValue()) {
-          const validationErrorMessage = this.messageAboutValidationErrors(errors);
-          this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
-        } else {
-          this.logInToValidate = !this.authService.authenticated.getValue();
-        }
-      });
+    this.validationConfigService.startValidation(newValidation, checkForExistingValidation)
+      .subscribe(this.startValidationObserver);
+  }
+
+  private onStartValidationNext(data): void {
+    if (data.id) {
+      this.router.navigate([`validation-result/${data.id}`]).then(() =>
+        this.toastService.showSuccessWithHeader('Validation started',
+          'Your validation has been started'));
+    } else if (data.is_there_validation) {
+      this.isThereValidation = data;
+      this.modalWindowService.open();
+    }
+  }
+
+  private onStartValidationError(error) {
+    if (this.authService.authenticated.getValue()) {
+      const validationErrorMessage = this.messageAboutValidationErrors(error);
+      this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
+    } else {
+      this.logInToValidate = !this.authService.authenticated.getValue();
+    }
   }
 
   setLoggedIn(): void {
@@ -609,7 +637,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.spatialSubsetModel.minLat$.next(this.defMinLat);
   }
 
-  getCurrentSpatialSubseting(): {lonMax: number, lonMin: number, latMax: number, latMin: number}{
+  getCurrentSpatialSubseting(): { lonMax: number, lonMin: number, latMax: number, latMin: number } {
     return {
       lonMax: this.validationModel.spatialSubsetModel.maxLon$.value,
       lonMin: this.validationModel.spatialSubsetModel.minLon$.value,
@@ -691,31 +719,31 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 // again get current values of the spatial subsetting
     currentVals = this.getCurrentSpatialSubseting();
 
-    if (currentVals.latMin > currentVals.latMax && latMinLimit){
+    if (currentVals.latMin > currentVals.latMax && latMinLimit) {
       this.validationModel.spatialSubsetModel.minLat$.next(latMinLimit);
       this.validationModel.spatialSubsetModel.minLatLimit$.next(latMinLimit);
-    } else if (currentVals.latMin > currentVals.latMax && !latMinLimit){
+    } else if (currentVals.latMin > currentVals.latMax && !latMinLimit) {
       this.validationModel.spatialSubsetModel.maxLat$.next(currentVals.latMax);
     }
 
-    if (currentVals.latMax < latMinLimit && latMaxLimit){
+    if (currentVals.latMax < latMinLimit && latMaxLimit) {
       this.validationModel.spatialSubsetModel.maxLat$.next(latMaxLimit);
       this.validationModel.spatialSubsetModel.maxLatLimit$.next(latMaxLimit);
     } else if (currentVals.latMax < latMinLimit && !latMaxLimit) {
       this.validationModel.spatialSubsetModel.maxLat$.next(latMinLimit);
     }
 
-    if (currentVals.lonMin > currentVals.lonMax && lonMinLimit){
+    if (currentVals.lonMin > currentVals.lonMax && lonMinLimit) {
       this.validationModel.spatialSubsetModel.minLon$.next(lonMinLimit);
       this.validationModel.spatialSubsetModel.minLonLimit$.next(lonMinLimit);
-    } else if (currentVals.lonMin > currentVals.lonMax && !lonMinLimit){
+    } else if (currentVals.lonMin > currentVals.lonMax && !lonMinLimit) {
       this.validationModel.spatialSubsetModel.minLon$.next(currentVals.lonMax);
     }
 
-    if (currentVals.lonMax < currentVals.lonMin && lonMaxLimit){
+    if (currentVals.lonMax < currentVals.lonMin && lonMaxLimit) {
       this.validationModel.spatialSubsetModel.maxLon$.next(lonMaxLimit);
       this.validationModel.spatialSubsetModel.maxLonLimit$.next(lonMaxLimit);
-    } else if (currentVals.lonMax < currentVals.lonMin && !lonMaxLimit){
+    } else if (currentVals.lonMax < currentVals.lonMin && !lonMaxLimit) {
       this.validationModel.spatialSubsetModel.maxLon$.next(currentVals.lonMin);
     }
 
@@ -786,7 +814,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.highlightedDataset.highlighted$.next(event.highlight);
   }
 
-  disableValidateButton(validationModel): boolean{
+  disableValidateButton(validationModel): boolean {
     return validationModel.datasetConfigurations
       .filter(config => config.datasetModel?.selectedVariable?.short_name === '--none--').length !== 0;
   }
