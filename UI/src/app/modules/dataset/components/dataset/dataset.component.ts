@@ -25,6 +25,16 @@ export class DatasetComponent implements OnInit {
   selectableDatasetVersions$: Observable<DatasetVersionDto[]>;
   selectableDatasetVariables$: Observable<DatasetVariableDto[]>;
 
+  selectableDatasetVersionsObserver = {
+    next: versions => this.onSelectableVersionsNext(versions),
+    complete: () => this.onSelectableVersionsComplete()
+  }
+
+  selectableDatasetVariablesObserver = {
+    next: variables => this.onSelectableVariablesNext(variables),
+    complete: () => this.onSelectableVariablesComplete()
+  }
+
   @Input() selectionModel: DatasetComponentSelectionModel;
   @Input() removable = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
@@ -42,7 +52,7 @@ export class DatasetComponent implements OnInit {
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
       if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0
-        && this.selectionModel.selectedDataset?.short_name !== 'ISMN'){
+        && this.selectionModel.selectedDataset?.short_name !== 'ISMN') {
         this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
           return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
         }));
@@ -69,25 +79,26 @@ export class DatasetComponent implements OnInit {
       this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
 
 
-    this.selectableDatasetVersions$.subscribe(
-      versions => {
-        this.selectionModel.selectedVersion = versions[0];
-      },
-      () => {
-      },
-      () => {
-        this.selectableDatasetVariables$ = this.sortObservableById(
-          this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+    this.selectableDatasetVersions$.subscribe(this.selectableDatasetVersionsObserver);
+  }
 
-        this.selectableDatasetVariables$.subscribe(
-          variables => {
-            this.selectionModel.selectedVariable = variables[variables.length - 1];
-          },
-          () => {},
-          () => {
-            this.changeDataset.emit(this.selectionModel);
-          });
-      });
+  private onSelectableVersionsNext(versions): void {
+    this.selectionModel.selectedVersion = versions[0];
+  }
+
+  private onSelectableVersionsComplete(): void {
+    this.selectableDatasetVariables$ = this.sortObservableById(
+      this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+
+    this.selectableDatasetVariables$.subscribe(this.selectableDatasetVariablesObserver)
+  }
+
+  private onSelectableVariablesNext(variables): void {
+    this.selectionModel.selectedVariable = variables[variables.length - 1];
+  }
+
+  private onSelectableVariablesComplete(): void {
+    this.changeDataset.emit(this.selectionModel);
   }
 
   onDatasetChange(): void {
