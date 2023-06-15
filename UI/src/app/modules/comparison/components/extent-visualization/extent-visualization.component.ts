@@ -7,8 +7,6 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-// import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
-// import {Gallery} from 'angular-gallery';
 
 @Component({
   selector: 'qa-extent-visualization',
