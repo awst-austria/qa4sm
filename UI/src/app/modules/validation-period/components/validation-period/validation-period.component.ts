@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {ValidationPeriodModel} from './validation-period-model';
 
 @Component({
@@ -6,13 +6,9 @@ import {ValidationPeriodModel} from './validation-period-model';
   templateUrl: './validation-period.component.html',
   styleUrls: ['./validation-period.component.scss']
 })
-export class ValidationPeriodComponent implements OnInit {
+export class ValidationPeriodComponent {
 
   @Input() validationPeriodModel: ValidationPeriodModel;
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
-
 }
