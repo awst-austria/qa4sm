@@ -60,22 +60,30 @@ export class ExtentVisualizationComponent implements OnInit {
     ids.forEach(id => {
       parameters = parameters.append('ids', id);
     });
-    this.comparisonService.getComparisonExtentImage(parameters).subscribe(data => {
-      if (data) {
-        this.img = data;
-        this.showLoadingSpinner = false;
-      }
-    },
-      () => {
-        this.showLoadingSpinner = false;
-        this.errorHappened = true;
-        this.isError.emit(true);
-      }
-    );
+
+    const getComparisonExtentImageObserver = {
+      next: data => this.onGetComparisonExtentImageNext(data),
+      error: () => this.onGetComparisonExtentImageError()
+    }
+
+    this.comparisonService.getComparisonExtentImage(parameters).subscribe(getComparisonExtentImageObserver);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plotBase64);
+  }
+
+  private onGetComparisonExtentImageNext(data): void {
+    if (data) {
+      this.img = data;
+      this.showLoadingSpinner = false;
+    }
+  }
+
+  private onGetComparisonExtentImageError(): void {
+    this.showLoadingSpinner = false;
+    this.errorHappened = true;
+    this.isError.emit(true);
   }
 
 }
