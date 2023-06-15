@@ -13,6 +13,7 @@ export class PasswordResetValidateTokenComponent implements OnInit {
               private route: ActivatedRoute,
               private router: Router) { }
 
+
   ngOnInit(): void {
     if (this.router.url !== '/password-reset/set-password'){
       this.validateToken();
@@ -21,20 +22,30 @@ export class PasswordResetValidateTokenComponent implements OnInit {
 
   validateToken(): void{
     this.route.params.subscribe(params => {
-      this.authService.validateResetPasswordToken(params.token).subscribe(response => {
-        if (response.status === 'OK'){
-          this.authService.setPasswordResetToken(params.token);
-        } else {
-          this.tokenValid = false;
-        }
-      },
-        () => {
-          this.tokenValid = false;
-        },
-        () => {
-          this.router.navigate(['set-password']);
-        });
-    });
 
+      const validateTokenObserver = {
+        next: response => this.onValidateTokenNext(response, params),
+        error: () => this.onValidateTokenError(),
+        complete: () => this.onValidateTokenComplete()
+      }
+
+      this.authService.validateResetPasswordToken(params.token).subscribe(validateTokenObserver);
+    });
+  }
+
+  private onValidateTokenNext(response, params): void{
+    if (response.status === 'OK'){
+      this.authService.setPasswordResetToken(params.token);
+    } else {
+      this.tokenValid = false;
+    }
+  }
+
+  private onValidateTokenError(): void{
+    this.tokenValid = false;
+  }
+
+  private onValidateTokenComplete(): void{
+    this.router.navigate(['set-password']);
   }
 }
