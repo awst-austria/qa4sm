@@ -16,6 +16,10 @@ export class TableComparisonComponent implements OnInit {
   table: string;
   showLoadingSpinner = true;
   errorHappened = false;
+  getComparisonTableObserver = {
+    next: data => this.onGetComparisonTableNext(data),
+    error: () => this.onGetComparisonTableError()
+  }
 
   constructor(private comparisonService: ComparisonService) {
   }
@@ -54,18 +58,21 @@ export class TableComparisonComponent implements OnInit {
     });
   }
 
-  getComparisonTable(parameters): void{
-    this.comparisonService.getComparisonTable(parameters).subscribe(data => {
-      if (data){
-        this.table = data;
-        this.showLoadingSpinner = false;
-      }
-    },
-      () => {
-        this.showLoadingSpinner = false;
-        this.errorHappened = true;
-        this.isError.emit(true);
-      });
+  getComparisonTable(parameters): void {
+    this.comparisonService.getComparisonTable(parameters).subscribe(this.getComparisonTableObserver);
+  }
+
+  private onGetComparisonTableNext(data): void {
+    if (data) {
+      this.table = data;
+      this.showLoadingSpinner = false;
+    }
+  }
+
+  private onGetComparisonTableError(): void {
+    this.showLoadingSpinner = false;
+    this.errorHappened = true;
+    this.isError.emit(true);
   }
 
   getComparisonTableAsCsv(): void {
@@ -73,7 +80,7 @@ export class TableComparisonComponent implements OnInit {
     const ids = this.comparisonParameters.getAll('ids');
     const metricList = this.comparisonParameters.getAll('metric_list');
     const getIntersection = this.comparisonParameters.get('get_intersection') === 'true';
-    // I don't know where extent comes from so I leave it null and I handle it in the service
+    // I don't know where extent comes from, so I leave it null and I handle it in the service
     const extent = null;
     this.comparisonService.downloadComparisonTableCsv(
       ids, metricList, getIntersection, extent

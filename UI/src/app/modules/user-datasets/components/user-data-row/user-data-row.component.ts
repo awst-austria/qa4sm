@@ -42,6 +42,11 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   dateFormat = 'medium';
   timeZone = 'UTC';
   filePreprocessingStatus: any;
+  getUserDataFileByIdObserver = {
+    next: data => this.onGetUserDataFileByIdNext(data),
+    error: () => this.onGetUserDataFileByIdError()
+  }
+
 
   // variables$: Observable<DatasetVariableDto>[] = [];
 
@@ -91,27 +96,38 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
   updateMetadata(fieldName, fieldValue, userDataId): void {
-    this.userDatasetService.updateMetadata(fieldName, fieldValue, userDataId).subscribe(() => {
-        this.toggle(fieldName, false);
-        if (fieldName === this.datasetFieldName) {
-          this.datasetName$.next(fieldValue);
-        }
-        if (fieldName === this.versionFieldName) {
-          this.versionName$.next(fieldValue);
-        }
-        if (fieldName === this.variableFieldName) {
-          this.variableName.prettyName$.next(
-            this.userDataset.all_variables.find(choice => choice.name === fieldValue).long_name);
-          this.variableName.unit$.next(this.userDataset.all_variables.find(choice => choice.name === fieldValue).units);
-          this.variableName.shortName$.next(fieldValue);
-        }
-      },
-      () => {
-        this.toastService.showError('Metadata could not be updated');
-      },
-      () => {
-        this.toastService.showSuccess('Metadata has been updated');
-      });
+
+    const updateMetadataObserver = {
+      next: () => this.onUpdateMetadataNext(fieldName, fieldValue),
+      error: () => this.onUpdateMetadataError(),
+      complete: () => this.onUpdateMetadataComplete()
+    }
+
+    this.userDatasetService.updateMetadata(fieldName, fieldValue, userDataId).subscribe(updateMetadataObserver);
+  }
+
+  private onUpdateMetadataNext(fieldName, fieldValue): void{
+    this.toggle(fieldName, false);
+    if (fieldName === this.datasetFieldName) {
+      this.datasetName$.next(fieldValue);
+    }
+    if (fieldName === this.versionFieldName) {
+      this.versionName$.next(fieldValue);
+    }
+    if (fieldName === this.variableFieldName) {
+      this.variableName.prettyName$.next(
+        this.userDataset.all_variables.find(choice => choice.name === fieldValue).long_name);
+      this.variableName.unit$.next(this.userDataset.all_variables.find(choice => choice.name === fieldValue).units);
+      this.variableName.shortName$.next(fieldValue);
+    }
+  }
+
+  private onUpdateMetadataError(): void{
+    this.toastService.showError('Metadata could not be updated');
+  }
+
+  private onUpdateMetadataComplete(): void{
+    this.toastService.showSuccess('Metadata has been updated');
   }
 
   toggle(fieldName, open): void {
@@ -138,22 +154,25 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   refreshFilePreprocessingStatus(): void {
     if (!this.userDataset.metadata_submitted) {
       this.filePreprocessingStatus = setInterval(() => {
-        this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe(data => {
-            if (data.metadata_submitted) {
-              this.updateVariable();
-              if (this.variableName.prettyName$.value !== 'none') {
-                this.userDatasetService.refresh.next(true);
-              }
-            }
-          },
-          () => {
-            this.userDatasetService.refresh.next(true);
-            this.toastService.showErrorWithHeader('File preprocessing failed',
-              'File could not be preprocessed. Please make sure that you are uploading a proper file and if the ' +
-              'file fulfills our requirements', 10000);
-          });
+        this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe(this.getUserDataFileByIdObserver);
       }, 60 * 1000); // one minute
     }
+  }
+
+  private onGetUserDataFileByIdNext(data): void {
+    if (data.metadata_submitted) {
+      this.updateVariable();
+      if (this.variableName.prettyName$.value !== 'none') {
+        this.userDatasetService.refresh.next(true);
+      }
+    }
+  }
+
+  private onGetUserDataFileByIdError(): void{
+    this.userDatasetService.refresh.next(true);
+    this.toastService.showErrorWithHeader('File preprocessing failed',
+      'File could not be preprocessed. Please make sure that you are uploading a proper file and if the ' +
+      'file fulfills our requirements', 10000);
   }
 
 

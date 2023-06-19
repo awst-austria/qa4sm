@@ -6,8 +6,6 @@ import {LoginDto} from './login.dto';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
 
-// const csrfToken = '{{csrf_token}}';
-// const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 @Injectable({
   providedIn: 'root'
 })
@@ -54,8 +52,6 @@ export class AuthService {
         data => {
           this.currentUser = data;
           this.authenticated.next(true);
-        },
-        error => {
         }
       );
   }
@@ -72,39 +68,50 @@ export class AuthService {
 
   login(credentials: LoginDto): Subject<boolean> {
     let authResult = new Subject<boolean>();
+    const loginObserver = {
+      next: data => this.onLoginNext(data, authResult),
+      error: error => this.onLoginError(error, authResult)
+    }
     this.httpClient
       .post<UserDto>(this.loginUrl, credentials)
-      .subscribe(
-        data => {
-          this.currentUser = data;
-          this.authenticated.next(true);
-          authResult.next(true);
-        },
-        error => {
-          this.authenticated.next(false);
-          authResult.next(false);
-        }
-      );
-
+      .subscribe(loginObserver);
     return authResult;
+  }
+
+  private onLoginNext(data, authResult): void {
+    this.currentUser = data;
+    this.authenticated.next(true);
+    authResult.next(true);
+  }
+
+  private onLoginError(error, authResult): void {
+    this.authenticated.next(false);
+    authResult.next(false);
   }
 
   logout(): Subject<boolean> {
     let logoutResult = new Subject<boolean>();
+    const logoutObserver = {
+      next: data => this.onLogoutNext(data, logoutResult),
+      error: () => this.onLogoutError(logoutResult)
+    }
     this.httpClient
       .post(this.logoutUrl, null)
-      .subscribe(
-        data => {
-          this.currentUser = this.emptyUser;
-          this.authenticated.next(false);
-          logoutResult.next(true);
-        },
-        error => {
-          logoutResult.next(false);
-        }
-      );
+      .subscribe(logoutObserver);
+
     return logoutResult;
   }
+
+  private onLogoutNext(data, logoutResult): void {
+    this.currentUser = this.emptyUser;
+    this.authenticated.next(false);
+    logoutResult.next(true);
+  }
+
+  private onLogoutError(logoutResult): void {
+    logoutResult.next(false);
+  }
+
 
   signUp(userForm: any): Observable<any> {
     return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'});
@@ -139,15 +146,15 @@ export class AuthService {
     this.passwordResetToken.next(newToken);
   }
 
-  checkPreviousUrl(): Observable<string>{
+  checkPreviousUrl(): Observable<string> {
     return this.previousUrl.asObservable();
   }
 
-  setPreviousUrl(prevUrl: string): void{
+  setPreviousUrl(prevUrl: string): void {
     this.previousUrl.next(prevUrl);
   }
 
-  sendSupportRequest(messageForm): Observable<any>{
+  sendSupportRequest(messageForm): Observable<any> {
     return this.httpClient.post(this.contactUrl, messageForm);
   }
 

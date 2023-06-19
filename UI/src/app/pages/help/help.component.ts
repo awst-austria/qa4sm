@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
@@ -12,7 +12,7 @@ const plotsUrlPrefix = '/static/images/help/';
   templateUrl: './help.component.html',
   styleUrls: ['./help.component.scss']
 })
-export class HelpComponent implements OnInit, AfterViewInit {
+export class HelpComponent implements OnInit {
   // Icons for bullet points
   faIcons = {
     faArchive: fas.faArchive,
@@ -59,16 +59,6 @@ export class HelpComponent implements OnInit, AfterViewInit {
   }
 
   @ViewChild('helpPage') container: ElementRef<HTMLElement>;
-
-  ngAfterViewInit(): void{
-    this.activeRoute.params.subscribe(param => {
-      if (param.pageSec){
-        const section = this.container.nativeElement.querySelector(`#${param.pageSec}`);
-        // section?.scrollTo();
-        section?.scrollIntoView();
-      }
-    });
-  }
 
   ngOnInit(): void {
     this.helpPagePlots();

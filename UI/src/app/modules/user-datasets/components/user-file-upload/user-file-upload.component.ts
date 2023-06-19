@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {UserDatasetsService} from '../../services/user-datasets.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
@@ -16,7 +16,7 @@ import {UserFileMetadata} from '../../../core/services/form-interfaces/UserFileM
   templateUrl: './user-file-upload.component.html',
   styleUrls: ['./user-file-upload.component.scss']
 })
-export class UserFileUploadComponent implements OnInit {
+export class UserFileUploadComponent {
   // variables to store file information
   file: File;
   fileName = '';
@@ -30,6 +30,12 @@ export class UserFileUploadComponent implements OnInit {
   uploadSub: Subscription;
   allowedExtensions = ['.zip', '.nc', '.nc4'];
 
+  uploadObserver = {
+    next: event => this.onUploadNext(event),
+    error: error => this.onUploadError(error),
+    complete: () => this.onUploadComplete()
+  }
+
   // dataset file form
   metadataForm = this.formBuilder.group<UserFileMetadata>({
     dataset_name: [null, [Validators.required, Validators.maxLength(30), allowedNameValidator()]],
@@ -42,9 +48,6 @@ export class UserFileUploadComponent implements OnInit {
               private formBuilder: FormBuilder,
               private toastService: ToastService,
               public authService: AuthService) {
-  }
-
-  ngOnInit(): void {
   }
 
   private verifyZipContent(): void {
@@ -95,28 +98,31 @@ export class UserFileUploadComponent implements OnInit {
       const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName, this.metadataForm.value)
         .pipe(finalize(() => this.reset));
 
-      this.uploadSub = upload$.subscribe(event => {
-          if (event.type === HttpEventType.UploadProgress) {
-            this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
-          } else if (event.type === HttpEventType.Response) {
-            this.userDatasetService.refresh.next(true);
-            this.authService.init();
-            this.resetFile();
-          }
-        },
-        (message) => {
-          this.spinnerVisible = false;
-          this.toastService.showErrorWithHeader('File not saved',
-            `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
-        },
-        () => {
-          this.spinnerVisible = false;
-          this.metadataForm.reset({});
-        }
-      );
+      this.uploadSub = upload$.subscribe(this.uploadObserver);
     }
   }
 
+
+  private onUploadNext(event): void {
+    if (event.type === HttpEventType.UploadProgress) {
+      this.uploadProgress.next(Math.round(100 * (event.loaded / event.total)));
+    } else if (event.type === HttpEventType.Response) {
+      this.userDatasetService.refresh.next(true);
+      this.authService.init();
+      this.resetFile();
+    }
+  }
+
+  private onUploadError(message): void {
+    this.spinnerVisible = false;
+    this.toastService.showErrorWithHeader('File not saved',
+      `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
+  }
+
+  private onUploadComplete(): void {
+    this.spinnerVisible = false;
+    this.metadataForm.reset({});
+  }
 
   onSaveData(): void {
     this.dialogVisible = false;

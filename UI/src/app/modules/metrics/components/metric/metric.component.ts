@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {MetricModel} from './metric-model';
 
 @Component({
@@ -6,15 +6,12 @@ import {MetricModel} from './metric-model';
   templateUrl: './metric.component.html',
   styleUrls: ['./metric.component.scss']
 })
-export class MetricComponent implements OnInit {
+export class MetricComponent {
 
   @Input() metricModel: MetricModel;
   @Input() disabled: boolean = false;
 
   constructor() {
-  }
-
-  ngOnInit(): void {
   }
 
 }

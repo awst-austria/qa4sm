@@ -33,9 +33,6 @@ export class GlobalParamsService {
       .subscribe(
         data => {
           this.globalContext = data;
-        },
-        error => {
-
         }
       );
   }

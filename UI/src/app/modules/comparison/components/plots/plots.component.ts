@@ -7,8 +7,6 @@ import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {ExtentModel} from '../spatial-extent/extent-model';
-// import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
-// import {Gallery} from 'angular-gallery';
 import {debounceTime} from 'rxjs/operators';
 
 // types of plots to show up. Shouldn't be hardcoded
@@ -38,6 +36,11 @@ export class PlotsComponent implements OnInit {
   displayGallery: boolean;
   activeIndex = 0;
 
+  getComparisonPlotsObserver = {
+    next: data => this.onGetComparisonPlotsNext(data),
+    error: () => this.onGetComparisonPlotsError()
+  }
+
   constructor(private comparisonService: ComparisonService,
               private domSanitizer: DomSanitizer,
               private plotService: WebsiteGraphicsService) {
@@ -53,7 +56,7 @@ export class PlotsComponent implements OnInit {
       this.comparisonModel = comparison;
       if ((comparison.selectedValidations.length > 1 && !comparison.multipleNonReference) ||
         (comparison.selectedValidations.length === 1 && comparison.multipleNonReference)) {
-          this.getComparisonMetrics(comparison);
+        this.getComparisonMetrics(comparison);
       }
     });
   }
@@ -101,18 +104,23 @@ export class PlotsComponent implements OnInit {
     PLOT_TYPES.forEach(plotType => {
       parameters = parameters.append('plot_types', plotType);
     });
-    this.comparisonService.getComparisonPlots(parameters).subscribe(data => {
-      if (data) {
-        this.plots = data;
-        this.showLoadingSpinner = false;
-      }
-    },
-      () => {
-        this.showLoadingSpinner = false;
-        this.errorHappened = true;
-        this.isError.emit(true);
-      }
+
+    this.comparisonService.getComparisonPlots(parameters).subscribe(
+      this.getComparisonPlotsObserver
     );
+  }
+
+  private onGetComparisonPlotsNext(data): void {
+    if (data) {
+      this.plots = data;
+      this.showLoadingSpinner = false;
+    }
+  }
+
+  private onGetComparisonPlotsError(): void {
+    this.showLoadingSpinner = false;
+    this.errorHappened = true;
+    this.isError.emit(true);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {

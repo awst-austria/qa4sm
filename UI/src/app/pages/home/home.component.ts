@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {Observable} from 'rxjs';
-// import {Gallery} from 'angular-gallery';
 
 
 const homeUrlPrefix = '/static/images/home/';
@@ -83,18 +82,5 @@ export class HomeComponent implements OnInit {
     }
     );
   }
-
-  // showGallery(index: number = 0, imagesListObject): void {
-  //   const imagesList = [];
-  //   imagesListObject.forEach(image => {
-  //     imagesList.push({path: image.plot});
-  //   });
-  //   const prop: any = {};
-  //   prop.component = CarouselComponent;
-  //   prop.images = imagesList;
-  //   prop.index = index;
-  //   prop.arrows = imagesList.length > 1;
-  //   this.gallery.load(prop);
-  // }
 
 }

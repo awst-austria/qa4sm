@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {ExtentModel} from './extent-model';
 
 
@@ -7,16 +7,13 @@ import {ExtentModel} from './extent-model';
   templateUrl: './spatial-extent.component.html',
   styleUrls: ['./spatial-extent.component.scss']
 })
-export class SpatialExtentComponent implements OnInit {
+export class SpatialExtentComponent {
 
   @Input() extentModel: ExtentModel;
   @Input() disabled: boolean;
   @Output() ifChecked: EventEmitter<any> = new EventEmitter<any>();
 
   constructor() {
-  }
-
-  ngOnInit(): void {
   }
 
   spatialExtentChange(event: any): void{

@@ -7,8 +7,6 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
-// import {CarouselComponent} from 'angular-gallery/lib/carousel.component.d';
-// import {Gallery} from 'angular-gallery';
 
 @Component({
   selector: 'qa-extent-visualization',
@@ -60,22 +58,30 @@ export class ExtentVisualizationComponent implements OnInit {
     ids.forEach(id => {
       parameters = parameters.append('ids', id);
     });
-    this.comparisonService.getComparisonExtentImage(parameters).subscribe(data => {
-      if (data) {
-        this.img = data;
-        this.showLoadingSpinner = false;
-      }
-    },
-      () => {
-        this.showLoadingSpinner = false;
-        this.errorHappened = true;
-        this.isError.emit(true);
-      }
-    );
+
+    const getComparisonExtentImageObserver = {
+      next: data => this.onGetComparisonExtentImageNext(data),
+      error: () => this.onGetComparisonExtentImageError()
+    }
+
+    this.comparisonService.getComparisonExtentImage(parameters).subscribe(getComparisonExtentImageObserver);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
     return this.plotService.sanitizePlotUrl(plotBase64);
+  }
+
+  private onGetComparisonExtentImageNext(data): void {
+    if (data) {
+      this.img = data;
+      this.showLoadingSpinner = false;
+    }
+  }
+
+  private onGetComparisonExtentImageError(): void {
+    this.showLoadingSpinner = false;
+    this.errorHappened = true;
+    this.isError.emit(true);
   }
 
 }

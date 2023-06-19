@@ -26,11 +26,22 @@ export class PublishingComponent implements OnInit {
     orcid: ['', [Validators.maxLength(25)]]
   });
 
+  publishResultsObserver = {
+    next: () => this.onPublishResultNext(),
+    error: error => this.onPublishResultError(error)
+  }
+
+  getPublishingFormDataObserver = {
+    next: data => this.onGetPublishingFormDataNext(data),
+    complete: () => this.onGetPublishingFormDataComplete()
+  }
+
   constructor(
     private modalService: ModalWindowService,
     private validationrunService: ValidationrunService,
     private formBuilder: FormBuilder,
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
     this.display$ = this.modalService.watch();
@@ -38,39 +49,44 @@ export class PublishingComponent implements OnInit {
     this.publishingInProgress$ = this.validationrunService.checkPublishingInProgress();
   }
 
-  close(): void{
+  close(): void {
     this.modalService.close();
   }
-  publish(): void{
+
+  publish(): void {
     this.validationrunService.changePublishingStatus(true);
     this.formErrors = [];
 
-    this.validationrunService.publishResults(this.validationId, this.publishingForm.value).subscribe(
-      () => {
-        this.validationrunService.changePublishingStatus(false);
-        this.close();
-        window.location.reload();
-      },
-      error => {
-        this.formErrors = error.error;
-        this.validationrunService.changePublishingStatus(false);
-      });
+    this.validationrunService.publishResults(this.validationId, this.publishingForm.value)
+      .subscribe(this.publishResultsObserver);
   }
 
-  getPublishingForm(): void{
+  private onPublishResultNext(): void {
+    this.validationrunService.changePublishingStatus(false);
+    this.close();
+    window.location.reload();
+  }
+
+  private onPublishResultError(error): void {
+    this.formErrors = error.error;
+    this.validationrunService.changePublishingStatus(false);
+  }
+
+  getPublishingForm(): void {
     const params = new HttpParams().set('id', this.validationId);
-    this.validationrunService.getPublishingFormData(params).subscribe(data => {
-      this.publishingForm.controls.title.setValue(data.title);
-      this.publishingForm.controls.description.setValue(data.description);
-      this.publishingForm.controls.keywords.setValue(data.keywords);
-      this.publishingForm.controls.name.setValue(data.name);
-      this.publishingForm.controls.affiliation.setValue(data.affiliation);
-      this.publishingForm.controls.orcid.setValue(data.orcid);
-    },
-    error => {},
-      () =>
-      //  here I refresh the window, so the submit button is not disabled
-      {this.modalService.open();
-      });
+    this.validationrunService.getPublishingFormData(params).subscribe(this.getPublishingFormDataObserver);
+  }
+
+  private onGetPublishingFormDataNext(data): void{
+    this.publishingForm.controls.title.setValue(data.title);
+    this.publishingForm.controls.description.setValue(data.description);
+    this.publishingForm.controls.keywords.setValue(data.keywords);
+    this.publishingForm.controls.name.setValue(data.name);
+    this.publishingForm.controls.affiliation.setValue(data.affiliation);
+    this.publishingForm.controls.orcid.setValue(data.orcid);
+  }
+
+  private onGetPublishingFormDataComplete(): void{
+    this.modalService.open();
   }
 }
