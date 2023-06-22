@@ -48,7 +48,7 @@
               pButton
               type="submit"
               label="Send"
-              [disabled]="!contactForm.valid || sliderValues.length < 10">
+              [disabled]="!contactForm.valid && sliderValues.length < 10">
       </button>
 
 
