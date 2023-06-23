@@ -9,4 +9,6 @@ export interface UserData {
   country: any;
   orcid: any;
   terms_consent: any;
+  active: any;
+  honeypot: any;
 }
