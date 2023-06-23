@@ -25,12 +25,15 @@ export class UserFormComponent implements OnInit {
     organisation: [''],
     country: [''],
     orcid: [''],
-    terms_consent: ['', Validators.required]
+    terms_consent: ['', Validators.required],
+    active: false,
+    honeypot: [0, [Validators.required, Validators.min(100)]]
   });
   countries: CountryDto[];
   countries$: Observable<CountryDto[]>;
   selectedCountry: CountryDto;
   formErrors: any;
+  sliderValues = [];
 
   signUpObserver = {
     next: () => this.onSignUpNext(),
@@ -59,6 +62,9 @@ export class UserFormComponent implements OnInit {
     if (this.userData) {
       this.setDefaultValues();
     }
+    this.userForm.get('honeypot').valueChanges.subscribe(value => {
+      this.handleSliderChange(value);
+    });
   }
 
   onSubmit(): void {
@@ -126,5 +132,10 @@ export class UserFormComponent implements OnInit {
       }
     );
   }
+
+  handleSliderChange(value: any) {
+    this.sliderValues.push(value)
+  }
+
 
 }

@@ -38,8 +38,8 @@
 
       <div class="py-3 " style="line-height: 1rem">
         <span class="p-float-label">
-          <p-slider id="honeypot" formControlName="honeypot"></p-slider>
-          <label for="honeypot"> Slide to send a message <span class="pi pi-angle-double-right"></span></label>
+          <p-slider id="honeypot" formControlName="honeypot" ></p-slider>
+          <label for="honeypot"> To prove you're a real person, slide the handle all the way to the right <span class="pi pi-angle-double-right"></span></label>
         </span>
 
       </div>
@@ -48,7 +48,7 @@
               pButton
               type="submit"
               label="Send"
-              [disabled]="!contactForm.valid">
+              [disabled]="!contactForm.valid && sliderValues.length < 10">
       </button>
 
 

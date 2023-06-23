@@ -31,7 +31,9 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         assert response.status_code == 400
         assert len(User.objects.filter(email='geralt@of.rivia.pl')) == 0
@@ -46,7 +48,9 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         assert response.status_code == 400
         assert len(User.objects.filter(username='geralt_of_rivia')) == 0
@@ -61,7 +65,9 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         assert response.status_code == 400
         assert len(User.objects.filter(username='geralt_of_rivia')) == 0
@@ -76,7 +82,9 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '',
-                             'terms_consent': False}
+                             'terms_consent': False,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         assert response.status_code == 400
         assert len(User.objects.filter(username='geralt_of_rivia')) == 0
@@ -91,7 +99,9 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         assert response.status_code == 400
         assert len(User.objects.filter(username='geralt_of_rivia')) == 0
@@ -106,7 +116,9 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '1111',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         assert response.status_code == 400
         assert len(User.objects.filter(username='geralt_of_rivia')) == 0
@@ -121,7 +133,9 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '0000-0002-1111-0097',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         new_user = User.objects.get(username='geralt_of_rivia')
 
@@ -139,7 +153,26 @@ class TestUserView(TestCase):
                              'organisation': 'Kaer Morhen',
                              'country': 'PL',
                              'orcid': '0000-0002-1111-0097',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
+        response = self.client.post(signup_url, user_form_correct, format='json')
+
+        assert response.status_code == 400
+
+        # correct full user form - but bot field checked
+        user_form_correct = {'username': 'geralt_from_rivia',
+                             'password1':'roachRoach',
+                             'password2':'roachRoach',
+                             'email': 'geralt@of.rivia.pl',
+                             'first_name': 'Geralt',
+                             'last_name': 'TheWitcher',
+                             'organisation': 'Kaer Morhen',
+                             'country': 'PL',
+                             'orcid': '0000-0002-1111-0097',
+                             'terms_consent': True,
+                             'active': True,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
 
         assert response.status_code == 400
@@ -154,7 +187,9 @@ class TestUserView(TestCase):
                              'organisation': '',
                              'country': '',
                              'orcid': '',
-                             'terms_consent': True}
+                             'terms_consent': True,
+                             'active': False,
+                             'honeypot': 100}
         response = self.client.post(signup_url, user_form_correct, format='json')
         new_user = User.objects.get(username='geraltOfRivia')
 

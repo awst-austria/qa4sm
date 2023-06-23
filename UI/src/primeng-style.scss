@@ -1579,10 +1579,19 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   height: 2rem;
 }
 
+#honeypot-user .p-slider.p-slider-horizontal {
+  height: 3rem;
+}
+
 .p-slider.p-slider-horizontal .p-slider-handle {
   margin-top: -1rem;
   margin-left: -1rem;
   opacity: 0.5;
+}
+
+#honeypot-user .p-slider.p-slider-horizontal .p-slider-handle {
+  margin-top: -1.5rem;
+  margin-left: -1.5rem;
 }
 
 .p-slider.p-slider-vertical {
@@ -1601,6 +1610,11 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   border: 2px solid darkgray;
   border-radius: 4px;
   transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+#honeypot-user .p-slider .p-slider-handle {
+  height: 3rem;
+  width: 3rem;
 }
 
 .p-slider .p-slider-handle:focus {

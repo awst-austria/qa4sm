@@ -27,6 +27,8 @@ def signup_post(request):
     new_user_data = _get_querydict_from_user_data(request, request.data)
     form = SignUpForm(new_user_data)
     if form.is_valid():
+        if form.data.get('active') or form.data.get('honeypot') < 100:
+            return JsonResponse({"message": ''}, status=status.HTTP_400_BAD_REQUEST)
         newuser = form.save(commit=False)
         # new user should not be active by default, admin needs to confirm
         newuser.is_active = False

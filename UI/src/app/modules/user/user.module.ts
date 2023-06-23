@@ -8,6 +8,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {ButtonModule} from 'primeng/button';
 import {CheckboxModule} from 'primeng/checkbox';
 import {RouterModule} from '@angular/router';
+import {SliderModule} from 'primeng/slider';
 
 
 @NgModule({
@@ -15,16 +16,17 @@ import {RouterModule} from '@angular/router';
   exports: [
     UserFormComponent
   ],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    InputTextModule,
-    DropdownModule,
-    FormsModule,
-    TooltipModule,
-    ButtonModule,
-    CheckboxModule,
-    RouterModule,
-  ]
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        InputTextModule,
+        DropdownModule,
+        FormsModule,
+        TooltipModule,
+        ButtonModule,
+        CheckboxModule,
+        RouterModule,
+        SliderModule,
+    ]
 })
 export class UserModule { }

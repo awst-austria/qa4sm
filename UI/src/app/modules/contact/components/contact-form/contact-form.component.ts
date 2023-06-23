@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormBuilder, Validators} from '@angular/forms';
 import {UserDatasetsService} from '../../../user-datasets/services/user-datasets.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
@@ -10,7 +10,7 @@ import {ContactForm} from '../../../core/services/form-interfaces/contact-form';
   templateUrl: './contact-form.component.html',
   styleUrls: ['./contact-form.component.scss']
 })
-export class ContactFormComponent {
+export class ContactFormComponent implements OnInit {
 
   contactForm = this.formBuilder.group<ContactForm>({
     name: ['', [Validators.required, Validators.maxLength(150)]],
@@ -20,6 +20,8 @@ export class ContactFormComponent {
     active: false,
     honeypot: [0, [Validators.required, Validators.min(100)]]
   });
+
+  sliderValues = [];
 
   formObserver = {
     next: next => this.onSubmitNext(),
@@ -31,6 +33,12 @@ export class ContactFormComponent {
               private formBuilder: FormBuilder,
               private toastService: ToastService,
               public authService: AuthService) {
+  }
+
+  ngOnInit() {
+    this.contactForm.get('honeypot').valueChanges.subscribe(value => {
+      this.handleSliderChange(value);
+    });
   }
 
   public onSubmit(): void {
@@ -45,6 +53,10 @@ export class ContactFormComponent {
   }
   onSubmitComplete(): void{
     this.contactForm.reset({});
+  }
+
+  handleSliderChange(value: any) {
+    this.sliderValues.push(value)
   }
 
 }
