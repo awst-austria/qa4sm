@@ -10,6 +10,7 @@ from validator.admin import UserDatasetFileAdmin
 from validator.admin import DatasetAdmin
 from validator.admin import DatasetVersionAdmin
 from validator.admin import DatasetVariableAdmin
+from validator.admin.data_management_groups import DataManagementGroupAdmin
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -20,6 +21,7 @@ from validator.models import Statistics
 from validator.models import Email
 from validator.models import UptimeReport
 from validator.models import UserDatasetFile
+from validator.models import DataManagementGroup
 User = get_user_model()
 
 admin.site.register(Settings, SystemSettingsAdmin)
@@ -33,3 +35,4 @@ admin.site.register(Statistics, StatisticsAdmin)
 admin.site.register(Email, EmailAdmin)
 admin.site.register(UptimeReport, UptimeMonitoringAdmin)
 admin.site.register(UserDatasetFile, UserDatasetFileAdmin)
+admin.site.register(DataManagementGroup, DataManagementGroupAdmin)
