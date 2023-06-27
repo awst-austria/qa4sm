@@ -25,10 +25,9 @@ class DataManagementGroupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance:
+        if self.instance.pk:
             self.fields['user_datasets'].initial = self.instance.custom_datasets.all()
             self.fields['users'].initial = self.instance.user_set.all()
-
 
 class DataManagementGroupAdmin(GroupAdmin):
     form = DataManagementGroupForm
