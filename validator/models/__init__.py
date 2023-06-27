@@ -1,4 +1,5 @@
 from .settings import Settings
+from .data_management_group import DataManagementGroup
 from .custom_user import User
 from .filter import DataFilter
 from .parametrised_filter import ParametrisedFilter
@@ -16,5 +17,4 @@ from .uptime_agent import UptimeAgent
 from .uptime_report import UptimeReport
 from .email import Email
 from .user_dataset_file import UserDatasetFile
-from .data_management_group import DataManagementGroup
 
