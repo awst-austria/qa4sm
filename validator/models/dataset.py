@@ -39,7 +39,8 @@ class Dataset(models.Model):
 
     @property
     def is_shared(self):
-        return len(self.shared_with()) > 0
+        if self.shared_with():
+            return True
 
     @property
     def not_as_reference(self):
