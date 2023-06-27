@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userdatasetfile',
             name='user_groups',
-            field=models.ManyToManyField(related_name='custom_datasets', to='validator.DataManagementGroup'),
+            field=models.ManyToManyField(null=True, blank=True, related_name='custom_datasets', to='validator.DataManagementGroup'),
         ),
     ]

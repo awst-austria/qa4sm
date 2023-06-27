@@ -33,7 +33,7 @@ class UserDatasetFile(models.Model):
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
     metadata_submitted = models.BooleanField(default=False)
-    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets')
+    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True, blank=True)
 
 
 

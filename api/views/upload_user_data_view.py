@@ -271,7 +271,8 @@ def upload_user_data(request, filename):
         'dataset': new_dataset.pk,
         'version': new_version.pk,
         'variable': new_variable.pk,
-        'upload_date': timezone.now()
+        'upload_date': timezone.now(),
+        'user_groups': []
     }
 
     file_serializer = UploadFileSerializer(data=file_data)
