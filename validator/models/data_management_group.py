@@ -7,7 +7,7 @@ class DataManagementGroup(Group):
 
     def save(self,  *args, **kwargs):
         super().save(*args, **kwargs)
-        self.assign_permissions()
+        # self.assign_permissions()
 
     def assign_permissions(self):
         permissions = [
