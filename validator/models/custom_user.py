@@ -14,11 +14,13 @@ class User(AbstractUser):
     BASIC = 'basic'
     EXTENDED = 'extended'
     UNLIMITED = 'unlimited'
+    LARGE = 'large'
 
     DATA_SPACE_LEVELS = (
         (NO_DATA, 1),
         (BASIC, 5 * 10**9),
         (EXTENDED, 10 ** 10),
+        (LARGE, 200 * 10**9),
         (UNLIMITED, None)
     )
 
