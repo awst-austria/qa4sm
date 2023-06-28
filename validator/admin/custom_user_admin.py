@@ -36,6 +36,7 @@ class CustomUserAdmin(UserAdmin):
 #             ## add the action button(s) (change status) to the detail view
             if (field_name == 'Permissions' and 'fields' in attributes):
                 attributes['fields'] = ('user_actions', ) + attributes['fields']
+                attributes['fields'] += ('space_limit',)
 
 
     ## add the url for our user status change action
