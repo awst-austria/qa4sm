@@ -1,3 +1,14 @@
+QA4SM v2.2.4 - Release notes 2023-06-28
+=======================================================
+# New features
+1. Contact form added
+
+# Improvements
+1. Admin panel updated
+2. Sign up form updated with a 'prove you are a real person' feature.
+
+
+
 QA4SM v2.2.3 - Release notes 2023-06-07
 =======================================================
 # Improvements
