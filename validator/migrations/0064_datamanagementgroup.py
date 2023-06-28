@@ -5,28 +5,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def create_dataset_permissions(apps, schema_editor):
-    Permission = apps.get_model('auth', 'Permission')
-    ContentType = apps.get_model('contenttypes', 'ContentType')
-    DataManagementGroup = apps.get_model('validator', 'DataManagementGroup')
-
-    content_type = ContentType.objects.get_for_model(DataManagementGroup)
-
-    publish_datamanagementgroup = Permission.objects.create(
-        codename='publish_datamanagementgroup',
-        name='Can publish validations with dataset',
-        content_type=content_type,
-    )
-    publish_datamanagementgroup.save()
-
-    download_datamanagementgroup = Permission.objects.create(
-        codename='download_datamanagementgroup',
-        name='Can download dataset file',
-        content_type=content_type,
-    )
-    download_datamanagementgroup.save()
-
-
 class Migration(migrations.Migration):
     dependencies = [
         ('auth', '0012_alter_user_first_name_max_length'),
@@ -46,5 +24,4 @@ class Migration(migrations.Migration):
                 ('objects', django.contrib.auth.models.GroupManager()),
             ],
         ),
-        # migrations.RunPython(create_dataset_permissions),
     ]
