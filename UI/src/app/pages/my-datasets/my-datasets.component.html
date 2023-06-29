@@ -29,7 +29,7 @@
     </div>
     <div *ngIf="(userDatasets$ | async) as userDatasetList">
 
-      <div *ngIf="userDatasetList.length !== 0" class="container mb-5 mt-4" style="max-width: 70rem;">
+      <div *ngIf="userDatasetList.length !== 0" class="container mb-5 mt-4" [ngStyle]="pageStyle">
         <div>
           <div *ngFor="let userDataset of userDatasetList" class="mb-3">
             <qa-user-data-row [userDataset]="userDataset"></qa-user-data-row>

@@ -18,6 +18,10 @@ export class MyDatasetsComponent implements OnInit {
   hasNoSpaceLimit: boolean;
   hasNoSpaceAssigned: boolean;
 
+  pageStyle ={
+    'max-width': `${this.authService.currentUser.is_staff ? '85rem' : '70rem'}`
+  }
+
   ngOnInit(): void {
     this.userDatasets$ = this.userDatasetService.getUserDataList();
     this.userDatasetService.doRefresh.subscribe(value => {
