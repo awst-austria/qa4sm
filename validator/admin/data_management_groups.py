@@ -29,6 +29,7 @@ class DataManagementGroupForm(forms.ModelForm):
             self.fields['user_datasets'].initial = self.instance.custom_datasets.all()
             self.fields['users'].initial = self.instance.user_set.all()
 
+
 class DataManagementGroupAdmin(GroupAdmin):
     form = DataManagementGroupForm
 
