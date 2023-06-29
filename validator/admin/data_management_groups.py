@@ -32,12 +32,13 @@ class DataManagementGroupForm(forms.ModelForm):
 class DataManagementGroupAdmin(GroupAdmin):
     form = DataManagementGroupForm
 
-    list_display = ('name', 'permission_list', 'users', 'user_datasets')
+    list_display = ('name', 'group_owner', 'permission_list', 'users', 'user_datasets')
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
 
         content_type_id = ContentType.objects.get_for_model(DataManagementGroup)
+        form.base_fields['group_owner'].queryset = User.objects.filter(id=request.user.id)
         form.base_fields['permissions'].queryset = Permission.objects.filter(content_type_id=content_type_id)
         form.base_fields['user_datasets'].queryset = UserDatasetFile.objects.filter(owner=request.user)
         return form
@@ -45,6 +46,7 @@ class DataManagementGroupAdmin(GroupAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
 
+        # obj.group_owner = request.user
         obj.custom_datasets.set(form.cleaned_data['user_datasets'])
         obj.user_set.set(form.cleaned_data['users'])
 
