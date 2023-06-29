@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {environment} from '../../../../environments/environment';
 import {UserDataFileDto} from './user-data-file.dto';
+import {DataManagementGroupsDto} from './data-management-groups.dto';
 
 
 const urlPrefix = environment.API_URL + 'api';
@@ -11,6 +12,7 @@ const userDataListUrl: string = urlPrefix + '/get-list-of-user-data-files';
 const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
 const userDataFileUrl: string = urlPrefix + '/get-user-file-by-id';
+const dataManagementGroupsUrl: string = urlPrefix + '/data-management-groups';
 
 
 const csrfToken = '{{csrf_token}}';
@@ -52,6 +54,14 @@ export class UserDatasetsService {
   updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
     const updateUrl = updateMetadataUrl + '/' + dataFileId + '/';
     return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue});
+  }
+
+  getDataManagementGroups(ids=[]): Observable<DataManagementGroupsDto[]>{
+    let params = new HttpParams();
+    ids.forEach((id) => {
+      params = params.append('id', id)
+    });
+    return this.httpClient.get<DataManagementGroupsDto[]>(dataManagementGroupsUrl, {params})
   }
 
   getTheSizeInProperUnits(sizeInBites): string {
