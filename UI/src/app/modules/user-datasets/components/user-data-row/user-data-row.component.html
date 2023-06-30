@@ -126,7 +126,7 @@
     <!-- validations -->
     <div class="p-fluid" [style]="{height: '100%'}" [ngClass]="authService.currentUser.is_staff ? 'col-4' : 'col-5'">
       <div><strong>Validation list: </strong></div>
-      <p-scrollPanel  [style]="{width: '80%', height: '80%'}">
+      <p-scrollPanel [style]="{width: '80%', height: '80%'}">
         <div *ngIf="userDataset.validation_list.length > 0">
           <div *ngFor="let validation of userDataset.validation_list; index as ind">
             {{ind + 1}}) <a routerLink="/validation-result/{{validation.val_id}}"
@@ -145,7 +145,7 @@
     <!-- sharing groups-->
     <div *ngIf="authService.currentUser.is_staff" class="p-fluid col-2" [style]="{height: '100%', width: '20%'}">
       <div><strong>Shared: </strong></div>
-      <p-scrollPanel *ngIf="(dataManagementGroups$|async) as managementGroups" [style]="{width: '80%', height: '80%'}">
+      <p-scrollPanel *ngIf="(datasetGroups$|async) as managementGroups" [style]="{width: '80%', height: '80%'}">
         <div *ngIf="managementGroups.length !== 0">
           <div *ngFor="let group of managementGroups; index as ind">
             {{ind + 1}}) {{group.name}}
@@ -157,13 +157,11 @@
       </p-scrollPanel>
     </div>
 
-
-
     <!-- actions   -->
     <div class="status col-2" [style]="{width: '12%'}">
-      <div
-        [pTooltip]="userDataset.is_used_in_validation ? 'Dataset has been used in a validation, it can not be removed' : ''"
-        tooltipPosition="left">
+      <div class="py-1"
+           [pTooltip]="userDataset.is_used_in_validation ? 'Dataset has been used in a validation, it can not be removed' : ''"
+           tooltipPosition="left">
         <button pButton
                 icon="pi pi-times"
                 type="button"
@@ -175,11 +173,108 @@
                 (click)="removeDataset(userDataset.id)">
         </button>
       </div>
+      <div *ngIf="authService.currentUser.is_staff" class="py-1">
+        <button pButton
+                icon="pi pi-times"
+                type="button"
+                label="Share dataset"
+                pTooltip="Share your dataset with other users"
+                class="p-button-info"
+                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+                (click)="openWindowForDataSharing()">
+        </button>
+      </div>
     </div>
   </div>
   <div class="grid mx-0 px-0 my-0 no-validation-box" *ngIf="!userDataset.metadata_submitted" [style]="{height: '100%'}">
-     <h4> <span class="pi pi-spin pi-spinner" style="font-size: 2rem"></span><em> Your file is still being preprocessed. </em> </h4>
+    <h4><span class="pi pi-spin pi-spinner" style="font-size: 2rem"></span><em> Your file is still being
+      preprocessed. </em></h4>
   </div>
 
 </p-panel>
 
+<p-dialog header="Share your dataset with other users"
+          id="share-dataset-modal"
+          [modal]="true"
+          [style]="{height: '100%', width: '50%'}"
+          [(visible)]="shareDataModalWindow">
+
+
+  <div class="p-float-label my-4" *ngIf="addToGroupModalWindow">
+      <p-dropdown [options]="dataManagementGroups"
+                  optionLabel="name"
+                  [style]="{width: '40%'}"
+                  [(ngModel)]="groupToUpdate"
+                  id="group-selector">
+      </p-dropdown>
+      <label for="group-selector">Choose a group</label>
+
+    <button pButton
+            icon="pi pi-plus-circle"
+            type="button"
+            label="Add"
+            pTooltip="Add your data to the chosen group."
+            class="p-button-success mx-2"
+            [style]="{width:'6rem', height: '2.25rem'}"
+            (click)="addToExistingGroup(groupToUpdate.id, userDataset.id)">
+    </button>
+  </div>
+
+  <div>
+    <button pButton
+            icon="pi pi-times"
+            type="button"
+            label="Create a group"
+            pTooltip="Create a new group and choose users to share your data with."
+            class="p-button-info py-2 px-2"
+            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+            (click)="createGroup()">
+    </button>
+    <!--  </div>-->
+    <!--  <div *ngIf="(dataManagementGroups$|async) as dataManagementGroups">-->
+    <button *ngIf="dataManagementGroups.length > 0"
+            pButton
+            icon="pi pi-times"
+            type="button"
+            label="Add to a group"
+            pTooltip="Add your data to an existing group."
+            class="p-button-info py-2 px-2"
+            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+            (click)="openAddToGroupModalWindow()">
+    </button>
+  </div>
+
+
+
+
+
+</p-dialog>
+<!--<p-dialog header="Add your dataset to an existing group"-->
+<!--          id="update-group-modal"-->
+<!--          [modal]="true"-->
+<!--          [style]="{height: '100%'} "-->
+<!--          [(visible)]="addToGroupModalWindow">-->
+
+
+
+<!--&lt;!&ndash;  <div class="p-float-label mb-4">&ndash;&gt;-->
+<!--&lt;!&ndash;  <p-dropdown [options]="dataManagementGroups"&ndash;&gt;-->
+<!--&lt;!&ndash;              optionLabel="name"&ndash;&gt;-->
+<!--&lt;!&ndash;              id="group-selector">&ndash;&gt;-->
+<!--&lt;!&ndash;  </p-dropdown>&ndash;&gt;-->
+<!--&lt;!&ndash;      <label for="group-selector">Choose a group</label>&ndash;&gt;-->
+
+
+<!--&lt;!&ndash;    <button pButton&ndash;&gt;-->
+<!--&lt;!&ndash;            icon="pi pi-times"&ndash;&gt;-->
+<!--&lt;!&ndash;            type="button"&ndash;&gt;-->
+<!--&lt;!&ndash;            label="Add"&ndash;&gt;-->
+<!--&lt;!&ndash;            pTooltip="Add your data to the chosen group."&ndash;&gt;-->
+<!--&lt;!&ndash;            class="p-button-info py-2 px-2"&ndash;&gt;-->
+<!--&lt;!&ndash;            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"&ndash;&gt;-->
+<!--&lt;!&ndash;            (click)="addToExistingGroup()">&ndash;&gt;-->
+<!--&lt;!&ndash;    </button>&ndash;&gt;-->
+<!--&lt;!&ndash;  </div>&ndash;&gt;-->
+
+
+<!--</p-dialog>-->

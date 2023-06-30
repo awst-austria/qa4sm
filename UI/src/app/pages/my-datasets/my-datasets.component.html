@@ -17,7 +17,7 @@
     <div class="text-center lead text-muted pt-3">
       {{getLimitMessage()}}
     </div>
-<!--    <hr class="featurette-divider">-->
+    <!--    <hr class="featurette-divider">-->
     <div class="text-center pt-5">
       <qa-user-file-upload></qa-user-file-upload>
     </div>
@@ -28,45 +28,48 @@
       <!--    </div>-->
     </div>
     <div *ngIf="(userDatasets$ | async) as userDatasetList">
+      <div *ngIf="(dataManagementGroups$ | async) as dataManagementGroups">
 
-      <div *ngIf="userDatasetList.length !== 0" class="container mb-5 mt-4" [ngStyle]="pageStyle">
-        <div>
-          <div *ngFor="let userDataset of userDatasetList" class="mb-3">
-            <qa-user-data-row [userDataset]="userDataset"></qa-user-data-row>
-          </div>
-        </div>
-        <hr class="featurette-divider">
-        <div class="lead text-muted pb-3">
+
+        <div *ngIf="userDatasetList.length !== 0" class="container mb-5 mt-4" [ngStyle]="pageStyle">
           <div>
-            Above you can find a list of datasets you have uploaded: <span *ngIf="!readMore">...</span>
-            <span *ngIf="!readMore" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-down">
+            <div *ngFor="let userDataset of userDatasetList" class="mb-3">
+              <qa-user-data-row [userDataset]="userDataset" [dataManagementGroups]="dataManagementGroups"></qa-user-data-row>
+            </div>
+          </div>
+          <hr class="featurette-divider">
+          <div class="lead text-muted pb-3">
+            <div>
+              Above you can find a list of datasets you have uploaded: <span *ngIf="!readMore">...</span>
+              <span *ngIf="!readMore" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-down">
           Read more
         </span>
-          </div>
-          <div *ngIf="readMore">
-            <ul>
-              <li>
-                The soil moisture <b>variable</b> names were retrieved from the file. <br>
-                If they are improper or you want to use another one, <b>click</b> on the name and
-                choose a different one. <br>
-                Please note, if the chosen name is incorrect, data validation will not be possible.
-              </li>
-              <li>
-                Dataset name and version can be changed by clicking on it. <br>
-                The new name can consist of max 30 characters. Letters, digits, space and @/./+/-/_ only."
-              </li>
-              <li>
-                Only datasets for which there were no validation run can be removed.
-              </li>
-            </ul>
+            </div>
+            <div *ngIf="readMore">
+              <ul>
+                <li>
+                  The soil moisture <b>variable</b> names were retrieved from the file. <br>
+                  If they are improper or you want to use another one, <b>click</b> on the name and
+                  choose a different one. <br>
+                  Please note, if the chosen name is incorrect, data validation will not be possible.
+                </li>
+                <li>
+                  Dataset name and version can be changed by clicking on it. <br>
+                  The new name can consist of max 30 characters. Letters, digits, space and @/./+/-/_ only."
+                </li>
+                <li>
+                  Only datasets for which there were no validation run can be removed.
+                </li>
+              </ul>
 
-            <span style="" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-up"> Read less</span>
+              <span style="" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-up"> Read less</span>
+            </div>
+
           </div>
 
         </div>
-
+        `
       </div>
-
       <div *ngIf="userDatasetList.length === 0" class="text-center">
         <div class="center">
           <p class="lead text-muted">

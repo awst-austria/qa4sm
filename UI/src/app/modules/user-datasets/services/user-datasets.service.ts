@@ -13,6 +13,7 @@ const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
 const userDataFileUrl: string = urlPrefix + '/get-user-file-by-id';
 const dataManagementGroupsUrl: string = urlPrefix + '/data-management-groups';
+const addDataToManagementGroupUrl: string = urlPrefix + '/add-data-to-management-group';
 
 
 const csrfToken = '{{csrf_token}}';
@@ -62,6 +63,10 @@ export class UserDatasetsService {
       params = params.append('id', id)
     });
     return this.httpClient.get<DataManagementGroupsDto[]>(dataManagementGroupsUrl, {params})
+  }
+
+  addDataToManagementGroup(group_id: number, data_id: string): Observable<any>{
+    return this.httpClient.put<any>(addDataToManagementGroupUrl, {group_id, data_id})
   }
 
   getTheSizeInProperUnits(sizeInBites): string {

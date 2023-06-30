@@ -3,6 +3,7 @@ import {UserDatasetsService} from '../../modules/user-datasets/services/user-dat
 import {Observable} from 'rxjs';
 import {UserDataFileDto} from '../../modules/user-datasets/services/user-data-file.dto';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
+import {DataManagementGroupsDto} from '../../modules/user-datasets/services/data-management-groups.dto';
 
 @Component({
   selector: 'qa-my-datasets',
@@ -14,6 +15,7 @@ export class MyDatasetsComponent implements OnInit {
   constructor(private userDatasetService: UserDatasetsService,
               public authService: AuthService) { }
   userDatasets$: Observable<UserDataFileDto[]>;
+  dataManagementGroups$: Observable<DataManagementGroupsDto[]>;
   readMore = false;
   hasNoSpaceLimit: boolean;
   hasNoSpaceAssigned: boolean;
@@ -31,6 +33,10 @@ export class MyDatasetsComponent implements OnInit {
     });
     this.hasNoSpaceLimit = !this.authService.currentUser.space_limit_value;
     this.hasNoSpaceAssigned = this.authService.currentUser.space_limit_value === 1;
+    this.dataManagementGroups$ = this.userDatasetService.getDataManagementGroups()
+    // this.dataManagementGroups$.subscribe(data =>{
+    //   console.log('Monia', data)
+    // })
   }
 
   toggleReadMore(): void{
