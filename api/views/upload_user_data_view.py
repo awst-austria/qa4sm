@@ -155,9 +155,40 @@ def get_data_management_groups(request):
     if len(groups_ids):
         groups = groups.filter(id__in=groups_ids)
     serializer = DataManagementGroupSerializer(groups, many=True)
-    print(serializer)
     try:
         return JsonResponse(serializer.data, status=200, safe=False)
+    except:
+        return JsonResponse({'message': 'Something went wrong'}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_data_management_groups(request):
+    # here I'll create a new data management group
+    pass
+    # groups_ids = request.GET.getlist('id')
+    # groups = DataManagementGroup.objects.all()
+    # if len(groups_ids):
+    #     groups = groups.filter(id__in=groups_ids)
+    # serializer = DataManagementGroupSerializer(groups, many=True)
+    #
+    # try:
+    #     return JsonResponse(serializer.data, status=200, safe=False)
+    # except:
+    #     return JsonResponse({'message': 'Something went wrong'}, status=500)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def add_data_to_data_management_group(request):
+    group_id = request.data.get('group_id')
+    data_id = request.data.get('data_id')
+
+    group = get_object_or_404(DataManagementGroup, pk=group_id)
+    user_dataset = get_object_or_404(UserDatasetFile, pk=data_id)
+    try:
+        group.custom_datasets.add(user_dataset)
+        return JsonResponse({'message': 'Ok'}, status=200)
     except:
         return JsonResponse({'message': 'Something went wrong'}, status=500)
 
