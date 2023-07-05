@@ -1,4 +1,4 @@
 [submodule "testdata"]
 	path = testdata
-	url = https://github.com/awst-austria/qa4sm-testdata.git
+	url = https://github.com/nfb2021/qa4sm-testdata.git #https://github.com/awst-austria/qa4sm-testdata.git
 	branch = master
