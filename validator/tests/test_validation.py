@@ -2199,8 +2199,10 @@ class TestValidation(TestCase):
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
         copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
+
         comparison = compare_validation_runs(copied_run, validations, copied_run.user)
 
+        # print(f'\n\t{comparison}\n')
         assert comparison['is_there_validation']
         assert comparison['val_id'] == run.id
         assert not comparison['belongs_to_user']
