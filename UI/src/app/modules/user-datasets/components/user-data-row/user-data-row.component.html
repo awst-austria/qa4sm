@@ -177,8 +177,8 @@
         <button pButton
                 icon="pi pi-times"
                 type="button"
-                label="Share dataset"
-                pTooltip="Share your dataset with other users"
+                label="Sharing options"
+                pTooltip="Manage sharing options of your dataset"
                 class="p-button-info"
                 [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
                 (click)="openWindowForDataSharing()">
@@ -199,56 +199,69 @@
           [style]="{height: '100%', width: '50%'}"
           [(visible)]="shareDataModalWindow">
 
-
-  <div class="p-float-label my-4" *ngIf="addToGroupModalWindow">
-      <p-dropdown [options]="dataManagementGroups"
-                  optionLabel="name"
-                  [style]="{width: '40%'}"
-                  [(ngModel)]="groupToUpdate"
-                  id="group-selector">
-      </p-dropdown>
-      <label for="group-selector">Choose a group</label>
-
-    <button pButton
-            icon="pi pi-plus-circle"
-            type="button"
-            label="Add"
-            pTooltip="Add your data to the chosen group."
-            class="p-button-success mx-2"
-            [style]="{width:'6rem', height: '2.25rem'}"
-            (click)="addToExistingGroup(groupToUpdate.id, userDataset.id)">
-    </button>
-  </div>
-
-  <div>
-    <button pButton
-            icon="pi pi-times"
-            type="button"
-            label="Create a group"
-            pTooltip="Create a new group and choose users to share your data with."
-            class="p-button-info py-2 px-2"
-            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-            (click)="createGroup()">
-    </button>
-    <!--  </div>-->
-    <!--  <div *ngIf="(dataManagementGroups$|async) as dataManagementGroups">-->
-    <button *ngIf="dataManagementGroups.length > 0"
-            pButton
-            icon="pi pi-times"
-            type="button"
-            label="Add to a group"
-            pTooltip="Add your data to an existing group."
-            class="p-button-info py-2 px-2"
-            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-            (click)="openAddToGroupModalWindow()">
-    </button>
-  </div>
-
-
-
-
+  <qa-share-user-data [userDataset]="userDataset"
+                      [dataManagementGroups]="dataManagementGroups"
+                      (openShareDataWindow)="manageSharingWindow($event)">
+  </qa-share-user-data>
 
 </p-dialog>
+
+<!--<p-dialog header="Share your dataset with other users"-->
+<!--          id="share-dataset-modal"-->
+<!--          [modal]="true"-->
+<!--          [style]="{height: '100%', width: '50%'}"-->
+<!--          [(visible)]="shareDataModalWindow">-->
+
+
+<!--  <div class="p-float-label my-4" *ngIf="addToGroupModalWindow">-->
+<!--      <p-dropdown [options]="dataManagementGroups"-->
+<!--                  optionLabel="name"-->
+<!--                  [style]="{width: '40%'}"-->
+<!--                  [(ngModel)]="groupToUpdate"-->
+<!--                  id="group-selector">-->
+<!--      </p-dropdown>-->
+<!--      <label for="group-selector">Choose a group</label>-->
+
+<!--    <button pButton-->
+<!--            icon="pi pi-plus-circle"-->
+<!--            type="button"-->
+<!--            label="Add"-->
+<!--            pTooltip="Add your data to the chosen group."-->
+<!--            class="p-button-success mx-2"-->
+<!--            [style]="{width:'6rem', height: '2.25rem'}"-->
+<!--            (click)="addToExistingGroup(groupToUpdate.id, userDataset.id)">-->
+<!--    </button>-->
+<!--  </div>-->
+
+<!--  <div>-->
+<!--    <button pButton-->
+<!--            icon="pi pi-times"-->
+<!--            type="button"-->
+<!--            label="Create a group"-->
+<!--            pTooltip="Create a new group and choose users to share your data with."-->
+<!--            class="p-button-info py-2 px-2"-->
+<!--            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"-->
+<!--            (click)="createGroup()">-->
+<!--    </button>-->
+<!--    &lt;!&ndash;  </div>&ndash;&gt;-->
+<!--    &lt;!&ndash;  <div *ngIf="(dataManagementGroups$|async) as dataManagementGroups">&ndash;&gt;-->
+<!--    <button *ngIf="dataManagementGroups.length > 0"-->
+<!--            pButton-->
+<!--            icon="pi pi-times"-->
+<!--            type="button"-->
+<!--            label="Add to a group"-->
+<!--            pTooltip="Add your data to an existing group."-->
+<!--            class="p-button-info py-2 px-2"-->
+<!--            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"-->
+<!--            (click)="openAddToGroupModalWindow()">-->
+<!--    </button>-->
+<!--  </div>-->
+
+
+
+
+
+<!--</p-dialog>-->
 <!--<p-dialog header="Add your dataset to an existing group"-->
 <!--          id="update-group-modal"-->
 <!--          [modal]="true"-->

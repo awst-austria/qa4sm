@@ -20,6 +20,8 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
 
   @Input() userDataset: UserDataFileDto;
   @Input() dataManagementGroups: DataManagementGroupsDto[];
+  // @Output() openShareDataWindow = new EventEmitter<any>()
+
   datasetGroups$: BehaviorSubject<DataManagementGroupsDto[]> =
     new BehaviorSubject<DataManagementGroupsDto[]>([])
   datasetName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -52,10 +54,8 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
   shareDataModalWindow = false;
-  addToGroupModalWindow = false;
-  createNewGroupModalWindow = false;
 
-  groupToUpdate: DataManagementGroupsDto
+  // groupToUpdate: DataManagementGroupsDto
   // variables$: Observable<DatasetVariableDto>[] = [];
 
   constructor(private userDatasetService: UserDatasetsService,
@@ -70,10 +70,6 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     this.datasetGroups$.next(
       this.dataManagementGroups.filter(group => this.userDataset.user_groups.includes(group.id))
     )
-    console.log(this.dataManagementGroups)
-    // if (this.userDataset.user_groups.length){
-    //   this.dataManagementGroups.filter(group => this.userDataset.user_groups.includes(group.id))
-    // }
     this.datasetService.getDatasetById(this.userDataset.dataset).subscribe(datasetData => {
       this.datasetName$.next(datasetData.pretty_name);
     });
@@ -191,29 +187,13 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
   public openWindowForDataSharing(): void{
-    this.addToGroupModalWindow = false;
-    this.createNewGroupModalWindow = false;
     this.shareDataModalWindow = true;
   }
 
-  public createGroup(): void{
-    this.createNewGroupModalWindow = true;
-    this.addToGroupModalWindow = false;
-  //   this function will open a group creation form
-  }
-
-  public openAddToGroupModalWindow(): void{
-    // this.shareDataModalWindow = false;
-    this.addToGroupModalWindow = true;
-  //   this function will open a dropdown with available groups and button for adding dataset to the group
-  }
-
-  public addToExistingGroup(groupId: number, dataId: string): void{
-    console.log(groupId, dataId)
-    this.userDatasetService.addDataToManagementGroup(groupId, dataId).subscribe(data => {
-      console.log(data);
-      this.shareDataModalWindow = false;
-    })
+  public manageSharingWindow(open): void{
+    if (!open){
+      // this.refreshUserData()
+    }
   }
 
   ngOnDestroy(): void {
