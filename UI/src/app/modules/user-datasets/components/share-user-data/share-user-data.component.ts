@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {UserDataFileDto} from '../../services/user-data-file.dto';
 import {DataManagementGroupsDto} from '../../services/data-management-groups.dto';
 import {UserDatasetsService} from '../../services/user-datasets.service';
@@ -9,15 +9,17 @@ import {BehaviorSubject} from 'rxjs';
   templateUrl: './share-user-data.component.html',
   styleUrls: ['./share-user-data.component.scss']
 })
-export class ShareUserDataComponent implements OnInit{
+export class ShareUserDataComponent implements OnInit, OnChanges{
 
   @Input() userDataset: UserDataFileDto;
   @Input() dataManagementGroups: DataManagementGroupsDto[];
+  @Input() isOpened: boolean;
   @Output() openShareDataWindow = new EventEmitter<boolean>()
 
-  addToGroupModalWindow = false;
-  removeFromGroupWindow = false
-  createNewGroupModalWindow = false;
+  addToGroupView = false;
+  deleteGroupView = false;
+  removeFromGroupView = false
+  createNewGroupModalView = false;
   // shareDataModalWindow = false;
 
 
@@ -38,17 +40,33 @@ export class ShareUserDataComponent implements OnInit{
     )
   }
 
+  ngOnChanges(changes: SimpleChanges): void{
+    if (changes.isOpened && !changes.isOpened.firstChange) {
+      if (this.isOpened) {
+        this.resetView();
+      }
+    }
+  }
+
+  private resetView(): void{
+    this.addToGroupView = false;
+    this.deleteGroupView = false;
+    this.removeFromGroupView = false
+    this.createNewGroupModalView = false;
+  }
+
   public createGroup(): void{
-    this.createNewGroupModalWindow = true;
-    this.addToGroupModalWindow = false;
+    this.createNewGroupModalView = true;
+    // this.addToGroupView = false;
+    // this.deleteGroupView = false;
     //   this function will open a group creation form
   }
   public openAddToGroupModalWindow(): void{
-    this.addToGroupModalWindow = true;
+    this.addToGroupView = true;
   }
 
   public openRemovedGroupModalWindow(): void{
-    this.removeFromGroupWindow = true;
+    this.removeFromGroupView = true;
   }
 
 
@@ -58,6 +76,10 @@ export class ShareUserDataComponent implements OnInit{
       this.openShareDataWindow.emit(false)
       // this.shareDataModalWindow = false;
     })
+  }
+
+  public removeGroup(): void{
+    console.log('I am trying to remove this group')
   }
 
 }

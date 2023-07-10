@@ -10,8 +10,8 @@
   <!--  </qa-share-user-data>-->
 
 
-  <div class="p-float-label my-4" *ngIf="addToGroupModalWindow || removeFromGroupWindow">
-    <p-dropdown [options]="addToGroupModalWindow ? dataManagementGroups : (datasetGroups$|async)"
+  <div class="p-float-label my-4" *ngIf="addToGroupView || removeFromGroupView">
+    <p-dropdown [options]="addToGroupView ? dataManagementGroups : (datasetGroups$|async)"
                 optionLabel="name"
                 [style]="{width: '40%'}"
                 [(ngModel)]="groupToUpdate"
@@ -21,7 +21,7 @@
 
     {{userDataset.id}}
 
-    <button *ngIf="addToGroupModalWindow"
+    <button *ngIf="addToGroupView"
             pButton
             icon="pi pi-plus-circle"
             type="button"
@@ -32,7 +32,7 @@
             (click)="manageDataInGroup(groupToUpdate.id, userDataset.id, 'add')">
     </button>
 
-    <button *ngIf="removeFromGroupWindow"
+    <button *ngIf="removeFromGroupView"
             pButton
             icon="pi pi-times"
             type="button"
@@ -56,6 +56,18 @@
             [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
             (click)="createGroup()">
     </button>
+
+    <button *ngIf="dataManagementGroups.length > 0"
+            pButton
+            icon="pi pi-times"
+            type="button"
+            label="Delete a group"
+            pTooltip="Remove your data from an existing group."
+            class="p-button-danger py-2 px-2"
+            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+            (click)="removeGroup()">
+    </button>
+
     <!--  </div>-->
     <!--  <div *ngIf="(dataManagementGroups$|async) as dataManagementGroups">-->
     <button *ngIf="dataManagementGroups.length > 0"
@@ -75,10 +87,11 @@
             type="button"
             label="Remove from a group"
             pTooltip="Remove your data from an existing group."
-            class="p-button-info py-2 px-2"
+            class="p-button-danger py-2 px-2"
             [style]="{'width':'12rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
             (click)="openRemovedGroupModalWindow()">
     </button>
+
 
   </div>
 <!--</p-dialog>-->
