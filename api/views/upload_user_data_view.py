@@ -180,17 +180,20 @@ def create_data_management_groups(request):
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def add_data_to_data_management_group(request):
+def manage_data_in_group(request):
     group_id = request.data.get('group_id')
     data_id = request.data.get('data_id')
+    action = request.data.get('action')
 
     group = get_object_or_404(DataManagementGroup, pk=group_id)
     user_dataset = get_object_or_404(UserDatasetFile, pk=data_id)
+
     try:
-        group.custom_datasets.add(user_dataset)
+        group.custom_datasets.add(user_dataset) if action == 'add' else group.custom_datasets.remove(user_dataset)
         return JsonResponse({'message': 'Ok'}, status=200)
     except:
         return JsonResponse({'message': 'Something went wrong'}, status=500)
+
 
 
 @api_view(['GET'])

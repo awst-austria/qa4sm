@@ -119,7 +119,7 @@ urlpatterns = [
     path('scaling-methods', get_scaling_methods, name='Scaling methods'),
     path('support-request', send_support_request, name='Support request'),
     path('data-management-groups', get_data_management_groups, name='Get data management groups'),
-    path('add-data-to-management-group', add_data_to_data_management_group,
+    path('manage-data-in-management-group', manage_data_in_group,
          name='Add data to management groups'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
