@@ -1,14 +1,3 @@
-<!--<p-dialog header="Share your dataset with other users"-->
-<!--          id="share-dataset-modal"-->
-<!--          [modal]="true"-->
-<!--          [style]="{height: '100%', width: '50%'}"-->
-<!--          [(visible)]='shareDataModalWindow'>-->
-
-  <!--  <qa-share-user-data [userDataset]="userDataset"-->
-  <!--                      [dataManagementGroups]="dataManagementGroups"-->
-  <!--                      (openShareDataWindow)="manageSharingWindow($event)">-->
-  <!--  </qa-share-user-data>-->
-
 
   <div class="p-float-label my-4" *ngIf="addToGroupView || removeFromGroupView">
     <p-dropdown [options]="addToGroupView ? dataManagementGroups : (datasetGroups$|async)"
@@ -18,8 +7,6 @@
                 id="group-selector">
     </p-dropdown>
     <label for="group-selector">Choose a group</label>
-
-    {{userDataset.id}}
 
     <button *ngIf="addToGroupView"
             pButton
@@ -94,4 +81,3 @@
 
 
   </div>
-<!--</p-dialog>-->
