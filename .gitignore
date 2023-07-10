@@ -22,4 +22,4 @@ node_modules
 .vscode
 .qa4sm-testdata
 nicolas_files
-validator/old*
+validator/fixtures/old*
