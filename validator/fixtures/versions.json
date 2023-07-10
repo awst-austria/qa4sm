@@ -513,5 +513,29 @@
             "time_range_end": "2022-12-31",
             "geographical_range": null
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 52,
+        "fields": {
+            "short_name": "SMAP_V8_PM",
+            "pretty_name": "v8 PM/ascending",
+            "help_text": "-",
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2022-07-26",
+            "geographical_range": null
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 53,
+        "fields": {
+            "short_name": "SMAP_V8_AM",
+            "pretty_name": "v8 AM/descending",
+            "help_text": "-",
+            "time_range_start": "2015-03-31",
+            "time_range_end": "2022-07-26",
+            "geographical_range": null
+        }
     }
 ]
