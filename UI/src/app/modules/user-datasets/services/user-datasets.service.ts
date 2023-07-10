@@ -13,7 +13,7 @@ const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
 const userDataFileUrl: string = urlPrefix + '/get-user-file-by-id';
 const dataManagementGroupsUrl: string = urlPrefix + '/data-management-groups';
-const addDataToManagementGroupUrl: string = urlPrefix + '/add-data-to-management-group';
+const manageDataInGroupUrl: string = urlPrefix + '/manage-data-in-management-group';
 
 
 const csrfToken = '{{csrf_token}}';
@@ -26,6 +26,9 @@ export class UserDatasetsService {
 
   public refresh: BehaviorSubject<boolean> = new BehaviorSubject(false);
   doRefresh = this.refresh.asObservable();
+
+  public openSharingDataWindow: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
+  doOpenSharingDataWindow = this.openSharingDataWindow.asObservable();
 
   constructor(private httpClient: HttpClient) { }
 
@@ -65,8 +68,8 @@ export class UserDatasetsService {
     return this.httpClient.get<DataManagementGroupsDto[]>(dataManagementGroupsUrl, {params})
   }
 
-  addDataToManagementGroup(group_id: number, data_id: string): Observable<any>{
-    return this.httpClient.put<any>(addDataToManagementGroupUrl, {group_id, data_id})
+  manageDataInManagementGroup(group_id: number, data_id: string, action: string): Observable<any>{
+    return this.httpClient.put<any>(manageDataInGroupUrl, {group_id, data_id, action})
   }
 
   getTheSizeInProperUnits(sizeInBites): string {
