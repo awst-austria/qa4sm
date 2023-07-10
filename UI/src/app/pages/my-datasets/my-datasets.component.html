@@ -34,7 +34,10 @@
         <div *ngIf="userDatasetList.length !== 0" class="container mb-5 mt-4" [ngStyle]="pageStyle">
           <div>
             <div *ngFor="let userDataset of userDatasetList" class="mb-3">
-              <qa-user-data-row [userDataset]="userDataset" [dataManagementGroups]="dataManagementGroups"></qa-user-data-row>
+              <qa-user-data-row [userDataset]="userDataset"
+                                [dataManagementGroups]="dataManagementGroups">
+
+              </qa-user-data-row>
             </div>
           </div>
           <hr class="featurette-divider">
@@ -79,8 +82,23 @@
       </div>
     </div>
   </div>
+
+
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 
 </main>
+
+<!--<p-dialog header="Share your dataset with other users"-->
+<!--          id="share-dataset-modal"-->
+<!--          [modal]="true"-->
+<!--          [style]="{height: '100%', width: '50%'}"-->
+<!--          [(visible)]='sharingWindowOpened'>-->
+
+<!--&lt;!&ndash;    <qa-share-user-data [userDataset]="userDataset"&ndash;&gt;-->
+<!--&lt;!&ndash;                        [dataManagementGroups]="dataManagementGroups"&ndash;&gt;-->
+<!--&lt;!&ndash;                        (openShareDataWindow)="manageSharingWindow($event)">&ndash;&gt;-->
+<!--&lt;!&ndash;    </qa-share-user-data>&ndash;&gt;-->
+<!--</p-dialog>-->
+
 
 

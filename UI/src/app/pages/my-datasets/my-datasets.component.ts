@@ -19,6 +19,8 @@ export class MyDatasetsComponent implements OnInit {
   readMore = false;
   hasNoSpaceLimit: boolean;
   hasNoSpaceAssigned: boolean;
+  sharingWindowOpened = false;
+  // userDatasetToEdit: UserDataFileDto;
 
   pageStyle ={
     'max-width': `${this.authService.currentUser.is_staff ? '85rem' : '70rem'}`
@@ -26,21 +28,24 @@ export class MyDatasetsComponent implements OnInit {
 
   ngOnInit(): void {
     this.userDatasets$ = this.userDatasetService.getUserDataList();
+    this.refreshUserData();
+    this.hasNoSpaceLimit = !this.authService.currentUser.space_limit_value;
+    this.hasNoSpaceAssigned = this.authService.currentUser.space_limit_value === 1;
+    this.dataManagementGroups$ = this.userDatasetService.getDataManagementGroups()
+    this.dataManagementGroups$.subscribe(data =>{
+    })
+  }
+
+  toggleReadMore(): void{
+    this.readMore = !this.readMore;
+  }
+
+  refreshUserData(): void{
     this.userDatasetService.doRefresh.subscribe(value => {
       if (value){
         this.userDatasets$ = this.userDatasetService.getUserDataList();
       }
     });
-    this.hasNoSpaceLimit = !this.authService.currentUser.space_limit_value;
-    this.hasNoSpaceAssigned = this.authService.currentUser.space_limit_value === 1;
-    this.dataManagementGroups$ = this.userDatasetService.getDataManagementGroups()
-    // this.dataManagementGroups$.subscribe(data =>{
-    //   console.log('Monia', data)
-    // })
-  }
-
-  toggleReadMore(): void{
-    this.readMore = !this.readMore;
   }
 
   getLimitMessage(): string{
