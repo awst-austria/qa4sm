@@ -22,7 +22,7 @@ class Dataset(models.Model):
     versions = models.ManyToManyField(DatasetVersion, related_name='versions')
     variables = models.ManyToManyField(DataVariable, related_name='variables')
 
-    filters = models.ManyToManyField(DataFilter, related_name='filters')
+    # filters = models.ManyToManyField(DataFilter, related_name='filters') #TODO this must be put intp version.py
     resolution = models.JSONField(null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
     

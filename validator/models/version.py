@@ -1,4 +1,5 @@
 from django.db import models
+from validator.models.filter import DataFilter
 
 
 class DatasetVersion(models.Model):
@@ -9,6 +10,7 @@ class DatasetVersion(models.Model):
     time_range_start = models.TextField(blank=True, null=True)
     time_range_end = models.TextField(blank=True, null=True)
     geographical_range = models.JSONField(blank=True, null=True)
+    filters = models.ManyToManyField(DataFilter, related_name='filters')
 
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration

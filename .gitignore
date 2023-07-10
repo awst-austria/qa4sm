@@ -21,3 +21,4 @@ node_modules
 .angular
 .vscode
 .qa4sm-testdata
+.nicolas_files
