@@ -175,7 +175,7 @@
       </div>
       <div *ngIf="authService.currentUser.is_staff" class="py-1">
         <button pButton
-                icon="pi pi-times"
+                icon="pi pi-cog"
                 type="button"
                 label="Sharing options"
                 pTooltip="Manage sharing options of your dataset"
@@ -196,7 +196,7 @@
 <p-dialog header="Share your dataset with other users"
           id="share-dataset-modal"
           [modal]="true"
-          [style]="{height: '100%', width: '50%'}"
+          [style]="{width: '50%'}"
           [(visible)]="shareDataModalWindow">
 
   <qa-share-user-data [userDataset]="userDataset"
