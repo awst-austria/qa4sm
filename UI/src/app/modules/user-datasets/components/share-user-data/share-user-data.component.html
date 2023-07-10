@@ -1,83 +1,87 @@
 
-  <div class="p-float-label my-4" *ngIf="addToGroupView || removeFromGroupView">
-    <p-dropdown [options]="addToGroupView ? dataManagementGroups : (datasetGroups$|async)"
-                optionLabel="name"
-                [style]="{width: '40%'}"
-                [(ngModel)]="groupToUpdate"
-                id="group-selector">
-    </p-dropdown>
-    <label for="group-selector">Choose a group</label>
+<div class="py-3">
+  <button pButton
+          icon="pi pi-plus"
+          type="button"
+          label="Create a group"
+          pTooltip="Create a new group and choose users to share your data with."
+          class="p-button-info py-2 px-2"
+          [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+          (click)="createGroup()">
+  </button>
 
-    <button *ngIf="addToGroupView"
-            pButton
-            icon="pi pi-plus-circle"
-            type="button"
-            label="Add"
-            pTooltip="Add your data to the chosen group."
-            class="p-button-success mx-2"
-            [style]="{width:'6rem', height: '2.25rem'}"
-            (click)="manageDataInGroup(groupToUpdate.id, userDataset.id, 'add')">
-    </button>
+  <button *ngIf="dataManagementGroups.length > 0"
+          pButton
+          icon="pi pi-times"
+          type="button"
+          label="Delete a group"
+          pTooltip="Remove your data from an existing group."
+          class="p-button-danger py-2 px-2"
+          [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+          (click)="removeGroup()">
+  </button>
 
-    <button *ngIf="removeFromGroupView"
-            pButton
-            icon="pi pi-times"
-            type="button"
-            label="Remove"
-            pTooltip="Remove your data from the chosen group."
-            class="p-button-danger mx-2"
-            [style]="{width:'7rem', height: '2.25rem'}"
-            (click)="manageDataInGroup(groupToUpdate.id, userDataset.id, 'remove')">
-    </button>
+  <!--  </div>-->
+  <!--  <div *ngIf="(dataManagementGroups$|async) as dataManagementGroups">-->
+  <button *ngIf="dataManagementGroups.length > 0"
+          pButton
+          icon="pi pi-plus"
+          type="button"
+          label="Add to a group"
+          pTooltip="Add your data to an existing group."
+          class="p-button-info py-2 px-2"
+          [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+          (click)="openAddToGroupModalWindow()">
+  </button>
 
-  </div>
-
-
-  <div>
-    <button pButton
-            icon="pi pi-plus"
-            type="button"
-            label="Create a group"
-            pTooltip="Create a new group and choose users to share your data with."
-            class="p-button-info py-2 px-2"
-            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-            (click)="createGroup()">
-    </button>
-
-    <button *ngIf="dataManagementGroups.length > 0"
-            pButton
-            icon="pi pi-times"
-            type="button"
-            label="Delete a group"
-            pTooltip="Remove your data from an existing group."
-            class="p-button-danger py-2 px-2"
-            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-            (click)="removeGroup()">
-    </button>
-
-    <!--  </div>-->
-    <!--  <div *ngIf="(dataManagementGroups$|async) as dataManagementGroups">-->
-    <button *ngIf="dataManagementGroups.length > 0"
-            pButton
-            icon="pi pi-plus"
-            type="button"
-            label="Add to a group"
-            pTooltip="Add your data to an existing group."
-            class="p-button-info py-2 px-2"
-            [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-            (click)="openAddToGroupModalWindow()">
-    </button>
-
-    <button *ngIf="(datasetGroups$|async).length > 0"
-            pButton
-            icon="pi pi-times-circle"
-            type="button"
-            label="Remove from a group"
-            pTooltip="Remove your data from an existing group."
-            class="p-button-danger py-2 px-2"
-            [style]="{'width':'12rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-            (click)="openRemovedGroupModalWindow()">
-    </button>
+  <button *ngIf="(datasetGroups$|async).length > 0"
+          pButton
+          icon="pi pi-times-circle"
+          type="button"
+          label="Remove from a group"
+          pTooltip="Remove your data from an existing group."
+          class="p-button-danger py-2 px-2"
+          [style]="{'width':'12rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+          (click)="openRemovedGroupModalWindow()">
+  </button>
 
 
-  </div>
+</div>
+
+<div>
+  <hr class="featurette-divider">
+</div>
+
+<div class="p-float-label my-4" *ngIf="addToGroupView || removeFromGroupView" [style]="{height: '5vw'}">
+  <p-dropdown [options]="addToGroupView ? dataManagementGroups : (datasetGroups$|async)"
+              optionLabel="name"
+              [style]="{width: '40%', 'max-height': '100%', 'overflow-y': 'unset'}"
+              [(ngModel)]="groupToUpdate"
+              id="user-group-selector">
+  </p-dropdown>
+  <label for="user-group-selector">Choose a group</label>
+
+  <button *ngIf="addToGroupView && !removeFromGroupView"
+          pButton
+          icon="pi pi-plus-circle"
+          type="button"
+          label="Add"
+          pTooltip="Add your data to the chosen group."
+          class="p-button-success mx-2"
+          [style]="{width:'6rem', height: '2.25rem'}"
+          (click)="manageDataInGroup(groupToUpdate.id, userDataset.id, 'add')">
+  </button>
+
+  <button *ngIf="removeFromGroupView && !addToGroupView"
+          pButton
+          icon="pi pi-times"
+          type="button"
+          label="Remove"
+          pTooltip="Remove your data from the chosen group."
+          class="p-button-danger mx-2"
+          [style]="{width:'7rem', height: '2.25rem'}"
+          (click)="manageDataInGroup(groupToUpdate.id, userDataset.id, 'remove')">
+  </button>
+
+</div>
+

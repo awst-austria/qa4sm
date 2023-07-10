@@ -192,7 +192,12 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
 
   public manageSharingWindow(open): void{
     if (!open){
-      // this.refreshUserData()
+      this.shareDataModalWindow = false;
+      this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe( data =>{
+        console.log(data)
+        this.userDataset = data;
+        }
+      )
     }
   }
 
