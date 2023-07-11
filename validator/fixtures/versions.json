@@ -53,6 +53,24 @@
     },
     {
         "model": "validator.datasetversion",
+        "pk": 4,
+        "fields": {
+            "short_name": "ASCAT_H113_test",
+            "pretty_name": "H113 test",
+            "help_text": "",
+            "time_range_start": "1007-01-02",
+            "time_range_end": "1017-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                10,
+                11,
+                12
+            ]
+        }
+    },
+    {
+        "model": "validator.datasetversion",
         "pk": 5,
         "fields": {
             "short_name": "ISMN_V20180712_MINI",

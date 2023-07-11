@@ -40,6 +40,7 @@ class DatasetVersionSerializer(ModelSerializer):
                   'short_name',
                   'pretty_name',
                   'help_text',
+                  'filters', # new
                   'time_range_start',
                   'time_range_end',
                   'geographical_range'
