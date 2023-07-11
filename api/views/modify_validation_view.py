@@ -9,7 +9,9 @@ from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from validator.validation.validation import copy_validationrun
+import logging
 
+__logger = logging.getLogger(__name__)
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def stop_validation(request, result_uuid):
@@ -120,6 +122,7 @@ def publish_result(request, result_uuid):
     try:
         get_doi_for_validation(val_run, pub_form.pub_metadata)
     except Exception as e:
+        __logger.debug(e, repr(e))
         m = getattr(e, 'message', repr(e))
         response = JsonResponse({'response': m}, status=400)
         return response
