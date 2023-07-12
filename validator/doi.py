@@ -62,8 +62,6 @@ def get_doi_for_validation(val, metadata):
             ds.doi = settings.DOI_URL_PREFIX + reserved_doi
 
         ## add file to new entry
-        # check file size
-
         zipfilename = val.output_file.path.replace('.nc', '.zip')
         with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
             myzip.write(val.output_file.path, arcname=str(val.id) + '.nc')
@@ -96,5 +94,3 @@ def get_doi_for_validation(val, metadata):
             os.remove(zipfilename)
 
 
-    def compress_file_before_publishing(file_path):
-        pass
