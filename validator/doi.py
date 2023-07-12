@@ -4,7 +4,8 @@ import logging
 from django.conf import settings
 import netCDF4
 import requests
-
+from zipfile import ZipFile, ZIP_DEFLATED
+import os
 
 __logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ def get_doi_for_validation(val, metadata):
     val.is_archived = True
     val.publishing_in_progress = True
     val.save()
+    zipfilename = None
 
     try:
         ## create new entry
@@ -35,6 +37,7 @@ def get_doi_for_validation(val, metadata):
 
         deposition_id = r.json()['id']
         __logger.debug('New DOI id: ' + str(deposition_id))
+        bucket_url = r.json()["links"]["bucket"]
 
         ## add metadata to new entry and get reserved DOI
         meta = {
@@ -59,15 +62,21 @@ def get_doi_for_validation(val, metadata):
             ds.doi = settings.DOI_URL_PREFIX + reserved_doi
 
         ## add file to new entry
-        with open(val.output_file.path, 'rb') as result_file:
-            data = {'name': str(val.id) + '.nc'}
-            files = {'file': result_file}
-            r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/files'.format(deposition_id), params=access_param, data=data, files=files)
+        # check file size
+
+        zipfilename = val.output_file.path.replace('.nc', '.zip')
+        with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+            myzip.write(val.output_file.path, arcname=str(val.id) + '.nc')
+
+        with open(zipfilename, 'rb') as result_file:
+            file_name =  str(val.id) + '.zip'
+            r = requests.put(f'{bucket_url}/{file_name}', data=result_file, params=access_param, stream=True)
             __logger.debug('New DOI, add files, status: ' + str(r.status_code))
             __logger.debug(r.json())
 
-        if r.status_code != 201:
+        if r.status_code not in [201, 200]:
             raise RuntimeError("Could not upload result file to new DOI")
+
 
         ## PUBLISH new entry
         r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/actions/publish'.format(deposition_id), params=access_param)
@@ -83,3 +92,9 @@ def get_doi_for_validation(val, metadata):
     finally:
         val.publishing_in_progress = False
         val.save()
+        if zipfilename and os.path.isfile(zipfilename):
+            os.remove(zipfilename)
+
+
+    def compress_file_before_publishing(file_path):
+        pass
