@@ -76,6 +76,7 @@ def get_doi_for_validation(val, metadata):
         if r.status_code not in [201, 200]:
             raise RuntimeError("Could not upload result file to new DOI")
 
+
         ## PUBLISH new entry
         r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/actions/publish'.format(deposition_id),
                           params=access_param)
@@ -93,5 +94,5 @@ def get_doi_for_validation(val, metadata):
         val.publishing_in_progress = False
         val.save()
         if zipfilename and os.path.isfile(zipfilename):
-            os.remove(zipfilename)
     return
+

@@ -25,6 +25,7 @@ def get_doi_process(validation, publish_form):
     return
 
 
+__logger = logging.getLogger(__name__)
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def stop_validation(request, result_uuid):
