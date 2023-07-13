@@ -7,13 +7,20 @@ from rest_framework.serializers import ModelSerializer
 
 from validator.models import Dataset, DatasetVersion, DataFilter, ParametrisedFilter
 
+import logging
+from autologging import traced, TRACE, logged
+logging.basicConfig(level=TRACE, filename = 'nfb_logger.log', format='%(asctime)s - %(levelname)s:%(name)s:%(funcName)s:%(message)s"')
 
+@logged
+@traced
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_filter(request):
     # All filters are taken
     data_filters = DataFilter.objects.all()
+    data_filters.__log.debug(f'data_filters = {data_filters}')
     serializer = DataFilterSerializer(data_filters, many=True)
+    serializer.__log.debug(f'serializer = {serializer}')
 
     included_filters = check_included_filters(data_filters)
     if included_filters:

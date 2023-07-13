@@ -46,7 +46,8 @@
                 43,
                 44,
                 52,
-                53
+                53,
+                1000
             ],
             "variables": [
                 2
@@ -71,8 +72,7 @@
             "citation": "See <a target=\"_blank\" href=\"http://doi.org/10.15770/EUM_SAF_H_0005\" rel=\"noreferrer\">here</a>",
             "is_spatial_reference": false,
             "versions": [
-                3,
-                4
+                3
             ],
             "variables": [
                 3
