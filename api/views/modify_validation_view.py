@@ -111,10 +111,19 @@ def publish_result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
 
     if val_run.user != request.user:
-        return HttpResponse(status=403)
+        return JsonResponse({'message': 'Wrong user'}, status=403)
 
     if not val_run.is_unpublished:
-        return HttpResponse('Validation has been published', status=405)
+        return JsonResponse({'message': 'Validation has been published'}, status=405)
+
+    if not val_run.output_file:
+        return JsonResponse({'message': 'There is no result to be published'}, status=405)
+
+    if not val_run.id or not val_run.output_file or not val_run.output_file.path or not val_run.user:
+        return JsonResponse({'message': "'Can't create DOI for broken validation'"}, status=405)
+
+    if (val_run.publishing_in_progress):
+        return JsonResponse({'message': "Publishing already in progress"}, status=405)
 
     patch_params = request.data
 
