@@ -180,8 +180,8 @@ export class ValidationSummaryComponent implements OnInit {
     this.isNearExpiry$.next(this.validationRun.is_near_expiry);
   }
 
-  handlePublishWindow(): void{
-    this.isPublishingWindowOpen = true;
+  handlePublishWindow(open): void{
+    this.isPublishingWindowOpen = open;
   }
 
 }

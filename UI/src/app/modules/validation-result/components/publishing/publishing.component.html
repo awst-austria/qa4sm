@@ -6,7 +6,7 @@
         page</a>.
       </p>
     </div>
-    <form [formGroup]="publishingForm" (ngSubmit)="publish()">
+    <form [formGroup]="publishingForm">
       <div class="pt-3 pb-2 grid">
           <span class="label col-2">
             <label for="title">Title</label>
@@ -107,10 +107,11 @@
         </button>
         <button pButton
                 id="submit-button"
-                type="submit"
+                (click)="publish()"
                 label="Publish now!"
                 [disabled]="!publishingForm.valid">
         </button>
       </div>
     </form>
+
 </div>

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {Observable} from 'rxjs';
 import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -15,6 +15,7 @@ export class PublishingComponent implements OnInit {
   formErrors: any;
   publishingInProgress$: Observable<boolean>;
   @Input() validationId: string;
+  @Output() openPublishWindow = new EventEmitter();
 
   publishingForm = this.formBuilder.group<PublishingForm>({
     title: ['', [Validators.required]],
@@ -48,15 +49,15 @@ export class PublishingComponent implements OnInit {
   }
 
   close(): void {
-    this.modalService.close();
+    this.openPublishWindow.emit(false)
+    // this.modalService.close();
   }
 
   publish(): void {
     this.validationrunService.changePublishingStatus(true);
     this.formErrors = [];
-
-    this.validationrunService.publishResults(this.validationId, this.publishingForm.value)
-      .subscribe(this.publishResultsObserver);
+    // this.validationrunService.publishResults(this.validationId, this.publishingForm.value)
+    //   .subscribe(this.publishResultsObserver);
   }
 
   private onPublishResultNext(): void {

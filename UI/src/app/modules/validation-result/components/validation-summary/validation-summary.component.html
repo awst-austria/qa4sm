@@ -210,12 +210,12 @@
         </li>
       </ul>
       <qa-buttons *ngIf="!forComparison && (validationModel.validationRun|async) as validation" [validationList]="false"
-                  [validationRun]="validation" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow()"></qa-buttons>
+                  [validationRun]="validation" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
     </div>
   </p-panel>
 
   <p-dialog [modal]="true" [(visible)]="isPublishingWindowOpen">
-    <qa-publishing [validationId]="validationRun.id"></qa-publishing>
+    <qa-publishing [validationId]="validationRun.id" (openPublishWindow)="handlePublishWindow($event)"></qa-publishing>
   </p-dialog>
 
 </main>
