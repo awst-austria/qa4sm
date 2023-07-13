@@ -16,6 +16,7 @@ export class PublishingComponent implements OnInit {
   publishingInProgress$: Observable<boolean>;
   @Input() validationId: string;
   @Output() openPublishWindow = new EventEmitter();
+  @Output() startPublishing = new EventEmitter();
 
   publishingForm = this.formBuilder.group<PublishingForm>({
     title: ['', [Validators.required]],
@@ -58,14 +59,12 @@ export class PublishingComponent implements OnInit {
   }
 
   private onPublishResultNext(): void {
-    // this.validationrunService.changePublishingStatus(false);
+    this.startPublishing.emit(true)
     this.handleModalWindow(false);
-    window.location.reload();
   }
 
   private onPublishResultError(error): void {
     this.formErrors = error.error;
-    // this.validationrunService.changePublishingStatus(false);
     this.handleModalWindow(true)
   }
 

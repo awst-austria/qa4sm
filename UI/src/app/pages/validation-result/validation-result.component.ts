@@ -3,7 +3,6 @@ import {ActivatedRoute} from '@angular/router';
 import {ValidationrunService} from '../../modules/core/services/validation-run/validationrun.service';
 import {DatasetConfigurationService} from '../../modules/validation-result/services/dataset-configuration.service';
 import {ValidationResultModel} from './validation-result-model';
-import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 
 @Component({
   selector: 'app-validation',
@@ -14,12 +13,10 @@ import {ModalWindowService} from '../../modules/core/services/global/modal-windo
 export class ValidationResultComponent implements OnInit {
   public validationId: string;
   public validationModel: ValidationResultModel;
-  public isPublishingWindowOpen: boolean;
 
   constructor(private route: ActivatedRoute,
               private validationRunService: ValidationrunService,
-              private datasetConfigurationService: DatasetConfigurationService,
-              private modalWindowService: ModalWindowService) {
+              private datasetConfigurationService: DatasetConfigurationService) {
   }
 
   ngOnInit(): void {
