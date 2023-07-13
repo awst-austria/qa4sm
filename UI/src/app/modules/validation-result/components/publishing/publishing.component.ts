@@ -48,27 +48,28 @@ export class PublishingComponent implements OnInit {
     this.publishingInProgress$ = this.validationrunService.checkPublishingInProgress();
   }
 
-  close(): void {
-    this.openPublishWindow.emit(false)
+  handleModalWindow(open): void {
+    this.openPublishWindow.emit(open)
     // this.modalService.close();
   }
 
   publish(): void {
     this.validationrunService.changePublishingStatus(true);
     this.formErrors = [];
-    // this.validationrunService.publishResults(this.validationId, this.publishingForm.value)
-    //   .subscribe(this.publishResultsObserver);
+    this.validationrunService.publishResults(this.validationId, this.publishingForm.value)
+      .subscribe(this.publishResultsObserver);
   }
 
   private onPublishResultNext(): void {
     this.validationrunService.changePublishingStatus(false);
-    this.close();
+    this.handleModalWindow(false);
     window.location.reload();
   }
 
   private onPublishResultError(error): void {
     this.formErrors = error.error;
     this.validationrunService.changePublishingStatus(false);
+    this.handleModalWindow(true)
   }
 
   getPublishingForm(): void {
