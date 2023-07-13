@@ -209,8 +209,19 @@
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons *ngIf="!forComparison && (validationModel.validationRun|async) as validation" [validationList]="false"
-                  [validationRun]="validation" (doUpdate)="update($event)"></qa-buttons>
+      <qa-buttons *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false" [validationList]="false"
+                  [validationRun]="validationRun" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
+
+      <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
+           style="float: right">
+         <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i> Publishing in progress...
+      </div>
+
     </div>
   </p-panel>
+
+  <p-dialog [modal]="true" [(visible)]="isPublishingWindowOpen">
+    <qa-publishing [validationId]="validationRun.id" (openPublishWindow)="handlePublishWindow($event)" (startPublishing)="startPublishing()"></qa-publishing>
+  </p-dialog>
+
 </main>
