@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
 import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
@@ -20,7 +20,7 @@ import {ValidationRunConfigService} from '../../../../pages/validate/service/val
   templateUrl: './validation-summary.component.html',
   styleUrls: ['./validation-summary.component.scss']
 })
-export class ValidationSummaryComponent implements OnInit {
+export class ValidationSummaryComponent implements OnInit, OnDestroy {
 
   @Input() validationModel: ValidationResultModel;
   @Input() validationRun: ValidationrunDto;
@@ -43,6 +43,9 @@ export class ValidationSummaryComponent implements OnInit {
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   scalingMethod: string;
+  public isPublishingWindowOpen: boolean;
+  publishingInProgressInterval: any;
+  publishingInProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -62,6 +65,7 @@ export class ValidationSummaryComponent implements OnInit {
     this.validationConfigService.getScalingMethods().subscribe(methods => {
       this.scalingMethod = methods.find(method => method.method === this.validationRun.scaling_method).description;
     });
+    this.checkIfPublishingInProgress();
   }
 
   getCurrentUser(): number {
@@ -178,4 +182,31 @@ export class ValidationSummaryComponent implements OnInit {
     this.expiryDate$.next(this.validationRun.expiry_date);
     this.isNearExpiry$.next(this.validationRun.is_near_expiry);
   }
+
+  checkIfPublishingInProgress(): void{
+    if (this.validationRun.publishing_in_progress || this.publishingInProgress$.getValue()){
+      this.publishingInProgressInterval = setInterval(() => {
+        this.validationService.getValidationRunById(this.validationRun.id).subscribe(data => {
+          if (!data.publishing_in_progress) {
+            this.doRefresh.emit(true)
+          }
+        });
+      }, 20 * 1000)
+
+    }
+  }
+
+  handlePublishWindow(open): void{
+    this.isPublishingWindowOpen = open;
+  }
+
+  startPublishing(): void{
+    this.publishingInProgress$.next(true)
+    this.checkIfPublishingInProgress()
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.publishingInProgressInterval);
+  }
+
 }

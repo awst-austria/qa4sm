@@ -43,11 +43,12 @@ def get_doi_for_validation(val, metadata):
         meta = {
             'upload_type': 'dataset',
             'prereserve_doi': True,
-            }
+        }
         meta.update(metadata)
 
-        data = { 'metadata': meta }
-        r = requests.put(settings.DOI_REGISTRATION_URL + '/{}'.format(deposition_id), params=access_param, data=json.dumps(data), headers=json_header)
+        data = {'metadata': meta}
+        r = requests.put(settings.DOI_REGISTRATION_URL + '/{}'.format(deposition_id), params=access_param,
+                         data=json.dumps(data), headers=json_header)
         __logger.debug('New DOI, add metadata, status: ' + str(r.status_code))
         __logger.debug(r.json())
 
@@ -62,14 +63,12 @@ def get_doi_for_validation(val, metadata):
             ds.doi = settings.DOI_URL_PREFIX + reserved_doi
 
         ## add file to new entry
-        # check file size
-
         zipfilename = val.output_file.path.replace('.nc', '.zip')
         with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
             myzip.write(val.output_file.path, arcname=str(val.id) + '.nc')
 
         with open(zipfilename, 'rb') as result_file:
-            file_name =  str(val.id) + '.zip'
+            file_name = str(val.id) + '.zip'
             r = requests.put(f'{bucket_url}/{file_name}', data=result_file, params=access_param, stream=True)
             __logger.debug('New DOI, add files, status: ' + str(r.status_code))
             __logger.debug(r.json())
@@ -79,7 +78,8 @@ def get_doi_for_validation(val, metadata):
 
 
         ## PUBLISH new entry
-        r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/actions/publish'.format(deposition_id), params=access_param)
+        r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/actions/publish'.format(deposition_id),
+                          params=access_param)
         __logger.debug('New DOI, publish, status: ' + str(r.status_code))
         __logger.debug(r.json())
 
@@ -88,13 +88,11 @@ def get_doi_for_validation(val, metadata):
 
         val.doi = r.json()['doi']
 
-    ## however the publication ends, make sure to signal that it's not in progress any more
+
+    # however the publication ends, make sure to signal that it's not in progress any more
     finally:
         val.publishing_in_progress = False
         val.save()
         if zipfilename and os.path.isfile(zipfilename):
-            os.remove(zipfilename)
+    return
 
-
-    def compress_file_before_publishing(file_path):
-        pass

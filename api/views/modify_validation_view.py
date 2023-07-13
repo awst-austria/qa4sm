@@ -11,6 +11,20 @@ from rest_framework import status
 from validator.validation.validation import copy_validationrun
 import logging
 
+from django.db import connections
+from multiprocessing.context import Process
+
+__logger = logging.getLogger(__name__)
+
+
+def get_doi_process(validation, publish_form):
+    connections.close_all()
+    p = Process(target=get_doi_for_validation, kwargs={"val": validation,
+                                                       "metadata": publish_form.pub_metadata})
+    p.start()
+    return
+
+
 __logger = logging.getLogger(__name__)
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
@@ -120,14 +134,14 @@ def publish_result(request, result_uuid):
         return response
 
     try:
-        get_doi_for_validation(val_run, pub_form.pub_metadata)
+        get_doi_process(val_run, pub_form)
+        response = JsonResponse({'response': 'Publishing in progress'}, status=200)
     except Exception as e:
         __logger.debug(e, repr(e))
         m = getattr(e, 'message', repr(e))
         response = JsonResponse({'response': m}, status=400)
         return response
 
-    response = JsonResponse({'response': 'Published'}, status=200)
     return response
 
 
@@ -160,8 +174,8 @@ def remove_validation(request, result_uuid):
 
     user = request.user
     if post_params['remove_validation']:
-            user.copied_runs.remove(val_run)
-            response = HttpResponse("Validation has been removed from your list", status=200)
+        user.copied_runs.remove(val_run)
+        response = HttpResponse("Validation has been removed from your list", status=200)
     else:
         response = HttpResponse("Wrong action parameter.", status=400)
 
@@ -174,12 +188,12 @@ def delete_result(request, result_uuid):
     val_run = get_object_or_404(ValidationRun, pk=result_uuid)
 
     ## make sure only the owner of a validation can delete it (others are allowed to GET it, though)
-    if(val_run.user != request.user):
-        return HttpResponse(status = status.HTTP_403_FORBIDDEN)
+    if (val_run.user != request.user):
+        return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
     ## check that our validation can be deleted; it can't if it already has a DOI
-    if(not val_run.is_unpublished):
-        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED) #405
+    if (not val_run.is_unpublished):
+        return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)  # 405
 
     val_run.delete()
     return HttpResponse(status=status.HTTP_200_OK)
