@@ -9,6 +9,7 @@ import os
 
 __logger = logging.getLogger(__name__)
 
+
 ## See https://developers.zenodo.org/#rest-api for documentation
 def get_doi_for_validation(val, metadata):
     if ((not val.id) or (not val.output_file) or (not val.output_file.path) or (not val.user)):
@@ -76,7 +77,6 @@ def get_doi_for_validation(val, metadata):
         if r.status_code not in [201, 200]:
             raise RuntimeError("Could not upload result file to new DOI")
 
-
         ## PUBLISH new entry
         r = requests.post(settings.DOI_REGISTRATION_URL + '/{}/actions/publish'.format(deposition_id),
                           params=access_param)
@@ -87,13 +87,12 @@ def get_doi_for_validation(val, metadata):
             raise RuntimeError("Could not publish new DOI")
 
         val.doi = r.json()['doi']
-
         return
-
 
     # however the publication ends, make sure to signal that it's not in progress any more
     finally:
         val.publishing_in_progress = False
         val.save()
         if zipfilename and os.path.isfile(zipfilename):
+            os.remove(zipfilename)
 
