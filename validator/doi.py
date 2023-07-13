@@ -95,3 +95,4 @@ def get_doi_for_validation(val, metadata):
         val.save()
         if zipfilename and os.path.isfile(zipfilename):
             os.remove(zipfilename)
+
