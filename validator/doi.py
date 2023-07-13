@@ -88,11 +88,12 @@ def get_doi_for_validation(val, metadata):
 
         val.doi = r.json()['doi']
 
+        return
+
 
     # however the publication ends, make sure to signal that it's not in progress any more
     finally:
         val.publishing_in_progress = False
         val.save()
         if zipfilename and os.path.isfile(zipfilename):
-    return
 
