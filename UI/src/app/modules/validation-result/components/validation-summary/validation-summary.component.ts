@@ -43,6 +43,7 @@ export class ValidationSummaryComponent implements OnInit {
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   scalingMethod: string;
+  public isPublishingWindowOpen: boolean;
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -178,4 +179,9 @@ export class ValidationSummaryComponent implements OnInit {
     this.expiryDate$.next(this.validationRun.expiry_date);
     this.isNearExpiry$.next(this.validationRun.is_near_expiry);
   }
+
+  handlePublishWindow(): void{
+    this.isPublishingWindowOpen = true;
+  }
+
 }

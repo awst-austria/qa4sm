@@ -30,9 +30,6 @@ export class ValidationResultComponent implements OnInit {
         this.datasetConfigurationService.getConfigByValidationrun(this.validationId)
       );
     });
-    this.modalWindowService.watch().subscribe(state => {
-      this.isPublishingWindowOpen = state === 'open';
-    });
   }
 
   update(): void{

@@ -13,7 +13,6 @@ import {PublishingForm} from '../../../core/services/form-interfaces/publishing-
 })
 export class PublishingComponent implements OnInit {
   formErrors: any;
-  display$: Observable<'open' | 'close'>;
   publishingInProgress$: Observable<boolean>;
   @Input() validationId: string;
 
@@ -44,7 +43,6 @@ export class PublishingComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.display$ = this.modalService.watch();
     this.getPublishingForm();
     this.publishingInProgress$ = this.validationrunService.checkPublishingInProgress();
   }
