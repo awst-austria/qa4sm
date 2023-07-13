@@ -1,6 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Observable} from 'rxjs';
-import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
@@ -13,7 +11,6 @@ import {PublishingForm} from '../../../core/services/form-interfaces/publishing-
 })
 export class PublishingComponent implements OnInit {
   formErrors: any;
-  publishingInProgress$: Observable<boolean>;
   @Input() validationId: string;
   @Output() openPublishWindow = new EventEmitter();
   @Output() startPublishing = new EventEmitter();
@@ -33,12 +30,10 @@ export class PublishingComponent implements OnInit {
   }
 
   getPublishingFormDataObserver = {
-    next: data => this.onGetPublishingFormDataNext(data),
-    complete: () => this.onGetPublishingFormDataComplete()
+    next: data => this.onGetPublishingFormDataNext(data)
   }
 
   constructor(
-    private modalService: ModalWindowService,
     private validationrunService: ValidationrunService,
     private formBuilder: FormBuilder,
   ) {
@@ -82,7 +77,4 @@ export class PublishingComponent implements OnInit {
     this.publishingForm.controls.orcid.setValue(data.orcid);
   }
 
-  private onGetPublishingFormDataComplete(): void{
-    this.modalService.open();
-  }
 }
