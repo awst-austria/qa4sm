@@ -45,30 +45,27 @@ export class PublishingComponent implements OnInit {
 
   ngOnInit(): void {
     this.getPublishingForm();
-    this.publishingInProgress$ = this.validationrunService.checkPublishingInProgress();
   }
 
   handleModalWindow(open): void {
     this.openPublishWindow.emit(open)
-    // this.modalService.close();
   }
 
   publish(): void {
-    this.validationrunService.changePublishingStatus(true);
     this.formErrors = [];
     this.validationrunService.publishResults(this.validationId, this.publishingForm.value)
       .subscribe(this.publishResultsObserver);
   }
 
   private onPublishResultNext(): void {
-    this.validationrunService.changePublishingStatus(false);
+    // this.validationrunService.changePublishingStatus(false);
     this.handleModalWindow(false);
     window.location.reload();
   }
 
   private onPublishResultError(error): void {
     this.formErrors = error.error;
-    this.validationrunService.changePublishingStatus(false);
+    // this.validationrunService.changePublishingStatus(false);
     this.handleModalWindow(true)
   }
 

@@ -49,7 +49,6 @@ export class ButtonsComponent implements OnInit {
     this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
     this.isTrackedByTheUser$.next(this.authService.currentUser.copied_runs.includes(this.validationRun.id));
-    this.publishingInProgress$ = this.validationService.checkPublishingInProgress();
     this.isArchived$.next(this.validationRun.is_archived);
   }
 
