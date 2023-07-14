@@ -1,3 +1,9 @@
+QA4SM v2.2.5 - Release notes 2023-07-14
+=======================================================
+# Improvements
+1. Publishing updated, so it is possible to publish also large result files
+
+
 QA4SM v2.2.4 - Release notes 2023-06-28
 =======================================================
 # New features
