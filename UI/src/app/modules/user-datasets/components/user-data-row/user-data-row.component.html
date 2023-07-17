@@ -173,17 +173,18 @@
                 (click)="removeDataset(userDataset.id)">
         </button>
       </div>
-      <div *ngIf="authService.currentUser.is_staff" class="py-1">
-        <button pButton
-                icon="pi pi-cog"
-                type="button"
-                label="Sharing options"
-                pTooltip="Manage sharing options of your dataset"
-                class="p-button-info"
-                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-                (click)="openWindowForDataSharing()">
-        </button>
-      </div>
+<!--      DO NOT REMOVE THIS CODE -->
+<!--      <div *ngIf="authService.currentUser.is_staff" class="py-1">-->
+<!--        <button pButton-->
+<!--                icon="pi pi-cog"-->
+<!--                type="button"-->
+<!--                label="Sharing options"-->
+<!--                pTooltip="Manage sharing options of your dataset"-->
+<!--                class="p-button-info"-->
+<!--                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"-->
+<!--                (click)="openWindowForDataSharing()">-->
+<!--        </button>-->
+<!--      </div>-->
     </div>
   </div>
   <div class="grid mx-0 px-0 my-0 no-validation-box" *ngIf="!userDataset.metadata_submitted" [style]="{height: '100%'}">
@@ -192,20 +193,24 @@
   </div>
 
 </p-panel>
+<!---->
+<!--DO NOT REMOVE THIS CODE! -->
+<!--<p-dialog header="Share your dataset with other users"-->
+<!--          id="share-dataset-modal"-->
+<!--          [modal]="true"-->
+<!--          [style]="{width: '50%'}"-->
+<!--          [(visible)]="shareDataModalWindow">-->
 
-<p-dialog header="Share your dataset with other users"
-          id="share-dataset-modal"
-          [modal]="true"
-          [style]="{width: '50%'}"
-          [(visible)]="shareDataModalWindow">
+<!--  <qa-share-user-data [userDataset]="userDataset"-->
+<!--                      [dataManagementGroups]="dataManagementGroups"-->
+<!--                      [isOpened]="shareDataModalWindow"-->
+<!--                      (openShareDataWindow)="manageSharingWindow($event)">-->
+<!--  </qa-share-user-data>-->
 
-  <qa-share-user-data [userDataset]="userDataset"
-                      [dataManagementGroups]="dataManagementGroups"
-                      [isOpened]="shareDataModalWindow"
-                      (openShareDataWindow)="manageSharingWindow($event)">
-  </qa-share-user-data>
+<!--</p-dialog>-->
+<!---->
 
-</p-dialog>
+
 
 <!--<p-dialog header="Share your dataset with other users"-->
 <!--          id="share-dataset-modal"-->
