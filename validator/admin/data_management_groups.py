@@ -10,10 +10,10 @@ from validator.models import DataManagementGroup, UserDatasetFile, User
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Permission, ContentType
 from django.contrib import messages
-from django.contrib.admin.actions import delete_selected
+from django.contrib.admin.actions import delete_selected as delete_selected_
 
 
-def custom_delete_selected(modeladmin, request, queryset):
+def delete_selected(modeladmin, request, queryset):
     # this method overrides delete_selected to remove confirmation message which shows up even if there is an error
     if request.POST.get('post'):
         try:
@@ -22,7 +22,7 @@ def custom_delete_selected(modeladmin, request, queryset):
         except ProtectedError:
             messages.error(request, "Cannot delete some of the selected groups due to existing relationships.")
     else:
-        return delete_selected(modeladmin, request, queryset)
+        return delete_selected_(modeladmin, request, queryset)
 
 
 class DataManagementGroupForm(forms.ModelForm):
@@ -50,7 +50,7 @@ class DataManagementGroupForm(forms.ModelForm):
 
 
 class DataManagementGroupAdmin(GroupAdmin, ModelAdmin):
-    actions = [custom_delete_selected]
+    actions = [delete_selected]
     form = DataManagementGroupForm
     list_display = ('name', 'group_owner', 'permission_list', 'users', 'user_datasets')
 
