@@ -16,6 +16,7 @@ import os
 
 key_store = FileSystemStorage(location=USER_DATA_DIR)
 
+
 def upload_directory(instance, filename):
     # this is a temporarily fixed path, I'll update it with the proper one later:
     storage_path = path.join(str(instance.owner), str(instance.id), filename)
@@ -33,9 +34,12 @@ class UserDatasetFile(models.Model):
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
     metadata_submitted = models.BooleanField(default=False)
-    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True, blank=True)
+    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
+                                         blank=True)
 
-
+    @property
+    def user_data_configs(self):
+        return DatasetConfiguration.objects.filter(dataset=self.dataset)
 
     @property
     def get_raw_file_path(self):
@@ -43,13 +47,16 @@ class UserDatasetFile(models.Model):
 
     @property
     def is_used_in_validation(self):
-        configs = DatasetConfiguration.objects.all()
-        return self.dataset.id in configs.values_list('dataset', flat=True)
+        return len(self.user_data_configs) != 0
 
     @property
     def validation_list(self):
-        configs = DatasetConfiguration.objects.filter(dataset=self.dataset)
-        return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in configs]
+        return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in
+                self.user_data_configs]
+
+    # @property
+    # def used_by_users(self):
+    #     return [config.validation.user for config in self.user_data_configs]
 
     @property
     def file_size(self):
