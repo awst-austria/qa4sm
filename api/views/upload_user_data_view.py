@@ -11,7 +11,7 @@ from rest_framework import serializers
 from django.utils import timezone
 
 from api.views.auxiliary_functions import get_fields_as_list
-from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset
+from validator.models import UserDatasetFile, DatasetVersion, DataVariable, Dataset, DataManagementGroup
 from api.variable_and_field_names import *
 import logging
 from validator.validation.globals import USER_DATASET_MIN_ID, USER_DATASET_VERSION_MIN_ID, USER_DATASET_VARIABLE_MIN_ID
@@ -147,6 +147,55 @@ def preprocess_file(file_serializer, file_raw_path):
 
 
 # API VIEWS
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_data_management_groups(request):
+    groups_ids = request.GET.getlist('id')
+    groups = DataManagementGroup.objects.all()
+    if len(groups_ids):
+        groups = groups.filter(id__in=groups_ids)
+    serializer = DataManagementGroupSerializer(groups, many=True)
+    try:
+        return JsonResponse(serializer.data, status=200, safe=False)
+    except:
+        return JsonResponse({'message': 'Something went wrong'}, status=500)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_data_management_groups(request):
+    # here I'll create a new data management group
+    pass
+    # groups_ids = request.GET.getlist('id')
+    # groups = DataManagementGroup.objects.all()
+    # if len(groups_ids):
+    #     groups = groups.filter(id__in=groups_ids)
+    # serializer = DataManagementGroupSerializer(groups, many=True)
+    #
+    # try:
+    #     return JsonResponse(serializer.data, status=200, safe=False)
+    # except:
+    #     return JsonResponse({'message': 'Something went wrong'}, status=500)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def manage_data_in_group(request):
+    group_id = request.data.get('group_id')
+    data_id = request.data.get('data_id')
+    action = request.data.get('action')
+
+    group = get_object_or_404(DataManagementGroup, pk=group_id)
+    user_dataset = get_object_or_404(UserDatasetFile, pk=data_id)
+
+    try:
+        group.custom_datasets.add(user_dataset) if action == 'add' else group.custom_datasets.remove(user_dataset)
+        return JsonResponse({'message': 'Ok'}, status=200)
+    except:
+        return JsonResponse({'message': 'Something went wrong'}, status=500)
+
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_list_of_user_data_files(request):
@@ -331,6 +380,12 @@ class DatasetSerializer(ModelSerializer):
                   'variables',
                   'user'
                   ]
+
+
+class DataManagementGroupSerializer(ModelSerializer):
+    class Meta:
+        model = DataManagementGroup
+        fields = get_fields_as_list(model)
 
 
 class DatasetVersionSerializer(ModelSerializer):
