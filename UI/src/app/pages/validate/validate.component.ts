@@ -381,12 +381,14 @@ export class ValidateComponent implements OnInit {
       });
 
       // and the filters
-      this.loadFiltersForModel(model);
+      // this.loadFiltersForModel(model);
     });
   }
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
     model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
+    this.loadFiltersForModel(model)
+    // this.
   }
 
   private onGetVersionComplete(): void {
@@ -402,8 +404,8 @@ export class ValidateComponent implements OnInit {
       next: filters => this.onGetFiltersNext(filters, model, reloadingSettings, updatedModel$),
       error: error => this.onGetFiltersError(error, updatedModel$)
     }
-
-    this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(getFiltersObserver);
+    // console.log(model)
+    this.filterService.getFiltersByVersionId(model.datasetModel.selectedVersion.id).subscribe(getFiltersObserver);
     return updatedModel$;
   }
 
