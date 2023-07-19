@@ -37,8 +37,7 @@ class UserDatasetFile(models.Model):
     user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
                                          blank=True)
 
-    @property
-    def user_data_configs(self):
+    def get_user_data_configs(self):
         return DatasetConfiguration.objects.filter(dataset=self.dataset)
 
     @property
@@ -47,16 +46,12 @@ class UserDatasetFile(models.Model):
 
     @property
     def is_used_in_validation(self):
-        return len(self.user_data_configs) != 0
+        return len(self.get_user_data_configs()) != 0
 
     @property
     def validation_list(self):
         return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in
-                self.user_data_configs]
-
-    # @property
-    # def used_by_users(self):
-    #     return [config.validation.user for config in self.user_data_configs]
+                self.get_user_data_configs()]
 
     @property
     def file_size(self):
