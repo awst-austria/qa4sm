@@ -1,7 +1,7 @@
 from django.conf.urls import re_path
 from django.urls import path, include
 
-from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_dataset
+from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_datasetversion
 # data_parameterised_filter_by_config
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
@@ -70,7 +70,7 @@ urlpatterns = [
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
-    re_path(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset),
+    re_path(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_datasetversion),
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),

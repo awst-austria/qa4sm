@@ -20,6 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "baseHref": "/ui/",
             "outputPath": "dist/UI",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -139,7 +140,8 @@
   "cli": {
     "schematicCollections": [
       "@angular-eslint/schematics"
-    ]
+    ],
+    "analytics": false
   },
   "defaultProject": "UI"
 }

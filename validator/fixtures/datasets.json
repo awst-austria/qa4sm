@@ -21,11 +21,6 @@
             "variables": [
                 1
             ],
-            "filters": [
-                1,
-                6,
-                7
-            ],
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
@@ -49,13 +44,13 @@
                 2,
                 29,
                 43,
-                44
+                44,
+                52,
+                53,
+                1000
             ],
             "variables": [
                 2
-            ],
-            "filters": [
-                1
             ],
             "resolution": {
                 "value": 36,
@@ -81,14 +76,6 @@
             ],
             "variables": [
                 3
-            ],
-            "filters": [
-                1,
-                10,
-                11,
-                12,
-                13,
-                14
             ],
             "resolution": {
                 "value": 12.5,
@@ -118,13 +105,6 @@
             "variables": [
                 4
             ],
-            "filters": [
-                1,
-                2,
-                18,
-                24,
-                43
-            ],
             "resolution": null
         }
     },
@@ -148,10 +128,6 @@
                 6,
                 7,
                 8
-            ],
-            "filters": [
-                1,
-                9
             ],
             "resolution": {
                 "value": 0.25,
@@ -184,11 +160,6 @@
             "variables": [
                 9
             ],
-            "filters": [
-                1,
-                6,
-                7
-            ],
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
@@ -213,15 +184,6 @@
             ],
             "variables": [
                 10
-            ],
-            "filters": [
-                1,
-                15,
-                19,
-                20,
-                21,
-                22,
-                23
             ],
             "resolution": {
                 "value": 25,
@@ -248,10 +210,6 @@
             "variables": [
                 11
             ],
-            "filters": [
-                1,
-                16
-            ],
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
@@ -276,10 +234,6 @@
             ],
             "variables": [
                 12
-            ],
-            "filters": [
-                1,
-                17
             ],
             "resolution": {
                 "value": 0.1,
@@ -310,11 +264,6 @@
             "variables": [
                 13
             ],
-            "filters": [
-                1,
-                6,
-                7
-            ],
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
@@ -344,11 +293,6 @@
             "variables": [
                 14
             ],
-            "filters": [
-                1,
-                6,
-                7
-            ],
             "resolution": {
                 "value": 0.25,
                 "unit": "deg"
@@ -373,9 +317,6 @@
             ],
             "variables": [
                 15
-            ],
-            "filters": [
-                1
             ],
             "resolution": {
                 "value": 1,
@@ -403,9 +344,6 @@
                 16,
                 17
             ],
-            "filters": [
-                1
-            ],
             "resolution": {
                 "value": 1,
                 "unit": "km"
@@ -432,19 +370,6 @@
             "variables": [
                 18
             ],
-            "filters": [
-                1,
-                25,
-                26,
-                27,
-                28,
-                29,
-                30,
-                31,
-                32,
-                33,
-                34
-            ],
             "resolution": {
                 "value": 25,
                 "unit": "km"
@@ -469,17 +394,6 @@
             ],
             "variables": [
                 19
-            ],
-            "filters": [
-                1,
-                35,
-                36,
-                37,
-                38,
-                39,
-                40,
-                41,
-                42
             ],
             "resolution": {
                 "value": 15,
@@ -506,9 +420,6 @@
             "variables": [
                 2
             ],
-            "filters": [
-                1
-            ],
             "resolution": {
                 "value": 36,
                 "unit": "km"
@@ -516,5 +427,4 @@
             "user": null
         }
     }
-
 ]
