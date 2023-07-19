@@ -102,4 +102,6 @@ class UserSerializer(ModelSerializer):
                   'copied_runs',
                   'space_limit',
                   'space_limit_value',
-                  'space_left']
+                  'space_left',
+                  'is_staff',
+                  'is_superuser']

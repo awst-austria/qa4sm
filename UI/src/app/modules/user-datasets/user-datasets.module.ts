@@ -12,14 +12,16 @@ import {UserDataRowComponent} from './components/user-data-row/user-data-row.com
 import {PanelModule} from 'primeng/panel';
 import {AllowedNameDirective} from './services/allowed-name.directive';
 import {ScrollPanelModule} from 'primeng/scrollpanel';
+import {ShareUserDataComponent} from './components/share-user-data/share-user-data.component';
 
 
 @NgModule({
-  declarations: [UserFileUploadComponent, UserDataRowComponent, AllowedNameDirective],
-  exports: [
-    UserFileUploadComponent,
-    UserDataRowComponent
-  ],
+  declarations: [UserFileUploadComponent, UserDataRowComponent, AllowedNameDirective, ShareUserDataComponent],
+    exports: [
+        UserFileUploadComponent,
+        UserDataRowComponent,
+        ShareUserDataComponent
+    ],
     imports: [
         CommonModule,
         ButtonModule,

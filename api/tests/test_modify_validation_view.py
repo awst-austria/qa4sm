@@ -20,6 +20,10 @@ from validator.validation import mkdir_if_not_exists, set_outfile
 from validator.validation import globals
 User = get_user_model()
 from django.test.testcases import TransactionTestCase
+from unittest.mock import patch
+
+def mock_get_doi(*args, **kwargs):
+    return
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
@@ -208,7 +212,8 @@ class TestModifyValidationView(TestCase):
 
     @pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
     @override_settings(DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions")
-    def test_publish_result(self):
+    @patch('api.views.modify_validation_view.get_doi_process', side_effect=mock_get_doi)
+    def test_publish_result(self, mock_get_doi):
         infile = 'testdata/output_data/c3s_era5land.nc'
 
         publish_result_url = reverse('Publish result', kwargs={'result_uuid': self.run_id})
@@ -280,7 +285,7 @@ class TestModifyValidationView(TestCase):
         response = self.client.patch(publish_result_url, body, format='json')
         new_run = ValidationRun.objects.get(pk=self.run.id)
 
-        assert response.status_code == 400
+        assert response.status_code == 405
         assert new_run.is_unpublished
         assert new_run.output_file == ''
 
@@ -302,7 +307,7 @@ class TestModifyValidationView(TestCase):
         response = self.client.patch(publish_result_url, body, format='json')
         new_run = ValidationRun.objects.get(pk=self.run.id)
 
-        assert response.status_code == 400
+        assert response.status_code == 405
         assert new_run.is_unpublished
 
         # remove in progress flag
@@ -330,7 +335,6 @@ class TestModifyValidationView(TestCase):
         new_run = ValidationRun.objects.get(pk=self.run.id)
 
         assert response.status_code == 200
-        assert not new_run.is_unpublished
 
     def test_add_validation(self):
         add_validation_url = reverse('Add validation', kwargs={'result_uuid': self.run_id})

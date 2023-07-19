@@ -5,7 +5,6 @@ import {HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
-import {ModalWindowService} from '../../../core/services/global/modal-window.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 
@@ -24,6 +23,7 @@ export class ButtonsComponent implements OnInit {
   @Input() tracked: boolean;
   @Output() doRefresh = new EventEmitter();
   @Output() doUpdate = new EventEmitter();
+  @Output() openPublishWindow = new EventEmitter();
 
   faIcons = {
     faArchive: fas.faArchive,
@@ -42,7 +42,6 @@ export class ButtonsComponent implements OnInit {
   constructor(private router: Router,
               private validationService: ValidationrunService,
               public authService: AuthService,
-              private modalService: ModalWindowService,
               public globals: GlobalParamsService) {
   }
 
@@ -50,7 +49,6 @@ export class ButtonsComponent implements OnInit {
     this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
     this.isTrackedByTheUser$.next(this.authService.currentUser.copied_runs.includes(this.validationRun.id));
-    this.publishingInProgress$ = this.validationService.checkPublishingInProgress();
     this.isArchived$.next(this.validationRun.is_archived);
   }
 
@@ -139,7 +137,7 @@ export class ButtonsComponent implements OnInit {
   }
 
   open(): void {
-    this.modalService.open();
+    this.openPublishWindow.emit(true)
   }
 
   copy(validationId: string): void {

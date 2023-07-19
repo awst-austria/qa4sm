@@ -11,7 +11,8 @@ export class UserDataFileDto {
               public is_used_in_validation: boolean,
               public file_size: number,
               public validation_list: {val_id: string, val_name: string}[],
-              public metadata_submitted: boolean
+              public metadata_submitted: boolean,
+              public user_groups: number[]
               ) {
   }
 }
