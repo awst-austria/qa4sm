@@ -8,11 +8,9 @@ from rest_framework.serializers import ModelSerializer
 from validator.models import Dataset, DatasetVersion, DataFilter, ParametrisedFilter
 
 import logging
-from autologging import traced, TRACE, logged
-logging.basicConfig(level=TRACE, filename = 'nfb_logger.log', format='%(asctime)s - %(levelname)s:%(name)s:%(funcName)s:%(message)s"')
 
-@logged
-@traced
+__logger = logging.getLogger(__name__)
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def data_filter(request):
