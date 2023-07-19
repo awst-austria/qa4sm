@@ -1,4 +1,5 @@
 from .settings import Settings
+from .data_management_group import DataManagementGroup
 from .custom_user import User
 from .filter import DataFilter
 from .parametrised_filter import ParametrisedFilter

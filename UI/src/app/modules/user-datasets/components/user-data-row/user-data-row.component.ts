@@ -9,6 +9,7 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
 import {AuthService} from '../../../core/services/auth/auth.service';
+import {DataManagementGroupsDto} from '../../services/data-management-groups.dto';
 
 @Component({
   selector: 'qa-user-data-row',
@@ -18,6 +19,11 @@ import {AuthService} from '../../../core/services/auth/auth.service';
 export class UserDataRowComponent implements OnInit, OnDestroy {
 
   @Input() userDataset: UserDataFileDto;
+  @Input() dataManagementGroups: DataManagementGroupsDto[];
+  // @Output() openShareDataWindow = new EventEmitter<any>()
+
+  datasetGroups$: BehaviorSubject<DataManagementGroupsDto[]> =
+    new BehaviorSubject<DataManagementGroupsDto[]>([])
   datasetName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   versionName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   variableName: {
@@ -47,7 +53,9 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     error: () => this.onGetUserDataFileByIdError()
   }
 
+  shareDataModalWindow = false;
 
+  // groupToUpdate: DataManagementGroupsDto
   // variables$: Observable<DatasetVariableDto>[] = [];
 
   constructor(private userDatasetService: UserDatasetsService,
@@ -59,6 +67,9 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.datasetGroups$.next(
+      this.dataManagementGroups.filter(group => this.userDataset.user_groups.includes(group.id))
+    )
     this.datasetService.getDatasetById(this.userDataset.dataset).subscribe(datasetData => {
       this.datasetName$.next(datasetData.pretty_name);
     });
@@ -106,7 +117,7 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     this.userDatasetService.updateMetadata(fieldName, fieldValue, userDataId).subscribe(updateMetadataObserver);
   }
 
-  private onUpdateMetadataNext(fieldName, fieldValue): void{
+  private onUpdateMetadataNext(fieldName, fieldValue): void {
     this.toggle(fieldName, false);
     if (fieldName === this.datasetFieldName) {
       this.datasetName$.next(fieldValue);
@@ -122,11 +133,11 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     }
   }
 
-  private onUpdateMetadataError(): void{
+  private onUpdateMetadataError(): void {
     this.toastService.showError('Metadata could not be updated');
   }
 
-  private onUpdateMetadataComplete(): void{
+  private onUpdateMetadataComplete(): void {
     this.toastService.showSuccess('Metadata has been updated');
   }
 
@@ -168,13 +179,27 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     }
   }
 
-  private onGetUserDataFileByIdError(): void{
+  private onGetUserDataFileByIdError(): void {
     this.userDatasetService.refresh.next(true);
     this.toastService.showErrorWithHeader('File preprocessing failed',
       'File could not be preprocessed. Please make sure that you are uploading a proper file and if the ' +
       'file fulfills our requirements', 10000);
   }
 
+  public openWindowForDataSharing(): void{
+    this.shareDataModalWindow = true;
+  }
+
+  public manageSharingWindow(open): void{
+    if (!open){
+      this.shareDataModalWindow = false;
+      this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe( data =>{
+        console.log(data)
+        this.userDataset = data;
+        }
+      )
+    }
+  }
 
   ngOnDestroy(): void {
     clearInterval(this.filePreprocessingStatus);

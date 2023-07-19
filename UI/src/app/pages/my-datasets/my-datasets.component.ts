@@ -3,6 +3,7 @@ import {UserDatasetsService} from '../../modules/user-datasets/services/user-dat
 import {Observable} from 'rxjs';
 import {UserDataFileDto} from '../../modules/user-datasets/services/user-data-file.dto';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
+import {DataManagementGroupsDto} from '../../modules/user-datasets/services/data-management-groups.dto';
 
 @Component({
   selector: 'qa-my-datasets',
@@ -14,23 +15,37 @@ export class MyDatasetsComponent implements OnInit {
   constructor(private userDatasetService: UserDatasetsService,
               public authService: AuthService) { }
   userDatasets$: Observable<UserDataFileDto[]>;
+  dataManagementGroups$: Observable<DataManagementGroupsDto[]>;
   readMore = false;
   hasNoSpaceLimit: boolean;
   hasNoSpaceAssigned: boolean;
+  sharingWindowOpened = false;
+  // userDatasetToEdit: UserDataFileDto;
+
+  pageStyle ={
+    'max-width': `${this.authService.currentUser.is_staff ? '85rem' : '70rem'}`
+  }
 
   ngOnInit(): void {
     this.userDatasets$ = this.userDatasetService.getUserDataList();
+    this.refreshUserData();
+    this.hasNoSpaceLimit = !this.authService.currentUser.space_limit_value;
+    this.hasNoSpaceAssigned = this.authService.currentUser.space_limit_value === 1;
+    this.dataManagementGroups$ = this.userDatasetService.getDataManagementGroups()
+    this.dataManagementGroups$.subscribe(data =>{
+    })
+  }
+
+  toggleReadMore(): void{
+    this.readMore = !this.readMore;
+  }
+
+  refreshUserData(): void{
     this.userDatasetService.doRefresh.subscribe(value => {
       if (value){
         this.userDatasets$ = this.userDatasetService.getUserDataList();
       }
     });
-    this.hasNoSpaceLimit = !this.authService.currentUser.space_limit_value;
-    this.hasNoSpaceAssigned = this.authService.currentUser.space_limit_value === 1;
-  }
-
-  toggleReadMore(): void{
-    this.readMore = !this.readMore;
   }
 
   getLimitMessage(): string{
