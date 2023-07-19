@@ -16,9 +16,9 @@ __logger = logging.getLogger(__name__)
 def data_filter(request):
     # All filters are taken
     data_filters = DataFilter.objects.all()
-    data_filters.__log.debug(f'data_filters = {data_filters}')
+    # data_filters.__log.debug(f'data_filters = {data_filters}')
     serializer = DataFilterSerializer(data_filters, many=True)
-    serializer.__log.debug(f'serializer = {serializer}')
+    # serializer.__log.debug(f'serializer = {serializer}')
 
     included_filters = check_included_filters(data_filters)
     if included_filters:
@@ -49,7 +49,7 @@ def data_filter(request):
 @permission_classes([AllowAny])
 def data_filter_by_datasetversion(request, **kwargs):
     # Here we can take all the filters or filters assigned to the particular dataset only.
-    data_filters = get_object_or_404(DatasetVersion, id=kwargs['dataset_id']).filters.all()
+    data_filters = get_object_or_404(DatasetVersion, id=kwargs['version_id']).filters.all()
     serializer = DataFilterSerializer(data_filters, many=True)
 
     included_filters = check_included_filters(data_filters)

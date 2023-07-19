@@ -70,7 +70,7 @@ urlpatterns = [
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
-    re_path(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_datasetversion),
+    re_path(r'^data-filter/(?P<version_id>.+)$', data_filter_by_datasetversion),
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
