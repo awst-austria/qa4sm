@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.serializers import ModelSerializer
 
-from validator.models import Dataset, DatasetVersion, DataFilter, ParametrisedFilter
+from validator.models import DatasetVersion, DataFilter, ParametrisedFilter
 
 import logging
 
@@ -28,21 +28,6 @@ def data_filter(request):
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
-
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def data_filter_by_dataset(request, **kwargs):
-#     # Here we can take all the filters or filters assigned to the particular dataset only.
-#     data_filters = get_object_or_404(Dataset, id=kwargs['dataset_id']).filters.all()
-#     serializer = DataFilterSerializer(data_filters, many=True)
-
-#     included_filters = check_included_filters(data_filters)
-#     if included_filters:
-#         # I don't overwrite the data_filter variable because here I'm returning a list not a query
-#         sorted_filters = sort_included_filters(list(data_filters), included_filters)
-#         serializer = DataFilterSerializer(sorted_filters, many=True)
-
-#     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
 
 @api_view(['GET'])
