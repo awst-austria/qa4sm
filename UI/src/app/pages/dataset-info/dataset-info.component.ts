@@ -43,7 +43,11 @@ export class DatasetInfoComponent implements OnInit {
               versionsHelpText: datasetVersions.map(version => version.help_text),
               versionsStart: datasetVersions.map(version => version.time_range_start),
               versionsEnd: datasetVersions.map(version => version.time_range_end),
-              filters: this.getDistincFilters(datasetVersions.flatMap(version => version.filters.map(filterId =>
+              versionsFilters: datasetVersions.map(version => version.filters),
+              filtersIds: this.getDistincFilters(datasetVersions.flatMap(version => version.filters.map(filterId =>
+                filters.find(filter => filter.id === filterId).id
+              ))),
+              filtersDescription: this.getDistincFilters(datasetVersions.flatMap(version => version.filters.map(filterId =>
                 filters.find(filter => filter.id === filterId).description
               ))),
               filtersHelpText: this.getDistincFilters(datasetVersions.flatMap(version => version.filters.map(filterId =>
@@ -70,4 +74,9 @@ export class DatasetInfoComponent implements OnInit {
     return filters.filter(e => !(t[e] = e in t));
   }
 
+  getPositionsOfElementsInList(entireList: any[], partialList: any[]): number[] {
+    return partialList.map(itemB => entireList.indexOf(itemB) + 1);
+  }
+
+  protected readonly String = String;
 }
