@@ -1400,10 +1400,10 @@ class TestValidation(TestCase):
             self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
             va = dataset.variables.all()
-            fils = dataset.filters.all()
 
             for version in vs:
                 reader = val.create_reader(dataset, version)
+                fils = version.filters.all()
                 for variable in va:
                     for data_filter in fils:
                         self.__logger.debug(
