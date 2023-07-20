@@ -13,16 +13,19 @@ import {map} from 'rxjs/operators';
 export class DatasetInfoComponent implements OnInit {
 
   datasetInfo$: Observable<any>;
+
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
-              private filterService: FilterService) { }
+              private filterService: FilterService) {
+  }
 
   ngOnInit(): void {
     this.updateDatasetInfo();
     this.sort();
+
   }
 
-  private updateDatasetInfo(): void{
+  private updateDatasetInfo(): void {
     this.datasetInfo$ = combineLatest(
       this.datasetService.getAllDatasets(),
       this.versionService.getAllVersions(),
@@ -30,27 +33,41 @@ export class DatasetInfoComponent implements OnInit {
     ).pipe(
       map(([datasets, versions, filters]) =>
         datasets.map(
-          dataset =>
-            ({...dataset,
-              versions: dataset.versions.map(versionId => versions.find(version => version.id === versionId).pretty_name),
-              versionsHelpText: dataset.versions.map(versionId => versions.find(version => version.id === versionId).help_text),
-              versionsStart: dataset.versions.map(versionId => versions.find(version => version.id === versionId).time_range_start),
-              versionsEnd: dataset.versions.map(versionId => versions.find(version => version.id === versionId).time_range_end),
-              filters: dataset.filters.map(filterId => filters.find(filter => filter.id === filterId).description),
-              filtersHelpText: dataset.filters.map(filterId => filters.find(filter => filter.id === filterId).help_text),
-            })
+          dataset => {
+            const datasetVersions = dataset.versions.map(versionId =>
+              versions.find(version => version.id === versionId)
+            );
+            return {
+              ...dataset,
+              versions: datasetVersions.map(version => version.pretty_name),
+              versionsHelpText: datasetVersions.map(version => version.help_text),
+              versionsStart: datasetVersions.map(version => version.time_range_start),
+              versionsEnd: datasetVersions.map(version => version.time_range_end),
+              filters: this.getDistincFilters(datasetVersions.flatMap(version => version.filters.map(filterId =>
+                filters.find(filter => filter.id === filterId).description
+              ))),
+              filtersHelpText: this.getDistincFilters(datasetVersions.flatMap(version => version.filters.map(filterId =>
+                filters.find(filter => filter.id === filterId).help_text
+              ))),
+            }
+          }
         )
       )
     );
   }
 
-  sort(): void{
+  sort(): void {
     this.datasetInfo$ = this.datasetInfo$.pipe(map((data) => {
+      console.log(data)
       data.sort((a, b) => {
         return a.id < b.id ? -1 : 1;
       });
       return data;
     }));
+  }
+
+  getDistincFilters(filters, t = {}): any {
+    return filters.filter(e => !(t[e] = e in t));
   }
 
 }
