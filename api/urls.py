@@ -70,7 +70,7 @@ urlpatterns = [
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
-    re_path(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_datasetversion),
+    re_path(r'^data-filter/(?P<version_id>.+)$', data_filter_by_datasetversion),
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
@@ -117,7 +117,10 @@ urlpatterns = [
          name='Get user file by ID'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
     path('scaling-methods', get_scaling_methods, name='Scaling methods'),
-    path('support-request', send_support_request, name='Support request')
+    path('support-request', send_support_request, name='Support request'),
+    path('data-management-groups', get_data_management_groups, name='Get data management groups'),
+    path('manage-data-in-management-group', manage_data_in_group,
+         name='Add data to management groups'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

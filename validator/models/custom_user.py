@@ -6,7 +6,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django_countries.fields import CountryField
-# from validator.models import UserDatasetFile
+from validator.models import DataManagementGroup
 
 
 class User(AbstractUser):
@@ -18,7 +18,7 @@ class User(AbstractUser):
 
     DATA_SPACE_LEVELS = (
         (NO_DATA, 1),
-        (BASIC, 5 * 10**9),
+        (BASIC, 5 * 10 ** 9),
         (EXTENDED, 10 ** 10),
         (LARGE, 200 * 10**9),
         (UNLIMITED, None)
@@ -35,6 +35,7 @@ class User(AbstractUser):
     def space_limit_value(self):
         # this property is added to be able to use it in api
         return self.get_space_limit_display()
+
     @property
     def space_left(self):
         if self.get_space_limit_display():
@@ -43,9 +44,16 @@ class User(AbstractUser):
 
         return
 
+    def data_management_groups(self):
+        return DataManagementGroup.objects.filter(user=self)
+
+    @property
+    def belongs_to_data_management_groups(self):
+        return len(self.data_management_groups()) > 0
+
     def clean(self):
         super(User, self).clean()
         if self.orcid:
             r = reg_search(settings.ORICD_REGEX, self.orcid)
             if not r or len(r.groups()) < 1:
-                raise ValidationError({'orcid': 'Invalid ORCID identifier.',})
+                raise ValidationError({'orcid': 'Invalid ORCID identifier.', })

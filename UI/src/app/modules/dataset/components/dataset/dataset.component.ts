@@ -10,6 +10,7 @@ import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variabl
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
 import {map} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
+import {AuthService} from '../../../core/services/auth/auth.service';
 
 
 @Component({
@@ -43,7 +44,8 @@ export class DatasetComponent implements OnInit {
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
-              private validationConfigService: ValidationRunConfigService) {
+              private validationConfigService: ValidationRunConfigService,
+              public authService: AuthService) {
   }
 
 

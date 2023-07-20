@@ -62,7 +62,11 @@
             "time_range_end": "",
             "geographical_range": null,
             "filters": [
-                null
+                1,
+                2,
+                18,
+                24,
+                43
             ]
         }
     },
@@ -768,23 +772,6 @@
             "geographical_range": null,
             "filters": [
                 1
-            ]
-        }
-    },
-    {
-        "model": "validator.datasetversion",
-        "pk": 1000,
-        "fields": {
-            "short_name": "SMAP_TEST_TEST",
-            "pretty_name": "TEST TEST",
-            "help_text": "-",
-            "time_range_start": "2015-03-31",
-            "time_range_end": "2022-07-26",
-            "geographical_range": null,
-            "filters": [
-                1,
-                6,
-                7
             ]
         }
     }

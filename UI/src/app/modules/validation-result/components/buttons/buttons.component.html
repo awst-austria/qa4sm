@@ -173,7 +173,7 @@
 </div>
 
 <!--Buttons shown on the single validation page (both custom and published)-->
-<div *ngIf="!validationList && (publishingInProgress$|async)===false" class="col-sm pb-4" style="text-align: right;">
+<div *ngIf="!validationList" class="col-sm pb-4" style="text-align: right;">
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
     <button pButton
@@ -242,15 +242,6 @@
        pTooltip="Loading settings will redirect you to the validate page"
        [life]="globals.tooltipLifetime">
     </a>
-
-    <div [ngClass]="{'collapse': !validationRun.publishing_in_progress}"
-         style="float: right">
-      <div class="spinner-border spinner-border-sm" role="status">
-        <span class="sr-only">Publishing in progress...</span>
-      </div>
-      Publishing in progress...
-    </div>
-
   </div>
 
 
@@ -308,7 +299,4 @@
 
     </div>
   </ng-template>
-</div>
-<div *ngIf="!validationList && (publishingInProgress$|async)" class="col-sm pb-4 text-muted" id="publishingInProgress">
-  <span class="pi pi-spin pi-spinner"></span> <span> Publishing in progress... </span>
 </div>

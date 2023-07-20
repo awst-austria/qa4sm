@@ -67,16 +67,16 @@ class TestDataFilterView(TestCase):
 
     def test_sorting_with_included_filters(self):
         data_filter_url = reverse('Dataset filters')
-        # check filters for C3S (id = 1)
-        dataset_id = 1  #
+        # check filters for C3S version C3S_V201706 (id = 1)
+        version_id = 1  #
         # overwrite the last filter so it has others as 'to_include'
-        dataset_filter_to_update = Dataset.objects.get(pk=dataset_id).filters.all().order_by('id').last()
-        filters_to_include_list = list(Dataset.objects.get(pk=dataset_id).filters.all().values_list('id', flat=True))[0:-1]
+        dataset_filter_to_update = DatasetVersion.objects.get(pk=version_id).filters.all().order_by('id').last()
+        filters_to_include_list = list(DatasetVersion.objects.get(pk=version_id).filters.all().values_list('id', flat=True))[0:-1]
         filters_to_include_string = ','.join([str(filter_id) for filter_id in filters_to_include_list])
         dataset_filter_to_update.to_include = filters_to_include_string
         dataset_filter_to_update.save()
 
-        response = self.client.get(f'{data_filter_url}/{dataset_id}')
+        response = self.client.get(f'{data_filter_url}/{version_id}')
         assert response.status_code == 200
         assert len(response.json()) == 3
 

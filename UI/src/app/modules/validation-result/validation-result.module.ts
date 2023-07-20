@@ -23,6 +23,7 @@ import {ButtonModule} from 'primeng/button';
 import {PublishingComponent} from './components/publishing/publishing.component';
 import {ExistingValidationComponent} from './components/existing-validation/existing-validation.component';
 import {GalleriaModule} from 'primeng/galleria';
+import {DialogModule} from 'primeng/dialog';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -45,21 +46,22 @@ import {GalleriaModule} from 'primeng/galleria';
         PublishingComponent,
         ExistingValidationComponent,
     ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    NgxPaginationModule,
-    RouterModule,
-    DropdownModule,
-    FormsModule,
-    InputTextModule,
-    NgDompurifyModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    GalleriaModule
-  ]
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        NgxPaginationModule,
+        RouterModule,
+        DropdownModule,
+        FormsModule,
+        InputTextModule,
+        NgDompurifyModule,
+        ButtonModule,
+        ReactiveFormsModule,
+        GalleriaModule,
+        DialogModule
+    ]
 })
 export class ValidationResultModule {
 }
