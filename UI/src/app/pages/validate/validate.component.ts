@@ -212,17 +212,7 @@ export class ValidateComponent implements OnInit {
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
       this.versionService.getVersionById(datasetConfig.version_id).subscribe(versionDto => {
         newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
-      });
 
-      this.variableService.getVariableById(datasetConfig.variable_id).subscribe(variableDto => {
-        newDatasetConfigModel.datasetModel.selectedVariable = variableDto;
-      });
-      newDatasetConfigModel.spatialReference$.next(datasetConfig.is_spatial_reference);
-      newDatasetConfigModel.temporalReference$.next(datasetConfig.is_temporal_reference);
-      newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
-
-      this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
-        newDatasetConfigModel.datasetModel.selectedDataset = dataset;
         this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
           .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
             datasetConfig.basic_filters.forEach(basicFilterConfig => {
@@ -244,6 +234,19 @@ export class ValidateComponent implements OnInit {
               }
             });
           });
+
+      });
+
+      this.variableService.getVariableById(datasetConfig.variable_id).subscribe(variableDto => {
+        newDatasetConfigModel.datasetModel.selectedVariable = variableDto;
+      });
+      newDatasetConfigModel.spatialReference$.next(datasetConfig.is_spatial_reference);
+      newDatasetConfigModel.temporalReference$.next(datasetConfig.is_temporal_reference);
+      newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
+
+      this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
+        newDatasetConfigModel.datasetModel.selectedDataset = dataset;
+
         if (datasetConfig.is_spatial_reference) {
           this.spatialReferenceChild.setReference(newDatasetConfigModel);
         }
@@ -381,12 +384,14 @@ export class ValidateComponent implements OnInit {
       });
 
       // and the filters
-      this.loadFiltersForModel(model);
+      // this.loadFiltersForModel(model);
     });
   }
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
     model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
+    this.loadFiltersForModel(model)
+    // this.
   }
 
   private onGetVersionComplete(): void {
@@ -402,8 +407,8 @@ export class ValidateComponent implements OnInit {
       next: filters => this.onGetFiltersNext(filters, model, reloadingSettings, updatedModel$),
       error: error => this.onGetFiltersError(error, updatedModel$)
     }
-
-    this.filterService.getFiltersByDatasetId(model.datasetModel.selectedDataset.id).subscribe(getFiltersObserver);
+    // console.log(model)
+    this.filterService.getFiltersByVersionId(model.datasetModel.selectedVersion.id).subscribe(getFiltersObserver);
     return updatedModel$;
   }
 
@@ -570,6 +575,7 @@ export class ValidateComponent implements OnInit {
 
     // prepare metrics
     const metricDtos: ValidationRunMetricConfigDto[] = [];
+
     this.validationModel.metrics.forEach(metric => {
       metricDtos.push(metric.toValidationRunMetricDto());
     });

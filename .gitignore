@@ -18,3 +18,8 @@ run_celery/
 .coverage*
 */python_metadata/*
 node_modules
+.angular
+.vscode
+.qa4sm-testdata
+nicolas_files
+validator/fixtures/original*

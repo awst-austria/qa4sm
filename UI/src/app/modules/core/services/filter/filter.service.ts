@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {shareReplay} from 'rxjs/operators';
 import {environment} from '../../../../../environments/environment';
 import {FilterDto} from './filter.dto';
@@ -39,7 +39,7 @@ export class FilterService {
     }
   }
 
-  getFiltersByDatasetId(datasetId: number): Observable<FilterDto[]> {
+  getFiltersByVersionId(datasetId: number): Observable<FilterDto[]> {
     if (this.arrayRequestCache.isCached(datasetId)) {
       return this.arrayRequestCache.get(datasetId);
     } else {

@@ -1400,10 +1400,10 @@ class TestValidation(TestCase):
             self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
             va = dataset.variables.all()
-            fils = dataset.filters.all()
 
             for version in vs:
                 reader = val.create_reader(dataset, version)
+                fils = version.filters.all()
                 for variable in va:
                     for data_filter in fils:
                         self.__logger.debug(
@@ -2199,8 +2199,10 @@ class TestValidation(TestCase):
 
         validations = ValidationRun.objects.exclude(pk=copied_run_info['run_id'])
         copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
+
         comparison = compare_validation_runs(copied_run, validations, copied_run.user)
 
+        # print(f'\n\t{comparison}\n')
         assert comparison['is_there_validation']
         assert comparison['val_id'] == run.id
         assert not comparison['belongs_to_user']

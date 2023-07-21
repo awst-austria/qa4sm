@@ -18,13 +18,10 @@ from valentina.version import APP_VERSION
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 MEDIA_ROOT = os.path.join(BASE_DIR, 'output/')
-
 LOGIN_REDIRECT_URL = 'validation'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-
 ENV_FILE_URL_TEMPLATE = "https://github.com/awst-austria/qa4sm/blob/v{}/environment/qa4sm_env.yml"
 
 ORICD_REGEX = "^([0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9Xx]{3}[0-9Xx])$"

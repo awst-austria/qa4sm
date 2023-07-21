@@ -172,8 +172,8 @@ def get_validation_configuration(request, **kwargs):
 
             for basic_filter in ds.filters.all():
                 # check if the reloaded filter still belongs to the dataset
-                dataset_filters = Dataset.objects.get(id=dataset_id).filters.all()
-                if basic_filter in dataset_filters:
+                datasetversion_filters = DatasetVersion.objects.get(id=ds.version_id).filters.all()
+                if basic_filter in datasetversion_filters:
                     filters_list.append(basic_filter.id)
                 else:
                     non_existing_filters_list.append(basic_filter.description)
@@ -182,14 +182,15 @@ def get_validation_configuration(request, **kwargs):
             ds_dict['parametrised_filters'] = parametrised_filters
             for param_filter in ParametrisedFilter.objects.filter(dataset_config=ds):
                 # check if the reloaded filter still belongs to the dataset
-                dataset_filter_ids = Dataset.objects.get(id=dataset_id).filters.all().values_list('id', flat=True)
-                if param_filter.filter_id in dataset_filter_ids:
+                datasetversion_filter_ids = DatasetVersion.objects.get(id=ds.version_id).filters.all().values_list('id', flat=True)
+                if param_filter.filter_id in datasetversion_filter_ids:
                     parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
                 else:
                     filter_desc = DataFilter.objects.get(id=param_filter.filter.id).description
                     non_existing_filters_list.append(filter_desc)
 
             if len(non_existing_filters_list) != 0:
+                print('non existing filter', non_existing_filters_list)
                 changes_in_settings['filters'].append(
                     {'dataset': ds.dataset.pretty_name, 'filter_desc': non_existing_filters_list})
 
