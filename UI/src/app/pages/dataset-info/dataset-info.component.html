@@ -30,6 +30,15 @@
               <span *ngIf="dataset.versionsHelpText[ind] !== '-' && dataset.versionsHelpText[ind] !==''">
                 ({{ dataset.versionsHelpText[ind] }}) <br>
               </span>
+
+
+              <span>Filters: {{
+                String(
+                  getPositionsOfElementsInList(dataset.filtersIds, dataset.versionsFilters[ind])
+                ).replaceAll(',', ', ') // don't know why it's marked as an error, it's actually working
+                }}
+              </span> <br>
+
               <span *ngIf="dataset.versionsStart[ind] === '' && dataset.versionsEnd[ind] === ''; else elseTimeRange">
                 Time coverage is station dependent
               </span>
@@ -43,11 +52,11 @@
         <td [innerHTML]="dataset.source_reference"></td>
         <td [innerHTML]="dataset.citation"></td>
         <td>
-          <ul class="pl-0  my-0">
-            <li *ngFor="let filter of dataset.filters; let ind = index" class="ml-2">
-              {{filter}}: {{dataset.filtersHelpText[ind]}}
+          <ol class="pl-0  my-0">
+            <li *ngFor="let filter of dataset.filtersDescription; let ind = index" class="ml-2">
+               {{filter}}: {{dataset.filtersHelpText[ind]}}
             </li>
-          </ul>
+          </ol>
         </td>
       </tr>
       </tbody>

@@ -59,6 +59,7 @@ def create_version_entry(version_name, version_pretty_name, dataset_pretty_name,
         "time_range_start": None,
         "time_range_end": None,
         "geographical_range": None,
+        "filters": []
     }
 
     version_serializer = DatasetVersionSerializer(data=new_version_data)
@@ -365,7 +366,6 @@ class UploadFileSerializer(ModelSerializer):
 
 
 class DatasetSerializer(ModelSerializer):
-    # this serializer do not verify filters field, as the field is required and for now we don't provide any
     class Meta:
         model = Dataset
         fields = ['id',

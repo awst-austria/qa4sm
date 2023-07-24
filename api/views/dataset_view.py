@@ -51,7 +51,7 @@ class DatasetSerializer(ModelSerializer):
                   'is_spatial_reference',
                   'versions',
                   'variables',
-                  'filters',
+                #   'filters',
                   'not_as_reference',
                   'user',
                   'is_shared'
