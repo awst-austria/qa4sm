@@ -11,4 +11,6 @@ export interface UserDto{
   space_limit: string;
   space_limit_value: number;
   space_left: number;
+  is_staff: boolean,
+  is_superuser: boolean
 }

@@ -10,8 +10,8 @@ export class DatasetDto {
               public is_spatial_reference: boolean,
               public versions: number[],
               public variables: number[],
-              public filters: number[],
               public not_as_reference: boolean,
-              public user: string) {
+              public user: string,
+              public is_shared: boolean) {
   }
 }

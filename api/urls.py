@@ -1,7 +1,7 @@
 from django.conf.urls import re_path
 from django.urls import path, include
 
-from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_dataset
+from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_datasetversion
 # data_parameterised_filter_by_config
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
@@ -71,7 +71,7 @@ urlpatterns = [
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation, name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
-    re_path(r'^data-filter/(?P<dataset_id>.+)$', data_filter_by_dataset),
+    re_path(r'^data-filter/(?P<version_id>.+)$', data_filter_by_datasetversion),
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
@@ -120,6 +120,10 @@ urlpatterns = [
     path('scaling-methods', get_scaling_methods, name='Scaling methods'),
     path('support-request', send_support_request, name='Support request'),
     re_path(r'^dataset-version-geojson/(?P<version_id>.+)$', dataset_version_geojson_by_id)
+    path('support-request', send_support_request, name='Support request'),
+    path('data-management-groups', get_data_management_groups, name='Get data management groups'),
+    path('manage-data-in-management-group', manage_data_in_group,
+         name='Add data to management groups'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
