@@ -73,9 +73,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "UI:build",
-            "proxyConfig": "src/proxy.conf.json",
-            "baseUrl": "/ui/",
-            "baseHref": "/ui/"
+            "proxyConfig": "src/proxy.conf.json"
           },
           "configurations": {
             "production": {
