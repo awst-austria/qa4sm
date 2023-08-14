@@ -116,6 +116,11 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.userDatasetService.deleteUserDataFileOnly(dataset.id).subscribe(response => {
+      this.userDatasetService.refresh.next(true);
+      this.authService.init();
+    })
+
   }
 
   updateVariable(): void {

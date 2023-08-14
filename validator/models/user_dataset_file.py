@@ -42,7 +42,7 @@ class UserDatasetFile(models.Model):
 
     @property
     def get_raw_file_path(self):
-        return self.file.path.rstrip(self.file_name)
+        return self.file.path.rstrip(self.file_name) if self.file else ""
 
     @property
     def is_used_in_validation(self):
@@ -55,7 +55,27 @@ class UserDatasetFile(models.Model):
 
     @property
     def file_size(self):
-        return self.file.size
+        print('Monika', self.file, self.file_name is None, self.id)
+        if self.file_name is not None:
+            return self.file.size
+        else:
+            return
+
+    def delete_dataset_file(self):
+        # set storage path to an empty string
+        self.dataset.storage_path = ''
+        self.dataset.save()
+
+        # remove the file
+        if self.file:
+            rundir = path.dirname(self.file.path)
+            if path.isdir(rundir):
+                rmtree(rundir)
+
+        # set file and file name to None
+        self.file = None
+        self.file_name = None
+        self.save()
 
 
 @receiver(pre_delete, sender=UserDatasetFile)

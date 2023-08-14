@@ -9,7 +9,8 @@ import {DataManagementGroupsDto} from './data-management-groups.dto';
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
 const userDataListUrl: string = urlPrefix + '/get-list-of-user-data-files';
-const userDataDeleteUrl: string = urlPrefix + '/delete-user-datafile';
+const userDataDeleteUrl: string = urlPrefix + '/delete-entire-dataset';
+const userDeleteFileOnlyUrl: string = urlPrefix + '/delete-only-datafile';
 const updateMetadataUrl: string = urlPrefix + '/update-metadata';
 const userDataFileUrl: string = urlPrefix + '/get-user-file-by-id';
 const dataManagementGroupsUrl: string = urlPrefix + '/data-management-groups';
@@ -54,6 +55,12 @@ export class UserDatasetsService {
     const deleteUrl = userDataDeleteUrl + '/' + dataFileId + '/';
     return this.httpClient.delete(deleteUrl, {headers});
   }
+
+  deleteUserDataFileOnly(dataFileId: string): Observable<any>{
+    const deleteUrl = userDeleteFileOnlyUrl + '/' + dataFileId + '/';
+    return this.httpClient.delete(deleteUrl, {headers});
+  }
+
 
   updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
     const updateUrl = updateMetadataUrl + '/' + dataFileId + '/';

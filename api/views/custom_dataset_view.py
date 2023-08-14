@@ -69,8 +69,6 @@ def get_list_of_user_data_files(request):
     try:
         return JsonResponse(serializer.data, status=200, safe=False)
     except:
-        # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
-        # with proper path bound to a docker container
         return JsonResponse({'message': 'We could not return the list of your datafiles'}, status=500)
 
 
@@ -95,4 +93,15 @@ def delete_user_dataset_and_file(request, file_uuid):
 
     file_entry.delete()
 
+    return HttpResponse(status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_dataset_file_only(request, file_uuid):
+    file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
+    if file_entry.owner != request.user:
+        return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+
+    file_entry.delete_dataset_file()
     return HttpResponse(status=status.HTTP_200_OK)

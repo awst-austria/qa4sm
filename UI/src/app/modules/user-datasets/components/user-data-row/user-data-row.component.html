@@ -1,7 +1,11 @@
 <p-panel class="user-data-row">
 
   <ng-template pTemplate="header">
-    <h5 class="my-0"><span class="font-weight-normal">Size: </span> {{ getTheFileSize() }}</h5>
+    <h5 class="my-0">
+      <span class="font-weight-normal">
+      {{ userDataset.file ? "Size: " + getTheFileSize() : "File has been removed" }}
+      </span>
+    </h5>
   </ng-template>
   <ng-template pTemplate="icons" class="font-weight-normal">
     <h5 class="my-0"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
@@ -11,8 +15,6 @@
     <!--    dataset -->
     <div [ngClass]="authService.currentUser.is_staff ? 'col-4' : 'col-5'">
       <div><strong>Dataset: </strong></div>
-
-
       <div
         *ngIf="!editDataset.opened"
         style="cursor: pointer"
@@ -174,7 +176,7 @@
         </button>
       </div>
       <div class="py-1">
-        <button *ngIf="userDataset.is_used_in_validation"
+        <button *ngIf="userDataset.is_used_in_validation && userDataset.file"
                 pButton
                 icon="pi pi-times"
                 type="button"
@@ -185,18 +187,18 @@
                 (click)="removeDatasetFile(userDataset)">
         </button>
       </div>
-<!--      DO NOT REMOVE THIS CODE -->
-<!--      <div *ngIf="authService.currentUser.is_staff" class="py-1">-->
-<!--        <button pButton-->
-<!--                icon="pi pi-cog"-->
-<!--                type="button"-->
-<!--                label="Sharing options"-->
-<!--                pTooltip="Manage sharing options of your dataset"-->
-<!--                class="p-button-info"-->
-<!--                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"-->
-<!--                (click)="openWindowForDataSharing()">-->
-<!--        </button>-->
-<!--      </div>-->
+      <!--      DO NOT REMOVE THIS CODE -->
+      <!--      <div *ngIf="authService.currentUser.is_staff" class="py-1">-->
+      <!--        <button pButton-->
+      <!--                icon="pi pi-cog"-->
+      <!--                type="button"-->
+      <!--                label="Sharing options"-->
+      <!--                pTooltip="Manage sharing options of your dataset"-->
+      <!--                class="p-button-info"-->
+      <!--                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"-->
+      <!--                (click)="openWindowForDataSharing()">-->
+      <!--        </button>-->
+      <!--      </div>-->
     </div>
   </div>
   <div class="grid mx-0 px-0 my-0 no-validation-box" *ngIf="!userDataset.metadata_submitted" [style]="{height: '100%'}">
@@ -221,7 +223,6 @@
 
 <!--</p-dialog>-->
 <!---->
-
 
 
 <!--<p-dialog header="Share your dataset with other users"-->
@@ -276,16 +277,12 @@
 <!--  </div>-->
 
 
-
-
-
 <!--</p-dialog>-->
 <!--<p-dialog header="Add your dataset to an existing group"-->
 <!--          id="update-group-modal"-->
 <!--          [modal]="true"-->
 <!--          [style]="{height: '100%'} "-->
 <!--          [(visible)]="addToGroupModalWindow">-->
-
 
 
 <!--&lt;!&ndash;  <div class="p-float-label mb-4">&ndash;&gt;-->
