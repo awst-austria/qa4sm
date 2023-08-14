@@ -168,9 +168,8 @@
                 label="Remove dataset"
                 pTooltip="Remove dataset and the attached file"
                 class="p-button-danger"
-                [disabled]="userDataset.is_used_in_validation"
                 [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-                (click)="removeDataset(userDataset.id)">
+                (click)="removeDataset(userDataset)">
         </button>
       </div>
 <!--      DO NOT REMOVE THIS CODE -->
