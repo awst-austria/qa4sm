@@ -40,7 +40,8 @@ class DataManagementGroupAdmin(GroupAdmin, ModelAdmin):
         content_type_id = ContentType.objects.get_for_model(DataManagementGroup)
         form.base_fields['group_owner'].queryset = User.objects.filter(id=request.user.id)
         form.base_fields['permissions'].queryset = Permission.objects.filter(content_type_id=content_type_id)
-        form.base_fields['user_datasets'].queryset = UserDatasetFile.objects.filter(owner=request.user)
+        form.base_fields['user_datasets'].queryset = UserDatasetFile.objects.filter(owner=request.user).exclude(
+            file_name=None)
         form.base_fields['users'].queryset = User.objects.exclude(id=request.user.id)
 
         return form
