@@ -27,6 +27,7 @@ from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
 from api.views.support_request_view import *
+from api.views.custom_dataset_view import *
 
 # schema_view = get_schema_view(
 #     openapi.Info(
