@@ -165,11 +165,24 @@
         <button pButton
                 icon="pi pi-times"
                 type="button"
-                label="Remove dataset"
+                label="Remove entire dataset"
                 pTooltip="Remove dataset and the attached file"
                 class="p-button-danger"
-                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-                (click)="removeDataset(userDataset)">
+                [disabled]="userDataset.is_used_in_validation"
+                [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+                (click)="removeEntireDataset(userDataset)">
+        </button>
+      </div>
+      <div class="py-1">
+        <button *ngIf="userDataset.is_used_in_validation"
+                pButton
+                icon="pi pi-times"
+                type="button"
+                label="Remove file only"
+                pTooltip="Remove the attached file only to regain some space."
+                class="p-button-info"
+                [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+                (click)="removeDatasetFile(userDataset)">
         </button>
       </div>
 <!--      DO NOT REMOVE THIS CODE -->

@@ -80,17 +80,10 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     this.refreshFilePreprocessingStatus();
   }
 
-  removeDataset(dataset: UserDataFileDto): void {
+
+  removeEntireDataset(dataset: UserDataFileDto): void {
     let warning = 'Do you really want to delete the dataset?'
-    if (dataset.is_used_in_validation) {
-      if (dataset.user_groups.length === 0) {
-        warning += '\n\nPlease note that the data you are about to remove has been used in validations. ' +
-          '\n\nIf you proceed the validations will become unreproducible.'
-      } else {
-        warning += '\n\nPlease note that the data you are about to remove has been used in validations and shared with other users. ' +
-          '\n\nIf you proceed the validations will become unreproducible and other users will lose access to this dataset.'
-      }
-    } else if (dataset.user_groups.length !== 0) {
+    if (dataset.user_groups.length !== 0) {
       warning += '\n\nPlease note that the data you are about to remove has been shared with other users. ' +
         '\n\nIf you proceed other users will lose access to this dataset.'
     }
@@ -102,6 +95,27 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
       this.userDatasetService.refresh.next(true);
       this.authService.init();
     });
+  }
+
+  removeDatasetFile(dataset: UserDataFileDto): void {
+    let warning = 'Do you really want to delete the dataset?'
+    if (dataset.is_used_in_validation) {
+      if (dataset.user_groups.length === 0) {
+        warning += '\n\nPlease note that the file you are about to remove has been used in validations. ' +
+          '\n\nIf you proceed the validations will become unreproducible.'
+      } else {
+        warning += '\n\nPlease note that the file you are about to remove has been used in validations and shared with other users. ' +
+          '\n\nIf you proceed the validations will become unreproducible and other users will lose access to this dataset.'
+      }
+    } else if (dataset.user_groups.length !== 0) {
+      warning += '\n\nPlease note that the data you are about to remove has been shared with other users. ' +
+        '\n\nIf you proceed other users will lose access to this dataset.'
+    }
+
+    if (!confirm(warning)) {
+      return;
+    }
+
   }
 
   updateVariable(): void {
