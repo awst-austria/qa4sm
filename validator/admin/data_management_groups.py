@@ -68,43 +68,43 @@ class DataManagementGroupAdmin(GroupAdmin, ModelAdmin):
         super().save_model(request, obj, form, change)
 
         shared_datasets = form.cleaned_data['user_datasets']
-        used_datasets = obj.get_list_of_group_ds_used_by_group_users()
+        # used_datasets = obj.get_list_of_group_ds_used_by_group_users()
 
         group_users = form.cleaned_data['users']
-        users_using_datasets = obj.get_list_of_group_users_using_group_ds()
+        # users_using_datasets = obj.get_list_of_group_users_using_group_ds()
 
-        trying_to_remove_used_ds = used_datasets and not used_datasets.intersection(shared_datasets).exists()
-        trying_to_remove_user_using_ds = users_using_datasets and not users_using_datasets.intersection(
-            group_users).exists()
+        # trying_to_remove_used_ds = used_datasets and not used_datasets.intersection(shared_datasets).exists()
+        # trying_to_remove_user_using_ds = users_using_datasets and not users_using_datasets.intersection(
+        #     group_users).exists()
 
-        if trying_to_remove_used_ds or trying_to_remove_user_using_ds:
-            messages.error(request,
-                           "Changes can not be saved. "
-                           "At least one of the users uses the dataset shared within the group.")
-        else:
-            obj.custom_datasets.set(shared_datasets)
-            obj.user_set.set(group_users)
+        # if trying_to_remove_used_ds or trying_to_remove_user_using_ds:
+        #     messages.error(request,
+        #                    "Changes can not be saved. "
+        #                    "At least one of the users uses the dataset shared within the group.")
+        # else:
+        obj.custom_datasets.set(shared_datasets)
+        obj.user_set.set(group_users)
 
-    def delete_view(self, request, object_id, extra_context=None):
-        model = self.model
-        obj = self.get_object(request, object_id)
-
-        try:
-            self.log_deletion(request, obj, obj.__str__())
-            obj.delete()
-            return self.response_delete(request, obj_display=obj.__str__(), obj_id=obj.id)
-        except ProtectedError:
-            messages.error(request, "Cannot delete the model instance due to existing relationships.")
-            return redirect(f'admin:{model._meta.app_label}_{model._meta.model_name}_change', object_id)
-
-    def response_change(self, request, obj):
-        if request.method == 'POST' and hasattr(request, '_messages'):
-            if any(message.level == messages.ERROR for message in request._messages):
-                messages.error(request,
-                               "Changes can not be saved. At least one of the users uses the dataset shared within "
-                               "the group.")
-                return redirect(request.path)
-        return super().response_change(request, obj)
+    # def delete_view(self, request, object_id, extra_context=None):
+    #     model = self.model
+    #     obj = self.get_object(request, object_id)
+    #
+    #     try:
+    #         self.log_deletion(request, obj, obj.__str__())
+    #         obj.delete()
+    #         return self.response_delete(request, obj_display=obj.__str__(), obj_id=obj.id)
+    #     except ProtectedError:
+    #         messages.error(request, "Cannot delete the model instance due to existing relationships.")
+    #         return redirect(f'admin:{model._meta.app_label}_{model._meta.model_name}_change', object_id)
+    #
+    # def response_change(self, request, obj):
+    #     if request.method == 'POST' and hasattr(request, '_messages'):
+    #         if any(message.level == messages.ERROR for message in request._messages):
+    #             messages.error(request,
+    #                            "Changes can not be saved. At least one of the users uses the dataset shared within "
+    #                            "the group.")
+    #             return redirect(request.path)
+    #     return super().response_change(request, obj)
 
     @staticmethod
     def permission_list(obj):
