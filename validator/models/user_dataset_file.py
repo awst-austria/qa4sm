@@ -55,7 +55,6 @@ class UserDatasetFile(models.Model):
 
     @property
     def file_size(self):
-        print('Monika', self.file, self.file_name is None, self.id)
         if self.file_name is not None:
             return self.file.size
         else:
@@ -65,7 +64,8 @@ class UserDatasetFile(models.Model):
         # set storage path to an empty string
         self.dataset.storage_path = ''
         self.dataset.save()
-
+        # clear all the user management groups
+        self.user_groups.clear()
         # remove the file
         if self.file:
             rundir = path.dirname(self.file.path)
