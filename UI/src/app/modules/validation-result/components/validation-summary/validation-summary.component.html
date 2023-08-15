@@ -63,6 +63,12 @@
       </div>
     </ng-template>
     <div *ngIf="configurations$| async as configurations" class="card-body">
+      <div *ngIf="!allFilesExist" [ngClass]="'alert-danger pb-2'">
+        <b>
+          At least one data set file has been removed, therefore there is no possibility to rerun this validation.
+        </b>
+      </div>
+
       <div *ngIf="!forComparison && validationRun.total_points === 0" [ngClass]="'alert-danger'">
         <b>There were no spatial reference data points in the selected area. Please select a different spatial subsetting  or select
           different dataset as a spatial reference.
@@ -210,7 +216,7 @@
         </li>
       </ul>
       <qa-buttons *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false" [validationList]="false"
-                  [validationRun]="validationRun" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
+                  [validationRun]="validationRun" [canBeRerun]="allFilesExist" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
 
       <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
            style="float: right">

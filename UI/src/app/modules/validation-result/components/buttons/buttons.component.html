@@ -231,7 +231,7 @@
             (click)="open()">
     </button>
 
-    <a *ngIf="isLogged"
+    <a *ngIf="isLogged && canBeRerun"
        pButton
        type="button"
        icon="pi pi-replay"
@@ -263,7 +263,7 @@
 <!--        <button pButton type="button" label="Button" [disabled]="!buttonEnabled"></button>-->
 <!--      </p-tooltip>-->
 
-      <a *ngIf="isLogged && !validationRun.contains_user_data"
+      <a *ngIf="isLogged && !validationRun.contains_user_data && canBeRerun"
          pButton
          type="button"
          icon="pi pi-replay"

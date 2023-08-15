@@ -46,6 +46,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   public isPublishingWindowOpen: boolean;
   publishingInProgressInterval: any;
   publishingInProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  allFilesExist: boolean;
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -88,11 +89,14 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
              dataFilters,
              paramFilters]) =>
         configurations.map(
-          config =>
-            ({
+          config => {
+            const datasetInfo = datasets.find(ds => config.dataset === ds.id);
+
+            return {
               ...config,
-              dataset: datasets.find(ds =>
-                config.dataset === ds.id)?.pretty_name,
+              dataset: datasetInfo?.pretty_name,
+
+              fileExists: datasetInfo?.storage_path.length > 0,
 
               version: versions.find(dsVersion =>
                 config.version === dsVersion.id).pretty_name,
@@ -113,10 +117,12 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
                     .find(pF => pF.id === pf).parameters])
                   .find(f => f[0] === fId)[1])
 
-            })
+            }
+          }
         ))
     );
-    this.configurations$.subscribe(() => {
+    this.configurations$.subscribe(data => {
+      this.allFilesExist = data.map(conf => conf.fileExists).every(Boolean);
     });
   }
 
@@ -138,7 +144,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   saveName(validationId: string, newName: string): void {
     this.validationService.saveResultsName(validationId, newName).subscribe(
       (resp) => {
-        if (resp === 'Changed.'){
+        if (resp === 'Changed.') {
           this.valName$.next(newName);
           this.toggleEditing();
         }
@@ -149,11 +155,10 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     if (doUpdate.key === 'archived') {
       this.isArchived$.next(doUpdate.value === 'None');
       doUpdate.value !== 'None' ? this.expiryDate$.next(doUpdate.value) : this.expiryDate$.next(null);
-    } else if (doUpdate.key === 'extended'){
+    } else if (doUpdate.key === 'extended') {
       this.expiryDate$.next(doUpdate.value);
       this.isNearExpiry$.next(false);
-    }
-    else if (doUpdate.key === 'delete'){
+    } else if (doUpdate.key === 'delete') {
       this.router.navigate(['/my-validations']);
     }
   }
@@ -172,7 +177,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
-  setInitialValues(): void{
+  setInitialValues(): void {
     this.runTime = this.getRunTime(this.validationRun.start_time, this.validationRun.end_time);
     this.errorRate = this.validationRun.total_points !== 0 ?
       (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
@@ -183,8 +188,8 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     this.isNearExpiry$.next(this.validationRun.is_near_expiry);
   }
 
-  checkIfPublishingInProgress(): void{
-    if (this.validationRun.publishing_in_progress || this.publishingInProgress$.getValue()){
+  checkIfPublishingInProgress(): void {
+    if (this.validationRun.publishing_in_progress || this.publishingInProgress$.getValue()) {
       this.publishingInProgressInterval = setInterval(() => {
         this.validationService.getValidationRunById(this.validationRun.id).subscribe(data => {
           if (!data.publishing_in_progress) {
@@ -196,11 +201,11 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  handlePublishWindow(open): void{
+  handlePublishWindow(open): void {
     this.isPublishingWindowOpen = open;
   }
 
-  startPublishing(): void{
+  startPublishing(): void {
     this.publishingInProgress$.next(true)
     this.checkIfPublishingInProgress()
   }
