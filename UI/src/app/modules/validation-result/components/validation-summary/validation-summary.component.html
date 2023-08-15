@@ -63,7 +63,7 @@
       </div>
     </ng-template>
     <div *ngIf="configurations$| async as configurations" class="card-body">
-      <div *ngIf="!allFilesExist" [ngClass]="'alert-danger pb-2'">
+      <div *ngIf="!validationRun.all_files_exist" [ngClass]="'alert-danger pb-2'">
         <b>
           At least one data set file has been removed, therefore there is no possibility to rerun this validation.
         </b>
@@ -216,7 +216,7 @@
         </li>
       </ul>
       <qa-buttons *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false" [validationList]="false"
-                  [validationRun]="validationRun" [canBeRerun]="allFilesExist" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
+                  [validationRun]="validationRun" [canBeRerun]="validationRun.all_files_exist" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
 
       <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
            style="float: right">
