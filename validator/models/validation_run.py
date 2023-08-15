@@ -159,6 +159,10 @@ class ValidationRun(models.Model):
     def is_unpublished(self):
         return not self.doi
 
+    @property
+    def all_files_exist(self):
+        return len(self.dataset_configurations.all().filter(dataset__storage_path='')) == 0
+
     def archive(self, unarchive=False, commit=True):
         if unarchive:
             self.extend_lifespan(commit=False)
