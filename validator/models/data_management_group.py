@@ -23,3 +23,12 @@ class DataManagementGroup(Group):
         return self.user_set.all().filter(validationrun__dataset_configurations__dataset__in=
                                           self.get_list_of_group_ds_used_by_group_users().values_list('dataset',
                                                                                                       flat=True))
+
+    def delete(self, using=None, keep_parents=False):
+        if self.get_list_of_group_ds_used_by_group_users().exists():
+            raise ProtectedError(
+                "Cannot delete the group as users have used assigned datasets.",
+                self.__class__,
+            )
+        else:
+            super().delete(using=using, keep_parents=keep_parents)
