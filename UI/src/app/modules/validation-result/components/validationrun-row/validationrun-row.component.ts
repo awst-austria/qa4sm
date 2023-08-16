@@ -55,7 +55,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   private updateConfig(): void {
     this.configurations$ = combineLatest(
       this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
-      this.datasetService.getAllDatasets(true),
+      this.datasetService.getAllDatasets(true, false),
       this.datasetVersionService.getAllVersions(),
       this.datasetVariableService.getAllVariables()
     ).pipe(

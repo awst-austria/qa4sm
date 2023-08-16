@@ -25,11 +25,11 @@ export class DatasetService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getAllDatasets(userData = false): Observable<DatasetDto[]> {
+  getAllDatasets(userData = false, excludeNoFiles = true): Observable<DatasetDto[]> {
     if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS) && this.userDataInfoCache.get(CACHE_USER_DATA_INFO) === userData) {
       return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS);
     } else {
-      const params = new HttpParams().set('userData', String(userData));
+      const params = new HttpParams().set('userData', String(userData)).set('excludeNoFiles', String(excludeNoFiles));
       const datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, {params}).pipe(shareReplay());
       this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, datasets$);
       this.userDataInfoCache.push(CACHE_USER_DATA_INFO, userData);

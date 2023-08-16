@@ -9,19 +9,22 @@ from rest_framework.serializers import ModelSerializer
 
 from validator.models import Dataset, User, UserDatasetFile
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset(request):
     user_data = json.loads(request.query_params.get('userData', 'false'))
+    exclude_no_files = json.loads(request.query_params.get('excludeNoFiles', 'true'))
     user = request.user
     datasets = Dataset.objects.filter(user=None)
     if user_data and user.is_authenticated:
         user_datasets = Dataset.objects.filter(user=user).filter(user_dataset__isnull=False)
-        datasets = datasets.union(user_datasets)
+        datasets = datasets.union(user_datasets.exclude(storage_path='')) if exclude_no_files else datasets.union(
+            user_datasets)
 
         # check if there is data that has been shared with the logged-in user
         if user.belongs_to_data_management_groups:
-            datasets_ids = UserDatasetFile.objects.filter(user_groups__in=user.data_management_groups())\
+            datasets_ids = UserDatasetFile.objects.filter(user_groups__in=user.data_management_groups()) \
                 .values_list('dataset', flat=True)
             datasets = datasets.union(Dataset.objects.filter(id__in=datasets_ids))
 
@@ -51,7 +54,7 @@ class DatasetSerializer(ModelSerializer):
                   'is_spatial_reference',
                   'versions',
                   'variables',
-                #   'filters',
+                  #   'filters',
                   'not_as_reference',
                   'user',
                   'is_shared'
