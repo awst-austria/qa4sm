@@ -64,8 +64,9 @@ class UserDatasetFile(models.Model):
         # set storage path to an empty string
         self.dataset.storage_path = ''
         self.dataset.save()
-        # clear all the user management groups
-        self.user_groups.clear()
+        # clear all the user management groups if there are no validations run by other users
+        if len(self.get_user_data_configs().exclude(validation__user = self.owner)) == 0:
+            self.user_groups.clear()
         # remove the file
         if self.file:
             rundir = path.dirname(self.file.path)

@@ -26,7 +26,9 @@ def dataset(request):
         if user.belongs_to_data_management_groups:
             datasets_ids = UserDatasetFile.objects.filter(user_groups__in=user.data_management_groups()) \
                 .values_list('dataset', flat=True)
-            datasets = datasets.union(Dataset.objects.filter(id__in=datasets_ids))
+            shared_datasets = Dataset.objects.filter(id__in=datasets_ids).exclude(
+                storage_path='') if exclude_no_files else Dataset.objects.filter(id__in=datasets_ids)
+            datasets = datasets.union(shared_datasets)
 
     serializer = DatasetSerializer(datasets, many=True)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
