@@ -172,11 +172,10 @@
                 type="button"
                 label="Remove dataset"
                 [pTooltip]="userDataset.is_used_in_validation ? 'Remove the data set file to regain some space. ' +
-                 'Validations with this dataset will still be accessible' : 'Remove dataset and the attached file'"
+                 'Validations with this dataset will still be accessible' : 'Remove dataset'"
                 class="p-button-danger"
-                [disabled]="userDataset.is_used_in_validation"
                 [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-                (click)="removeEntireDataset(userDataset)">
+                (click)="removeDataset(userDataset)">
         </button>
         <div *ngIf="!userDataset.file" [ngClass]="'no-dataset-info'">
           <span>Dataset removed. This row will vanish when related validations are deleted. </span>
