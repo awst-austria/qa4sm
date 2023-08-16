@@ -1,4 +1,4 @@
-<p-panel class="user-data-row">
+<p-panel class="user-data-row" [style.opacity]="userDataset.file ? 1 : 0.6">
 
   <ng-template pTemplate="header">
     <h5 class="my-0">
@@ -129,14 +129,18 @@
     <div class="p-fluid" [style]="{height: '100%'}" [ngClass]="authService.currentUser.is_staff ? 'col-4' : 'col-5'">
       <div><strong>Validation list: </strong></div>
       <p-scrollPanel [style]="{width: '80%', height: '80%'}">
-        <div *ngIf="userDataset.validation_list.length > 0">
-          <div *ngFor="let validation of userDataset.validation_list; index as ind">
+        <div *ngIf="userDataset.owner_validation_list.length > 0 || userDataset.number_of_other_users_validations > 0">
+          <div *ngFor="let validation of userDataset.owner_validation_list; index as ind">
             {{ind + 1}}) <a routerLink="/validation-result/{{validation.val_id}}"
                             pTooltip="View validation">{{validation.val_name}}</a>
           </div>
+          <div *ngIf="userDataset.number_of_other_users_validations > 0">
+            Other users used this dataset in {{userDataset.number_of_other_users_validations}}
+            {{userDataset.number_of_other_users_validations === 1 ? 'validation' : 'validations'}}.
+          </div>
         </div>
 
-        <div class="no-validation-box" *ngIf="userDataset.validation_list.length === 0">
+        <div class="no-validation-box" *ngIf="userDataset.owner_validation_list.length === 0">
           <em> No validation has been run with this data </em>
         </div>
 
@@ -161,32 +165,24 @@
 
     <!-- actions   -->
     <div class="status col-2" [style]="{width: '12%'}">
-      <div class="py-1"
-           [pTooltip]="userDataset.is_used_in_validation ? 'Dataset has been used in a validation, it can not be removed' : ''"
-           tooltipPosition="left">
-        <button pButton
-                icon="pi pi-times"
-                type="button"
-                label="Remove entire dataset"
-                pTooltip="Remove dataset and the attached file"
-                class="p-button-danger"
-                [disabled]="userDataset.is_used_in_validation"
-                [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-                (click)="removeEntireDataset(userDataset)">
-        </button>
-      </div>
       <div class="py-1">
-        <button *ngIf="userDataset.is_used_in_validation && userDataset.file"
+        <button *ngIf="userDataset.file"
                 pButton
                 icon="pi pi-times"
                 type="button"
-                label="Remove file only"
-                pTooltip="Remove the attached file only to regain some space."
-                class="p-button-info"
-                [style]="{'width':'10rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
-                (click)="removeDatasetFile(userDataset)">
+                label="Remove dataset"
+                [pTooltip]="userDataset.is_used_in_validation ? 'Remove the data set file to regain some space. ' +
+                 'Validations with this dataset will still be accessible' : 'Remove dataset and the attached file'"
+                class="p-button-danger"
+                [disabled]="userDataset.is_used_in_validation"
+                [style]="{'width':'8rem', 'height': '2.5rem', 'margin-right': '0.5rem'}"
+                (click)="removeEntireDataset(userDataset)">
         </button>
+        <div *ngIf="!userDataset.file" [ngClass]="'no-dataset-info'">
+          <span>Dataset removed. This row will vanish when related validations are deleted. </span>
+        </div>
       </div>
+
       <!--      DO NOT REMOVE THIS CODE -->
       <!--      <div *ngIf="authService.currentUser.is_staff" class="py-1">-->
       <!--        <button pButton-->

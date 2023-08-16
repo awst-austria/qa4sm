@@ -49,9 +49,13 @@ class UserDatasetFile(models.Model):
         return len(self.get_user_data_configs()) != 0
 
     @property
-    def validation_list(self):
+    def owner_validation_list(self):
         return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in
-                self.get_user_data_configs()]
+                self.get_user_data_configs().filter(validation__user = self.owner)]
+
+    @property
+    def number_of_other_users_validations(self):
+        return len(self.get_user_data_configs().exclude(validation__user = self.owner))
 
     @property
     def file_size(self):
@@ -65,7 +69,7 @@ class UserDatasetFile(models.Model):
         self.dataset.storage_path = ''
         self.dataset.save()
         # clear all the user management groups if there are no validations run by other users
-        if len(self.get_user_data_configs().exclude(validation__user = self.owner)) == 0:
+        if self.number_of_other_users_validations == 0:
             self.user_groups.clear()
         # remove the file
         if self.file:
