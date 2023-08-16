@@ -119,7 +119,8 @@
     <div class="col">
       <strong>Data:</strong><br/>
       <span *ngFor="let config of configurations">
-        <span [style.color]="config.fileExists ? 'inherit' : 'red'">
+        <span [style.color]="config.fileExists ? 'inherit' : 'red'"
+              [pTooltip]="config.fileExists ? '' : 'File has been removed' ">
           {{config.dataset}},
           {{config.version}},
           {{config.variable}}
