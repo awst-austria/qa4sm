@@ -27,6 +27,7 @@ import {DialogModule} from 'primeng/dialog';
 import {
     HandleMultipleValidationsComponent
 } from './components/handle-multiple-validations/handle-multiple-validations.component';
+import {PanelMenuModule} from 'primeng/panelmenu';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -64,7 +65,8 @@ import {
         ButtonModule,
         ReactiveFormsModule,
         GalleriaModule,
-        DialogModule
+        DialogModule,
+        PanelMenuModule
     ]
 })
 export class ValidationResultModule {
