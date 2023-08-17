@@ -129,18 +129,18 @@
     <div class="p-fluid" [style]="{height: '100%'}" [ngClass]="authService.currentUser.is_staff ? 'col-4' : 'col-5'">
       <div><strong>Validation list: </strong></div>
       <p-scrollPanel [style]="{width: '80%', height: '80%'}">
-        <div *ngIf="userDataset.owner_validation_list.length > 0 || userDataset.number_of_other_users_validations > 0">
+        <div *ngIf="userDataset.owner_validation_list.length || userDataset.number_of_other_users_validations">
           <div *ngFor="let validation of userDataset.owner_validation_list; index as ind">
             {{ind + 1}}) <a routerLink="/validation-result/{{validation.val_id}}"
                             pTooltip="View validation">{{validation.val_name}}</a>
           </div>
-          <div *ngIf="userDataset.number_of_other_users_validations > 0">
+          <div *ngIf="userDataset.number_of_other_users_validations">
             Other users used this dataset in {{userDataset.number_of_other_users_validations}}
             {{userDataset.number_of_other_users_validations === 1 ? 'validation' : 'validations'}}.
           </div>
         </div>
 
-        <div class="no-validation-box" *ngIf="userDataset.owner_validation_list.length === 0">
+        <div class="no-validation-box" *ngIf="!userDataset.owner_validation_list.length && !userDataset.number_of_other_users_validations">
           <em> No validation has been run with this data </em>
         </div>
 
