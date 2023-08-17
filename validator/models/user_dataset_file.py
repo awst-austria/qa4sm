@@ -42,20 +42,45 @@ class UserDatasetFile(models.Model):
 
     @property
     def get_raw_file_path(self):
-        return self.file.path.rstrip(self.file_name)
+        return self.file.path.rstrip(self.file_name) if self.file else ""
 
     @property
     def is_used_in_validation(self):
         return len(self.get_user_data_configs()) != 0
 
     @property
-    def validation_list(self):
+    def owner_validation_list(self):
         return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in
-                self.get_user_data_configs()]
+                self.get_user_data_configs().filter(validation__user = self.owner)]
+
+    @property
+    def number_of_other_users_validations(self):
+        return len(self.get_user_data_configs().exclude(validation__user = self.owner))
 
     @property
     def file_size(self):
-        return self.file.size
+        if self.file_name is not None:
+            return self.file.size
+        else:
+            return
+
+    def delete_dataset_file(self):
+        # set storage path to an empty string
+        self.dataset.storage_path = ''
+        self.dataset.save()
+        # clear all the user management groups if there are no validations run by other users
+        if self.number_of_other_users_validations == 0:
+            self.user_groups.clear()
+        # remove the file
+        if self.file:
+            rundir = path.dirname(self.file.path)
+            if path.isdir(rundir):
+                rmtree(rundir)
+
+        # set file and file name to None
+        self.file = None
+        self.file_name = None
+        self.save()
 
 
 @receiver(pre_delete, sender=UserDatasetFile)

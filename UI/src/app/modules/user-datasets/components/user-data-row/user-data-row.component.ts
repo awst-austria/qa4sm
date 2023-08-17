@@ -80,14 +80,40 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     this.refreshFilePreprocessingStatus();
   }
 
-  removeDataset(dataFileId: string): void {
-    if (!confirm('Do you really want to delete the dataset?')) {
+  refreshAfterRemoval(): void{
+    this.userDatasetService.refresh.next(true);
+    this.authService.init();
+  }
+
+  removeDataset(dataset: UserDataFileDto): void{
+    let warning = 'Do you really want to delete the dataset?'
+    if (dataset.is_used_in_validation) {
+      if (dataset.user_groups.length === 0) {
+        warning += '\n\nPlease note that the data you are about to remove has been used in validations. ' +
+          '\n\nIf you proceed the validations will become unreproducible.'
+      } else {
+        warning += '\n\nPlease note that the data you are about to remove has been used in validations and shared with other users. ' +
+          '\n\nIf you proceed the validations will become unreproducible and other users will lose access to this dataset.'
+      }
+    } else if (dataset.user_groups.length !== 0) {
+      warning += '\n\nPlease note that the data you are about to remove has been shared with other users. ' +
+        '\n\nIf you proceed other users will lose access to this dataset.'
+    }
+
+    if (!confirm(warning)) {
       return;
     }
-    this.userDatasetService.deleteUserData(dataFileId).subscribe(() => {
-      this.userDatasetService.refresh.next(true);
-      this.authService.init();
-    });
+
+    if (this.userDataset.is_used_in_validation){
+      this.userDatasetService.deleteUserDataFileOnly(dataset.id).subscribe(response => {
+        this.refreshAfterRemoval();
+      })
+    } else {
+      this.userDatasetService.deleteUserData(dataset.id).subscribe(() => {
+        this.refreshAfterRemoval();
+      });
+    }
+
   }
 
   updateVariable(): void {
@@ -186,16 +212,16 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
       'file fulfills our requirements', 10000);
   }
 
-  public openWindowForDataSharing(): void{
+  public openWindowForDataSharing(): void {
     this.shareDataModalWindow = true;
   }
 
-  public manageSharingWindow(open): void{
-    if (!open){
+  public manageSharingWindow(open): void {
+    if (!open) {
       this.shareDataModalWindow = false;
-      this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe( data =>{
-        console.log(data)
-        this.userDataset = data;
+      this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe(data => {
+          console.log(data)
+          this.userDataset = data;
         }
       )
     }

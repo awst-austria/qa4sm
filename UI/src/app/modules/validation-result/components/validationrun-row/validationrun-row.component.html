@@ -6,7 +6,7 @@
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
     <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
-                                href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
+                              href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
     </h5>
   </ng-template>
   <!--  CUSTOM    -->
@@ -14,13 +14,15 @@
     <h5 class="my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
-          <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
+          <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1"
+                class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
                 pTooltip="This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
-          <span *ngIf="!validationRun.is_near_expiry && validationRun.progress !== -1" class="p-panel-header-icon pi pi-calendar expiry-icons"
+          <span *ngIf="!validationRun.is_near_expiry && validationRun.progress !== -1"
+                class="p-panel-header-icon pi pi-calendar expiry-icons"
                 pTooltip="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
           </span>
           <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
-                        pTooltip="This validation was cancelled.">
+                pTooltip="This validation was cancelled.">
           </span>
       </span>
       <!--      if there is no expiry date property: -->
@@ -48,6 +50,13 @@
         Copied: {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}} <br>
         (Date of original run: {{ originalDate|date: 'mediumDate' :timeZone }})
       </span>
+      <em *ngIf="!validationRun.all_files_exist" class="ml-2">
+        Validation can not be reproduced
+        <span class="pi pi-question-circle"
+              pTooltip="At least one of the dataset files has been removed,
+              therefore there is no possibility of rerunning this validation.">
+        </span>
+      </em>
 
     </h5>
   </ng-template>
@@ -110,11 +119,12 @@
     <div class="col">
       <strong>Data:</strong><br/>
       <span *ngFor="let config of configurations">
-        <span>
+        <span [style.color]="config.fileExists ? 'inherit' : 'red'"
+              [pTooltip]="config.fileExists ? '' : 'Data set has been removed' ">
           {{config.dataset}},
           {{config.version}},
           {{config.variable}}
-          {{config.variableUnit ? '[' + config.variableUnit + ']': ''}}
+          {{config.variableUnit ? '[' + config.variableUnit + ']' : ''}}
           <span style="font-weight: 600">
             {{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
             config.is_temporal_reference, config.is_scaling_reference)}}</span>
@@ -122,18 +132,6 @@
         </span>
       </span>
     </div>
-<!--    &lt;!&ndash; Reference &ndash;&gt;-->
-<!--    <div class="col">-->
-<!--      <strong>Reference:</strong><br/>-->
-<!--      <span *ngFor="let config of configurations">-->
-<!--        <span *ngIf="config.id === validationRun.spatial_reference_configuration">-->
-<!--          {{config.dataset}},-->
-<!--          {{config.version}},-->
-<!--          {{config.variable}} <br>-->
-<!--        </span>-->
-<!--      </span>-->
-<!--    </div>-->
-    <!-- Status / Created   -->
     <div class="col status">
       <!--    PUBLISHED -->
       <div *ngIf="published">
@@ -149,7 +147,8 @@
 
     <!-- Action Buttons -->
     <div class="col-3" style="max-width: 10rem">
-      <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"></qa-buttons>
+      <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"
+                  [canBeRerun]="validationRun.all_files_exist"></qa-buttons>
     </div>
 
 

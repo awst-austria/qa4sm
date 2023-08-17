@@ -73,7 +73,8 @@
           <span style="margin-right: 0.5rem; margin-left: 0.2rem"><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
         </button>
       </div>
-      <button pButton
+      <button *ngIf="canBeRerun"
+              pButton
               routerLink="/validate/"
               class="dropdown-item"
               [queryParams]="{validation_id: validationRun.id}"
@@ -109,7 +110,7 @@
   </div>
   <!--published validations page only-->
   <span *ngIf="published">
-    <button *ngIf="isLogged"
+    <button *ngIf="isLogged && canBeRerun"
             pButton
             routerLink="/validate/"
             class="btn-action"
@@ -231,7 +232,7 @@
             (click)="open()">
     </button>
 
-    <a *ngIf="isLogged"
+    <a *ngIf="isLogged && canBeRerun"
        pButton
        type="button"
        icon="pi pi-replay"
@@ -263,7 +264,7 @@
 <!--        <button pButton type="button" label="Button" [disabled]="!buttonEnabled"></button>-->
 <!--      </p-tooltip>-->
 
-      <a *ngIf="isLogged && !validationRun.contains_user_data"
+      <a *ngIf="isLogged && !validationRun.contains_user_data && canBeRerun"
          pButton
          type="button"
          icon="pi pi-replay"

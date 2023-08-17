@@ -63,11 +63,12 @@
       </div>
     </ng-template>
     <div *ngIf="configurations$| async as configurations" class="card-body">
-      <div *ngIf="!forComparison && validationRun.total_points === 0" [ngClass]="'alert-danger'">
-        <b>There were no spatial reference data points in the selected area. Please select a different spatial subsetting  or select
-          different dataset as a spatial reference.
+      <div *ngIf="!validationRun.all_files_exist" [ngClass]="'alert-danger p-2'">
+        <b>
+          At least one of the data set files has been removed, therefore there is no possibility of rerunning this validation.
         </b>
       </div>
+
       <ul [ngClass]="{'for-comparison-list': forComparison}">
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
@@ -86,16 +87,21 @@
                 )</span>
               <em>{{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
                 config.is_temporal_reference, config.is_scaling_reference)}}
-              </em><br>
-              Filters:
-              <ul>
-                <li *ngFor="let filter of config.filters">{{filter}};</li>
-              </ul>
-              <ul>
-                <li *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
-                  {{paramFilter}}: {{config.parametrisedFiltersValues[indF].split(',').join(', ')}};
-                </li>
-              </ul>
+              </em>
+              <span *ngIf="!config.fileExists" style="color: red">(Data set has been removed)</span>
+              <br>
+              <div *ngIf="config.filters.length > 0 || config.parametrisedFilters.length > 0">
+                Filters:
+                <ul>
+                  <li *ngFor="let filter of config.filters">{{filter}};</li>
+                </ul>
+                <ul>
+                  <li *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
+                    {{paramFilter}}: {{config.parametrisedFiltersValues[indF].split(',').join(', ')}};
+                  </li>
+                </ul>
+              </div>
+
             </li>
           </ol>
         <li
@@ -181,6 +187,11 @@
             of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
             not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the 'Result files' section.
           </li>
+          <li *ngIf="!forComparison && validationRun.total_points === 0" [ngClass]="'alert-danger'">
+            <b>There were no spatial reference data points in the selected area. Please select a different spatial subsetting  or select
+              different dataset as a spatial reference.
+            </b>
+          </li>
         </ng-template>
         <li *ngIf="(isArchived$|async)===false && getCurrentUser() === validationRun.user  && !forComparison">
           <span *ngIf="isNearExpiry$|async">
@@ -210,7 +221,7 @@
         </li>
       </ul>
       <qa-buttons *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false" [validationList]="false"
-                  [validationRun]="validationRun" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
+                  [validationRun]="validationRun" [canBeRerun]="validationRun.all_files_exist" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
 
       <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
            style="float: right">
