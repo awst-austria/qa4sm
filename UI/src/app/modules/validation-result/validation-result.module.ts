@@ -6,7 +6,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgxPaginationModule} from 'ngx-pagination';
 import {
-  ValidationPagePaginatedComponent
+    ValidationPagePaginatedComponent
 } from './components/validation-page-paginated/validation-page-paginated.component';
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
@@ -24,6 +24,9 @@ import {PublishingComponent} from './components/publishing/publishing.component'
 import {ExistingValidationComponent} from './components/existing-validation/existing-validation.component';
 import {GalleriaModule} from 'primeng/galleria';
 import {DialogModule} from 'primeng/dialog';
+import {
+    HandleMultipleValidationsComponent
+} from './components/handle-multiple-validations/handle-multiple-validations.component';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -35,7 +38,8 @@ import {DialogModule} from 'primeng/dialog';
     SummaryStatisticsComponent,
     ResultFilesComponent,
     PublishingComponent,
-    ExistingValidationComponent],
+    ExistingValidationComponent,
+    HandleMultipleValidationsComponent],
     exports: [
         ValidationrunRowComponent,
         ValidationPagePaginatedComponent,
