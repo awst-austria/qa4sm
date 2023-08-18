@@ -1,17 +1,13 @@
-<div class="flex flex-column">
-  <div *ngIf="!published" class="bg-gray-100 w-2 ml-8">
-    <qa-handle-multiple-validations></qa-handle-multiple-validations>
+<div class="flex">
+  <div class="w-2 ml-8">
+    <qa-handle-multiple-validations *ngIf="!published"></qa-handle-multiple-validations>
   </div>
-  <div class="grid">
-    <div class="
-    col-12
-    md:col-10 md:col-offset-1
-    lg:col-10 lg:col-offset-1
-    xl:col-8 xl:col-offset-2">
-      <div class="grid" style="justify-content: center">
+  <div class="grid w-full">
+    <div class="grid col col-offset-1">
+<!--      <div class="grid w-full" style="justify-content: center">-->
 
         <!-- custom -->
-        <div *ngIf="!published" class="col-9 text-center">
+        <div *ngIf="!published" class="col-8 text-center">
           <h1>My validations</h1>
           <p *ngIf="!validations.length" class="lead text-muted">
             You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
@@ -20,7 +16,7 @@
         </div>
 
         <!-- published -->
-        <div *ngIf="published" class="col-9 text-center">
+        <div *ngIf="published" class="col-8 text-center">
           <h1>Published validations</h1>
           <p class="lead text-muted">
             The QA4SM validations below have been published by their owners to <a target="_blank"
@@ -32,10 +28,10 @@
         </div>
 
         <!-- Rows -->
-        <div *ngIf="validations.length" class="col-9">
+        <div *ngIf="validations.length" class="col-8">
           <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
           <!--        here go rows-->
-          <div>
+          <div class="mt-3">
             <div *ngFor="let valrun of validations  | paginate :
         {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
 
@@ -76,7 +72,7 @@
           </div>
         </div>
 
-      </div>
+<!--      </div>-->
     </div>
   </div>
 </div>
