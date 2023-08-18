@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -17,6 +18,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   limit = 10;
   offset = 0;
   order = '-start_time';
+  selectionActive$ = new BehaviorSubject(false)
 
   constructor(private validationrunService: ValidationrunService) { }
 
