@@ -28,7 +28,7 @@ def send_failed_preprocessing_notification(file_entry, too_long_variable_name=Fa
     subject = '[QA4SM] File preprocessing failed'
     body = f"""Dear {file_entry.owner.first_name} {file_entry.owner.last_name}, \n\n
     {file_problem_body if not too_long_variable_name else variable_problem_body}
-    In case of further problem, please contact our team.\n\nBest regards,\nQA4SM team'"""
+    In case of further problems, please contact our team.\n\nBest regards,\nQA4SM team'"""
 
     _send_email(recipients=[file_entry.owner.email],
                 subject=subject,
