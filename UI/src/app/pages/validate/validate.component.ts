@@ -61,7 +61,7 @@ const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either co
   styleUrls: ['./validate.component.scss'],
 })
 export class ValidateComponent implements OnInit {
-  @ViewChild(MapComponent) child: MapComponent;
+  @ViewChild(MapComponent) mapComponent: MapComponent;
   @ViewChild(AnomaliesComponent) anomaliesChild: AnomaliesComponent;
   @ViewChild(ScalingComponent) scalingChild: ScalingComponent;
   @ViewChild('spatialReference') spatialReferenceChild: ValidationReferenceComponent;
@@ -547,6 +547,20 @@ export class ValidateComponent implements OnInit {
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+
+
+
+    //map update
+    this.mapComponent.clearSelection()
+    if(this.validationModel.referenceConfigurations.spatial){
+      console.log('Updating reference selection')
+      this.versionService.getGeoJSONById(this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion.id).subscribe(value => this.mapComponent.addGeoJson(value));
+    }
+
+    this.validationModel.datasetConfigurations.forEach(config=>{
+      console.log('Updating data selection')
+      this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).subscribe(value => this.mapComponent.addGeoJson(value));
+    });
   }
 
   private getISMN(configs: DatasetConfigModel[]): DatasetConfigModel[] {
