@@ -70,7 +70,7 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path):
     try:
         variable_entry.save()
     except Exception as e:
-        send_failed_preprocessing_notification(file_entry)
+        send_failed_preprocessing_notification(file_entry, True)
         file_entry.delete()
 
     file_entry.all_variables = all_variables
