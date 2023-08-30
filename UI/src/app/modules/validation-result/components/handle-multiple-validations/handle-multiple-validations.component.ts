@@ -1,5 +1,7 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MenuItem} from 'primeng/api';
+import {BehaviorSubject} from 'rxjs';
+import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -8,6 +10,10 @@ import {MenuItem} from 'primeng/api';
 })
 export class HandleMultipleValidationsComponent implements OnInit {
   @Output() selectionActive = new EventEmitter();
+  @Input() validations: ValidationrunDto[];
+  @Input() selectedValidationsId$: BehaviorSubject<String[]>;
+
+  selectionActive$ = new BehaviorSubject(false);
 
   deleteItems: MenuItem[];
 
@@ -33,10 +39,33 @@ export class HandleMultipleValidationsComponent implements OnInit {
     ]
   }
 
-    activateSelection(allSelected)
-  :
-    void {
-      this.selectionActive.emit({activate: true, selectAll: allSelected})
-    }
+  activateSelection(allSelected): void {
+    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected)})
+    this.selectionActive$.next(true);
+  }
+
+  closeAndCleanSelection(): void {
+    this.selectionActive.emit({activate: false, selected: this.selectValidations(false)})
+    this.selectionActive$.next(false)
 
   }
+
+  selectValidations(all: boolean): BehaviorSubject<String[]> {
+    const selectedValidations = [];
+    if (all) {
+      this.validations.forEach(val => {
+        if (!val.is_archived && val.is_unpublished) {
+          selectedValidations.push(val.id)
+        }
+      })
+    }
+    return new BehaviorSubject(selectedValidations)
+  }
+
+
+  deleteMultipleValidations(): void {
+    console.log(this.selectedValidationsId$.getValue())
+  }
+
+
+}
