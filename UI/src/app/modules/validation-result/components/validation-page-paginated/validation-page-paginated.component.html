@@ -56,7 +56,8 @@
               class="modify-checkbox"
               *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
               [value]="valrun.id"
-              [(ngModel)]="selectedValidations"
+              [ngModel]="selectedValidations$ | async"
+              (ngModelChange)="updateSelectedValidations($event, valrun.id)"
               inputId="{{valrun.id}}}">
             </p-checkbox>
 <!--          </div>-->

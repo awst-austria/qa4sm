@@ -20,7 +20,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   order = '-start_time';
   selectionActive$ = new BehaviorSubject(false);
   allSelected$ = new BehaviorSubject(false);
-  selectedValidations: string[] = [];
+  selectedValidations$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
   constructor(private validationrunService: ValidationrunService) { }
 
@@ -85,16 +85,14 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   handleMultipleSelection(event): void{
-    console.log('I am here', event)
-
-      this.selectionActive$.next(event.activate)
+      if (!this.selectionActive$.value){
+        this.selectionActive$.next(event.activate)
+      }
 
       if (event.selectAll){
-          this.validations.forEach(val => {
-              if (!val.is_archived && val.is_unpublished){
-                  this.selectedValidations.push(val.id)
-              }
-          })
+        this.selectAllModifiableValidations()
+      } else {
+        this.cleanSelection()
       }
   }
 
@@ -103,12 +101,32 @@ export class ValidationPagePaginatedComponent implements OnInit {
         this.cleanSelection()
     }
 
+    selectAllModifiableValidations(): void{
+      const selectedValidations = [];
+      this.validations.forEach(val => {
+        if (!val.is_archived && val.is_unpublished){
+          selectedValidations.push(val.id)
+        }
+        this.selectedValidations$.next(selectedValidations);
+      })
+    }
+
+  updateSelectedValidations(checked: boolean, id: number): void{
+    let selectedValidations = this.selectedValidations$.getValue();
+      if (checked) {
+        selectedValidations = [...selectedValidations, id];
+      } else {
+        selectedValidations = selectedValidations.filter(selectedId => selectedId !== id);
+      }
+      this.selectedValidations$.next(selectedValidations)
+    }
+
     cleanSelection(): void {
-      this.selectedValidations = [];
+      this.selectedValidations$.next([])
     }
 
     deleteMultipleValidations(): void{
-      console.log(this.selectedValidations)
+      console.log('Monika')
     }
 
 }
