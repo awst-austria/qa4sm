@@ -9,10 +9,10 @@ import {MenuItem} from 'primeng/api';
 export class HandleMultipleValidationsComponent implements OnInit {
     @Output() selectionActive = new EventEmitter();
 
-    items: MenuItem[];
+    deleteItems: MenuItem[];
 
     ngOnInit() {
-        this.items = [
+        this.deleteItems = [
             {
                 label: 'Delete',
                 icon: 'pi pi-fw pi-trash',
@@ -22,25 +22,36 @@ export class HandleMultipleValidationsComponent implements OnInit {
                         items: [
                             {
                                 label: 'Select all',
-                                icon: 'pi pi-fw pi-check-square'
+                                icon: 'pi pi-fw pi-check-square',
+                                command: () => this.activateSelection(true)
                             },
                             {
                                 label: 'Select individually',
-                                icon: 'pi pi-fw pi-square'
+                                icon: 'pi pi-fw pi-stop',
+                                command: () => this.activateSelection(false)
                             }
                         ]
                     },
                     {
                         label: 'Select a group',
-                        icon: 'pi pi-fw pi-calendar'
+                        items: [
+                            {
+                                label: 'Select by date',
+                                icon: 'pi pi-fw pi-calendar'
+                            },
+                            {
+                                label: 'Select by data set',
+                                icon: 'pi pi-fw pi-file'
+                            }
+                        ]
                     },
                 ]
             }
         ]
     }
 
-    activateSelection(): void{
-        this.selectionActive.emit(true)
+    activateSelection(allSelected): void{
+        this.selectionActive.emit({activate: true, selectAll: allSelected})
     }
 
 }

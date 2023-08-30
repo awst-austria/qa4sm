@@ -6,7 +6,7 @@ import {TooltipModule} from 'primeng/tooltip';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgxPaginationModule} from 'ngx-pagination';
 import {
-    ValidationPagePaginatedComponent
+  ValidationPagePaginatedComponent
 } from './components/validation-page-paginated/validation-page-paginated.component';
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
@@ -25,10 +25,11 @@ import {ExistingValidationComponent} from './components/existing-validation/exis
 import {GalleriaModule} from 'primeng/galleria';
 import {DialogModule} from 'primeng/dialog';
 import {
-    HandleMultipleValidationsComponent
+  HandleMultipleValidationsComponent
 } from './components/handle-multiple-validations/handle-multiple-validations.component';
 import {PanelMenuModule} from 'primeng/panelmenu';
 import {FieldsetModule} from 'primeng/fieldset';
+import {CheckboxModule} from 'primeng/checkbox';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -68,7 +69,8 @@ import {FieldsetModule} from 'primeng/fieldset';
         GalleriaModule,
         DialogModule,
         PanelMenuModule,
-        FieldsetModule
+        FieldsetModule,
+        CheckboxModule
     ]
 })
 export class ValidationResultModule {

@@ -18,7 +18,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
   limit = 10;
   offset = 0;
   order = '-start_time';
-  selectionActive$ = new BehaviorSubject(false)
+  selectionActive$ = new BehaviorSubject(false);
+  allSelected$ = new BehaviorSubject(false);
+  selectedValidations: string[] = [];
 
   constructor(private validationrunService: ValidationrunService) { }
 
@@ -81,5 +83,30 @@ export class ValidationPagePaginatedComponent implements OnInit {
         this.numberOfValidations = length;
       });
   }
+
+  handleMultipleSelection(event): void{
+      this.selectionActive$.next(event.activate)
+
+      if (event.selectAll){
+          this.validations.forEach(val => {
+              if (!val.is_archived && val.is_unpublished){
+                  this.selectedValidations.push(val.id)
+              }
+          })
+      }
+  }
+
+    closeAndCleanSelection(): void{
+        this.selectionActive$.next(false)
+        this.cleanSelection()
+    }
+
+    cleanSelection(): void {
+      this.selectedValidations = [];
+    }
+
+    deleteMultipleValidations(): void{
+      console.log(this.selectedValidations)
+    }
 
 }

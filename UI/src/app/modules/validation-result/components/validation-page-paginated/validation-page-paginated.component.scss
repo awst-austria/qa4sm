@@ -105,6 +105,16 @@ div {
   justify-content: center !important;
 }
 
+.scroll-buttons-area {
+  position: fixed;
+  right: 10%; /* Adjust as needed */
+  top: 50%; /* Adjust as needed */
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
 
 
 
