@@ -105,17 +105,25 @@ div {
   justify-content: center !important;
 }
 
-.scroll-buttons-area {
+.side-panel-area {
   position: fixed;
-  right: 10%; /* Adjust as needed */
-  top: 50%; /* Adjust as needed */
-  transform: translateY(-50%);
+  left: 5vw; /* Adjust as needed */
+  top: 40vw; /* Adjust as needed */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 10px;
+  //width: 20vw;
+}
+.validation-row-area{
+  position: relative;
 }
 
+.modify-checkbox{
+  position: absolute;
+  left: -30px;
+  top: 10px;
+}
 
 
 

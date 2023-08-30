@@ -1,107 +1,103 @@
-<div class="flex">
-    <div class="w-2 ml-8">
-        <qa-handle-multiple-validations
-                (selectionActive)="handleMultipleSelection($event)"
-                *ngIf="!published">
-        </qa-handle-multiple-validations>
-    </div>
-    <div class="grid w-full">
-        <div class="grid col col-offset-1">
-            <!--      <div class="grid w-full" style="justify-content: center">-->
 
-            <!-- custom -->
-            <div *ngIf="!published" class="col-8 text-center">
-                <h1>My validations</h1>
-                <p *ngIf="!validations.length" class="lead text-muted">
-                    You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
-                    to start your own validation run.
-                </p>
-            </div>
+<div class="side-panel-area">
+  <qa-handle-multiple-validations
+    (selectionActive)="handleMultipleSelection($event)"
+    *ngIf="!published">
+  </qa-handle-multiple-validations>
 
-            <!-- published -->
-            <div *ngIf="published" class="col-8 text-center">
-                <h1>Published validations</h1>
-                <p class="lead text-muted">
-                    The QA4SM validations below have been published by their owners to <a target="_blank"
-                                                                                          href="https://zenodo.org/"
-                                                                                          rel="noreferrer">Zenodo</a>
-                    and
-                    can be referenced with a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
-                </p>
-            </div>
-
-            <!-- Rows -->
-            <div *ngIf="validations.length" class="col-8">
-                <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
-                <!--        here go rows-->
-                <div class="mt-3">
-                    <div *ngFor="let valrun of validations  | paginate :
-                    {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
-                        <div class="flex mr-8" *ngIf="(selectionActive$|async)">
-                            <p-checkbox
-                                    *ngIf="valrun.is_unpublished && !valrun.is_archived"
-                                    [value]="valrun.id"
-                                    [(ngModel)]="selectedValidations"
-                                    inputId="{{valrun.id}}}"
-                            >
-                            </p-checkbox>
-                        </div>
-                        <qa-validationrun-row
-                                [published]=published [validationRun]="valrun">
-                        </qa-validationrun-row>
-                        <br/>
-                    </div>
-                    <!--    Pagination -->
-                    <pagination-template *ngIf="validations.length" #p="paginationApi"
-                                         (pageChange)="handlePageChange($event)">
-
-                        <div class="text-center">
-                            <ul class="custom-pagination custom-responsive custom-star-inserted justify-content-center"
-                                aria-label="Pagination">
-                                <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
-                                    <div *ngIf="!p.isFirstPage()" (click)="p.previous()"><span
-                                            class="pi pi-angle-left"></span></div>
-                                    <div *ngIf="p.isFirstPage()" [class.disabled]="true"><span
-                                            class="pi pi-angle-left"></span></div>
-                                </li>
-
-                                <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
-                                    <div (click)="p.setCurrent(page.value)"
-                                         *ngIf="p.getCurrent() !== page.value"
-                                         [class.current]="p.getCurrent() === page.value">
-                                        <span>{{ page.label }}</span>
-                                    </div>
-                                    <div *ngIf="p.getCurrent() === page.value"
-                                         [class.current]="p.getCurrent() === page.value">
-                                        <span>{{ page.label }}</span>
-                                    </div>
-                                </li>
-
-                                <li class="pagination-next" [class.disabled]="p.isLastPage()">
-                                    <div *ngIf="!p.isLastPage()" (click)="p.next()"><span
-                                            class="pi pi-angle-right"></span></div>
-                                    <div *ngIf="p.isLastPage()" [class.disabled]="true"><span
-                                            class="pi pi-angle-right"></span></div>
-                                </li>
-                            </ul>
-                        </div>
-
-                    </pagination-template>
-                </div>
-            </div>
-
-            <!--      </div>-->
-        </div>
-    </div>
+  <div *ngIf="(selectionActive$|async)">
+    <p-button
+      label="Cancel"
+      icon="pi pi-ban"
+      (onClick)="closeAndCleanSelection()">
+    </p-button>
+  </div>
 </div>
 
-<div *ngIf="(selectionActive$|async)"  class="scroll-buttons-area">
-    <p-button
-            label="Cancel"
-            icon="pi pi-ban"
-            (onClick)="closeAndCleanSelection()"
-    >
-    </p-button>
+<div class="grid no-gutters">
+  <div class="
+    col-12
+    md:col-10 md:col-offset-1
+    lg:col-10 lg:col-offset-1
+    xl:col-8 xl:col-offset-2">
+    <div class="grid" style="justify-content: center">
+
+      <!-- custom -->
+      <div *ngIf="!published" class="col-9 text-center">
+        <h1>My validations</h1>
+        <p *ngIf="!validations.length" class="lead text-muted">
+          You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
+          to start your own validation run.
+        </p>
+      </div>
+
+      <!-- published -->
+      <div *ngIf="published" class="col-9 text-center">
+        <h1>Published validations</h1>
+        <p class="lead text-muted">
+          The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/"
+                                                                                rel="noreferrer">Zenodo</a>
+          and
+          can be referenced with a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
+        </p>
+      </div>
+
+      <div *ngIf="validations.length" class="col-9">
+        <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
+      </div>
+
+      <!-- Rows -->
+      <div *ngIf="validations.length" class="col-9">
+        <div *ngFor="let valrun of validations  | paginate :
+        {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}"
+             class="validation-row-area">
+<!--          <div *ngIf="(selectionActive$|async)">-->
+            <p-checkbox
+              class="modify-checkbox"
+              *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
+              [value]="valrun.id"
+              [(ngModel)]="selectedValidations"
+              inputId="{{valrun.id}}}">
+            </p-checkbox>
+<!--          </div>-->
+          <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
+          <br/>
+        </div>
+        <!--    Pagination -->
+        <pagination-template *ngIf="validations.length" #p="paginationApi"
+                             (pageChange)="handlePageChange($event)">
+
+          <div class="text-center">
+            <ul class="custom-pagination custom-responsive custom-star-inserted justify-content-center"
+                aria-label="Pagination">
+              <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
+                <div *ngIf="!p.isFirstPage()" (click)="p.previous()"><span class="pi pi-angle-left"></span></div>
+                <div *ngIf="p.isFirstPage()" [class.disabled]="true"><span class="pi pi-angle-left"></span></div>
+              </li>
+
+              <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
+                <div (click)="p.setCurrent(page.value)"
+                     *ngIf="p.getCurrent() !== page.value"
+                     [class.current]="p.getCurrent() === page.value">
+                  <span>{{ page.label }}</span>
+                </div>
+                <div *ngIf="p.getCurrent() === page.value" [class.current]="p.getCurrent() === page.value">
+                  <span>{{ page.label }}</span>
+                </div>
+              </li>
+
+              <li class="pagination-next" [class.disabled]="p.isLastPage()">
+                <div *ngIf="!p.isLastPage()" (click)="p.next()"><span class="pi pi-angle-right"></span></div>
+                <div *ngIf="p.isLastPage()" [class.disabled]="true"><span class="pi pi-angle-right"></span></div>
+              </li>
+            </ul>
+          </div>
+
+        </pagination-template>
+      </div>
+
+    </div>
+  </div>
 </div>
 
 
