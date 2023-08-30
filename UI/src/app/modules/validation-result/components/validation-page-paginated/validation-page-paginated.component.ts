@@ -86,6 +86,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   handleMultipleSelection(event): void{
     console.log('I am here', event)
+
       this.selectionActive$.next(event.activate)
 
       if (event.selectAll){
