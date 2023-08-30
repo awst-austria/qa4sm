@@ -20,8 +20,7 @@ from api.views.validation_run_view import published_results, my_results, validat
     custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_validation
 from api.views.global_params_view import global_params
-from api.views.modify_validation_view import stop_validation, delete_result, change_name, archive_result, \
-    extend_result, publish_result, add_validation, remove_validation, get_publishing_form, copy_validation_results
+from api.views.modify_validation_view import *
 from api.views.serving_file_view import *
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import backend_settings
@@ -124,6 +123,7 @@ urlpatterns = [
     path('manage-data-in-management-group', manage_data_in_group,
          name='Add data to management groups'),
     path('delete-only-datafile/<str:file_uuid>/', delete_dataset_file_only, name='Delete User Data File Only'),
+    path('delete-multiple-validations', delete_multiple_result, name='Delete Multiple Validations'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

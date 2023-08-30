@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
+import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -11,11 +12,15 @@ import {ValidationrunDto} from '../../../core/services/validation-run/validation
 export class HandleMultipleValidationsComponent implements OnInit {
   @Output() selectionActive = new EventEmitter();
   @Input() validations: ValidationrunDto[];
-  @Input() selectedValidationsId$: BehaviorSubject<String[]>;
+  @Input() selectedValidationsId$: BehaviorSubject<string[]>;
+  @Output() doUpdate = new EventEmitter();
 
   selectionActive$ = new BehaviorSubject(false);
 
   deleteItems: MenuItem[];
+
+  constructor(private validationrunService: ValidationrunService) {
+  }
 
   ngOnInit() {
     this.deleteItems = [
@@ -39,7 +44,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
     ]
   }
 
-  activateSelection(allSelected): void {
+  activateSelection(allSelected: boolean): void {
     this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected)})
     this.selectionActive$.next(true);
   }
@@ -50,7 +55,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   }
 
-  selectValidations(all: boolean): BehaviorSubject<String[]> {
+  selectValidations(all: boolean): BehaviorSubject<string[]> {
     const selectedValidations = [];
     if (all) {
       this.validations.forEach(val => {
@@ -64,7 +69,13 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
 
   deleteMultipleValidations(): void {
-    console.log(this.selectedValidationsId$.getValue())
+    if (!confirm('Do you really want to delete selected validations?')) {
+      return;
+    }
+    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response =>{
+      this.validationrunService.refreshComponent('page');
+      this.closeAndCleanSelection()
+    })
   }
 
 
