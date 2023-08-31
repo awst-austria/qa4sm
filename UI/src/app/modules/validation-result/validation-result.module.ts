@@ -24,6 +24,12 @@ import {PublishingComponent} from './components/publishing/publishing.component'
 import {ExistingValidationComponent} from './components/existing-validation/existing-validation.component';
 import {GalleriaModule} from 'primeng/galleria';
 import {DialogModule} from 'primeng/dialog';
+import {
+  HandleMultipleValidationsComponent
+} from './components/handle-multiple-validations/handle-multiple-validations.component';
+import {PanelMenuModule} from 'primeng/panelmenu';
+import {FieldsetModule} from 'primeng/fieldset';
+import {CheckboxModule} from 'primeng/checkbox';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -35,7 +41,8 @@ import {DialogModule} from 'primeng/dialog';
     SummaryStatisticsComponent,
     ResultFilesComponent,
     PublishingComponent,
-    ExistingValidationComponent],
+    ExistingValidationComponent,
+    HandleMultipleValidationsComponent],
     exports: [
         ValidationrunRowComponent,
         ValidationPagePaginatedComponent,
@@ -60,7 +67,10 @@ import {DialogModule} from 'primeng/dialog';
         ButtonModule,
         ReactiveFormsModule,
         GalleriaModule,
-        DialogModule
+        DialogModule,
+        PanelMenuModule,
+        FieldsetModule,
+        CheckboxModule
     ]
 })
 export class ValidationResultModule {

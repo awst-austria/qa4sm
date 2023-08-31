@@ -1,9 +1,15 @@
+
+<div class="side-panel-area">
+  <qa-handle-multiple-validations
+    [validations]="validations"
+    [selectedValidationsId$]="selectedValidations$"
+    (selectionActive)="handleMultipleSelection($event)"
+    *ngIf="!published">
+  </qa-handle-multiple-validations>
+</div>
+
 <div class="grid no-gutters">
-  <div class="
-    col-12
-    md:col-10 md:col-offset-1
-    lg:col-10 lg:col-offset-1
-    xl:col-8 xl:col-offset-2">
+  <div [ngClass]="published ? publishedValClasses : myValClasses">
     <div class="grid" style="justify-content: center">
 
       <!-- custom -->
@@ -27,14 +33,24 @@
       </div>
 
       <div *ngIf="validations.length" class="col-9">
-          <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
+        <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
       </div>
 
       <!-- Rows -->
       <div *ngIf="validations.length" class="col-9">
         <div *ngFor="let valrun of validations  | paginate :
-        {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
-
+        {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}"
+             class="validation-row-area">
+<!--          <div *ngIf="(selectionActive$|async)">-->
+            <p-checkbox
+              class="modify-checkbox"
+              *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
+              [value]="valrun.id"
+              [ngModel]="selectedValidations$ | async"
+              (ngModelChange)="updateSelectedValidations($event, valrun.id)"
+              inputId="{{valrun.id}}}">
+            </p-checkbox>
+<!--          </div>-->
           <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
           <br/>
         </div>
@@ -74,3 +90,6 @@
     </div>
   </div>
 </div>
+
+
+
