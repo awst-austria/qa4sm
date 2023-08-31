@@ -12,6 +12,10 @@ import {BehaviorSubject} from 'rxjs';
 export class ValidationPagePaginatedComponent implements OnInit {
   @Input() published: boolean;
 
+  commonClasses = 'col-12 md:col-10 lg:col-10 xl:col-8  xl:col-offset-2 '
+  myValClasses = this.commonClasses + 'col-offset-4  md:col-offset-3  lg:col-offset-2'
+  publishedValClasses = this.commonClasses +  'md:col-offset-1 lg:col-offset-1'
+
   validations: ValidationrunDto[] = [];
   numberOfValidations: number;
   page = 1;
@@ -86,7 +90,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   handleMultipleSelection(event): void {
     this.selectionActive$.next(event.activate)
-    console.log(event.selected.value)
     this.selectedValidations$.next(event.selected.value)
   }
 
