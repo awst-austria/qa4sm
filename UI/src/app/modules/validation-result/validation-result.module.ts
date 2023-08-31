@@ -30,6 +30,7 @@ import {
 import {PanelMenuModule} from 'primeng/panelmenu';
 import {FieldsetModule} from 'primeng/fieldset';
 import {CheckboxModule} from 'primeng/checkbox';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -70,7 +71,8 @@ import {CheckboxModule} from 'primeng/checkbox';
         DialogModule,
         PanelMenuModule,
         FieldsetModule,
-        CheckboxModule
+        CheckboxModule,
+        CdkVirtualScrollViewport
     ]
 })
 export class ValidationResultModule {
