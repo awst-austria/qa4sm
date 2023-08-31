@@ -162,6 +162,10 @@ class ValidationRun(models.Model):
     def all_files_exist(self):
         return len(self.get_dataset_configs_without_file()) == 0
 
+    @property
+    def graphics_file_path(self):
+        return self.output_file.path.replace(self.output_file.name, f'{self.id}/graphs.zip')
+
     def get_dataset_configs_without_file(self):
         return self.dataset_configurations.all().filter(dataset__storage_path='')
 
