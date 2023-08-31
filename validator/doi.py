@@ -67,7 +67,8 @@ def get_doi_for_validation(val, metadata):
         zipfilename = val.output_file.path.replace('.nc', '.zip')
         with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
             myzip.write(val.output_file.path, arcname=str(val.id) + '.nc')
-            myzip.write(val.get_graphics_path(), arcname='graphics.zip')
+            if os.path.isfile(val.get_graphics_path()):
+                myzip.write(val.get_graphics_path(), arcname='graphs.zip')
 
         with open(zipfilename, 'rb') as result_file:
             file_name = str(val.id) + '.zip'
