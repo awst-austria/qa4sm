@@ -203,7 +203,7 @@ def delete_result(request, result_uuid):
         return HttpResponse(status=status.HTTP_403_FORBIDDEN)
 
     ## check that our validation can be deleted; it can't if it already has a DOI
-    if (not val_run.is_unpublished):
+    if not val_run.is_unpublished or val_run.is_archived:
         return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)  # 405
 
     val_run.delete()
@@ -214,16 +214,12 @@ def delete_result(request, result_uuid):
 @permission_classes([IsAuthenticated])
 def delete_multiple_result(request):
     id_list = request.GET.getlist('id')
-    validations_to_remove = ValidationRun.objects.filter(id__in=id_list)
+    validations_to_remove = (ValidationRun.objects.filter(id__in=id_list)
+                             .filter(doi='')
+                             .filter(is_archived=False)
+                             .filter(user=request.user))
 
     for validation in validations_to_remove:
-        if (validation.user != request.user):
-            return HttpResponse(status=status.HTTP_403_FORBIDDEN)
-
-        ## check that our validation can be deleted; it can't if it already has a DOI
-        if (not validation.is_unpublished):
-            return HttpResponse(status=status.HTTP_405_METHOD_NOT_ALLOWED)  # 405
-
         validation.delete()
 
     return HttpResponse(status=status.HTTP_200_OK)
