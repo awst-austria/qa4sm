@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
@@ -25,6 +25,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
   selectionActive$ = new BehaviorSubject(false);
   selectedValidations$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
+
+  isLoading: boolean = false;
+  endOfPage: boolean = false;
   constructor(private validationrunService: ValidationrunService) {
   }
 
@@ -39,15 +42,43 @@ export class ValidationPagePaginatedComponent implements OnInit {
     });
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onScroll() {
+    const windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
+    const body = document.body, html = document.documentElement;
+    const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+    const windowBottom = windowHeight + window.pageYOffset;
+
+    if (windowBottom >= docHeight - 1 && !this.isLoading && !this.endOfPage) {
+      this.page++;
+      this.getValidationsAndItsNumber(this.published);
+    }
+  }
+
   getValidationsAndItsNumber(published: boolean): void {
+    // if (this.isLoading || this.endOfPage) {
+    //   return;
+    // }
     const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
       .set('order', String(this.order));
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters).subscribe(
         response => {
           const {validations, length} = response;
-          this.validations = validations;
           this.numberOfValidations = length;
+          const maxPages = length / this.limit;
+          if (validations.length){
+            this.validations = this.validations.concat(validations);
+            this.page++;
+
+            if (this.page >= maxPages){
+              this.endOfPage = true;
+            }
+          } else {
+            this.endOfPage = true;
+          }
+
+          this.isLoading = false;
         });
     } else {
       this.validationrunService.getPublishedValidationruns(parameters).subscribe(
