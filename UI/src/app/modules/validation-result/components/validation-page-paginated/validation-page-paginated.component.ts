@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
@@ -17,14 +17,17 @@ export class ValidationPagePaginatedComponent implements OnInit {
   publishedValClasses = this.commonClasses +  'md:col-offset-1 lg:col-offset-1'
 
   validations: ValidationrunDto[] = [];
-  numberOfValidations: number;
-  page = 1;
+  maxNumberOfPages: number;
+  currentPage = 1;
   limit = 10;
   offset = 0;
   order = '-start_time';
   selectionActive$ = new BehaviorSubject(false);
   selectedValidations$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
+
+  isLoading: boolean = false;
+  endOfPage: boolean = false;
   constructor(private validationrunService: ValidationrunService) {
   }
 
@@ -39,29 +42,58 @@ export class ValidationPagePaginatedComponent implements OnInit {
     });
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onScroll() {
+    const windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
+    const body = document.body, html = document.documentElement;
+    const docHeight = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
+    const windowBottom = windowHeight + window.pageYOffset;
+
+    if (windowBottom >= docHeight - 1 && !this.isLoading && !this.endOfPage) {
+      this.currentPage++;
+      this.getValidationsAndItsNumber(this.published);
+    }
+  }
+
   getValidationsAndItsNumber(published: boolean): void {
+    this.isLoading = true;
     const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
       .set('order', String(this.order));
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters).subscribe(
         response => {
-          const {validations, length} = response;
-          this.validations = validations;
-          this.numberOfValidations = length;
+          this.handleFetchedValidations(response)
         });
     } else {
       this.validationrunService.getPublishedValidationruns(parameters).subscribe(
         response => {
-          const {validations, length} = response;
-          this.validations = validations;
-          this.numberOfValidations = length;
+          this.handleFetchedValidations(response);
         });
     }
   }
 
+  handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void{
+    const {validations, length} = serverResponse;
+    if (!this.maxNumberOfPages){
+      this.maxNumberOfPages = Math.ceil( length/this.limit);
+    }
+    if (validations.length){
+      this.validations = this.validations.concat(validations);
+      this.currentPage++;
+
+      if (this.currentPage > this.maxNumberOfPages ){
+        this.endOfPage = true;
+      }
+    } else {
+      this.endOfPage = true;
+    }
+
+    this.isLoading = false;
+  }
+
   handlePageChange(event: number): void {
-    this.page = event;
-    this.offset = (this.page - 1) * this.limit;
+    this.currentPage = event;
+    this.offset = (this.currentPage - 1) * this.limit;
     this.getValidationsAndItsNumber(this.published);
   }
 
@@ -84,7 +116,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       response => {
         const {validations, length} = response;
         this.validations = validations;
-        this.numberOfValidations = length;
+        // this.numberOfValidations = length;
       });
   }
 

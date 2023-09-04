@@ -40,7 +40,6 @@
     "jquery": "^3.6.0",
     "jszip": "^3.10.1",
     "ngx-logger": "^5.0.12",
-    "ngx-pagination": "^6.0.3",
     "ol": "^7.3.0",
     "primeflex": "^3.3.0",
     "primeicons": "^6.0.0",
