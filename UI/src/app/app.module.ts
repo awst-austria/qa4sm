@@ -42,7 +42,6 @@ import {ValidationPeriodModule} from './modules/validation-period/validation-per
 import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
-import {NgxPaginationModule} from 'ngx-pagination';
 import {MapModule} from './modules/map/map.module';
 import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
@@ -137,7 +136,6 @@ import {ContactModule} from './modules/contact/contact.module';
     MetricsModule,
     AnomaliesModule,
     ScalingModule,
-    NgxPaginationModule,
     MapModule,
     ComparisonModule,
     CoreModule,
