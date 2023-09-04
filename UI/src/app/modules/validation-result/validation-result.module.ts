@@ -4,7 +4,6 @@ import {ValidationrunRowComponent} from './components/validationrun-row/validati
 import {PanelModule} from 'primeng/panel';
 import {TooltipModule} from 'primeng/tooltip';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {NgxPaginationModule} from 'ngx-pagination';
 import {
   ValidationPagePaginatedComponent
 } from './components/validation-page-paginated/validation-page-paginated.component';
@@ -58,7 +57,6 @@ import {CheckboxModule} from 'primeng/checkbox';
         PanelModule,
         TooltipModule,
         FontAwesomeModule,
-        NgxPaginationModule,
         RouterModule,
         DropdownModule,
         FormsModule,
