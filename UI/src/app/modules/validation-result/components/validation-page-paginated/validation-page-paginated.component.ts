@@ -46,7 +46,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     @HostListener('window:scroll', ['$event'])
     onScroll() {
         const windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
-        const docHeight = document.body.offsetHeight
+        const docHeight = document.documentElement.scrollHeight
         const windowBottom = windowHeight + window.scrollY;
 
         if (windowBottom >= docHeight - 1 && !this.isLoading && !this.endOfPage) {
