@@ -70,7 +70,7 @@ import {CheckboxModule} from 'primeng/checkbox';
         DialogModule,
         PanelMenuModule,
         FieldsetModule,
-        CheckboxModule,
+        CheckboxModule
     ]
 })
 export class ValidationResultModule {
