@@ -125,9 +125,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.selectedValidations$.next(event.selected.value)
   }
 
-  updateSelectedValidations(checked: boolean, id: number): void {
+  updateSelectedValidations(checked: string[], id: string): void {
     let selectedValidations = this.selectedValidations$.getValue();
-    if (checked) {
+    if (checked.includes(id)) {
       selectedValidations = [...selectedValidations, id];
     } else {
       selectedValidations = selectedValidations.filter(selectedId => selectedId !== id);
