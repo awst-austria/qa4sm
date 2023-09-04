@@ -80,6 +80,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     if (validations.length){
       this.validations = this.validations.concat(validations);
       this.currentPage++;
+      this.offset = (this.currentPage - 1) * this.limit;
 
       if (this.currentPage > this.maxNumberOfPages ){
         this.endOfPage = true;
