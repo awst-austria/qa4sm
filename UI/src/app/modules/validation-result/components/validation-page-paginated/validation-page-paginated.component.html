@@ -56,8 +56,8 @@
           <span class="pi pi-spin pi-spinner mr-2" style="font-size: 2rem"> </span><em style="font-size: 1.5rem"> Loading... </em>
         </div>
 
-        <div *ngIf="endOfPage">
-          You have run {{validations.length}} {{validations.length === 1 ? 'validation ': 'validations'}}.
+        <div *ngIf="endOfPage && !published" class="val-number-information">
+          <em> You have run {{validations.length}} {{validations.length === 1 ? 'validation ': 'validations'}}.</em>
         </div>
       </div>
 
