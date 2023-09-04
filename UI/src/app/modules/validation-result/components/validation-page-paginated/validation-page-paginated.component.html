@@ -52,12 +52,12 @@
           <br/>
         </div>
 
-        <div *ngIf="isLoading">
-          Loading...
+        <div *ngIf="isLoading" class="loading-vals-box">
+          <span class="pi pi-spin pi-spinner mr-2" style="font-size: 2rem"> </span><em style="font-size: 1.5rem"> Loading... </em>
         </div>
 
         <div *ngIf="endOfPage">
-          You have {{validations.length}} {{validations.length === 1 ? 'validation ': 'validations'}}.
+          You have run {{validations.length}} {{validations.length === 1 ? 'validation ': 'validations'}}.
         </div>
       </div>
 

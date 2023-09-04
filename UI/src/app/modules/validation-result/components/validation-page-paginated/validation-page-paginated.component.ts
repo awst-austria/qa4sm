@@ -56,6 +56,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   getValidationsAndItsNumber(published: boolean): void {
+    this.isLoading = true;
     const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
       .set('order', String(this.order));
     if (!published) {
