@@ -1396,7 +1396,7 @@ class TestValidation(TestCase):
     def test_setup_filtering_max(self):
         start_time = time.time()
 
-        for dataset in Dataset.objects.all():
+        for i, dataset in enumerate(Dataset.objects.all()):
             self.__logger.info(dataset.pretty_name)
             vs = dataset.versions.all()
             va = dataset.variables.all()
@@ -1432,8 +1432,7 @@ class TestValidation(TestCase):
                         # handles the case where all values are flagged (i.e. for SMOS L3)
                         if not len(data.index) > 1 or data[variable.short_name].empty:
                             unfiltered = reader.read(-155.42, 19.78, **read_kwargs)
-
-                            assert unfiltered.count()[variable.short_name] == len(unfiltered)
+                            assert unfiltered.count()[variable.short_name] == len(unfiltered[variable.short_name].dropna())
 
         print("Test duration: {}".format(time.time() - start_time))
 
