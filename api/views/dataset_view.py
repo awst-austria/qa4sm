@@ -18,7 +18,7 @@ def dataset(request):
     user = request.user
     datasets = Dataset.objects.filter(user=None)
     if user_data and user.is_authenticated:
-        user_datasets = Dataset.objects.filter(user=user).filter(user_dataset__isnull=False)
+        user_datasets = Dataset.objects.filter(user=user)
         datasets = datasets.union(user_datasets.exclude(storage_path='')) if exclude_no_files else datasets.union(
             user_datasets)
 
