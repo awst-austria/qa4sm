@@ -25,6 +25,8 @@ class Dataset(models.Model):
     # filters = models.ManyToManyField(DataFilter, related_name='filters') #TODO this must be put into version.py
     resolution = models.JSONField(null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
+                                         blank=True)
 
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration

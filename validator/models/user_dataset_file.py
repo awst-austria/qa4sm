@@ -34,8 +34,8 @@ class UserDatasetFile(models.Model):
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
     metadata_submitted = models.BooleanField(default=False)
-    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
-                                         blank=True)
+    # user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
+    #                                      blank=True)
 
     def get_user_data_configs(self):
         return DatasetConfiguration.objects.filter(dataset=self.dataset)
@@ -68,7 +68,7 @@ class UserDatasetFile(models.Model):
         # # set storage path to an empty string
         # clear all the user management groups if there are no validations run by other users
         if self.number_of_other_users_validations == 0:
-            self.user_groups.clear()
+            self.dataset.user_groups.clear()
         # remove the file
         if self.file:
             rundir = path.dirname(self.file.path)

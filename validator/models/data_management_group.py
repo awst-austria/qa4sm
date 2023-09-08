@@ -16,13 +16,11 @@ class DataManagementGroup(Group):
         super().save(*args, **kwargs)
 
     def get_list_of_group_ds_used_by_group_users(self):
-        return self.custom_datasets.all().filter(
-            dataset__dataset_configurations__validation__user__in=self.user_set.all())
+        return self.custom_datasets.all().filter(dataset_configurations__validation__user__in=self.user_set.all())
 
     def get_list_of_group_users_using_group_ds(self):
         return self.user_set.all().filter(validationrun__dataset_configurations__dataset__in=
-                                          self.get_list_of_group_ds_used_by_group_users().values_list('dataset',
-                                                                                                      flat=True))
+                                          self.get_list_of_group_ds_used_by_group_users())
 
     def delete(self, using=None, keep_parents=False):
         if self.get_list_of_group_ds_used_by_group_users().exists():
