@@ -34,15 +34,9 @@ class Dataset(models.Model):
     def __str__(self):
         return self.short_name
 
-    def shared_with(self):
-        if len(self.user_dataset.all()):
-            user_file = self.user_dataset.get()
-            return user_file.user_groups.all()
-
     @property
     def is_shared(self):
-        if self.shared_with():
-            return True
+        return len(self.user_groups.all())
 
     @property
     def not_as_reference(self):
