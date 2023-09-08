@@ -65,9 +65,7 @@ class UserDatasetFile(models.Model):
             return
 
     def delete_dataset_file(self):
-        # set storage path to an empty string
-        self.dataset.storage_path = ''
-        self.dataset.save()
+        # # set storage path to an empty string
         # clear all the user management groups if there are no validations run by other users
         if self.number_of_other_users_validations == 0:
             self.user_groups.clear()
@@ -83,8 +81,7 @@ class UserDatasetFile(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-
-        self.dataset.storage_path = self.file.path
+        self.dataset.storage_path = "" if not self.file else self.file.path
         self.dataset.save()
 
         super(UserDatasetFile, self).save(*args, **kwargs)
