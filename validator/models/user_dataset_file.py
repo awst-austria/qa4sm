@@ -64,6 +64,10 @@ class UserDatasetFile(models.Model):
         else:
             return
 
+    @property
+    def user_groups(self):
+        return list(self.dataset.user_groups.all().values_list('id', flat=True))
+
     def delete_dataset_file(self):
         # # set storage path to an empty string
         # clear all the user management groups if there are no validations run by other users
