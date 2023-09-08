@@ -245,10 +245,6 @@ def upload_user_data(request, filename):
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']
-        # now I can assign proper storage path
-        new_dataset.storage_path = file_raw_path
-        new_dataset.save()
-
         preprocess_file(file_serializer, file_raw_path)
 
         return JsonResponse(file_serializer.data, status=201, safe=False)
