@@ -96,7 +96,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
 
-    if dataset.user:
+    if dataset.user and len(dataset.user_dataset.all()):
         file = UserDatasetFile.objects.get(dataset=dataset)
         if file.file_name.endswith('nc') or file.file_name.endswith('nc4'):
             reader = GriddedNcOrthoMultiTs(file.get_raw_file_path + "/timeseries", ioclass_kws={'read_bulk': True})
