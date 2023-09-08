@@ -25,6 +25,8 @@ class Dataset(models.Model):
     # filters = models.ManyToManyField(DataFilter, related_name='filters') #TODO this must be put into version.py
     resolution = models.JSONField(null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
+    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
+                                         blank=True)
 
     # many-to-one relationships coming from other models:
     # dataset_configuration from DatasetConfiguration
@@ -32,15 +34,9 @@ class Dataset(models.Model):
     def __str__(self):
         return self.short_name
 
-    def shared_with(self):
-        if len(self.user_dataset.all()):
-            user_file = self.user_dataset.get()
-            return user_file.user_groups.all()
-
     @property
     def is_shared(self):
-        if self.shared_with():
-            return True
+        return len(self.user_groups.all())
 
     @property
     def not_as_reference(self):
