@@ -51,11 +51,11 @@ class UserDatasetFile(models.Model):
     @property
     def owner_validation_list(self):
         return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in
-                self.get_user_data_configs().filter(validation__user = self.owner)]
+                self.get_user_data_configs().filter(validation__user=self.owner)]
 
     @property
     def number_of_other_users_validations(self):
-        return len(self.get_user_data_configs().exclude(validation__user = self.owner))
+        return len(self.get_user_data_configs().exclude(validation__user=self.owner))
 
     @property
     def file_size(self):
@@ -82,16 +82,22 @@ class UserDatasetFile(models.Model):
         self.file_name = None
         self.save()
 
+    def save(self, *args, **kwargs):
+
+        self.dataset.storage_path = self.file.path
+        self.dataset.save()
+
+        super(UserDatasetFile, self).save(*args, **kwargs)
+
 
 @receiver(pre_delete, sender=UserDatasetFile)
 def auto_delete_dataset_version_variable(sender, instance, **kwargs):
-    if instance.dataset:
+    if instance.dataset and len(instance.dataset.versions.all().exclude(id=instance.version.id)) == 0:
         instance.dataset.delete()
-    if instance.version:
+    if instance.version and len(instance.version.versions.all()) == 0:
         instance.version.delete()
-    if instance.variable:
+    if instance.variable and len(instance.variable.variables.all()) == 0:
         instance.variable.delete()
-
 
 @receiver(post_delete, sender=UserDatasetFile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
