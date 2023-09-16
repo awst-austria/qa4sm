@@ -396,7 +396,7 @@ class TestValidation(TestCase):
 
         run.save()
 
-        for config in run.dataset_configurations.all():
+        for i, config in enumerate(run.dataset_configurations.all()):
             if config == run.spatial_reference_configuration:
                 config.filters.add(DataFilter.objects.get(name='FIL_ISMN_GOOD'))
             else:

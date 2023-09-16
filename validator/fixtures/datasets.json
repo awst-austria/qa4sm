@@ -433,7 +433,7 @@
             "short_name": "SMOS_SBPCA",
             "pretty_name": "SMOS SBPCA",
             "help_text": "SMOS SBPCA metrics exercise data",
-            "storage_path": "testdata/input_data/SMOS_L2/",
+            "storage_path": "testdata/input_data/SMOS_SBPCA/",
             "detailed_description": "This dataset is only available to members of the 'smos_developer' group. Please contact the administrator if you need access.",
             "source_reference": "",
             "citation": "",
