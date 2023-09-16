@@ -34,8 +34,8 @@ class UserDatasetFile(models.Model):
     all_variables = models.JSONField(blank=True, null=True)
     upload_date = models.DateTimeField()
     metadata_submitted = models.BooleanField(default=False)
-    user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
-                                         blank=True)
+    # user_groups = models.ManyToManyField(to='DataManagementGroup', related_name='custom_datasets', null=True,
+    #                                      blank=True)
 
     def get_user_data_configs(self):
         return DatasetConfiguration.objects.filter(dataset=self.dataset)
@@ -51,11 +51,11 @@ class UserDatasetFile(models.Model):
     @property
     def owner_validation_list(self):
         return [{'val_id': config.validation.pk, 'val_name': config.validation.user_data_panel_label()} for config in
-                self.get_user_data_configs().filter(validation__user = self.owner)]
+                self.get_user_data_configs().filter(validation__user=self.owner)]
 
     @property
     def number_of_other_users_validations(self):
-        return len(self.get_user_data_configs().exclude(validation__user = self.owner))
+        return len(self.get_user_data_configs().exclude(validation__user=self.owner))
 
     @property
     def file_size(self):
@@ -64,13 +64,15 @@ class UserDatasetFile(models.Model):
         else:
             return
 
+    @property
+    def user_groups(self):
+        return list(self.dataset.user_groups.all().values_list('id', flat=True))
+
     def delete_dataset_file(self):
-        # set storage path to an empty string
-        self.dataset.storage_path = ''
-        self.dataset.save()
+        # # set storage path to an empty string
         # clear all the user management groups if there are no validations run by other users
         if self.number_of_other_users_validations == 0:
-            self.user_groups.clear()
+            self.dataset.user_groups.clear()
         # remove the file
         if self.file:
             rundir = path.dirname(self.file.path)
@@ -82,16 +84,21 @@ class UserDatasetFile(models.Model):
         self.file_name = None
         self.save()
 
+    def save(self, *args, **kwargs):
+        self.dataset.storage_path = "" if not self.file else self.file.path
+        self.dataset.save()
+
+        super(UserDatasetFile, self).save(*args, **kwargs)
+
 
 @receiver(pre_delete, sender=UserDatasetFile)
 def auto_delete_dataset_version_variable(sender, instance, **kwargs):
-    if instance.dataset:
+    if instance.dataset and len(instance.dataset.versions.all().exclude(id=instance.version.id)) == 0:
         instance.dataset.delete()
-    if instance.version:
+    if instance.version and len(instance.version.versions.all()) == 0:
         instance.version.delete()
-    if instance.variable:
+    if instance.variable and len(instance.variable.variables.all()) == 0:
         instance.variable.delete()
-
 
 @receiver(post_delete, sender=UserDatasetFile)
 def auto_delete_file_on_delete(sender, instance, **kwargs):

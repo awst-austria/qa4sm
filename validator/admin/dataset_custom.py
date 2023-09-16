@@ -8,7 +8,9 @@ class DatasetAdmin(ModelAdmin):
     def file(self, obj):
         if len(obj.user_dataset.all()) and obj.id >= USER_DATASET_MIN_ID:
             return obj.user_dataset.all()[0]
-        elif obj.id< USER_DATASET_MIN_ID:
+        elif not len(obj.user_dataset.all()) and obj.user is not None:
+            return "Private admin data"
+        elif obj.id < USER_DATASET_MIN_ID:
             return "Application data"
         else:
             return "No file assigned"
