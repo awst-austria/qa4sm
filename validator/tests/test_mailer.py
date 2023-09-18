@@ -27,7 +27,7 @@ class TestMailer(TestCase):
 
     __logger = logging.getLogger(__name__)
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     def setUp(self):
         self.user_data = {

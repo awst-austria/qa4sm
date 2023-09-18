@@ -17,7 +17,7 @@ import validator.validation as val
 class TestValidationComparisonView(TestCase):
     # Test all functions in api/views/comparison_view.py
     __logger = logging.getLogger(__name__)
-    fixtures = ['datasets', 'filters', 'versions', 'variables']
+    fixtures = ['datasets', 'filters', 'versions', 'variables', 'users']
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()

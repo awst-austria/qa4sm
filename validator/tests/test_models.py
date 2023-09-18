@@ -29,7 +29,7 @@ from validator.models import ValidationRun
 
 class TestModels(TestCase):
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     __logger = logging.getLogger(__name__)
 

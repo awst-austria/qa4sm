@@ -25,7 +25,7 @@ def get_ncfile_name(validation):
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestServingFileView(TestCase):
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
     __logger = logging.getLogger(__name__)
 
     def setUp(self):
