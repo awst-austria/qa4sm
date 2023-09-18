@@ -774,5 +774,28 @@
                 1
             ]
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 54,
+        "fields": {
+            "short_name": "SMOS_SBPCA_v724",
+            "pretty_name": "v724",
+            "help_text": "SMOS L2 SM from SBPCA metrics exercise (ESA)",
+            "time_range_start": "2011-02-01",
+            "time_range_end": "2013-01-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                35,
+                36,
+                37,
+                38,
+                39,
+                40,
+                41,
+                42
+            ]
+        }
     }
 ]

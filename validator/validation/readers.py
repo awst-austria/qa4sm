@@ -96,6 +96,9 @@ def create_reader(dataset, version) -> GriddedNcTs:
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
 
+    if dataset.short_name == globals.SMOS_SBPCA:
+        reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
+
     if dataset.user and len(dataset.user_dataset.all()):
         file = UserDatasetFile.objects.get(dataset=dataset)
         if file.file_name.endswith('nc') or file.file_name.endswith('nc4'):
@@ -120,7 +123,7 @@ def adapt_timestamp(reader, dataset, version):
             'base_time_reference': '2000-01-01',
         }
 
-    elif dataset.short_name == globals.SMOS_L2:
+    elif dataset.short_name in [globals.SMOS_L2, globals.SMOS_SBPCA]:
         tadapt_kwargs = {
             'time_offset_fields': 'Seconds',
             'time_units': 's',
