@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, Renderer2} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'navigation-bar',
@@ -16,11 +17,14 @@ export class NavigationBarComponent implements OnInit {
   loginMenuItem: MenuItem;
   logoutMenuItem: MenuItem;
   userProfileMenuItem: MenuItem;
+  isFixed: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   constructor(private authService: AuthService,
               private router: Router,
               private toastService: ToastService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private el: ElementRef,
+              private renderer: Renderer2) {
 
     this.loginMenuItem = {
       label: 'Log in',
@@ -94,6 +98,22 @@ export class NavigationBarComponent implements OnInit {
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.authStatusChanged(authenticated));
     this.setSumLink();
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  onScroll(event: Event) {
+    const scrollPosition = window.scrollY;
+
+    // Determine the threshold where you want the navigation to become fixed
+    const threshold = 100; // Adjust as needed
+
+    console.log(scrollPosition, this.el.nativeElement)
+
+    if (scrollPosition < threshold) {
+      this.isFixed.next(true);
+    } else {
+      this.isFixed.next(false);
+    }
   }
 
   private authStatusChanged(authenticated: boolean): void {

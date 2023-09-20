@@ -4764,13 +4764,13 @@ div.carousel-caption{
 }
 
 .p-menubar {
-  padding: 0.5rem 1rem;
-  background: $base-color;
-  color: #ffffff;
+  //padding: 0.5rem 1rem;
+  background: transparent;
+  color: black;
   border: 0 none;
   border-radius: 4px;
   font-size: 1.25rem;
-  z-index: 5;
+  //z-index: 5;
 }
 
 .p-menubar .p-menuitem-link {
