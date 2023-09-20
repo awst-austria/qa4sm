@@ -20,11 +20,11 @@ export class HomeComponent implements OnInit {
     attrLink: '#',
     description: 'Image: QA4SM'
   }, {
-    plot: homeUrlPrefix + 'smos.jpg',
+    plot: homeUrlPrefix + 'smos_full.jpg',
     attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
     description: 'Image: ESA'
   }, {
-    plot: homeUrlPrefix + 'root-zone_soil_moisture_may_2016.jpg',
+    plot: homeUrlPrefix + 'Root-zone_soil_moisture_May_2016.jpg',
     attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
     description: 'Image: ESA'
   }];
