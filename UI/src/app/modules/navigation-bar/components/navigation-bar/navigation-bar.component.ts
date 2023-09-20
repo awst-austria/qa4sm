@@ -107,8 +107,6 @@ export class NavigationBarComponent implements OnInit {
     // Determine the threshold where you want the navigation to become fixed
     const threshold = 100; // Adjust as needed
 
-    console.log(scrollPosition, this.el.nativeElement)
-
     if (scrollPosition < threshold) {
       this.isFixed.next(true);
     } else {
