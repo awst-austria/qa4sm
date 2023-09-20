@@ -23,6 +23,10 @@ $accordion-header-padding: 0.5rem 0.5rem;
 * {
   box-sizing: border-box;
 }
+body{
+  margin: 0;
+  padding: 0;
+}
 
 .p-component {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";

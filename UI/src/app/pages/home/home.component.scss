@@ -4,15 +4,21 @@
   font-family: $base-font;
   line-height: 1.5rem;
 }
-main{
-  max-width: 100%;
-  min-width: 100%;
+//main{
+//  max-width: 100%;
+//  min-width: 100%;
+//}
+
+div#wrapper {
+  display: block;
+  height: 100%;
+  //width: 100vw;
 }
 
 div#landing{
-  width: 100vw;
+  //width: 100vw;
   height: 100vh;
-  background: url("../../../../../validator/static/images/home/smos_full.jpg") fixed center center;
+  background: url("../../../../../validator/static/images/home/smos_full.jpg") center center;
   background-size: cover;
 }
 
