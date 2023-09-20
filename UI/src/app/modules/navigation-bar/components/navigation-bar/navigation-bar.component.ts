@@ -36,6 +36,7 @@ export class NavigationBarComponent implements OnInit {
         label: 'Validate',
         icon: 'pi pi-fw pi-wrench',
         routerLink: ['validate'],
+        // styleClass: 'validate-button',
         command: () => this.setPreviousUrl('validate')
       },
       {

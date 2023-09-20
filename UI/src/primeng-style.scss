@@ -4830,21 +4830,34 @@ div.carousel-caption{
   border-radius: 4px;
   transition: box-shadow 0.15s;
   user-select: none;
-  border: 0.1px solid #FFDB5C;
+  border: 0.1px solid $menu-button-color;
+}
+
+.p-menubar .p-menubar-root-list > .p-menuitem.validate-button > .p-menuitem-link {
+  border: 1px solid $pronouced-button-color;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-menuitem-text {
-  color: #FFDB5C;
+  color: $menu-button-color;
+}
+
+.p-menubar .p-menubar-root-list > .p-menuitem.validate-button > .p-menuitem-link .p-menuitem-text {
+  color: $pronouced-button-color;
+  font-weight: bold;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-menuitem-icon {
-  color: #FFDB5C;
+  color: $menu-button-color;
   margin-right: 0.3rem;
   font-size: 1.2rem;
 }
 
+.p-menubar .p-menubar-root-list > .p-menuitem.validate-button > .p-menuitem-link .p-menuitem-icon {
+  color: $pronouced-button-color;
+}
+
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link .p-submenu-icon {
-  color: #FFDB5C;
+  color: $menu-button-color;
   margin-left: 0.5rem;
 }
 
