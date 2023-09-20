@@ -34,24 +34,41 @@ export class NavigationBarComponent implements OnInit {
       {label: 'Home', icon: 'pi pi-fw pi-home', routerLink: ['home'], command: () => this.setPreviousUrl('home')},
       {
         label: 'Validate',
-        icon: 'pi pi-fw pi-check-square',
+        icon: 'pi pi-fw pi-wrench',
         routerLink: ['validate'],
         command: () => this.setPreviousUrl('validate')
       },
       {
-        label: 'My validations',
+        label: 'Results',
         icon: 'pi pi-fw pi-folder',
-        routerLink: ['my-validations'],
-        command: () => this.setPreviousUrl('my-validations')
+        items: [
+          {
+            label: 'My validations',
+            icon: 'pi pi-fw pi-folder',
+            routerLink: ['my-validations'],
+            command: () => this.setPreviousUrl('my-validations')
+          },
+          {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
+        ]
       },
-      {label: 'Published validations', icon: 'pi pi-fw pi-globe', routerLink: ['published-validations']},
       {label: 'Compare validations', icon: 'pi pi-fw pi-th-large', routerLink: ['comparison'], command: () => this.setPreviousUrl('comparison')},
-      {label: 'My datasets', icon: 'pi pi-fw pi-upload', routerLink: ['my-datasets'],  command: () => this.setPreviousUrl('my-datasets')},
+      {
+        label: 'Dataset upload',
+        icon: 'pi pi-fw pi-upload',
+        items: [
+          {label: 'My datasets',
+            icon: 'pi pi-fw pi-upload',
+            routerLink: ['my-datasets'],
+            command: () => this.setPreviousUrl('my-datasets')
+          },
+          {label: 'Upload Data Help', icon: 'pi pi-fw pi-question', routerLink: ['user-data-guidelines']},
+        ]
+      },
+
       {
         label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
-          {label: 'About', icon: 'pi pi-fw pi-info', routerLink: ['about']},
+          // {label: 'About', icon: 'pi pi-fw pi-info', routerLink: ['about']},
           {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']},
-          {label: 'Upload Data Help', icon: 'pi pi-fw pi-server', routerLink: ['user-data-guidelines']},
           {
             label: 'User Manual',
             icon: 'pi pi-fw pi-book',
@@ -60,10 +77,9 @@ export class NavigationBarComponent implements OnInit {
           },
           {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']},
           {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']},
-          {label: 'Contact Us', icon: 'pi pi-fw pi-envelope', routerLink: ['contact-us']},
-
         ]
       },
+      {label: 'Contact Us', icon: 'pi pi-fw pi-envelope', routerLink: ['contact-us']},
       {
         label: 'Profile', icon: 'pi pi-fw pi-user', items: [
           this.userProfileMenuItem,
