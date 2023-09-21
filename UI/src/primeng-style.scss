@@ -26,6 +26,7 @@ $accordion-header-padding: 0.5rem 0.5rem;
 body{
   margin: 0;
   padding: 0;
+  background-color: $background-color;
 }
 
 .p-component {
@@ -4769,8 +4770,8 @@ div.carousel-caption{
 
 .p-menubar {
   //padding: 0.5rem 1rem;
-  background: transparent;
-  color: black;
+  background: $background-color;
+  color: $base-color;
   border: 0 none;
   border-radius: 4px;
   font-size: 1.25rem;
@@ -4831,7 +4832,7 @@ div.carousel-caption{
   border-radius: 4px;
   transition: box-shadow 0.15s;
   user-select: none;
-  border: 0.1px solid $menu-button-color;
+  //border: 0.1px solid $menu-button-color;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem.validate-button > .p-menuitem-link {
