@@ -25,14 +25,13 @@ div#landing {
 
 div#title-box {
   position: absolute;
-  bottom: 20%;
-  left: 5%;
+  bottom: 27%;
+  left: 1%;
   color: white;
   display: inline-block;
   vertical-align: middle;
   z-index: 10;
   text-align: center;
-  background-color: green;
 }
 
 .page-title {
@@ -40,6 +39,10 @@ div#title-box {
   text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, .5);
   z-index: 1;
   line-height: 1.1;
+}
+
+span.carousel-desc {
+  line-height: 3rem;
 }
 
 //

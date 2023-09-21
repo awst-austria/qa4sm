@@ -6217,15 +6217,15 @@ div.carousel-caption{
   width: 8.5rem;
   height: 3rem;
   font-size: 1.25rem;
-  margin-right: 0.2rem;
-  background-color: $button-base-color;
-  border-color: $button-base-color;
+  margin-right: 1rem;
+  background-color: transparent;
+  border-color: white;
   margin-bottom: 0.1rem;
 }
 
 .btn-action.p-button:hover, .btn-action-large.p-button:hover, .btn-action-home.p-button:hover{
-  background-color: #213FE0;
-  border-color: #213FE0;
+  background-color: $menu-item-color;
+  border-color: $menu-item-color;
   color: white;
   text-decoration: none;
 }
