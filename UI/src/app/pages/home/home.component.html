@@ -2,6 +2,57 @@
 
 
   <div id="landing" class="section">
+    <div id="title-box">
+      <h1 class="page-title">
+        Quality Assurance <br> for Soil Moisture
+      </h1>
+
+      <div id="action-buttons">
+        <div *ngIf="userLoggedIn else elseBlock">
+          <p>
+            <a pButton
+               label="See results"
+               routerLink="/published-validations"
+               class="btn-action-home"
+               role="button">
+            </a>
+            <span class="mx-3 carousel-desc  d-sm-inline">or</span>
+            <a pButton
+               label="Try it"
+               routerLink="/validate"
+               class="btn-action-home"
+               role="button">
+            </a>
+          </p>
+        </div>
+        <ng-template #elseBlock>
+          <p>
+            <a pButton
+               label="See results"
+               routerLink="/published-validations"
+               class="btn-action-home"
+               role="button">
+            </a>
+            <span class="mx-3 carousel-desc d-sm-inline">or</span>
+            <a pButton
+               label="Sign up"
+               routerLink="/signup"
+               class="btn-action-home"
+               role="button">
+            </a>
+            <span class="mx-3 carousel-desc d-sm-inline">or</span>
+            <a pButton
+               label="Log in"
+               routerLink="/login"
+               class="btn-action-home"
+               role="button">
+            </a>
+          </p>
+        </ng-template>
+
+      </div>
+
+    </div>
 
   </div>
   <div id="info" class="section">

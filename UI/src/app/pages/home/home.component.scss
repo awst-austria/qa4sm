@@ -4,6 +4,7 @@
   font-family: $base-font;
   line-height: 1.5rem;
 }
+
 //main{
 //  max-width: 100%;
 //  min-width: 100%;
@@ -15,11 +16,30 @@ div#wrapper {
   //width: 100vw;
 }
 
-div#landing{
+div#landing {
   //width: 100vw;
   height: 100vh;
   background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1)), url("../../../../../validator/static/images/home/Root-zone_soil_moisture_May_2016.jpg") center center;
   background-size: cover;
+}
+
+div#title-box {
+  position: absolute;
+  bottom: 20%;
+  left: 5%;
+  color: white;
+  display: inline-block;
+  vertical-align: middle;
+  z-index: 10;
+  text-align: center;
+  background-color: green;
+}
+
+.page-title {
+  text-align: center;
+  text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, .5);
+  z-index: 1;
+  line-height: 1.1;
 }
 
 //
@@ -77,10 +97,7 @@ div#landing{
 //  text-align: center;
 //}
 //
-//.carousel-desc {
-//  text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, .5);
-//  z-index: 1;
-//}
+
 //
 //span.carousel-desc {
 //  line-height: 3rem;
