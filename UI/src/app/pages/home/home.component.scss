@@ -5,10 +5,6 @@
   line-height: 1.5rem;
 }
 
-//main{
-//  max-width: 100%;
-//  min-width: 100%;
-//}
 
 div#wrapper {
   display: block;
@@ -25,7 +21,7 @@ div#landing {
 
 div#title-box {
   position: absolute;
-  bottom: 40%;
+  bottom: 40%; // this one and the lower one set the title box position
   left: 10%;
   color: white;
   display: inline-block;
@@ -44,6 +40,28 @@ div#title-box {
 span.carousel-desc {
   line-height: 3rem;
 }
+
+div#scroll-down{
+  position: absolute;
+  left: 50%;
+  bottom: 5%;
+  width: 50px;
+  height: 50px;
+  animation: moveDown 4s ease-in-out infinite;
+}
+
+/* Define the animation */
+@keyframes moveDown {
+  0% {
+    transform: translateY(0); /* Initial position: no vertical translation */
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(50px); /* Final position: move down by 50 pixels */
+    opacity: 0;
+  }
+}
+
 
 //
 //.scaled_image {
