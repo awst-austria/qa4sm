@@ -71,6 +71,11 @@ export class HomeComponent implements OnInit {
 
   userLoggedIn: boolean;
 
+  applicationInfoClass = 'flex flex-wrap flex-column row-gap-0 application-info';
+  applicationInfoOddRowClass = 'flex flex-row flex-wrap column-gap-0 w-12';
+  applicationInfoEvenRowClass = 'flex flex-row-reverse flex-wrap column-gap-0 w-12';
+  applicationInfoTileClass = 'flex flex-column w-6 align-items-center justify-content-center application-tile';
+
   constructor(private authService: AuthService,
               private settingsService: SettingsService) {
   }

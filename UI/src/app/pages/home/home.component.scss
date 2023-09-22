@@ -9,7 +9,6 @@
 div#wrapper {
   display: block;
   height: 100%;
-  //width: 100vw;
 }
 
 div#landing {
@@ -23,10 +22,6 @@ div#landing {
 }
 
 div#title-box {
-  //position: absolute;
-  //bottom: 40%; // this one and the lower one set the title box position
-  //right: 38%;
-  //margin-top: 50%;
   color: white;
   display: inline-block;
   vertical-align: middle;
@@ -46,9 +41,6 @@ span.carousel-desc {
 }
 
 div#scroll-down{
-  //position: absolute;
-  //left: 50%;
-  //bottom: 5%;
   width: 50px;
   height: 50px;
   animation: moveDown 4s ease-in-out infinite;
@@ -57,18 +49,18 @@ div#scroll-down{
 /* Define the animation */
 @keyframes moveDown {
   0% {
-    transform: translateY(0); /* Initial position: no vertical translation */
+    transform: translateY(0);
     opacity: 1;
   }
   100% {
-    transform: translateY(50px); /* Final position: move down by 50 pixels */
+    transform: translateY(50px);
     opacity: 0;
   }
 }
 
 div#about-project {
-  color: #212529;
-  height: 100vh;
+  color: white;
+  //height: 100vh;
   background: linear-gradient(rgba(200, 200, 200, 0.1), rgba(200, 200, 200, 0.4));
   background-size: cover;
   display: flex;
@@ -76,25 +68,58 @@ div#about-project {
   align-items: center; /* Center horizontally */
 }
 .application-intro{
-  width: 70%;
-  height: 200px;
-  background-color: gray;
+  margin-top: 2.5%;
+  width: 60%;
+  background-color: #A1A1A1;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center horizontally */
-  border-radius: 10px;
+  border-radius: 5px;
+  padding: 4%;
+  //line-height: 1.5;
+}
+.application-intro h1{
+  font-size: 2.75rem;
+  text-align: center;
+  line-height: 1.1;
+  width: 85%;
+  margin-bottom: 2rem;
+  //padding: 2rem;
 }
 
-.application {
-  width: 100%;
-  align-items: center; /* Center horizontally */
-  display: flex;
-  justify-content: center;
+.application-intro span {
+  width: 70%;
+  line-height: 1.2;
+  font-size: 1.5rem;
+  text-align: center;
 }
 
-.application-col {
+.application-info {
+  width: 60%;
+  //align-items: center; /* Center horizontally */
+  //display: flex;
+  //justify-content: center;
+}
+
+.application-tile {
   border: 1px solid lightgray;
-  margin: 1rem;
+  padding: 1rem;
+  height: 300px;
+}
+
+.application-info .application-tile:nth-child(even){
+  background-color: lightgray;
+}
+
+.application-info .application-tile:nth-child(odd){
+  background-color: #74A5B9;
+}
+
+.application-tile div{
+  font-size: 1.25rem;
+  line-height: 1.2;
+  padding: 2rem;
+  text-align: center;
 }
 
 

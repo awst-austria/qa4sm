@@ -4,8 +4,8 @@
   <div id="landing" class="section">
     <div id="title-box">
       <h1 class="page-title">
-<!--        QA4SM - QUALITY ASSURANCE <br> FOR SOIL MOISTURE-->
-        QA4SM - Quality Assurance <br> for Soil Moisture
+        <!--        QA4SM - QUALITY ASSURANCE <br> FOR SOIL MOISTURE-->
+        QA4SM - Quality Assurance Service <br> for Soil Moisture
       </h1>
       <div id="action-buttons">
         <div *ngIf="userLoggedIn else elseBlock">
@@ -64,271 +64,319 @@
   </div>
   <div id="about-project" class="section">
     <div class="application-intro">
-      <h1 class="my-5"><span class="text-muted">QA4SM</span> - Application</h1>
-      <div>
-              Validation of satellite soil moisture products against in-situ and model reference data
-      </div>
-    </div>
-
-    <div class="grid application">
-      <div class="col-4 application-col">
-        <h4>Our goal</h4>
-        <span>
-          The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality
-        control of soil moisture data products and provider users with <b>traceable validation results</b>.
+      <h1> Service for validation of satellite soil moisture products against in-situ and model reference data </h1>
+      <span>
+          that <span class="text-muted">brings together methodologies and protocols </span> used for the validation
+          and quality control of soil moisture data products and provides users with.
+          <span class="text-muted">traceable validation results</span>.
         </span>
+    </div>
 
+    <!--    Application information -->
+    <div [class]="applicationInfoClass">
+      <!--      ROW =========================================================  -->
+      <div [class]="applicationInfoOddRowClass">
+        <div [class]="applicationInfoTileClass">
+          <h1>Simple</h1>
+          <div>
+            An easy-to-use interface for comparing satellite soil moisture data against land surface models and the
+            <a href="https://ismn.earth/" target="_blank">International Soil Moisture Network</a>
+          </div>
+        </div>
+        <div [class]="applicationInfoTileClass">2</div>
+        <!--      ROW ========================================================= -->
       </div>
-      <div class="col-4 application-col">
-        <h4>Features</h4>
+      <div [class]="applicationInfoEvenRowClass">
+        <div [class]="applicationInfoTileClass">
+          <h1>Free</h1>
+          <div>
+            Just set up and account to have full access to all functionalities
+          </div>
+        </div>
+        <div [class]="applicationInfoTileClass">
+        </div>
       </div>
-      <div class="col-4 application-col">
-        <h4>News</h4>
 
+      <!--      ROW =========================================================  -->
+      <div [class]="applicationInfoOddRowClass">
+        <div [class]="applicationInfoTileClass">
+          <h1>Traceable</h1>
+          <div>
+            You can download your results in netCDF format and as visualisations, share them with others or publish
+            using <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> service
+          </div>
+        </div>
+        <div [class]="applicationInfoTileClass">2</div>
       </div>
-      <div class="col-4 application-col">
-        <h4>Your feedback</h4>
+      <!--      ROW =========================================================  -->
+      <div [class]="applicationInfoEvenRowClass">
+        <div [class]="applicationInfoTileClass">
+          <h1>Customizable</h1>
+          <div>
+            You can upload your own data and use various filtering and scaling options to assess the impact of these on
+            the validation results
+          </div>
+        </div>
+        <div [class]="applicationInfoTileClass">
+        </div>
       </div>
-      <!--      <div class="col-7">-->
-      <!--        <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>-->
-      <!--        The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:-->
-      <!--        <ul class="list">-->
-      <!--          <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the-->
-      <!--            <a-->
-      <!--              href="https://ismn.earth/" target="_blank">international soil moisture network</a></li>-->
-      <!--          <li>A traceble and consistent methodology for all comparisons</li>-->
-      <!--          <li>Various filtering and scaling options to assess the impact of these on the validation results</li>-->
-      <!--          <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>-->
-      <!--        </ul>-->
-      <!--        The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality-->
-      <!--        control of soil moisture data products and provider users with <b>traceable validation results</b>.-->
-      <!--        <p>QA4SM was created thanks to support of the <a href="https://www.ffg.at/en" target="_blank">Austrian Space-->
-      <!--          Application Programme</a>.-->
-      <!--          From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European-->
-      <!--            Space Agency</a>.</p>-->
 
+    </div>
+    <div id="videos" class="section">
 
-      <!--        <div *ngIf="settings$|async as settings">-->
-      <!--          <div *ngIf="settings[0].feed_link" class="news card-body">-->
-      <!--            <h4 class="featurette-heading"> Share with us your <span class="text-muted">opinion</span></h4>-->
-
-      <!--            If you think we could improve something or you see a missing functionality, please let us know using-->
-      <!--            this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.-->
-
-      <!--          </div>-->
-      <!--        </div>-->
-      <!--        If you have any questions or you would like to share your opinion with us, please email us at <b>support&nbsp;(at)&nbsp;qa4sm.eu</b>-->
-      <!--        or use our <a [routerLink]="['/contact-us']">contact form</a>.-->
-
-      <!--      </div>-->
     </div>
   </div>
-  <div id="videos" class="section">
-
-  </div>
-</div>
-<!--  <div class="carousel">-->
-<!--    <div>-->
-<!--      <p-carousel [value]="carouselFiles"-->
-<!--                  [circular]="true"-->
-<!--                  [autoplayInterval]="5000"-->
-<!--                  [numVisible]="1"-->
-<!--                  [numScroll]="1"-->
-<!--                  [styleClass]="'home-carousel'">-->
-<!--        <ng-template let-image pTemplate="item">-->
-<!--          <img alt="{{image.attrLink}}"-->
-<!--               [src]="image.plot"-->
-<!--               class="carousel-img">-->
-<!--          <div class="image-attribution">-->
-<!--            <a href="{{ image.attrLink }}" target="_blank">{{ image.description }}</a>-->
-<!--          </div>-->
-<!--        </ng-template>-->
-<!--      </p-carousel>-->
-<!--    </div>-->
-<!--    <div>-->
-<!--      <div class="carousel-caption">-->
-<!--        <div class="textbox mb-3">-->
-<!--          <h1 class="carousel-desc">Quality Assurance for Soil Moisture</h1>-->
-<!--          <h3 class="carousel-desc d-sm-block">-->
-<!--            Validation of satellite soil moisture products <br>-->
-<!--            against in-situ and model reference data-->
-<!--          </h3>-->
-<!--        </div>-->
-<!--        <div *ngIf="userLoggedIn else elseBlock">-->
-<!--          <p>-->
-<!--            <a pButton-->
-<!--               label="See results"-->
-<!--               routerLink="/published-validations"-->
-<!--               class="btn-action-home"-->
-<!--               role="button">-->
-<!--            </a>-->
-<!--            <span class="mx-3 carousel-desc  d-sm-inline">or</span>-->
-<!--            <a pButton-->
-<!--               label="Try it"-->
-<!--               routerLink="/validate"-->
-<!--               class="btn-action-home"-->
-<!--               role="button">-->
-<!--            </a>-->
-<!--          </p>-->
-<!--        </div>-->
-<!--        <ng-template #elseBlock>-->
-<!--          <p>-->
-<!--            <a pButton-->
-<!--               label="See results"-->
-<!--               routerLink="/published-validations"-->
-<!--               class="btn-action-home"-->
-<!--               role="button">-->
-<!--            </a>-->
-<!--            <span class="mx-3 carousel-desc d-sm-inline">or</span>-->
-<!--            <a pButton-->
-<!--               label="Sign up"-->
-<!--               routerLink="/signup"-->
-<!--               class="btn-action-home"-->
-<!--               role="button">-->
-<!--            </a>-->
-<!--            <span class="mx-3 carousel-desc d-sm-inline">or</span>-->
-<!--            <a pButton-->
-<!--               label="Log in"-->
-<!--               routerLink="/login"-->
-<!--               class="btn-action-home"-->
-<!--               role="button">-->
-<!--            </a>-->
-<!--          </p>-->
-<!--        </ng-template>-->
-<!--      </div>-->
-<!--    </div>-->
-
-<!--  </div>-->
-
-<!--  <hr class="featurette-divider">-->
 
 
-<!--  <div class="container-marketing grid">-->
-<!--    <div class="md:col-12">-->
-<!--      <div class="overflow">-->
-<!--        <div *ngFor="let logo of logoFiles">-->
-<!--          <a href="{{logo.link}}" target="_blank">-->
-<!--            <img alt="{{logo.link}}" [src]="logo.plot">-->
-<!--          </a>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <hr class="featurette-divider">-->
-<!--  <div class="container-marketing grid">-->
-<!--    <div class="md:col-7">-->
-<!--      <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>-->
-<!--      The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:-->
-<!--      <ul class="list">-->
-<!--        <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the <a-->
-<!--          href="https://ismn.earth/" target="_blank">international soil moisture network</a></li>-->
-<!--        <li>A traceble and consistent methodology for all comparisons</li>-->
-<!--        <li>Various filtering and scaling options to assess the impact of these on the validation results</li>-->
-<!--        <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>-->
-<!--      </ul>-->
-<!--      The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality-->
-<!--      control of soil moisture data products and provider users with <b>traceable validation results</b>.-->
-<!--      <p>QA4SM was created thanks to support of the <a href="https://www.ffg.at/en" target="_blank">Austrian Space-->
-<!--        Application Programme</a>.-->
-<!--        From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European-->
-<!--          Space Agency</a>.</p>-->
+
+  <!--        <h4>We offer... </h4>-->
+  <!--        <ul class="list">-->
+  <!--          <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the-->
+  <!--            <a-->
+  <!--              href="https://ismn.earth/" target="_blank">international soil moisture network</a></li>-->
+  <!--          <li>A traceble and consistent methodology for all comparisons</li>-->
+  <!--          <li>Various filtering and scaling options to assess the impact of these on the validation results</li>-->
+  <!--          <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>-->
+  <!--        </ul>-->
+  <!--      <div class="col-4 application-col">-->
+  <!--        <h4>Your feedback</h4>-->
+  <!--      </div>-->
+  <!--      <div class="col-7">-->
+  <!--        <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>-->
+  <!--        The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:-->
+  <!--        <ul class="list">-->
+  <!--          <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the-->
+  <!--            <a-->
+  <!--              href="https://ismn.earth/" target="_blank">international soil moisture network</a></li>-->
+  <!--          <li>A traceble and consistent methodology for all comparisons</li>-->
+  <!--          <li>Various filtering and scaling options to assess the impact of these on the validation results</li>-->
+  <!--          <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>-->
+  <!--        </ul>-->
+  <!--        The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality-->
+  <!--        control of soil moisture data products and provider users with <b>traceable validation results</b>.-->
+  <!--        <p>QA4SM was created thanks to support of the <a href="https://www.ffg.at/en" target="_blank">Austrian Space-->
+  <!--          Application Programme</a>.-->
+  <!--          From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European-->
+  <!--            Space Agency</a>.</p>-->
 
 
-<!--      <div *ngIf="settings$|async as settings">-->
-<!--        <div *ngIf="settings[0].feed_link" class="news card-body">-->
-<!--          <h4 class="featurette-heading"> Share with us your <span class="text-muted">opinion</span></h4>-->
+  <!--        <div *ngIf="settings$|async as settings">-->
+  <!--          <div *ngIf="settings[0].feed_link" class="news card-body">-->
+  <!--            <h4 class="featurette-heading"> Share with us your <span class="text-muted">opinion</span></h4>-->
 
-<!--          If you think we could improve something or you see a missing functionality, please let us know using-->
-<!--          this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.-->
+  <!--            If you think we could improve something or you see a missing functionality, please let us know using-->
+  <!--            this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.-->
 
-<!--        </div>-->
-<!--      </div>-->
-<!--      If you have any questions or you would like to share your opinion with us, please email us at <b>support&nbsp;(at)&nbsp;qa4sm.eu</b>-->
-<!--      or use our <a [routerLink]="['/contact-us']">contact form</a>.-->
+  <!--          </div>-->
+  <!--        </div>-->
+  <!--        If you have any questions or you would like to share your opinion with us, please email us at <b>support&nbsp;(at)&nbsp;qa4sm.eu</b>-->
+  <!--        or use our <a [routerLink]="['/contact-us']">contact form</a>.-->
 
-<!--    </div>-->
-<!--    <div class="md:col-5">-->
-<!--      <div *ngIf="settings$|async as settings">-->
-<!--        <div class="card news card-body">-->
-<!--          <h5 class="card-title">News</h5>-->
-<!--          <div [innerHTML]=settings[0].news></div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div>-->
-<!--        &lt;!&ndash;        <img class="scaled_image"&ndash;&gt;-->
-<!--        &lt;!&ndash;             [src]="workflowDiagram[0].plot"&ndash;&gt;-->
-<!--        &lt;!&ndash;             (click)="showGallery(0, workflowDiagram)"&ndash;&gt;-->
-<!--        &lt;!&ndash;             [alt]="workflowDiagram[0].description"&ndash;&gt;-->
-<!--        &lt;!&ndash;             id="workflow"&ndash;&gt;-->
-<!--        &lt;!&ndash;             style="max-width: 80%">&ndash;&gt;-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-
-<!--  <hr class="featurette-divider">-->
-
-<!--  <div class="container-marketing grid  justify-content-center">-->
-<!--    <div class="card-deck">-->
-<!--      <div class="card card-body">-->
-<!--        <h4 class="text-center mt-0">Datasets and Settings</h4>-->
-<!--        <p class="text-muted text-center" style="min-height: 3rem;">-->
-<!--          Allows specification of input datasets and settings for your validation-->
-<!--        </p>-->
-
-<!--        <div>-->
-<!--          <p-image-->
-<!--            width="100%"-->
-<!--            preview="true"-->
-<!--            [src]="cardValidate[0].plot"-->
-<!--            [alt]="cardValidate[0].description">-->
-<!--          </p-image>-->
-<!--        </div>-->
-<!--      </div>-->
-
-<!--      <div class="card card-body">-->
-<!--        <h4 class="text-center mt-0">Results</h4>-->
-<!--        <p class="text-muted text-center" style="min-height: 3rem;">-->
-<!--          Provides a list of all validation results-->
-<!--        </p>-->
-<!--        <div>-->
-<!--          <p-image-->
-<!--            width="100%"-->
-<!--            [src]="cardValidateResult[0].plot"-->
-<!--            [alt]="cardValidateResult[0].description"-->
-<!--            preview="true">-->
-<!--            <ng-template pTemplate="indicator">-->
-<!--            </ng-template>-->
-<!--          </p-image>-->
-<!--        </div>-->
-<!--      </div>-->
-
-<!--      <div class="card card-body">-->
-<!--        <h4 class="text-center mt-0">Download and Visualize</h4>-->
-<!--        <p class="text-muted text-center" style="min-height: 3rem;">-->
-<!--          Allows download of validation results in netCDF format and as graphics-->
-<!--        </p>-->
-<!--        <div>-->
-<!--          <p-image-->
-<!--            width="100%"-->
-<!--            preview="true"-->
-<!--            [src]="cardValidateDetails[0].plot"-->
-<!--            [alt]="cardValidateDetails[0].description">-->
-<!--          </p-image>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <hr class="featurette-divider">-->
-
-<!--  <footer class="container-marketing">-->
-<!--    <div>-->
-<!--      Created by <a href="https://www.geo.tuwien.ac.at/" target="_blank">TU Wien GEO</a>-->
-<!--      and <a href="https://www.awst.at/" target="_blank">AWST</a>.-->
-<!--    </div>-->
-<!--  </footer>-->
+  <!--      </div>-->
 
 
-<p-scrollTop styleClass="scroll-button"></p-scrollTop>
+  <!--  <div class="carousel">-->
+  <!--    <div>-->
+  <!--      <p-carousel [value]="carouselFiles"-->
+  <!--                  [circular]="true"-->
+  <!--                  [autoplayInterval]="5000"-->
+  <!--                  [numVisible]="1"-->
+  <!--                  [numScroll]="1"-->
+  <!--                  [styleClass]="'home-carousel'">-->
+  <!--        <ng-template let-image pTemplate="item">-->
+  <!--          <img alt="{{image.attrLink}}"-->
+  <!--               [src]="image.plot"-->
+  <!--               class="carousel-img">-->
+  <!--          <div class="image-attribution">-->
+  <!--            <a href="{{ image.attrLink }}" target="_blank">{{ image.description }}</a>-->
+  <!--          </div>-->
+  <!--        </ng-template>-->
+  <!--      </p-carousel>-->
+  <!--    </div>-->
+  <!--    <div>-->
+  <!--      <div class="carousel-caption">-->
+  <!--        <div class="textbox mb-3">-->
+  <!--          <h1 class="carousel-desc">Quality Assurance for Soil Moisture</h1>-->
+  <!--          <h3 class="carousel-desc d-sm-block">-->
+  <!--            Validation of satellite soil moisture products <br>-->
+  <!--            against in-situ and model reference data-->
+  <!--          </h3>-->
+  <!--        </div>-->
+  <!--        <div *ngIf="userLoggedIn else elseBlock">-->
+  <!--          <p>-->
+  <!--            <a pButton-->
+  <!--               label="See results"-->
+  <!--               routerLink="/published-validations"-->
+  <!--               class="btn-action-home"-->
+  <!--               role="button">-->
+  <!--            </a>-->
+  <!--            <span class="mx-3 carousel-desc  d-sm-inline">or</span>-->
+  <!--            <a pButton-->
+  <!--               label="Try it"-->
+  <!--               routerLink="/validate"-->
+  <!--               class="btn-action-home"-->
+  <!--               role="button">-->
+  <!--            </a>-->
+  <!--          </p>-->
+  <!--        </div>-->
+  <!--        <ng-template #elseBlock>-->
+  <!--          <p>-->
+  <!--            <a pButton-->
+  <!--               label="See results"-->
+  <!--               routerLink="/published-validations"-->
+  <!--               class="btn-action-home"-->
+  <!--               role="button">-->
+  <!--            </a>-->
+  <!--            <span class="mx-3 carousel-desc d-sm-inline">or</span>-->
+  <!--            <a pButton-->
+  <!--               label="Sign up"-->
+  <!--               routerLink="/signup"-->
+  <!--               class="btn-action-home"-->
+  <!--               role="button">-->
+  <!--            </a>-->
+  <!--            <span class="mx-3 carousel-desc d-sm-inline">or</span>-->
+  <!--            <a pButton-->
+  <!--               label="Log in"-->
+  <!--               routerLink="/login"-->
+  <!--               class="btn-action-home"-->
+  <!--               role="button">-->
+  <!--            </a>-->
+  <!--          </p>-->
+  <!--        </ng-template>-->
+  <!--      </div>-->
+  <!--    </div>-->
+
+  <!--  </div>-->
+
+  <!--  <hr class="featurette-divider">-->
+
+
+  <!--  <div class="container-marketing grid">-->
+  <!--    <div class="md:col-12">-->
+  <!--      <div class="overflow">-->
+  <!--        <div *ngFor="let logo of logoFiles">-->
+  <!--          <a href="{{logo.link}}" target="_blank">-->
+  <!--            <img alt="{{logo.link}}" [src]="logo.plot">-->
+  <!--          </a>-->
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
+  <!--  <hr class="featurette-divider">-->
+  <!--  <div class="container-marketing grid">-->
+  <!--    <div class="md:col-7">-->
+  <!--      <h3 class="featurette-heading">Overview <span class="text-muted">QA4SM</span></h3>-->
+  <!--      The Quality Assurance for Soil Moisture (<b>QA4SM</b>) service provides the user with:-->
+  <!--      <ul class="list">-->
+  <!--        <li>An easy-to-use interface for comparing satellite soil moisture data against land surface models and the <a-->
+  <!--          href="https://ismn.earth/" target="_blank">international soil moisture network</a></li>-->
+  <!--        <li>A traceble and consistent methodology for all comparisons</li>-->
+  <!--        <li>Various filtering and scaling options to assess the impact of these on the validation results</li>-->
+  <!--        <li>Traceable validation results in netCDF format and as visualisations (graphs and maps)</li>-->
+  <!--      </ul>-->
+  <!--      The overall aim is to <b>bring together methodologies and protocols</b> used for the validation and quality-->
+  <!--      control of soil moisture data products and provider users with <b>traceable validation results</b>.-->
+  <!--      <p>QA4SM was created thanks to support of the <a href="https://www.ffg.at/en" target="_blank">Austrian Space-->
+  <!--        Application Programme</a>.-->
+  <!--        From 2021 on the application is also supported by the <a href="https://www.esa.int/" target="_blank">European-->
+  <!--          Space Agency</a>.</p>-->
+
+
+  <!--      <div *ngIf="settings$|async as settings">-->
+  <!--        <div *ngIf="settings[0].feed_link" class="news card-body">-->
+  <!--          <h4 class="featurette-heading"> Share with us your <span class="text-muted">opinion</span></h4>-->
+
+  <!--          If you think we could improve something or you see a missing functionality, please let us know using-->
+  <!--          this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.-->
+
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--      If you have any questions or you would like to share your opinion with us, please email us at <b>support&nbsp;(at)&nbsp;qa4sm.eu</b>-->
+  <!--      or use our <a [routerLink]="['/contact-us']">contact form</a>.-->
+
+  <!--    </div>-->
+  <!--    <div class="md:col-5">-->
+  <!--      <div *ngIf="settings$|async as settings">-->
+  <!--        <div class="card news card-body">-->
+  <!--          <h5 class="card-title">News</h5>-->
+  <!--          <div [innerHTML]=settings[0].news></div>-->
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--      <div>-->
+  <!--        &lt;!&ndash;        <img class="scaled_image"&ndash;&gt;-->
+  <!--        &lt;!&ndash;             [src]="workflowDiagram[0].plot"&ndash;&gt;-->
+  <!--        &lt;!&ndash;             (click)="showGallery(0, workflowDiagram)"&ndash;&gt;-->
+  <!--        &lt;!&ndash;             [alt]="workflowDiagram[0].description"&ndash;&gt;-->
+  <!--        &lt;!&ndash;             id="workflow"&ndash;&gt;-->
+  <!--        &lt;!&ndash;             style="max-width: 80%">&ndash;&gt;-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
+
+  <!--  <hr class="featurette-divider">-->
+
+  <!--  <div class="container-marketing grid  justify-content-center">-->
+  <!--    <div class="card-deck">-->
+  <!--      <div class="card card-body">-->
+  <!--        <h4 class="text-center mt-0">Datasets and Settings</h4>-->
+  <!--        <p class="text-muted text-center" style="min-height: 3rem;">-->
+  <!--          Allows specification of input datasets and settings for your validation-->
+  <!--        </p>-->
+
+  <!--        <div>-->
+  <!--          <p-image-->
+  <!--            width="100%"-->
+  <!--            preview="true"-->
+  <!--            [src]="cardValidate[0].plot"-->
+  <!--            [alt]="cardValidate[0].description">-->
+  <!--          </p-image>-->
+  <!--        </div>-->
+  <!--      </div>-->
+
+  <!--      <div class="card card-body">-->
+  <!--        <h4 class="text-center mt-0">Results</h4>-->
+  <!--        <p class="text-muted text-center" style="min-height: 3rem;">-->
+  <!--          Provides a list of all validation results-->
+  <!--        </p>-->
+  <!--        <div>-->
+  <!--          <p-image-->
+  <!--            width="100%"-->
+  <!--            [src]="cardValidateResult[0].plot"-->
+  <!--            [alt]="cardValidateResult[0].description"-->
+  <!--            preview="true">-->
+  <!--            <ng-template pTemplate="indicator">-->
+  <!--            </ng-template>-->
+  <!--          </p-image>-->
+  <!--        </div>-->
+  <!--      </div>-->
+
+  <!--      <div class="card card-body">-->
+  <!--        <h4 class="text-center mt-0">Download and Visualize</h4>-->
+  <!--        <p class="text-muted text-center" style="min-height: 3rem;">-->
+  <!--          Allows download of validation results in netCDF format and as graphics-->
+  <!--        </p>-->
+  <!--        <div>-->
+  <!--          <p-image-->
+  <!--            width="100%"-->
+  <!--            preview="true"-->
+  <!--            [src]="cardValidateDetails[0].plot"-->
+  <!--            [alt]="cardValidateDetails[0].description">-->
+  <!--          </p-image>-->
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
+  <!--  <hr class="featurette-divider">-->
+
+  <!--  <footer class="container-marketing">-->
+  <!--    <div>-->
+  <!--      Created by <a href="https://www.geo.tuwien.ac.at/" target="_blank">TU Wien GEO</a>-->
+  <!--      and <a href="https://www.awst.at/" target="_blank">AWST</a>.-->
+  <!--    </div>-->
+  <!--  </footer>-->
+
+
+  <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 
 
 
