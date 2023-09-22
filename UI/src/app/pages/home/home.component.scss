@@ -13,16 +13,20 @@ div#wrapper {
 }
 
 div#landing {
-  //width: 100vw;
   height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1)), url("../../../../../validator/static/images/home/soil.jpg") center center;
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.2)), url("../../../../../validator/static/images/home/Root-zone_soil_moisture_May_2016.jpg") center center;
   background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: center;
 }
 
 div#title-box {
-  position: absolute;
-  bottom: 40%; // this one and the lower one set the title box position
-  left: 10%;
+  //position: absolute;
+  //bottom: 40%; // this one and the lower one set the title box position
+  //right: 38%;
+  //margin-top: 50%;
   color: white;
   display: inline-block;
   vertical-align: middle;
@@ -42,9 +46,9 @@ span.carousel-desc {
 }
 
 div#scroll-down{
-  position: absolute;
-  left: 50%;
-  bottom: 5%;
+  //position: absolute;
+  //left: 50%;
+  //bottom: 5%;
   width: 50px;
   height: 50px;
   animation: moveDown 4s ease-in-out infinite;
@@ -60,6 +64,37 @@ div#scroll-down{
     transform: translateY(50px); /* Final position: move down by 50 pixels */
     opacity: 0;
   }
+}
+
+div#about-project {
+  color: #212529;
+  height: 100vh;
+  background: linear-gradient(rgba(200, 200, 200, 0.1), rgba(200, 200, 200, 0.4));
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+}
+.application-intro{
+  width: 70%;
+  height: 200px;
+  background-color: gray;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  border-radius: 10px;
+}
+
+.application {
+  width: 100%;
+  align-items: center; /* Center horizontally */
+  display: flex;
+  justify-content: center;
+}
+
+.application-col {
+  border: 1px solid lightgray;
+  margin: 1rem;
 }
 
 
