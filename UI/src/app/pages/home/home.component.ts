@@ -6,6 +6,7 @@ import {Observable} from 'rxjs';
 
 const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
+const videosPrefix = 'static/videos/'
 
 
 @Component({
@@ -15,19 +16,19 @@ const logoUrlPrefix = '/static/images/logo/';
 })
 export class HomeComponent implements OnInit {
 
-  public carouselFiles = [{
-    plot: homeUrlPrefix + 'map_us_spearman.jpg',
-    attrLink: '#',
-    description: 'Image: QA4SM'
-  }, {
-    plot: homeUrlPrefix + 'smos_full.jpg',
-    attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
-    description: 'Image: ESA'
-  }, {
-    plot: homeUrlPrefix + 'Root-zone_soil_moisture_May_2016.jpg',
-    attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
-    description: 'Image: ESA'
-  }];
+  // public carouselFiles = [{
+  //   plot: homeUrlPrefix + 'map_us_spearman.jpg',
+  //   attrLink: '#',
+  //   description: 'Image: QA4SM'
+  // }, {
+  //   plot: homeUrlPrefix + 'smos_full.jpg',
+  //   attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
+  //   description: 'Image: ESA'
+  // }, {
+  //   plot: homeUrlPrefix + 'Root-zone_soil_moisture_May_2016.jpg',
+  //   attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
+  //   description: 'Image: ESA'
+  // }];
 
   logoFiles = [{
     plot: logoUrlPrefix + 'logo_awst.png',
@@ -54,26 +55,47 @@ export class HomeComponent implements OnInit {
 
   cardValidate = [{
     plot: homeUrlPrefix + 'validate.png',
-    link: '', description: 'Validate'
+    link: '',
+    description: 'Validate'
   }];
 
-  cardValidateResult = [{
-    plot: homeUrlPrefix + 'validation_result_list.png',
-    link: '', description: 'Results'
+  videoValidate ={
+    video: videosPrefix + 'QA4SM_Video_Series_I_Validation_4k.mp4'
+  }
+
+  videoResults ={
+    video: videosPrefix + 'QA4SM_Video_Series_II_Results_4K.mp4'
+  }
+
+  cardPublish = [{
+    plot: '/static/images/help/publishing_dialog.png',
+    link: "",
+    description: "Publishing results"
+  }]
+
+  cardSignUp = [{
+    plot: homeUrlPrefix + 'sign-up.png',
+    link: '',
+    description: 'Sign up'
   }];
 
-  cardValidateDetails = [{
-    plot: homeUrlPrefix + 'validation_result_details.png',
-    link: '', description: 'Download and Visualise'
-  }];
+  // cardValidateResult = [{
+  //   plot: homeUrlPrefix + 'validation_result_list.png',
+  //   link: '', description: 'Results'
+  // }];
+  //
+  // cardValidateDetails = [{
+  //   plot: homeUrlPrefix + 'validation_result_details.png',
+  //   link: '', description: 'Download and Visualise'
+  // }];
 
   settings$: Observable<any>;
 
   userLoggedIn: boolean;
 
   applicationInfoClass = 'flex flex-wrap flex-column row-gap-0 application-info';
-  applicationInfoOddRowClass = 'flex flex-row flex-wrap column-gap-0 w-12';
-  applicationInfoEvenRowClass = 'flex flex-row-reverse flex-wrap column-gap-0 w-12';
+  applicationInfoOddRowClass = 'flex flex-row flex-wrap column-gap-0 w-12 application-row';
+  applicationInfoEvenRowClass = 'flex flex-row-reverse flex-wrap column-gap-0 w-12 application-row';
   applicationInfoTileClass = 'flex flex-column w-6 align-items-center justify-content-center application-tile';
 
   constructor(private authService: AuthService,

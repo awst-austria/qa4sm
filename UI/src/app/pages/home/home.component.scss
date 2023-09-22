@@ -69,13 +69,15 @@ div#about-project {
 }
 .application-intro{
   margin-top: 2.5%;
+  margin-bottom: 2.5%;
   width: 60%;
-  background-color: #A1A1A1;
+  background-color: transparent;
+  color: gray;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center horizontally */
   border-radius: 5px;
-  padding: 4%;
+  padding: 1% 0 1%;
   //line-height: 1.5;
 }
 .application-intro h1{
@@ -96,6 +98,7 @@ div#about-project {
 
 .application-info {
   width: 60%;
+  margin-bottom: 2rem;
   //align-items: center; /* Center horizontally */
   //display: flex;
   //justify-content: center;
@@ -110,7 +113,6 @@ div#about-project {
 .application-info .application-tile:nth-child(even){
   background-color: lightgray;
 }
-
 .application-info .application-tile:nth-child(odd){
   background-color: #74A5B9;
 }
@@ -121,6 +123,39 @@ div#about-project {
   padding: 2rem;
   text-align: center;
 }
+.application-tile div.image-card{
+  padding: 2rem;
+  width: 75%;
+}
+
+
+.application-info .application-row:first-child .application-tile:first-child{
+  border-top-left-radius: 5px;
+}
+
+.application-info .application-row:first-child .application-tile:last-child{
+  border-top-right-radius: 5px;
+}
+
+.application-info .application-row:last-child .application-tile:last-child{
+  border-bottom-left-radius: 5px;
+}
+
+.application-info .application-row:last-child .application-tile:first-child{
+  border-bottom-right-radius: 5px;
+}
+
+//.application-info .application-tile:nth-child(2){
+//  border-top-right-radius: 5px;
+//}
+//
+//.application-info .application-tile:last-child{
+//  border-bottom-left-radius: 5px;
+//}
+//
+//.application-info .application-tile:nth-child(7){
+//  border-bottom-right-radius: 5px;
+//}
 
 
 //
