@@ -2,7 +2,7 @@
 
 * {
   font-family: $base-font;
-  line-height: 1.5rem;
+  line-height: 1.5vw;
 }
 
 
@@ -59,21 +59,39 @@ div#scroll-down{
 }
 div#about-app {
   color: white;
-  background: linear-gradient(rgba(200, 200, 200, 0.1), rgba(200, 200, 200, 0.4));
-  background-size: cover;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center horizontally */
+  background-size: cover;
+  background:  linear-gradient(45deg, rgba(116, 165, 185, 0.7) 20%, #A2A2A2 70%) repeat, no-repeat center center;
+  transition: filter .5s ease,opacity 1s ease;
+
+  //animation: shimmer 15s ease-in-out infinite; /* Add the glow animation */
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0 0; /* Początkowa pozycja gradientu */
+  }
+  100% {
+    background-position: 200% 0; /* Końcowa pozycja gradientu (przesunięcie w lewo) */
+  }
 }
 
 .app-news{
   width: 40%;
-  border: 1px solid lightgray;
+  //border: 1px solid lightgray;
   border-radius: 5px;
-  color: gray;
-  padding: 2rem;
-  margin-bottom: 5rem;
-  margin-top: 5rem;
+  color: white;
+  padding: 2vw;
+  margin-bottom: 5vw;
+  margin-top: 5vw;
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 70%;
+}
+
+.app-news div {
+  font-size: 2vw;
 }
 
 //.application-desc:before{
@@ -89,8 +107,11 @@ div#about-app {
 
 .application-desc{
   width: 60%;
-  border: 1px solid lightgray;
+  //border: 1px solid lightgray;
   border-radius: 5px;
+  //background-color: rebeccapurple;
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 70%;
 }
 
 .application-intro{
@@ -98,7 +119,7 @@ div#about-app {
   margin-bottom: 2.5%;
   width: 100%;
   background-color: transparent;
-  color: gray;
+  color: white;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center horizontally */
@@ -111,7 +132,7 @@ div#about-app {
   text-align: center;
   line-height: 1.1;
   width: 85%;
-  margin-bottom: 2rem;
+  margin-bottom: 2vw;
   //padding: 2rem;
 }
 
@@ -123,17 +144,14 @@ div#about-app {
 }
 
 .application-info {
-  margin-bottom: 2rem;
+  margin-bottom: 2vw;
   width: 100%;
-  //align-items: center; /* Center horizontally */
-  //display: flex;
-  //justify-content: center;
 }
 
 .application-tile {
-  border: 1px solid lightgray;
-  padding: 1rem;
-  height: 300px;
+  padding: 1vw;
+  aspect-ratio: 1 / 1;
+  opacity: 1;
 }
 
 .application-info .application-tile:nth-child(even){
@@ -146,22 +164,22 @@ div#about-app {
 .application-tile h1{
   font-size: 2.75vw;
   line-height: 1.2;
-  padding: 2rem;
+  padding: 2vw;
   text-align: center;
 }
 
 .application-tile div{
-  font-size: 1.25vw;
+  font-size: 1.5vw;
   line-height: 1.2;
-  padding: 2rem;
+  padding: 2vw;
   text-align: center;
 }
 .application-tile div.image-card{
-  padding: 2rem;
+  padding: 2vw;
   width: 75%;
 }
 
-
+//
 .application-info .application-row:first-child .application-tile:first-child{
   border-top-left-radius: 5px;
 }

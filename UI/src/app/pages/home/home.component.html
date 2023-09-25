@@ -63,11 +63,11 @@
 
   </div>
   <div id="about-app" class="section">
-    <div *ngIf="settings$|async as settings" class="app-news flex flex-column flex wrap justify-content-center">
+    <div *ngIf="settings$|async as settings" class="app-news flex flex-column flex-wrap justify-content-center">
       <h3>What's new</h3>
       <div [innerHTML]=settings[0].news class="text-2xl line-height-2"></div>
     </div>
-    <div class="application-desc">
+    <div class="application-desc flex flex-column flex-wrap h-auto">
       <!--      Application introduction-->
       <div class="application-intro">
         <h1> Service for validation of satellite soil moisture products against in-situ and model reference data </h1>
