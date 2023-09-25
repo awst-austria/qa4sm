@@ -107,7 +107,7 @@ div#about-app {
   //line-height: 1.5;
 }
 .application-intro h1{
-  font-size: 2.75rem;
+  font-size: 2.75vw;
   text-align: center;
   line-height: 1.1;
   width: 85%;
@@ -118,7 +118,7 @@ div#about-app {
 .application-intro span {
   width: 70%;
   line-height: 1.2;
-  font-size: 1.5rem;
+  font-size: 1.5vw;
   text-align: center;
 }
 
@@ -143,8 +143,15 @@ div#about-app {
   background-color: #74A5B9;
 }
 
+.application-tile h1{
+  font-size: 2.75vw;
+  line-height: 1.2;
+  padding: 2rem;
+  text-align: center;
+}
+
 .application-tile div{
-  font-size: 1.25rem;
+  font-size: 1.25vw;
   line-height: 1.2;
   padding: 2rem;
   text-align: center;

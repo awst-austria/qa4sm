@@ -105,6 +105,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log("Screen Width: " + window.screen.width);
     this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
     this.settings$ = this.settingsService.getAllSettings();
   }
