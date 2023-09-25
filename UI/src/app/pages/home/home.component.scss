@@ -57,20 +57,46 @@ div#scroll-down{
     opacity: 0;
   }
 }
-
-div#about-project {
+div#about-app {
   color: white;
-  //height: 100vh;
   background: linear-gradient(rgba(200, 200, 200, 0.1), rgba(200, 200, 200, 0.4));
   background-size: cover;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center horizontally */
 }
+
+.app-news{
+  width: 40%;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  color: gray;
+  padding: 2rem;
+  margin-bottom: 5rem;
+  margin-top: 5rem;
+}
+
+//.application-desc:before{
+//  content: "";
+//  display: block;
+//  position: absolute;
+//  bottom: -20em;
+//  left: calc(50% - 1px);
+//  width: 1px;
+//  height: 10em;
+//  background: rgba(0,0,0,.5);
+//}
+
+.application-desc{
+  width: 60%;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+}
+
 .application-intro{
   margin-top: 2.5%;
   margin-bottom: 2.5%;
-  width: 60%;
+  width: 100%;
   background-color: transparent;
   color: gray;
   display: flex;
@@ -97,8 +123,8 @@ div#about-project {
 }
 
 .application-info {
-  width: 60%;
   margin-bottom: 2rem;
+  width: 100%;
   //align-items: center; /* Center horizontally */
   //display: flex;
   //justify-content: center;

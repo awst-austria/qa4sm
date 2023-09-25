@@ -67,6 +67,8 @@ export class HomeComponent implements OnInit {
     video: videosPrefix + 'QA4SM_Video_Series_II_Results_4K.mp4'
   }
 
+  videos = [this.videoValidate, this.videoResults];
+
   cardPublish = [{
     plot: '/static/images/help/publishing_dialog.png',
     link: "",
@@ -105,9 +107,6 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
     this.settings$ = this.settingsService.getAllSettings();
-    this.settings$.subscribe(data => {
-    }
-    );
   }
 
 }

@@ -62,91 +62,129 @@
     </div>
 
   </div>
-  <div id="about-project" class="section">
-    <div class="application-intro">
-      <h1> Service for validation of satellite soil moisture products against in-situ and model reference data </h1>
-      <span>
+  <div id="about-app" class="section">
+    <div *ngIf="settings$|async as settings" class="app-news flex flex-column flex wrap justify-content-center">
+      <h3>What's new</h3>
+      <div [innerHTML]=settings[0].news class="text-2xl line-height-2"></div>
+    </div>
+    <div class="application-desc">
+      <!--      Application introduction-->
+      <div class="application-intro">
+        <h1> Service for validation of satellite soil moisture products against in-situ and model reference data </h1>
+        <span>
           that <span class="text-muted">brings together methodologies and protocols </span> used for the validation
           and quality control of soil moisture data products and provides users with.
           <span class="text-muted">traceable validation results</span>.
         </span>
-    </div>
-
-    <!--    Application information -->
-    <div [class]="applicationInfoClass">
-      <!--      ROW =========================================================  -->
-      <div [class]="applicationInfoOddRowClass">
-        <div [class]="applicationInfoTileClass">
-          <h1>Simple</h1>
-          <div>
-            An easy-to-use interface for comparing satellite soil moisture data against land surface models and the
-            <a href="https://ismn.earth/" target="_blank">International Soil Moisture Network</a>
-          </div>
-        </div>
-        <div [class]="applicationInfoTileClass">
-          <div class="flex flex-column w-12">
+      </div>
+      <!-- Application videos -->
+      <div class="application-videos">
+        <p-carousel [value]="videos"
+                    [circular]="true"
+                    [autoplayInterval]="5000"
+                    [numVisible]="1"
+                    [numScroll]="1"
+                    [showIndicators]="false">
+          <ng-template let-video pTemplate="item">
             <video width="100%" controls allowfullscreen>
-              <source [src]="videoValidate.video">
+              <source [src]="video.video">
             </video>
-          </div>
-        </div>
-        <!--      ROW ========================================================= -->
+          </ng-template>
+        </p-carousel>
       </div>
-      <div [class]="applicationInfoEvenRowClass">
-        <div [class]="applicationInfoTileClass">
-          <h1>Free</h1>
-          <div>
-            Just set up and account to have full access to all functionalities
+      <!--    Application information -->
+      <div [class]="applicationInfoClass">
+        <!--      ROW =========================================================  -->
+        <div [class]="applicationInfoOddRowClass">
+          <div [class]="applicationInfoTileClass">
+            <h1>Simple</h1>
+            <div>
+              An easy-to-use interface for comparing satellite soil moisture data against land surface models and the
+              <a href="https://ismn.earth/" target="_blank">International Soil Moisture Network</a>
+            </div>
           </div>
-        </div>
-        <div [class]="applicationInfoTileClass">
-          <div class="flex flex-column w-7 p-0">
-<!--            <p-image-->
-<!--              width="100%"-->
-<!--              preview="true"-->
-<!--              [src]="cardSignUp[0].plot"-->
-<!--              [alt]="cardSignUp[0].description">-->
-<!--            </p-image>-->
+          <div [class]="applicationInfoTileClass">
+            <h1>Traceable</h1>
+            <div>
+              You can download your results in netCDF format and as visualisations, share them with others or publish
+              using <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> service
+            </div>
           </div>
+          <!--          <div [class]="applicationInfoTileClass">-->
+          <!--            <div class="flex flex-column w-12">-->
+          <!--              <video width="100%" controls allowfullscreen>-->
+          <!--                <source [src]="videoValidate.video">-->
+          <!--              </video>-->
+          <!--            </div>-->
+          <!--          </div>-->
+          <!--      ROW ========================================================= -->
         </div>
-      </div>
+        <div [class]="applicationInfoEvenRowClass">
+          <div [class]="applicationInfoTileClass">
+            <h1>Free</h1>
+            <div>
+              Just set up and account to have full access to all functionalities
+            </div>
+          </div>
+          <div [class]="applicationInfoTileClass">
+            <h1>Customizable</h1>
+            <div>
+              You can upload your own data and use various filtering and scaling options to assess the impact of these
+              on
+              the validation results
+            </div>
+          </div>
+          <!--          <div [class]="applicationInfoTileClass">-->
+          <!--            <div class="flex flex-column w-7 p-0">-->
+          <!--            <p-image-->
+          <!--              width="100%"-->
+          <!--              preview="true"-->
+          <!--              [src]="cardSignUp[0].plot"-->
+          <!--              [alt]="cardSignUp[0].description">-->
+          <!--            </p-image>-->
+          <!--            </div>-->
+          <!--          </div>-->
+        </div>
 
-      <!--      ROW =========================================================  -->
-      <div [class]="applicationInfoOddRowClass">
-        <div [class]="applicationInfoTileClass">
-          <h1>Traceable</h1>
-          <div>
-            You can download your results in netCDF format and as visualisations, share them with others or publish
-            using <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> service
-          </div>
-        </div>
-        <div [class]="applicationInfoTileClass">
-          <div class="flex flex-column w-12">
-            <video width="100%" controls allowfullscreen>
-              <source [src]="videoResults.video">
-            </video>
-          </div>
-        </div>
-      </div>
-      <!--      ROW =========================================================  -->
-      <div [class]="applicationInfoEvenRowClass">
-        <div [class]="applicationInfoTileClass">
-          <h1>Customizable</h1>
-          <div>
-            You can upload your own data and use various filtering and scaling options to assess the impact of these on
-            the validation results
-          </div>
-        </div>
-        <div [class]="applicationInfoTileClass">
-        </div>
-      </div>
+        <!--        &lt;!&ndash;      ROW =========================================================  &ndash;&gt;-->
+        <!--        <div [class]="applicationInfoOddRowClass">-->
+        <!--          <div [class]="applicationInfoTileClass">-->
+        <!--            <h1>Traceable</h1>-->
+        <!--            <div>-->
+        <!--              You can download your results in netCDF format and as visualisations, share them with others or publish-->
+        <!--              using <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> service-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--          <div [class]="applicationInfoTileClass">-->
+        <!--            <div class="flex flex-column w-12">-->
+        <!--              <video width="100%" controls allowfullscreen>-->
+        <!--                <source [src]="videoResults.video">-->
+        <!--              </video>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+        <!--        &lt;!&ndash;      ROW =========================================================  &ndash;&gt;-->
+        <!--        <div [class]="applicationInfoEvenRowClass">-->
+        <!--          <div [class]="applicationInfoTileClass">-->
+        <!--            <h1>Customizable</h1>-->
+        <!--            <div>-->
+        <!--              You can upload your own data and use various filtering and scaling options to assess the impact of these on-->
+        <!--              the validation results-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--          <div [class]="applicationInfoTileClass">-->
+        <!--          </div>-->
+        <!--        </div>-->
 
-    </div>
-    <div id="videos" class="section">
+      </div>
 
     </div>
   </div>
+  <div id="about-project" class="section">
+    <div>
 
+    </div>
+  </div>
 
 
   <!--        <h4>We offer... </h4>-->
