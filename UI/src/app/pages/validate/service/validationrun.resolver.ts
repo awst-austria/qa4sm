@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
+import {ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 import {Observable} from 'rxjs';
 import {ValidationrunService} from '../../../modules/core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../modules/core/services/validation-run/validationrun.dto';
@@ -7,7 +7,7 @@ import {ValidationrunDto} from '../../../modules/core/services/validation-run/va
 @Injectable({
   providedIn: 'root'
 })
-export class ValidationrunResolver implements Resolve<ValidationrunDto> {
+export class ValidationrunResolver  {
   constructor(private validationService: ValidationrunService) {
   }
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<ValidationrunDto> {
