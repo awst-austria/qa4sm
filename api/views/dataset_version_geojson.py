@@ -1,4 +1,6 @@
-from django.http import JsonResponse
+import os
+
+from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -19,6 +21,9 @@ def dataset_version_geojson_by_id(request, **kwargs):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR, safe=False)
 
     file_path = version.versions.all()[0].storage_path + "/" + version.short_name + "/" + GEOJSON_FILE_NAME
+
+    if not os.path.exists(file_path):
+        raise Http404("Geo-info file could not found")
 
     with open(file_path, "r") as geojson:
         return JsonResponse(geojson.read(), status=status.HTTP_200_OK, safe=False)
