@@ -27,7 +27,7 @@ def mock_get_doi(*args, **kwargs):
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestModifyValidationView(TestCase):
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
     __logger = logging.getLogger(__name__)
 
     def setUp(self):

@@ -11,7 +11,7 @@ from validator.validation.validation import copy_validationrun
 
 class TestValidationRunView(TestCase):
     __logger = logging.getLogger(__name__)
-    fixtures = ['datasets', 'filters', 'versions', 'variables']
+    fixtures = ['datasets', 'filters', 'versions', 'variables', 'users']
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()

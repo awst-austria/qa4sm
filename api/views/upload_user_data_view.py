@@ -241,7 +241,15 @@ def upload_user_data(request, filename):
     file_serializer = UploadFileSerializer(data=file_data)
     if file_serializer.is_valid():
         # saving file
-        file_serializer.save()
+        try:
+            file_serializer.save()
+        except:
+            new_dataset.delete()
+            new_variable.delete()
+            new_version.delete()
+            return JsonResponse({'error': 'We could not save your file. Please try again later or contact our team'
+                                          ' to get help.'}, status=500, safe=False)
+
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']

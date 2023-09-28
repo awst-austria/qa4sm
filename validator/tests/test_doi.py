@@ -29,7 +29,7 @@ from validator.validation.globals import OUTPUT_FOLDER
 @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
 @pytest.mark.long_running
 class TestDOI(TestCase):
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     __logger = logging.getLogger(__name__)
 

@@ -57,7 +57,7 @@ jobs:
       - name: Migrate database
         run: python manage.py migrate
       - name: Fill database
-        run: python manage.py loaddata versions variables filters datasets networks
+        run: python manage.py loaddata versions variables filters datasets networks users
       - name: Tests with token
         if: ${{ env.DOI_ACCESS_TOKEN_ENV }}
         run: |

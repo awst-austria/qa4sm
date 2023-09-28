@@ -25,7 +25,7 @@ def cleanup_metadata(ISMN_storage_path):
 
 class TestHacks(TestCase):
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     def setUp(self):
         set_dataset_paths()

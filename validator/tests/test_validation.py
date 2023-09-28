@@ -53,7 +53,7 @@ User = get_user_model()
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidation(TestCase):
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
     hawaii_coordinates = [18.16464, -158.79638, 22.21588, -155.06103]
 
     __logger = logging.getLogger(__name__)

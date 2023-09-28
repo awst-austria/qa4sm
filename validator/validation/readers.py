@@ -138,7 +138,7 @@ def adapt_timestamp(reader, dataset, version):
             'base_time_reference': '2000-01-01',
         }
 
-    elif dataset.short_name == globals.SMOS_L2:
+    elif dataset.short_name in [globals.SMOS_L2, globals.SMOS_SBPCA]:
         tadapt_kwargs = {
             'time_offset_fields': 'Seconds',
             'time_units': 's',

@@ -9,7 +9,7 @@ from validator.models import DataFilter, Dataset
 
 class TestDataFilterView(TestCase):
     __logger = logging.getLogger(__name__)
-    fixtures = ['datasets', 'filters', 'versions', 'variables']
+    fixtures = ['datasets', 'filters', 'versions', 'variables', 'users']
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()
