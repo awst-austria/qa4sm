@@ -7,4 +7,4 @@ class UserDatasetFileAdmin(ModelAdmin):
     ordering = ('owner', 'upload_date','dataset', 'version')
 
     def user_groups_list(self, obj):
-        return list(obj.user_groups.all())
+        return list(obj.dataset.user_groups.all())

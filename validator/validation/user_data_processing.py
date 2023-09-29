@@ -67,7 +67,11 @@ def user_data_preprocessing(file_uuid, file_path, file_raw_path):
     variable_entry.help_text = f'Variable {sm_variable["long_name"]} of dataset ' \
                                f'{file_entry.dataset.pretty_name} provided by user {file_entry.owner.username}.',
     variable_entry.unit = sm_variable['units'] if sm_variable['units'] else 'n.a.'
-    variable_entry.save()
+    try:
+        variable_entry.save()
+    except Exception as e:
+        send_failed_preprocessing_notification(file_entry, True)
+        file_entry.delete()
 
     file_entry.all_variables = all_variables
     file_entry.metadata_submitted = True

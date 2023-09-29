@@ -8,16 +8,17 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, pre_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
-from validator.models import DatasetConfiguration, User, CopiedValidations
+from validator.models import DatasetConfiguration, User, CopiedValidations, Dataset
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
-
 
 # def get_spatial_reference_id(instance) -> int:
 #     return instance.spatial_reference_configuration.primary_key
+
+DATASETS_WITHOUT_FILES = []
 
 
 class ValidationRun(models.Model):
@@ -123,15 +124,13 @@ class ValidationRun(models.Model):
             ('threshold', 'create metadata box plots only when the minimum '
                           'number of required points is available '
                           '(set in globals of qa4sm-reader'),
-            ),
+        ),
         default='threshold'
     )
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
-
-
 
     @property
     def expiry_date(self):
@@ -158,6 +157,16 @@ class ValidationRun(models.Model):
     @property
     def is_unpublished(self):
         return not self.doi
+
+    @property
+    def all_files_exist(self):
+        return len(self.get_dataset_configs_without_file()) == 0
+
+    def get_graphics_path(self):
+        return self.output_file.path.replace(self.output_file.name, f'{self.id}/graphs.zip')
+
+    def get_dataset_configs_without_file(self):
+        return self.dataset_configurations.all().filter(dataset__storage_path='')
 
     def archive(self, unarchive=False, commit=True):
         if unarchive:
@@ -253,7 +262,7 @@ class ValidationRun(models.Model):
             return self.name_tag
         config = DatasetConfiguration.objects.filter(validation=self.id).get(is_spatial_reference=True)
         label = f"Date: {self.start_time.strftime('%Y-%m-%d')}, Spatial-reference: " \
-               f"{config.dataset.short_name}"
+                f"{config.dataset.short_name}"
         return label
 
     @property
@@ -261,13 +270,31 @@ class ValidationRun(models.Model):
         user_data = [conf for conf in self.dataset_configurations.all() if conf.dataset.user_dataset.all()]
         return len(user_data) > 0
 
+    def delete(self, using=None, keep_parents=False):
+        global DATASETS_WITHOUT_FILES
+        DATASETS_WITHOUT_FILES = list(self.get_dataset_configs_without_file().values_list('dataset', flat=True))
+        super().delete(using=using, keep_parents=keep_parents)
 
-# delete model output directory on disk when model is deleted
+    # delete model output directory on disk when model is deleted
+
+
 @receiver(post_delete, sender=ValidationRun)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     # I know external modules should be imported at the very beginning of the file, but in this case it doesn't work,
     # I haven't found a solution for that, so I import it here
     from validator.validation.globals import OUTPUT_FOLDER
+
+    # here I need to check if there are datasets assigned to this validation that do not have files and if they're not
+    # use anywhere else, the dataset can be removed
+
+    if len(DATASETS_WITHOUT_FILES) > 0:
+        datasets_to_delete = Dataset.objects.filter(
+            id__in=DATASETS_WITHOUT_FILES,
+            dataset_configurations__isnull=True
+        )
+        for dataset in datasets_to_delete:
+            dataset.user_dataset.first().delete()
+
     if instance.output_file:
         rundir = path.dirname(instance.output_file.path)
         if path.isdir(rundir):

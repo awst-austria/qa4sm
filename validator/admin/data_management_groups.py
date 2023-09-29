@@ -6,7 +6,7 @@ from django.db.models import ProtectedError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
-from validator.models import DataManagementGroup, UserDatasetFile, User
+from validator.models import DataManagementGroup, UserDatasetFile, User, Dataset
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Permission, ContentType
 from django.contrib import messages
@@ -27,7 +27,7 @@ def delete_selected(modeladmin, request, queryset):
 
 class DataManagementGroupForm(forms.ModelForm):
     user_datasets = forms.ModelMultipleChoiceField(
-        queryset=UserDatasetFile.objects.all(),
+        queryset=Dataset.objects.all(),
         widget=FilteredSelectMultiple('User Datasets', False),
         required=False
     )
@@ -59,7 +59,7 @@ class DataManagementGroupAdmin(GroupAdmin, ModelAdmin):
         content_type_id = ContentType.objects.get_for_model(DataManagementGroup)
         form.base_fields['group_owner'].queryset = User.objects.filter(id=request.user.id)
         form.base_fields['permissions'].queryset = Permission.objects.filter(content_type_id=content_type_id)
-        form.base_fields['user_datasets'].queryset = UserDatasetFile.objects.filter(owner=request.user)
+        form.base_fields['user_datasets'].queryset = Dataset.objects.filter(user=request.user)
         form.base_fields['users'].queryset = User.objects.exclude(id=request.user.id)
 
         return form

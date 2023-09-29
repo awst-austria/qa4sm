@@ -21,13 +21,13 @@ from api.views.validation_run_view import published_results, my_results, validat
     custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_validation
 from api.views.global_params_view import global_params
-from api.views.modify_validation_view import stop_validation, delete_result, change_name, archive_result, \
-    extend_result, publish_result, add_validation, remove_validation, get_publishing_form, copy_validation_results
+from api.views.modify_validation_view import *
 from api.views.serving_file_view import *
 from api.views.local_api_view import get_list_of_countries
 from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
 from api.views.support_request_view import *
+from api.views.custom_dataset_view import *
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -69,7 +69,8 @@ urlpatterns = [
     path('published-results', published_results, name='Published results'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
-    re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation, name='Configuration'),
+    re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation,
+            name='Configuration'),
     path('data-filter', data_filter, name='Dataset filters'),
     re_path(r'^data-filter/(?P<version_id>.+)$', data_filter_by_datasetversion),
     path('globals', global_params, name='Global context'),
@@ -113,7 +114,7 @@ urlpatterns = [
     path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
     path('upload-user-data/<str:filename>/', upload_user_data, name='Upload user data'),
     path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
-    path('delete-user-datafile/<str:file_uuid>/', delete_user_dataset_and_file, name='Delete User Data File'),
+    path('delete-entire-dataset/<str:file_uuid>/', delete_user_dataset_and_file, name='Delete User Data File'),
     path('get-user-file-by-id/<uuid:file_uuid>/', get_user_data_file_by_id,
          name='Get user file by ID'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
@@ -124,6 +125,8 @@ urlpatterns = [
     path('data-management-groups', get_data_management_groups, name='Get data management groups'),
     path('manage-data-in-management-group', manage_data_in_group,
          name='Add data to management groups'),
+    path('delete-only-datafile/<str:file_uuid>/', delete_dataset_file_only, name='Delete User Data File Only'),
+    path('delete-multiple-validations', delete_multiple_result, name='Delete Multiple Validations'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

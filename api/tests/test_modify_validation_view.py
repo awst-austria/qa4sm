@@ -1,13 +1,11 @@
 import logging
 import shutil
-import time
 from os import path
 
 import pytest
 from django.test.utils import override_settings
 from django.urls import reverse
 
-import validator.validation as val
 from django.test import TestCase
 from rest_framework.test import APIClient
 
@@ -17,19 +15,19 @@ from validator.models import ValidationRun
 from dateutil import parser
 
 from validator.validation import mkdir_if_not_exists, set_outfile
-from validator.validation import globals
+
 User = get_user_model()
-from django.test.testcases import TransactionTestCase
 from unittest.mock import patch
+
 
 def mock_get_doi(*args, **kwargs):
     return
 
+
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestModifyValidationView(TestCase):
-
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
     __logger = logging.getLogger(__name__)
 
     def setUp(self):
@@ -480,6 +478,27 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 0  # not there anymore
 
+    def test_delete_multiple_results(self):
+        create_default_validation_without_running(self.test_user)
+        create_default_validation_without_running(self.test_user)
+        all_validations = ValidationRun.objects.all()
+
+        assert len(ValidationRun.objects.all()) == 4
+
+        self.run.doi = '19282843'
+        self.run.save()
+
+        delete_validation_url = reverse('Delete Multiple Validations') + '?'
+        val_ids = [str(validation.id) for validation in all_validations]
+        for id in val_ids:
+            delete_validation_url += f'id={id}&'
+        delete_validation_url = delete_validation_url.rstrip('&')
+
+        response = self.client.delete(delete_validation_url)
+
+        assert response.status_code == 200
+        assert len(ValidationRun.objects.all()) == 2  # 2 left, one belonging to othe user, second one published.
+
     def test_get_publishing_form(self):
         get_publishing_form_url = reverse('Get publishing form')
 
@@ -508,9 +527,9 @@ class TestModifyValidationView(TestCase):
         # everything is ok
         response = self.client.get(copy_validation_url + f'?validation_id={self.run_2.id}')
         assert response.status_code == 200
-        assert response.json()['run_id'] != self.run_2.id # copied validation has different id
+        assert response.json()['run_id'] != self.run_2.id  # copied validation has different id
         assert ValidationRun.objects.get(pk=response.json()['run_id']).user == self.test_user
-        assert self.run_2.user == self.alt_test_user # and the user of the validation being copied has not changed
+        assert self.run_2.user == self.alt_test_user  # and the user of the validation being copied has not changed
 
         # non existing validation
         response = self.client.get(copy_validation_url + f'?validation_id={self.wrong_id}')
@@ -519,11 +538,10 @@ class TestModifyValidationView(TestCase):
         # I can copy also my own validation - not possible from the UI though
         response = self.client.get(copy_validation_url + f'?validation_id={self.run.id}')
         assert response.status_code == 200
-        assert response.json()['run_id'] != self.run.id # copied validation has different id
+        assert response.json()['run_id'] != self.run.id  # copied validation has different id
         assert ValidationRun.objects.get(pk=response.json()['run_id']).user == self.test_user
 
         # not possible to copy if a user is not logged in
         self.client.logout()
         response = self.client.get(copy_validation_url + f'?validation_id={self.run_2.id}')
         assert response.status_code == 403
-

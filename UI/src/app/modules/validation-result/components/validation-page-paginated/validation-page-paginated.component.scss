@@ -1,4 +1,4 @@
-@import "src/styles";
+@import "../../../../../styles";
 
 div {
   font-family: $base-font;
@@ -105,9 +105,39 @@ div {
   justify-content: center !important;
 }
 
+.side-panel-area {
+  position: fixed;
+  left: 2vw; /* Adjust as needed */
+  top: 40vh; /* Adjust as needed */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  //width: 20vw;
+}
+.validation-row-area{
+  position: relative;
+}
 
+.modify-checkbox{
+  position: absolute;
+  left: -30px;
+  top: 10px;
+}
 
+.loading-vals-box{
+  color: darkgray;
+  display: flex;
+  align-items:center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
 
+.val-number-information {
+  display: flex;
+  color: darkgray;
+  font-weight: bold;
+}
 
 
 

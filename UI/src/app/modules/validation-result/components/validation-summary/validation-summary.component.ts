@@ -75,7 +75,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   private updateConfig(): void {
     this.configurations$ = combineLatest(
       this.validationModel.datasetConfigs,
-      this.datasetService.getAllDatasets(true),
+      this.datasetService.getAllDatasets(true, false),
       this.datasetVersionService.getAllVersions(),
       this.datasetVariableService.getAllVariables(),
       this.filterService.getAllFilters(),
@@ -88,11 +88,14 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
              dataFilters,
              paramFilters]) =>
         configurations.map(
-          config =>
-            ({
+          config => {
+            const datasetInfo = datasets.find(ds => config.dataset === ds.id);
+
+            return {
               ...config,
-              dataset: datasets.find(ds =>
-                config.dataset === ds.id)?.pretty_name,
+              dataset: datasetInfo?.pretty_name,
+
+              fileExists: datasetInfo?.storage_path.length > 0,
 
               version: versions.find(dsVersion =>
                 config.version === dsVersion.id).pretty_name,
@@ -113,11 +116,10 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
                     .find(pF => pF.id === pf).parameters])
                   .find(f => f[0] === fId)[1])
 
-            })
+            }
+          }
         ))
     );
-    this.configurations$.subscribe(() => {
-    });
   }
 
   getRunTime(startTime: Date, endTime: Date): number {

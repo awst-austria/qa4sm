@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {ValidationrunDto} from './validationrun.dto';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
@@ -30,6 +30,7 @@ const extendResultUrl = urlPrefix + '/extend-result/00000000-0000-0000-0000-0000
 const publishResultUrl = urlPrefix + '/publish-result/00000000-0000-0000-0000-000000000000';
 const addValidationUrl = urlPrefix + '/add-validation/00000000-0000-0000-0000-000000000000';
 const removeValidationUrl = urlPrefix + '/remove-validation/00000000-0000-0000-0000-000000000000';
+const removeMultipleValidationUrl = urlPrefix + '/delete-multiple-validations';
 const deleteResultUrl = urlPrefix + '/delete-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -118,6 +119,15 @@ export class ValidationrunService {
     const addUrl = removeValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
     const data = {remove_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
+  }
+
+  removeMultipleValidation(validationId: string[]): Observable<any> {
+    let params = new HttpParams();
+    validationId.forEach(id => {
+      params = params.append('id', id);
+    })
+
+    return this.httpClient.delete(removeMultipleValidationUrl, {params});
   }
 
   getSummaryStatistics(params: any): Observable<any> {

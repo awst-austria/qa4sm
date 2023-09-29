@@ -40,7 +40,8 @@ export class ValidationrunDto{
               public bootstrap_tcol_cis: boolean,
               public temporal_matching: number,
               public comparison_label?: string,
-              public contains_user_data?: boolean) {
+              public contains_user_data?: boolean,
+              public all_files_exist?: boolean) {
   }
 }
 

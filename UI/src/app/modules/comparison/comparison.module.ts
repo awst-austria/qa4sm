@@ -3,7 +3,6 @@ import {CommonModule} from '@angular/common';
 import {PanelModule} from 'primeng/panel';
 import {TooltipModule} from 'primeng/tooltip';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
-import {NgxPaginationModule} from 'ngx-pagination';
 import {RouterModule} from '@angular/router';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
@@ -36,7 +35,6 @@ import {GalleriaModule} from 'primeng/galleria';
     PanelModule,
     TooltipModule,
     FontAwesomeModule,
-    NgxPaginationModule,
     RouterModule,
     DropdownModule,
     FormsModule,

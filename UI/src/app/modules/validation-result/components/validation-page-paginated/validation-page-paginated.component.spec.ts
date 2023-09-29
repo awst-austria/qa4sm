@@ -2,7 +2,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ValidationPagePaginatedComponent} from './validation-page-paginated.component';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {NgxPaginationModule} from 'ngx-pagination';
 import {of} from 'rxjs';
 
 describe('ValidationPagePaginatedComponent', () => {
@@ -24,7 +23,6 @@ describe('ValidationPagePaginatedComponent', () => {
 
     await TestBed.configureTestingModule({
       imports : [
-        NgxPaginationModule
       ],
       declarations: [ValidationPagePaginatedComponent],
       providers: [{provide: ValidationrunService, useValue: validationrunServiceSpy}]

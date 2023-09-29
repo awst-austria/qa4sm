@@ -7,9 +7,9 @@
             </div>
           </ng-template>
           <ng-template pTemplate="icons">
-            <label class="mb-0" pTooltip="Expand this section to inspect a table of statistics of the validation results."
+            <label class="p-panel-header-icon mb-0" pTooltip="Expand this section to inspect a table of statistics of the validation results."
                    tooltipPosition="bottom">
-              <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+              <span class="pi pi-question-circle help-icon"></span>
             </label>
           </ng-template>
           <div *ngIf="(table$|async) as table" class="pb-3">

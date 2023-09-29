@@ -62,7 +62,6 @@ export class DatasetInfoComponent implements OnInit {
 
   sort(): void {
     this.datasetInfo$ = this.datasetInfo$.pipe(map((data) => {
-      console.log(data)
       data.sort((a, b) => {
         return a.id < b.id ? -1 : 1;
       });

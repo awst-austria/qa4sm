@@ -75,6 +75,7 @@ class TestUploadUserDataView(TransactionTestCase):
         self.delete_data_url_name = 'Delete User Data File'
         self.update_metadata_url_name = 'Update metadata'
         self.get_user_file_by_id_url_name = 'Get user file by ID'
+        self.delete_file_only_url_name = "Delete User Data File Only"
 
         self.metadata_correct = {
             USER_DATA_DATASET_FIELD_NAME: 'test_dataset',
@@ -274,6 +275,14 @@ class TestUploadUserDataView(TransactionTestCase):
 
         # loging in as the proper user:
         self.client.login(**self.auth_data)
+
+        # delete non existing file
+        response = self.client.delete(
+            reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
+
+        assert response.status_code == 404
+        assert response.json().get('detail') == 'Not found.'
+
         delete_response = self.client.delete(
             reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
 
@@ -283,6 +292,60 @@ class TestUploadUserDataView(TransactionTestCase):
         assert len(DataVariable.objects.all()) == 0
         assert len(UserDatasetFile.objects.all()) == 0
         assert len(os.listdir(self.test_user_data_path)) == 0
+
+    @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
+    def test_delete_only_user_file(self, mock_preprocess_file):
+        # posting a file to be removed
+
+        post_response = self.client.post(
+            reverse(self.upload_data_url_name, kwargs={URL_FILENAME: self.netcdf_file_name}),
+            {FILE: self.netcdf_file},
+            format=FORMAT_MULTIPART,
+            **_get_headers(self.metadata_correct))
+
+        file_entry_id = post_response.json()['id']
+        assert len(Dataset.objects.all()) == 1
+        assert len(DatasetVersion.objects.all()) == 1
+        assert len(DataVariable.objects.all()) == 1
+        assert len(UserDatasetFile.objects.all()) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 1
+
+        # checking if another user can remove it:
+        self.client.logout()
+        self.client.login(**self.second_user_data)
+        delete_response = self.client.delete(
+            reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
+
+        assert delete_response.status_code == 403
+        # nothing happened, as the user has no credentials
+        assert len(Dataset.objects.all()) == 1
+        assert len(DatasetVersion.objects.all()) == 1
+        assert len(DataVariable.objects.all()) == 1
+        assert len(UserDatasetFile.objects.all()) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 1
+
+        # loging in as the proper user:
+        self.client.login(**self.auth_data)
+
+        delete_response = self.client.delete(
+            reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
+
+        assert delete_response.status_code == 404
+        assert delete_response.json().get('detail') == 'Not found.'
+
+        delete_response = self.client.delete(
+            reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
+
+        assert delete_response.status_code == 200
+        assert len(Dataset.objects.all()) == 1
+        assert len(DatasetVersion.objects.all()) == 1
+        assert len(DataVariable.objects.all()) == 1
+        assert len(UserDatasetFile.objects.all()) == 1
+        assert len(os.listdir(self.test_user_data_path)) == 0
+
+        assert Dataset.objects.all()[0].storage_path == ''
+        assert not UserDatasetFile.objects.all()[0].file
+        assert not UserDatasetFile.objects.all()[0].file_name
 
     @patch('api.views.upload_user_data_view.preprocess_file', side_effect=mock_preprocess_file)
     def test_upload_user_data_nc_correct(self, mock_preprocess_file):

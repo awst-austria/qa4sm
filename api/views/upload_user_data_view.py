@@ -1,8 +1,7 @@
 import json
 
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import FileUploadParser
 from rest_framework.permissions import IsAuthenticated
@@ -148,91 +147,6 @@ def preprocess_file(file_serializer, file_raw_path):
 
 
 # API VIEWS
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_data_management_groups(request):
-    groups_ids = request.GET.getlist('id')
-    groups = DataManagementGroup.objects.all()
-    if len(groups_ids):
-        groups = groups.filter(id__in=groups_ids)
-    serializer = DataManagementGroupSerializer(groups, many=True)
-    try:
-        return JsonResponse(serializer.data, status=200, safe=False)
-    except:
-        return JsonResponse({'message': 'Something went wrong'}, status=500)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_data_management_groups(request):
-    # here I'll create a new data management group
-    pass
-    # groups_ids = request.GET.getlist('id')
-    # groups = DataManagementGroup.objects.all()
-    # if len(groups_ids):
-    #     groups = groups.filter(id__in=groups_ids)
-    # serializer = DataManagementGroupSerializer(groups, many=True)
-    #
-    # try:
-    #     return JsonResponse(serializer.data, status=200, safe=False)
-    # except:
-    #     return JsonResponse({'message': 'Something went wrong'}, status=500)
-
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def manage_data_in_group(request):
-    group_id = request.data.get('group_id')
-    data_id = request.data.get('data_id')
-    action = request.data.get('action')
-
-    group = get_object_or_404(DataManagementGroup, pk=group_id)
-    user_dataset = get_object_or_404(UserDatasetFile, pk=data_id)
-
-    try:
-        group.custom_datasets.add(user_dataset) if action == 'add' else group.custom_datasets.remove(user_dataset)
-        return JsonResponse({'message': 'Ok'}, status=200)
-    except:
-        return JsonResponse({'message': 'Something went wrong'}, status=500)
-
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_list_of_user_data_files(request):
-    list_of_files = UserDatasetFile.objects.filter(owner=request.user).order_by('-upload_date')
-    serializer = UploadSerializer(list_of_files, many=True)
-    try:
-        return JsonResponse(serializer.data, status=200, safe=False)
-    except:
-        # this exception is to catch a situation when the file doesn't exist, or in our case is rather about problems
-        # with proper path bound to a docker container
-        return JsonResponse({'message': 'We could not return the list of your datafiles'}, status=500)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_user_data_file_by_id(request, file_uuid):
-    file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
-
-    if file_entry.owner != request.user:
-        return JsonResponse({'detail': 'Not found.'}, status=404)
-
-    serializer = UploadSerializer(file_entry, many=False)
-    return JsonResponse(serializer.data, status=200, safe=False)
-
-
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_user_dataset_and_file(request, file_uuid):
-    file_entry = get_object_or_404(UserDatasetFile, pk=file_uuid)
-    if file_entry.owner != request.user:
-        return HttpResponse(status=status.HTTP_403_FORBIDDEN)
-
-    file_entry.delete()
-
-    return HttpResponse(status=status.HTTP_200_OK)
-
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -297,7 +211,6 @@ def upload_user_data(request, filename):
     serializer = UserFileMetadataSerializer(data=metadata)
 
     if not serializer.is_valid():
-        print(serializer.errors)
         return JsonResponse(serializer.errors, status=500, safe=False)
 
     dataset_name = metadata[USER_DATA_DATASET_FIELD_NAME]
@@ -328,14 +241,18 @@ def upload_user_data(request, filename):
     file_serializer = UploadFileSerializer(data=file_data)
     if file_serializer.is_valid():
         # saving file
-        file_serializer.save()
+        try:
+            file_serializer.save()
+        except:
+            new_dataset.delete()
+            new_variable.delete()
+            new_version.delete()
+            return JsonResponse({'error': 'We could not save your file. Please try again later or contact our team'
+                                          ' to get help.'}, status=500, safe=False)
+
         # need to get the path and assign it to the dataset as well as pass it to preprocessing function, so I don't
         # have to open the db connection before file preprocessing.
         file_raw_path = file_serializer.data['get_raw_file_path']
-        # now I can assign proper storage path
-        new_dataset.storage_path = file_raw_path
-        new_dataset.save()
-
         preprocess_file(file_serializer, file_raw_path)
 
         return JsonResponse(file_serializer.data, status=201, safe=False)

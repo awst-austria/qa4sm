@@ -20,6 +20,7 @@ export class ButtonsComponent implements OnInit {
   @Input() validationRun: ValidationrunDto;
   @Input() published: boolean;
   @Input() validationList: boolean;
+  @Input() canBeRerun: boolean;
   @Input() tracked: boolean;
   @Output() doRefresh = new EventEmitter();
   @Output() doUpdate = new EventEmitter();

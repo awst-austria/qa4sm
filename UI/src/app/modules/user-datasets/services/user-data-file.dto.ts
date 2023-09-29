@@ -10,7 +10,8 @@ export class UserDataFileDto {
               public upload_date: Date,
               public is_used_in_validation: boolean,
               public file_size: number,
-              public validation_list: {val_id: string, val_name: string}[],
+              public owner_validation_list: {val_id: string, val_name: string}[],
+              public number_of_other_users_validations: number,
               public metadata_submitted: boolean,
               public user_groups: number[]
               ) {

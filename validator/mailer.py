@@ -12,15 +12,23 @@ from valentina.settings_conf import EMAIL_HOST_USER
 __logger = logging.getLogger(__name__)
 
 
-def send_failed_preprocessing_notification(file_entry):
+def send_failed_preprocessing_notification(file_entry, too_long_variable_name=False):
     __logger.info(f'Sending mail about failed preprocessing of the {file_entry.id} to user {file_entry.owner}...')
     guidelines_url = settings.SITE_URL + get_angular_url('my-datasets')
 
+    file_problem_body = (f"Your file containing data for dataset {file_entry.dataset.pretty_name}, version "
+                         f"{file_entry.version.pretty_name} could not be processed. Please check if you "
+                         f"uploaded proper file and if your file hs been prepared according to our"
+                         f" guidelines ({guidelines_url}).\n")
+
+    variable_problem_body = (f"Looks like the variable name used in the file is too long. Please note that the "
+                             f"variable name can not be longer than 30 characters and the long_name can not be "
+                             f"longer than 100 characters.\n")
+
     subject = '[QA4SM] File preprocessing failed'
     body = f"""Dear {file_entry.owner.first_name} {file_entry.owner.last_name}, \n\n
-    Your file containing data for dataset {file_entry.dataset.pretty_name}, version {file_entry.version.pretty_name} \
-    could not be processed. Please check if you uploaded proper file and if your file hs been prepared according to our\
-    guidelines ({guidelines_url}). In case of further problem, please contact our team.\n\nBest regards,\nQA4SM team'"""
+    {file_problem_body if not too_long_variable_name else variable_problem_body}
+    In case of further problems, please contact our team.\n\nBest regards,\nQA4SM team'"""
 
     _send_email(recipients=[file_entry.owner.email],
                 subject=subject,

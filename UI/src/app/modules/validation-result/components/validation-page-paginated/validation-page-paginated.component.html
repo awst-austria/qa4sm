@@ -1,9 +1,15 @@
+
+<div class="side-panel-area">
+  <qa-handle-multiple-validations
+    [validations]="validations"
+    [selectedValidationsId$]="selectedValidations$"
+    (selectionActive)="handleMultipleSelection($event)"
+    *ngIf="!published">
+  </qa-handle-multiple-validations>
+</div>
+
 <div class="grid no-gutters">
-  <div class="
-    col-12
-    md:col-10 md:col-offset-1
-    lg:col-10 lg:col-offset-1
-    xl:col-8 xl:col-offset-2">
+  <div [ngClass]="published ? publishedValClasses : myValClasses">
     <div class="grid" style="justify-content: center">
 
       <!-- custom -->
@@ -27,50 +33,37 @@
       </div>
 
       <div *ngIf="validations.length" class="col-9">
-          <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
+        <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
       </div>
 
       <!-- Rows -->
       <div *ngIf="validations.length" class="col-9">
-        <div *ngFor="let valrun of validations  | paginate :
-        {itemsPerPage: limit, currentPage: page, totalItems: numberOfValidations}">
-
+        <div *ngFor="let valrun of validations"
+             class="validation-row-area">
+            <p-checkbox
+              class="modify-checkbox"
+              *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
+              [value]="valrun.id"
+              [ngModel]="selectedValidations$ | async"
+              (ngModelChange)="updateSelectedValidations($event, valrun.id)"
+              inputId="{{valrun.id}}}">
+            </p-checkbox>
           <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
           <br/>
         </div>
-        <!--    Pagination -->
-        <pagination-template *ngIf="validations.length" #p="paginationApi"
-                             (pageChange)="handlePageChange($event)">
 
-          <div class="text-center">
-            <ul class="custom-pagination custom-responsive custom-star-inserted justify-content-center"
-                aria-label="Pagination">
-              <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
-                <div *ngIf="!p.isFirstPage()" (click)="p.previous()"><span class="pi pi-angle-left"></span></div>
-                <div *ngIf="p.isFirstPage()" [class.disabled]="true"><span class="pi pi-angle-left"></span></div>
-              </li>
+        <div *ngIf="isLoading" class="loading-vals-box">
+          <span class="pi pi-spin pi-spinner mr-2" style="font-size: 2rem"> </span><em style="font-size: 1.5rem"> Loading... </em>
+        </div>
 
-              <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
-                <div (click)="p.setCurrent(page.value)"
-                     *ngIf="p.getCurrent() !== page.value"
-                     [class.current]="p.getCurrent() === page.value">
-                  <span>{{ page.label }}</span>
-                </div>
-                <div *ngIf="p.getCurrent() === page.value" [class.current]="p.getCurrent() === page.value">
-                  <span>{{ page.label }}</span>
-                </div>
-              </li>
-
-              <li class="pagination-next" [class.disabled]="p.isLastPage()">
-                <div *ngIf="!p.isLastPage()" (click)="p.next()"><span class="pi pi-angle-right"></span></div>
-                <div *ngIf="p.isLastPage()" [class.disabled]="true"><span class="pi pi-angle-right"></span></div>
-              </li>
-            </ul>
-          </div>
-
-        </pagination-template>
+        <div *ngIf="endOfPage && !published" class="val-number-information">
+          <em> You have run {{validations.length}} {{validations.length === 1 ? 'validation ': 'validations'}}.</em>
+        </div>
       </div>
 
     </div>
   </div>
 </div>
+
+
+

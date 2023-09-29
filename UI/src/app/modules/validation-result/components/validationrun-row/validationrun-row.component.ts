@@ -55,17 +55,19 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   private updateConfig(): void {
     this.configurations$ = combineLatest(
       this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
-      this.datasetService.getAllDatasets(true),
+      this.datasetService.getAllDatasets(true, false),
       this.datasetVersionService.getAllVersions(),
       this.datasetVariableService.getAllVariables()
     ).pipe(
       map(([configurations, datasets, versions, variables]) =>
         configurations.map(
-          config =>
-            ({
+          config => {
+            const datasetInfo = datasets.find(ds => config.dataset === ds.id);
+            return {
               ...config,
-              dataset: datasets.find(ds =>
-                config.dataset === ds.id)?.pretty_name,
+              dataset: datasetInfo?.pretty_name,
+
+              fileExists: datasetInfo?.storage_path.length > 0,
 
               version: versions.find(dsVersion =>
                 config.version === dsVersion.id).pretty_name,
@@ -75,7 +77,8 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
               variableUnit: variables.find(dsVar =>
                 config.variable === dsVar.id).unit,
-            })
+            }
+          }
         )
       )
     );

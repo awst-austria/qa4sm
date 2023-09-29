@@ -23,7 +23,7 @@ User = get_user_model()
 # See https://stackoverflow.com/a/6513372/
 class TestCommands(TestCase):
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     __logger = logging.getLogger(__name__)
 
