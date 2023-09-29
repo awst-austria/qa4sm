@@ -21,7 +21,7 @@ from validator.validation.readers import create_reader
 class TestValidation(TestCase):
     databases = '__all__'
     allow_database_queries = True
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     def setUp(self) -> None:
         self.run = generate_default_validation_smos()

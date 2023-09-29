@@ -1,0 +1,11 @@
+[
+  {
+    "model": "validator.user",
+    "pk": 1,
+    "fields": {
+      "username": "test_admin",
+      "password": "topSecretAdminPassword",
+      "email": "some_email@some_domain.com"
+    }
+  }
+]

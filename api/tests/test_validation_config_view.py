@@ -28,7 +28,7 @@ class TestValidationConfigView(TransactionTestCase):
 
     __logger = logging.getLogger(__name__)
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters', 'networks']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'networks', 'users']
 
     def setUp(self):
         # creating the main user to run a validation

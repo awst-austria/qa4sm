@@ -21,9 +21,24 @@ from validator.validation.util import first_file_in
 
 from pytesmo.validation_framework.adapters import TimestampAdapter, BasicAdapter
 from validator.models import UserDatasetFile
+import pandas as pd
 
 __logger = logging.getLogger(__name__)
 
+class SBPCAReader(GriddedNcOrthoMultiTs):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def read(self, *args, **kwargs) -> pd.DataFrame:
+        ts = super(SBPCAReader, self).read(*args, **kwargs)
+        if (ts is not None) and not ts.empty:
+            ts = ts[ts.index.notnull()]
+            for col in ['Chi_2_P', 'M_AVA0', 'N_RFI_X', 'N_RFI_Y', 'RFI_Prob',
+                        'Science_Flags']:
+                if col in ts.columns:
+                    ts[col] = ts[col].fillna(0)
+            ts = ts.dropna(subset='Soil_Moisture')
+        return ts
 
 def create_reader(dataset, version) -> GriddedNcTs:
     """
@@ -95,6 +110,10 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
+
+    if dataset.short_name == globals.SMOS_SBPCA:
+        reader = SBPCAReader(folder_name, ioclass_kws={'read_bulk': True},
+                             timevarname='acquisition_time')
 
     if dataset.user and len(dataset.user_dataset.all()):
         file = UserDatasetFile.objects.get(dataset=dataset)

@@ -22,7 +22,7 @@ def execute_test_job(self, parameter):
 ## See also: https://stackoverflow.com/a/11887308/
 class TestAdmin(TestCase):
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     __logger = logging.getLogger(__name__)
     # setting False, because the page that we refer here may raise logging.exception and pytest 6.0.0 and newer
