@@ -1,6 +1,5 @@
+<div id="background"></div>
 <div id="wrapper">
-
-
   <div id="landing" class="section">
     <div id="title-box">
       <h1 class="page-title">
@@ -51,21 +50,23 @@
 
     </div>
     <div id="scroll-down">
-      <a pButton
-         icon="pi pi-chevron-down"
-         routerLink="/home"
-         fragment="about-project"
-         class="btn-scroll-down"
-         role="button">
-      </a>
+      <p-button
+        icon="pi pi-chevron-down"
+        (onClick)="goToNews()"
+        class="btn-scroll-down">
+      </p-button>
       <!--      <span class="pi pi-chevron-down" style="color:white"></span>-->
     </div>
 
   </div>
   <div id="about-app" class="section">
-    <div *ngIf="settings$|async as settings" class="app-news flex flex-column flex-wrap justify-content-center">
+    <div *ngIf="settings$|async as settings" id="qa4sm-news"
+         class="app-news flex flex-column flex-wrap justify-content-center">
       <h3>What's new</h3>
       <div [innerHTML]=settings[0].news class="text-2xl line-height-2"></div>
+    </div>
+    <div class="flex flex-column h-6rem">
+      <div class="vertical-line"></div>
     </div>
     <div class="application-desc flex flex-column flex-wrap h-auto">
       <!--      Application introduction-->
@@ -81,12 +82,12 @@
       <div class="application-videos">
         <p-carousel [value]="videos"
                     [circular]="true"
-                    [autoplayInterval]="5000"
                     [numVisible]="1"
                     [numScroll]="1"
-                    [showIndicators]="false">
+                    [showIndicators]="false"
+                    [showNavigators]="true">
           <ng-template let-video pTemplate="item">
-            <video width="100%" controls allowfullscreen>
+            <video width="80%" class="mb-2" controls allowfullscreen>
               <source [src]="video.video">
             </video>
           </ng-template>
@@ -131,13 +132,58 @@
         </div>
       </div>
 
-    </div>
-  </div>
-  <div id="about-project" class="section">
-    <div>
+      <div class="application-team flex flex-column flex-wrap h-auto">
+        <h1> Project Team and Partners </h1>
+        <div class="flex flex-row gap-1 w-12 mb-2">
+          <div class="w-8 pl-3 text-justify partner-desc">
+            The <b>QA4SM</b> project provides an operational online validation service for soil moisture products. It
+            started
+            in May 2018 and is supported by the <a href="https://www.ffg.at/en" target="_blank">Austrian Research
+            Promotion Agency
+            (Österreichische Forschungsförderungsgesellschaft, FFG)</a> in the
+            <a href="https://www.ffg.at/en/program/austrian-space-applications-programme-0" target="_blank">Austrian
+              Space
+              Application
+              Programme</a>.
+          </div>
+
+          <div class="w-4 pr-2 partner-logo"><a href="https://www.ffg.at/en" rel="noreferrer" target="_blank">
+            <img alt="FFG logo" id="logo_ffg" [src]="logoFiles[3].plot"></a></div>
+        </div>
+        <div class="flex flex-row gap-1 w-12">
+          <div class="w-8 pl-3 text-justify partner-desc">
+            From 2021 on, QA4SM is further evolved within the <a href="https://project-frm4sm.geo.tuwien.ac.at/"
+                                                                 target="_blank">FRM4SM</a> project, supported by the <a
+            href="https://www.esa.int/" target="_blank">European Space Agency</a>.
+          </div>
+          <div class="w-4 pr-2 partner-logo">
+            <a href="https://www.esa.int/" target="_blank">
+              <img alt="ESA logo" id="logo_esa" [src]="logoFiles[2].plot">
+            </a>
+          </div>
+        </div>
+
+      </div>
 
     </div>
+
+    <div class="flex flex-column h-6rem">
+      <div class="vertical-line"></div>
+    </div>
+    <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
+         class="app-news flex flex-column flex-wrap justify-content-center">
+      <h3>Share with us your opinion</h3>
+      <div class="text-2xl line-height-2">
+        If you think we could improve something or you see a missing functionality, please let us know using
+        this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
+      </div>
+    </div>
   </div>
+  <!--  <div id="about-project" class="section">-->
+  <!--    <div>-->
+
+  <!--    </div>-->
+  <!--  </div>-->
 
 
   <!--        <h4>We offer... </h4>-->
@@ -388,9 +434,6 @@
 
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
-
-
-
 
 
 </div>

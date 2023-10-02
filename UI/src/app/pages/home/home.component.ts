@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {Observable} from 'rxjs';
+import {Router} from '@angular/router';
 
 
 const homeUrlPrefix = '/static/images/home/';
@@ -39,11 +40,11 @@ export class HomeComponent implements OnInit {
     link: 'https://www.geo.tuwien.ac.at/',
     description: 'GEO'
   }, {
-    plot: logoUrlPrefix + 'logo_esa.png',
+    plot: logoUrlPrefix + 'logo_esa_transparent.png',
     link: 'https://www.esa.int/',
     description: 'ESA'
   }, {
-    plot: logoUrlPrefix + 'logo_ffg.png',
+    plot: logoUrlPrefix + 'logo_ffg_transparent.png',
     link: 'https://www.ffg.at/',
     description: 'FFG'
   }];
@@ -101,13 +102,17 @@ export class HomeComponent implements OnInit {
   applicationInfoTileClass = 'flex flex-column w-6 align-items-center justify-content-center application-tile';
 
   constructor(private authService: AuthService,
-              private settingsService: SettingsService) {
+              private settingsService: SettingsService,
+              private router: Router) {
   }
 
   ngOnInit(): void {
-    console.log("Screen Width: " + window.screen.width);
     this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
     this.settings$ = this.settingsService.getAllSettings();
+  }
+
+  goToNews(): void{
+    this.router.navigate([], {fragment: "qa4sm-news"});
   }
 
 }

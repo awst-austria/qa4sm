@@ -2292,21 +2292,32 @@ div.carousel-caption{
   z-index: 1;
 }
 
-.p-carousel-items-content{
-  //background-color: greenyellow;
-  //opacity: 0.7;
+.p-carousel-item{
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .p-carousel .p-carousel-content .p-carousel-prev,
 .p-carousel .p-carousel-content .p-carousel-next {
-  width: 2rem;
-  height: 2rem;
+  font-size: 2rem;
+  width: 3rem;
+  height: 3rem;
   color: #6c757d;
   border: 0 none;
-  background: transparent;
+  background: white;
   border-radius: 50%;
   transition: box-shadow 0.15s;
-  display: none;
+}
+
+.p-carousel .p-carousel-content .p-carousel-prev {
+  margin-left: 3vw;
+}
+
+.p-carousel .p-carousel-content .p-carousel-next{
+  margin-right: 3vw;
 }
 
 .p-carousel-content .carousel-img{
@@ -6237,7 +6248,7 @@ div.carousel-caption{
   margin-bottom: 0.1rem;
 }
 
-.btn-scroll-down.p-button{
+.btn-scroll-down .p-button{
   width: 50px;
   height: 50px;
   background-color: transparent;
@@ -6246,10 +6257,18 @@ div.carousel-caption{
   text-decoration: none;
 }
 
-.btn-scroll-down.p-button .p-button-icon{
+.btn-scroll-down .p-button .p-button-icon{
   color: white;
   font-size: 2rem;
 }
+
+.btn-scroll-down .p-button:hover{
+  background-color: transparent;
+}
+.btn-scroll-down .p-button:focus, .btn-scroll-down .p-button:active{
+  outline: none;
+}
+
 
 .btn-action.p-button:hover, .btn-action-large.p-button:hover, .btn-action-home.p-button:hover{
   background-color: $menu-item-color;
@@ -6258,11 +6277,11 @@ div.carousel-caption{
   text-decoration: none;
 }
 
-.btn-action.p-button:focus, .btn-action-large.p-button:focus{
+.btn-action .p-button:focus, .btn-action-large .p-button:focus{
   box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .5);
 }
 
-.btn-scroll-down.p-button:focus, .btn-action-home.p-button:focus{
+.btn-scroll-down .p-button:focus, .btn-action-home .p-button:focus{
   box-shadow: none;
 }
 
@@ -6322,7 +6341,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   width: 100%;
   background-color: $dropdown-buttons-background;;
 }
-.dropdown-item.p-button:hover{
+.dropdown-item .p-button:hover{
   color: #212529;
   background-color: rgba(248, 193, 0, .5);
 }
