@@ -34,7 +34,7 @@ from validator.validation import globals
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestValidity(TestCase):
 
-    fixtures = ['variables', 'versions', 'datasets', 'filters']
+    fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     # run before every test case
     def setUp(self):

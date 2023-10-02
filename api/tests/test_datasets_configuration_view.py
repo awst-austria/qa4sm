@@ -11,7 +11,7 @@ from api.tests.test_helper import *
                    CELERY_TASK_ALWAYS_EAGER=True)
 class TestDatasetConfigurationView(TestCase):
     __logger = logging.getLogger(__name__)
-    fixtures = ['datasets', 'filters', 'versions', 'variables']
+    fixtures = ['datasets', 'filters', 'versions', 'variables', 'users']
 
     def setUp(self):
         self.auth_data, self.test_user = create_test_user()

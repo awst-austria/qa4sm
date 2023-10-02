@@ -140,6 +140,5 @@
     "schematicCollections": [
       "@angular-eslint/schematics"
     ]
-  },
-  "defaultProject": "UI"
+  }
 }

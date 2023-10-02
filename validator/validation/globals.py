@@ -48,6 +48,7 @@ CGLS_SCATSAR_SWI1km = 'CGLS_SCATSAR_SWI1km'
 SMOS_L3 = 'SMOS_L3'
 SMOS_L2 = 'SMOS_L2'
 SMAP_L2 = 'SMAP_L2'
+SMOS_SBPCA = 'SMOS_SBPCA'
 
 # dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -94,6 +95,7 @@ SMOSL3_Level3_DESC = 'SMOSL3_v339_DESC'
 SMOSL3_Level3_ASC = 'SMOSL3_v339_ASC'
 SMOSL2_700 = 'SMOSL2_v700'
 SMAPL2_V8 = 'SMAPL2_V8'
+SMOS_SBPCA_v724 = 'SMOS_SBPCA_v724'
 
 # dataset data variables PRETTY NAMES
 C3S_sm = 'C3S_sm'
@@ -113,6 +115,7 @@ ESA_CCI_SM_C_sm = 'ESA_CCI_SM_C_sm'
 SMOSL3_sm = 'SMOSL3_sm'
 SMOSL2_sm = 'SMOSL2_sm'
 SMAPL2_soil_moisture = 'SMAPL2_soil_moisture'
+SMOS_SBPCA_sm = 'SMOS_SBPCA_sm'
 
 # left empty, because if in the future we want to exclude some datasets from the reference group it will be enough to
 # insert it's shortname to the list
@@ -128,6 +131,7 @@ IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
                    'SMOS_IC': 0.25,
                    'ASCAT': 0.1,
                    'SMOS_L2': 0.135,  # 15km
+                   'SMOS_SBPCA': 0.135,  # 15km
                    'SMAP_L2': 0.35, }  # 35km
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
