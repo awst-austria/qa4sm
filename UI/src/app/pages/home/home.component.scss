@@ -155,6 +155,10 @@ div#about-app {
   text-align: center;
 }
 
+.application-team  .team-desc{
+  font-size: 1.2vw;
+}
+
 .application-info {
   width: 100%;
   height: auto;
@@ -217,12 +221,27 @@ div#about-app {
 }
 
 #logo_ffg {
-  scale: 0.6;
+  width: 100%;
 }
 
 #logo_esa {
-  scale: 0.3;
+  width: 100%;
 }
+
+
+#logo_tu, #logo_awst {
+  width: 100%;
+}
+
+.partner-logo a{
+  width: 100%;
+  height: 100%;
+}
+
+//.partner-logo {
+//  height: 3rem;
+//  vertical-align: middle;
+//}
 
 //.application-info .application-tile:nth-child(2){
 //  border-top-right-radius: 5px;

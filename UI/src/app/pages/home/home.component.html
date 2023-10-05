@@ -134,8 +134,9 @@
 
       <div class="application-team flex flex-column flex-wrap h-auto">
         <h1> Project Team and Partners </h1>
-        <div class="flex flex-row gap-1 w-12 mb-2">
-          <div class="w-8 pl-3 text-justify partner-desc">
+<!--        FFG -->
+        <div class="flex flex-row flex-wrap w-12 align-items-center justify-content-center">
+          <div class="w-8 pl-3 text-justify partner-desc gap-1">
             The <b>QA4SM</b> project provides an operational online validation service for soil moisture products. It
             started
             in May 2018 and is supported by the <a href="https://www.ffg.at/en" target="_blank">Austrian Research
@@ -147,23 +148,59 @@
               Programme</a>.
           </div>
 
-          <div class="w-4 pr-2 partner-logo"><a href="https://www.ffg.at/en" rel="noreferrer" target="_blank">
-            <img alt="FFG logo" id="logo_ffg" [src]="logoFiles[3].plot"></a></div>
+          <div class="w-3 partner-logo flex flex-wrap align-items-center justify-content-center">
+            <a href="https://www.ffg.at/en" rel="noreferrer" target="_blank">
+              <img alt="FFG logo" id="logo_ffg" [src]="logoFiles[3].plot"></a>
+          </div>
         </div>
-        <div class="flex flex-row gap-1 w-12">
+
+<!--        ESA -->
+        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center">
           <div class="w-8 pl-3 text-justify partner-desc">
             From 2021 on, QA4SM is further evolved within the <a href="https://project-frm4sm.geo.tuwien.ac.at/"
                                                                  target="_blank">FRM4SM</a> project, supported by the <a
             href="https://www.esa.int/" target="_blank">European Space Agency</a>.
           </div>
-          <div class="w-4 pr-2 partner-logo">
+          <div class="w-3 partner-logo flex flex-wrap align-items-center justify-content-center">
             <a href="https://www.esa.int/" target="_blank">
               <img alt="ESA logo" id="logo_esa" [src]="logoFiles[2].plot">
             </a>
           </div>
         </div>
-
+<!--        TU -->
+        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center">
+          <div class="w-3 partner-logo flex align-items-center justify-content-center">
+            <a href="https://climers.geo.tuwien.ac.at/climers/" target="_blank">
+              <img alt="TU logo" id="logo_tu" [src]="logoFiles[1].plot">
+            </a>
+          </div>
+          <div class="w-7 pl-3 text-justify team-desc px-5">
+            <b>TU Wien (Vienna University of Technology)</b><br>
+            Department of Geodesy and Geoinformation<br>
+            Research Group Climate and Environmental Remote Sensing (CLIMERS)<br>
+            Website: <a href="https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/" target="_blank">
+            https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/</a><br>
+            Contact: Wouter Dorigo (wouter.dorigo (at) tuwien.ac.at)<br>
+            Tasks: Scientific lead and research, dataset support
+          </div>
+        </div>
+        <!--      AWST-->
+        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center">
+          <div class="w-3 partner-logo flex align-items-center justify-content-center">
+            <a href="https://www.awst.at/" target="_blank">
+              <img alt="AWST logo" id="logo_awst" [src]="logoFiles[0].plot">
+            </a>
+          </div>
+          <div class="w-7 pl-3 text-justify team-desc px-5">
+            <b>AWST (Applied Science, Software and Technology)</b><br>
+            Website: <a href="https://www.awst.at" target="_blank">https://www.awst.at</a><br>
+            Contact: Alexander Boresch (boresch (at) awst.at)<br>
+            Tasks: Project management, technical lead, webservice development and operations
+          </div>
+        </div>
       </div>
+
+
 
     </div>
 
