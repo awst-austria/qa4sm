@@ -7,7 +7,7 @@ import {SettingsService} from '../../../core/services/global/settings.service';
 import {BehaviorSubject} from 'rxjs';
 
 @Component({
-  selector: 'navigation-bar',
+  selector: 'navigation-bar-header',
   templateUrl: './navigation-bar.component.html',
   styleUrls: ['./navigation-bar.component.scss']
 })
