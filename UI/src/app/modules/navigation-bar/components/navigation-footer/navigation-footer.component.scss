@@ -1,0 +1,15 @@
+@import "../../../../../style.variables";
+
+.footer {
+  background: transparent;
+  height: 2rem;
+}
+
+a {
+  color: $menu-item-focus-color;
+  text-decoration: none;
+}
+
+.footer-dark {
+  background: rgba(0, 0, 0, 0.5);
+}

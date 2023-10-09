@@ -1,0 +1,20 @@
+<div class="flex flex-row flex-wrap align-items-center justify-content-center footer"
+     [ngClass]="{'footer-dark': currentRoute === '/home'}">
+  <div class="flex flex-row flex-wrap gap-6 align-items-center justify-content-center">
+    <div class="flex w-1">
+      <a [routerLink]="'help'">
+        Help
+      </a>
+    </div>
+    <div class="flex w-1">
+      <a [routerLink]="'terms'">
+        Terms
+      </a>
+    </div>
+    <div class="flex w-1">
+      <a [routerLink]="'contact-us'">
+        Contact
+      </a>
+    </div>
+  </div>
+</div>
