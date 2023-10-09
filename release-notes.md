@@ -1,7 +1,8 @@
-QA4SM v2.4.1 - Release notes 2023-10-02
+QA4SM v2.4.1 - Release notes 2023-10-09
 =======================================================
 # Bug fix
 1. Label 'User data' from dataset selector removed
+2. Styling improved
 
 
 QA4SM v2.4.0 - Release notes 2023-09-29
