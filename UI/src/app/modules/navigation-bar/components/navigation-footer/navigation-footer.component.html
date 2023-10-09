@@ -2,6 +2,11 @@
      [ngClass]="{'footer-dark': currentRoute === '/home'}">
   <div class="flex flex-row flex-wrap gap-6 align-items-center justify-content-center">
     <div class="flex w-1">
+      <a [routerLink]="'home'">
+        Home
+      </a>
+    </div>
+    <div class="flex w-1">
       <a [routerLink]="'help'">
         Help
       </a>
