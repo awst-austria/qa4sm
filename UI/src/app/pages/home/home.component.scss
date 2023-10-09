@@ -102,8 +102,12 @@ div#about-app {
   border: 2px solid lightgray;
 }
 
-.app-news div {
+.app-news h3 {
   font-size: 2vw;
+}
+
+.app-news div {
+  font-size: 1.5vw;
 }
 
 .application-desc {
@@ -220,17 +224,31 @@ div#about-app {
   background-color: lightgray;
 }
 
+.horizontal-line {
+  width: 85%;
+  height: 2px;
+  background-color: #74A5B9;
+}
+
 #logo_ffg {
   width: 100%;
+  scale: 0.7;
 }
 
 #logo_esa {
   width: 100%;
+  scale: 0.9;
 }
 
 
-#logo_tu, #logo_awst {
+#logo_tu {
   width: 100%;
+  scale: 0.7;
+}
+
+#logo_awst {
+  width: 100%;
+  scale: 0.8;
 }
 
 .partner-logo a{

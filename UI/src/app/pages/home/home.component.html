@@ -63,7 +63,7 @@
     <div *ngIf="settings$|async as settings" id="qa4sm-news"
          class="app-news flex flex-column flex-wrap justify-content-center">
       <h3>What's new</h3>
-      <div [innerHTML]=settings[0].news class="text-2xl line-height-2"></div>
+      <div [innerHTML]=settings[0].news class="line-height-2"></div>
     </div>
     <div class="flex flex-column h-6rem">
       <div class="vertical-line"></div>
@@ -140,8 +140,7 @@
             The <b>QA4SM</b> project provides an operational online validation service for soil moisture products. It
             started
             in May 2018 and is supported by the <a href="https://www.ffg.at/en" target="_blank">Austrian Research
-            Promotion Agency
-            (Österreichische Forschungsförderungsgesellschaft, FFG)</a> in the
+            Promotion Agency</a> (Österreichische Forschungsförderungsgesellschaft, FFG) in the
             <a href="https://www.ffg.at/en/program/austrian-space-applications-programme-0" target="_blank">Austrian
               Space
               Application
@@ -167,8 +166,10 @@
             </a>
           </div>
         </div>
+
+        <div class="horizontal-line my-2"></div>
 <!--        TU -->
-        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center">
+        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center mb-2">
           <div class="w-3 partner-logo flex align-items-center justify-content-center">
             <a href="https://climers.geo.tuwien.ac.at/climers/" target="_blank">
               <img alt="TU logo" id="logo_tu" [src]="logoFiles[1].plot">
@@ -178,12 +179,14 @@
             <b>TU Wien (Vienna University of Technology)</b><br>
             Department of Geodesy and Geoinformation<br>
             Research Group Climate and Environmental Remote Sensing (CLIMERS)<br>
-            Website: <a href="https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/" target="_blank">
-            https://climers.geo.tuwien.ac.at/climers/research/quality-assurance/qa4sm/</a><br>
-            Contact: Wouter Dorigo (wouter.dorigo (at) tuwien.ac.at)<br>
-            Tasks: Scientific lead and research, dataset support
+            <b>Website: </b> <a href="https://www.tuwien.at/en/mg/geo/climers" target="_blank">
+            CLIMERS</a><br>
+            <b>Contact:</b> Wouter Dorigo (wouter.dorigo (at) tuwien.ac.at)<br>
+            <b>Tasks:</b> Scientific lead and research, dataset support
           </div>
         </div>
+
+
         <!--      AWST-->
         <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center">
           <div class="w-3 partner-logo flex align-items-center justify-content-center">
@@ -193,9 +196,9 @@
           </div>
           <div class="w-7 pl-3 text-justify team-desc px-5">
             <b>AWST (Applied Science, Software and Technology)</b><br>
-            Website: <a href="https://www.awst.at" target="_blank">https://www.awst.at</a><br>
-            Contact: Alexander Boresch (boresch (at) awst.at)<br>
-            Tasks: Project management, technical lead, webservice development and operations
+            <b>Website:</b> <a href="https://www.awst.at" target="_blank"> AWST</a><br>
+            <b>Contact: </b> Alexander Boresch (boresch (at) awst.at)<br>
+            <b>Tasks: </b> Project management, technical lead, webservice development and operations
           </div>
         </div>
       </div>
@@ -209,8 +212,8 @@
     </div>
     <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
          class="app-news flex flex-column flex-wrap justify-content-center">
-      <h3>Share with us your opinion</h3>
-      <div class="text-2xl line-height-2">
+      <h3 class="line-height-2">Share with us your opinion</h3>
+      <div class="line-height-2">
         If you think we could improve something or you see a missing functionality, please let us know using
         this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
       </div>
