@@ -1,5 +1,5 @@
-<div class="grid pt-4">
-  <div class="col-12 text-center py-0 my-0">
+<div class="flex flex-column pt-4">
+  <div class="w-12 text-center py-0 my-0">
     <h4 class="py-0 my-0 text-muted">
       Temporal matching
       <span class="pi pi-question-circle mb-1"
@@ -10,16 +10,15 @@
       </span>
     </h4>
   </div>
-  <hr class="col-12 pt-0 mt-0 featurette-divider" style="max-width: 60rem">
-  <div class="col-12 ml-3">
-    <div class="grid" id="method">
-      <div class="small-label col-10" style="max-width: 8rem">
+  <hr class="w-11 pt-0 mt-0 featurette-divider">
+  <div class="flex flex-row w-12 p-5 align-content-center justify-content-center">
+      <div class="small-label w-4" style="max-width: 8rem">
         <div class="p-fluid">
           <div>Window size</div>
         </div>
       </div>
-      <div class="col-7 px-0">
-        <div class="p-float-label">
+      <div class="flex w-8 px-0 p-float-label align-content-center justify-content-start">
+<!--        <div class="p-float-label">-->
           <p-inputNumber
             id="windowSizeSelector"
             [showButtons]="true"
@@ -32,9 +31,8 @@
             [max]="24">
           </p-inputNumber>
           <label for="windowSizeSelector">Select a size</label>
-        </div>
+<!--        </div>-->
       </div>
-    </div>
   </div>
 </div>
 
