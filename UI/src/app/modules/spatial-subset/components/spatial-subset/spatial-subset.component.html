@@ -6,20 +6,16 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
-  <div class="grid pt-1">
+  <div class="flex flex-row flex-wrap pt-3">
 
-    <div class="col-12 sm:col-5">
-      <div class="grid" id="lowerLeft">
-        <div class="col-12">
-          <div class="d-flex justify-content-center  pb-2">
-          </div>
-        </div>
-        <div class="small-label col-4">
-          <div class="p-fluid">
+    <div class="flex flex-column lg:w-5 md:w-12 p-2 justify-content-center align-content-center">
+      <div class="flex flex-row" id="lowerLeft">
+        <div class="small-label w-4 p-2">
+          <div class="p-fluid text-center w-12">
             <div pTooltip="Lower left bounding box corner">Lower left</div>
           </div>
         </div>
-        <div class="col-4 px-0 mx-0">
+        <div class="w-4 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label">
               <p-inputNumber id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
@@ -33,9 +29,9 @@
           </div>
 
         </div>
-        <div class="col-4  px-0 mx-0">
+        <div class="w-4 px-0 mx-0">
           <div class="p-fluid">
-            <div class="p-float-label ">
+            <div class="p-float-label">
               <p-inputNumber id="minLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLon$|async"
                              [min]="checkValIfLimited(subsetModel.minLon$|async)"
@@ -50,31 +46,25 @@
     </div>
 
     <!--    Clear and map buttons-->
-    <div class="col-12 sm:col-2">
-      <div class="d-flex justify-content-center">
+    <div class="flex flex-column lg:w-2 md:w-12 p-2 justify-content-center align-content-center">
+      <div class="flex justify-content-center align-content-center">
         <button pButton type="button" icon="pi pi-trash" pTooltip="Clear coordinates"
-                class="clearCoordinates p-button-info mr-2" style="padding: 0.2rem;"
+                class="clearCoordinates p-button-info mr-2"
                 (click)="clearCoordinatesOrSetDefault()"></button>
       </div>
     </div>
 
     <!--    Upper right coordinates-->
-    <div class="col-12 sm:col-5">
-      <div class="grid" id="upperRight">
-        <div class="col-12">
-          <div class="d-flex justify-content-center pb-2">
-<!--            Upper right-->
-          </div>
-        </div>
-        <div class="small-label col-4">
+    <div class="flex flex-column lg:w-5 md:w-12 lg:mt-0 md:mt-2 p-2 justify-content-center align-content-center">
+      <div class="flex flex-row" id="upperRight">
+        <div class="small-label w-4 p-2">
           <div class="p-fluid">
             <div pTooltip="Upper right bounding box corner">Upper right</div>
           </div>
         </div>
-        <div class="col-4 mx-0 px-0">
+        <div class="w-4 mx-0 px-0">
           <div class="p-fluid">
             <div class="p-float-label ">
-
               <p-inputNumber id="maxLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="(subsetModel.maxLat$|async)"
                              [min]="checkValIfLimited(subsetModel.minLat$|async, true)"
@@ -85,7 +75,7 @@
             </div>
           </div>
         </div>
-        <div class="col-4 px-0 mx-0">
+        <div class="w-4 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label ">
               <p-inputNumber id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
