@@ -16,9 +16,9 @@
 
       <div *ngIf="!maintenanceMode" class="flex flex-column flex-wrap align-content-center justify-content-center flex-wrap">
 
-        <div class="flex flex-row gap-3 justify-content-center w-10 p-2 md:flex-wrap lg:flex-nowrap">
+        <div class="flex flex-row gap-3 justify-content-center w-10 p-2 flex-wrap lg:flex-nowrap">
           <!--  data column-->
-          <div class="flex flex-column lg:w-6 md:w-12">
+          <div class="flex flex-column lg:w-6 w-12">
             <!--        here toggleable is set to false, otherwise accordions won't close, that's a bug in primeng 15.4.1-->
             <p-panel header="Data" [toggleable]="false" class="validation-small-row">
               <ng-template pTemplate="icons">
@@ -103,7 +103,7 @@
           </div>
 
 
-          <div class="flex flex-column lg:w-6 md:w-12">
+          <div class="flex flex-column lg:w-6 w-12">
             <!--  reference column-->
             <p-panel header="Reference" [toggleable]="true" class="validation-small-row">
               <ng-template pTemplate="icons">
