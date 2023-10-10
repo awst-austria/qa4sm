@@ -1,7 +1,7 @@
 <main>
-  <div class="grid no-gutters" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
+  <div class="flex flex-wrap align-content-center justify-content-center w-12" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
     <div *ngIf="(authService.authenticated|async)===false"
-         class="col-12 alert center">
+         class="flex flex-column w-12 alert py-2 mb-2 text-center align-content-center">
       <h5 class="pt-2">
         You are not logged in.
         You can check validation options, but cannot start a validation.
@@ -12,164 +12,162 @@
       </h5>
 
     </div>
-    <div class="
-    col-12
-    md:col-10 md:col-offset-1
-    lg:col-10 lg:col-offset-1
-    xl:col-8 xl:col-offset-2">
+    <div class="flex flex-column flex-wrap w-8 justify-content-center">
 
-      <div *ngIf="!maintenanceMode" class="grid" style="justify-content: center">
+      <div *ngIf="!maintenanceMode" class="flex flex-column flex-wrap align-content-center justify-content-center flex-wrap">
 
-        <!--  data column-->
-        <div class="md:col-5 col-10">
-          <!--        here toggleable is set to false, otherwise accordions won't close, that's a bug in primeng 15.4.1-->
-          <p-panel header="Data" [toggleable]="false" class="validation-small-row">
-            <ng-template pTemplate="icons">
-              <label class="p-panel-header-icon"
-                     pTooltip="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."
-                     tooltipPosition="bottom">
-                <span class="pi pi-question-circle"></span>
-              </label>
-            </ng-template>
-            <p-accordion multiple="true">
+        <div class="flex flex-row gap-3 justify-content-center w-10 p-2 md:flex-wrap lg:flex-nowrap">
+          <!--  data column-->
+          <div class="flex flex-column lg:w-6 md:w-12">
+            <!--        here toggleable is set to false, otherwise accordions won't close, that's a bug in primeng 15.4.1-->
+            <p-panel header="Data" [toggleable]="false" class="validation-small-row">
+              <ng-template pTemplate="icons">
+                <label class="p-panel-header-icon"
+                       pTooltip="The soil moisture dataset which is to be validated, i.e. compared to the 'Reference' data."
+                       tooltipPosition="bottom">
+                  <span class="pi pi-question-circle"></span>
+                </label>
+              </ng-template>
+              <p-accordion multiple="true">
 
-              <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; index as datasetIdx"
-                              [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / ' +
+                <p-accordionTab *ngFor="let item of validationModel.datasetConfigurations; index as datasetIdx"
+                                [header]="(item.datasetModel.selectedDataset?.pretty_name)+' / ' +
                              ''+(item.datasetModel.selectedVersion?.pretty_name)+' / '+(item.datasetModel.selectedVariable?.short_name)
                              + (validationConfigService.getInformationOnTheReference((item.spatialReference$|async), (item.temporalReference$|async), (item.scalingReference$|async)))"
-                              [selected]="datasetIdx === validationModel.datasetConfigurations.length - 1"
-                              [class]="{'highlighted': (item.highlighted$|async),
+                                [selected]="datasetIdx === validationModel.datasetConfigurations.length - 1"
+                                [class]="{'highlighted': (item.highlighted$|async),
                             'is-reference': ((item.spatialReference$|async) || (item.temporalReference$|async) || (item.scalingReference$|async))}">
 
-                <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset"
-                            [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                            [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
+                  <qa-dataset *ngIf="validationModel.datasetConfigurations[datasetIdx].datasetModel.selectedDataset"
+                              [selectionModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                              [removable]="true" (changeDataset)="onDatasetChange($event)"></qa-dataset>
 
-                <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
-                  <qa-basic-filter
-                    [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
-                    [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
-                    [filterModel]="filter"
-                    (excludeMutual)="this.excludeFilter($event, item.basicFilters)"
-                    (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
-                  </qa-basic-filter>
-                </ng-container>
+                  <ng-container *ngFor="let filter of item.basicFilters; let filterIdx = index">
+                    <qa-basic-filter
+                      [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
+                      [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
+                      [filterModel]="filter"
+                      (excludeMutual)="this.excludeFilter($event, item.basicFilters)"
+                      (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
+                    </qa-basic-filter>
+                  </ng-container>
 
-                <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
-                                     [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                     [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
-                                     [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
-                </qa-threshold-filter>
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosRfiFilter$"
+                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
+                  </qa-threshold-filter>
 
-                <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
-                                     [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                     [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
-                                     [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
-                </qa-threshold-filter>
-                <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
-                  <qa-ismn-network-filter
+                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
+                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
+                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
+                  </qa-threshold-filter>
+                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
+                    <qa-ismn-network-filter
 
-                    [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                    [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
-                </div>
-                <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
-                  <qa-ismn-depth-filter
-                    [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                    [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
-                  </qa-ismn-depth-filter>
-                </div>
+                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
+                  </div>
+                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
+                    <qa-ismn-depth-filter
+                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
+                    </qa-ismn-depth-filter>
+                  </div>
 
-                <div style="width: 100%;text-align: right">
-                  <button pButton type="button"
-                          [disabled]="validationModel.datasetConfigurations.length < 3"
-                          (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
-                          label="Remove dataset"
-                          icon="pi pi-trash"
-                          class="removeDataset p-button-danger my-2"
-                          style="padding: 0.2rem;">
-                  </button>
-                </div>
-              </p-accordionTab>
+                  <div style="width: 100%;text-align: right">
+                    <button pButton type="button"
+                            [disabled]="validationModel.datasetConfigurations.length < 3"
+                            (click)="removeDataset(validationModel.datasetConfigurations[datasetIdx])"
+                            label="Remove dataset"
+                            icon="pi pi-trash"
+                            class="removeDataset p-button-danger my-2"
+                            style="padding: 0.2rem;">
+                    </button>
+                  </div>
+                </p-accordionTab>
 
-            </p-accordion>
-            <button pButton
-                    type="button"
-                    label="Add dataset"
-                    icon="pi pi-plus-circle"
-                    (click)="addDatasetToValidate()"
-                    class="addDataset p-button-success my-2"
-                    style="padding: 0.2rem;"
-                    [disabled]="addDatasetButtonDisabled()">
-            </button>
+              </p-accordion>
+              <button pButton
+                      type="button"
+                      label="Add dataset"
+                      icon="pi pi-plus-circle"
+                      (click)="addDatasetToValidate()"
+                      class="addDataset p-button-success my-2"
+                      style="padding: 0.2rem;"
+                      [disabled]="addDatasetButtonDisabled()">
+              </button>
 
-          </p-panel>
-        </div>
-
-
-        <div class="md:col-5 col-10">
-          <!--  reference column-->
-          <p-panel header="Reference" [toggleable]="true" class="validation-small-row">
-            <ng-template pTemplate="icons">
-              <label class="p-panel-header-icon"
-                     pTooltip="Select which dataset chosen in the 'Data' component should be marked as spatial and temporal reference."
-                     tooltipPosition="bottom">
-                <span class="pi pi-question-circle"></span>
-              </label>
-            </ng-template>
-
-            <!--             spatial reference-->
-            <div class="pt-2">
-              <label for="spatial-reference"
-                     class="mb-4"
-                     pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool, it has to be chosen as the spatial reference."
-                     tooltipPosition="bottom">
-                <span class="pi pi-question-circle"></span>
-                Spatial reference
-              </label>
-              <qa-validation-reference
-                id="spatial-reference"
-                #spatialReference
-                [validationModel]="validationModel"
-                [referenceType]="'spatialReference$'"
-                (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
-            </div>
-
-            <!--             temporal reference-->
-            <div>
-              <label for="temporal-reference"
-                     class="mb-4"
-                     pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
-                     tooltipPosition="bottom">
-                <span class="pi pi-question-circle"></span>
-                Temporal reference
-              </label>
-              <qa-validation-reference
-                id="temporal-reference"
-                #temporalReference
-                [validationModel]="validationModel"
-                [referenceType]="'temporalReference$'"
-                (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
-            </div>
+            </p-panel>
+          </div>
 
 
-          </p-panel>
+          <div class="flex flex-column lg:w-6 md:w-12">
+            <!--  reference column-->
+            <p-panel header="Reference" [toggleable]="true" class="validation-small-row">
+              <ng-template pTemplate="icons">
+                <label class="p-panel-header-icon"
+                       pTooltip="Select which dataset chosen in the 'Data' component should be marked as spatial and temporal reference."
+                       tooltipPosition="bottom">
+                  <span class="pi pi-question-circle"></span>
+                </label>
+              </ng-template>
+
+              <!--             spatial reference-->
+              <div class="pt-2">
+                <label for="spatial-reference"
+                       class="mb-4"
+                       pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool, it has to be chosen as the spatial reference."
+                       tooltipPosition="bottom">
+                  <span class="pi pi-question-circle"></span>
+                  Spatial reference
+                </label>
+                <qa-validation-reference
+                  id="spatial-reference"
+                  #spatialReference
+                  [validationModel]="validationModel"
+                  [referenceType]="'spatialReference$'"
+                  (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
+              </div>
+
+              <!--             temporal reference-->
+              <div>
+                <label for="temporal-reference"
+                       class="mb-4"
+                       pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
+                       tooltipPosition="bottom">
+                  <span class="pi pi-question-circle"></span>
+                  Temporal reference
+                </label>
+                <qa-validation-reference
+                  id="temporal-reference"
+                  #temporalReference
+                  [validationModel]="validationModel"
+                  [referenceType]="'temporalReference$'"
+                  (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
+              </div>
 
 
-          <!--      Scaling-->
-          <!--        <p-panel header="Reference" [toggleable]="true" class="validation-small-row">-->
-          <!--          <div class="col-10">-->
-          <qa-scaling
-            [validationModel]="validationModel"
-            (hoverOverDataset)="onHoverOverReferenceDataset($event)"
-          ></qa-scaling>
-          <!--          </div>-->
-          <!--        </p-panel>-->
+            </p-panel>
 
 
+            <!--      Scaling-->
+            <!--        <p-panel header="Reference" [toggleable]="true" class="validation-small-row">-->
+            <!--          <div class="col-10">-->
+            <qa-scaling
+              [validationModel]="validationModel"
+              (hoverOverDataset)="onHoverOverReferenceDataset($event)"
+            ></qa-scaling>
+            <!--          </div>-->
+            <!--        </p-panel>-->
+
+
+          </div>
         </div>
 
         <!--      Map-->
-        <div class="col-10">
+        <div class="w-10 p-2">
           <p-panel toggleable="true" [header]="'Map'" styleClass="map-panel" class="validation-row">
             <qa-map class="map" #qwerty
                     [spatialSubset]="validationModel.spatialSubsetModel"
@@ -180,12 +178,12 @@
         </div>
 
         <!--      Spatial subsetting-->
-        <div class="col-10">
+        <div class="w-10 p-2">
           <qa-spatial-subset [subsetModel]="validationModel.spatialSubsetModel"></qa-spatial-subset>
         </div>
 
 
-        <p-panel header="Temporal Subsetting" [toggleable]="true" class="validation-row col-10">
+        <p-panel header="Temporal Subsetting" [toggleable]="true" class="validation-row w-10 p-2">
           <ng-template pTemplate="icons">
             <label class="p-panel-header-icon"
                    pTooltip="Select validation period and temporal matching window."
@@ -209,13 +207,13 @@
 
 
         <!--      Metrics-->
-        <div class="col-10">
+        <div class="w-10 p-2">
           <qa-metrics [validationModel]="validationModel"></qa-metrics>
         </div>
 
 
         <!--      Anomalies-->
-        <div class="col-10">
+        <div class="w-10 p-2">
           <qa-anomalies [anomaliesModel]="validationModel.anomalies"></qa-anomalies>
         </div>
 
@@ -225,7 +223,7 @@
         <!--      </div>-->
 
         <!-- Name -->
-        <div class="col-10">
+        <div class="w-10 p-2">
           <div class="grid px-2">
             <span class="label col-1">
               <label for="name">Name your validation</label>
