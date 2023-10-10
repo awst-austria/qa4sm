@@ -11,18 +11,11 @@
 
   <div class="flex flex-column flex-wrap align-content-center justify-content-center">
     <div class="flex flex-column w-8">
-<!--    <div class="-->
-<!--    col-12-->
-<!--    md:col-10 md:col-offset-1-->
-<!--    lg:col-10 lg:col-offset-1-->
-<!--    xl:col-8 xl:col-offset-2">-->
-
       <!--   validations selection   -->
       <qa-validation-selector></qa-validation-selector>
-      <div class="container mb-5 mt-4"
-           style="max-width: 60rem;">
+      <div class="flex flex-column flex-wrap mb-5 mt-4 align-content-center justify-content-center">
         <!--       summary of the selected comparison  -->
-        <div *ngIf="showComparisonResults" class="comparison-result-container">
+        <div *ngIf="showComparisonResults" class="flex flex-column w-10 mt-3 comparison-result-container">
           <div  class="text-center">
             <h3 class="my-3">Validation comparison results</h3>
           </div>
