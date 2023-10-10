@@ -61,7 +61,7 @@
   </div>
   <div id="about-app" class="section">
     <div *ngIf="settings$|async as settings" id="qa4sm-news"
-         class="app-news flex flex-column flex-wrap justify-content-center">
+         class="app-news flex flex-column flex-wrap justify-content-center align-items-center">
       <h3>What's new</h3>
       <div [innerHTML]=settings[0].news class="line-height-2"></div>
     </div>
@@ -79,7 +79,7 @@
         </span>
       </div>
       <!-- Application videos -->
-      <div class="application-videos">
+      <div class="application-videos mb-8">
         <p-carousel [value]="videos"
                     [circular]="true"
                     [numVisible]="1"
@@ -87,7 +87,7 @@
                     [showIndicators]="false"
                     [showNavigators]="true">
           <ng-template let-video pTemplate="item">
-            <video width="80%" class="mb-2" controls allowfullscreen>
+            <video width="80%" class="mb-8" controls allowfullscreen>
               <source [src]="video.video">
             </video>
           </ng-template>
@@ -132,7 +132,7 @@
         </div>
       </div>
 
-      <div class="application-team flex flex-column flex-wrap h-auto">
+      <div class="application-team flex flex-column flex-wrap h-auto my-8">
         <h1> Project Team and Partners </h1>
 <!--        FFG -->
         <div class="flex flex-row flex-wrap w-12 align-items-center justify-content-center">
@@ -211,7 +211,7 @@
       <div class="vertical-line"></div>
     </div>
     <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
-         class="app-news flex flex-column flex-wrap justify-content-center mb-4">
+         class="app-news flex flex-column flex-wrap justify-content-center align-items-center mb-4 text-center">
       <h3 class="line-height-2">Share with us your opinion</h3>
       <div class="line-height-2">
         If you think we could improve something or you see a missing functionality, please let us know using
