@@ -1,3 +1,8 @@
+QA4SM v2.4.2 - Release notes 2023-10-11
+=======================================================
+# Improvements
+1. Memory allocation updated
+
 QA4SM v2.4.1 - Release notes 2023-10-09
 =======================================================
 # Bug fix
