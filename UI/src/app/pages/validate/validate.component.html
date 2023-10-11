@@ -1,5 +1,6 @@
 <main>
-  <div class="flex flex-wrap align-content-center justify-content-center w-12" [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
+  <div class="flex flex-wrap align-content-center justify-content-center w-12"
+       [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
     <div *ngIf="(authService.authenticated|async)===false"
          class="flex flex-column w-12 alert py-2 mb-2 text-center align-content-center">
       <h5 class="pt-2">
@@ -14,7 +15,8 @@
     </div>
     <div class="flex flex-column flex-wrap w-8 justify-content-center">
 
-      <div *ngIf="!maintenanceMode" class="flex flex-column flex-wrap align-content-center justify-content-center flex-wrap">
+      <div *ngIf="!maintenanceMode"
+           class="flex flex-column flex-wrap align-content-center justify-content-center flex-wrap">
 
         <div class="flex flex-row gap-3 justify-content-center w-10 p-2 flex-wrap lg:flex-nowrap">
           <!--  data column-->
@@ -223,37 +225,38 @@
         <!--      </div>-->
 
         <!-- Name -->
-        <div class="w-10 p-2">
-          <div class="grid px-2">
-            <span class="label col-1">
-              <label for="name">Name your validation</label>
-            </span>
-            <input class="form-field col"
-                   id="name"
-                   type="text"
-                   pInputText
-                   [ngModel]="validationModel.nameTag$|async"
-                   (ngModelChange)="validationModel.nameTag$.next($event)">
-            <span
-              pTooltip="You can optionally name the validation to make it easier to identify in your list of validations."
-              class="pi pi-question-circle col-1 help-field">
-          </span>
+        <div class="w-10 p-2 flex flex-row">
+          <div class="label w-3">
+            <label for="name">Name your validation</label>
           </div>
+          <input class="form-field w-8"
+                 id="name"
+                 type="text"
+                 pInputText
+                 [ngModel]="validationModel.nameTag$|async"
+                 (ngModelChange)="validationModel.nameTag$.next($event)">
+          <div class="w-1">
+           <span
+             pTooltip="You can optionally name the validation to make it easier to identify in your list of validations."
+             class="pi pi-question-circle help-field">
+            </span>
+          </div>
+
         </div>
 
-        <div class="col-10">
+        <div class="w-10 p-2">
           <div>
-            <div class="d-flex justify-content-center">
-            <span
-              pTooltip="{{disableValidateButton(validationModel) ? 'You can not start a validation, because one of the chosen dataset has no variable assigned.' : ''}}">
-              <p-button
-                id="validateButton"
-                label="Validate"
-                icon="pi pi-play"
-                [disabled]="disableValidateButton(validationModel)"
-                (onClick)="startValidation(true)">
-              </p-button>
-            </span>
+            <div class="flex flex-row flex-wrap justify-content-center">
+              <span
+                pTooltip="{{disableValidateButton(validationModel) ? 'You can not start a validation, because one of the chosen dataset has no variable assigned.' : ''}}">
+                <p-button
+                  id="validateButton"
+                  label="Validate"
+                  icon="pi pi-play"
+                  [disabled]="disableValidateButton(validationModel)"
+                  (onClick)="startValidation(true)">
+                </p-button>
+              </span>
             </div>
           </div>
         </div>
