@@ -1064,11 +1064,11 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-radius: 0;
 }
 
-#windowSizeSelector, #threshold_filter{
+#windowSizeSelector, #threshold_filter, #yearFrom, #yearTo{
   height: 2.5rem;
 }
 
-#windowSizeSelector .p-inputtext {
+#windowSizeSelector .p-inputtext, #yearFrom .p-inputtext, #yearTo .p-inputtext {
   width: 90%;
 }
 
