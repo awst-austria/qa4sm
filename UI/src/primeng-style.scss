@@ -1038,6 +1038,10 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-radius: 4px;
 }
 
+#minLatInput, #maxLatInput, #minLonInput, #maxLonInput{
+  height: 2.5rem;
+}
+
 #minLatInput .p-inputtext, #maxLatInput .p-inputtext{
   border-radius: 0;
 }
@@ -1052,6 +1056,7 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
+  height: 2.5rem;
 }
 #windowSizeSelector .p-inputtext {
   border-left: none;
@@ -1060,7 +1065,7 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
 }
 
 #windowSizeSelector, #threshold_filter{
-  height: 2.25rem;
+  height: 2.5rem;
 }
 
 #windowSizeSelector .p-inputtext {
@@ -1071,6 +1076,14 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
+}
+
+#anomaliesMethodSelector .p-dropdown{
+  height: 2.5rem;
+  border-left-style: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  max-width: 100%
 }
 
 #sortingChoiceSelector .p-dropdown{
