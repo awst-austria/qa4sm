@@ -1,8 +1,10 @@
-<div class="grid">
-  <div class="col-12">
+<div class="flex flex-row gap-0">
+  <div class="w-auto">
     <p-checkbox [label]="metricModel.description" [ngModel]="metricModel.value$|async"
                 (ngModelChange)="metricModel.value$.next($event)" [binary]="true" [disabled]="disabled"
     ></p-checkbox>
+  </div>
+  <div class="w-1">
     <label class="p-panel-header-icon"
            pTooltip="{{metricModel.helperText}}"
            tooltipPosition="bottom">
