@@ -22,7 +22,7 @@ services:
     restart: always
 
   web:
-    image: "awst/qa4sm:2.4.1"
+    image: "awst/qa4sm:2.4.2"
     restart: always
     environment:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
@@ -50,16 +50,16 @@ services:
         target: /var/lib/qa4sm-web-val/valentina/data/user_data
 
   proxy:
-    image: "awst/qa4sm-proxy:2.4.1"
+    image: "awst/qa4sm-proxy:2.4.2"
     restart: always
     ports:
       - "8080:80"
   ui:
-    image: "awst/qa4sm-ui:2.4.1"
+    image: "awst/qa4sm-ui:2.4.2"
     restart: always
 
   worker-1:
-    image: "awst/qa4sm-worker:2.4.1"
+    image: "awst/qa4sm-worker:2.4.2"
     restart: always
     environment:
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
@@ -80,4 +80,4 @@ services:
     deploy:
       resources:
         limits:
-          memory: 250G
+          memory: 350G
