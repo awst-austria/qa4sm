@@ -1,11 +1,11 @@
 <main *ngIf="trackedRuns$ | async as myCopiedRuns"
-      class="flex flex-column mb-5 mt-4 w-6 align-content-center justify-content-center">
-  <div *ngIf="myCopiedRuns.length !== 0" class="w-12 flex flex-column align-content-center justify-content-center">
+      class="flex flex-column my-2 w-6 align-content-center justify-content-center">
+  <div *ngIf="myCopiedRuns.length !== 0" class="w-12 flex flex-column">
     <h1 class="text-center">Pinned validations</h1>
     <div class="mb-3 flex flex-column w-12">
-      <div *ngFor="let valrun of myCopiedRuns" class="mx-0 my-2 flex flex-row w-12 justify-content-start"
+      <div *ngFor="let valrun of myCopiedRuns" class="mx-0 my-2 flex flex-row flex-wrap w-12 justify-content-start"
            id="attached_result_row_{{ valrun.id }}">
-        <h5 class="my-0 w-9"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
+        <h5 class="my-0 w-9 text-justify"><span class="font-weight-normal"><b>Validation:</b></span> {{ valrun.name_tag }}</h5>
 
         <div class="w-3">
           <qa-buttons [tracked]="true" [validationList]="true" [validationRun]="valrun"

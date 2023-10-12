@@ -1,19 +1,17 @@
+<main class="flex flex-column mb-5 w-6 align-content-center justify-content-center">
 
-<div class="side-panel-area">
-  <qa-handle-multiple-validations
-    [validations]="validations"
-    [selectedValidationsId$]="selectedValidations$"
-    (selectionActive)="handleMultipleSelection($event)"
-    *ngIf="!published">
-  </qa-handle-multiple-validations>
-</div>
+  <div class="side-panel-area">
+    <qa-handle-multiple-validations
+      [validations]="validations"
+      [selectedValidationsId$]="selectedValidations$"
+      (selectionActive)="handleMultipleSelection($event)"
+      *ngIf="!published">
+    </qa-handle-multiple-validations>
+  </div>
 
-<div class="grid no-gutters">
-  <div [ngClass]="published ? publishedValClasses : myValClasses">
-    <div class="grid" style="justify-content: center">
-
+  <div class="flex flex-column w-12 align-content-center justify-content-center">
       <!-- custom -->
-      <div *ngIf="!published" class="col-9 text-center">
+      <div *ngIf="!published" class="text-center w-12">
         <h1>My validations</h1>
         <p *ngIf="!validations.length" class="lead text-muted">
           You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
@@ -22,7 +20,7 @@
       </div>
 
       <!-- published -->
-      <div *ngIf="published" class="col-9 text-center">
+      <div *ngIf="published" class="text-center w-12 my-2">
         <h1>Published validations</h1>
         <p class="lead text-muted">
           The QA4SM validations below have been published by their owners to <a target="_blank" href="https://zenodo.org/"
@@ -32,22 +30,22 @@
         </p>
       </div>
 
-      <div *ngIf="validations.length" class="col-9">
+      <div *ngIf="validations.length" class="w-12 my-2">
         <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
       </div>
 
       <!-- Rows -->
-      <div *ngIf="validations.length" class="col-9">
+      <div *ngIf="validations.length" class="w-12 py-2">
         <div *ngFor="let valrun of validations"
              class="validation-row-area">
-            <p-checkbox
-              class="modify-checkbox"
-              *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
-              [value]="valrun.id"
-              [ngModel]="selectedValidations$ | async"
-              (ngModelChange)="updateSelectedValidations($event, valrun.id)"
-              inputId="{{valrun.id}}}">
-            </p-checkbox>
+          <p-checkbox
+            class="modify-checkbox"
+            *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
+            [value]="valrun.id"
+            [ngModel]="selectedValidations$ | async"
+            (ngModelChange)="updateSelectedValidations($event, valrun.id)"
+            inputId="{{valrun.id}}}">
+          </p-checkbox>
           <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
           <br/>
         </div>
@@ -62,8 +60,7 @@
       </div>
 
     </div>
-  </div>
-</div>
+</main>
 
 
 

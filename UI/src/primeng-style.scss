@@ -23,7 +23,8 @@ $accordion-header-padding: 0.5rem 0.5rem;
 * {
   box-sizing: border-box;
 }
-body{
+
+body {
   margin: 0;
   padding: 0;
   background-color: $background-color;
@@ -522,7 +523,7 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   background: #007bff;
 }
 
-.readonly-filter-checkbox .p-checkbox-box.p-highlight{
+.readonly-filter-checkbox .p-checkbox-box.p-highlight {
   border-color: rgba(150, 150, 150, 0.15);
   background: rgba(150, 150, 150, 0.6);
   cursor: auto;
@@ -545,7 +546,7 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   color: #ffffff;
 }
 
-.readonly-filter-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover{
+.readonly-filter-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
   border-color: rgba(150, 150, 150, 0.15);
   background: rgba(150, 150, 150, 0.6);
   cursor: auto;
@@ -971,6 +972,7 @@ p-inputmask.ng-dirty.ng-invalid > .p-inputtext {
 .p-inputnumber.ng-dirty.ng-invalid > .p-inputnumber > .p-inputtext {
   border-color: #dc3545;
 }
+
 //.p-inputnumber-input{
 //  background-color: #00AAE3;
 //}
@@ -1038,33 +1040,34 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-radius: 4px;
 }
 
-#minLatInput, #maxLatInput, #minLonInput, #maxLonInput{
+#minLatInput, #maxLatInput, #minLonInput, #maxLonInput {
   height: 2.5rem;
 }
 
-#minLatInput .p-inputtext, #maxLatInput .p-inputtext{
+#minLatInput .p-inputtext, #maxLatInput .p-inputtext {
   border-radius: 0;
 }
 
-#minLonInput .p-inputtext, #maxLonInput .p-inputtext{
+#minLonInput .p-inputtext, #maxLonInput .p-inputtext {
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
 
-#fromDateInput .p-inputtext, #toDateInput .p-inputtext{
+#fromDateInput .p-inputtext, #toDateInput .p-inputtext {
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
   height: 2.5rem;
 }
+
 #windowSizeSelector .p-inputtext {
   border-left: none;
   border-right: none;
   border-radius: 0;
 }
 
-#windowSizeSelector, #threshold_filter, #yearFrom, #yearTo{
+#windowSizeSelector, #threshold_filter, #yearFrom, #yearTo {
   height: 2.5rem;
 }
 
@@ -1072,22 +1075,34 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   width: 90%;
 }
 
-#method .p-dropdown, #orderSelector .p-dropdown{
+#orderSelector .p-dropdown{
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
 
-#anomaliesMethodSelector .p-dropdown{
+#sortingChoiceSelector .p-dropdown {
+  border-radius: 0;
+}
+
+@media screen and (max-width: 991px) {
+  #sortingForm .small-label {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+  }
+  #orderSelector .p-dropdown {
+    border-radius: 0;
+    border: 1px solid #ced4da;
+    border-top: none;
+  }
+}
+
+#anomaliesMethodSelector .p-dropdown {
   height: 2.5rem;
   border-left-style: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
   max-width: 100%
-}
-
-#sortingChoiceSelector .p-dropdown{
-  border-radius: 0;
 }
 
 .p-inputtext:enabled:hover {
@@ -1740,13 +1755,14 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   border-radius: 4px;
 }
 
-#validateButton .p-button{
+#validateButton .p-button {
   width: 8rem;
   height: 3rem;
   font-size: 1.25rem;
   padding-right: 1.5rem;
 }
-#validateButton .p-button-icon.p-button-icon-left{
+
+#validateButton .p-button-icon.p-button-icon-left {
   font-size: 1.25rem;
 }
 
@@ -2290,7 +2306,8 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   color: #007bff;
   border-color: transparent;
 }
-.p-carousel{
+
+.p-carousel {
   position: relative;
   width: 100%;
   margin: 0;
@@ -2298,19 +2315,19 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   outline: 0;
 }
 
-div.carousel-caption{
+div.carousel-caption {
   position: absolute;
   top: 11rem;
   vertical-align: bottom;
 }
 
-.p-carousel ul.p-carousel-indicators.p-reset{
+.p-carousel ul.p-carousel-indicators.p-reset {
   padding: 0;
   transform: translate(0, -2rem);
   z-index: 1;
 }
 
-.p-carousel-item{
+.p-carousel-item {
   background-color: transparent;
   display: flex;
   flex-direction: row;
@@ -2334,11 +2351,11 @@ div.carousel-caption{
   margin-left: 3vw;
 }
 
-.p-carousel .p-carousel-content .p-carousel-next{
+.p-carousel .p-carousel-content .p-carousel-next {
   margin-right: 3vw;
 }
 
-.p-carousel-content .carousel-img{
+.p-carousel-content .carousel-img {
   height: 100%;
 }
 
@@ -3767,7 +3784,7 @@ div.carousel-caption{
 }
 
 .p-accordion p-accordiontab .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link,
-.p-accordion p-accordiontab.highlighted .p-accordion-header:not(.p-highlight):not(.p-disabled) .p-accordion-header-link{
+.p-accordion p-accordiontab.highlighted .p-accordion-header:not(.p-highlight):not(.p-disabled) .p-accordion-header-link {
   background: #EFEFEF;
   border-color: #dee2e6;
   color: #495057;
@@ -3784,7 +3801,7 @@ div.carousel-caption{
 }
 
 .p-accordion p-accordiontab .p-accordion-header:not(.p-disabled).p-highlight:hover .p-accordion-header-link,
-.p-accordion p-accordiontab.highlighted .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link{
+.p-accordion p-accordiontab.highlighted .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
   border-color: #dee2e6;
   background: #EFEFEF;
   color: #495057;
@@ -3840,7 +3857,7 @@ div.carousel-caption{
 }
 
 .p-accordion p-accordiontab.is-reference .p-accordion-header:not(.p-highlight):not(.p-disabled) .p-accordion-header-link,
-.p-accordion p-accordiontab.is-reference .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link{
+.p-accordion p-accordiontab.is-reference .p-accordion-header:not(.p-disabled).p-highlight .p-accordion-header-link {
   color: #004085;
 }
 
@@ -4252,12 +4269,12 @@ div.carousel-caption{
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-#uploading-data-spinner .p-dialog .p-dialog-content{
+#uploading-data-spinner .p-dialog .p-dialog-content {
   opacity: 1;
   background: transparent;
 }
 
-#uploading-data-spinner .p-dialog{
+#uploading-data-spinner .p-dialog {
   border-color: transparent;
 }
 
@@ -4823,7 +4840,7 @@ div.carousel-caption{
   font-size: 1rem;
 }
 
-.p-menubar .p-menuitem > .p-menuitem-content{
+.p-menubar .p-menuitem > .p-menuitem-content {
   background-color: transparent;
 }
 
@@ -4888,7 +4905,7 @@ div.carousel-caption{
   font-weight: bold;
 }
 
-.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content> .p-menuitem-link .p-menuitem-icon {
+.p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link .p-menuitem-icon {
   color: $menu-item-color;
   margin-right: 0.3rem;
   font-size: 1.2rem;
@@ -4924,6 +4941,7 @@ div.carousel-caption{
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-text {
   color: #ffffff;
 }
+
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):focus .p-menuitem-text {
   color: #ffffff;
 }
@@ -4999,15 +5017,15 @@ div.carousel-caption{
 }
 
 .p-menubar .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover {
-  background:  rgba(248, 193, 0, .5);
+  background: rgba(248, 193, 0, .5);
   text-decoration: none;
 }
 
 .p-menubar .p-menuitem > .p-menuitem-content > .p-menuitem-link.p-menuitem-link-active {
-  background:   $menu-item-focus-color;
+  background: $menu-item-focus-color;
 }
 
-.p-menubar .p-menuitem.p-menuitem-active >  .p-menuitem-link .p-menuitem-text {
+.p-menubar .p-menuitem.p-menuitem-active > .p-menuitem-link .p-menuitem-text {
   color: #212529;
 }
 
@@ -5016,7 +5034,7 @@ div.carousel-caption{
 
 }
 
-.p-menubar-root-list{
+.p-menubar-root-list {
   justify-content: center;
 }
 
@@ -5061,7 +5079,7 @@ div.carousel-caption{
     width: 100%;
     position: static;
   }
-  .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content >  .p-menuitem-link {
+  .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link {
     padding: 0.75rem 1rem;
     color: #212529;
     border-radius: 0;
@@ -5087,7 +5105,7 @@ div.carousel-caption{
   .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-icon {
     color: #212529;
   }
-  .p-menubar .p-menubar-root-list > .p-menuitem >  .p-menuitem-link:not(.p-disabled):hover .p-submenu-icon {
+  .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link:not(.p-disabled):hover .p-submenu-icon {
     color: #212529;
   }
   .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:focus {
@@ -5095,7 +5113,7 @@ div.carousel-caption{
     outline-offset: 0;
     box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
   }
-  .p-menubar .p-menubar-root-list > .p-menuitem >  .p-menuitem-link > .p-submenu-icon {
+  .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link > .p-submenu-icon {
     margin-left: auto;
     transition: transform 0.15s;
   }
@@ -5149,7 +5167,7 @@ div.carousel-caption{
     font-weight: bold;
   }
 
-  .p-menubar.p-menubar-mobile-active .p-menubar-root-list > .p-menuitem > .p-menuitem-content> .p-menuitem-link .p-menuitem-icon {
+  .p-menubar.p-menubar-mobile-active .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link .p-menuitem-icon {
     color: $menu-item-color;
     margin-right: 0.3rem;
     font-size: 1.2rem;
@@ -5161,7 +5179,7 @@ div.carousel-caption{
   }
 
   .p-menubar.p-menubar-mobile-active .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link-active .p-menuitem-text,
-  .p-menubar.p-menubar-mobile-active .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link-active .p-menuitem-icon{
+  .p-menubar.p-menubar-mobile-active .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link-active .p-menuitem-icon {
     color: #ffffff;
   }
 
@@ -5171,8 +5189,8 @@ div.carousel-caption{
     color: #ffffff;
   }
 
-  .p-menubar.p-menubar-mobile-active  .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-icon,
-  .p-menubar.p-menubar-mobile-active  .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):focus .p-menuitem-icon{
+  .p-menubar.p-menubar-mobile-active .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-icon,
+  .p-menubar.p-menubar-mobile-active .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):focus .p-menuitem-icon {
     color: #ffffff;
   }
 
@@ -5202,7 +5220,7 @@ div.carousel-caption{
 
 
   .p-menubar.p-menubar-mobile-active .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover {
-    background:  rgba(248, 193, 0, .5);
+    background: rgba(248, 193, 0, .5);
     text-decoration: none;
   }
 
@@ -5269,7 +5287,7 @@ div.carousel-caption{
   border-bottom-left-radius: 4px;
 }
 
-.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-content  .p-menuitem-link {
+.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link {
   padding: 0.75rem 1rem;
   color: #212529;
   border-radius: 0;
@@ -5302,7 +5320,7 @@ div.carousel-caption{
   color: #212529;
 }
 
-.p-panelmenu .p-panelmenu-content .p-menuitem  .p-menuitem-content .p-menuitem-link:not(.p-disabled):hover .p-submenu-icon {
+.p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link:not(.p-disabled):hover .p-submenu-icon {
   color: #212529;
 }
 
@@ -6273,21 +6291,21 @@ div.carousel-caption{
 
 /* Customizations to the designer theme should be defined here */
 
-.validation-row .p-panel .p-panel-header, .user-data-row .p-panel .p-panel-header{
+.validation-row .p-panel .p-panel-header, .user-data-row .p-panel .p-panel-header {
   font-size: 1.5rem;
 }
 
-.validation-row .p-panel .p-panel-title, .user-data-row .p-panel .p-panel-title{
+.validation-row .p-panel .p-panel-title, .user-data-row .p-panel .p-panel-title {
   width: 93%;
   text-align: center;
 }
 
-.validation-small-row .p-panel .p-panel-title{
+.validation-small-row .p-panel .p-panel-title {
   width: 86%;
   text-align: center;
 }
 
-.validation-row .p-panel .p-panel-header .p-panel-icons, .user-data-row .p-panel .p-panel-header .p-panel-icons{
+.validation-row .p-panel .p-panel-header .p-panel-icons, .user-data-row .p-panel .p-panel-header .p-panel-icons {
   max-width: 30rem;
   text-align: right;
 }
@@ -6302,7 +6320,7 @@ div.carousel-caption{
   border-top: 0 none;
 }
 
-.user-data-row .p-panel .p-panel-content{
+.user-data-row .p-panel .p-panel-content {
   height: 150px;
 }
 
@@ -6311,7 +6329,7 @@ div.carousel-caption{
   margin-bottom: 0.2rem;
 }
 
-.btn-action.p-button, .btn-action-large.p-button{
+.btn-action.p-button, .btn-action-large.p-button {
   font-size: 1rem;
   height: 2rem;
   margin-right: 0.2rem;
@@ -6319,12 +6337,12 @@ div.carousel-caption{
   border-color: $button-base-color;
 }
 
-.btn-action-large.download-results.p-button{
+.btn-action-large.download-results.p-button {
   height: 2.5rem;
   width: 100%;
 }
 
-.btn-action-home.p-button{
+.btn-action-home.p-button {
   width: 8.5rem;
   height: 3rem;
   font-size: 1.25rem;
@@ -6334,7 +6352,7 @@ div.carousel-caption{
   margin-bottom: 0.1rem;
 }
 
-.btn-scroll-down .p-button{
+.btn-scroll-down .p-button {
   width: 50px;
   height: 50px;
   background-color: transparent;
@@ -6343,40 +6361,41 @@ div.carousel-caption{
   text-decoration: none;
 }
 
-.btn-scroll-down .p-button .p-button-icon{
+.btn-scroll-down .p-button .p-button-icon {
   color: white;
   font-size: 2rem;
 }
 
-.btn-scroll-down .p-button:hover{
+.btn-scroll-down .p-button:hover {
   background-color: transparent;
 }
-.btn-scroll-down .p-button:focus, .btn-scroll-down .p-button:active{
+
+.btn-scroll-down .p-button:focus, .btn-scroll-down .p-button:active {
   outline: none;
 }
 
 
-.btn-action.p-button:hover, .btn-action-large.p-button:hover, .btn-action-home.p-button:hover{
+.btn-action.p-button:hover, .btn-action-large.p-button:hover, .btn-action-home.p-button:hover {
   background-color: $menu-item-color;
   border-color: $menu-item-color;
   color: white;
   text-decoration: none;
 }
 
-.btn-action .p-button:focus, .btn-action-large .p-button:focus{
+.btn-action .p-button:focus, .btn-action-large .p-button:focus {
   box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .5);
 }
 
-.btn-scroll-down .p-button:focus, .btn-action-home .p-button:focus{
+.btn-scroll-down .p-button:focus, .btn-action-home .p-button:focus {
   box-shadow: none;
 }
 
-a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
+a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
   color: white;
   text-decoration: none;
 }
 
-.edit_name_btn.p-button{
+.edit_name_btn.p-button {
   color: #ffffff;
   background-color: $edit-name-button-backgroud-color;
   border-color: $edit-name-button-backgroud-color;
@@ -6385,13 +6404,14 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
 
 }
 
-.edit_name_btn.p-button:not(.disabled):hover{
+.edit_name_btn.p-button:not(.disabled):hover {
   color: $button-hover-color;
   background-color: $edit-name-button-backgroud-color;
   border-color: $edit-name-button-backgroud-color;
   transform: scale(1.2);
 }
-.save_name_btn.p-button, .cancel_editing_btn.p-button{
+
+.save_name_btn.p-button, .cancel_editing_btn.p-button {
   color: #fff;
   background-color: #00AAE3;
   border-color: #00AAE3;
@@ -6400,14 +6420,14 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   width: 1.3rem;
 }
 
-.save_name_btn.p-button:not(.disabled):hover, .cancel_editing_btn.p-button:not(.disabled):hover{
+.save_name_btn.p-button:not(.disabled):hover, .cancel_editing_btn.p-button:not(.disabled):hover {
   color: $button-base-color;
   background-color: $base-color;
   border-color: $base-color;
   transform: scale(1.2);
 }
 
-.cancel_black_btn.p-button, .save_name_black_btn.p-button{
+.cancel_black_btn.p-button, .save_name_black_btn.p-button {
   color: black;
   font-size: 1.5rem;
   background-color: transparent;
@@ -6416,75 +6436,82 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   width: 1.5rem;
 }
 
-.cancel_black_btn.p-button:not(.disabled):hover, .save_name_black_btn.p-button:not(.disabled):hover{
+.cancel_black_btn.p-button:not(.disabled):hover, .save_name_black_btn.p-button:not(.disabled):hover {
   color: black;
   background-color: transparent;
   border-color: transparent;
   transform: scale(1.2);
 }
 
-.dropdown-item.p-button{
+.dropdown-item.p-button {
   width: 100%;
   background-color: $dropdown-buttons-background;;
 }
-.dropdown-item .p-button:hover{
+
+.dropdown-item .p-button:hover {
   color: #212529;
   background-color: rgba(248, 193, 0, .5);
 }
-.dataframe thead th{
+
+.dataframe thead th {
   text-align: center;
 }
-.dataframe td:first-child{
+
+.dataframe td:first-child {
   font-weight: bold;
 }
-.dataframe.comparison td:not(:first-child){
+
+.dataframe.comparison td:not(:first-child) {
   width: 10rem;
 }
-.dataframe.comparison td:first-child{
+
+.dataframe.comparison td:first-child {
   min-width: 20rem;
 }
 
-.addDataset.p-button-success, .removeDataset.p-button-danger{
+.addDataset.p-button-success, .removeDataset.p-button-danger {
   height: 2rem;
 }
 
-.addDataset.p-button-success .p-button-label, .removeDataset.p-button-danger .p-button-label{
+.addDataset.p-button-success .p-button-label, .removeDataset.p-button-danger .p-button-label {
   padding-right: 0.2rem;
 }
-.addDataset.p-button-success .p-button-icon, .removeDataset.p-button-danger .p-button-icon{
+
+.addDataset.p-button-success .p-button-icon, .removeDataset.p-button-danger .p-button-icon {
   padding-left: 0.2rem;
 }
 
-.clearCoordinates.p-button-info{
+.clearCoordinates.p-button-info {
   width: 2.5rem;
   height: 2.1rem;
 }
 
-.clearCoordinates.p-button-info .p-button-icon{
+.clearCoordinates.p-button-info .p-button-icon {
   font-size: 1.2rem;
 }
 
-.addDataset.p-button-success, .removeDataset.p-button-danger{
+.addDataset.p-button-success, .removeDataset.p-button-danger {
   height: 2rem;
 }
 
-.addDataset.p-button-success .p-button-label, .removeDataset.p-button-danger .p-button-label{
+.addDataset.p-button-success .p-button-label, .removeDataset.p-button-danger .p-button-label {
   padding-right: 0.2rem;
 }
-.addDataset.p-button-success .p-button-icon, .removeDataset.p-button-danger .p-button-icon{
+
+.addDataset.p-button-success .p-button-icon, .removeDataset.p-button-danger .p-button-icon {
   padding-left: 0.2rem;
 }
 
-.clearCoordinates.p-button-info{
+.clearCoordinates.p-button-info {
   width: 2.5rem;
   height: 2.1rem;
 }
 
-.clearCoordinates.p-button-info .p-button-icon{
+.clearCoordinates.p-button-info .p-button-icon {
   font-size: 1.2rem;
 }
 
-.ol-control button{
+.ol-control button {
   display: block;
   margin: 1px;
   padding: 0;
@@ -6496,17 +6523,17 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   height: 1.375em;
   width: 1.375em;
   line-height: .4em;
-  background-color: rgba(0,60,136,.5);
+  background-color: rgba(0, 60, 136, .5);
   border: none;
   border-radius: 2px;
 }
 
-.ol-control button:hover{
+.ol-control button:hover {
   color: white;
-  background-color: rgba(0,60,136, 0.8);
+  background-color: rgba(0, 60, 136, 0.8);
 }
 
-@media screen and (min-width: 564px) and (max-width: 714.9px){
+@media screen and (min-width: 564px) and (max-width: 714.9px) {
   .btn-action.p-button {
     width: 1.75rem;
     height: 1.85rem;
@@ -6517,7 +6544,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
   //  max-width: 30rem;
   //}
 
-  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5{
+  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5 {
     font-size: 1.25rem;
     max-width: 50vw;
   }
@@ -6528,21 +6555,21 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover{
     //height: 1.85rem;
   }
 
-  .edit_name_btn.p-button, .save_name_btn.p-button, .cancel_editing_btn.p-button{
+  .edit_name_btn.p-button, .save_name_btn.p-button, .cancel_editing_btn.p-button {
     width: 1.1rem;
     font-size: 0.8rem;
   }
 
 }
 
-@media screen and (max-width: 563.9px){
-  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5{
+@media screen and (max-width: 563.9px) {
+  .validation-row .p-panel .p-panel-header h5, .user-data-row .p-panel .p-panel-header h5 {
     font-size: 1.125rem;
   }
 }
 
 
-@media screen and (max-width: 377.9px){
+@media screen and (max-width: 377.9px) {
   .btn-action.p-button {
     width: 1.5rem;
     height: 1.65rem;

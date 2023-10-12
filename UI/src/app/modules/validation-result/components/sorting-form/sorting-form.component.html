@@ -1,12 +1,13 @@
-<div class="grid" id="sortingForm">
-  <div class="col-12 sm:col-2 px-0 mx-0">
-    <div class="small-label">
-      <span> Sort By:</span>
+<div class="flex flex-row lg:flex-nowrap flex-wrap" id="sortingForm">
+    <div class="small-label lg:w-2 w-12" style="height: 41.5px">
+      <div class="p-fluid">
+        <span> Sort By:</span>
+      </div>
     </div>
-  </div>
-  <div class="col-12 sm:col-5 px-0 mx-0">
+  <div class="lg:w-5 w-12 px-0 mx-0">
     <!--      <div class="box">-->
-    <p-dropdown id="sortingChoiceSelector" (onChange)="onSortingChange()"
+    <p-dropdown id="sortingChoiceSelector"
+                (onChange)="onSortingChange()"
                 [options]="sortingChoicesModels"
                 [(ngModel)]="selectedChoicesModel"
                 optionLabel="displayName"
@@ -14,7 +15,7 @@
     </p-dropdown>
     <!--      </div>-->
   </div>
-  <div class="col-12 sm:col-5 px-0 mx-0">
+  <div class="lg:w-5 w-12 px-0 mx-0">
     <div class="box">
       <p-dropdown id="orderSelector" (onChange)="onSortingChange()"
                   [options]="orderChoicesModels"
