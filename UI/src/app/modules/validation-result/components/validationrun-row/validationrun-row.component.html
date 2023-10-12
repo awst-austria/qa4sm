@@ -116,7 +116,7 @@
   <!-- Body -->
   <!-- Datasets -->
   <div class="flex flex-row lg:flex-nowrap flex-wrap mx-0 px-0 my-0">
-    <div class="w-8 p-2">
+    <div class="md:w-8 w-12 p-2">
       <strong>Data:</strong><br/>
       <span *ngFor="let config of configurations">
         <span [style.color]="config.fileExists ? 'inherit' : 'red'"
@@ -132,7 +132,7 @@
         </span>
       </span>
     </div>
-    <div class="w-2 p-2">
+    <div class="md:w-2 w-6 p-2">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
@@ -146,7 +146,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="w-2 p-2" style="max-width: 10rem">
+    <div class="md:w-2 w-6 p-2" style="max-width: 10rem">
       <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"
                   [canBeRerun]="validationRun.all_files_exist"></qa-buttons>
     </div>
