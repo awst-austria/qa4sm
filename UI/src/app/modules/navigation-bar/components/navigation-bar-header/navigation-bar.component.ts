@@ -57,8 +57,7 @@ export class NavigationBarComponent implements OnInit {
     this.myResultsMenuItem = {
       label: 'My validations',
       icon: 'pi pi-fw pi-folder',
-      routerLink: ['my-validations'],
-      command: () => this.setPreviousUrl('my-validations')
+      routerLink: ['my-validations']
     };
 
     this.publishedResultsMenuItem = {
@@ -80,14 +79,12 @@ export class NavigationBarComponent implements OnInit {
       label: 'Compare validations',
       icon: 'pi pi-fw pi-th-large',
       routerLink: ['comparison'],
-      command: () => this.setPreviousUrl('comparison')
     };
 
     this.uploadDataMenuItem = {
       label: 'My datasets',
       icon: 'pi pi-fw pi-upload',
       routerLink: ['my-datasets'],
-      command: () => this.setPreviousUrl('my-datasets')
     };
 
     this.uploadDataHelpMenuItem = {
@@ -115,7 +112,6 @@ export class NavigationBarComponent implements OnInit {
         this.userManualMenuItem,
         this.datasetMenuItem,
         this.termsMenuItem,
-
       ]
     };
 
