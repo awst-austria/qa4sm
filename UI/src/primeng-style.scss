@@ -973,10 +973,6 @@ p-inputmask.ng-dirty.ng-invalid > .p-inputtext {
   border-color: #dc3545;
 }
 
-//.p-inputnumber-input{
-//  background-color: #00AAE3;
-//}
-
 .p-inputswitch {
   width: 3rem;
   height: 1.75rem;
@@ -6418,8 +6414,8 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
 
 .save_name_btn.p-button, .cancel_editing_btn.p-button {
   color: #fff;
-  background-color: #00AAE3;
-  border-color: #00AAE3;
+  background-color: $base-color;
+  border-color: $base-color;
   padding: 0.6rem 0 0 0;
   margin-left: 0.5rem;
   width: 1.3rem;

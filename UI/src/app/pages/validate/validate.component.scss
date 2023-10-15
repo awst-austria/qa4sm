@@ -17,7 +17,7 @@ div {
   padding: 1rem;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  background-color: #00AAE3;
+  background-color: $base-color;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,7 +30,7 @@ div {
 
 .help-field{
   color: white;
-  background-color: #00AAE3;
+  background-color: $base-color;
   height: 100%;
   border-radius: 0 5px 5px 0;
   font-size: 1.1rem;

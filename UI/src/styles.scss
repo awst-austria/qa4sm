@@ -109,7 +109,7 @@ h5, .h5 {
 
 .table .thead-dark th {
   color: #fff;
-  background-color: #00AAE3;
+  background-color: $base-color;
   border-color: #454d55;
 }
 
@@ -127,7 +127,7 @@ h5, .h5 {
 }
 
 .edit_name {
-  border: 1px solid #00AAE3;
+  border: 1px solid $base-color;
   border-radius: 4px;
   position: relative;
   padding: 3px;
@@ -135,7 +135,7 @@ h5, .h5 {
 }
 
 .edit_name:focus {
-  border: 1px solid #00AAE3;
+  border: 1px solid $base-color;
   box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .3);
   outline: none;
 }
@@ -324,7 +324,7 @@ img {
   padding: 1rem;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  background-color: #00AAE3;
+  background-color: $base-color;
   display: flex;
   align-items: center;
   min-width: 4.7rem;
@@ -335,7 +335,7 @@ img {
 
 @keyframes spinAndChangeColor {
   from {color: #9CF2F6}
-  to {color: #00AAE3;}
+  to {color: $base-color;}
   from {
     transform:rotate(0deg);
   }
