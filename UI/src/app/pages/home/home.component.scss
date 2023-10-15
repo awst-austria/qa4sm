@@ -3,11 +3,11 @@
 * {
   font-family: $base-font;
   line-height: 1.5vw;
+  scroll-behavior: smooth;
 }
 
 div#background {
   display: block;
-  scroll-behavior: smooth;
   background: url("../../../../../validator/static/images/home/FSSCat.jpg") center center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -175,11 +175,11 @@ div#about-app {
 }
 
 .application-info .application-tile:nth-child(even) {
-  background-color: lightgray;
+  background-color: $main-page-color-1;
 }
 
 .application-info .application-tile:nth-child(odd) {
-  background-color: #74A5B9;
+  background-color: $main-page-color-2;
 }
 
 .application-tile h1 {
@@ -227,7 +227,7 @@ div#about-app {
 .horizontal-line {
   width: 85%;
   height: 2px;
-  background-color: #74A5B9;
+  background-color: $main-page-color-1;
 }
 
 #logo_ffg {
