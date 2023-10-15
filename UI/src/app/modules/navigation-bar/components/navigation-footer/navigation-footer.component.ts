@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {ActivatedRoute, Event, NavigationEnd, Router} from '@angular/router';
+import {Event, NavigationEnd, Router} from '@angular/router';
 
 @Component({
   selector: 'qa-navigation-footer',
@@ -10,9 +10,7 @@ import {ActivatedRoute, Event, NavigationEnd, Router} from '@angular/router';
 export class NavigationFooterComponent {
 
   currentRoute: string = "";
-  constructor(private route: ActivatedRoute,
-              private router: Router) {
-
+  constructor(private router: Router) {
 
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
-import {Router} from '@angular/router';
+import {Event, NavigationEnd, Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
 
@@ -34,12 +34,19 @@ export class NavigationBarComponent implements OnInit {
   userProfileMenuItem: MenuItem;
 
   isAuthenticated: boolean;
-
+  currentRoute: string = "";
 
   constructor(private authService: AuthService,
               private router: Router,
               private toastService: ToastService,
               private settingsService: SettingsService) {
+
+    this.router.events.subscribe((event: Event) => {
+      if (event instanceof NavigationEnd) {
+        this.currentRoute = event.url;
+      }
+    });
+
     this.homeMenuItem = {
       label: 'Home',
       icon: 'pi pi-fw pi-home',

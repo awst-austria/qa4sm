@@ -1,4 +1,4 @@
-<div class="navbar">
+<div class="navbar" [ngClass]="{'header-dark': currentRoute === '/home'}">
 <!--  <div class="col-12">-->
     <p-menubar [model]="items">
     </p-menubar>

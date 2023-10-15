@@ -17,20 +17,6 @@ const videosPrefix = 'static/videos/'
 })
 export class HomeComponent implements OnInit {
 
-  // public carouselFiles = [{
-  //   plot: homeUrlPrefix + 'map_us_spearman.jpg',
-  //   attrLink: '#',
-  //   description: 'Image: QA4SM'
-  // }, {
-  //   plot: homeUrlPrefix + 'smos_full.jpg',
-  //   attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2009/09/SMOS',
-  //   description: 'Image: ESA'
-  // }, {
-  //   plot: homeUrlPrefix + 'Root-zone_soil_moisture_May_2016.jpg',
-  //   attrLink: 'https://www.esa.int/ESA_Multimedia/Images/2016/05/Root-zone_soil_moisture_May_2016',
-  //   description: 'Image: ESA'
-  // }];
-
   logoFiles = [{
     plot: logoUrlPrefix + 'logo_awst.png',
     link: 'https://www.awst.at/',
@@ -49,17 +35,6 @@ export class HomeComponent implements OnInit {
     description: 'FFG'
   }];
 
-  workflowDiagram = [{
-    plot: homeUrlPrefix + 'qa4am_overview_diagram.png',
-    link: '', description: 'QA4SM workflow'
-  }];
-
-  cardValidate = [{
-    plot: homeUrlPrefix + 'validate.png',
-    link: '',
-    description: 'Validate'
-  }];
-
   videoValidate ={
     video: videosPrefix + 'QA4SM_Video_Series_I_Validation_4k.mp4'
   }
@@ -69,28 +44,6 @@ export class HomeComponent implements OnInit {
   }
 
   videos = [this.videoValidate, this.videoResults];
-
-  cardPublish = [{
-    plot: '/static/images/help/publishing_dialog.png',
-    link: "",
-    description: "Publishing results"
-  }]
-
-  cardSignUp = [{
-    plot: homeUrlPrefix + 'sign-up.png',
-    link: '',
-    description: 'Sign up'
-  }];
-
-  // cardValidateResult = [{
-  //   plot: homeUrlPrefix + 'validation_result_list.png',
-  //   link: '', description: 'Results'
-  // }];
-  //
-  // cardValidateDetails = [{
-  //   plot: homeUrlPrefix + 'validation_result_details.png',
-  //   link: '', description: 'Download and Visualise'
-  // }];
 
   settings$: Observable<any>;
 

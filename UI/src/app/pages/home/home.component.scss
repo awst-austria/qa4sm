@@ -8,7 +8,7 @@
 div#background {
   display: block;
   scroll-behavior: smooth;
-  background: url("../../../../../validator/static/images/home/Root-zone_soil_moisture_May_2016.jpg") center center;
+  background: url("../../../../../validator/static/images/home/FSSCat.jpg") center center;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -254,6 +254,17 @@ div#about-app {
 .partner-logo a{
   width: 100%;
   height: 100%;
+}
+.background-link{
+  position: fixed;
+  bottom: 2%;
+  left: 2% ;
+}
+
+.background-link a{
+  color: $menu-item-color;
+  text-decoration: none;
+  font-size: 1rem;
 }
 
 //.partner-logo {
