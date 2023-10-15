@@ -98,8 +98,9 @@ div#about-app {
   border-radius: 5px;
   color: white;
   padding: 2vw;
-  background-color: rgba(211, 211, 211, 0.5);
-  border: 2px solid lightgray;
+  background-color: rgba(0, 76, 89, 0.6);
+  //background-color: rgba(211, 211, 211, 0.5);
+  border: 2px solid $main-page-color-3;
 }
 
 .app-news h3 {
@@ -112,8 +113,9 @@ div#about-app {
 
 .application-desc {
   width: 60%;
-  border: 2px solid lightgray;
+  border: 2px solid $main-page-color-3;
   border-radius: 5px;
+  //background-color: rgba(0, 76, 89, 0.6);
   background-color: rgba(211, 211, 211, 0.6);
   opacity: 90%;
 }
@@ -129,7 +131,7 @@ div#about-app {
   margin-bottom: 2.5%;
   width: 100%;
   background-color: transparent;
-  color: white;
+  color: $main-page-color-3;
   display: flex;
   flex-direction: column;
   align-items: center; /* Center horizontally */
@@ -162,6 +164,7 @@ div#about-app {
 .application-team  .team-desc{
   font-size: 1.2vw;
 }
+
 
 .application-info {
   width: 100%;
@@ -201,6 +204,11 @@ div#about-app {
   width: 75%;
 }
 
+.application-tile a, .application-team a, .app-news a{
+  color: $menu-item-color;
+  text-decoration: none;
+}
+
 //
 .application-info .application-row:first-child .application-tile:first-child {
   border-top-left-radius: 5px;
@@ -221,7 +229,7 @@ div#about-app {
 .vertical-line {
   height: 100%;
   width: 2px;
-  background-color: lightgray;
+  background-color: $main-page-color-3;
 }
 
 .horizontal-line {
@@ -265,6 +273,10 @@ div#about-app {
   color: $menu-item-color;
   text-decoration: none;
   font-size: 1rem;
+}
+
+.text-highlighted{
+  color: white;
 }
 
 //.partner-logo {
