@@ -1,7 +1,8 @@
+@import "../../../style.variables";
 .readMoreOrLess {
   //font-size: 1rem;
   cursor: pointer;
-  color: #007BFF;
+  color: $button-base-color;
 }
 li{
   margin-top: 1.1rem;

@@ -13,12 +13,12 @@ main {
 }
 
 a {
-  color: #4760E5;
+  color: $main-link-color;
   text-decoration: none;
 }
 
 a:hover {
-  color: #213FE0;
+  color: $main-link-hover-color;
   text-decoration: underline;
 }
 

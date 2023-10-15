@@ -1,9 +1,10 @@
 @import "../../../styles";
 
+
 div {
   font-family: $base-font;
 }
-::ng-deep .map-panel.p-panel {
+.map-panel.p-panel {
   .p-panel-content {
     padding: 0px;
   }

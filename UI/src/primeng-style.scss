@@ -230,7 +230,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
   outline: 0 none;
   outline-offset: 0;
   box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: #007bff;
+  border-color: $main-page-color-2;
 }
 
 .p-datepicker .p-datepicker-header .p-datepicker-title .p-datepicker-month {
@@ -519,8 +519,8 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
 }
 
 .p-checkbox .p-checkbox-box.p-highlight {
-  border-color: #007bff;
-  background: #007bff;
+  border-color: $main-page-color-1;
+  background: $main-page-color-1;
 }
 
 .readonly-filter-checkbox .p-checkbox-box.p-highlight {
@@ -562,7 +562,7 @@ p-checkbox.ng-dirty.ng-invalid > .p-checkbox > .p-checkbox-box {
 }
 
 .p-input-filled .p-checkbox .p-checkbox-box.p-highlight {
-  background: #007bff;
+  background: $button-hover-color;
 }
 
 .p-input-filled .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
@@ -570,7 +570,7 @@ p-checkbox.ng-dirty.ng-invalid > .p-checkbox > .p-checkbox-box {
 }
 
 .p-input-filled .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-  background: #0062cc;
+  background: $main-page-color-2;
 }
 
 .p-checkbox-label {
@@ -1748,8 +1748,8 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 
 .p-button {
   color: #ffffff;
-  background: #007bff;
-  border: 1px solid #007bff;
+  background: $button-base-color;
+  border: 1px solid $button-base-color;
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
   transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
@@ -1768,15 +1768,15 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 }
 
 .p-button:enabled:hover {
-  background: #0069d9;
+  background: $button-hover-color;
   color: #ffffff;
-  border-color: #0069d9;
+  border-color: $button-hover-color;
 }
 
 .p-button:enabled:active {
-  background: #0062cc;
+  background: $button-active-color;
   color: #ffffff;
-  border-color: #0062cc;
+  border-color: $button-active-color;
 }
 
 .p-button.p-button-outlined {
@@ -3406,7 +3406,7 @@ div.carousel-caption {
 }
 
 .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
-  background: #007bff;
+  background: $main-page-color-2;
   color: #ffffff;
 }
 
@@ -4194,6 +4194,10 @@ div.carousel-caption {
 
 #ismn-depth-selector .p-dialog {
   width: 550px;
+}
+
+#depthFromInput .p-inputnumber, #depthToInput .p-inputnumber{
+  height: 2.5rem;
 }
 
 .p-dialog .p-dialog-header {
