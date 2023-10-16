@@ -1,4 +1,5 @@
 @import "../../../style.variables";
+$home-page-link-color: #CF8400;
 
 * {
   font-family: $base-font;
@@ -94,34 +95,34 @@ div#about-app {
 }
 
 .app-news {
-  width: 40%;
+  //width: 40%;
   border-radius: 5px;
   color: white;
   padding: 2vw;
   background-color: rgba(0, 76, 89, 0.6);
   //background-color: rgba(211, 211, 211, 0.5);
-  border: 2px solid $main-page-color-3;
+  border: 2px solid white;
 }
 
-.app-news h3 {
-  font-size: 2vw;
-}
-
-.app-news div {
-  font-size: 1.5vw;
-}
+//.app-news h3 {
+//  font-size: 2vw;
+//}
+//
+//.app-news div {
+//  font-size: 1.5vw;
+//}
 
 .application-desc {
   width: 60%;
   border: 2px solid $main-page-color-3;
   border-radius: 5px;
   //background-color: rgba(0, 76, 89, 0.6);
-  background-color: rgba(211, 211, 211, 0.6);
+  background-color: rgba(210, 210, 210, 0.8);
   opacity: 90%;
 }
 
 .application-project {
-  width: 60%;
+  //width: 60%;
   border: 2px solid lightgray;
   border-radius: 5px;
 }
@@ -140,7 +141,6 @@ div#about-app {
 }
 
 .application-intro h1, .application-team h1 {
-  font-size: 2.75vw;
   text-align: center;
   line-height: 1.1;
   width: 85%;
@@ -151,18 +151,16 @@ div#about-app {
 .application-intro span {
   width: 70%;
   line-height: 1.2;
-  font-size: 1.5vw;
   text-align: center;
 }
 
 .application-team .partner-desc {
   line-height: 1.2;
-  font-size: 1.3vw;
   text-align: center;
 }
 
 .application-team  .team-desc{
-  font-size: 1.2vw;
+  line-height: 1.2;
 }
 
 
@@ -173,7 +171,7 @@ div#about-app {
 
 .application-tile {
   padding: 1vw;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 0.9;
   opacity: 1;
 }
 
@@ -186,7 +184,7 @@ div#about-app {
 }
 
 .application-tile h1 {
-  font-size: 2.75vw;
+  //font-size: 2.75vw;
   line-height: 1.2;
   padding: 2vw;
   text-align: center;
@@ -205,8 +203,12 @@ div#about-app {
 }
 
 .application-tile a, .application-team a, .app-news a{
-  color: $menu-item-color;
+  color: $home-page-link-color;
   text-decoration: none;
+}
+
+.application-tile a:hover, .application-team a:hover, .app-news a:hover{
+  color: $menu-item-focus-color;
 }
 
 //
@@ -229,7 +231,7 @@ div#about-app {
 .vertical-line {
   height: 100%;
   width: 2px;
-  background-color: $main-page-color-3;
+  background-color: white;
 }
 
 .horizontal-line {
@@ -240,14 +242,19 @@ div#about-app {
 
 #logo_ffg {
   width: 100%;
-  scale: 0.7;
+  scale: 0.6;
 }
 
 #logo_esa {
   width: 100%;
-  scale: 0.9;
+  scale: 0.7;
 }
 
+#logo_cesbio {
+  width: 100%;
+  aspect-ratio: 1 / 0.6;
+  scale: 0.5;
+}
 
 #logo_tu {
   width: 100%;

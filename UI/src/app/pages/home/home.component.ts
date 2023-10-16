@@ -33,14 +33,20 @@ export class HomeComponent implements OnInit {
     plot: logoUrlPrefix + 'logo_ffg_transparent.png',
     link: 'https://www.ffg.at/',
     description: 'FFG'
-  }];
+  }, {
+      plot: logoUrlPrefix + 'logo_cesbio_transparent.png',
+      link: 'https://www.cesbio.cnrs.fr/homepage/',
+      description: 'CESBIO'
+    },];
 
   videoValidate = {
-    video: videosPrefix + 'QA4SM_Video_Series_I_Validation_4k.mp4'
+    video: videosPrefix + 'QA4SM_Video_Series_I_Validation_4k.mp4',
+    title: 'QA4SM - validation set up'
   }
 
   videoResults = {
-    video: videosPrefix + 'QA4SM_Video_Series_II_Results_4K.mp4'
+    video: videosPrefix + 'QA4SM_Video_Series_II_Results_4K.mp4',
+    title: 'QA4SM - validation results'
   }
 
   videos = [this.videoValidate, this.videoResults];
@@ -52,7 +58,7 @@ export class HomeComponent implements OnInit {
   applicationInfoClass = 'flex flex-wrap flex-column row-gap-0 application-info';
   applicationInfoOddRowClass = 'flex flex-row flex-wrap column-gap-0 w-12 application-row';
   applicationInfoEvenRowClass = 'flex flex-row-reverse flex-wrap column-gap-0 w-12 application-row';
-  applicationInfoTileClass = 'flex flex-column w-6 align-items-center justify-content-center application-tile';
+  applicationInfoTileClass = 'flex flex-column w-6 align-items-center justify-content-start application-tile';
 
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
