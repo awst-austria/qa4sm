@@ -88,7 +88,7 @@ body {
 .p-autocomplete .p-autocomplete-multiple-container:not(.p-disabled).p-focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
   border-color: #007bff;
 }
 
@@ -215,7 +215,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 .p-datepicker .p-datepicker-header .p-datepicker-next:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-datepicker .p-datepicker-header .p-datepicker-title {
@@ -229,8 +229,8 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 .p-datepicker .p-datepicker-header .p-datepicker-title select:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: $main-page-color-2;
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
+  border-color: $highlight-border;
 }
 
 .p-datepicker .p-datepicker-header .p-datepicker-title .p-datepicker-month {
@@ -265,13 +265,13 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 
 .p-datepicker table td > span.p-highlight {
   color: #ffffff;
-  background: #007bff;
+  background: $main-page-color-2;
 }
 
 .p-datepicker table td > span:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-datepicker table td.p-datepicker-today > span {
@@ -282,7 +282,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 
 .p-datepicker table td.p-datepicker-today > span.p-highlight {
   color: #ffffff;
-  background: #007bff;
+  background: $base-color;
 }
 
 .p-datepicker .p-datepicker-buttonbar {
@@ -318,7 +318,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 .p-datepicker .p-timepicker button:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-datepicker .p-timepicker button:last-child {
@@ -376,7 +376,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 .p-datepicker:not(.p-disabled) table td span:not(.p-highlight):not(.p-disabled):focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-datepicker:not(.p-disabled) .p-monthpicker .p-monthpicker-month:not(.p-highlight):not(.p-disabled):hover {
@@ -386,7 +386,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 .p-datepicker:not(.p-disabled) .p-monthpicker .p-monthpicker-month:not(.p-highlight):not(.p-disabled):focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 @media screen and (max-width: 769px) {
@@ -409,8 +409,8 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 .p-cascadeselect:not(.p-disabled).p-focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
+  border-color: $highlight-border;
 }
 
 .p-cascadeselect .p-cascadeselect-label {
@@ -464,7 +464,7 @@ p-calendar.ng-dirty.ng-invalid > .p-calendar > .p-inputtext {
 .p-cascadeselect-panel .p-cascadeselect-items .p-cascadeselect-item .p-cascadeselect-item-content:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-cascadeselect-panel .p-cascadeselect-items .p-cascadeselect-item.p-highlight {
@@ -519,8 +519,8 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
 }
 
 .p-checkbox .p-checkbox-box.p-highlight {
-  border-color: $main-page-color-1;
-  background: $main-page-color-1;
+  border-color: $checkbox-main-color;
+  background: $checkbox-main-color;
 }
 
 .readonly-filter-checkbox .p-checkbox-box.p-highlight {
@@ -536,13 +536,13 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem $checkbox-shadow-color;
+  border-color: $checkbox-focus-color;
 }
 
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-  border-color: #0062cc;
-  background: #0062cc;
+  border-color: $checkbox-hover-color;
+  background: $checkbox-hover-color;
   color: #ffffff;
 }
 
@@ -570,7 +570,7 @@ p-checkbox.ng-dirty.ng-invalid > .p-checkbox > .p-checkbox-box {
 }
 
 .p-input-filled .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-  background: $main-page-color-2;
+  background: $checkbox-hover-color;
 }
 
 .p-checkbox-label {
@@ -659,8 +659,8 @@ p-chips.ng-dirty.ng-invalid > .p-chips > .p-inputtext {
 .p-dropdown:not(.p-disabled).p-focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
+  border-color: $highlight-border;
 }
 
 .p-dropdown.p-dropdown-clearable .p-dropdown-label {
@@ -737,7 +737,7 @@ p-chips.ng-dirty.ng-invalid > .p-chips > .p-inputtext {
 
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
   color: #ffffff;
-  background: #007bff;
+  background: $main-page-color-2;
 }
 
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
@@ -1113,8 +1113,8 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
 .p-inputtext:enabled:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
+  border-color: $highlight-border;
 }
 
 .p-inputtext.ng-dirty.ng-invalid {
@@ -1247,13 +1247,13 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
 
 .p-listbox .p-listbox-list .p-listbox-item.p-highlight {
   color: #ffffff;
-  background: #007bff;
+  background: $main-page-color-2;
 }
 
 .p-listbox .p-listbox-list .p-listbox-item:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-listbox .p-listbox-list .p-listbox-item .p-checkbox {
@@ -1291,8 +1291,8 @@ p-listbox.ng-dirty.ng-invalid > .p-listbox {
 .p-multiselect:not(.p-disabled).p-focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
+  border-color: $highlight-border;
 }
 
 .p-multiselect .p-multiselect-label {
@@ -1379,7 +1379,7 @@ p-listbox.ng-dirty.ng-invalid > .p-listbox {
 .p-multiselect-panel .p-multiselect-header .p-multiselect-close:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-multiselect-panel .p-multiselect-items {
@@ -1409,7 +1409,7 @@ p-listbox.ng-dirty.ng-invalid > .p-listbox {
 .p-multiselect-panel .p-multiselect-items .p-multiselect-item:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-multiselect-panel .p-multiselect-items .p-multiselect-item .p-checkbox {
@@ -1481,8 +1481,8 @@ p-multiselect.ng-dirty.ng-invalid > .p-multiselect {
 .p-radiobutton .p-radiobutton-box:not(.p-disabled).p-focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
-  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
+  border-color: $highlight-border;
 }
 
 .p-radiobutton .p-radiobutton-box .p-radiobutton-icon {
@@ -1545,7 +1545,7 @@ p-radiobutton.ng-dirty.ng-invalid > .p-radiobutton > .p-radiobutton-box {
 .p-rating .p-rating-icon:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-rating .p-rating-icon:first-child {
@@ -1668,7 +1668,7 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 .p-slider .p-slider-handle:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-slider .p-slider-range {
@@ -1847,7 +1847,7 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 .p-button:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-button .p-button-icon-left {
@@ -2298,7 +2298,7 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 
 .p-button.p-button-link:enabled:focus {
   background: transparent;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
   border-color: transparent;
 }
 
@@ -2363,15 +2363,15 @@ div.carousel-caption {
 .p-carousel .p-carousel-content .p-carousel-prev:enabled:hover,
 .p-carousel .p-carousel-content .p-carousel-next:enabled:hover {
   color: #495057;
-  border-color: transparent;
-  background: transparent;
+  border-color: $button-hover-color;
+  background: $button-hover-color;
 }
 
 .p-carousel .p-carousel-content .p-carousel-prev:focus,
 .p-carousel .p-carousel-content .p-carousel-next:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-carousel .p-carousel-indicators {
@@ -2492,7 +2492,7 @@ div.carousel-caption {
 }
 
 .p-datatable .p-sortable-column:focus {
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
   outline: 0 none;
 }
 
@@ -2500,7 +2500,7 @@ div.carousel-caption {
   background: #ffffff;
   color: #212529;
   transition: box-shadow 0.15s;
-  outline-color: rgba(38, 143, 255, 0.5);
+  outline-color: $highlight-shadow;
 }
 
 .p-datatable .p-datatable-tbody > tr > td {
@@ -2538,7 +2538,7 @@ div.carousel-caption {
 .p-datatable .p-datatable-tbody > tr > td .p-row-editor-cancel:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-datatable .p-datatable-tbody > tr > td .p-row-editor-save {
@@ -2745,7 +2745,7 @@ div.carousel-caption {
 .p-column-filter-menu-button:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-column-filter-clear-button {
@@ -2767,7 +2767,7 @@ div.carousel-caption {
 .p-column-filter-clear-button:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-column-filter-overlay {
@@ -2806,7 +2806,7 @@ div.carousel-caption {
 .p-column-filter-overlay .p-column-filter-row-items .p-column-filter-row-item:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-column-filter-overlay .p-column-filter-row-items .p-column-filter-separator {
@@ -2906,7 +2906,7 @@ div.carousel-caption {
 .fc .fc-toolbar .fc-button:enabled:active:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .fc .fc-toolbar .fc-button .fc-icon-chevron-left {
@@ -2932,7 +2932,7 @@ div.carousel-caption {
 .fc .fc-toolbar .fc-button:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .fc .fc-toolbar .fc-button.fc-dayGridMonth-button, .fc .fc-toolbar .fc-button.fc-timeGridWeek-button, .fc .fc-toolbar .fc-button.fc-timeGridDay-button {
@@ -2963,7 +2963,7 @@ div.carousel-caption {
 .fc .fc-toolbar .fc-button.fc-dayGridMonth-button:focus, .fc .fc-toolbar .fc-button.fc-timeGridWeek-button:focus, .fc .fc-toolbar .fc-button.fc-timeGridDay-button:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
   z-index: 1;
 }
 
@@ -3045,7 +3045,7 @@ div.carousel-caption {
 .p-orderlist .p-orderlist-list .p-orderlist-item:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-orderlist .p-orderlist-list .p-orderlist-item.p-highlight {
@@ -3118,7 +3118,7 @@ div.carousel-caption {
 .p-organizationchart .p-organizationchart-node-content .p-node-toggler:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-paginator {
@@ -3269,7 +3269,7 @@ div.carousel-caption {
 .p-picklist .p-picklist-list .p-picklist-item:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-picklist .p-picklist-list .p-picklist-item.p-highlight {
@@ -3383,7 +3383,7 @@ div.carousel-caption {
 .p-tree .p-tree-container .p-treenode .p-treenode-content .p-tree-toggler:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-tree .p-tree-container .p-treenode .p-treenode-content .p-treenode-icon {
@@ -3402,7 +3402,7 @@ div.carousel-caption {
 .p-tree .p-tree-container .p-treenode .p-treenode-content:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-tree .p-tree-container .p-treenode .p-treenode-content.p-highlight {
@@ -3500,7 +3500,7 @@ div.carousel-caption {
 .p-tree.p-tree-horizontal .p-treenode .p-treenode-content:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-treetable .p-paginator-top {
@@ -3553,7 +3553,7 @@ div.carousel-caption {
 }
 
 .p-treetable .p-sortable-column {
-  outline-color: rgba(38, 143, 255, 0.5);
+  outline-color: $highlight-shadow;
 }
 
 .p-treetable .p-sortable-column .p-sortable-column-icon {
@@ -3593,7 +3593,7 @@ div.carousel-caption {
   background: #ffffff;
   color: #212529;
   transition: box-shadow 0.15s;
-  outline-color: rgba(38, 143, 255, 0.5);
+  outline-color: $highlight-shadow;
 }
 
 .p-treetable .p-treetable-tbody > tr > td {
@@ -3623,7 +3623,7 @@ div.carousel-caption {
 .p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-treetable .p-treetable-tbody > tr > td p-treetablecheckbox .p-checkbox {
@@ -3781,7 +3781,7 @@ div.carousel-caption {
 .p-accordion .p-accordion-header:not(.p-disabled) .p-accordion-header-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-accordion p-accordiontab .p-accordion-header:not(.p-highlight):not(.p-disabled):hover .p-accordion-header-link,
@@ -3958,7 +3958,7 @@ div.carousel-caption {
 .p-fieldset.p-fieldset-toggleable .p-fieldset-legend a:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-fieldset.p-fieldset-toggleable .p-fieldset-legend:hover {
@@ -4085,7 +4085,7 @@ div.carousel-caption {
 .p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
@@ -4234,7 +4234,7 @@ div.carousel-caption {
 .p-dialog .p-dialog-header .p-dialog-header-icon:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-dialog .p-dialog-header .p-dialog-header-icon:last-child {
@@ -4359,7 +4359,7 @@ div.carousel-caption {
 .p-sidebar .p-sidebar-close:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-sidebar-mask.p-component-overlay {
@@ -4407,7 +4407,7 @@ div.carousel-caption {
 .p-fileupload .p-fileupload-buttonbar .p-button.p-fileupload-choose.p-focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-fileupload .p-fileupload-content {
@@ -4458,7 +4458,7 @@ div.carousel-caption {
 .p-breadcrumb ul li .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-breadcrumb ul li .p-menuitem-link .p-menuitem-text {
@@ -4531,7 +4531,7 @@ div.carousel-caption {
 .p-contextmenu .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-contextmenu .p-submenu-list {
@@ -4619,7 +4619,7 @@ div.carousel-caption {
 .p-megamenu .p-megamenu-root-list > .p-menuitem > .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-megamenu .p-megamenu-root-list > .p-menuitem.p-menuitem-active > .p-menuitem-link,
@@ -4682,7 +4682,7 @@ div.carousel-caption {
 .p-megamenu .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-megamenu .p-megamenu-panel {
@@ -4794,7 +4794,7 @@ div.carousel-caption {
 .p-menu .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-menu.p-menu-overlay {
@@ -4883,7 +4883,7 @@ div.carousel-caption {
 .p-menubar .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link {
@@ -5116,7 +5116,7 @@ div.carousel-caption {
   .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:focus {
     outline: 0 none;
     outline-offset: 0;
-    box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+    box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
   }
   .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-link > .p-submenu-icon {
     margin-left: auto;
@@ -5252,7 +5252,7 @@ div.carousel-caption {
 .p-panelmenu .p-panelmenu-header > a:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-panelmenu .p-panelmenu-header:not(.p-highlight):not(.p-disabled) > a:hover {
@@ -5332,7 +5332,7 @@ div.carousel-caption {
 .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-panelmenu .p-panelmenu-content .p-menuitem .p-menuitem-content .p-menuitem-link .p-panelmenu-icon {
@@ -5427,7 +5427,7 @@ div.carousel-caption {
 .p-slidemenu .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-slidemenu.p-slidemenu-overlay {
@@ -5496,7 +5496,7 @@ div.carousel-caption {
 .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-steps .p-steps-item.p-highlight .p-steps-number {
@@ -5551,7 +5551,7 @@ div.carousel-caption {
 .p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link:not(.p-disabled):focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-tabmenu .p-tabmenu-nav .p-tabmenuitem:not(.p-highlight):not(.p-disabled):hover .p-menuitem-link {
@@ -5615,7 +5615,7 @@ div.carousel-caption {
 .p-tieredmenu .p-menuitem-link:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: inset 0 0 0 0.15rem rgba(38, 143, 255, 0.5);
+  box-shadow: inset 0 0 0 0.15rem $highlight-shadow;
 }
 
 .p-tieredmenu.p-tieredmenu-overlay {
@@ -5747,7 +5747,7 @@ div.carousel-caption {
 .p-message .p-message-close:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-message.p-message-info {
@@ -5875,7 +5875,7 @@ div.carousel-caption {
 .p-toast .p-toast-message .p-toast-icon-close:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-toast .p-toast-message.p-toast-message-info {
@@ -6035,7 +6035,7 @@ div.carousel-caption {
 
 .p-galleria .p-galleria-thumbnail-container .p-galleria-thumbnail-prev:hover,
 .p-galleria .p-galleria-thumbnail-container .p-galleria-thumbnail-next:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: $button-hover-color;
   color: #efefef;
 }
 
@@ -6046,7 +6046,7 @@ div.carousel-caption {
 .p-galleria .p-galleria-thumbnail-container .p-galleria-thumbnail-item-content:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-galleria-mask.p-component-overlay {
@@ -6171,7 +6171,7 @@ div.carousel-caption {
 .p-chip .pi-chip-remove-icon:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-inplace .p-inplace-display {
@@ -6188,7 +6188,7 @@ div.carousel-caption {
 .p-inplace .p-inplace-display:focus {
   outline: 0 none;
   outline-offset: 0;
-  box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
+  box-shadow: 0 0 0 0.2rem $highlight-shadow;
 }
 
 .p-progressbar {

@@ -3,6 +3,8 @@ $main-page-color-2: #87BEA9;
 $main-page-color-3: rgba(0, 76, 89);
 
 $base-color: #1BA595;
+$highlight-shadow: rgba(255, 172, 4, 0.5);
+$highlight-border: #FFAC04;
 //$base-color: #00AAE3; // old one
 $base-font-color: #212529;
 $base-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -20,4 +22,11 @@ $menu-item-focus-color: #F8C100; //#585864; #9E878D - green;//
 $background-color: white;//#F0F4F5; //#74A5B9
 $main-link-color: $main-page-color-1;
 $main-link-hover-color: $main-page-color-3;
+
+$checkbox-main-color: $main-page-color-1;
+$checkbox-hover-color: $main-page-color-2;
+$checkbox-shadow-color: $highlight-shadow;
+$checkbox-focus-color: $highlight-border;
+
+$calendar-picker-main-color: $main-page-color-1;
 

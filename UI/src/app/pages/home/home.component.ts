@@ -35,11 +35,11 @@ export class HomeComponent implements OnInit {
     description: 'FFG'
   }];
 
-  videoValidate ={
+  videoValidate = {
     video: videosPrefix + 'QA4SM_Video_Series_I_Validation_4k.mp4'
   }
 
-  videoResults ={
+  videoResults = {
     video: videosPrefix + 'QA4SM_Video_Series_II_Results_4K.mp4'
   }
 
@@ -64,7 +64,7 @@ export class HomeComponent implements OnInit {
     this.settings$ = this.settingsService.getAllSettings();
   }
 
-  goToNews(): void{
+  goToNews(): void {
     this.router.navigate([], {fragment: "qa4sm-news"});
   }
 
