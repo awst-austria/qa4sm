@@ -93,6 +93,7 @@ div#about-app {
 }
 
 .app-news {
+  width: 40%;
   border-radius: 5px;
   color: white;
   padding: 2vw;
@@ -269,4 +270,18 @@ div#about-app {
 
 .text-highlighted{
   color: white;
+}
+
+@media screen and (max-width: 1385px) {
+  .application-desc {
+    width: 83.3333%;
+  }
+  .app-news {
+    width: 60%;
+  }
+  .background-link{
+    width: 2rem;
+    line-height: 1.5;
+    left: 0.5%;
+  }
 }

@@ -65,14 +65,14 @@ export class HomeComponent implements OnInit {
   }
 
   newsSectionClass = {
-    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center mb-4 text-center lg:w-4 w-8',
+    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center text-center',
     h3: 'line-height-2 lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1',
     div: 'line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1'
   }
 
   opinionSectionClass = {
-    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center lg:w-4 w-8',
-    h3: 'lg:text-5xl md:text-4xl sm:text-3xl text-2xl mb-2 line-height-2',
+    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center',
+    h3: 'lg:text-5xl md:text-4xl sm:text-3xl text-2xl mb-2 line-height-2 text-center',
     div: 'line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1 text-center'
   }
 
@@ -80,7 +80,7 @@ export class HomeComponent implements OnInit {
     main: 'flex flex-column lg:h-6rem h-3rem',
   };
 
-  applicationDescriptionClass = 'application-desc flex flex-column flex-wrap h-auto lg:w-7 w-10';
+  applicationDescriptionClass = 'application-desc flex flex-column flex-wrap h-auto';
   applicationIntroClass = {
     main: 'application-intro',
     h1: 'lg:text-6xl md:text-5xl sm:text-4xl text-3xl',
