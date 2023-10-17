@@ -50,7 +50,7 @@ export class HelpComponent implements OnInit {
   dataRow: string;
   userDataOnTheList: string;
 
-  plotDivClass = 'w-12 align-items-center inline-block'
+  plotDivClass = 'w-12 align-items-center inline-block text-center'
   constructor(private globalParamsService: GlobalParamsService,
               public settingsService: SettingsService) {
   }
