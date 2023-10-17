@@ -5014,8 +5014,8 @@ div.carousel-caption {
 
 .p-menubar .p-submenu-list {
   padding: 0.5rem 0;
-  background: rgba(255, 172, 4, 0.8);
-  border: 1px solid rgba(255, 172, 4, 0.8);
+  background: rgba(255, 172, 4, 0.9);
+  border: 1px solid rgba(255, 172, 4, 0.9);
   box-shadow: none;
   width: 13.5rem;
 }
@@ -5041,7 +5041,7 @@ div.carousel-caption {
 
 .p-menubar .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover,
 .p-menubar.p-menubar-mobile-active .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover{
-  background: $main-page-color-1-trans;
+  background: $main-page-color-1;
   text-decoration: none;
 }
 

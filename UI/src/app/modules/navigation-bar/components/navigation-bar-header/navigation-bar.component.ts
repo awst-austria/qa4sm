@@ -104,8 +104,8 @@ export class NavigationBarComponent implements OnInit {
       label: 'Dataset upload',
       icon: 'pi pi-fw pi-upload',
       items: [
-        this.uploadDataMenuItem,
         this.uploadDataHelpMenuItem,
+        this.uploadDataMenuItem,
       ]
     };
 
@@ -166,8 +166,8 @@ export class NavigationBarComponent implements OnInit {
       this.homeMenuItem,
       this.validateMenuItem,
       this.resultsMenuItem,
-      this.compareResultsMenuItem,
       this.datasetUploadMenuItem,
+      this.compareResultsMenuItem,
       this.infoMenuItem,
       this.contactMenuItem,
       this.loginMenuItem,
