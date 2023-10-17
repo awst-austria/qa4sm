@@ -22,6 +22,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
 
     isLoading: boolean = false;
+    orderChange: boolean  = false;
     endOfPage: boolean = false;
 
     constructor(private validationrunService: ValidationrunService) {
@@ -73,22 +74,34 @@ export class ValidationPagePaginatedComponent implements OnInit {
         if (!this.maxNumberOfPages) {
             this.maxNumberOfPages = Math.ceil(length / this.limit);
         }
-        if (validations.length) {
+
+        if (this.orderChange) {
+          this.validations = validations;
+        } else {
+          if (validations.length) {
             this.validations = this.validations.concat(validations);
 
             if (this.currentPage > this.maxNumberOfPages) {
-                this.endOfPage = true;
+              this.setEndOfPage();
             }
-        } else {
-            this.endOfPage = true;
+          } else {
+            this.setEndOfPage();
+          }
         }
-
+        this.orderChange = false;
         this.isLoading = false;
     }
 
     getOrder(order): void {
         this.order = order;
+        this.orderChange = true;
         this.getValidationsAndItsNumber(this.published);
+    }
+
+    setEndOfPage() {
+      this.endOfPage = true;
+      this.limit = this.validations.length;
+      this.offset = 0;
     }
 
     updateData(validationId: string): void {

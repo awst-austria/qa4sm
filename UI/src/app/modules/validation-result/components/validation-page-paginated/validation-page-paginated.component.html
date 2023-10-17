@@ -36,19 +36,22 @@
 
       <!-- Rows -->
       <div *ngIf="validations.length" class="w-12 py-2">
-        <div *ngFor="let valrun of validations"
-             class="validation-row-area">
-          <p-checkbox
-            class="modify-checkbox"
-            *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
-            [value]="valrun.id"
-            [ngModel]="selectedValidations$ | async"
-            (ngModelChange)="updateSelectedValidations($event, valrun.id)"
-            inputId="{{valrun.id}}}">
-          </p-checkbox>
-          <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
-          <br/>
+        <div *ngIf="!(isLoading && orderChange)">
+          <div *ngFor="let valrun of validations"
+               class="validation-row-area">
+            <p-checkbox
+              class="modify-checkbox"
+              *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
+              [value]="valrun.id"
+              [ngModel]="selectedValidations$ | async"
+              (ngModelChange)="updateSelectedValidations($event, valrun.id)"
+              inputId="{{valrun.id}}}">
+            </p-checkbox>
+            <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
+            <br/>
+          </div>
         </div>
+
 
         <div *ngIf="isLoading" class="loading-vals-box">
           <span class="pi pi-spin pi-spinner mr-2" style="font-size: 2rem"> </span><em style="font-size: 1.5rem"> Loading... </em>
