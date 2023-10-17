@@ -1,6 +1,6 @@
 <div id="background"></div>
 <div id="wrapper">
-  <div id="landing" class="section">
+  <div id="landing">
     <div id="title-box">
       <h1 class="page-title">
         <span style="color:#FFAC04">QA4SM </span> -
@@ -60,27 +60,27 @@
     </div>
 
   </div>
-  <div id="about-app" class="section">
+  <div id="about-app">
     <div *ngIf="settings$|async as settings" id="qa4sm-news"
-         class="app-news flex flex-column flex-wrap justify-content-center align-items-center lg:w-4 w-8">
-      <h3 class="lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1">What's new</h3>
-      <div  [innerHTML]=settings[0].news class="line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1"></div>
+         [ngClass]="newsSectionClass.main">
+      <h3 [ngClass]="newsSectionClass.h3">What's new</h3>
+      <div  [innerHTML]=settings[0].news [ngClass]="newsSectionClass.div"></div>
     </div>
-    <div class="flex flex-column lg:h-6rem h-3rem">
+    <div [ngClass]="verticalLineClass.main">
       <div class="vertical-line"></div>
     </div>
-    <div class="application-desc flex flex-column flex-wrap h-auto lg:w-7 w-10">
+    <div [ngClass]="applicationDescriptionClass">
       <!--      Application introduction-->
-      <div class="application-intro">
-        <h1 class="lg:text-6xl md:text-5xl sm:text-4xl text-3xl"> Service for validation of satellite soil moisture products against in-situ and model reference data </h1>
-        <span class="lg:text-3xl md:text-2xl">
+      <div [ngClass]="applicationIntroClass.main">
+        <h1 [ngClass]="applicationIntroClass.h1"> Service for validation of satellite soil moisture products against in-situ and model reference data </h1>
+        <span [ngClass]="applicationIntroClass.span">
           that <span class="text-highlighted">brings together methodologies and protocols </span> used for the validation
           and quality control of soil moisture data products and provides users with
           <span class="text-highlighted">traceable validation results</span>.
         </span>
       </div>
       <!-- Application videos -->
-      <div class="application-videos lg:my-5 my-2 w-12">
+      <div [ngClass]="videosClass.main">
         <p-carousel [value]="videos"
                     [circular]="true"
                     [numVisible]="1"
@@ -88,11 +88,11 @@
                     [showIndicators]="false"
                     [showNavigators]="true">
           <ng-template let-video pTemplate="item">
-            <div class="flex flex-column align-content-center justify-content-center">
-              <div class="w-12 py-2 text-center">
-                <h4 class="lg:text-3xl md:text-2xl text-base">{{video.title}}</h4>
+            <div [ngClass]="videosClass.mainDiv">
+              <div [ngClass]="videosClass.rowDiv">
+                <h4 [ngClass]="videosClass.h4">{{video.title}}</h4>
               </div>
-              <div class="w-12 text-center">
+              <div [ngClass]="videosClass.rowDiv">
                 <video width="85%" class="mb-3" controls allowfullscreen>
                   <source [src]="video.video">
                 </video>
@@ -102,36 +102,35 @@
         </p-carousel>
       </div>
       <!--    Application information -->
-      <div [class]="applicationInfoClass">
+      <div [class]="applicationInfoClass.main">
         <!--      ROW =========================================================  -->
-        <div [class]="applicationInfoOddRowClass">
-          <div [class]="applicationInfoTileClass">
-
-            <h1 class="lg:text-6xl md:text-4xl sm:text-2xl text-xl">Simple</h1>
-            <div class="lg:text-3xl md:text-2xl  sm:text-base text-xs">
+        <div [class]="applicationInfoClass.oddRow">
+          <div [class]="applicationInfoClass.tile">
+            <h1 [ngClass]="applicationInfoClass.h1">Simple</h1>
+            <div [ngClass]="applicationInfoClass.div">
               An easy-to-use interface for comparing satellite soil moisture data against land surface models and the
               <a href="https://ismn.earth/" target="_blank">International Soil Moisture Network</a>
             </div>
           </div>
-          <div [class]="applicationInfoTileClass">
-            <h1 class="lg:text-6xl md:text-4xl sm:text-2xl text-xl">Traceable</h1>
-            <div class="lg:text-3xl md:text-2xl sm:text-base text-xs">
+          <div [class]="applicationInfoClass.tile">
+            <h1 [ngClass]="applicationInfoClass.h1">Traceable</h1>
+            <div [ngClass]="applicationInfoClass.div">
               You can download your results in netCDF format and as visualisations, share them with others or publish
               using <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> service
             </div>
           </div>
           <!--      ROW ========================================================= -->
         </div>
-        <div [class]="applicationInfoEvenRowClass">
-          <div [class]="applicationInfoTileClass">
-            <h1 class="lg:text-6xl md:text-4xl sm:text-2xl text-xl">Free</h1>
-            <div class="lg:text-3xl md:text-2xl  sm:text-base text-xs">
+        <div [class]="applicationInfoClass.evenRow">
+          <div [class]="applicationInfoClass.tile">
+            <h1 [ngClass]="applicationInfoClass.h1">Free</h1>
+            <div [ngClass]="applicationInfoClass.div">
               Just set up and account to have full access to all functionalities
             </div>
           </div>
-          <div [class]="applicationInfoTileClass">
-            <h1 class="lg:text-6xl md:text-4xl sm:text-2xl text-xl">Customizable</h1>
-            <div class="lg:text-3xl md:text-2xl  sm:text-base text-xs">
+          <div [class]="applicationInfoClass.tile">
+            <h1 [ngClass]="applicationInfoClass.h1">Customizable</h1>
+            <div [ngClass]="applicationInfoClass.div">
               You can upload your own data and use various filtering and scaling options to assess the impact of these
               on
               the validation results
@@ -140,11 +139,11 @@
         </div>
       </div>
 
-      <div class="application-team flex flex-column flex-wrap h-auto lg:my-6 my-4 row-gap-2">
-        <h1 class="lg:text-6xl md:text-5xl sm:text-4xl text-3xl"> Project Team and Partners </h1>
+      <div [ngClass]="applicationTeamClass.main">
+        <h1 [ngClass]="applicationTeamClass.h1"> Project Team and Partners </h1>
         <!--        FFG -->
-        <div class="flex flex-row flex-wrap w-12 align-items-center justify-content-center">
-          <div class="w-8 pl-3 text-justify partner-desc gap-1 lg:text-xl md:text-base text-xs">
+        <div [ngClass]="applicationTeamClass.partner">
+          <div [ngClass]="applicationTeamClass.partnerDesc">
             The <b>QA4SM</b> project provides an operational online validation service for soil moisture products. It
             started
             in May 2018 and was supported by the <a href="https://www.ffg.at/en" target="_blank">Austrian Research
@@ -155,34 +154,34 @@
               Programme</a>.
           </div>
 
-          <div class="w-3 partner-logo flex flex-wrap align-items-center justify-content-center">
+          <div [ngClass]="applicationTeamClass.partnerLogo">
             <a href="https://www.ffg.at/en" rel="noreferrer" target="_blank">
               <img alt="FFG logo" id="logo_ffg" [src]="logoFiles[3].plot"></a>
           </div>
         </div>
 
         <!--        ESA -->
-        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center text-justify">
-          <div class="w-8 pl-3 text-justify partner-desc lg:text-xl md:text-base text-xs">
+        <div [ngClass]="applicationTeamClass.partner">
+          <div [ngClass]="applicationTeamClass.partnerDesc">
             From 2021 on, <b>QA4SM</b> is further evolved within the <a href="https://project-frm4sm.geo.tuwien.ac.at/"
                                                                         target="_blank">FRM4SM</a> project, supported by
             the <a
             href="https://www.esa.int/" target="_blank">European Space Agency</a>.
           </div>
-          <div class="w-3 partner-logo flex flex-wrap align-items-center justify-content-center">
+          <div [ngClass]="applicationTeamClass.partnerLogo">
             <a href="https://www.esa.int/" target="_blank">
               <img alt="ESA logo" id="logo_esa" [src]="logoFiles[2].plot">
             </a>
           </div>
         </div>
         <!--        CESBIO -->
-        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center text-justify"
+        <div [ngClass]="applicationTeamClass.partner"
              style="margin-top: -1.5vw">
-          <div class="w-8 pl-3 text-justify partner-desc lg:text-xl md:text-base text-xs">
+          <div [ngClass]="applicationTeamClass.partnerDesc">
             Within the <b>FRM4SM</b> project, <b>QA4SM</b> has been scientifically developed in cooperation with
             <a href="https://www.cesbio.cnrs.fr/homepage/">CESBIO</a>
           </div>
-          <div class="w-3 partner-logo flex flex-wrap align-items-center justify-content-center">
+          <div [ngClass]="applicationTeamClass.partnerLogo">
             <a href="https://www.cesbio.cnrs.fr/homepage/" target="_blank">
               <img alt="CESBIO logo" id="logo_cesbio" [src]="logoFiles[4].plot">
             </a>
@@ -192,13 +191,13 @@
 
         <div class="horizontal-line my-2"></div>
         <!--        TU -->
-        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center mb-2">
-          <div class="w-2 partner-logo flex align-items-center justify-content-center">
+        <div [ngClass]="applicationTeamClass.team">
+          <div [ngClass]="applicationTeamClass.teamLogo">
             <a href="https://climers.geo.tuwien.ac.at/climers/" target="_blank">
               <img alt="TU logo" id="logo_tu" [src]="logoFiles[1].plot">
             </a>
           </div>
-          <div class="w-9 pl-3 text-justify team-desc px-5 lg:text-xl md:text-base text-xs">
+          <div [ngClass]="applicationTeamClass.teamDesc">
             <b>TU Wien (Vienna University of Technology)</b><br>
             Department of Geodesy and Geoinformation<br>
             Research Group Climate and Environmental Remote Sensing (CLIMERS)<br>
@@ -211,13 +210,13 @@
 
 
         <!--      AWST-->
-        <div class="flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center">
-          <div class="w-2 partner-logo flex align-items-center justify-content-center">
+        <div [ngClass]="applicationTeamClass.team">
+          <div [ngClass]="applicationTeamClass.teamLogo">
             <a href="https://www.awst.at/" target="_blank">
               <img alt="AWST logo" id="logo_awst" [src]="logoFiles[0].plot">
             </a>
           </div>
-          <div class="w-9 pl-3 text-justify team-desc px-5 lg:text-xl md:text-base text-xs">
+          <div [ngClass]="applicationTeamClass.teamDesc">
             <b>AWST (Applied Science, Software and Technology)</b><br>
             <b>Website:</b> <a href="https://www.awst.at" target="_blank"> AWST</a><br>
             <b>Contact: </b> Alexander Boresch (boresch (at) awst.at)<br>
@@ -229,13 +228,13 @@
 
     </div>
 
-    <div class="flex flex-column lg:h-6rem h-3rem">
+    <div [ngClass]="verticalLineClass.main">
       <div class="vertical-line"></div>
     </div>
     <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
-         class="app-news flex flex-column flex-wrap justify-content-center align-items-center mb-4 text-center lg:w-4 w-8">
-      <h3 class="line-height-2 lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1">Share with us your opinion</h3>
-      <div class="line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1">
+         [ngClass]="opinionSectionClass.main">
+      <h3 [ngClass]="opinionSectionClass.h3">Share with us your opinion</h3>
+      <div [ngClass]="opinionSectionClass.div">
         If you think we could improve something or you see a missing functionality, please let us know using
         this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.
       </div>
