@@ -65,13 +65,13 @@ export class HomeComponent implements OnInit {
   }
 
   newsSectionClass = {
-    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center text-center',
-    h3: 'line-height-2 lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1',
+    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center',
+    h3: 'line-height-2 lg:text-5xl md:text-4xl sm:text-3xl text-2xl my-1 text-center',
     div: 'line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1'
   }
 
   opinionSectionClass = {
-    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center',
+    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center mb-2',
     h3: 'lg:text-5xl md:text-4xl sm:text-3xl text-2xl mb-2 line-height-2 text-center',
     div: 'line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1 text-center'
   }

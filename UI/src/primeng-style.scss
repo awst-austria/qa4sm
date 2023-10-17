@@ -2348,6 +2348,22 @@ div.carousel-caption {
   transition: box-shadow 0.15s;
 }
 
+@media screen and (max-width: 1385px) {
+  .p-carousel .p-carousel-content .p-carousel-prev,
+  .p-carousel .p-carousel-content .p-carousel-next {
+    width: 5vw;
+    height: 5vw;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .p-carousel .p-carousel-content .p-carousel-prev,
+  .p-carousel .p-carousel-content .p-carousel-next {
+    width: 7vw;
+    height: 7vw;
+  }
+}
+
 .p-carousel .p-carousel-content .p-carousel-prev {
   margin-left: 3vw;
 }
@@ -4998,8 +5014,8 @@ div.carousel-caption {
 
 .p-menubar .p-submenu-list {
   padding: 0.5rem 0;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 172, 4, 0.8);
+  border: 1px solid rgba(255, 172, 4, 0.8);
   box-shadow: none;
   width: 13.5rem;
 }
@@ -5011,18 +5027,26 @@ div.carousel-caption {
 
 .p-menubar .p-submenu-list .p-submenu-icon {
   font-size: 0.875rem;
+  color: white;
 }
 
 .p-menubar .p-submenu-list .p-menuitem {
   margin: 0;
+  color: white;
 }
 
 .p-menubar .p-submenu-list .p-menuitem:last-child {
   margin: 0;
 }
 
-.p-menubar .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover {
-  background: rgba(248, 193, 0, .5);
+.p-menubar .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover,
+.p-menubar.p-menubar-mobile-active .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover{
+  background: $main-page-color-1-trans;
+  text-decoration: none;
+}
+
+.p-menubar .p-submenu-list .p-menuitem > .p-menuitem-content > .p-menuitem-link.p-menuitem-link-active{
+  background: $main-page-color-1-trans;
   text-decoration: none;
 }
 
@@ -5051,12 +5075,12 @@ div.carousel-caption {
     display: flex;
     width: 2rem;
     height: 2rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: $button-active-color;
     border-radius: 50%;
     transition: box-shadow 0.15s;
   }
   .p-menubar .p-menubar-button:hover {
-    color: rgba(0, 0, 0, 0.7);
+    color: $button-hover-color;
     background: transparent;
   }
   .p-menubar .p-menubar-button:focus {
@@ -5068,7 +5092,7 @@ div.carousel-caption {
     position: absolute;
     display: none;
     padding: 0.5rem 0;
-    background: #ffffff;
+    background: rgba(100, 100, 100, 0.9);
     border: 1px solid rgba(0, 0, 0, 0.15);
     box-shadow: none;
     width: 100%;
@@ -5223,11 +5247,11 @@ div.carousel-caption {
     background: $menu-item-focus-color;
   }
 
-
-  .p-menubar.p-menubar-mobile-active .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover {
-    background: rgba(248, 193, 0, .5);
-    text-decoration: none;
-  }
+  //
+  //.p-menubar.p-menubar-mobile-active .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover {
+  //  background: rgba(248, 193, 0, .5);
+  //  text-decoration: none;
+  //}
 
 }
 
