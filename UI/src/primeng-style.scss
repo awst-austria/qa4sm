@@ -1665,6 +1665,25 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   width: 3rem;
 }
 
+@media screen and (max-width: 650px) {
+  .p-slider.p-slider-horizontal {
+    height: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .p-slider .p-slider-handle {
+    height: 4.5rem;
+    width: 4.5rem;
+  }
+  .p-slider.p-slider-horizontal .p-slider-handle {
+    margin-top: -2.25rem;
+  }
+  label[for="honeypot"] {
+    margin-top: -1rem;
+  }
+}
+
 .p-slider .p-slider-handle:focus {
   outline: 0 none;
   outline-offset: 0;
