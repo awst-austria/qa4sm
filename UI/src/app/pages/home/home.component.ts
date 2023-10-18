@@ -97,7 +97,7 @@ export class HomeComponent implements OnInit {
   applicationTeamClass = {
     main: 'application-team flex flex-column flex-wrap h-auto lg:my-6 my-4 row-gap-2',
     h1: 'lg:text-6xl md:text-5xl sm:text-4xl text-3xl',
-    partner: 'flex flex-row flex-wrap w-12 align-items-center justify-content-center',
+    partner: 'flex flex-row flex-wrap w-12 gap-2 align-items-center justify-content-center',
     partnerDesc: 'w-8 pl-3 text-justify partner-desc gap-1 lg:text-xl md:text-base text-xs',
     partnerLogo: 'w-3 partner-logo flex flex-wrap align-items-center justify-content-center',
     team: 'flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center mb-2',
