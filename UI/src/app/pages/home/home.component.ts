@@ -18,23 +18,23 @@ const videosPrefix = 'static/videos/'
 export class HomeComponent implements OnInit {
 
   logoFiles = [{
-    plot: logoUrlPrefix + 'logo_awst.png',
+    plot: logoUrlPrefix + 'logo_awst.webp',
     link: 'https://www.awst.at/',
     description: 'AWST'
   }, {
-    plot: logoUrlPrefix + 'logo_tuwien_geo.png',
+    plot: logoUrlPrefix + 'logo_tuwien_geo.webp',
     link: 'https://www.geo.tuwien.ac.at/',
     description: 'GEO'
   }, {
-    plot: logoUrlPrefix + 'logo_esa_transparent.png',
+    plot: logoUrlPrefix + 'logo_esa_transparent.webp',
     link: 'https://www.esa.int/',
     description: 'ESA'
   }, {
-    plot: logoUrlPrefix + 'logo_ffg_transparent.png',
+    plot: logoUrlPrefix + 'logo_ffg_transparent.webp',
     link: 'https://www.ffg.at/',
     description: 'FFG'
   }, {
-    plot: logoUrlPrefix + 'logo_cesbio_transparent.png',
+    plot: logoUrlPrefix + 'logo_cesbio_transparent.webp',
     link: 'https://www.cesbio.cnrs.fr/homepage/',
     description: 'CESBIO'
   },];
