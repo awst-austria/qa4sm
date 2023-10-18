@@ -1,3 +1,8 @@
+QA4SM v2.4.3 - Release notes 2023-10-18
+=======================================================
+# Bug fix
+1. Adding up file size updated to omit non-existing files 
+
 QA4SM v2.4.2 - Release notes 2023-10-11
 =======================================================
 # Improvements
