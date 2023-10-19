@@ -2069,14 +2069,14 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 
 .p-button.p-button-success, .p-buttonset.p-button-success > .p-button, .p-splitbutton.p-button-success > .p-button {
   color: #ffffff;
-  background: #28a745;
-  border: 1px solid #28a745;
+  background:  #218838;
+  border: 1px solid  #218838;
 }
 
 .p-button.p-button-success:enabled:hover, .p-buttonset.p-button-success > .p-button:enabled:hover, .p-splitbutton.p-button-success > .p-button:enabled:hover {
-  background: #218838;
+  background: #28a745;
   color: #ffffff;
-  border-color: #1e7e34;
+  border-color: #28a745;
 }
 
 .p-button.p-button-success:enabled:focus, .p-buttonset.p-button-success > .p-button:enabled:focus, .p-splitbutton.p-button-success > .p-button:enabled:focus {
@@ -4018,6 +4018,7 @@ div.carousel-caption {
 }
 
 .p-panel .p-panel-header .p-panel-title {
+  font-size: 1.5rem;
   font-weight: 400;
   text-align: right;
 }
