@@ -1,136 +1,139 @@
-<main id="top">
-  <p>
-    <a routerLink="{{pageUrl}}" fragment="terms-and-conditions">Terms and Conditions</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="references">References</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="privacy_policy">Privacy Policy</a>
-  </p>
+<main id="top" class="flex flex-column align-items-center">
+  <div class="flex flex-column lg:w-4 w-10 align-content-center justify-content-center text-justify">
+    <p>
+      <a routerLink="{{pageUrl}}" fragment="terms-and-conditions">Terms and Conditions</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="references">References</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="privacy_policy">Privacy Policy</a>
+    </p>
 
 
-  <p>
-    The Quality Assurance for Soil Moisture (QA4SM) web service is developed by
-    <a href="https://www.geo.tuwien.ac.at/" target="_blank">TU Wien GEO</a> and <a href="https://www.awst.at/"
-                                                                                   target="_blank">AWST GmbH</a> with
-    funding from the Austrian Space Applications Programme by <a href="https://www.ffg.at/">FFG</a>.
-    From 2021 on, the application is also supported by the <a href="https://www.esa.int/" target="_blank"> European
-    Space Agency</a>.
-    It aims to allow its users to validate soil moisture datasets in a traceable, transparent, reproducible and
-    standardised fashion
-    and to download the validation results for further use, for example in publications.<br/>
-    In order to use the webservice, users must accept and follow the Terms and Conditions below:
-  </p>
+    <p>
+      The Quality Assurance for Soil Moisture (QA4SM) web service is developed by
+      <a href="https://www.geo.tuwien.ac.at/" target="_blank">TU Wien GEO</a> and <a href="https://www.awst.at/"
+                                                                                     target="_blank">AWST GmbH</a> with
+      funding from the Austrian Space Applications Programme by <a href="https://www.ffg.at/">FFG</a>.
+      From 2021 on, the application is also supported by the <a href="https://www.esa.int/" target="_blank"> European
+      Space Agency</a>.
+      It aims to allow its users to validate soil moisture datasets in a traceable, transparent, reproducible and
+      standardised fashion
+      and to download the validation results for further use, for example in publications.<br/>
+      In order to use the webservice, users must accept and follow the Terms and Conditions below:
+    </p>
 
 
-  <h1 id="terms-and-conditions" class="h3 mb-3 font-weight-normal">Terms and Conditions</h1>
-  <ol>
-    <li>
-      <b>Registration:</b>
-      Users of the QA4SM webservice are asked to register before using the service to validate data, view and download
-      results.
-    </li>
-    <li>
-      <b>Intellectual Property Rights:</b>
-      The user acknowledges the respective data owner’s full title and ownership of the data, and nothing in these terms
-      and
-      conditions shall be construed as granting or implying any rights to, or interest in copyrights or intellectual
-      property
-      rights of the respective data owners.
-    </li>
-    <li>
-      <b>Acknowledgement and citation:</b>
-      Whenever results produced by the QA4SM web service are used for publication, the data's and the results' origin
-      (i.e. the original data, reference data providers and the QA4SM webservice) must be acknowledged and referenced.
-      A reference both to the QA4SM webservice and to all data providers for the study in question shall be provided.
-      <a routerLink="{{pageUrl}}" fragment="references">See reference section below.</a>
-    </li>
-    <li>
-      <b>User feedback:</b>
-      For questions and remarks concerning the QA4SM web service, users can contact the service provider by email at
-      {{this.getAdminMail()}}.
-      If necessary, the team will forward questions or comments to the respective data providers or to other recipients
-      who
-      may be suitable for providing help with the questions received.
-    </li>
-    <li>
-      <b>No warranties:</b>
-      The results produced by the QA4SM webservice are provided for free and &quot;as is&quot;, i.e. without any
-      warranty
-      as to their condition, consistency or suitability for a particular purpose. Neither TU Wien GEO nor AWST, EODC or
-      the
-      individual data providers can be held responsible for any errors or inconsistencies in the results provided by the
-      QA4SM web service or for a timely delivery of results. Moreover, they have no obligation whatsoever relating to
-      updates
-      or availailability of the results, data or web service.
-    </li>
-    <li>
-      <b>Termination:</b>
-      The provision of the service and/or delivery of results or data may be suspended or terminated at any time.
-    </li>
-  </ol>
+    <h1 id="terms-and-conditions" class="h3 mb-3 font-weight-normal">Terms and Conditions</h1>
+    <ol>
+      <li>
+        <b>Registration:</b>
+        Users of the QA4SM webservice are asked to register before using the service to validate data, view and download
+        results.
+      </li>
+      <li>
+        <b>Intellectual Property Rights:</b>
+        The user acknowledges the respective data owner’s full title and ownership of the data, and nothing in these terms
+        and
+        conditions shall be construed as granting or implying any rights to, or interest in copyrights or intellectual
+        property
+        rights of the respective data owners.
+      </li>
+      <li>
+        <b>Acknowledgement and citation:</b>
+        Whenever results produced by the QA4SM web service are used for publication, the data's and the results' origin
+        (i.e. the original data, reference data providers and the QA4SM webservice) must be acknowledged and referenced.
+        A reference both to the QA4SM webservice and to all data providers for the study in question shall be provided.
+        <a routerLink="{{pageUrl}}" fragment="references">See reference section below.</a>
+      </li>
+      <li>
+        <b>User feedback:</b>
+        For questions and remarks concerning the QA4SM web service, users can contact the service provider by email at
+        {{this.getAdminMail()}}.
+        If necessary, the team will forward questions or comments to the respective data providers or to other recipients
+        who
+        may be suitable for providing help with the questions received.
+      </li>
+      <li>
+        <b>No warranties:</b>
+        The results produced by the QA4SM webservice are provided for free and &quot;as is&quot;, i.e. without any
+        warranty
+        as to their condition, consistency or suitability for a particular purpose. Neither TU Wien GEO nor AWST, EODC or
+        the
+        individual data providers can be held responsible for any errors or inconsistencies in the results provided by the
+        QA4SM web service or for a timely delivery of results. Moreover, they have no obligation whatsoever relating to
+        updates
+        or availailability of the results, data or web service.
+      </li>
+      <li>
+        <b>Termination:</b>
+        The provision of the service and/or delivery of results or data may be suspended or terminated at any time.
+      </li>
+    </ol>
 
 
-  <h1 id="references" class="h3 mb-3 font-weight-normal">References and Acknowledgements</h1>
-  <p>
-    Whenever results generated by the QA4SM service are used in publications, the QA4SM service must be acknowledged and
-    referenced along with the original data source(s).
-  </p>
-  <ol>
-    <li>
-      The QA4SM service should be cited using the following text:
-      <p style="margin-left: 40px"><i>The results used in this study were generated using the QA4SM service available
-        at: {{this.getSiteURL()}}. The service
-        was developed by TU Wien GEO and AWST GmbH. The results were generated on [date of processing].</i>
-    </li>
-    <li>
-      The individual datasets must be referenced using the guidance provided by the data providers. Links to the
-      official websites of the
-      datasets currently supported by the service are listed in the <a routerLink="/datasets" target="_blank">datasets
-      page</a>.
-    </li>
-  </ol>
+    <h1 id="references" class="h3 mb-3 font-weight-normal">References and Acknowledgements</h1>
+    <p>
+      Whenever results generated by the QA4SM service are used in publications, the QA4SM service must be acknowledged and
+      referenced along with the original data source(s).
+    </p>
+    <ol>
+      <li>
+        The QA4SM service should be cited using the following text:
+        <p style="margin-left: 40px"><i>The results used in this study were generated using the QA4SM service available
+          at: {{this.getSiteURL()}}. The service
+          was developed by TU Wien GEO and AWST GmbH. The results were generated on [date of processing].</i>
+      </li>
+      <li>
+        The individual datasets must be referenced using the guidance provided by the data providers. Links to the
+        official websites of the
+        datasets currently supported by the service are listed in the <a routerLink="/datasets" target="_blank">datasets
+        page</a>.
+      </li>
+    </ol>
 
-  <h1 id="privacy_policy" class="h3 mb-3 font-weight-normal">Privacy Policy</h1>
-  All personal user data are managed in agreement with the EU General Data Protection Regulation (GDPR).
-  The data controller are TU Wien and AWST jointly. User data are kept as long as users have a registered QA4SM account
-  and are deleted when the account is deleted.
-  User data are processed in the following ways and for the following purposes: <br> <br>
-  <ol>
-    <li>
-      <b>Email:</b> On registration, users are asked to provide a valid email address where they can receive
-      notifications
-      concerning account activation, completed validations, maintenance etc. The QA4SM web service providers will not
-      convey
-      these email addresses to third parties, other than for the delivery of the specified emails or as may be legally
-      required.
-      If users send questions or comments e.g. about datasets via email, the QA4SM webservice providers may forward
-      these
-      emails to the appropriate data providers or other recipients <i>unless otherwise indicated in the email</i>.
-    </li>
-    <li>
-      <b>Other user profile data:</b> On registration, users are asked to provide additional information including given
-      name, family name,
-      organisation and country. Providing this information is optional and not necessary for creating an account.
-      Information about individual users will not be conveyed to third parties other than for the provision of the
-      QA4SM web service (e.g. mentioning a user's full name in emails to them) or as required by law. Aggregated user
-      information,
-      including the number of users per country and organisation, may be passed on to funding agencies or others to
-      advertise the
-      service or attract more funding. This is aimed at helping cover the cost of this free service. Users who want to
-      delete some
-      or all of their user information stored in the QA4SM web service can do so by contacting the provider by email
-      at {{this.getAdminMail()}}.
-      The deletion of required user information will remove access to the service.
-    </li>
-    <li>
-      <b>Logs:</b> The QA4SM web service writes logs about connections made to it, which include the users' IP
-      addresses.
-      This information is used to investigate errors, attempts to disrupt the service etc. The logs will not be conveyed
-      to third parties unless legally required or needed for the prosecution of disruptions of the service or the
-      investigation
-      of malfunctions. Aggregated information about connections may be passed on together with aggregated user
-      information.
-      Logged information is deleted at regular intervals.
-    </li>
-  </ol>
+    <h1 id="privacy_policy" class="h3 mb-3 font-weight-normal">Privacy Policy</h1>
+    All personal user data are managed in agreement with the EU General Data Protection Regulation (GDPR).
+    The data controller are TU Wien and AWST jointly. User data are kept as long as users have a registered QA4SM account
+    and are deleted when the account is deleted.
+    User data are processed in the following ways and for the following purposes: <br> <br>
+    <ol>
+      <li>
+        <b>Email:</b> On registration, users are asked to provide a valid email address where they can receive
+        notifications
+        concerning account activation, completed validations, maintenance etc. The QA4SM web service providers will not
+        convey
+        these email addresses to third parties, other than for the delivery of the specified emails or as may be legally
+        required.
+        If users send questions or comments e.g. about datasets via email, the QA4SM webservice providers may forward
+        these
+        emails to the appropriate data providers or other recipients <i>unless otherwise indicated in the email</i>.
+      </li>
+      <li>
+        <b>Other user profile data:</b> On registration, users are asked to provide additional information including given
+        name, family name,
+        organisation and country. Providing this information is optional and not necessary for creating an account.
+        Information about individual users will not be conveyed to third parties other than for the provision of the
+        QA4SM web service (e.g. mentioning a user's full name in emails to them) or as required by law. Aggregated user
+        information,
+        including the number of users per country and organisation, may be passed on to funding agencies or others to
+        advertise the
+        service or attract more funding. This is aimed at helping cover the cost of this free service. Users who want to
+        delete some
+        or all of their user information stored in the QA4SM web service can do so by contacting the provider by email
+        at {{this.getAdminMail()}}.
+        The deletion of required user information will remove access to the service.
+      </li>
+      <li>
+        <b>Logs:</b> The QA4SM web service writes logs about connections made to it, which include the users' IP
+        addresses.
+        This information is used to investigate errors, attempts to disrupt the service etc. The logs will not be conveyed
+        to third parties unless legally required or needed for the prosecution of disruptions of the service or the
+        investigation
+        of malfunctions. Aggregated information about connections may be passed on together with aggregated user
+        information.
+        Logged information is deleted at regular intervals.
+      </li>
+    </ol>
+  </div>
+
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 

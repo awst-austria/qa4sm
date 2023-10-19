@@ -15,11 +15,11 @@
         </div>
       </ng-template>
       <ng-template pTemplate="icons">
-        <label class="mb-0" pTooltip="Shown are the comparison plots for {{selectedMetric.metric_pretty_name}}. To generate maps and
+        <label class="mb-0 p-panel-header-icon" pTooltip="Shown are the comparison plots for {{selectedMetric.metric_pretty_name}}. To generate maps and
         correlation plots with the comparison results, make sure that the input validations have overlapping extents
         and that 'Compare the union of spatial extents' is unchecked."
                tooltipPosition="bottom">
-          <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+          <span class="pi pi-question-circle help-icon"></span>
         </label>
       </ng-template>
 
@@ -85,8 +85,8 @@
 <!--          </button>-->
 <!--        </div>-->
         <!--   Metric selector  -->
-        <div class="col mt-4">
-        <span class="p-float-label mt-4 mt-4">
+        <div class="col mt-4 pt-4">
+        <span class="p-float-label mt-4">
           <p-dropdown id="metricSelector"
                       [options]="this.comparisonMetrics"
                       [(ngModel)]="selectedMetric"

@@ -9,15 +9,16 @@ main {
   margin: auto;
   font-family: $base-font;
   line-height: 1.5rem;
+  padding-top: 2rem; // DO NOT REMOVE THIS ONE!!!!!!!
 }
 
 a {
-  color: #4760E5;
+  color: $main-link-color;
   text-decoration: none;
 }
 
 a:hover {
-  color: #213FE0;
+  color: $main-link-hover-color;
   text-decoration: underline;
 }
 
@@ -108,7 +109,7 @@ h5, .h5 {
 
 .table .thead-dark th {
   color: #fff;
-  background-color: #00AAE3;
+  background-color: $base-color;
   border-color: #454d55;
 }
 
@@ -126,7 +127,7 @@ h5, .h5 {
 }
 
 .edit_name {
-  border: 1px solid #00AAE3;
+  border: 1px solid $base-color;
   border-radius: 4px;
   position: relative;
   padding: 3px;
@@ -134,7 +135,7 @@ h5, .h5 {
 }
 
 .edit_name:focus {
-  border: 1px solid #00AAE3;
+  border: 1px solid $base-color;
   box-shadow: 0 0 0 .2rem rgba(33, 63, 224, .3);
   outline: none;
 }
@@ -170,8 +171,9 @@ h5, .h5 {
 }
 
 .text-muted {
-  color: #6c757d !important;
+  color: #6c757d;
 }
+
 
 .text-center {
   text-align: center !important;
@@ -318,26 +320,22 @@ img {
   font-size: 1rem;
   color: white;
   line-height: 1rem;
-  height: 2.25rem;
+  height: 2.5rem;
   padding: 1rem;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
-  background-color: #00AAE3;
+  background-color: $base-color;
   display: flex;
   align-items: center;
-  min-width: 4.5rem;
+  min-width: 4.7rem;
   max-width: 7rem;
   text-align: center;
-}
-
-#sortingForm .small-label{
   justify-content: center;
-  max-width: 100%;
 }
 
 @keyframes spinAndChangeColor {
   from {color: #9CF2F6}
-  to {color: #00AAE3;}
+  to {color: $base-color;}
   from {
     transform:rotate(0deg);
   }

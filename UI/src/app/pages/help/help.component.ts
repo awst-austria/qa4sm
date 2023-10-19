@@ -2,8 +2,6 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {HttpClient} from '@angular/common/http';
-import {ActivatedRoute} from '@angular/router';
 
 const plotsUrlPrefix = '/static/images/help/';
 
@@ -52,10 +50,9 @@ export class HelpComponent implements OnInit {
   dataRow: string;
   userDataOnTheList: string;
 
+  plotDivClass = 'w-12 align-items-center inline-block text-center'
   constructor(private globalParamsService: GlobalParamsService,
-              public settingsService: SettingsService,
-              private http: HttpClient,
-              private activeRoute: ActivatedRoute) {
+              public settingsService: SettingsService) {
   }
 
   @ViewChild('helpPage') container: ElementRef<HTMLElement>;

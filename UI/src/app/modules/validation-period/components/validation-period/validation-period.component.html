@@ -1,5 +1,5 @@
-<div class="grid pt-4">
-  <div class="col-12 text-center py-0 my-0">
+<div class="flex flex-row flex-wrap pt-4">
+  <div class="w-12 text-center py-0 my-0">
     <h4 class="py-0 my-0 text-muted">
       Validation Period
       <span class="pi pi-question-circle mb-1"
@@ -8,54 +8,47 @@
       </span>
     </h4>
   </div>
-  <hr class="col-12 pt-0 mt-0 featurette-divider" style="max-width: 60rem">
-  <div class="col-12 sm:col-5">
-    <div class="grid" id="fromField">
-      <div class="small-label col-4">
-        <div class="p-fluid">
-          <div>From</div>
-        </div>
-      </div>
-      <div class="col-8 px-0 mx-0">
-        <div class="p-fluid">
-          <div class="p-float-label">
-            <p-calendar id="fromDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                        yearRange="1970:2100"
-                        [maxDate]="validationPeriodModel.intervalTo$|async"
-                        [ngModel]="(validationPeriodModel.intervalFrom$|async)"
-                        (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-calendar>
-            <label for="fromDateInput">Choose a date</label>
+  <hr class="flex w-11 pt-0 mt-0 featurette-divider">
+  <div class="flex lg:flex-nowrap flex-wrap lg:gap-8 gap-2 justify-content-center align-content-center w-12">
+    <div class="flex p-2 lg:w-6 w-12" id="fromField">
+        <div class="small-label w-4">
+          <div class="p-fluid">
+            <div>From</div>
           </div>
         </div>
+        <div class="w-8 px-0 mx-0">
+          <div class="p-fluid">
+            <div class="p-float-label">
+              <p-calendar id="fromDateInput" dateFormat="yy-mm-dd"
+                          [maxDate]="validationPeriodModel.intervalTo$|async"
+                          [ngModel]="(validationPeriodModel.intervalFrom$|async)"
+                          (ngModelChange)="validationPeriodModel.intervalFrom$.next($event)"></p-calendar>
+              <label for="fromDateInput">Choose a date</label>
+            </div>
+          </div>
 
-      </div>
-    </div>
-  </div>
-
-  <div class="col-12 sm:col-2">
-    <div class="d-flex justify-content-center">
-    </div>
-  </div>
-
-  <div class="col-12 sm:col-5">
-    <div class="grid" id="toField">
-      <div class="small-label col-4">
-        <div class="p-fluid">
-          <div>To</div>
         </div>
-      </div>
-      <div class="col-8 px-0 mx-0">
-        <div class="p-fluid">
-          <div class="p-float-label">
-            <p-calendar id="toDateInput" dateFormat="yy-mm-dd" [monthNavigator]="true" [yearNavigator]="true"
-                        yearRange="1970:2100"
-                        [minDate]="validationPeriodModel.intervalFrom$|async"
-                        [ngModel]="(validationPeriodModel.intervalTo$|async)"
-                        (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-calendar>
-            <label for="toDateInput">Chose a date</label>
+    </div>
+
+    <div class="flex p-2 lg:w-6 w-12" id="toField">
+<!--      <div class="grid" id="toField">-->
+        <div class="small-label w-4">
+          <div class="p-fluid">
+            <div>To</div>
           </div>
         </div>
-      </div>
+        <div class="w-8 px-0 mx-0">
+          <div class="p-fluid">
+            <div class="p-float-label">
+              <p-calendar id="toDateInput" dateFormat="yy-mm-dd"
+                          [minDate]="validationPeriodModel.intervalFrom$|async"
+                          [ngModel]="(validationPeriodModel.intervalTo$|async)"
+                          (ngModelChange)="validationPeriodModel.intervalTo$.next($event)"></p-calendar>
+              <label for="toDateInput">Chose a date</label>
+            </div>
+          </div>
+        </div>
+<!--      </div>-->
     </div>
   </div>
 </div>

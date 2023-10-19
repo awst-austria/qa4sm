@@ -1,686 +1,691 @@
-<main #helpPage>
-  <h1 class="h3 mb-3 font-weight-normal">Go to section</h1>
-  <p>
-    <a routerLink="{{pageUrl}}" fragment="validation">Validate Page</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="results_list">My Validations - Results List Page</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="results">Validation Results Page</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="published">Published Validations Page</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="comparison">Validation Comparison</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="user-data-upload">User Data Upload</a><br/>
-  </p>
+<main #helpPage class="flex flex-column align-items-center">
+  <div class="flex flex-column lg:w-4 w-10 align-content-center justify-content-center text-justify">
+    <h1 class="h3 mb-3 font-weight-normal">Go to section</h1>
+    <p>
+      <a routerLink="{{pageUrl}}" fragment="validation">Validate Page</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="results_list">My Validations - Results List Page</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="results">Validation Results Page</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="published">Published Validations Page</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="comparison">Validation Comparison</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="user-data-upload">User Data Upload</a><br/>
+    </p>
 
-  <a id="manual"></a>
-  <h1 class="h3 mb-3 font-weight-normal">User Manual</h1>
-  <p *ngIf="settingsService.getAllSettings()|async as settings">
-    This page contains a quick user tutorial. More comprehensive information can be found in our
-    <a target="_blank"
-       [href]="settings[0].sum_link">User Manual</a>.
-  </p>
+    <a id="manual"></a>
+    <h1 class="h3 mb-3 font-weight-normal">User Manual</h1>
+    <p *ngIf="settingsService.getAllSettings()|async as settings">
+      This page contains a quick user tutorial. More comprehensive information can be found in our
+      <a target="_blank"
+         [href]="settings[0].sum_link">User Manual</a>.
+    </p>
 
-  <h1 id="validation" class="h3 mb-3 font-weight-normal">Validate Page</h1>
+    <h1 id="validation" class="h3 mb-3 font-weight-normal">Validate Page</h1>
 
-  <p>
-    The validate page is subdivided into areas for the various validation parameters. Each area has
-    menu with two icons on the top right. Hover over the question mark to get help for the respective areas. You can
-    use the +/- icon to fold up or fold down the area.
-  </p>
-  <div>
-    <img alt="menu-minus" class="px-5 mx-5" [src]="menuMinus">
-    <img alt="menu-plus" class="px-5 mx-5" [src]="menuPlus">
-  </div>
+    <p>
+      The validate page is subdivided into areas for the various validation parameters. Each area has
+      menu with two icons on the top right. Hover over the question mark to get help for the respective areas. You can
+      use the +/- icon to fold up or fold down the area.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="menu-minus" class="px-5 mx-5" [src]="menuMinus"  width="15%"></p-image>
+      <p-image alt="menu-minus" class="px-5 mx-5" [src]="menuPlus"  width="15%"></p-image>
+    </div>
 
-  <p>
-    <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
-    and one of the soil moisture variables provided in the dataset. All the supported datasets are listed on
-    <a routerLink="/datasets" target="_blank">datasets page here</a>. Plase note,
-    that there have to be at least two datasets added, as one of them will be treated as the reference one.
-  </p>
-  <div>
-    <img alt="dataset selection" class="scaled_image" [src]="datasetSelections">
-  </div>
-  <p>
-    <b>Step 2 [optional]</b> - Choose the criteria by which you would like to filter this dataset.
-    The filters available depend on the data contained within the chosen dataset. For example,
-    you can filter the C3S data to include only data with variable in valid geophysical range.
-    Details of the filter options provided for each dataset are given on the
-    <a routerLink="/datasets" target="_blank">supported datasets page</a>. You
-    can also
-    hover your mouse pointer over the question mark next to a filter to get a short explanation.
-  </p>
-  <p>
-    <b>Step 3 [optional]</b> - If you want to intercompare several datasets, you can add more datasets to the validation
-    using the <b>Add dataset</b> button, up to a maximum of six. Configure the settings for the additional datasets by
-    selecting
-    the respective tab and repeating steps 1 and 2 above.<br/>
-  </p>
-  <p class="alert alert-info">
-    <b>Intercomparison:</b> The intercomparison mode of QA4SM validates up to six satellite data sets against a common
-    spatial reference data set. For each reference location (e.g. each ISMN station) it finds the nearest observation
-    series in
-    all selected satellite products.
-    All observations series are then scaled (if selected) and temporally matched to the temporal reference series.
-    For validation only the common time stamps (that are available in all satellite products) are used to calculate
-    validation metrics
-    between the reference and each individual satellite product.
-    This way deviations in the metrics due to different temporal coverage are excluded and validation results represent
-    differences in
-    the performance of the compared satellite products.
-  </p>
-  <div>
-    <img alt="intercomparison" class="scaled_image" [src]="intercomparison">
-  </div>
-  <p>
-    <b>Step 4</b> - Choose which dataset selected for validation should be used as the spatial and temporal reference.
-    Please note, that if the ISMN dataset belongs to the pool, it is set as the spatial reference automatically and
-    there
-    is no possibility of changing it.
-  </p>
-  <div>
-    <img alt="reference dataset" class="scaled_image" [src]="referenceDatasetSelection">
-  </div>
-  <p>
-    <b>Step 5 [optional]</b> -
-    <span>
+    <p>
+      <b>Step 1</b> - Choose the data you would like to validate - including the dataset name, the version of the dataset,
+      and one of the soil moisture variables provided in the dataset. All the supported datasets are listed on
+      <a routerLink="/datasets" target="_blank">datasets page here</a>. Plase note,
+      that there have to be at least two datasets added, as one of them will be treated as the reference one.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="dataset selection" class="scaled_image" [src]="datasetSelections" preview="true" width="100%"></p-image>
+    </div>
+    <p>
+      <b>Step 2 [optional]</b> - Choose the criteria by which you would like to filter this dataset.
+      The filters available depend on the data contained within the chosen dataset. For example,
+      you can filter the C3S data to include only data with variable in valid geophysical range.
+      Details of the filter options provided for each dataset are given on the
+      <a routerLink="/datasets" target="_blank">supported datasets page</a>. You
+      can also
+      hover your mouse pointer over the question mark next to a filter to get a short explanation.
+    </p>
+    <p>
+      <b>Step 3 [optional]</b> - If you want to intercompare several datasets, you can add more datasets to the validation
+      using the <b>Add dataset</b> button, up to a maximum of six. Configure the settings for the additional datasets by
+      selecting
+      the respective tab and repeating steps 1 and 2 above.<br/>
+    </p>
+    <p class="alert alert-info">
+      <b>Intercomparison:</b> The intercomparison mode of QA4SM validates up to six satellite data sets against a common
+      spatial reference data set. For each reference location (e.g. each ISMN station) it finds the nearest observation
+      series in
+      all selected satellite products.
+      All observations series are then scaled (if selected) and temporally matched to the temporal reference series.
+      For validation only the common time stamps (that are available in all satellite products) are used to calculate
+      validation metrics
+      between the reference and each individual satellite product.
+      This way deviations in the metrics due to different temporal coverage are excluded and validation results represent
+      differences in
+      the performance of the compared satellite products.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="intercomparison" class="scaled_image" [src]="intercomparison" preview="true"  width="100%"></p-image>
+    </div>
+    <p>
+      <b>Step 4</b> - Choose which dataset selected for validation should be used as the spatial and temporal reference.
+      Please note, that if the ISMN dataset belongs to the pool, it is set as the spatial reference automatically and
+      there
+      is no possibility of changing it.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="reference dataset" class="scaled_image" [src]="referenceDatasetSelection" preview="true" width="100%"></p-image>
+    </div>
+    <p>
+      <b>Step 5 [optional]</b> -
+      <span>
     If the ISMN belongs to the dataset pool you can also choose specific networks and/or measurements in a defined depth range.
     To do that you have to open an appropriate window by clicking a 'select...' link next to the filter you want to parameterised.
     </span>
-  </p>
-  <img alt='ismn networks' class="scaled_image mb-3" [src]="ismnNetworks">
-  <p>
-    The window for choosing networks contains a list of continents. When clicking an arrow next to a continent name a
-    list of networks that belong to the continent unfolds.
-    Next to each network there is the name of the country it belongs to. To toggle the particular network it is enough
-    to click on its name.
-    The choice doesn't have to be approved, it is enough to close the dialog window and the choice will be saved.
-  </p>
-  <img alt="ismn depths" class="scaled_image mb-3" [src]="ismnDepths">
-  <p>
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt='ismn networks' class="scaled_image mb-3" [src]="ismnNetworks" preview="true" width="100%"></p-image>
+    </div>
+    <p>
+      The window for choosing networks contains a list of continents. When clicking an arrow next to a continent name a
+      list of networks that belong to the continent unfolds.
+      Next to each network there is the name of the country it belongs to. To toggle the particular network it is enough
+      to click on its name.
+      The choice doesn't have to be approved, it is enough to close the dialog window and the choice will be saved.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="ismn depths" class="scaled_image mb-3" [src]="ismnDepths" preview="true" width="100%"></p-image>
+    </div>
+
+    <p>
     <span>
     The window for the depth selection contains two fields for introducing the depth range. Values have to be introduced in meters.
     The choice can to be accepted by clicking the 'OK' button or simply by closing the dialog window.
     </span>
-    <br>
-    <br>
-    Details of the filter options provided for each dataset are given on the supported datasets page
-    <a routerLink="/datasets">here</a>. You can also hover your mouse pointer over the question mark next to a filter
-    to get a short explanation.
-  </p>
-  <p>
-    <b>Step 6 [optional]</b> - If you want to calculate metrics from anomalies instead of absolute values, select the
-    desired method
-    in the &quot;Method&quot; drop-down menu. The options are:
-  </p>
-  <ul>
-    <li>Do not calculate: don't calculate anomalies, use absolute values.</li>
-    <li>35 day moving average: calculate the differences between each measurement value and the 35 day moving average
-      around the value.
-    </li>
-    <li>Climatology: calculate the differences between each measurement value and the climatology value for that day of
-      the year. The climatology
-      is calculated producing an average for each day of the year across the input dataset over the given climatology
-      period. You have to specify
-      which years to use for climatology calculation.
-    </li>
-  </ul>
-  <div>
-    <img alt="anomalies" class="scaled_image mb-3" [src]="anomalies">
-  </div>
-  <p>
-    <b>Step 7 [optional]</b> - Chose the geographic area over which the validation should be performed. You can either
-    specify a lat/lon bounding
-    box directly or you can select the area on a map. The trash button will clear all four
-    bounding
-    box fields.<br/>
-    If you don't specify an area, a global validation will be done.
-  </p>
-  <div>
-    <img alt="spatial subsetting" class="scaled_image mb-3" [src]="spatialSubsetting">
-    <img alt="map selection" class="scaled_image mb-3" [src]="mapSelection">
-  </div>
-  <p>
-    <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed and temporal matching
-    window size.
-    The only accepted date format for the validation period is: YYYY-MM-DD. It is also possible to choose a date from
-    a calendar, available when clicking the date input field. By default, the date range is determined through temporal
-    matching of the data and reference selected.
-    If the validation period fields are left empty, the validation will not be started. For the time range covered by
-    the various
-    datasets, see the <a routerLink="/datasets" target="_blank">datasets page</a>.
-    <br>
+      <br>
+      <br>
+      Details of the filter options provided for each dataset are given on the supported datasets page
+      <a routerLink="/datasets">here</a>. You can also hover your mouse pointer over the question mark next to a filter
+      to get a short explanation.
+    </p>
+    <p>
+      <b>Step 6 [optional]</b> - If you want to calculate metrics from anomalies instead of absolute values, select the
+      desired method
+      in the &quot;Method&quot; drop-down menu. The options are:
+    </p>
+    <ul>
+      <li>Do not calculate: don't calculate anomalies, use absolute values.</li>
+      <li>35 day moving average: calculate the differences between each measurement value and the 35 day moving average
+        around the value.
+      </li>
+      <li>Climatology: calculate the differences between each measurement value and the climatology value for that day of
+        the year. The climatology
+        is calculated producing an average for each day of the year across the input dataset over the given climatology
+        period. You have to specify
+        which years to use for climatology calculation.
+      </li>
+    </ul>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="anomalies" class="scaled_image mb-3" [src]="anomalies" preview="true" width="100%"></p-image>
+    </div>
+    <p>
+      <b>Step 7 [optional]</b> - Chose the geographic area over which the validation should be performed. You can either
+      specify a lat/lon bounding
+      box directly or you can select the area on a map. The trash button will clear all four
+      bounding
+      box fields.<br/>
+      If you don't specify an area, a global validation will be done.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="spatial subsetting" class="scaled_image mb-3" [src]="spatialSubsetting" preview="true"  width="100%"></p-image>
+      <p-image alt="map selection" class="scaled_image mb-3" [src]="mapSelection" preview="true"  width="100%"></p-image>
+    </div>
+    <p>
+      <b>Step 8 [optional]</b> - Choose the date range over which the validation should be performed and temporal matching
+      window size.
+      The only accepted date format for the validation period is: YYYY-MM-DD. It is also possible to choose a date from
+      a calendar, available when clicking the date input field. By default, the date range is determined through temporal
+      matching of the data and reference selected.
+      If the validation period fields are left empty, the validation will not be started. For the time range covered by
+      the various
+      datasets, see the <a routerLink="/datasets" target="_blank">datasets page</a>.
+      <br>
 
-    For temporal matching window size, the default (and recommended) value is 12 hours and possible choices are integer
-    numbers between 1 and 24 hours.
+      For temporal matching window size, the default (and recommended) value is 12 hours and possible choices are integer
+      numbers between 1 and 24 hours.
 
-  </p>
-  <div>
-    <img alt="validation period" class="scaled_image mb-3" [src]="temporalSubsetting">
-  </div>
-  <p>
-    <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC) and Bootstrapping Triple Collocation confidence
-    intervals (BTC). By default, QA4SM calculates validation
-    metrics between dataset pairs (the reference and each candidate data set). If more than 3 datasets
-    are selected (including the reference), the switch to activate TC becomes available. If
-    TC is selected, in addition to the basic metrics between dataset pairs, TC metrics between
-    triples of selected datasets are calculated. The reference is included in all triples and
-    metrics are found for all candidate datasets. Note that each TC metric is specific to a dataset
-    (this is evident from the metric name). TC metrics are affected by all 3 used datasets. Only results from TC with
-    independent datasets should be used. <br><br>
-    The bootstrapping option is enabled only if TC is selected.
-    When it is chosen confidence intervals are calculated via bootstrapping with 1000 repetitions, however the
-    validation time might be up to 5 times longer.
-  </p>
-  <div>
-    <img alt="triple collocation" class="scaled_image mb-3" [src]="tca">
-  </div>
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="validation period" class="scaled_image mb-3" [src]="temporalSubsetting" width="100%"></p-image>
+    </div>
+    <p>
+      <b>Step 9 [optional]</b> - Activate Triple Collocation Analysis (TC) and Bootstrapping Triple Collocation confidence
+      intervals (BTC). By default, QA4SM calculates validation
+      metrics between dataset pairs (the reference and each candidate data set). If more than 3 datasets
+      are selected (including the reference), the switch to activate TC becomes available. If
+      TC is selected, in addition to the basic metrics between dataset pairs, TC metrics between
+      triples of selected datasets are calculated. The reference is included in all triples and
+      metrics are found for all candidate datasets. Note that each TC metric is specific to a dataset
+      (this is evident from the metric name). TC metrics are affected by all 3 used datasets. Only results from TC with
+      independent datasets should be used. <br><br>
+      The bootstrapping option is enabled only if TC is selected.
+      When it is chosen confidence intervals are calculated via bootstrapping with 1000 repetitions, however the
+      validation time might be up to 5 times longer.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="triple collocation" class="scaled_image mb-3" [src]="tca" preview="true" width="100%"></p-image>
+    </div>
 
-  <p>
-    <b>Step 10</b> - Choose how the data will be scaled before metrics calculation.
-    The data can be scaled to any dataset selected for validation.
+    <p>
+      <b>Step 10</b> - Choose how the data will be scaled before metrics calculation.
+      The data can be scaled to any dataset selected for validation.
 
-    The scaling method determines how values of one dataset are mapped onto the value range of the
-    other dataset for better comparability.
+      The scaling method determines how values of one dataset are mapped onto the value range of the
+      other dataset for better comparability.
 
-    Note that if the chosen method is 'No scaling', there is no scaling reference drop down list available.
-  </p>
-  <div>
-    <img alt="scaling" class="scaled_image mb-3" [src]="scaling">
-  </div>
+      Note that if the chosen method is 'No scaling', there is no scaling reference drop down list available.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="scaling" class="scaled_image mb-3" [src]="scaling" preview="true" width="100%"></p-image>
+    </div>
 
-  <p>
-    <b>Step 11</b> - Optionally name your validation results to make it easier to identify it in
-    the list of all your validations.
-  </p>
-  <div>
-    <img alt="name your validation" class="scaled_image mb-3" [src]="nameYourValidation">
-  </div>
-  <p>
-    <b>Step 12</b> - Run the validation process. You'll be notified via e-mail once it's
-    finished. You don't need to keep the results window (or even your browser) open for
-    the validation to run. The email will contain a link to your results.
-  </p>
-  <div>
-    <img alt="validation button" class="w3-round" [src]="validateButton">
-  </div>
+    <p>
+      <b>Step 11</b> - Optionally name your validation results to make it easier to identify it in
+      the list of all your validations.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="name your validation" class="scaled_image mb-3" [src]="nameYourValidation" preview="true" width="100%"></p-image>
+    </div>
+    <p>
+      <b>Step 12</b> - Run the validation process. You'll be notified via e-mail once it's
+      finished. You don't need to keep the results window (or even your browser) open for
+      the validation to run. The email will contain a link to your results.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="validation button" class="w3-round" [src]="validateButton" preview="true" width="100%"></p-image>
+    </div>
 
 
-  <h1 id="results_list" class="h3 mb-3 font-weight-normal">My Validations - Results List Page</h1>
+    <h1 id="results_list" class="h3 mb-3 font-weight-normal">My Validations - Results List Page</h1>
 
-  <p>
-    The list shows all your validations, including the currently running ones, sorted by date (latest first).
-  </p>
-  <div>
-    <img alt="my validations" class="scaled_image mb-3" [src]="myValidations">
-  </div>
+    <p>
+      The list shows all your validations, including the currently running ones, sorted by date (latest first).
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="my validations" class="scaled_image mb-3" [src]="myValidations" preview="true" width="100%"></p-image>
+    </div>
 
-  <p>
-    <i>Note:</i> Your validations will be automatically removed {{ this.getExpiryPeriod() }} days after completion by
-    our
-    auto-cleanup process, unless you extend or archive them. You will be warned via email about validation expiry
-    {{ this.getWarningPeriod() }} days before deletion.
-  </p>
+    <p>
+      <i>Note:</i> Your validations will be automatically removed {{ this.getExpiryPeriod() }} days after completion by
+      our
+      auto-cleanup process, unless you extend or archive them. You will be warned via email about validation expiry
+      {{ this.getWarningPeriod() }} days before deletion.
+    </p>
 
-  <p>
-    The icons in the validations' title bars indicate the following:
-  </p>
+    <p>
+      The icons in the validations' title bars indicate the following:
+    </p>
 
-  <ul>
-    <li>
-      <span class="pi pi-ban"></span> The validation was cancelled.
-    </li>
-    <li>
-      <span class="pi pi-spin pi-spinner"></span> The validation is still running and has no results yet.
-    </li>
-    <li>
-      <span class="pi pi-calendar"></span> The validation has completed. It will be removed
-      by the auto-cleanup process {{ this.getExpiryPeriod() }} days after completion, unless you extend or archive it.
-      You can see the expiration date by hovering your mouse over the icon.
-    </li>
-    <li>
-      <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> The validation has been archived and won't be
-      automatically removed
-      by the cleanup process.
-    </li>
-    <li>
-      <span class="pi pi-exclamation-triangle"></span> The validation will expire within the next
-      {{ this.getWarningPeriod() }} days and will then be removed by the auto-cleanup process, unless you extend or
-      archive it.
-      You can see the expiration date by hovering your mouse over the icon.
-    </li>
-    <li>
-      <span class="pi pi-book"></span>
-      This result has been published with zenodo. It will NOT be automatically removed during cleanup.
-    </li>
-  </ul>
-
-  <p>
-    The buttons on the right-hand side of each validation have the following effects:
-  </p>
-
-  <ul>
-    <li>
-      <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span> The stop button is only visible while the validation is
-      still
-      running and allows you to abort it.
-    </li>
-    <li>
-      <span class="pi pi-folder-open"></span> You can access the
-      <a routerLink="{{pageUrl}}" fragment="results">results details page</a>
-      of a validation through its folder button.
-    </li>
-    <li>
-      <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> With the archive button, you can exclude a validation
-      from auto-cleanup
-      and thus keep it indefinitely.
-    </li>
-    <li>
-      <span class="pi pi-calendar"></span> With the un-archive button, you can make a validation eligible for
-      auto-cleanup again. It will be automatically extended, so you will have another {{ this.getExpiryPeriod() }} days
-      before
-      deletion and will be notified (again).
-    </li>
-    <li>
-      <span class="pi pi-angle-double-right"></span> It contains a drop-down list with following options:
-    </li>
     <ul>
       <li>
-        <span class="pi pi-download"></span> The Download Graphs option allows you to download all graphs
-        produced for the validation (in png and svg formats) in a zip archive.
+        <span class="pi pi-ban"></span> The validation was cancelled.
       </li>
       <li>
-        <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> The Download NetCDF File option allows you to
-        download
-        the
-        validation result (metrics computed).
+        <span class="pi pi-spin pi-spinner"></span> The validation is still running and has no results yet.
       </li>
+      <li>
+        <span class="pi pi-calendar"></span> The validation has completed. It will be removed
+        by the auto-cleanup process {{ this.getExpiryPeriod() }} days after completion, unless you extend or archive it.
+        You can see the expiration date by hovering your mouse over the icon.
+      </li>
+      <li>
+        <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> The validation has been archived and won't be
+        automatically removed
+        by the cleanup process.
+      </li>
+      <li>
+        <span class="pi pi-exclamation-triangle"></span> The validation will expire within the next
+        {{ this.getWarningPeriod() }} days and will then be removed by the auto-cleanup process, unless you extend or
+        archive it.
+        You can see the expiration date by hovering your mouse over the icon.
+      </li>
+      <li>
+        <span class="pi pi-book"></span>
+        This result has been published with zenodo. It will NOT be automatically removed during cleanup.
+      </li>
+    </ul>
 
-      <li>
-        <span class="pi pi-replay"></span> With Load Validation Settings option you can load settings of the particular
-        validations;
-        you will be redirected to the validate page.
-      </li>
+    <p>
+      The buttons on the right-hand side of each validation have the following effects:
+    </p>
 
+    <ul>
       <li>
-        <span class="pi pi-times"></span> The Remove Validation Run option is only visible once the validation has
-        finished
-        or was aborted and will permanently delete the result.
+        <span><fa-icon [icon]="faIcons.faStop"></fa-icon></span> The stop button is only visible while the validation is
+        still
+        running and allows you to abort it.
       </li>
-
       <li>
-        <span class="pi pi-calendar-plus"></span> With the Extend Life Span option, you can reset the auto-cleanup
+        <span class="pi pi-folder-open"></span> You can access the
+        <a routerLink="{{pageUrl}}" fragment="results">results details page</a>
+        of a validation through its folder button.
+      </li>
+      <li>
+        <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> With the archive button, you can exclude a validation
+        from auto-cleanup
+        and thus keep it indefinitely.
+      </li>
+      <li>
+        <span class="pi pi-calendar"></span> With the un-archive button, you can make a validation eligible for
+        auto-cleanup again. It will be automatically extended, so you will have another {{ this.getExpiryPeriod() }} days
+        before
+        deletion and will be notified (again).
+      </li>
+      <li>
+        <span class="pi pi-angle-double-right"></span> It contains a drop-down list with following options:
+      </li>
+      <ul>
+        <li>
+          <span class="pi pi-download"></span> The Download Graphs option allows you to download all graphs
+          produced for the validation (in png and svg formats) in a zip archive.
+        </li>
+        <li>
+          <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span> The Download NetCDF File option allows you to
+          download
+          the
+          validation result (metrics computed).
+        </li>
+
+        <li>
+          <span class="pi pi-replay"></span> With Load Validation Settings option you can load settings of the particular
+          validations;
+          you will be redirected to the validate page.
+        </li>
+
+        <li>
+          <span class="pi pi-times"></span> The Remove Validation Run option is only visible once the validation has
+          finished
+          or was aborted and will permanently delete the result.
+        </li>
+
+        <li>
+          <span class="pi pi-calendar-plus"></span> With the Extend Life Span option, you can reset the auto-cleanup
+          period of a result and thus postpone its automatic removal. You can use this if you're not sure yet whether
+          you want to keep it - you will have another {{ this.getExpiryPeriod() }} days to decide and will be notified
+          (again) before deletion.
+        </li>
+
+      </ul>
+
+    </ul>
+    <h1 id="results" class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
+
+    <p>
+      Once the validation process is finished, you can see a summary of the validation run
+      on the results page.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="results overview" class="scaled_image mb-3" [src]="resultsOverview" preview="true" width="100%"></p-image>
+    </div>
+    <p>
+      The buttons at the bottom of the result overview have the following effects:
+    </p>
+
+    <ul>
+      <li>
+        <span class="pi pi-times"></span> <span class="font-weight-bold"> Remove</span> will permanently delete the
+        result.
+      </li>
+      <li>
+        <span class="pi pi-calendar-plus"></span> <span class="font-weight-bold"> Renew</span> will reset the auto-cleanup
         period of a result and thus postpone its automatic removal. You can use this if you're not sure yet whether
         you want to keep it - you will have another {{ this.getExpiryPeriod() }} days to decide and will be notified
         (again) before deletion.
       </li>
-
+      <li>
+        <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> <span class="font-weight-bold"> Archive</span> will
+        exclude a validation from auto-cleanup
+        and thus keep it indefinitely.
+      </li>
+      <li>
+        <span class="pi pi-calendar"></span> <span class="font-weight-bold"> Un-archive</span> will make a validation
+        eligible for
+        auto-cleanup again. It will be automatically extended, so you will have another {{ this.getExpiryPeriod() }} days
+        before
+        deletion and will be notified (again).
+      </li>
+      <li>
+        <span class="pi pi-book"></span> <span class="font-weight-bold"> Publish</span> will publish the result NetCDF
+        file to <a target="_blank" href="https://zenodo.org/" rel="'noreferrer">Zenodo</a>. This means the results can be
+        cited
+        with a <a target="_blank" href="https://www.doi.org/" rel="'noreferrer">DOI</a>. See section
+        <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a> for details.
+      </li>
     </ul>
 
-  </ul>
-  <!--  <div>-->
-  <!--    <img alt="my validations" class="scaled_image mb-3" [src]="myValidations">-->
-  <!--  </div>-->
 
-  <h1 id="results" class="h3 mb-3 font-weight-normal">Validation Results Page</h1>
+    <p>
+      The following metrics are calculated during the validation process:
+    </p>
 
-  <p>
-    Once the validation process is finished, you can see a summary of the validation run
-    on the results page.
-  </p>
-  <div>
-    <img alt="results overview" class="scaled_image mb-3" [src]="resultsOverview">
-  </div>
-  <p>
-    The buttons at the bottom of the result overview have the following effects:
-  </p>
+    <table class="table table-bordered mb-5">
+      <thead class="thead-dark">
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Description</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <th scope="row">Pearson's r</th>
+        <td>Pearson correlation coefficient</td>
+      </tr>
+      <tr>
+        <th scope="row">Pearson's r p-value</th>
+        <td>p-value for pearson correlation coefficient</td>
+      </tr>
+      <tr>
+        <th scope="row">Spearman's rho</th>
+        <td>Spearman rank correlation coefficient</td>
+      </tr>
+      <tr>
+        <th scope="row">Spearman's rho p-value</th>
+        <td>p-value for Spearman rank correlation coefficient</td>
+      </tr>
+      <tr>
+        <th scope="row">Root-mean-square deviation</th>
+        <td>Root-mean-square deviation</td>
+      </tr>
+      <tr>
+        <th scope="row">Bias (difference of means)</th>
+        <td>Average Error</td>
+      </tr>
+      <tr>
+        <th scope="row"># observations</th>
+        <td>Number of Observations</td>
+      </tr>
+      <tr>
+        <th scope="row">Unbiased root-mean-square deviation</th>
+        <td>Unbiased root-mean-square deviation</td>
+      </tr>
+      <tr>
+        <th scope="row">Mean square error</th>
+        <td>Mean square error</td>
+      </tr>
+      <tr>
+        <th scope="row">Mean square error correlation</th>
+        <td>Mean square error correlation</td>
+      </tr>
+      <tr>
+        <th scope="row">Mean square error bias</th>
+        <td>Mean square error bias</td>
+      </tr>
+      <tr>
+        <th scope="row">Mean square error variance</th>
+        <td>Mean square error variance</td>
+      </tr>
+      <tr>
+        <th scope="row">Residual Sum of Squares</th>
+        <td>Residual Sum of Squares</td>
+      </tr>
+      <tr>
+        <th scope="row">TC: Signal-to-noise ratio</th>
+        <td>TC: Signal-to-noise ratio</td>
+      </tr>
+      <tr>
+        <th scope="row">TC: Error standard deviation</th>
+        <td>TC: Error standard deviation'</td>
+      </tr>
+      <tr>
+        <th scope="row">TC: Scaling coefficient</th>
+        <td>TC: Scaling coefficient</td>
+      </tr>
+      </tbody>
+    </table>
 
-  <ul>
-    <li>
-      <span class="pi pi-times"></span> <span class="font-weight-bold"> Remove</span> will permanently delete the
-      result.
-    </li>
-    <li>
-      <span class="pi pi-calendar-plus"></span> <span class="font-weight-bold"> Renew</span> will reset the auto-cleanup
-      period of a result and thus postpone its automatic removal. You can use this if you're not sure yet whether
-      you want to keep it - you will have another {{ this.getExpiryPeriod() }} days to decide and will be notified
-      (again) before deletion.
-    </li>
-    <li>
-      <span><fa-icon [icon]="faIcons.faArchive"></fa-icon></span> <span class="font-weight-bold"> Archive</span> will
-      exclude a validation from auto-cleanup
-      and thus keep it indefinitely.
-    </li>
-    <li>
-      <span class="pi pi-calendar"></span> <span class="font-weight-bold"> Un-archive</span> will make a validation
-      eligible for
-      auto-cleanup again. It will be automatically extended, so you will have another {{ this.getExpiryPeriod() }} days
-      before
-      deletion and will be notified (again).
-    </li>
-    <li>
-      <span class="pi pi-book"></span> <span class="font-weight-bold"> Publish</span> will publish the result NetCDF
-      file to <a target="_blank" href="https://zenodo.org/" rel="'noreferrer">Zenodo</a>. This means the results can be
-      cited
-      with a <a target="_blank" href="https://www.doi.org/" rel="'noreferrer">DOI</a>. See section
-      <a routerLink="{{pageUrl}}" fragment="publishing">Publishing</a> for details.
-    </li>
-  </ul>
+    <p>
+      Visualisations of these metrics are displayed in the <i>Result Files</i> section of the page: boxplots and
+      geographical
+      overview maps. You can select the metric shown with the left drop-down button below the graphs.<br/>
+      For an intercomparison validation, all boxplots are combined into one graph. The dataset displayed in the overview
+      map can be selected with the drop-down button on the right.
+      <br/>
+      You can also download a zipfile of all the plots in png and svg (vector) format by clicking on the <i>Download all
+      graphs</i> button, and the result <a target="_blank" href="https://www.unidata.ucar.edu/software/netcdf/"
+                                           rel="'noreferrer">NetCDF</a>
+      file
+      with all metrics with the <i>Download results in NetCDF</i> button.<br/>
+    </p>
 
+    <div id="results_graph" [ngClass]="plotDivClass">
+      <p-image alt="results graphs" class="scaled_image mb-3" [src]="resultsGraphs" preview="true"  width="100%"></p-image>
+    </div>
 
-  <p>
-    The following metrics are calculated during the validation process:
-  </p>
+    <h2 id="publishing" class="h4 mb-3 font-weight-normal">Publishing</h2>
 
-  <table class="table table-bordered mb-5">
-    <thead class="thead-dark">
-    <tr>
-      <th scope="col">Name</th>
-      <th scope="col">Description</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <th scope="row">Pearson's r</th>
-      <td>Pearson correlation coefficient</td>
-    </tr>
-    <tr>
-      <th scope="row">Pearson's r p-value</th>
-      <td>p-value for pearson correlation coefficient</td>
-    </tr>
-    <tr>
-      <th scope="row">Spearman's rho</th>
-      <td>Spearman rank correlation coefficient</td>
-    </tr>
-    <tr>
-      <th scope="row">Spearman's rho p-value</th>
-      <td>p-value for Spearman rank correlation coefficient</td>
-    </tr>
-    <tr>
-      <th scope="row">Root-mean-square deviation</th>
-      <td>Root-mean-square deviation</td>
-    </tr>
-    <tr>
-      <th scope="row">Bias (difference of means)</th>
-      <td>Average Error</td>
-    </tr>
-    <tr>
-      <th scope="row"># observations</th>
-      <td>Number of Observations</td>
-    </tr>
-    <tr>
-      <th scope="row">Unbiased root-mean-square deviation</th>
-      <td>Unbiased root-mean-square deviation</td>
-    </tr>
-    <tr>
-      <th scope="row">Mean square error</th>
-      <td>Mean square error</td>
-    </tr>
-    <tr>
-      <th scope="row">Mean square error correlation</th>
-      <td>Mean square error correlation</td>
-    </tr>
-    <tr>
-      <th scope="row">Mean square error bias</th>
-      <td>Mean square error bias</td>
-    </tr>
-    <tr>
-      <th scope="row">Mean square error variance</th>
-      <td>Mean square error variance</td>
-    </tr>
-    <tr>
-      <th scope="row">Residual Sum of Squares</th>
-      <td>Residual Sum of Squares</td>
-    </tr>
-    <tr>
-      <th scope="row">TC: Signal-to-noise ratio</th>
-      <td>TC: Signal-to-noise ratio</td>
-    </tr>
-    <tr>
-      <th scope="row">TC: Error standard deviation</th>
-      <td>TC: Error standard deviation'</td>
-    </tr>
-    <tr>
-      <th scope="row">TC: Scaling coefficient</th>
-      <td>TC: Scaling coefficient</td>
-    </tr>
-    </tbody>
-  </table>
+    <p>
+      This feature allows you to publish the result NetCDF file of your validation to
+      <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> under your own name but without creating
+      your own
+      Zenodo account. This gives you a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a> for your
+      results,
+      which you can cite in your publications to give your readers open access to your data.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="publishing dialog" class="scaled_image mb-3" [src]="publishingDialog" preview="true" width="100%"></p-image>
+    </div>
 
-  <p>
-    Visualisations of these metrics are displayed in the <i>Result Files</i> section of the page: boxplots and
-    geographical
-    overview maps. You can select the metric shown with the left drop-down button below the graphs.<br/>
-    For an intercomparison validation, all boxplots are combined into one graph. The dataset displayed in the overview
-    map can be selected with the drop-down button on the right.
-    <br/>
-    You can also download a zipfile of all the plots in png and svg (vector) format by clicking on the <i>Download all
-    graphs</i> button, and the result <a target="_blank" href="https://www.unidata.ucar.edu/software/netcdf/"
-                                         rel="'noreferrer">NetCDF</a>
-    file
-    with all metrics with the <i>Download results in NetCDF</i> button.<br/>
-  </p>
-
-  <div id="results_graph">
-    <img alt="results graphs" class="scaled_image mb-3" [src]="resultsGraphs">
-  </div>
-
-  <h2 id="publishing" class="h4 mb-3 font-weight-normal">Publishing</h2>
-
-  <p>
-    This feature allows you to publish the result NetCDF file of your validation to
-    <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> under your own name but without creating
-    your own
-    Zenodo account. This gives you a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a> for your
-    results,
-    which you can cite in your publications to give your readers open access to your data.
-  </p>
-  <div>
-    <img alt="publishing dialog" class="scaled_image mb-3" [src]="publishingDialog">
-  </div>
-
-  <p>
-    Once you click the <span class="font-weight-bold">Publish</span> button on the validation result page, you will
-    be presented with a dialog
-    containing the metadata the results will be published with. You can change the metadata to your liking (within
-    some limits) and start the file upload to Zenodo by clicking <span class="font-weight-bold">Publish
+    <p>
+      Once you click the <span class="font-weight-bold">Publish</span> button on the validation result page, you will
+      be presented with a dialog
+      containing the metadata the results will be published with. You can change the metadata to your liking (within
+      some limits) and start the file upload to Zenodo by clicking <span class="font-weight-bold">Publish
         results</span>.<br/>
-    Note that we require 'qa4sm' to be one of the keywords, and that Title, Description, Keywords, and
-    Name are mandatory fields. You don't need to give an affiliation or
-    <a href="https://orcid.org/" target="_blank" rel="'noreferrer">ORCID</a>, though. Changes you make to your
-    author details will <span class="font-weight-bold">not</span> be stored to your user profile - for that, please
-    got to the Profile page.<br/>
-    The upload can take a few minutes, please be patient. If it should fail, please try
-    again a few hours later. If it still doesn't work, please email us at {{ this.getAdminMail() }} and include the
-    error message
-    you received.
-  </p>
+      Note that we require 'qa4sm' to be one of the keywords, and that Title, Description, Keywords, and
+      Name are mandatory fields. You don't need to give an affiliation or
+      <a href="https://orcid.org/" target="_blank" rel="'noreferrer">ORCID</a>, though. Changes you make to your
+      author details will <span class="font-weight-bold">not</span> be stored to your user profile - for that, please
+      got to the Profile page.<br/>
+      The upload can take a few minutes, please be patient. If it should fail, please try
+      again a few hours later. If it still doesn't work, please email us at {{ this.getAdminMail() }} and include the
+      error message
+      you received.
+    </p>
 
-  <p>
-    Please be aware that the NetCDF file and the metadata will be stored at Zenodo under the account of the QA4SM
-    project but with your name as the author. Zenodo is a separate website run at CERN over which the QA4SM team
-    has no control.<br/>
-    <span class="font-weight-bold">Assigning a DOI to a result also means that it cannot easily be unpublished or
+    <p>
+      Please be aware that the NetCDF file and the metadata will be stored at Zenodo under the account of the QA4SM
+      project but with your name as the author. Zenodo is a separate website run at CERN over which the QA4SM team
+      has no control.<br/>
+      <span class="font-weight-bold">Assigning a DOI to a result also means that it cannot easily be unpublished or
         deleted - see also <a href="https://help.zenodo.org/" target="_blank"
                               rel="noreferrer">Zenodo's FAQ</a>.</span><br/>
 
-    If you prefer to use your own Zenodo account, you can of course do so - the QA4SM publishing feature is just
-    for convenience. Just download the NetCDF result file and upload it yourself through Zenodo's submission process
-    with your own account. We'd ask you to use 'qa4sm' as one of the keywords so that we can easily find all QA4SM
-    results on Zenodo with a keyword search.
-    <br/>
+      If you prefer to use your own Zenodo account, you can of course do so - the QA4SM publishing feature is just
+      for convenience. Just download the NetCDF result file and upload it yourself through Zenodo's submission process
+      with your own account. We'd ask you to use 'qa4sm' as one of the keywords so that we can easily find all QA4SM
+      results on Zenodo with a keyword search.
+      <br/>
 
-  </p>
+    </p>
 
-  <h1 id="published" class="h3 mb-3 font-weight-normal">Published Validations Page</h1>
+    <h1 id="published" class="h3 mb-3 font-weight-normal">Published Validations Page</h1>
 
-  <p>
-    The list shows validations on the QA4SM service that have been published to
-    <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> by their owners. This means the results
-    can be cited
-    with a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
-  </p>
+    <p>
+      The list shows validations on the QA4SM service that have been published to
+      <a target="_blank" href="https://zenodo.org/" rel="noreferrer">Zenodo</a> by their owners. This means the results
+      can be cited
+      with a <a target="_blank" href="https://www.doi.org/" rel="noreferrer">DOI</a>.
+    </p>
 
-  <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so
-    at {{ this.getAdminMail() }}.</p>
+    <p class="mt-5">If you want to email us to send comments, report errors, or ask questions, you can do so
+      at {{ this.getAdminMail() }}.</p>
 
-  <h1 id="comparison" class="h3 mb-3 font-weight-normal">Validation Comparison</h1>
+    <h1 id="comparison" class="h3 mb-3 font-weight-normal">Validation Comparison</h1>
 
-  <p>
-    With the QA4SM version 2.1 (and later) it is possible to compare existing validations that belong to the currently
-    logged-in user or have been published.
-    The comparison module is available for a logged-in user under the “Compare validations” button in the navigation
-    bar.
-  </p>
-  <p>
-    The module enables two comparison modes - a comparison of two validations with the same reference data set and
-    one non-reference dataset or a comparison between two non-reference datasets used in one validation. The module
-    consists of three main components: Dataset Configuration, Validations selection and Spatial extent (see pictures
-    below).
+    <p>
+      With the QA4SM version 2.1 (and later) it is possible to compare existing validations that belong to the currently
+      logged-in user or have been published.
+      The comparison module is available for a logged-in user under the “Compare validations” button in the navigation
+      bar.
+    </p>
+    <p>
+      The module enables two comparison modes - a comparison of two validations with the same reference data set and
+      one non-reference dataset or a comparison between two non-reference datasets used in one validation. The module
+      consists of three main components: Dataset Configuration, Validations selection and Spatial extent (see pictures
+      below).
 
-  </p>
-  <p>
-    The Datasets configuration component enables choosing the dataset that was used as the reference one
-    (including its version and the variable name) and selecting the comparison mode. Checking ‘Multiple non-reference
-    datasets’ switches on the ‘one validation’ comparison mode.
-  </p>
-  <div>
-    <img alt="datest-configuration" class="scaled_image mb-3" [src]="datsetConfigurationComparison">
-  </div>
-  <p>
-    The Validations selection component gets updated with every change of the reference dataset and shows validations
-    available for comparison. A selected validation has to be added by clicking the ‘Add validation’ button.
-    If the maximum number of validations has been added, the ‘Add validation’ button gets disabled. Added validations
-    are listed below the selection box as red ‘Remove validation’ buttons. Clicking a remove button will remove the
-    appropriate validation from the list.
-  </p>
-  <div>
-    <img alt="validation-selection" class="scaled_image mb-3" [src]="validationSelectionsComparison">
-  </div>
-  <p>
-    In general it is possible to compare any two validations that have the same reference dataset.
-    If additionally the two validations have a common spatial extent, a user can choose if the comparison should be
-    performed on all points or only on the common ones. If validations have no common points, the option
-    ‘Include all points...’ is disabled.
-  </p>
-  <div>
-    <img alt="spatial-extent" class="scaled_image mb-3" [src]="spatialExtentComparison">
-  </div>
-  <p>
-    The comparison is started by clicking the ‘Compare’ button. As a result users get four components:
-  </p>
-  <ol>
-    <li>
-      Comparison summary containing summaries, of chosen validations or validation (if ‘one validation’ mode was used);
-    </li>
-    <li>
-      Selected comparison extent containing a plot with marked area for which comparison was performed;
-    </li>
-    <li>
-      Comparison statistics containing a table of validation statistics calculated for both validations and differences
-      between them;
-    </li>
-    <li>
-      Comparison plots containing:
-      <ul>
-        <li>
-          a drop down list for metric selection,
-        </li>
-        <li>
-          a box plot depicting particular metric for each validation (if there is no common
-          spatial extent between compared validations or if ‘Include all points from the selected validations’ option
-          was
-          chosen),
-        </li>
-        <li>
-          or a box plot depicting particular metric for each validation and the difference between them, a map depicting
-          differences between the chosen metric on all points for which the comparison was performed
-          (if there was a common spatial extent between validations).
-        </li>
-      </ul>
-    </li>
-  </ol>
-  <p>
-    All the plots and the statistics table can be downloaded using appropriate buttons placed next to each object.
-  </p>
-  <p>
-    Please note, that since the comparison module is still being developed and the comparison is done on the fly,
-    there is a risk that a particular comparison may not be performed due to too big validation results file.
-    If that is the case the user is advised to run smaller (in terms of spatial subsetting) validations and compare them
-    one more time.
-  </p>
+    </p>
+    <p>
+      The Datasets configuration component enables choosing the dataset that was used as the reference one
+      (including its version and the variable name) and selecting the comparison mode. Checking ‘Multiple non-reference
+      datasets’ switches on the ‘one validation’ comparison mode.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image alt="datest-configuration" class="scaled_image mb-3" [src]="datsetConfigurationComparison"
+               preview="true" width="100%"></p-image>
+    </div>
+    <p>
+      The Validations selection component gets updated with every change of the reference dataset and shows validations
+      available for comparison. A selected validation has to be added by clicking the ‘Add validation’ button.
+      If the maximum number of validations has been added, the ‘Add validation’ button gets disabled. Added validations
+      are listed below the selection box as red ‘Remove validation’ buttons. Clicking a remove button will remove the
+      appropriate validation from the list.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="validation-selection" class="scaled_image mb-3"
+               [src]="validationSelectionsComparison" width="100%"></p-image>
+    </div>
+    <p>
+      In general it is possible to compare any two validations that have the same reference dataset.
+      If additionally the two validations have a common spatial extent, a user can choose if the comparison should be
+      performed on all points or only on the common ones. If validations have no common points, the option
+      ‘Include all points...’ is disabled.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="spatial-extent" class="scaled_image mb-3" [src]="spatialExtentComparison" width="100%"></p-image>
+    </div>
+    <p>
+      The comparison is started by clicking the ‘Compare’ button. As a result users get four components:
+    </p>
+    <ol>
+      <li>
+        Comparison summary containing summaries, of chosen validations or validation (if ‘one validation’ mode was used);
+      </li>
+      <li>
+        Selected comparison extent containing a plot with marked area for which comparison was performed;
+      </li>
+      <li>
+        Comparison statistics containing a table of validation statistics calculated for both validations and differences
+        between them;
+      </li>
+      <li>
+        Comparison plots containing:
+        <ul>
+          <li>
+            a drop down list for metric selection,
+          </li>
+          <li>
+            a box plot depicting particular metric for each validation (if there is no common
+            spatial extent between compared validations or if ‘Include all points from the selected validations’ option
+            was
+            chosen),
+          </li>
+          <li>
+            or a box plot depicting particular metric for each validation and the difference between them, a map depicting
+            differences between the chosen metric on all points for which the comparison was performed
+            (if there was a common spatial extent between validations).
+          </li>
+        </ul>
+      </li>
+    </ol>
+    <p>
+      All the plots and the statistics table can be downloaded using appropriate buttons placed next to each object.
+    </p>
+    <p>
+      Please note, that since the comparison module is still being developed and the comparison is done on the fly,
+      there is a risk that a particular comparison may not be performed due to too big validation results file.
+      If that is the case the user is advised to run smaller (in terms of spatial subsetting) validations and compare them
+      one more time.
+    </p>
 
-  <a id="user-data-upload"></a>
-  <h1 class="h3 mb-3 font-weight-normal">User Data Upload Procedure</h1>
-  <p>
-    To upload your go to 'My datasets' page, by clicking proper button on the navigation bar.
-  </p>
-  <div>
-    <img alt="select-file" class="scaled_image mb-3" [src]="selectFile">
-  </div>
-  <p>
-    Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be
-    able
-    to choose only .netCDF or .zip files, both types need to follow the standard described
-    <a target="_blank" [routerLink]="['/user-data-guidelines']">here.</a> If the .zip file you are trying to upload
-    contains
-    other types of files than .netCDF, .csv or .yml, you will not be able to upload the file. Please note, that you have
-    <b> 5GB </b>
-    space available for your files. In case you need more, please contact our team.
-  </p>
-  <div>
-    <img alt="select-file" class="scaled_image mb-3" [src]="uploadFileWindow">
-  </div>
-  <p>
-    When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version
-    names.
-    Additionally you can introduce display names for both dataset and its version, which is going to be used on the list
-    of available datasets.
-    If the display name is not provided, the basic name is going to be used.
-  </p>
-  <div>
-    <img alt="select-file" class="scaled_image mb-3" [src]="metadataWindow">
-  </div>
-  <p>
-    If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided
-    information, click 'Save' button.
-    Clicking 'Save' button will close the metadata form, but won't start uploading yet. To start uploading, click the
-    'Upload file' button.
-  </p>
-  <div>
-    <img alt="select-file" class="scaled_image mb-3" [src]="chosenFile">
-  </div>
-  <p>
-    Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a
-    blue spinner and information
-    about the percentage of uploaded file. Eventually an information will show up that the file has been uploaded, but
-    it still needs to be pre-processed.
-  </p>
-  <div>
-    <img alt="select-file" class="scaled_image mb-3" [src]="uploadingSpinner">
-  </div>
-  <p>
-    When the file gets uploaded and preprocessed, there will show up a row with basic information on the uploaded file.
-    You'll be able to change the dataset's name, the version's name and choose a different variable, if the default one
-    is inproper or we were not able to retrieve the proper name.
-    By clicking 'Remove dataset' button, you will remove the uploaded file. Note, that removing is possible only if the
-    uploaded data
-    hasn't been used for any validation.
-  </p>
-  <div>
-    <img alt="select-file" class="scaled_image mb-3" style="scale: 1.2" [src]="dataRow">
-  </div>
+    <a id="user-data-upload"></a>
+    <h1 class="h3 mb-3 font-weight-normal">User Data Upload Procedure</h1>
+    <p>
+      To upload your go to 'My datasets' page, by clicking proper button on the navigation bar.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="select-file" class="scaled_image mb-3" [src]="selectFile" width="100%"></p-image>
+    </div>
+    <p>
+      Click the 'Select file' button, and then choose 'Add file' to add the file you want to upload. Note, that you'll be
+      able
+      to choose only .netCDF or .zip files, both types need to follow the standard described
+      <a target="_blank" [routerLink]="['/user-data-guidelines']">here.</a> If the .zip file you are trying to upload
+      contains
+      other types of files than .netCDF, .csv or .yml, you will not be able to upload the file. Please note, that you have
+      <b> 5GB </b>
+      space available for your files. In case you need more, please contact our team.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="select-file" class="scaled_image mb-3" [src]="uploadFileWindow" width="100%"></p-image>
+    </div>
+    <p>
+      When you choose proper file, a form for providing metadata will show up. You need to provide dataset and version
+      names.
+      Additionally you can introduce display names for both dataset and its version, which is going to be used on the list
+      of available datasets.
+      If the display name is not provided, the basic name is going to be used.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="select-file" class="scaled_image mb-3" [src]="metadataWindow" width="100%"></p-image>
+    </div>
+    <p>
+      If you want to change file, you can do it by clicking 'Change file' button. If you want to save provided
+      information, click 'Save' button.
+      Clicking 'Save' button will close the metadata form, but won't start uploading yet. To start uploading, click the
+      'Upload file' button.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="select-file" class="scaled_image mb-3" [src]="chosenFile" width="100%"></p-image>
+    </div>
+    <p>
+      Depending on the file size and your upload speed it may take from few seconds up to tens of minutes. You will see a
+      blue spinner and information
+      about the percentage of uploaded file. Eventually an information will show up that the file has been uploaded, but
+      it still needs to be pre-processed.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="select-file" class="scaled_image mb-3" [src]="uploadingSpinner" width="100%"></p-image>
+    </div>
+    <p>
+      When the file gets uploaded and preprocessed, there will show up a row with basic information on the uploaded file.
+      You'll be able to change the dataset's name, the version's name and choose a different variable, if the default one
+      is inproper or we were not able to retrieve the proper name.
+      By clicking 'Remove dataset' button, you will remove the uploaded file. Note, that removing is possible only if the
+      uploaded data
+      hasn't been used for any validation.
+    </p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="select-file" class="scaled_image mb-3" [src]="dataRow" width="100%"></p-image>
+    </div>
 
-  <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown
-    list. Your dataset will be there.</p>
-  <div>
-    <img alt="select-file" class="scaled_image mb-3" style="scale: 0.9" [src]="userDataOnTheList">
-  </div>
-  <p>
-    Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation
-    that uses private data.
-    You can still share your validation with another user, but they won't be able to rerun it, as they don't have access
-    to your dataset.
-  </p>
+    <p>If you want to use your dataset in a validation, simply go to the Validate page and expand the dataset dropdown
+      list. Your dataset will be there.</p>
+    <div [ngClass]="plotDivClass">
+      <p-image preview="true" alt="select-file" class="scaled_image mb-3" [src]="userDataOnTheList" width="100%"></p-image>
+    </div>
+    <p>
+      Now you can choose other settings and run a validation. Note that for now it is not possible to publish validation
+      that uses private data.
+      You can still share your validation with another user, but they won't be able to rerun it, as they don't have access
+      to your dataset.
+    </p>
 
+  </div>
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>

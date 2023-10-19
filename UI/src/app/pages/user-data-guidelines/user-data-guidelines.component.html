@@ -1,410 +1,413 @@
-<main #userDataHelpPage>
-  <h1 class="h4 mb-3 font-weight-normal">Go to section</h1>
-  <p>
-    <a routerLink="{{pageUrl}}" fragment="ncstack">Option 1: NetCDF4 Image Stacks</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="csvfiles">Option 2: CSV Time Series Files</a><br/>
-    <a routerLink="{{pageUrl}}" fragment="examplefiles">Example Files</a><br/>
-  </p>
+<main #userDataHelpPage class="flex flex-column align-items-center">
+  <div class="flex flex-column lg:w-4 w-11 align-content-center justify-content-center text-justify">
+    <h1 class="h4 mb-3 font-weight-normal">Go to section</h1>
+    <p>
+      <a routerLink="{{pageUrl}}" fragment="ncstack">Option 1: NetCDF4 Image Stacks</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="csvfiles">Option 2: CSV Time Series Files</a><br/>
+      <a routerLink="{{pageUrl}}" fragment="examplefiles">Example Files</a><br/>
+    </p>
 
-  <h1 id="intro" class="h1 mb-3 font-weight-normal">User Data Upload</h1>
+    <h1 id="intro" class="h1 mb-3 font-weight-normal">User Data Upload</h1>
 
-  <p>
-    With this new, experimental feature we allow users to ingest (parts of) their own data sets into QA4SM for
-    comparison
-    and validation with the state-of-the-art products available in the service. Please note that
-  </p>
-  <ol>
-    <li>
-      Data uploaded into the service is not accessible or downloadable by other users. Your data sets in the graphical
-      user
-      interface will only appear under your account. Other users cannot see, use or download them!
-    </li>
-    <li>
-      There might be data wipes in the future, making it necessary to re-upload your files
-      <ol type="a">
-        <li>
-          We do not yet provide traceability for validation results with uploaded data.
-        </li>
-        <li>
-          It is therefore not yet possible to publish results from validation runs that use uploaded data.
-        </li>
-      </ol>
-    </li>
-    <li>
-      Data upload speed depends on your local internet connection. The correct structure of your data can only be
-      evaluated after uploading.
-      We therefore encourage you to use small data samples for testing.
-    </li>
-    <li>
-      The amount of data users can upload will be limited at some point. Please get in contact with us if you plan to
-      upload large data sets (multiple GB) at
-      <a href="mailto: support@qa4sm.eu">support@qa4sm.eu</a>. Otherwise we will delete your data again at some point.
-    </li>
-    <li>
-      The upload feature is in an early stage, if you find any bugs or need help with structuring your files correctly,
-      contact us at <a href="mailto: support@qa4sm.eu">support@qa4sm.eu</a>.
-    </li>
+    <p>
+      With this new, experimental feature we allow users to ingest (parts of) their own data sets into QA4SM for
+      comparison
+      and validation with the state-of-the-art products available in the service. Please note that
+    </p>
+    <ol>
+      <li>
+        Data uploaded into the service is not accessible or downloadable by other users. Your data sets in the graphical
+        user
+        interface will only appear under your account. Other users cannot see, use or download them!
+      </li>
+      <li>
+        There might be data wipes in the future, making it necessary to re-upload your files
+        <ol type="a">
+          <li>
+            We do not yet provide traceability for validation results with uploaded data.
+          </li>
+          <li>
+            It is therefore not yet possible to publish results from validation runs that use uploaded data.
+          </li>
+        </ol>
+      </li>
+      <li>
+        Data upload speed depends on your local internet connection. The correct structure of your data can only be
+        evaluated after uploading.
+        We therefore encourage you to use small data samples for testing.
+      </li>
+      <li>
+        The amount of data users can upload will be limited at some point. Please get in contact with us if you plan to
+        upload large data sets (multiple GB) at
+        <a href="mailto: support@qa4sm.eu">support@qa4sm.eu</a>. Otherwise we will delete your data again at some point.
+      </li>
+      <li>
+        The upload feature is in an early stage, if you find any bugs or need help with structuring your files correctly,
+        contact us at <a href="mailto: support@qa4sm.eu">support@qa4sm.eu</a>.
+      </li>
 
-  </ol>
+    </ol>
 
-  <a id="ncstack"></a>
-  <h2 class="h2 mb-3 font-weight-normal">Option 1: Upload NetCDF4 Image Stacks</h2>
-  <p>
-    Most Level 3 and Level 4 soil moisture data is usually provided in image format with three data dimensions
-    (latitude, longitude, time). Images can be concatenated along the time dimension to create image stacks / data
-    cubes.
-    From these data cubes, time series can be extracted, which is the basis for our validation algorithm.
-  </p>
-  <h3 class="h3 mb-3 font-weight-normal">General Requirements</h3>
-  <p>
-    QA4SM supports image stacks in NetCDF4 format only. NetCDF is the most common format for climate data records and
-    detailed CF conventions to create those files exist
-    (<a target="_blank" href="https://cfconventions.org/cf-conventions/cf-conventions">available here</a>).
-    In general we use the python library <a target="_blank" href="https://xarray.dev/">xarray</a> to open netCDF files.
-    If your data is
-    compatible with xarray, there are only a few more things to consider.
-  </p>
-  <ul>
-    <li>
-      No specific file name is required when uploading a netcdf stack. The file name will be changed upon uploading
-      data. It is however required that filenames have the extension <b>.nc</b> or <b>.nc4</b>.
-    </li>
-    <li>
-      While netCDF also supports data types such as strings, those are not usable by QA4SM. It is required that your
-      soil moisture data and the assigned coordinates (see next chapter) are of type
-      <b>integer, float or real</b>, or <b>double</b>.
-    </li>
-    <li>
-      All variables, dimensions and attributes in the file should be named using only letters, digits, and underscores.
-      Required attributes (see next chapter) are case sensitive.
-      Variable names, long names and standard names should not exceed a length of <b>30</b> characters.
-    </li>
-    <li>
-      Only 'coordinate data', i.e. 3-dimensional raster data, are supported as netCDF validation input.
-      As data variables must be 3-dimensional, 1 coordinate variable for each dimension (latitude, longitude, time) must
-      be present in the file (see <a routerLink="{{pageUrl}}" fragment="ncdims">this section</a>).
-    </li>
-    <li>
-      Latitude and Longitude coordinates assigned to soil moisture observations must always refer to the WGS84 reference
-      system (i.e. Longitudes from -180 to 180 &deg;E, Latitudes between -90 and 90 &deg;N.
-    </li>
-    <li>
-      A file must contain at least one soil moisture variable to use for validation. If a file contains multiple
-      variables, one must be selected after uploading the file in the respective dropdown menu.
-    </li>
-  </ul>
-
-
-  <a id="ncdims"></a>
-  <h3 class="h3 mb-3 font-weight-normal">Required dimensions and dimension attributes</h3>
-  <h4 class="h4 mb-3 font-weight-normal">Latitude and Longitude</h4>
-  <p>
-    Two of the three dimensions in a netCDF image stack refer to the location of a grid cell and assign latitude and
-    longitude coordinates. There are two ways to pass coordinates for a grid:
-  </p>
-  <ol>
-    <li>
-      Latitude and longitude can be 1-dimensional coordinate variables, with a dimension of the same name assigned, that
-      contain the coordinate values directly (148 longitude values in the following example).
-      The coordinates along the two axes then span a 2-dimension grid that contains the information on the location of
-      all points. The longitude variable is structured accordingly.
-      <table class="my-4 variable-table">
-        <tr>
-          <td><b>Variable</b></td>
-          <td colspan="2">lat</td>
-        </tr>
-        <tr>
-          <td rowspan="4"><b>Attributes (dimensions)</b></td>
-          <td colspan="2">
-            lat (lat: 148)
-          </td>
-        </tr>
-        <tr>
-          <td>standard_name:</td>
-          <td>latitude</td>
-        </tr>
-        <tr>
-          <td>units:</td>
-          <td>degrees_north</td>
-        </tr>
-        <tr>
-          <td>valid_range:</td>
-          <td>[-90. 90]</td>
-        </tr>
-        <tr>
-          <td><b>Coordinates [dtype]</b></td>
-          <td colspan="2">lat (lat) [float64]</td>
-        </tr>
-        <tr>
-          <td><b>Data / Values</b></td>
-          <td colspan="2">[69.88, 69.62, &#8230;, 33.38, 33.1]</td>
-        </tr>
-      </table>
-    </li>
-    <li>
-      Alternatively latitude and longitude can also be 2-dimensionsional coordinate variables, which <b>both</b> have
-      two dimensions (in x and y direction; different name as the variables)
-      assigned that contain the data point locations directly (16*35 data points in the following example). The
-      longitude variable is structured accordingly.
-      <table>
-        <tr>
-          <td><b>Variable</b></td>
-          <td colspan="2"> lat</td>
-        </tr>
-        <tr>
-          <td rowspan="4"><b>Attributes (dimensions)</b></td>
-          <td colspan="2">
-            lat (y: 16, x: 35)
-          </td>
-        </tr>
-        <tr>
-          <td>standard_name:</td>
-          <td>latitude</td>
-        </tr>
-        <tr>
-          <td>units:</td>
-          <td>degrees_north</td>
-        </tr>
-        <tr>
-          <td>valid_range:</td>
-          <td>[-90. 90]</td>
-        </tr>
-        <tr>
-          <td><b>Coordinates [dtypes]</b></td>
-          <td colspan="2">lat (y, x) [float64] <br> lon (y, x) [float64]</td>
-        </tr>
-        <tr>
-          <td><b>Data / Values</b></td>
-          <td colspan="2"> [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
-            [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
-            <div>&#8942;</div>
-            [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
-            [5.125, 5.375, &#8230;, 13.375, 13.625]
-          </td>
-        </tr>
-      </table>
-    </li>
-  </ol>
-  <p>
-    Latitude and Longitude coordinate variables must have the unit assigned!
-  </p>
-  <ul>
-    <li>
-      <b>Longitude</b>: 'units: degrees_east' or one of 'units: degree_east', 'units: degree_E', 'units: degrees_E',
-      'units: degreeE', and 'units: degreesE'.
-      If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i> attribute
-      with value 'longitude' also identifies longitude coordinates.
-      If no standard name is provided, the <i>axis</i> attribute with value 'X', otherwise the variable names (case
-      insensitive) 'longitude' and 'lon' should also work.
-    </li>
-    <li>
-      <b>Latitude</b>: 'units: degrees_north' or one of 'units: degree_north', 'units: degree_N', 'units: degrees_N',
-      'units: degreeN', and 'units: degreesN'.
-      If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i> attribute
-      with value 'latitude' also identifies latitude coordinates.
-      If no standard name is provided, the <i>axis</i> attribute with value 'Y', otherwise the variable names (case
-      insensitive) 'latitude' and 'lat' should also work.
-    </li>
-  </ul>
-
-  <h4 class="h4 mb-3 font-weight-normal">Observation time stamps</h4>
-  <p>
-    The third dimension in a file refers to the observation time stamp. It is assigned to a 1-dimensional coordinate
-    variable <b>time</b> (10 time stamps in the following example)
-  </p>
-  <p>
-    Time coordinates are stored as numeric timestamps. The variable must therefore have a unit attribute assigned like
-    <b>&lt;UNIT&gt; since &lt;REF DATE&gt;</b>, e.g. 'Days since 2000-01-01T00:00:00+00:00'
-    (see also the <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate">CF
-    conventions</a>).
-    If multiple potential time variables are found, the variable with attribute 'axis: T', the 'standard_name: time' or
-    the variable name 'time' identify the time coordinate variable.
-    A calendar name should be specified in the attributes but is not required (assumes 'calendar: standard', i.e. mixed
-    Gregorian/Julian calendar).
-  </p>
-  <table>
-    <tr>
-      <td><b>Variable</b></td>
-      <td colspan="2">time</td>
-    </tr>
-    <tr>
-      <td rowspan="4"><b>Attributes (dimensions)</b></td>
-      <td colspan="2">
-        time (time=10)
-      </td>
-    </tr>
-    <tr>
-      <td>standard_name:</td>
-      <td>time</td>
-    </tr>
-    <tr>
-      <td>units:</td>
-      <td>days since 2019-01-01 00:00:00</td>
-    </tr>
-    <tr>
-      <td>calendar:</td>
-      <td>proleptic_gregorian</td>
-    </tr>
-
-    <tr>
-      <td><b>Coordinates [dtype]</b></td>
-      <td colspan="2">time (time) [datetime64[ns]]</td>
-    </tr>
-    <tr>
-      <td><b>Data / Values</b></td>
-      <td colspan="2">['2019-01-01T00:00:00.0', &#8230;, '2019-01-10T00:00:00.0']</td>
-    </tr>
-  </table>
-  <p>
-    Often, time stamps cannot be applied globally. In this case the values provided in 'time' is the basis to which a
-    time offset is added. The time offset must be given as a separate, 3-dimensional variable (same size as the soil
-    moisture data) in **Seconds** (from the global time stamp of the same image).
-  </p>
-
-  <a id="ncoptattrs"></a>
-  <h3 class="h3 mb-3 font-weight-normal">Optional variable attributes</h3>
-
-  <ul>
-    <li>
-      Compression and packing is handled by xarray and controlled by (optional) variable encoding attributes
-      'add_offset', 'scale_factor', 'zlib' and 'complevel'. For more details on compressing netCDF files see
-      <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#_reduction_of_dataset_size">this
-        chapter</a> in
-      the CF conventions.
-    </li>
-    <li>
-      The (physical) valid range of a variable (for SM usually 0-100 or 0-1) should be identified by the variable
-      attributes 'valid_range' resp. 'valid_min' and 'valid_max'.
-      Values outside if this range will be treated as invalid.
-    </li>
-    <li>
-      While it is technically not necessary, it is highly recommended that all variables in a file have units assigned
-      (as the variable attribute 'units'). QA4SM may use these units in e.g. plots.
-    </li>
-    <li>
-      Data variables in the file should have a 'long_name' and/or 'standard_name' attribute. The name given under
-      'long_name' will be used in plots. If no 'long_name' is given, but a 'standard_name'
-      (see <a target="_blank"
-              href="http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html">this
-      table</a> for all possible standard names),
-      this will be used. If neither 'long_name' nor 'standard_name' attributes exist, the variable name will be used
-      directly.
-    </li>
-  </ul>
+    <a id="ncstack"></a>
+    <h2 class="h2 mb-3 font-weight-normal">Option 1: Upload NetCDF4 Image Stacks</h2>
+    <p>
+      Most Level 3 and Level 4 soil moisture data is usually provided in image format with three data dimensions
+      (latitude, longitude, time). Images can be concatenated along the time dimension to create image stacks / data
+      cubes.
+      From these data cubes, time series can be extracted, which is the basis for our validation algorithm.
+    </p>
+    <h3 class="h3 mb-3 font-weight-normal">General Requirements</h3>
+    <p>
+      QA4SM supports image stacks in NetCDF4 format only. NetCDF is the most common format for climate data records and
+      detailed CF conventions to create those files exist
+      (<a target="_blank" href="https://cfconventions.org/cf-conventions/cf-conventions">available here</a>).
+      In general we use the python library <a target="_blank" href="https://xarray.dev/">xarray</a> to open netCDF files.
+      If your data is
+      compatible with xarray, there are only a few more things to consider.
+    </p>
+    <ul>
+      <li>
+        No specific file name is required when uploading a netcdf stack. The file name will be changed upon uploading
+        data. It is however required that filenames have the extension <b>.nc</b> or <b>.nc4</b>.
+      </li>
+      <li>
+        While netCDF also supports data types such as strings, those are not usable by QA4SM. It is required that your
+        soil moisture data and the assigned coordinates (see next chapter) are of type
+        <b>integer, float or real</b>, or <b>double</b>.
+      </li>
+      <li>
+        All variables, dimensions and attributes in the file should be named using only letters, digits, and underscores.
+        Required attributes (see next chapter) are case sensitive.
+        Variable names, long names and standard names should not exceed a length of <b>30</b> characters.
+      </li>
+      <li>
+        Only 'coordinate data', i.e. 3-dimensional raster data, are supported as netCDF validation input.
+        As data variables must be 3-dimensional, 1 coordinate variable for each dimension (latitude, longitude, time) must
+        be present in the file (see <a routerLink="{{pageUrl}}" fragment="ncdims">this section</a>).
+      </li>
+      <li>
+        Latitude and Longitude coordinates assigned to soil moisture observations must always refer to the WGS84 reference
+        system (i.e. Longitudes from -180 to 180 &deg;E, Latitudes between -90 and 90 &deg;N.
+      </li>
+      <li>
+        A file must contain at least one soil moisture variable to use for validation. If a file contains multiple
+        variables, one must be selected after uploading the file in the respective dropdown menu.
+      </li>
+    </ul>
 
 
-  <a id="csvfiles"></a>
-  <h2 class="h2 mb-3 font-weight-normal">Option 2: Upload Time Series</h2>
+    <a id="ncdims"></a>
+    <h3 class="h3 mb-3 font-weight-normal">Required dimensions and dimension attributes</h3>
+    <h4 class="h4 mb-3 font-weight-normal">Latitude and Longitude</h4>
+    <p>
+      Two of the three dimensions in a netCDF image stack refer to the location of a grid cell and assign latitude and
+      longitude coordinates. There are two ways to pass coordinates for a grid:
+    </p>
+    <ol>
+      <li>
+        Latitude and longitude can be 1-dimensional coordinate variables, with a dimension of the same name assigned, that
+        contain the coordinate values directly (148 longitude values in the following example).
+        The coordinates along the two axes then span a 2-dimension grid that contains the information on the location of
+        all points. The longitude variable is structured accordingly.
+        <table class="my-4 variable-table">
+          <tr>
+            <td><b>Variable</b></td>
+            <td colspan="2">lat</td>
+          </tr>
+          <tr>
+            <td rowspan="4"><b>Attributes (dimensions)</b></td>
+            <td colspan="2">
+              lat (lat: 148)
+            </td>
+          </tr>
+          <tr>
+            <td>standard_name:</td>
+            <td>latitude</td>
+          </tr>
+          <tr>
+            <td>units:</td>
+            <td>degrees_north</td>
+          </tr>
+          <tr>
+            <td>valid_range:</td>
+            <td>[-90. 90]</td>
+          </tr>
+          <tr>
+            <td><b>Coordinates [dtype]</b></td>
+            <td colspan="2">lat (lat) [float64]</td>
+          </tr>
+          <tr>
+            <td><b>Data / Values</b></td>
+            <td colspan="2">[69.88, 69.62, &#8230;, 33.38, 33.1]</td>
+          </tr>
+        </table>
+      </li>
+      <li>
+        Alternatively latitude and longitude can also be 2-dimensionsional coordinate variables, which <b>both</b> have
+        two dimensions (in x and y direction; different name as the variables)
+        assigned that contain the data point locations directly (16*35 data points in the following example). The
+        longitude variable is structured accordingly.
+        <table>
+          <tr>
+            <td><b>Variable</b></td>
+            <td colspan="2"> lat</td>
+          </tr>
+          <tr>
+            <td rowspan="4"><b>Attributes (dimensions)</b></td>
+            <td colspan="2">
+              lat (y: 16, x: 35)
+            </td>
+          </tr>
+          <tr>
+            <td>standard_name:</td>
+            <td>latitude</td>
+          </tr>
+          <tr>
+            <td>units:</td>
+            <td>degrees_north</td>
+          </tr>
+          <tr>
+            <td>valid_range:</td>
+            <td>[-90. 90]</td>
+          </tr>
+          <tr>
+            <td><b>Coordinates [dtypes]</b></td>
+            <td colspan="2">lat (y, x) [float64] <br> lon (y, x) [float64]</td>
+          </tr>
+          <tr>
+            <td><b>Data / Values</b></td>
+            <td colspan="2"> [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
+              [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
+              <div>&#8942;</div>
+              [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
+              [5.125, 5.375, &#8230;, 13.375, 13.625]
+            </td>
+          </tr>
+        </table>
+      </li>
+    </ol>
+    <p>
+      Latitude and Longitude coordinate variables must have the unit assigned!
+    </p>
+    <ul>
+      <li>
+        <b>Longitude</b>: 'units: degrees_east' or one of 'units: degree_east', 'units: degree_E', 'units: degrees_E',
+        'units: degreeE', and 'units: degreesE'.
+        If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i> attribute
+        with value 'longitude' also identifies longitude coordinates.
+        If no standard name is provided, the <i>axis</i> attribute with value 'X', otherwise the variable names (case
+        insensitive) 'longitude' and 'lon' should also work.
+      </li>
+      <li>
+        <b>Latitude</b>: 'units: degrees_north' or one of 'units: degree_north', 'units: degree_N', 'units: degrees_N',
+        'units: degreeN', and 'units: degreesN'.
+        If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i> attribute
+        with value 'latitude' also identifies latitude coordinates.
+        If no standard name is provided, the <i>axis</i> attribute with value 'Y', otherwise the variable names (case
+        insensitive) 'latitude' and 'lat' should also work.
+      </li>
+    </ul>
 
-  <p>
-    As a more flexible way of providing data (which requires some pre-processing on the user side), we also allow
-    uploading a collection of individual time series stored in <b>.csv</b> format.
-    This is especially useful for datasets with non-orthogonal time steps (i.e. different time stamps at different
-    locations) and to reduce the amount of uploaded data
-    (as e.g. only time series at in situ locations can be extracted beforehand). This data can be uploaded to QA4SM as a
-    <b>zip achive</b> of individual time series stored in a separate CSV file for each location.
-    The location metadata (latitude, longitude, unique grid point index) has to be included in the individual file
-    names. Dataset wide metadata (units, variable names) are provided in a <b>yaml</b> file in the
-    same zip archive.
-  </p>
+    <h4 class="h4 mb-3 font-weight-normal">Observation time stamps</h4>
+    <p>
+      The third dimension in a file refers to the observation time stamp. It is assigned to a 1-dimensional coordinate
+      variable <b>time</b> (10 time stamps in the following example)
+    </p>
+    <p>
+      Time coordinates are stored as numeric timestamps. The variable must therefore have a unit attribute assigned like
+      <b>&lt;UNIT&gt; since &lt;REF DATE&gt;</b>, e.g. 'Days since 2000-01-01T00:00:00+00:00'
+      (see also the <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate">CF
+      conventions</a>).
+      If multiple potential time variables are found, the variable with attribute 'axis: T', the 'standard_name: time' or
+      the variable name 'time' identify the time coordinate variable.
+      A calendar name should be specified in the attributes but is not required (assumes 'calendar: standard', i.e. mixed
+      Gregorian/Julian calendar).
+    </p>
+    <table>
+      <tr>
+        <td><b>Variable</b></td>
+        <td colspan="2">time</td>
+      </tr>
+      <tr>
+        <td rowspan="4"><b>Attributes (dimensions)</b></td>
+        <td colspan="2">
+          time (time=10)
+        </td>
+      </tr>
+      <tr>
+        <td>standard_name:</td>
+        <td>time</td>
+      </tr>
+      <tr>
+        <td>units:</td>
+        <td>days since 2019-01-01 00:00:00</td>
+      </tr>
+      <tr>
+        <td>calendar:</td>
+        <td>proleptic_gregorian</td>
+      </tr>
 
-  <h3 class="h3 mb-3 font-weight-normal">File name conventions</h3>
-  <p>
-    The file name of an individual CSV file in the zip archive must match the following pattern:
-  </p>
+      <tr>
+        <td><b>Coordinates [dtype]</b></td>
+        <td colspan="2">time (time) [datetime64[ns]]</td>
+      </tr>
+      <tr>
+        <td><b>Data / Values</b></td>
+        <td colspan="2">['2019-01-01T00:00:00.0', &#8230;, '2019-01-10T00:00:00.0']</td>
+      </tr>
+    </table>
+    <p>
+      Often, time stamps cannot be applied globally. In this case the values provided in 'time' is the basis to which a
+      time offset is added. The time offset must be given as a separate, 3-dimensional variable (same size as the soil
+      moisture data) in **Seconds** (from the global time stamp of the same image).
+    </p>
 
-  <div><i><b>&lt;DATASET_NAME&gt;</b>_gpi=<b>&lt;GPI&gt;</b>_lat=<b>&lt;LAT&gt;</b>_lon=<b>&lt;LON&gt;</b>.csv</i></div>
-  <p>
-    with:
-  <p>
-  <table>
-    <tr>
-      <td><b>&lt;DATASET_NAME&gt;</b></td>
-      <td>The name of the dataset (same for all files)</td>
-    </tr>
-    <tr>
-      <td><b>&lt;GPI&gt;</b></td>
-      <td>a unique grid point index for the location / file</td>
-    </tr>
-    <tr>
-      <td><b>&lt;LAT&gt;</b></td>
-      <td>latitude in &degN (between -90 and 90 &deg;N) as a floating point number</td>
-    </tr>
-    <tr>
-      <td><b>&lt;LON&gt;</b></td>
-      <td>longitude in &deg;E (between -180 and 180 &deg;E) as a floating point number</td>
-    </tr>
-  </table>
-  <p>
-    E.g. the filename for a data set called 'myDataset' for a single point (ID: 000001) at the location at Latitude
-    38.887 &deg;N, Longitude 101.043 &deg;W would be:
-  </p>
-  <div><i>myDataset_gpi=000001_lat=38.887_lon=-101.043.csv</i></div>
+    <a id="ncoptattrs"></a>
+    <h3 class="h3 mb-3 font-weight-normal">Optional variable attributes</h3>
 
-  <h3 class="h3 mb-3 font-weight-normal">File format</h3>
-  <p>
-    All CSV files must follow the same format, which consists of
-  </p>
-  <ul>
-    <li>
-      A header row containing column names (must be the same for all files).
-    </li>
-    <li>
-      A date index column in a format that dateutil can parse (see <a target="_blank"
-                                                                      href="https://dateutil.readthedocs.io/en/stable/parser.html">here</a>
-      for more info).
-    </li>
-    <li>
-      A variable number of data columns (same number of columns for all files).
-    </li>
-  </ul>
-  <p>
-    Below is an example for the contents of a single csv time series file containing values for one soil moisture
-    variable:
-  </p>
-  <div class="yml">
-    Time,SM<br>
-    01-Jun-2016 01:30:07,0.18278<br>
-    02-Jun-2016 00:51:39,0.2003<br>
-    02-Jun-2016 12:08:07,0.181<br>
-    04-Jun-2016 01:13:32,0.22323<br>
-    &nbsp;&#8942;<br>
+    <ul>
+      <li>
+        Compression and packing is handled by xarray and controlled by (optional) variable encoding attributes
+        'add_offset', 'scale_factor', 'zlib' and 'complevel'. For more details on compressing netCDF files see
+        <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#_reduction_of_dataset_size">this
+          chapter</a> in
+        the CF conventions.
+      </li>
+      <li>
+        The (physical) valid range of a variable (for SM usually 0-100 or 0-1) should be identified by the variable
+        attributes 'valid_range' resp. 'valid_min' and 'valid_max'.
+        Values outside if this range will be treated as invalid.
+      </li>
+      <li>
+        While it is technically not necessary, it is highly recommended that all variables in a file have units assigned
+        (as the variable attribute 'units'). QA4SM may use these units in e.g. plots.
+      </li>
+      <li>
+        Data variables in the file should have a 'long_name' and/or 'standard_name' attribute. The name given under
+        'long_name' will be used in plots. If no 'long_name' is given, but a 'standard_name'
+        (see <a target="_blank"
+                href="http://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html">this
+        table</a> for all possible standard names),
+        this will be used. If neither 'long_name' nor 'standard_name' attributes exist, the variable name will be used
+        directly.
+      </li>
+    </ul>
+
+
+    <a id="csvfiles"></a>
+    <h2 class="h2 mb-3 font-weight-normal">Option 2: Upload Time Series</h2>
+
+    <p>
+      As a more flexible way of providing data (which requires some pre-processing on the user side), we also allow
+      uploading a collection of individual time series stored in <b>.csv</b> format.
+      This is especially useful for datasets with non-orthogonal time steps (i.e. different time stamps at different
+      locations) and to reduce the amount of uploaded data
+      (as e.g. only time series at in situ locations can be extracted beforehand). This data can be uploaded to QA4SM as a
+      <b>zip achive</b> of individual time series stored in a separate CSV file for each location.
+      The location metadata (latitude, longitude, unique grid point index) has to be included in the individual file
+      names. Dataset wide metadata (units, variable names) are provided in a <b>yaml</b> file in the
+      same zip archive.
+    </p>
+
+    <h3 class="h3 mb-3 font-weight-normal">File name conventions</h3>
+    <p>
+      The file name of an individual CSV file in the zip archive must match the following pattern:
+    </p>
+
+    <div><i><b>&lt;DATASET_NAME&gt;</b>_gpi=<b>&lt;GPI&gt;</b>_lat=<b>&lt;LAT&gt;</b>_lon=<b>&lt;LON&gt;</b>.csv</i></div>
+    <p>
+      with:
+    <p>
+    <table>
+      <tr>
+        <td><b>&lt;DATASET_NAME&gt;</b></td>
+        <td>The name of the dataset (same for all files)</td>
+      </tr>
+      <tr>
+        <td><b>&lt;GPI&gt;</b></td>
+        <td>a unique grid point index for the location / file</td>
+      </tr>
+      <tr>
+        <td><b>&lt;LAT&gt;</b></td>
+        <td>latitude in &degN (between -90 and 90 &deg;N) as a floating point number</td>
+      </tr>
+      <tr>
+        <td><b>&lt;LON&gt;</b></td>
+        <td>longitude in &deg;E (between -180 and 180 &deg;E) as a floating point number</td>
+      </tr>
+    </table>
+    <p>
+      E.g. the filename for a data set called 'myDataset' for a single point (ID: 000001) at the location at Latitude
+      38.887 &deg;N, Longitude 101.043 &deg;W would be:
+    </p>
+    <div><i>myDataset_gpi=000001_lat=38.887_lon=-101.043.csv</i></div>
+
+    <h3 class="h3 mb-3 font-weight-normal">File format</h3>
+    <p>
+      All CSV files must follow the same format, which consists of
+    </p>
+    <ul>
+      <li>
+        A header row containing column names (must be the same for all files).
+      </li>
+      <li>
+        A date index column in a format that dateutil can parse (see <a target="_blank"
+                                                                        href="https://dateutil.readthedocs.io/en/stable/parser.html">here</a>
+        for more info).
+      </li>
+      <li>
+        A variable number of data columns (same number of columns for all files).
+      </li>
+    </ul>
+    <p>
+      Below is an example for the contents of a single csv time series file containing values for one soil moisture
+      variable:
+    </p>
+    <div class="yml">
+      Time,SM<br>
+      01-Jun-2016 01:30:07,0.18278<br>
+      02-Jun-2016 00:51:39,0.2003<br>
+      02-Jun-2016 12:08:07,0.181<br>
+      04-Jun-2016 01:13:32,0.22323<br>
+      &nbsp;&#8942;<br>
+    </div>
+
+    <p>
+      To test whether a file complies with the required format, you can try to read it in python with <a target="_blank"
+                                                                                                         href="https://pandas.pydata.org/">pandas</a>.
+      <b>&lt;FNAME&gt;</b> refers to the location of the CSV file in the following example:
+    </p>
+    <div><i>pandas.read_csv(<b>&lt;FNAME&gt;</b>, index_col=0, parse_dates=True)</i></div>
+
+    <h3 class="h3 mb-3 font-weight-normal">Metadata</h3>
+    <p>
+      Metadata for the individual data variables (columns) in the CSV files (e.g. units, long name) can be provided in an
+      additional file with the name
+      'metadata.yml' alongside the CSV files (stored in the same zip archive). This should have a similar format to this
+      example for a 'metadata.yml' file:
+    </p>
+    <div class="yml">
+      SM:<br>
+      &nbsp;&nbsp; long_name: soil moisture <br>
+      &nbsp;&nbsp; units: m^3/m^3<br>
+      &nbsp;&#8942;<br>
+      myvarnameX:<br>
+      &nbsp;&nbsp; long_name: soil moisture x<br>
+      &nbsp;&nbsp; units: m^3/m^3<br>
+    </div>
+
+    <h3 class="h3 mb-3 font-weight-normal">Upload format</h3>
+    <p>
+      All CSV files and optionally the metadata file have to be in the same directory. This directory has to be uploaded
+      as zip file.
+    </p>
+
+    <a id="examplefiles"></a>
+    <h2 class="h2 mb-3 font-weight-normal">Example Files</h2>
+    Example files that fulfill the above described requirements to various degrees can be downloaded from
+    <a target="_blank" href="https://github.com/awst-austria/qa4sm-testdata/tree/master/user_data">this GitHub package</a>.
+
   </div>
-
-  <p>
-    To test whether a file complies with the required format, you can try to read it in python with <a target="_blank"
-                                                                                                       href="https://pandas.pydata.org/">pandas</a>.
-    <b>&lt;FNAME&gt;</b> refers to the location of the CSV file in the following example:
-  </p>
-  <div><i>pandas.read_csv(<b>&lt;FNAME&gt;</b>, index_col=0, parse_dates=True)</i></div>
-
-  <h3 class="h3 mb-3 font-weight-normal">Metadata</h3>
-  <p>
-    Metadata for the individual data variables (columns) in the CSV files (e.g. units, long name) can be provided in an
-    additional file with the name
-    'metadata.yml' alongside the CSV files (stored in the same zip archive). This should have a similar format to this
-    example for a 'metadata.yml' file:
-  </p>
-  <div class="yml">
-    SM:<br>
-    &nbsp;&nbsp; long_name: soil moisture <br>
-    &nbsp;&nbsp; units: m^3/m^3<br>
-    &nbsp;&#8942;<br>
-    myvarnameX:<br>
-    &nbsp;&nbsp; long_name: soil moisture x<br>
-    &nbsp;&nbsp; units: m^3/m^3<br>
-  </div>
-
-  <h3 class="h3 mb-3 font-weight-normal">Upload format</h3>
-  <p>
-    All CSV files and optionally the metadata file have to be in the same directory. This directory has to be uploaded
-    as zip file.
-  </p>
-
-  <a id="examplefiles"></a>
-  <h2 class="h2 mb-3 font-weight-normal">Example Files</h2>
-  Example files that fulfill the above described requirements to various degrees can be downloaded from
-  <a target="_blank" href="https://github.com/awst-austria/qa4sm-testdata/tree/master/user_data">this GitHub package</a>.
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>

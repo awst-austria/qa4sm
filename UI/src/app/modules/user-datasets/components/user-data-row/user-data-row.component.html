@@ -11,9 +11,9 @@
     <h5 class="my-0"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
     </h5>
   </ng-template>
-  <div class="grid mx-0 px-0 my-0" *ngIf="userDataset.metadata_submitted" [style]="{height: '100%'}">
+  <div class="flex flex-row lg:flex-nowrap flex-wrap mx-0 px-0 my-0" *ngIf="userDataset.metadata_submitted">
     <!--    dataset -->
-    <div [ngClass]="authService.currentUser.is_staff ? 'col-4' : 'col-5'">
+    <div class="w-12 md:w-6 pt-2" [ngClass]="authService.currentUser.is_staff ? 'lg:w-4' : 'lg:w-5'">
       <div><strong>Dataset: </strong></div>
       <div
         *ngIf="!editDataset.opened"
@@ -126,7 +126,7 @@
       </div>
     </div>
     <!-- validations -->
-    <div class="p-fluid" [style]="{height: '100%'}" [ngClass]="authService.currentUser.is_staff ? 'col-4' : 'col-5'">
+    <div class="w-12 md:w-6 pt-2" [ngClass]="authService.currentUser.is_staff ? 'lg:w-4' : 'lg:w-5'">
       <div><strong>Validation list: </strong></div>
       <p-scrollPanel [style]="{width: '80%', height: '80%'}">
         <div *ngIf="userDataset.owner_validation_list.length || userDataset.number_of_other_users_validations">
@@ -149,7 +149,7 @@
     </div>
 
     <!-- sharing groups-->
-    <div *ngIf="authService.currentUser.is_staff" class="p-fluid col-2" [style]="{height: '100%', width: '20%'}">
+    <div *ngIf="authService.currentUser.is_staff" class="lg:w-2 md:w-6 w-12 pt-2">
       <div><strong>Shared: </strong></div>
       <p-scrollPanel *ngIf="(datasetGroups$|async) as managementGroups" [style]="{width: '80%', height: '80%'}">
         <div *ngIf="managementGroups.length !== 0">
@@ -164,7 +164,7 @@
     </div>
 
     <!-- actions   -->
-    <div class="status col-2" [style]="{width: '12%'}">
+    <div class="lg:w-2 md:w-6 w-12 pt-2">
       <div class="py-1">
         <button *ngIf="userDataset.file"
                 pButton
