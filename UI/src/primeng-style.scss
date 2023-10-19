@@ -4971,19 +4971,19 @@ div.carousel-caption {
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link-active .p-menuitem-text {
-  color: #ffffff;
+  color: rgba(10, 10, 10, 0.7);
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link-active .p-menuitem-icon {
-  color: #ffffff;
+  color: rgba(10, 10, 10, 0.7);
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-text {
-  color: #ffffff;
+  color: white;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):focus .p-menuitem-text {
-  color: #ffffff;
+  color: white;
 }
 
 .p-menubar .p-menubar-root-list > .p-menuitem > .p-menuitem-content > .p-menuitem-link:not(.p-disabled):hover .p-menuitem-icon {
@@ -6400,7 +6400,7 @@ div.carousel-caption {
   margin-bottom: 0.1rem;
 }
 
-.btn-scroll-down .p-button {
+.btn-scroll-down.p-button {
   width: 50px;
   height: 50px;
   background-color: transparent;
@@ -6409,16 +6409,16 @@ div.carousel-caption {
   text-decoration: none;
 }
 
-.btn-scroll-down .p-button .p-button-icon {
+.btn-scroll-down.p-button .p-button-icon {
   color: white;
   font-size: 2rem;
 }
 
-.btn-scroll-down .p-button:hover {
+.btn-scroll-down.p-button:hover {
   background-color: transparent;
 }
 
-.btn-scroll-down .p-button:focus, .btn-scroll-down .p-button:active {
+.btn-scroll-down.p-button:focus, .btn-scroll-down.p-button:active {
   outline: none;
 }
 
