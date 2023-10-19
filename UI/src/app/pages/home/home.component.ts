@@ -98,11 +98,11 @@ export class HomeComponent implements OnInit {
     main: 'application-team flex flex-column flex-wrap h-auto lg:my-6 my-4 row-gap-2',
     h1: 'lg:text-6xl md:text-5xl sm:text-4xl text-3xl',
     partner: 'flex flex-row flex-wrap w-12 gap-2 align-items-center justify-content-center',
-    partnerDesc: 'w-8 pl-3 text-justify partner-desc gap-1 lg:text-xl md:text-base text-xs',
-    partnerLogo: 'w-3 partner-logo flex flex-wrap align-items-center justify-content-center',
-    team: 'flex flex-row flex-wrap gap-1 w-12 align-items-center justify-content-center mb-2',
-    teamDesc: 'w-9 pl-3 text-justify team-desc px-5 lg:text-xl md:text-base text-xs',
-    teamLogo: 'w-2 partner-logo flex align-items-center justify-content-center'
+    partnerDesc: 'md:w-8 w-12 px-3 text-justify partner-desc gap-1 lg:text-xl md:text-base text-xs',
+    partnerLogo: 'md:w-3 w-12 partner-logo align-items-center justify-content-center text-center',
+    team: 'flex flex-row flex-wrap gap-2 w-12 align-items-center justify-content-center mb-2',
+    teamDesc: 'md:w-9 w-12 text-justify team-desc md:pl-8 pl-2 lg:text-xl md:text-base text-xs',
+    teamLogo: 'md:w-2 w-12 md:ml-5 ml-3 partner-logo flex align-items-center justify-content-center'
   }
 
   constructor(private authService: AuthService,
