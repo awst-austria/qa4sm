@@ -51,11 +51,14 @@
 
     </div>
     <div id="scroll-down">
-      <p-button
+      <button
+        pButton
+        id="scroll-down-btn"
+        title="scroll-down"
+        class="btn-scroll-down p-button"
         icon="pi pi-chevron-down"
-        (onClick)="goToNews()"
-        class="btn-scroll-down">
-      </p-button>
+        (click)="goToNews()">
+      </button>
       <!--      <span class="pi pi-chevron-down" style="color:white"></span>-->
     </div>
 
@@ -63,8 +66,8 @@
   <div id="about-app">
     <div *ngIf="settings$|async as settings" id="qa4sm-news"
          [ngClass]="newsSectionClass.main">
-      <h3 [ngClass]="newsSectionClass.h3">What's new</h3>
-      <div  [innerHTML]=settings[0].news [ngClass]="newsSectionClass.div"></div>
+      <div [ngClass]="newsSectionClass.header">What's new</div>
+      <div [innerHTML]=settings[0].news [ngClass]="newsSectionClass.div"></div>
     </div>
     <div [ngClass]="verticalLineClass.main">
       <div class="vertical-line"></div>
@@ -72,7 +75,8 @@
     <div [ngClass]="applicationDescriptionClass">
       <!--      Application introduction-->
       <div [ngClass]="applicationIntroClass.main">
-        <h1 [ngClass]="applicationIntroClass.h1"> Service for validation of satellite soil moisture products against in-situ and model reference data </h1>
+        <h1 [ngClass]="applicationIntroClass.h1"> Service for validation of satellite soil moisture products against
+          in-situ and model reference data </h1>
         <span [ngClass]="applicationIntroClass.span">
           that <span class="text-highlighted">brings together methodologies and protocols </span> used for the validation
           and quality control of soil moisture data products and provides users with
@@ -90,7 +94,7 @@
           <ng-template let-video pTemplate="item">
             <div [ngClass]="videosClass.mainDiv">
               <div [ngClass]="videosClass.rowDiv">
-                <h4 [ngClass]="videosClass.h4">{{video.title}}</h4>
+                <div [ngClass]="videosClass.header">{{video.title}}</div>
               </div>
               <div [ngClass]="videosClass.rowDiv">
                 <video width="85%" class="mb-3" controls allowfullscreen>
@@ -232,7 +236,7 @@
     </div>
     <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
          [ngClass]="opinionSectionClass.main">
-      <h3 [ngClass]="opinionSectionClass.h3">Share with us your opinion</h3>
+      <div [ngClass]="opinionSectionClass.header">Share with us your opinion</div>
       <div [ngClass]="opinionSectionClass.div">
         If you think we could improve something or you see a missing functionality, please let us know using
         this <b> <a target="_blank" [href]="settings[0].feed_link">feedback form</a> </b>.

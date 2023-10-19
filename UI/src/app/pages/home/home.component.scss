@@ -1,4 +1,5 @@
 @import "../../../style.variables";
+
 $home-page-link-color: #CF8400;
 
 * {
@@ -28,7 +29,7 @@ div#wrapper {
 
 div#landing {
   height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3)) center center;
+  background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.35)) center center;
   background-size: cover;
   display: flex;
   flex-direction: column;
@@ -79,7 +80,7 @@ div#about-app {
   flex-direction: column;
   align-items: center; /* Center horizontally */
   background-size: cover;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
   transition: filter .5s ease, opacity 1s ease;
 }
 
@@ -145,7 +146,7 @@ div#about-app {
   text-align: center;
 }
 
-.application-team  .team-desc{
+.application-team .team-desc {
   line-height: 1.2;
 }
 
@@ -162,11 +163,32 @@ div#about-app {
 }
 
 .application-info .application-tile:nth-child(even) {
-  background-color: $main-page-color-1;
+  background-color: $main-page-color-3;
 }
 
 .application-info .application-tile:nth-child(odd) {
   background-color: $main-page-color-2;
+  color: $main-page-color-3;
+}
+
+.application-team a{
+  color: #333;
+  text-decoration: none;
+}
+
+.application-tile:nth-child(odd) a {
+  color: #333;
+  text-decoration: underline;
+}
+
+.application-tile:nth-child(odd) a:hover, .application-tile:nth-child(even) a:hover,
+.application-team a:hover, .app-news a:hover {
+  color: $home-page-link-color;
+}
+
+.application-tile:nth-child(even) a, .app-news a {
+  color: $main-page-color-2;
+  text-decoration: underline;
 }
 
 .application-tile h1 {
@@ -186,15 +208,6 @@ div#about-app {
 .application-tile div.image-card {
   padding: 2vw;
   width: 75%;
-}
-
-.application-tile a, .application-team a, .app-news a{
-  color: $home-page-link-color;
-  text-decoration: none;
-}
-
-.application-tile a:hover, .application-team a:hover, .app-news a:hover{
-  color: $menu-item-focus-color;
 }
 
 //
@@ -226,23 +239,24 @@ div#about-app {
   background-color: $main-page-color-1;
 }
 
-.partner-logo a{
+.partner-logo a {
   width: 100%;
   height: 100%;
 }
-.background-link{
+
+.background-link {
   position: fixed;
   bottom: 2%;
-  left: 2% ;
+  left: 2%;
 }
 
-.background-link a{
+.background-link a {
   color: $menu-item-color;
   text-decoration: none;
   font-size: 1rem;
 }
 
-.text-highlighted{
+.text-highlighted {
   color: white;
 }
 
@@ -253,7 +267,7 @@ div#about-app {
   .app-news {
     width: 60%;
   }
-  .background-link{
+  .background-link {
     width: 2rem;
     line-height: 1.5;
     left: 0.5%;
