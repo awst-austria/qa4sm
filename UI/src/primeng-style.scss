@@ -6469,7 +6469,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
 }
 
 .save_name_btn.p-button:not(.disabled):hover, .cancel_editing_btn.p-button:not(.disabled):hover {
-  color: $button-base-color;
+  color: $button-hover-color;
   background-color: $base-color;
   border-color: $base-color;
   transform: scale(1.2);
