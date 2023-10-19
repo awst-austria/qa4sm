@@ -1,12 +1,13 @@
 <div class="grid no-gutters">
-  <div class="col-11">
-    <p-checkbox [label]="filterModel.filterDto.description" [(ngModel)]="filterModel.enabled"
+  <div class="col-11 flex flex-row">
+    <p-checkbox [inputId]="String(filterModel.filterDto.id)" [(ngModel)]="filterModel.enabled"
                 [disabled]="filterModel.readonly"
                 [readonly]=filterModel.filterDto.readonly
                 [binary]="true"
                 (onChange)="include_filters($event); exclude_filters($event)"
                 [ngClass]="{'readonly-filter-checkbox': filterModel.filterDto.readonly}"
     ></p-checkbox>
+    <label class="pl-2" for="{{filterModel.filterDto.id}}"> {{filterModel.filterDto.description}}</label>
   </div>
   <div [ngClass]="{'col-1': true, 'adjust-margin': isIncluded}">
     <span class="pi pi-question-circle" [pTooltip]="filterModel.filterDto.help_text"></span>

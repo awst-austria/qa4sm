@@ -19,7 +19,8 @@
       </div>
       <div class="flex w-8 px-0 p-float-label align-content-center justify-content-start">
           <p-inputNumber
-            inputId="windowSizeSelector"
+            id="windowSizeSelector"
+            inputId="windowSizeSelectorInput"
             [showButtons]="true"
             [maxFractionDigits]="0"
             [suffix]="(temporalMatchingModel.size$|async) === 1 ? ' hour' : ' hours'"
@@ -29,7 +30,7 @@
             [min]="1"
             [max]="24">
           </p-inputNumber>
-          <label for="windowSizeSelector">Select a size</label>
+          <label for="windowSizeSelectorInput">Select a size</label>
       </div>
   </div>
 </div>

@@ -16,11 +16,12 @@
         <div class="w-8 px-0">
           <div class="p-float-label">
             <p-dropdown id="anomaliesMethodSelector"
+                        inputId="anomaliesMethodSelectorId"
                         [options]="availableAnomalyMethodModels"
                         [ngModel]="selectedMethod$|async"
                         (ngModelChange)="selectedMethod$.next($event)"
                         optionLabel="description"></p-dropdown>
-            <label for="anomaliesMethodSelector">Select</label>
+            <label for="anomaliesMethodSelectorId">Select</label>
           </div>
         </div>
     </div>

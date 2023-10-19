@@ -18,13 +18,13 @@
         <div class="w-4 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label">
-              <p-inputNumber inputId="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+              <p-inputNumber inputId="minLatInputId" id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLat$|async"
                              [min]="checkValIfLimited(subsetModel.minLat$|async)"
                              [max] ="checkValIfLimited(subsetModel.maxLat$|async, true)"
                              (ngModelChange)="subsetModel.minLat$.next($event)"></p-inputNumber>
 
-              <label for="minLatInput">Min. Latitude</label>
+              <label for="minLatInputId">Min. Latitude</label>
             </div>
           </div>
 
@@ -32,13 +32,13 @@
         <div class="w-4 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label">
-              <p-inputNumber inputId="minLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+              <p-inputNumber id="minLonInput" inputId="minLonInputId" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLon$|async"
                              [min]="checkValIfLimited(subsetModel.minLon$|async)"
                              [max]="checkValIfLimited(subsetModel.maxLon$|async, true)"
                              (ngModelChange)="subsetModel.minLon$.next($event)"></p-inputNumber>
 
-              <label for="minLonInput">Min. Longitude</label>
+              <label for="minLonInputId">Min. Longitude</label>
             </div>
           </div>
         </div>
@@ -65,26 +65,26 @@
         <div class="w-4 mx-0 px-0">
           <div class="p-fluid">
             <div class="p-float-label ">
-              <p-inputNumber inputId="maxLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+              <p-inputNumber inputId="maxLatInputId" id="maxLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="(subsetModel.maxLat$|async)"
                              [min]="checkValIfLimited(subsetModel.minLat$|async, true)"
                              [max]="checkValIfLimited(subsetModel.maxLat$|async)"
                              (ngModelChange)="subsetModel.maxLat$.next($event)"></p-inputNumber>
 
-              <label for="maxLatInput">Max. Latitude</label>
+              <label for="maxLatInputId">Max. Latitude</label>
             </div>
           </div>
         </div>
         <div class="w-4 px-0 mx-0">
           <div class="p-fluid">
             <div class="p-float-label ">
-              <p-inputNumber inputId="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
+              <p-inputNumber inputId="maxLonInputId" id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.maxLon$|async"
                              [min]="checkValIfLimited(subsetModel.minLon$|async, true)"
                              [max]="checkValIfLimited(subsetModel.maxLon$|async)"
                              (ngModelChange)="subsetModel.maxLon$.next($event)"></p-inputNumber>
 
-              <label for="maxLonInput">Max. Longitude</label>
+              <label for="maxLonInputId">Max. Longitude</label>
             </div>
           </div>
         </div>

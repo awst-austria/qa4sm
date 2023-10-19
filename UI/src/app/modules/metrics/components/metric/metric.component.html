@@ -4,7 +4,7 @@
       [inputId]="metricModel.id" [ngModel]="metricModel.value$|async"
                 (ngModelChange)="metricModel.value$.next($event)" [binary]="true" [disabled]="disabled"
     ></p-checkbox>
-    <label for="{{metricModel.id}}"> {{metricModel.description}}</label>
+    <label class="pl-2" for="{{metricModel.id}}"> {{metricModel.description}}</label>
   </div>
   <div class="w-1">
     <label class="p-panel-header-icon"
