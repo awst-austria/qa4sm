@@ -23,7 +23,7 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import VectorSource from "ol/source/Vector";
 import {GeoJSON} from "ol/format";
 import VectorLayer from "ol/layer/Vector";
-import {Icon} from "ol/style";
+import {Icon, Stroke} from "ol/style";
 import {Style, Circle, Fill} from 'ol/style';
 import {addCommon as addCommonProjections} from 'ol/proj.js';
 
@@ -161,12 +161,31 @@ export class MapComponent implements AfterViewInit {
         markerColor = '#808080';  // Default color: gray
       }
 
-      return new Style({
-        image: new Circle({
-          radius: 5,
-          fill: new Fill({color: markerColor})
-        })
-      });
+
+      console.log("Geo GEOM: "+feature.getGeometry().getType())
+        if(feature.getGeometry().getType()==='Point'||feature.getGeometry().getType()==='MultiPoint'){
+            return new Style({
+                image: new Circle({
+                    radius: 5,
+                    fill: new Fill({color: markerColor})
+                })
+            });
+        }
+        else if(feature.getGeometry().getType()==='Polygon'){
+            return new Style({
+                stroke: new Stroke({
+                    color: 'blue',
+                    lineDash: [4],
+                    width: 3,
+                }),
+                fill: new Fill({
+                    color: markerColor,
+                }),
+            })
+        }
+
+        console.error("Unknown geometry type: "+feature.getGeometry().getType())
+        return null;
     };
 
     this.addGeoJson(JSON.stringify(this.geojsonObject));
@@ -213,13 +232,14 @@ export class MapComponent implements AfterViewInit {
         const features = [];
         this.Map.forEachFeatureAtPixel(evt.pixel, (feature) => {
           if (feature.get('datasetProperties')) {
-            features.push(feature);
-            console.log('2')
+            if(!features.includes(feature)){
+              features.push(feature);
+            }
+
           }
         });
 
         if (features.length > 0) {
-          console.log('3')
           const coordinates = evt.coordinate;
           tooltipContent.innerHTML = this.generateMultipleTables(features);
           tooltipOverlay.setPosition(coordinates);
@@ -233,7 +253,9 @@ export class MapComponent implements AfterViewInit {
   private generateMultipleTables(features): string {
     let combinedTableHTML = '';
 
+    console.log("Features: ",features)
     features.forEach(feature => {
+      console.log("Feature: ",feature)
       const properties = feature.get('datasetProperties');
       let tableHTML = '<table>';
 

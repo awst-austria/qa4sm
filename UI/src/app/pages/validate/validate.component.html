@@ -67,12 +67,13 @@
               </qa-threshold-filter>
               <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
                 <qa-ismn-network-filter
-
+                  (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"
                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                   [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
               </div>
               <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
                 <qa-ismn-depth-filter
+                  (depthSelectionChanged)="onIsmnNetworkSelectionChange($event)"
                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                   [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
                 </qa-ismn-depth-filter>

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {
   DatasetComponentSelectionModel
@@ -60,7 +60,7 @@ const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either co
   templateUrl: './validate.component.html',
   styleUrls: ['./validate.component.scss'],
 })
-export class ValidateComponent implements OnInit {
+export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild(MapComponent) mapComponent: MapComponent;
   @ViewChild(AnomaliesComponent) anomaliesChild: AnomaliesComponent;
   @ViewChild(ScalingComponent) scalingChild: ScalingComponent;
@@ -129,6 +129,10 @@ export class ValidateComponent implements OnInit {
               private modalWindowService: ModalWindowService,
               private settingsService: SettingsService,
               public authService: AuthService) {
+  }
+
+  ngAfterViewInit(): void {
+    this.updateMap();
   }
 
 
@@ -549,19 +553,108 @@ export class ValidateComponent implements OnInit {
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
 
 
-
     //map update
+    this.updateMap();
+  }
+
+  onIsmnNetworkSelectionChange(selectedNetworks: string): void {
+    console.log("onIsmnNetworkSelectionChange: ", selectedNetworks);
+    this.updateMap();
+  }
+
+  onIsmnDepthSelectionChange(selectedNetworks: string): void {
+    console.log("onIsmnDepthSelectionChange: ", selectedNetworks);
+    this.updateMap();
+  }
+
+  updateMap() {
+    console.log("Updating MAP", this.validationModel)
     this.mapComponent.clearSelection()
-    if(this.validationModel.referenceConfigurations.spatial){
-      console.log('Updating reference selection')
+    if (this.validationModel.referenceConfigurations.spatial && this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion) {
+      console.log('Updating reference selection: ', this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion.id)
+      //todo filtering also here
       this.versionService.getGeoJSONById(this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion.id).subscribe(value => this.mapComponent.addGeoJson(value));
     }
 
-    this.validationModel.datasetConfigurations.forEach(config=>{
-      console.log('Updating data selection')
-      this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).subscribe(value => this.mapComponent.addGeoJson(value));
+    this.validationModel.datasetConfigurations.forEach(config => {
+      if (config.datasetModel.selectedVersion) {
+
+        this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).subscribe(value => {
+          //console.log("GEOJSON: ",JSON.parse(value));
+          let filteredGeoJson: any = JSON.parse(value);
+
+          // if(filteredGeoJson.hasOwnProperty(""))
+
+          if (config.ismnDepthFilter$.value != null) {
+            filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
+          }
+          if (config.ismnNetworkFilter$.value != null) {
+            filteredGeoJson=this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
+          }
+
+          console.log("Filtered 01: ", filteredGeoJson);
+          const sdfhgdfgh = JSON.stringify(filteredGeoJson);
+          console.log("COnvert back: ", sdfhgdfgh);
+          this.mapComponent.addGeoJson(JSON.stringify(filteredGeoJson));
+        });
+      }
     });
   }
+
+  private ismnDepthFilter(filter: string, geoJson: any): any {
+    const numbers: string[] = filter.split(',');
+    const geoJsonObj = geoJson;
+    if (numbers.length === 2) {
+      const minVal: number = parseFloat(numbers[0]);
+      const maxVal: number = parseFloat(numbers[1]);
+      if (!isNaN(minVal) && !isNaN(maxVal)) {
+
+        const filteredFeatures: any[] = geoJsonObj.features.filter((feature: any) => {
+          console.log("Feature filtering: ", feature);
+          const minDepthValue = parseFloat(
+            feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "depth_from")?.propertyValue || "0"
+          );
+          const maxDepthValue = parseFloat(
+            feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "depth_to")?.propertyValue || "0"
+          );
+
+          console.log("DS min: ", minDepthValue, " DS max: ", maxDepthValue, " Filter min: ", minVal, " Filter max: ", maxVal);
+
+          // If min_depth or max_depth property is missing or not a valid number, include the feature in the result
+          if (isNaN(minDepthValue) || isNaN(maxDepthValue)) {
+            return true;
+          }
+
+          return minDepthValue <= minVal && maxDepthValue >= maxVal;
+        });
+
+        return {
+          type: geoJsonObj.type,
+          features: filteredFeatures,
+        };
+      } else {
+        console.error("Invalid ISMN depth filter param. value:", filter);
+      }
+    } else {
+      console.error("Invalid ISMN depth filter param. value:", filter);
+    }
+
+
+  }
+
+  private ismnNetworkFilter(filter: string, geoJsonObj: any): any {
+    const filteredFeatures: any[] = geoJsonObj.features.filter((feature: any) => {
+      console.log("Feature filtering: ", feature);
+      const actualNetwork = feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "Network")?.propertyValue || "Unknown"
+      return filter.includes(actualNetwork);
+    });
+
+    return {
+      type: geoJsonObj.type,
+      features: filteredFeatures,
+    };
+  }
+
 
   private getISMN(configs: DatasetConfigModel[]): DatasetConfigModel[] {
     return configs.filter(config => config.datasetModel.selectedDataset.short_name === 'ISMN');

@@ -14,7 +14,7 @@ GEOJSON_FILE_NAME = "geoinfo.json"
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version_geojson_by_id(request, **kwargs):
-    print(kwargs)
+
     version = get_object_or_404(DatasetVersion, id=kwargs['version_id'])
     if version.versions.count() != 1:
         return JsonResponse({'message': 'Dataset could not be determined'},

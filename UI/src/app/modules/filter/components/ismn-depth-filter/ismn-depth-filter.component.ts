@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {FilterModel} from '../basic-filter/filter-model';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
@@ -12,6 +12,7 @@ export class IsmnDepthFilterComponent implements OnInit {
 
   @Input() filterModel$: BehaviorSubject<FilterModel>;
   @Input() datasetModel: DatasetComponentSelectionModel;
+  @Output() depthSelectionChanged = new EventEmitter<string>();
 
   dialogVisible = false;
 
@@ -28,6 +29,7 @@ export class IsmnDepthFilterComponent implements OnInit {
       }
     });
   }
+
 
   private initComponent(): void {
     this.updateUiFields(this.filterModel$.value.filterDto.default_parameter);
@@ -48,5 +50,6 @@ export class IsmnDepthFilterComponent implements OnInit {
   public saveNewValues(): void {
     this.filterModel$.value.parameters$.next(this.editFrom + ',' + this.editTo);
     this.dialogVisible = false;
+    this.depthSelectionChanged.emit(this.editFrom + ";" + this.editTo);
   }
 }
