@@ -48,7 +48,11 @@
     <!--    Clear and map buttons-->
     <div class="flex flex-column lg:w-2 w-12 p-2 justify-content-center align-content-center">
       <div class="flex justify-content-center align-content-center">
-        <button pButton type="button" icon="pi pi-trash" pTooltip="Clear coordinates"
+        <button pButton
+                title="clear-coordinates-button"
+                type="button"
+                icon="pi pi-trash"
+                pTooltip="Clear coordinates"
                 class="clearCoordinates p-button-info mr-2"
                 (click)="clearCoordinatesOrSetDefault()"></button>
       </div>
