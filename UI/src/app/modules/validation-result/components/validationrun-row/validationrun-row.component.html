@@ -2,10 +2,10 @@
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="font-semibold line-height-1">Name:</span> {{ valName$|async }}</div>
+    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="line-height-1">Name:</span> {{ valName$|async }}</div>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
-    <div class="my-0 lg:text-xl md:text-lg text-base"> DOI: <a title="doi-link" class="doilink font-semibold" target="_blank"
+    <div class="my-0 lg:text-xl md:text-lg text-base"> DOI: <a title="doi-link" class="doilink" target="_blank"
                               href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
     </div>
   </ng-template>
@@ -43,10 +43,10 @@
         </span>
       </span>
 
-      <span *ngIf="!validationRun.is_a_copy" class="font-semibold">
+      <span *ngIf="!validationRun.is_a_copy">
         {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}}
       </span>
-      <span *ngIf="validationRun.is_a_copy" class="font-semibold">
+      <span *ngIf="validationRun.is_a_copy">
         Copied: {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}} <br>
         (Date of original run: {{ originalDate|date: 'mediumDate' :timeZone }})
       </span>
@@ -63,8 +63,7 @@
   <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 12rem">
     <div class="my-0 lg:text-xl md:text-lg text-base">
       <span *ngIf="hideElement"
-            class=" font-semibold line-height-1">
-        Name: {{ valName$|async }}
+            class="line-height-1">Name: {{ valName$|async }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="my-0 font-weight-normal">
