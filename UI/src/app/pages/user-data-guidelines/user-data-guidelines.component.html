@@ -1,5 +1,5 @@
-<main #userDataHelpPage class="flex flex-column align-items-center">
-  <div class="flex flex-column lg:w-4 w-11 align-content-center justify-content-center text-justify">
+<main class="flex flex-column align-items-center">
+  <div id="help-panel" class="flex flex-column lg:w-6 w-11 align-content-center justify-content-center text-justify">
     <h1 class="h4 mb-3 font-weight-normal">Go to section</h1>
     <p>
       <a routerLink="{{pageUrl}}" fragment="ncstack">Option 1: NetCDF4 Image Stacks</a><br/>
@@ -309,12 +309,12 @@
       same zip archive.
     </p>
 
-    <h3 class="h3 mb-3 font-weight-normal">File name conventions</h3>
+    <h3 class="h3 my-3 font-weight-normal">File name conventions</h3>
     <p>
       The file name of an individual CSV file in the zip archive must match the following pattern:
     </p>
 
-    <div><i><b>&lt;DATASET_NAME&gt;</b>_gpi=<b>&lt;GPI&gt;</b>_lat=<b>&lt;LAT&gt;</b>_lon=<b>&lt;LON&gt;</b>.csv</i></div>
+    <div class="code-example"><i><b>&lt;DATASET_NAME&gt;</b>_gpi=<b>&lt;GPI&gt;</b>_lat=<b>&lt;LAT&gt;</b>_lon=<b>&lt;LON&gt;</b>.csv</i></div>
     <p>
       with:
     <p>
@@ -340,9 +340,9 @@
       E.g. the filename for a data set called 'myDataset' for a single point (ID: 000001) at the location at Latitude
       38.887 &deg;N, Longitude 101.043 &deg;W would be:
     </p>
-    <div><i>myDataset_gpi=000001_lat=38.887_lon=-101.043.csv</i></div>
+    <div class="code-example"><i>myDataset_gpi=000001_lat=38.887_lon=-101.043.csv</i></div>
 
-    <h3 class="h3 mb-3 font-weight-normal">File format</h3>
+    <h3 class="h3 my-3 font-weight-normal">File format</h3>
     <p>
       All CSV files must follow the same format, which consists of
     </p>
@@ -352,7 +352,7 @@
       </li>
       <li>
         A date index column in a format that dateutil can parse (see <a target="_blank"
-                                                                        href="https://dateutil.readthedocs.io/en/stable/parser.html">here</a>
+                                                                        href="https://dateutil.readthedocs.io/en/stable/parser.html">this page</a>
         for more info).
       </li>
       <li>
@@ -377,15 +377,16 @@
                                                                                                          href="https://pandas.pydata.org/">pandas</a>.
       <b>&lt;FNAME&gt;</b> refers to the location of the CSV file in the following example:
     </p>
-    <div><i>pandas.read_csv(<b>&lt;FNAME&gt;</b>, index_col=0, parse_dates=True)</i></div>
+    <div class="code-example"><i>pandas.read_csv(<b>&lt;FNAME&gt;</b>, index_col=0, parse_dates=True)</i></div>
 
-    <h3 class="h3 mb-3 font-weight-normal">Metadata</h3>
+    <h3 class="h3 my-3 font-weight-normal">Metadata</h3>
     <p>
       Metadata for the individual data variables (columns) in the CSV files (e.g. units, long name) can be provided in an
       additional file with the name
       'metadata.yml' alongside the CSV files (stored in the same zip archive). This should have a similar format to this
       example for a 'metadata.yml' file:
     </p>
+
     <div class="yml">
       SM:<br>
       &nbsp;&nbsp; long_name: soil moisture <br>
