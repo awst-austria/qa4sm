@@ -1,6 +1,6 @@
 <div class="grid no-gutters">
   <div class="col-11 flex flex-row">
-    <p-checkbox [inputId]="String(filterModel.filterDto.id)" [(ngModel)]="filterModel.enabled"
+    <p-checkbox [inputId]="filterModel.filterDto.id.toString()" [(ngModel)]="filterModel.enabled"
                 [disabled]="filterModel.readonly"
                 [readonly]=filterModel.filterDto.readonly
                 [binary]="true"
