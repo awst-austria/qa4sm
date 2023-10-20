@@ -1,7 +1,7 @@
 <div class="grid align-content-center">
   <div class="col">
     <span class="p-float-label mb-4 mt-3">
-    <p-dropdown [inputId]="'dataset_'+selectionModel.selectedDataset.id.toString()" (onChange)="onDatasetChange()" [options]="(datasets$|async)"
+    <p-dropdown [inputId]="datasetSelectorId" (onChange)="onDatasetChange()" [options]="(datasets$|async)"
                 [(ngModel)]="selectionModel.selectedDataset"
                 optionLabel="pretty_name" [style]="{'width': '100%'}">
       <ng-template let-item pTemplate="item">
@@ -18,7 +18,7 @@
       </ng-template>
     </p-dropdown>
 
-      <label for="{{'dataset_' + selectionModel.selectedDataset.id.toString()}}">Dataset</label>
+      <label for="{{datasetSelectorId}}">Dataset</label>
     </span>
 
   </div>
@@ -27,13 +27,13 @@
 <div class="grid  align-content-center">
   <div class="col">
     <span class="p-float-label mb-4">
-      <p-dropdown [inputId]="'version_'+selectionModel.selectedVersion.id.toString()"
+      <p-dropdown [inputId]="versionSelectorId"
                   [style]="{'width': '100%'}"
                   [options]="(selectableDatasetVersions$|async)"
                   [(ngModel)]="selectionModel.selectedVersion"
                   optionLabel="pretty_name"
                   (onChange)="onVersionChange()"></p-dropdown>
-      <label for="{{'version_'+selectionModel.selectedVersion.id.toString()}}">Version</label>
+      <label for="{{versionSelectorId}}">Version</label>
     </span>
 
   </div>
@@ -42,7 +42,7 @@
 <div class="grid  align-content-center">
   <div class="col">
     <span class="p-float-label">
-      <p-dropdown [inputId]="'variable_'+selectionModel.selectedVariable.id.toString()" optionLabel="short_name" [style]="{'width': '100%'}"
+      <p-dropdown [inputId]="variableSelectorId" optionLabel="short_name" [style]="{'width': '100%'}"
                   [options]="(selectableDatasetVariables$|async)"
                   [(ngModel)]="selectionModel.selectedVariable">
         <ng-template let-item pTemplate="item">
@@ -56,7 +56,7 @@
 
 
       </p-dropdown>
-            <label for="{{'variable_'+selectionModel.selectedVariable.id.toString()}}">Variable [units]</label>
+      <label for="{{variableSelectorId}}">Variable [units]</label>
     </span>
 
   </div>
