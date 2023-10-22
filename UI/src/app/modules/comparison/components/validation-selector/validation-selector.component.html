@@ -2,7 +2,7 @@
   <!-- selection of the reference dataset -->
   <div class="flex flex-row lg:flex-nowrap flex-wrap gap-2">
     <div class="w-12 lg:w-6">
-      <p-panel header="Datasets configuration" [toggleable]="false">
+      <p-panel header="Datasets configuration" [toggleable]="false" class="validation-row">
         <ng-template pTemplate="icons">
           <label class="p-panel-header-icon mb-0"
                  pTooltip="Select the spatial reference dataset from the menu below to access a list of validations available for comparison."
@@ -51,7 +51,7 @@
 
     <!-- selection of the validations -->
     <div class="w-12 lg:w-6">
-      <p-panel header="Validations selection" [toggleable]="false">
+      <p-panel header="Validations selection" [toggleable]="false" class="validation-row">
         <ng-template pTemplate="icons">
           <label class="p-panel-header-icon  mb-0" pTooltip="You can choose as many as one or two validations from the list, according to the number of non-reference
         datasets contained (respectively, two or one). Tip: rename your validations to find them more easily."
@@ -102,7 +102,7 @@
 
   <!-- selection of the spatial extent -->
   <div class="w-12 py-2">
-    <p-panel header="Spatial extent" [toggleable]="true">
+    <p-panel header="Spatial extent" [toggleable]="true" class="validation-row">
       <ng-template pTemplate="icons">
         <label class="p-panel-header-icon"
                pTooltip="When the selected validations are partially overlapping, all or only common points can be selected."
@@ -126,8 +126,12 @@
 <!-- Start comparison button -->
 <div class="w-12">
   <div>
-    <div class="d-flex justify-content-center">
-      <p-button label="Compare" (onClick)="startComparison()"></p-button>
+    <div class="d-flex justify-content-center text-2xl">
+      <p-button
+        id="compareButton"
+        label="Compare"
+        icon="pi pi-arrows-h"
+        (onClick)="startComparison()"></p-button>
     </div>
   </div>
 </div>

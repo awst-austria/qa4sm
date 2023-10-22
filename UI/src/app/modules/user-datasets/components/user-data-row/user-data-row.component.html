@@ -1,14 +1,14 @@
 <p-panel class="user-data-row" [style.opacity]="userDataset.file ? 1 : 0.6">
 
   <ng-template pTemplate="header">
-    <div class="my-0 text-xl">
+    <div class="my-0 text-2xl">
       <span class="font-weight-normal">
       {{ userDataset.file ? "Size: " + getTheFileSize() : "File has been removed" }}
       </span>
     </div>
   </ng-template>
   <ng-template pTemplate="icons" class="font-weight-normal">
-    <div class="my-0 text-xl"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
+    <div class="my-0 text-2xl"> Upload date: {{userDataset.upload_date| date: dateFormat :timeZone}} UTC
     </div>
   </ng-template>
   <div class="flex flex-row lg:flex-nowrap flex-wrap mx-0 px-0 my-0" *ngIf="userDataset.metadata_submitted">

@@ -1775,14 +1775,18 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   border-radius: 4px;
 }
 
-#validateButton .p-button {
+#validateButton .p-button, #compareButton .p-button {
   width: 8rem;
   height: 3rem;
   font-size: 1.25rem;
   padding-right: 1.5rem;
 }
 
-#validateButton .p-button-icon.p-button-icon-left {
+#compareButton .p-button{
+  width: 9rem
+}
+
+#validateButton .p-button-icon.p-button-icon-left, #compareButton .p-button-icon.p-button-icon-left {
   font-size: 1.25rem;
 }
 
