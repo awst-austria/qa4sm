@@ -1,8 +1,9 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 
 const homeUrlPrefix = '/static/images/home/';
@@ -13,9 +14,41 @@ const videosPrefix = 'static/videos/'
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  animations: [
+    trigger('showNews', [
+      state('show', style({ opacity: 1, transform: 'translateY(0)' })),
+      state('hide', style({ opacity: 0, transform: 'translateY(20px)' })),
+      transition('hide => show', animate('1000ms ease-in')),
+    ]),
+    trigger('showLine1', [
+      state('show', style({ opacity: 1, transform: 'translateY(0)' })),
+      state('hide', style({ opacity: 0, transform: 'translateY(20px)' })),
+      transition('hide => show', animate('1000ms ease-in')),
+    ]),
+    trigger('showDesc', [
+      state('show', style({ opacity: 1, transform: 'translateY(0)' })),
+      state('hide', style({ opacity: 0, transform: 'translateY(20px)' })),
+      transition('hide => show', animate('1000ms ease-in')),
+    ]),
+    trigger('showLine2', [
+      state('show', style({ opacity: 1, transform: 'translateY(0)' })),
+      state('hide', style({ opacity: 0, transform: 'translateY(20px)' })),
+      transition('hide => show', animate('1000ms ease-in')),
+    ]),
+    trigger('showFeedback', [
+      state('show', style({ opacity: 1, transform: 'translateY(0)' })),
+      state('hide', style({ opacity: 0, transform: 'translateY(20px)' })),
+      transition('hide => show', animate('1000ms ease-in')),
+    ]),
+  ],
 })
 export class HomeComponent implements OnInit {
+  showNewsState = 'hide';
+  showLine1State = 'hide';
+  showDescState = 'hide';
+  showLine2State = 'hide';
+  showFeedbackState = 'hide';
 
   logoFiles = [{
     plot: logoUrlPrefix + 'logo_awst.webp',
@@ -117,6 +150,52 @@ export class HomeComponent implements OnInit {
 
   goToNews(): void {
     this.router.navigate([], {fragment: "qa4sm-news"});
+  }
+
+  // Add a method to change the animation state
+  toggleNewsAnimation() {
+    this.showNewsState = 'show';
+  }
+  toggleDescAnimation() {
+    this.showDescState = 'show';
+  }
+  toggleAnimation(element, state){
+    switch (element) {
+      case '#qa4sm-news':
+        this.showNewsState = state;
+        break;
+      case '#line-1':
+        this.showLine1State = state;
+        break;
+      case '#qa4sm-desc':
+        this.showDescState = state;
+        break;
+      case '#line-2':
+        this.showLine2State = state;
+        break;
+      case '#qa4sm-opinion':
+        this.showFeedbackState = state;
+        break;
+    }
+  }
+  @HostListener('window:scroll', [])
+  onScroll() {
+    ['#qa4sm-news', '#line-1' , '#qa4sm-desc', '#line-2', '#qa4sm-opinion'].forEach(element => {
+      this.checkVisibility(element)
+    })
+  }
+
+  checkVisibility(element) {
+    const animatedElement = document.querySelector(element);
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          this.toggleAnimation(element, 'show')
+        }
+      });
+    });
+
+    observer.observe(animatedElement);
   }
 
 }

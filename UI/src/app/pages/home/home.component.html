@@ -64,15 +64,20 @@
 
   </div>
   <div id="about-app">
-    <div *ngIf="settings$|async as settings" id="qa4sm-news"
-         [ngClass]="newsSectionClass.main">
+    <div *ngIf="settings$|async as settings"
+         id="qa4sm-news"
+         [ngClass]="newsSectionClass.main"
+         [@showNews]="showNewsState"
+         (mouseenter)="toggleNewsAnimation()">
       <div [ngClass]="newsSectionClass.header">What's new</div>
       <div [innerHTML]=settings[0].news [ngClass]="newsSectionClass.div"></div>
     </div>
-    <div [ngClass]="verticalLineClass.main">
+    <div id="line-1" [ngClass]="verticalLineClass.main" [@showNews]="showLine1State">
       <div class="vertical-line"></div>
     </div>
-    <div [ngClass]="applicationDescriptionClass">
+    <div id='qa4sm-desc' [ngClass]="applicationDescriptionClass"
+         [@showDesc]="showDescState"
+         (mouseenter)="toggleDescAnimation()">
       <!--      Application introduction-->
       <div [ngClass]="applicationIntroClass.main">
         <h1 [ngClass]="applicationIntroClass.h1"> Service for validation of satellite soil moisture products against
@@ -231,11 +236,11 @@
 
     </div>
 
-    <div [ngClass]="verticalLineClass.main">
+    <div id="line-2" [ngClass]="verticalLineClass.main" [@showNews]="showLine2State">
       <div class="vertical-line"></div>
     </div>
     <div *ngIf="settings$|async as settings" id="qa4sm-opinion"
-         [ngClass]="opinionSectionClass.main">
+         [ngClass]="opinionSectionClass.main" [@showNews]="showFeedbackState">
       <div [ngClass]="opinionSectionClass.header">Share with us your opinion</div>
       <div [ngClass]="opinionSectionClass.div">
         If you think we could improve something or you see a missing functionality, please let us know using
