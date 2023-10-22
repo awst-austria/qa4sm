@@ -94,6 +94,7 @@
       <div class="py-3">
         <div class="p-float-label">
           <p-dropdown class="form-field"
+                      inputId="selectCountry"
                       [options]="countries$|async"
                       [style]="{'width':'15rem', 'height': '2.5rem'}"
                       formControlName="country"
@@ -102,7 +103,7 @@
                       placeholder=" "
                       ngDefaultControl>
           </p-dropdown>
-          <label>Country (optional)</label>
+          <label for="selectCountry">Country (optional)</label>
           <span pTooltip="Optional. The country where your organisation (or you) resides."
                 [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userForm.controls.country.value==''}"
                 id="countryHelp">
@@ -138,7 +139,8 @@
       </div>
 
       <div class="form-control-box">
-        <p-checkbox id="active" formControlName="active" binary="true"></p-checkbox>
+        <p-checkbox inputId="active" formControlName="active" binary="true"></p-checkbox>
+        <lable for="active">some label</lable>
       </div>
 
       <button *ngIf="!userData"
