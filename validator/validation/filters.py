@@ -328,6 +328,10 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             masking_filters.append(('sat_id', '==', 4))
             continue
 
+        if fil.name == "FIL_ASCAT_METOP_C":
+            masking_filters.append(('sat_id', '==', 5))
+            continue
+
         if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN":
             masking_filters.append(('ssf', '<=', 1))  # TODO: really should be == 0 or == 1
             continue
