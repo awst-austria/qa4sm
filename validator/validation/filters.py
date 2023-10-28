@@ -125,8 +125,8 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('SWE_inst')
                 continue
 
-            if ((fil.name == "FIL_ASCAT_METOP_A") or
-                    (fil.name == "FIL_ASCAT_METOP_B")):
+            if fil.name in ["FIL_ASCAT_METOP_A", "FIL_ASCAT_METOP_B",
+                            "FIL_ASCAT_METOP_C"]:
                 variables.append('sat_id')
                 continue
 
