@@ -1,0 +1,887 @@
+[
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 1,
+        "fields": {
+            "name": "AMMA-CATCH",
+            "continent": "Africa",
+            "country": "Benin, Niger, Mali",
+            "number_of_stations": "7",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 2,
+        "fields": {
+            "name": "CARBOAFRICA",
+            "continent": "Africa",
+            "country": "Sudan",
+            "number_of_stations": "1",
+            "versions": [
+                18, 30
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 3,
+        "fields": {
+            "name": "DAHRA",
+            "continent": "Africa",
+            "country": "Senegal",
+            "number_of_stations": "1",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 4,
+        "fields": {
+            "name": "CHINA",
+            "continent": "Asia",
+            "country": "China",
+            "number_of_stations": "40",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 5,
+        "fields": {
+            "name": "CTP_SMTMN",
+            "continent": "Asia",
+            "country": "China",
+            "number_of_stations": "57",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 6,
+        "fields": {
+            "name": "HiWATER_EHWSN",
+            "continent": "Asia",
+            "country": "China",
+            "number_of_stations": "174",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 7,
+        "fields": {
+            "name": "HSC_SEOLMACHEON",
+            "continent": "Asia",
+            "country": "Korea",
+            "number_of_stations": "1",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 8,
+        "fields": {
+            "name": "HYU-CHEONGMICHEON",
+            "continent": "Asia",
+            "country": "Korea",
+            "number_of_stations": "1",
+            "versions": [
+                18
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 9,
+        "fields": {
+            "name": "IIT_KANPUR",
+            "continent": "Asia",
+            "country": "India",
+            "number_of_stations": "1",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 10,
+        "fields": {
+            "name": "KHOREZM",
+            "continent": "Asia",
+            "country": "Uzbekistan",
+            "number_of_stations": "7",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 11,
+        "fields": {
+            "name": "MAQU",
+            "continent": "Asia",
+            "country": "China",
+            "number_of_stations": "20",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 12,
+        "fields": {
+            "name": "MONGOLIA",
+            "continent": "Asia",
+            "country": "Mongolia",
+            "number_of_stations": "44",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 13,
+        "fields": {
+            "name": "MySMNet",
+            "continent": "Asia",
+            "country": "Malaysia",
+            "number_of_stations": "7",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 14,
+        "fields": {
+            "name": "RUSWET-AGRO",
+            "continent": "Asia",
+            "country": "Former Soviet Union",
+            "number_of_stations": "212",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 15,
+        "fields": {
+            "name": "RUSWET-GRASS",
+            "continent": "Asia",
+            "country": "Former Soviet Union",
+            "number_of_stations": "122",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 16,
+        "fields": {
+            "name": "RUSWET-VALDAI",
+            "continent": "Asia",
+            "country": "Former Soviet Union",
+            "number_of_stations": "3",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 17,
+        "fields": {
+            "name": "SKKU",
+            "continent": "Asia",
+            "country": "Korea",
+            "number_of_stations": "5",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 18,
+        "fields": {
+            "name": "SW-WHU",
+            "continent": "Asia",
+            "country": "China",
+            "number_of_stations": "7",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 19,
+        "fields": {
+            "name": "AACES",
+            "continent": "Australia",
+            "country": "Australia",
+            "number_of_stations": "49",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 20,
+        "fields": {
+            "name": "OZNET",
+            "continent": "Australia",
+            "country": "Australia",
+            "number_of_stations": "38",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 21,
+        "fields": {
+            "name": "SASMAS",
+            "continent": "Australia",
+            "country": "Australia",
+            "number_of_stations": "14",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 22,
+        "fields": {
+            "name": "BIEBRZA_S-1",
+            "continent": "Europe",
+            "country": "Poland",
+            "number_of_stations": "30",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 23,
+        "fields": {
+            "name": "CALABRIA",
+            "continent": "Europe",
+            "country": "Italy",
+            "number_of_stations": "5",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 24,
+        "fields": {
+            "name": "CAMPANIA",
+            "continent": "Europe",
+            "country": "Italy",
+            "number_of_stations": "2",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 25,
+        "fields": {
+            "name": "FMI",
+            "continent": "Europe",
+            "country": "Finland",
+            "number_of_stations": "27",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 26,
+        "fields": {
+            "name": "FR_Aqui",
+            "continent": "Europe",
+            "country": "France",
+            "number_of_stations": "5",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 27,
+        "fields": {
+            "name": "GROW",
+            "continent": "Europe",
+            "country": "UK",
+            "number_of_stations": "154",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 28,
+        "fields": {
+            "name": "GTK",
+            "continent": "Europe",
+            "country": "Finland",
+            "number_of_stations": "7",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 29,
+        "fields": {
+            "name": "HOBE",
+            "continent": "Europe",
+            "country": "Denmark",
+            "number_of_stations": "32",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 30,
+        "fields": {
+            "name": "HYDROL-NET_PERUGIA",
+            "continent": "Europe",
+            "country": "Italy",
+            "number_of_stations": "2",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 31,
+        "fields": {
+            "name": "IMA_CAN1",
+            "continent": "Europe",
+            "country": "Italy",
+            "number_of_stations": "12",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 32,
+        "fields": {
+            "name": "METEROBS",
+            "continent": "Europe",
+            "country": "Italy",
+            "number_of_stations": "1",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 33,
+        "fields": {
+            "name": "MOL-RAO",
+            "continent": "Europe",
+            "country": "Germany",
+            "number_of_stations": "2",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 34,
+        "fields": {
+            "name": "ORACLE",
+            "continent": "Europe",
+            "country": "France",
+            "number_of_stations": "6",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 35,
+        "fields": {
+            "name": "REMEDHUS",
+            "continent": "Europe",
+            "country": "Spain",
+            "number_of_stations": "24",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 36,
+        "fields": {
+            "name": "RSMN",
+            "continent": "Europe",
+            "country": "Romania",
+            "number_of_stations": "20",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 37,
+        "fields": {
+            "name": "SMOSMANIA",
+            "continent": "Europe",
+            "country": "France",
+            "number_of_stations": "22",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 38,
+        "fields": {
+            "name": "SWEX_POLAND",
+            "continent": "Europe",
+            "country": "Poland",
+            "number_of_stations": "6",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 39,
+        "fields": {
+            "name": "TERENO",
+            "continent": "Europe",
+            "country": "Germany",
+            "number_of_stations": "5",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 40,
+        "fields": {
+            "name": "UDC_SMOS",
+            "continent": "Europe",
+            "country": "Germany",
+            "number_of_stations": "11",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 41,
+        "fields": {
+            "name": "UMBRIA",
+            "continent": "Europe",
+            "country": "Italy",
+            "number_of_stations": "13",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 42,
+        "fields": {
+            "name": "UMSUOL",
+            "continent": "Europe",
+            "country": "Italy",
+            "number_of_stations": "1",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 43,
+        "fields": {
+            "name": "VAS",
+            "continent": "Europe",
+            "country": "Spain",
+            "number_of_stations": "3",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 44,
+        "fields": {
+            "name": "WEGENERNET",
+            "continent": "Europe",
+            "country": "Austria",
+            "number_of_stations": "12",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 45,
+        "fields": {
+            "name": "WSMN",
+            "continent": "Europe",
+            "country": "UK",
+            "number_of_stations": "8",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 46,
+        "fields": {
+            "name": "ARM",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "29",
+            "versions": [
+                5, 18, 30, 41, 42
+
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 47,
+        "fields": {
+            "name": "AWDN",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "50",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 48,
+        "fields": {
+            "name": "BNZ-LTER",
+            "continent": "North America",
+            "country": "Alaska",
+            "number_of_stations": "12",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 49,
+        "fields": {
+            "name": "COSMOS",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "109",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 50,
+        "fields": {
+            "name": "FLUXNET-AMERIFLUX",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "2",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 51,
+        "fields": {
+            "name": "ICN",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "19",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 52,
+        "fields": {
+            "name": "IOWA",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "6",
+            "versions": [
+                18, 30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 53,
+        "fields": {
+            "name": "iRON",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "9",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 54,
+        "fields": {
+            "name": "PBO_H2O",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "159",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 55,
+        "fields": {
+            "name": "RISMA",
+            "continent": "North America",
+            "country": "Canada",
+            "number_of_stations": "23",
+            "versions": [
+                18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 56,
+        "fields": {
+            "name": "SCAN",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "239",
+            "versions": [
+                5, 18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 57,
+        "fields": {
+            "name": "SNOTEL",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "441",
+            "versions": [
+                5, 18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 58,
+        "fields": {
+            "name": "SOILSCAPE",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "171",
+            "versions": [
+                5, 18, 30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 59,
+        "fields": {
+            "name": "USCRN",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "115",
+            "versions": [
+                30, 18, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 60,
+        "fields": {
+            "name": "USDA-ARS",
+            "continent": "North America",
+            "country": "USA",
+            "number_of_stations": "4",
+            "versions": [
+                30, 18, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 61,
+        "fields": {
+            "name": "LAB-net",
+            "continent": "South America",
+            "country": "Chile",
+            "number_of_stations": "3",
+            "versions": [
+                30, 18, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 62,
+        "fields": {
+            "name": "HOAL",
+            "continent": "Europe",
+            "country": "Austria",
+            "number_of_stations": "33",
+            "versions": [
+                30, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 63,
+        "fields": {
+            "name": "IPE",
+            "continent": "Europe",
+            "country": "Spain",
+            "number_of_stations": "2",
+            "versions": [
+                30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 64,
+        "fields": {
+            "name": "KIHS_CMC",
+            "continent": "Asia",
+            "country": "Korea",
+            "number_of_stations": "18",
+            "versions": [
+                30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 65,
+        "fields": {
+            "name": "KIHS_SMC",
+            "continent": "Asia",
+            "country": "Korea",
+            "number_of_stations": "19",
+            "versions": [
+                30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 66,
+        "fields": {
+            "name": "VDS",
+            "continent": "Asia",
+            "country": "Myanmar",
+            "number_of_stations": "4",
+            "versions": [
+                30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 67,
+        "fields": {
+            "name": "PTSMN",
+            "continent": "Oceania",
+            "country": "New Zealand",
+            "number_of_stations": "20",
+            "versions": [
+                30, 41, 42
+            ]
+        }
+    },
+    {
+        "model": "validator.ismnnetworks",
+        "pk": 68,
+        "fields": {
+            "name": "TAHMO",
+            "continent": "Africa",
+            "country": "Côte d'Ivoire, Nigeria, Ghana, Uganda, Rwanda, Kenya",
+            "number_of_stations": "171",
+            "versions": [
+                30, 42
+            ]
+        }
+    }
+]
