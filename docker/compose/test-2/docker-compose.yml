@@ -80,4 +80,4 @@ services:
     deploy:
       resources:
         limits:
-          memory: 200G
+          memory: 100G

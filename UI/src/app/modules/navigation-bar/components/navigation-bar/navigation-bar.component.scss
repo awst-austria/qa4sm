@@ -1,10 +1,11 @@
-@import "src/style.variables";
+@import "../../../../../style.variables";
 .navbar {
   background-color: $base-color;
   margin-bottom: 1rem;
 }
 a {
   color: white;
+  text-decoration: none;
 }
 //.ui-menubar{
 //  background-color: $base-color !important;
