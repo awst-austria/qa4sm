@@ -12,7 +12,7 @@ export class BasicFilterComponent  {
   @Input() isIncluded: boolean;
   @Output() includeMutual = new EventEmitter<string>();
   @Output() mutuallyIncluded = new EventEmitter<string>();
-  @Output() excludeMutual = new EventEmitter<number>();
+  @Output() excludeMutual = new EventEmitter<string>();
 
   constructor() {
   }
@@ -28,9 +28,9 @@ export class BasicFilterComponent  {
 
   exclude_filters(event: Event): void {
     // should tell the parent to uncheck the mutually exclusive filter(s), if any
-    const toDisable = this.filterModel.filterDto.disable_filter;
-    if (toDisable !== null && this.filterModel.enabled) {
-      this.excludeMutual.emit(toDisable);
+    const to_exclude = this.filterModel.filterDto.to_exclude;
+    if (to_exclude !== null && this.filterModel.enabled) {
+      this.excludeMutual.emit(to_exclude);
     }
   }
 }

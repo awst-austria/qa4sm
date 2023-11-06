@@ -27,7 +27,7 @@ class FilterCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
                     duper['dialog_name'] = fil.dialog_name
                     duper['default_parameter'] = fil.default_parameter
                     duper['to_include'] = fil.to_include
-                    duper['disable_filter'] = fil.disable_filter
+                    duper['to_exclude'] = fil.to_exclude
                     duper['threshold'] = fil.threshold,
                     duper['default_threshold'] = fil.default_threshold,
                     duper['min_threshold'] = fil.min_threshold,

@@ -163,9 +163,9 @@
         "fields": {
             "short_name": "ERA5_LAND_V20190904",
             "pretty_name": "v20190904",
-            "help_text": "snapshot of the reanalysis dataset from 2019-09-04",
-            "time_range_start": "2001-01-01",
-            "time_range_end": "2019-04-30",
+            "help_text": "updated snapshot of the reanalysis dataset from 2019-09-04",
+            "time_range_start": "1981-01-01",
+            "time_range_end": "2022-12-31",
             "geographical_range": null,
             "filters": [
                 1,
@@ -787,6 +787,7 @@
             "geographical_range": null,
             "filters": [
                 1,
+                35,
                 36,
                 37,
                 38,
@@ -794,6 +795,27 @@
                 40,
                 41,
                 42
+            ]
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 55,
+        "fields": {
+            "short_name": "ASCAT_H119",
+            "pretty_name": "H119",
+            "help_text": "",
+            "time_range_start": "2007-01-02",
+            "time_range_end": "2020-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                10,
+                11,
+                12,
+                13,
+                14,
+                44
             ]
         }
     }
