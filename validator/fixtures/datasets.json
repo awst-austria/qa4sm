@@ -71,7 +71,8 @@
             "citation": "See <a target=\"_blank\" href=\"http://doi.org/10.15770/EUM_SAF_H_0005\" rel=\"noreferrer\">here</a>",
             "is_spatial_reference": false,
             "versions": [
-                3
+                3,
+                55
             ],
             "variables": [
                 3
