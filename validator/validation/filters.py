@@ -125,8 +125,8 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('SWE_inst')
                 continue
 
-            if ((fil.name == "FIL_ASCAT_METOP_A") or
-                    (fil.name == "FIL_ASCAT_METOP_B")):
+            if fil.name in ["FIL_ASCAT_METOP_A", "FIL_ASCAT_METOP_B",
+                            "FIL_ASCAT_METOP_C"]:
                 variables.append('sat_id')
                 continue
 
@@ -326,6 +326,10 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
         if fil.name == "FIL_ASCAT_METOP_B":
             masking_filters.append(('sat_id', '==', 4))
+            continue
+
+        if fil.name == "FIL_ASCAT_METOP_C":
+            masking_filters.append(('sat_id', '==', 5))
             continue
 
         if fil.name == "FIL_ASCAT_UNFROZEN_UNKNOWN":

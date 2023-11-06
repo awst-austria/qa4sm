@@ -11,7 +11,7 @@ class DataFilter(models.Model):
     default_set_active = models.BooleanField(default=False)
     default_parameter = models.TextField(null=True, blank=True)
     to_include = models.CharField(max_length=150, null=True, blank=True)
-    disable_filter = models.IntegerField(null=True)
+    to_exclude = models.CharField(max_length=150, null=True, blank=True)
     readonly = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:

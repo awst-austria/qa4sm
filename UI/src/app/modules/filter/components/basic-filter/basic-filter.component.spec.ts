@@ -27,7 +27,7 @@ describe('BasicFilterComponent', () => {
         dialog_name: null,
         default_parameter: null,
         to_include: null,
-        disable_filter: null,
+        to_exclude: null,
         default_set_active: true,
         readonly: true,
       },
