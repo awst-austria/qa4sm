@@ -20,6 +20,7 @@ p-checkbox ~ label, p-slider ~ label{
 .form-control-box{
   position: absolute;
   left: -100vw;
+  display: none;
 }
 
 @media screen and (max-width: 650px){

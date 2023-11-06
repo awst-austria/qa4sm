@@ -1,6 +1,8 @@
+@import "../../../../../style.variables";
+
 @keyframes spinAndChangeColor {
   from {color: #9CF2F6}
-  to {color: #00AAE3;}
+  to {color: $base-color;}
   from {
     transform:rotate(0deg);
   }

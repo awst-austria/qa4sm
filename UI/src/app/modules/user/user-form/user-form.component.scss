@@ -18,6 +18,7 @@
 }
 button{
   width: 15rem;
+  font-size: 1.2rem;
 }
 div.alert{
   margin-top: 1rem;
@@ -36,4 +37,5 @@ div.alert{
 .form-control-box{
   position: absolute;
   left: -100vw;
+  display: none;
 }

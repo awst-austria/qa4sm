@@ -18,7 +18,7 @@
       {{getLimitMessage()}}
     </div>
     <!--    <hr class="featurette-divider">-->
-    <div class="text-center pt-5">
+    <div class="flex flex-column pt-5 justify-content-center align-content-center">
       <qa-user-file-upload></qa-user-file-upload>
     </div>
     <hr class="featurette-divider">
@@ -45,8 +45,8 @@
             <div>
               Above you can find a list of datasets you have uploaded: <span *ngIf="!readMore">...</span>
               <span *ngIf="!readMore" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-down">
-          Read more
-        </span>
+              Read more
+            </span>
             </div>
             <div *ngIf="readMore">
               <ul>

@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
 @Component({
   selector: 'qa-user-data-guidelines',
@@ -8,7 +8,6 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 export class UserDataGuidelinesComponent implements OnInit {
   public pageUrl = '/user-data-guidelines';
   constructor() { }
-  @ViewChild('userDataHelpPage') container: ElementRef<HTMLElement>;
 
   ngOnInit(): void {
   }

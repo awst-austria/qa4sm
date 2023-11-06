@@ -1,59 +1,44 @@
-<div class="grid">
-  <div class="col-12 sm:col-6 pb-0">
-    <div class="grid" id="fromAnomField">
-      <div class="small-label col-4">
-        <div class="p-fluid">
-          <div>From</div>
-        </div>
-      </div>
-      <div class="col-7 px-0 mx-0">
-        <div class="p-fluid">
-          <div class="p-float-label">
-            <div class="p-float-label">
-              <p-inputNumber
-                id="yearFrom"
-                [useGrouping]="false"
-                [showButtons]="true"
-                [maxFractionDigits]="0"
-                [ngModel]="getYearFrom()"
-                (ngModelChange)="anomaliesModel.anomaliesFrom$.next(setDate($event))"
-                [step]="1"
-                [min]="minYear"
-                [max]="maxYear">
-              </p-inputNumber>
-              <label for="yearFrom">Choose year</label>
-            </div>
-
-          </div>
-        </div>
+<div class="flex flex-row flex-wrap w-12 lg:pt-0 pt-4">
+  <div class="w-12 lg:w-6 lg:py-2 py-3 flex-nowrap flex justify-content-start" id="fromAnomField">
+    <div class="small-label w-4">
+      <div>From</div>
+    </div>
+    <div class="w-7 px-0 mx-0">
+      <div class="p-float-label">
+        <p-inputNumber
+          id="yearFrom"
+          [useGrouping]="false"
+          [showButtons]="true"
+          [maxFractionDigits]="0"
+          [ngModel]="getYearFrom()"
+          (ngModelChange)="anomaliesModel.anomaliesFrom$.next(setDate($event))"
+          [step]="1"
+          [min]="minYear"
+          [max]="maxYear">
+        </p-inputNumber>
+        <label for="yearFrom">Choose year</label>
       </div>
     </div>
   </div>
 
-  <div class="col-12 sm:col-6 pb-0">
-    <div class="grid" id="toAnomField">
-      <div class="small-label col-4">
-        <div class="p-fluid">
-          <div>To</div>
-        </div>
-      </div>
-      <div class="col-7 px-0 mx-0">
-        <div class="p-fluid">
-          <div class="p-float-label">
-            <p-inputNumber
-              id="yearTo"
-              [useGrouping]="false"
-              [showButtons]="true"
-              [maxFractionDigits]="0"
-              [ngModel]="getYearTo()"
-              (ngModelChange)="anomaliesModel.anomaliesTo$.next(setDate($event))"
-              [step]="1"
-              [min]="minYear"
-              [max]="maxYear">
-            </p-inputNumber>
-            <label for="yearTo">Choose year</label>
-          </div>
-        </div>
+  <div class="w-12 lg:w-6 lg:py-2 py-3 flex flex-nowrap justify-content-start" id="toAnomField">
+    <div class="small-label w-4">
+      <div>To</div>
+    </div>
+    <div class="w-7 px-0 mx-0">
+      <div class="p-float-label">
+        <p-inputNumber
+          id="yearTo"
+          [useGrouping]="false"
+          [showButtons]="true"
+          [maxFractionDigits]="0"
+          [ngModel]="getYearTo()"
+          (ngModelChange)="anomaliesModel.anomaliesTo$.next(setDate($event))"
+          [step]="1"
+          [min]="minYear"
+          [max]="maxYear">
+        </p-inputNumber>
+        <label for="yearTo">Choose year</label>
       </div>
     </div>
   </div>
