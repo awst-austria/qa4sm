@@ -60,7 +60,12 @@ export class DatasetComponent implements OnInit {
         this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
           return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
         }));
-      } else {
+      } else if(configs.filter(config => config.datasetModel.selectedDataset.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user){
+        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+          return this.sortById(datasets.filter(dataset => !dataset.user));
+        }));
+      }
+      else {
         this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
           return this.sortById(datasets);
         }));

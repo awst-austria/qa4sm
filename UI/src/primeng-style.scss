@@ -4011,7 +4011,7 @@ div.carousel-caption {
 }
 
 .p-panel .p-panel-header {
-  border: 1px solid #dee2e6;
+  border: 1px solid  $base-color;
   padding: $panel-header-padding;
   background: $base-color;
   color: #ffffff;
@@ -4019,6 +4019,7 @@ div.carousel-caption {
   border-top-left-radius: 4px;
   min-height: 3.2rem;
   font-size: 1.4rem;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .p-panel .p-panel-header .p-panel-title {

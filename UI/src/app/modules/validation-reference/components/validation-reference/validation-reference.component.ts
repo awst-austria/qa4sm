@@ -44,8 +44,12 @@ export class ValidationReferenceComponent implements OnInit {
     if (this.referenceType === 'spatialReference$'){
       const listOfISMNDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
         dataset.datasetModel.selectedDataset?.short_name === 'ISMN');
+      const listOfServiceDatasets = this.validationModel.datasetConfigurations.filter(dataset =>
+      !dataset.datasetModel.selectedDataset?.user);
       if (listOfISMNDatasets.length !== 0){
         this.chosenDatasets$.next(listOfISMNDatasets);
+      } else if (listOfServiceDatasets.length < this.validationModel.datasetConfigurations.length) {
+        this.chosenDatasets$.next(listOfServiceDatasets);
       }
     }
     return this.chosenDatasets$;

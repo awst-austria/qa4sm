@@ -116,22 +116,24 @@
                 </label>
               </ng-template>
 
-              <!--             spatial reference-->
-              <div class="pt-2">
-                <label for="spatial-reference"
-                       class="mb-4"
-                       pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool, it has to be chosen as the spatial reference."
-                       tooltipPosition="bottom">
-                  <span class="pi pi-question-circle"></span>
-                  Spatial reference
-                </label>
-                <qa-validation-reference
-                  id="spatial-reference"
-                  #spatialReference
-                  [validationModel]="validationModel"
-                  [referenceType]="'spatialReference$'"
-                  (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
-              </div>
+          <!--             spatial reference-->
+          <div class="pt-2">
+            <label for="spatial-reference"
+                   class="mb-4"
+                   pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool,
+                   it has to be chosen as the spatial reference. Due to technical limitations, user dataset
+                   can't be chosen as the spatial reference."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+              Spatial reference
+            </label>
+            <qa-validation-reference
+              id="spatial-reference"
+              #spatialReference
+              [validationModel]="validationModel"
+              [referenceType]="'spatialReference$'"
+              (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
+          </div>
 
               <!--             temporal reference-->
               <div>
