@@ -1,3 +1,9 @@
+QA4SM v2.4.4 - Release notes 2023-11-06
+=======================================================
+# Updates
+1. New dataset filters added
+2. New version of ASCAT dataset added
+
 QA4SM v2.4.3 - Release notes 2023-10-18
 =======================================================
 # Bug fix
