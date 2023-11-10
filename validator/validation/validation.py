@@ -7,6 +7,7 @@ from re import sub as regex_sub
 import uuid
 import xarray as xr
 import numpy as np
+import qa4sm_reader
 
 
 from celery.app import shared_task
@@ -107,6 +108,7 @@ def save_validation_config(validation_run):
         ds = Dataset(path.join(OUTPUT_FOLDER, validation_run.output_file.name), "a", format="NETCDF4")
 
         ds.qa4sm_version = settings.APP_VERSION
+        ds.qa4sm_reader_version = qa4sm_reader.__version__
         ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(settings.APP_VERSION)
         ds.url = settings.SITE_URL + get_angular_url('result', validation_run.id)
         if validation_run.interval_from is None:
