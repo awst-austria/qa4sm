@@ -5,6 +5,9 @@ import logging
 from os import path
 from re import sub as regex_sub
 import uuid
+import xarray as xr
+import numpy as np
+
 
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
@@ -193,6 +196,9 @@ def save_validation_config(validation_run):
                                                               validation_run.max_lat, validation_run.max_lon)
 
         ds.close()
+
+        re_compressor(fpath = os.path.join(OUTPUT_FOLDER, validation_run.output_file.name), compression = 'zlib', complevel = 9)
+
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
 
@@ -853,3 +859,50 @@ def copy_validationrun(run_to_copy, new_user):
         'run_id': run_id,
     }
     return response
+
+
+
+
+def re_compressor(fpath: str, compression: str = 'zlib', complevel: int = 5) -> None:
+    """
+    Opens the generated results netCDF file and writes to a new netCDF file with new compression parameters.
+
+    Parameters
+    ----------
+    fpath: str
+        Path to the netCDF file to be re-compressed.
+    compression: str
+        Compression algorithm to be used. Currently only 'zlib' is implemented.
+    complevel: int
+        Compression level to be used. The higher the level, the better the compression, but the longer it takes.
+
+    Returns
+    -------
+    None
+    """
+    _implemented_compressions = ['zlib']
+    _allowed_compression_levels = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    if compression in _implemented_compressions and complevel in _allowed_compression_levels:
+
+        def encoding_params(ds: xr.Dataset, compression: str, complevel: int) -> dict:
+            return {str(var): {compression: True, 'complevel': complevel} for var in ds.variables if not np.issubdtype(ds[var].dtype, np.object_)}
+
+        try:
+            with xr.open_dataset(fpath) as ds:
+                parent_dir, file = os.path.split(fpath)
+                re_name = os.path.join(parent_dir, f're_{file}')
+                ds.to_netcdf(re_name, mode='w', format='NETCDF4', encoding=encoding_params(ds, compression, complevel))
+                print(f'\n\nRe-compression finished\n\n')
+
+            os.remove(fpath)
+            os.rename(re_name, fpath)
+
+        except Exception as e:
+            print(f'\n\nRe-compression failed. {e}\nContinue without re-compression.\n\n')
+            os.remove(re_name) if os.path.exists(re_name) else None
+
+    else:
+        print(f'\n\nRe-compression failed. Compression has to be {_implemented_compressions} and compression levels other than {_allowed_compression_levels} are not supported. Continue without re-compression.\n\n')
+
+    
