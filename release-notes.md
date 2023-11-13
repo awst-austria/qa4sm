@@ -1,4 +1,4 @@
-QA4SM v2.4.4.1 - Release notes 2023-11-07
+QA4SM v2.4.4.1 - Release notes 2023-11-13
 =======================================================
 # Updates
 1. Rabbit version downgraded to avoid breaking connection issues
