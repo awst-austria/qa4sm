@@ -26,6 +26,7 @@ import VectorLayer from "ol/layer/Vector";
 import {Icon, Stroke} from "ol/style";
 import {Style, Circle, Fill} from 'ol/style';
 import {addCommon as addCommonProjections} from 'ol/proj.js';
+import {Cluster} from "ol/source";
 
 @Component({
   selector: 'qa-map',
@@ -42,7 +43,8 @@ export class MapComponent implements AfterViewInit {
   extent: Extent = [-20026376.39, -20048966.10,
     20026376.39, 20048966.10];
   Map: Map;
-  selectedDatasets: VectorSource = new VectorSource();
+  clusteredSource: VectorSource = new VectorSource();
+  nonClusteredSource: VectorSource = new VectorSource();
   @Output() mapReady = new EventEmitter<Map>();
 
 
@@ -122,15 +124,25 @@ export class MapComponent implements AfterViewInit {
   }
 
 
-  public clearSelection(){
-    this.selectedDatasets.clear();
+  public clearSelection() {
+    this.clusteredSource.clear();
+    this.nonClusteredSource.clear();
   }
 
   public addGeoJson(geoJson: string) {
-    this.selectedDatasets.addFeatures(new GeoJSON().readFeatures(geoJson, {
+    console.log("ADD geojson-----------------------------------------------------");
+    var features = new GeoJSON().readFeatures(geoJson, {
       dataProjection: 'EPSG:4326',
       featureProjection: 'EPSG:3857'
-    }));
+    });
+
+    if (features.length > 0 && features[0].getGeometry().getType() === 'Polygon') {
+      //Satellite datasets
+      this.nonClusteredSource.addFeatures(features);
+    } else {
+      //ISMN
+      this.clusteredSource.addFeatures(features);
+    }
   }
 
   ngAfterViewInit(): void {
@@ -154,43 +166,80 @@ export class MapComponent implements AfterViewInit {
 
 
     const styleFunction = (feature) => {
-      let markerColor = feature.get('markerColor');
 
-      // If the markerColor property doesn't exist or is not a valid color, set a default color.
-      if (!markerColor) {
-        markerColor = '#808080';  // Default color: gray
-      }
+      let markerColor = '#808080'; // Default color: gray
 
+      if (feature.get('features') != undefined) {
+        //function called from a cluster source
 
-      console.log("Geo GEOM: "+feature.getGeometry().getType())
-        if(feature.getGeometry().getType()==='Point'||feature.getGeometry().getType()==='MultiPoint'){
-            return new Style({
-                image: new Circle({
-                    radius: 5,
-                    fill: new Fill({color: markerColor})
-                })
-            });
-        }
-        else if(feature.getGeometry().getType()==='Polygon'){
-            return new Style({
-                stroke: new Stroke({
-                    color: 'blue',
-                    lineDash: [4],
-                    width: 3,
-                }),
-                fill: new Fill({
-                    color: markerColor,
-                }),
+        // console.log("Feature count: " + feature.get('features').length, feature.get('features'))
+        if (feature.get('features').length > 1) {
+          //clustered representation of multiple points
+
+          return new Style({
+            image: new Circle({
+              radius: 8,
+              stroke: new Stroke({
+                color: 'blue',
+                width: 2,
+              })
             })
+          });
+
+
+        } else {
+          if (feature.get('features')[0].get('markerColor') != undefined) {
+            markerColor = feature.get('features')[0].get('markerColor');
+          }
+          return new Style({
+            image: new Circle({
+              radius: 5,
+              fill: new Fill({color: markerColor})
+            })
+          });
+        }
+      } else {
+        let markerColor = feature.get('markerColor');
+
+        // If the markerColor property doesn't exist or is not a valid color, set a default color.
+        if (!markerColor) {
+          markerColor = '#808080';
         }
 
-        console.error("Unknown geometry type: "+feature.getGeometry().getType())
-        return null;
+        if (feature.getGeometry().getType() === 'Polygon') {
+          return new Style({
+            stroke: new Stroke({
+              color: 'blue',
+              lineDash: [4],
+              width: 1,
+            }),
+            fill: new Fill({
+              color: this.hexToRgba(markerColor, 0.5),
+            }),
+          })
+        }
+
+        return new Style({
+          image: new Circle({
+            radius: 5,
+            fill: new Fill({color: markerColor})
+          })
+        });
+      }
     };
 
-    this.addGeoJson(JSON.stringify(this.geojsonObject));
-    let vectorLayer = new VectorLayer({
-      source: this.selectedDatasets,
+    var clusterSource = new Cluster({
+      source: this.clusteredSource,
+      distance: 20 // Pixel distance between features to be clustered
+    });
+
+    let clusteredSourceLayer = new VectorLayer({
+      source: clusterSource,
+      style: styleFunction,
+    });
+
+    let nonClusteredSourceLayer = new VectorLayer({
+      source: this.nonClusteredSource,
       style: styleFunction,
     });
 
@@ -212,7 +261,7 @@ export class MapComponent implements AfterViewInit {
     this.Map = new Map({
       layers: [new TileLayer({
         source: new OSM({})
-      }), vectorLayer],
+      }), clusteredSourceLayer, nonClusteredSourceLayer],
       target: 'map',
       // controls: DefaultControls({attribution: false}).extend([new MyControl(),new Attribution({collapsible: true,})]),
       controls: [new Attribution({collapsible: true})],
@@ -231,11 +280,17 @@ export class MapComponent implements AfterViewInit {
       this.zone.runOutsideAngular(() => {
         const features = [];
         this.Map.forEachFeatureAtPixel(evt.pixel, (feature) => {
-          if (feature.get('datasetProperties')) {
-            if(!features.includes(feature)){
+          if (feature.get('datasetProperties')) { // this branch covers simple polygons and points
+            if (!features.includes(feature)) {
               features.push(feature);
             }
-
+          }
+          else if(feature.get('features')){ //this branch covers cluster points
+            if(feature.get('features').length==1){
+              if (!features.includes(feature.get('features')[0])) {
+                features.push(feature.get('features')[0]);
+              }
+            }
           }
         });
 
@@ -250,12 +305,29 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
+  private hexToRgba(hex, opacity): string {
+    // Remove the hash character, if any
+    hex = hex.replace('#', '');
+
+    // Parse the hexadecimal value to get separate R, G, and B values
+    var bigint = parseInt(hex, 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+
+    // Calculate the alpha value (opacity)
+    var alpha = opacity || 1.0;
+
+    // Return the RGBA value
+    return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
+  }
+
   private generateMultipleTables(features): string {
     let combinedTableHTML = '';
 
-    console.log("Features: ",features)
+    console.log("Features: ", features)
     features.forEach(feature => {
-      console.log("Feature: ",feature)
+      console.log("Feature: ", feature)
       const properties = feature.get('datasetProperties');
       let tableHTML = '<table>';
 
