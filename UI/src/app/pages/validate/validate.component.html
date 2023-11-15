@@ -49,7 +49,7 @@
                   [ngClass]="{'ml-1-icon': isIncluded(filter.filterDto.id, item.basicFilters)}"
                   [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
                   [filterModel]="filter"
-                  (excludeMutual)="this.excludeFilter($event, item.basicFilters)"
+                  (excludeMutual)="this.includeFilter($event, item.basicFilters, false)"
                   (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
                 </qa-basic-filter>
               </ng-container>
@@ -121,7 +121,9 @@
           <div class="pt-2">
             <label for="spatial-reference"
                    class="mb-4"
-                   pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool, it has to be chosen as the spatial reference."
+                   pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool,
+                   it has to be chosen as the spatial reference. Due to technical limitations, user dataset
+                   can't be chosen as the spatial reference."
                    tooltipPosition="bottom">
               <span class="pi pi-question-circle"></span>
               Spatial reference

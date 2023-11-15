@@ -1,3 +1,16 @@
+QA4SM v2.4.4.1 - Release notes 2023-11-13
+=======================================================
+# Updates
+1. Rabbit version downgraded to avoid breaking connection issues
+
+QA4SM v2.4.4 - Release notes 2023-11-07
+=======================================================
+# Updates
+1. New dataset filters added
+2. New version of ASCAT dataset added
+3. ERA Land data period extended
+4. User data can not be used as spatial reference
+
 QA4SM v2.4.3 - Release notes 2023-10-18
 =======================================================
 # Bug fix

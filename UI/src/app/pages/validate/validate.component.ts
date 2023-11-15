@@ -670,14 +670,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return configs.filter(config => config.datasetModel.selectedDataset.short_name === 'ISMN');
   }
 
-  excludeFilter(toExclude: number, basicFilters: any): void {
-    // Exclude the filter if mutual is selected
-    basicFilters.forEach(filter => {
-      if (filter.filterDto.id === toExclude) {
-        filter.enabled = false;
-      }
-    });
-  }
 
   addDatasetButtonDisabled(): boolean {
     return this.validationModel.datasetConfigurations.length >= MAX_DATASETS_FOR_VALIDATION;

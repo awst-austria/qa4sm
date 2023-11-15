@@ -7,7 +7,7 @@ export class FilterDto {
               public dialog_name: string,
               public default_parameter: string,
               public to_include: string,
-              public disable_filter: number,
+              public to_exclude: string,
               public default_set_active: boolean,
               public readonly: boolean,
               ) {
