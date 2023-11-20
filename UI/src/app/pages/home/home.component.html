@@ -102,9 +102,12 @@
                 <div [ngClass]="videosClass.header">{{video.title}}</div>
               </div>
               <div [ngClass]="videosClass.rowDiv">
-                <video width="85%" class="mb-3" controls allowfullscreen>
-                  <source [src]="video.video">
-                </video>
+                <iframe class="w-11 lg:h-30rem md:h-20rem sm:h-15rem"
+                        [src]="video.video"
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                </iframe>
               </div>
             </div>
           </ng-template>

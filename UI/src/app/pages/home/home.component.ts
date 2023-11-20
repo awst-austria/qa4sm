@@ -4,7 +4,7 @@ import {SettingsService} from '../../modules/core/services/global/settings.servi
 import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {animate, state, style, transition, trigger} from '@angular/animations';
-
+import {DomSanitizer} from '@angular/platform-browser';
 
 const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
@@ -75,12 +75,19 @@ export class HomeComponent implements OnInit {
 
   videos = [
     {
-      video: videosPrefix + 'QA4SM_Video_Series_I_Validation_4k.mp4',
+      video: this.sanitizer
+        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/PUONm_hYi6A?si=4RtVwWnc3MwgPh9i'),
       title: 'QA4SM - validation set up'
     },
     {
-      video: videosPrefix + 'QA4SM_Video_Series_II_Results_4K.mp4',
+      video: this.sanitizer
+        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/cNswYu3ZjAI?si=bT1yV7qiR32keGN0'),
       title: 'QA4SM - validation results'
+    },
+    {
+      video: this.sanitizer
+        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/8EEvyJPKvoI?si=6-LZg2NzpRix5Wfw'),
+      title: 'QA4SM - upload custom data'
     }
   ];
 
@@ -122,8 +129,8 @@ export class HomeComponent implements OnInit {
 
   videosClass = {
     main: 'application-videos lg:my-5 my-2 w-12',
-    mainDiv: 'flex flex-column align-content-center justify-content-center',
-    rowDiv: "w-12 py-2 text-center",
+    mainDiv: 'flex flex-column align-content-center justify-content-center w-12',
+    rowDiv: "w-12 py-2 text-center iframe-container",
     header: "lg:text-3xl md:text-2xl text-base",
   }
 
@@ -140,7 +147,8 @@ export class HomeComponent implements OnInit {
 
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
-              private router: Router) {
+              private router: Router,
+              private sanitizer: DomSanitizer) {
   }
 
   ngOnInit(): void {
