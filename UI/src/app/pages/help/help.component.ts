@@ -62,35 +62,35 @@ export class HelpComponent implements OnInit {
   }
 
   helpPagePlots(): void {
-    this.menuMinus = plotsUrlPrefix + 'menu_minus.png';
-    this.menuPlus = plotsUrlPrefix + 'menu_plus.png';
-    this.datasetSelections = plotsUrlPrefix + 'data_set_selections.png';
-    this.intercomparison = plotsUrlPrefix + 'intercomparison.png';
-    this.referenceDatasetSelection = plotsUrlPrefix + 'reference_data_set_selections.png';
-    this.anomalies = plotsUrlPrefix + 'anomalies.png';
-    this.spatialSubsetting = plotsUrlPrefix + 'spatial_subsetting.png';
-    this.mapSelection = plotsUrlPrefix + 'map_selection.png';
-    this.temporalSubsetting = plotsUrlPrefix + 'temporal_subsetting.png';
-    this.tca = plotsUrlPrefix + 'metrics.png';
-    this.scaling = plotsUrlPrefix + 'scaling.png';
-    this.nameYourValidation = plotsUrlPrefix + 'name_your_validation.png';
-    this.validateButton = plotsUrlPrefix + 'validate_button.png';
-    this.myValidations = plotsUrlPrefix + 'my_validations.png';
-    this.resultsOverview = plotsUrlPrefix + 'results_overview.png';
-    this.resultsGraphs = plotsUrlPrefix + 'results_graphs.png';
-    this.publishingDialog = plotsUrlPrefix + 'publishing_dialog.png';
-    this.ismnNetworks = plotsUrlPrefix + 'networks.png';
-    this.ismnDepths = plotsUrlPrefix + 'depths.png';
-    this.datsetConfigurationComparison = plotsUrlPrefix + 'dataset-configuration-for-comparison.png';
-    this.validationSelectionsComparison = plotsUrlPrefix + 'validation-selection-comparison.png';
-    this.spatialExtentComparison = plotsUrlPrefix + 'spatial-extent-comparison.png';
-    this.metadataWindow = plotsUrlPrefix + 'metadata_window.png';
-    this.uploadFileWindow = plotsUrlPrefix + 'upload_file_window.png';
-    this.selectFile = plotsUrlPrefix + 'select_file.png';
-    this.chosenFile = plotsUrlPrefix + 'chosen_file.png';
-    this.uploadingSpinner = plotsUrlPrefix + 'uploading_spinner.png';
-    this.dataRow = plotsUrlPrefix + 'data_row.png';
-    this.userDataOnTheList = plotsUrlPrefix + 'user_data_on_the_list.png';
+    this.menuMinus = plotsUrlPrefix + 'menu_minus.webp';
+    this.menuPlus = plotsUrlPrefix + 'menu_plus.webp';
+    this.datasetSelections = plotsUrlPrefix + 'data_set_selections.webp';
+    this.intercomparison = plotsUrlPrefix + 'intercomparison.webp';
+    this.referenceDatasetSelection = plotsUrlPrefix + 'reference_data_set_selections.webp';
+    this.anomalies = plotsUrlPrefix + 'anomalies.webp';
+    this.spatialSubsetting = plotsUrlPrefix + 'spatial_subsetting.webp';
+    this.mapSelection = plotsUrlPrefix + 'map_selection.webp';
+    this.temporalSubsetting = plotsUrlPrefix + 'temporal_subsetting.webp';
+    this.tca = plotsUrlPrefix + 'metrics.webp';
+    this.scaling = plotsUrlPrefix + 'scaling.webp';
+    this.nameYourValidation = plotsUrlPrefix + 'name_your_validation.webp';
+    this.validateButton = plotsUrlPrefix + 'validate_button.webp';
+    this.myValidations = plotsUrlPrefix + 'my_validations.webp';
+    this.resultsOverview = plotsUrlPrefix + 'results_overview.webp';
+    this.resultsGraphs = plotsUrlPrefix + 'results_graphs.webp';
+    this.publishingDialog = plotsUrlPrefix + 'publishing_dialog.webp';
+    this.ismnNetworks = plotsUrlPrefix + 'networks.webp';
+    this.ismnDepths = plotsUrlPrefix + 'depths.webp';
+    this.datsetConfigurationComparison = plotsUrlPrefix + 'dataset-configuration-for-comparison.webp';
+    this.validationSelectionsComparison = plotsUrlPrefix + 'validation-selection-comparison.webp';
+    this.spatialExtentComparison = plotsUrlPrefix + 'spatial-extent-comparison.webp';
+    this.metadataWindow = plotsUrlPrefix + 'metadata_window.webp';
+    this.uploadFileWindow = plotsUrlPrefix + 'upload_file_window.webp';
+    this.selectFile = plotsUrlPrefix + 'select_file.webp';
+    this.chosenFile = plotsUrlPrefix + 'chosen_file.webp';
+    this.uploadingSpinner = plotsUrlPrefix + 'uploading_spinner.webp';
+    this.dataRow = plotsUrlPrefix + 'data_row.webp';
+    this.userDataOnTheList = plotsUrlPrefix + 'user_data_on_the_list.webp';
   }
 
   getAdminMail(): string {
