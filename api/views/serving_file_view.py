@@ -9,12 +9,13 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from validator.models import ValidationRun, DatasetConfiguration
+from validator.models import ValidationRun, DatasetConfiguration, PdfFiles
 
 import mimetypes
 from wsgiref.util import FileWrapper
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -75,7 +76,8 @@ def get_csv_with_statistics(request):
 def get_metric_names_and_associated_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    ref_dataset_name = DatasetConfiguration.objects.get(id=validation.spatial_reference_configuration_id).dataset.pretty_name
+    ref_dataset_name = DatasetConfiguration.objects.get(
+        id=validation.spatial_reference_configuration_id).dataset.pretty_name
 
     try:
         file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
@@ -101,7 +103,9 @@ def get_metric_names_and_associated_files(request):
         barplot_metric = ['status']
 
         boxplot_file = ''
-        boxplot_file_name = 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + metrics[key] + '.png'
+        boxplot_file_name = 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + \
+                                                                                                          metrics[
+                                                                                                              key] + '.png'
 
         if metrics[key] not in independent_metrics:
             overview_plots = [{'file_name': 'overview_' + name_key + '_' + metrics[key] + '.png',
@@ -120,7 +124,8 @@ def get_metric_names_and_associated_files(request):
         # for ISMN there might be also metadata plots
         boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
         if ref_dataset_name == ISMN:
-            metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_" }' + metrics[key] + '_' + metadata_name + '.png'}
+            metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_"}' +
+                                            metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
             for meta_ind, file_dict in enumerate(metadata_plots):
                 if file_dict['file_name'] in files:
@@ -197,3 +202,14 @@ def get_summary_statistics(request):
             index=False
         ))
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_pdf_file(request):
+    file_name = request.query_params.get('file_name', None)
+    file = PdfFiles.objects.all().first()
+
+    with open(file.file.path, 'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="your_filename.pdf"'
+        return response

@@ -22,7 +22,7 @@ from validator.models import Email
 from validator.models import UptimeReport
 from validator.models import UserDatasetFile
 from validator.models import DataManagementGroup
-from validator.models import UserManual
+from validator.models import PdfFiles
 User = get_user_model()
 
 admin.site.register(Settings, SystemSettingsAdmin)
@@ -37,4 +37,4 @@ admin.site.register(Email, EmailAdmin)
 admin.site.register(UptimeReport, UptimeMonitoringAdmin)
 admin.site.register(UserDatasetFile, UserDatasetFileAdmin)
 admin.site.register(DataManagementGroup, DataManagementGroupAdmin)
-admin.site.register(UserManual)
+admin.site.register(PdfFiles)
