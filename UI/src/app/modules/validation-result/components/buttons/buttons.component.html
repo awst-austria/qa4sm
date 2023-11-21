@@ -3,6 +3,7 @@
   <!--  this one will be shown on custom validation page only due to given conditions-->
   <button *ngIf="validationRun.progress > -1 && validationRun.progress < 100 && validationRun.end_time === null"
           pButton
+          title="cancel-validation"
           type="button"
           icon="faIcons.faStop"
           class="btn-action"
@@ -13,6 +14,7 @@
   </button>
   <!--  both pages -->
   <a class="btn-action"
+     title="see-results"
      pButton
      type="button"
      icon="pi pi-folder-open"
@@ -28,6 +30,7 @@
     <button *ngIf="isArchived$|async"
             pButton
             type="button"
+            title="unarchive"
             icon="pi pi-calendar"
             pTooltip="Un-archive"
             [life]="globals.tooltipLifetime"
@@ -38,6 +41,7 @@
     <button *ngIf="(isArchived$|async)===false"
             pButton
             type="button"
+            title="archive"
             icon="faIcons.faArchive"
             pTooltip="Archive"
             [life]="globals.tooltipLifetime"
@@ -49,7 +53,7 @@
   </span>
 
   <div *ngIf="!published && !tracked" class="dropdown">
-    <button class="dropdownbutton" aria-label="collapse">
+    <button class="dropdownbutton" aria-label="collapse" title="dropdown">
       <span class="pi pi-angle-double-right"></span>
     </button>
     <div class="dropdown-content" style="text-align: left">
@@ -117,10 +121,12 @@
             [queryParams]="{validation_id: validationRun.id}"
             pTooltip="Loading settings will redirect you to the validate page"
             [life]="globals.tooltipLifetime"
+            title="reload-settings"
             icon="pi pi-replay">
       </button>
     <button *ngIf="isLogged && (isTrackedByTheUser$|async)"
             pButton
+            title="unpin"
             type="button"
             icon="pi pi-times"
             class="btn-action"
@@ -130,6 +136,7 @@
     </button>
     <button *ngIf="isLogged && (isTrackedByTheUser$|async)===false"
             pButton
+            title="pin-validation"
             type="button"
             icon="pi pi-plus"
             class="btn-action"
@@ -147,12 +154,14 @@
             type="button"
             icon="pi pi-download"
             class="btn-action"
+            title="download-graphics"
             (click)="downloadResultFile(validationRun.id, 'graphics',validationRun.id + '_graphs.zip')"
             pTooltip="Download graphs .zip"
             [life]="globals.tooltipLifetime">
     </button>
     <button pButton
             type="button"
+            title="download-result"
             icon="faIcons.faFileDownload"
             class="btn-action"
             (click)="downloadResultFile(validationRun.id, 'netCDF', validationRun.output_file_name)"
@@ -162,6 +171,7 @@
     </button>
     <button *ngIf="isLogged"
             pButton
+            title="unpin"
             type="button"
             icon="pi pi-times"
             class="btn-action"

@@ -61,10 +61,7 @@ export class AuthService {
   public isAuthenticated(): Observable<boolean> {
     return this.httpClient
       .get<UserDto>(this.loginUrl).pipe(map(user => {
-        if (user != null) {
-          return true;
-        }
-        return false;
+        return user != null;
       }), catchError(error => of(false)));
   }
 

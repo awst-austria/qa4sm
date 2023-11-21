@@ -1,36 +1,33 @@
-<div class="grid">
-  <div class="col-12">
-    <div class="grid">
-      <div class="col-4">
-        <!--        this one here is to add the grid structure -->
-      </div>
-      <div class="col-2 sm:col-2">
-        <input type="file" class="file-input"
-               [accept]="allowedExtensions.join(',')"
-               (change)="onFileSelected($event)" #fileUpload>
-        <span class="label-button">{{file ? file.name : "No file chosen yet."}}</span>
-      </div>
-      <div class="col-2 sm:col-1">
-        <div class="p-fluid">
-          <button pButton
-                  label="Select file"
-                  [disabled]="authService.currentUser.space_left === 0"
-                  (click)="dialogVisible=true">
-            <!--                  (click)="fileUpload.click()">-->
-          </button>
-        </div>
-      </div>
-      <div class="col-2 sm:col-1">
-        <div class="p-fluid">
-          <button pButton
-                  [disabled]="!file || !metadataForm.valid"
-                  label="Upload file"
-                  (click)="sendForm()">
-          </button>
-        </div>
-      </div>
+<div class="flex w-12 justify-content-center align-content-center">
+<div class="flex flex-row lg:flex-nowrap flex-wrap w-5 justify-content-center align-content-center gap-3">
+  <!--    <div class="grid">-->
+  <div class="lg:w-6 w-12 flex justify-content-center align-items-center text-center">
+    <input type="file" class="file-input text-center"
+           [accept]="allowedExtensions.join(',')"
+           (change)="onFileSelected($event)" #fileUpload>
+    <span class="label-button text-center">{{file ? file.name : "No file chosen yet."}}</span>
+  </div>
+  <div class="lg:w-2 w-12">
+    <div class="p-fluid">
+      <button pButton
+              label="Select file"
+              [disabled]="authService.currentUser.space_left === 0"
+              (click)="dialogVisible=true">
+        <!--                  (click)="fileUpload.click()">-->
+      </button>
     </div>
   </div>
+  <div class="lg:w-2 w-12">
+    <div class="p-fluid">
+      <button pButton
+              [disabled]="!file || !metadataForm.valid"
+              label="Upload file"
+              (click)="sendForm()">
+      </button>
+    </div>
+    <!--      </div>-->
+  </div>
+</div>
 
 </div>
 
@@ -41,7 +38,7 @@
   </div>
   <div class="grid" style="display: flex">
 
-    <div class="center col-12 pb-0 pr-3">
+    <div class="center col-12 pb-0 pr-3 text-center">
       <div
         [ngClass]="{'form-field' : true, 'warning': isFileTooBig}"
       >
@@ -119,10 +116,12 @@
   </div>
 </p-dialog>
 
-<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible">
+<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible" class="text-center">
   <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
-  <div class="uploading-message">Do not close this tab. We are uploading your data... </div>
-  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{uploadProgress|async}} % </div>
-  <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need a few seconds to preprocess it.. </div>
+  <div class="uploading-message">Do not close this tab. We are uploading your data...</div>
+  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{uploadProgress|async}} %</div>
+  <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need
+    a few seconds to preprocess it..
+  </div>
 </p-dialog>
 

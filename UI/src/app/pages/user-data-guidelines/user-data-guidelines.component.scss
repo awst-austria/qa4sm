@@ -1,7 +1,4 @@
-main{
-  max-width: 50rem;
-}
-
+@import "../../../style.variables";
 div {
   text-align: center;
 }
@@ -25,8 +22,20 @@ table, th, td {
   padding: 0.3rem;
 }
 
+a {
+  font-weight: 600;
+}
 
-
+#help-panel {
+  padding: 2rem;
+  background-color: rgba(210, 210, 210, 0.2);
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+.code-example{
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+  color: white;
+  background: rgba(0, 0, 0, 0.7)
+}
 //.w3-round{
 //  align-content: center;
 //}

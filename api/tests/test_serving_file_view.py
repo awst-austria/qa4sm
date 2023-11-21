@@ -190,7 +190,7 @@ class TestServingFileView(TestCase):
         assert response.json()['message'] == 'No file names given'
 
         # get static graphic_files
-        files = ['/static/images/home/smos.jpg', '/static/images/logo/logo_awst.png']
+        files = ['/static/images/home/FSSCat.webp', '/static/images/logo/logo_awst.webp']
         new_url = get_graphic_files_url + '?'
         for file_name in files:
             new_url += 'file=' + file_name + '&'
@@ -201,7 +201,7 @@ class TestServingFileView(TestCase):
         assert len(response.json()) == 2
 
         # try to get only one file
-        file = '/static/images/home/smos.jpg'
+        file = '/static/images/home/FSSCat.webp'
 
         response = self.client.get(get_graphic_files_url+f'?file={file}')
         assert response.status_code == 200
@@ -226,14 +226,14 @@ class TestServingFileView(TestCase):
         assert response.json()['message'] == 'No file name given'
 
         # get static graphic_file
-        file = '/static/images/home/smos.jpg'
+        file = '/static/images/home/FSSCat.webp'
 
         response = self.client.get(get_graphic_file_url+f'?file={file}')
         assert response.status_code == 200
         assert len(response.json()) == 1
 
         # try to get many files
-        files = ['/static/images/home/smos.jpg', '/static/images/logo/logo_awst.png']
+        files = ['/static/images/home/FSSCat.webp', '/static/images/logo/logo_awst.webp']
         new_url = get_graphic_file_url + '?'
         for file_name in files:
             new_url += 'file=' + file_name + '&'
