@@ -7,12 +7,12 @@ from shutil import rmtree
 from os import path
 import uuid
 
-
 key_store = FileSystemStorage(location=DOCS_DIR)
+
 
 class UserManual(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    file = models.FileField(null=True, blank=True, storage=key_store)
+    file = models.FileField(null=True, blank=True, storage=key_store, upload_to='./user_manual')
     upload_date = models.DateTimeField()
 
 
