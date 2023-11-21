@@ -1,6 +1,6 @@
 <main>
 
-  <div *ngIf="hasNoSpaceAssigned">
+  <div *ngIf="hasNoSpaceAssigned & !maintenanceMode">
     <div class="text-center lead text-muted pt-3">
       You have no space for uploading data assigned. Please contact our team (support(at)qa4sm.eu or via our
       <a [routerLink]="['/contact-us']">contact form</a>) to solve this
@@ -8,7 +8,7 @@
     </div>
   </div>
 
-  <div *ngIf="!hasNoSpaceAssigned">
+  <div *ngIf="!hasNoSpaceAssigned && !maintenanceMode">
     <div class="center">
       <!--    <div class="col-9 text-center">-->
       <h1>Upload your data</h1>
@@ -81,6 +81,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="maintenanceMode" class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+    <h1 class="jumbotron-heading">Maintenance...</h1>
+    <p class="lead text-muted">Sorry! Currently, you can't upload new files because we're doing maintenance on
+      the service. Please come back later.</p>
   </div>
 
 
