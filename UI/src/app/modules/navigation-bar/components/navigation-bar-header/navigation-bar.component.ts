@@ -156,7 +156,7 @@ export class NavigationBarComponent implements OnInit {
     this.userMenuItem.visible = authenticated;
     this.myResultsMenuItem.visible = authenticated;
     this.compareResultsMenuItem.visible = authenticated;
-    this.datasetUploadMenuItem.visible = authenticated;
+    this.uploadDataMenuItem.visible = authenticated;
     this.setMenuItems();
   }
 

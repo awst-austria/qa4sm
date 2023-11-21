@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {UserDataFileDto} from '../../modules/user-datasets/services/user-data-file.dto';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {DataManagementGroupsDto} from '../../modules/user-datasets/services/data-management-groups.dto';
+import {SettingsService} from '../../modules/core/services/global/settings.service';
 
 @Component({
   selector: 'qa-my-datasets',
@@ -13,13 +14,15 @@ import {DataManagementGroupsDto} from '../../modules/user-datasets/services/data
 export class MyDatasetsComponent implements OnInit {
   // userDatasets = [];
   constructor(private userDatasetService: UserDatasetsService,
-              public authService: AuthService) { }
+              public authService: AuthService,
+              private settingsService: SettingsService,) { }
   userDatasets$: Observable<UserDataFileDto[]>;
   dataManagementGroups$: Observable<DataManagementGroupsDto[]>;
   readMore = false;
   hasNoSpaceLimit: boolean;
   hasNoSpaceAssigned: boolean;
   sharingWindowOpened = false;
+  maintenanceMode = false;
   // userDatasetToEdit: UserDataFileDto;
 
   pageStyle ={
@@ -27,6 +30,9 @@ export class MyDatasetsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.settingsService.getAllSettings().subscribe(setting => {
+      this.maintenanceMode = setting[0].maintenance_mode;
+    });
     this.userDatasets$ = this.userDatasetService.getUserDataList();
     this.refreshUserData();
     this.hasNoSpaceLimit = !this.authService.currentUser.space_limit_value;

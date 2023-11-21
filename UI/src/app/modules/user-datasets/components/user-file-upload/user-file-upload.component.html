@@ -1,11 +1,11 @@
 <div class="flex w-12 justify-content-center align-content-center">
 <div class="flex flex-row lg:flex-nowrap flex-wrap w-5 justify-content-center align-content-center gap-3">
   <!--    <div class="grid">-->
-  <div class="lg:w-6 w-12 justify-content-center text-center">
-    <input type="file" class="file-input"
+  <div class="lg:w-6 w-12 flex justify-content-center align-items-center text-center">
+    <input type="file" class="file-input text-center"
            [accept]="allowedExtensions.join(',')"
            (change)="onFileSelected($event)" #fileUpload>
-    <span class="label-button">{{file ? file.name : "No file chosen yet."}}</span>
+    <span class="label-button text-center">{{file ? file.name : "No file chosen yet."}}</span>
   </div>
   <div class="lg:w-2 w-12">
     <div class="p-fluid">
@@ -38,7 +38,7 @@
   </div>
   <div class="grid" style="display: flex">
 
-    <div class="center col-12 pb-0 pr-3">
+    <div class="center col-12 pb-0 pr-3 text-center">
       <div
         [ngClass]="{'form-field' : true, 'warning': isFileTooBig}"
       >
@@ -116,7 +116,7 @@
   </div>
 </p-dialog>
 
-<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible">
+<p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible" class="text-center">
   <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
   <div class="uploading-message">Do not close this tab. We are uploading your data...</div>
   <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{uploadProgress|async}} %</div>
