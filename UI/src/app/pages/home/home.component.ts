@@ -63,7 +63,7 @@ export class HomeComponent implements OnInit {
   userLoggedIn: boolean;
 
   animationFadeInDownClass = ['fadeindown', 'animation-duration-1000', 'animation-iteration-1']
-  animationFadeInClass = ['fadein', 'animation-duration-3000', 'animation-iteration-1']
+  animationFadeInClass = ['fadein', 'animation-duration-5000', 'animation-iteration-1']
   animationFadeInLeftClass = ['fadeinleft', 'animation-duration-1000', 'animation-iteration-1']
   animationFadeInRightClass = ['fadeinright', 'animation-duration-1000', 'animation-iteration-1']
 
@@ -83,7 +83,7 @@ export class HomeComponent implements OnInit {
   }
 
   opinionSectionClass = {
-    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center mb-2 fadeInOut',
+    main: 'app-news flex flex-column flex-wrap justify-content-center align-items-center mb-2 fadeIn',
     header: 'lg:text-5xl md:text-4xl sm:text-3xl text-2xl mb-2 line-height-2 text-center',
     div: 'line-height-2 lg:text-2xl md:text-xl sm:text-lg text-base py-1 text-center'
   }
