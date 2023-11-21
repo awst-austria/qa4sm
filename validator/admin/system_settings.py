@@ -15,7 +15,7 @@ class SystemSettingsAdmin(ModelAdmin):
 
     __logger = logging.getLogger(__name__)
 
-    fields = ['maintenance_mode', 'news', 'sum_link', 'feed_link']
+    fields = ['maintenance_mode', 'news', 'feed_link']
 
     def __init__(self, model, admin_site):
         super(SystemSettingsAdmin, self).__init__(model, admin_site)
