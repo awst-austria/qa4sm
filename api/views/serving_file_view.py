@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from validator.models import ValidationRun, DatasetConfiguration, PdfFiles
+from validator.models import ValidationRun, DatasetConfiguration, UserManual
 
 import mimetypes
 from wsgiref.util import FileWrapper
@@ -205,9 +205,8 @@ def get_summary_statistics(request):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_pdf_file(request):
-    file_id = request.query_params.get('file_id', None)
-    file = get_object_or_404(PdfFiles, id=file_id)
+def get_user_manual(request):
+    file = get_object_or_404(UserManual, id=1)
 
     with open(file.file.path, 'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')

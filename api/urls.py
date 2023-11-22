@@ -124,7 +124,7 @@ urlpatterns = [
          name='Add data to management groups'),
     path('delete-only-datafile/<str:file_uuid>/', delete_dataset_file_only, name='Delete User Data File Only'),
     path('delete-multiple-validations', delete_multiple_result, name='Delete Multiple Validations'),
-    path('get-pdf-file', get_pdf_file, name='Get PDF file'),
+    path('user-manual', get_user_manual, name='Get user manual'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
