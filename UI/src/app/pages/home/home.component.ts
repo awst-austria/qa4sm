@@ -63,7 +63,7 @@ export class HomeComponent implements OnInit {
   userLoggedIn: boolean;
 
   animationFadeInDownClass = ['fadeindown', 'animation-duration-1000', 'animation-iteration-1']
-  animationFadeInClass = ['fadein', 'animation-duration-5000', 'animation-iteration-1']
+  animationFadeInClass = ['fadein', 'animation-duration-3000', 'animation-iteration-1']
   animationFadeInLeftClass = ['fadeinleft', 'animation-duration-1000', 'animation-iteration-1']
   animationFadeInRightClass = ['fadeinright', 'animation-duration-1000', 'animation-iteration-1']
 
