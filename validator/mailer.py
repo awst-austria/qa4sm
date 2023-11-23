@@ -56,7 +56,7 @@ def send_val_done_notification(val_run):
 
     subject = '[QA4SM] Validation finished'
     body = 'Dear {} {},\n\nyour validation of {} with  {} ({})  data ' \
-           'as spatial reference and  {} ({}) data  as temporal referencehas been ' \
+           'as spatial reference and  {} ({}) data  as temporal reference has been ' \
            'completed.\nThe results are available at: {}.\nYou have until {} to inspect your validation - ' \
            'then it will be automatically removed (unless archived).\n\nBest regards,\nQA4SM team'.format(
         val_run.user.first_name,

@@ -37,8 +37,10 @@ class SBPCAReader(GriddedNcOrthoMultiTs):
                         'Science_Flags']:
                 if col in ts.columns:
                     ts[col] = ts[col].fillna(0)
-            ts = ts.dropna(subset='Soil_Moisture')
-            ts = ts.dropna(subset='acquisition_time')
+            if 'Soil_Moisture' in ts.columns:
+                ts = ts.dropna(subset='Soil_Moisture')
+            if 'acquisition_time' in ts.columns:
+                ts = ts.dropna(subset='acquisition_time')
         return ts
 
 def create_reader(dataset, version) -> GriddedNcTs:
