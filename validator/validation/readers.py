@@ -38,6 +38,7 @@ class SBPCAReader(GriddedNcOrthoMultiTs):
                 if col in ts.columns:
                     ts[col] = ts[col].fillna(0)
             ts = ts.dropna(subset='Soil_Moisture')
+            ts = ts.dropna(subset='acquisition_time')
         return ts
 
 def create_reader(dataset, version) -> GriddedNcTs:
@@ -112,8 +113,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_SBPCA:
-        reader = SBPCAReader(folder_name, ioclass_kws={'read_bulk': True},
-                             timevarname='acquisition_time')
+        reader = SBPCAReader(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.user and len(dataset.user_dataset.all()):
         file = UserDatasetFile.objects.get(dataset=dataset)
@@ -146,6 +146,15 @@ def adapt_timestamp(reader, dataset, version):
             'base_time_field': 'Days',
             'base_time_units': 'ns',
             'base_time_reference': '2000-01-01',
+        }
+
+    elif dataset.short_name == globals.SMOS_SBPCA:
+        tadapt_kwargs = {
+            'base_time_field': 'acquisition_time',
+            'base_time_reference': '2000-01-01T00:00:00',
+            'base_time_units': 's',
+            'time_offset_fields': None,
+            'time_units': None,
         }
 
     elif dataset.short_name == globals.SMOS_IC:
