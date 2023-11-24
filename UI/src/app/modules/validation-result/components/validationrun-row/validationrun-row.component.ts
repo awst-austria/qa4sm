@@ -95,7 +95,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     } else if (valrun.progress === 100 && valrun.end_time) {
       status = 'Done';
     }
-    else if (valrun.progress === -1) {
+    else if (valrun.progress === -1 || valrun.progress === -100) {
       status = 'Cancelled';
     } else if (valrun.end_time != null || valrun.total_points == 0) {
       status = 'ERROR';
@@ -131,7 +131,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   refreshStatus(): void{
     if (
-      (this.validationRun.progress !== -1) &&
+      (this.validationRun.progress !== -1 && this.validationRun.progress !== -100) &&
       !(this.validationRun.progress === 100 &&
         this.validationRun.end_time !== null) &&
       !(this.validationRun.progress === 0 &&

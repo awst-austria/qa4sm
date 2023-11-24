@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         aborted_validations=ValidationRun.objects.filter(progress__range=(0, 99))
         for val in aborted_validations:
-            val.progress=-1
+            val.progress=-100
             val.end_time=datetime.now(tzlocal())
             val.save()
 
