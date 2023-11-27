@@ -58,7 +58,7 @@ export class DatasetComponent implements OnInit {
         this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
           return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
         }));
-      } else if(configs.filter(config => config.datasetModel.selectedDataset.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user){
+      } else if(configs.filter(config => config.datasetModel.selectedDataset?.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user){
         this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
           return this.sortById(datasets.filter(dataset => !dataset.user));
         }));
