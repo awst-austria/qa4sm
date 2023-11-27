@@ -1,3 +1,12 @@
+QA4SM v2.4.5 - Release notes 2023-11-27
+=======================================================
+# Bug fixing
+1. Fixed differences in exact time stamp of the SBPCA data
+2. Reloading data fixed
+
+# Updates
+1. Aborting running validations on server outage added
+
 QA4SM v2.4.4.1 - Release notes 2023-11-13
 =======================================================
 # Updates
