@@ -8,5 +8,6 @@ from .user_data_file import *
 from .dataset_custom import *
 from .dataset_version_custom import *
 from .dataset_variable_custom import *
+from .celery_tasks import *
 # anything that is then registered in .general.py must go before!
 from .general import *

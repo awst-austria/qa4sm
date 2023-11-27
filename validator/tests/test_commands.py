@@ -67,7 +67,7 @@ class TestCommands(TestCase):
         test_val = ValidationRun.objects.get(id=run_id)
         assert test_val
         assert test_val.end_time
-        assert test_val.progress == -1
+        assert test_val.progress == -100
 
     def test_autocleanupvalidations(self):
 
