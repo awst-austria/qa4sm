@@ -14,15 +14,18 @@
     <h5 class="my-0">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
-          <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1"
+          <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1  && validationRun.progress !== -100"
                 class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"
                 pTooltip="This validation will SOON be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone}} {{timeZone}}."></span>
-          <span *ngIf="!validationRun.is_near_expiry && validationRun.progress !== -1"
+          <span *ngIf="!validationRun.is_near_expiry && validationRun.progress !== -1 && validationRun.progress !== -100"
                 class="p-panel-header-icon pi pi-calendar expiry-icons"
                 pTooltip="This validation will be automatically removed during cleanup on {{ validationRun.expiry_date|date: dateFormat :timeZone }} {{timeZone}}.">
           </span>
           <span *ngIf="validationRun.progress === -1" class="p-panel-header-icon pi pi-ban expiry-icons"
                 pTooltip="This validation was cancelled.">
+          </span>
+          <span *ngIf="validationRun.progress === -100" class="p-panel-header-icon pi pi-ban expiry-icons"
+                        pTooltip="This validation was cancelled due to service outage. You can easily restart it using 'Load settings' button.">
           </span>
       </span>
       <!--      if there is no expiry date property: -->
