@@ -12,6 +12,7 @@ from validator.admin import DatasetVersionAdmin
 from validator.admin import DatasetVariableAdmin
 from validator.admin.data_management_groups import DataManagementGroupAdmin
 from validator.admin.user_manual_admin import UserManualAdmin
+from validator.admin.celery_tasks import CeleryTasksAdmin
 from validator.models import DataFilter
 from validator.models import DataVariable
 from validator.models import Dataset
@@ -24,6 +25,7 @@ from validator.models import UptimeReport
 from validator.models import UserDatasetFile
 from validator.models import DataManagementGroup
 from validator.models import UserManual
+from validator.models import CeleryTask
 User = get_user_model()
 
 admin.site.register(Settings, SystemSettingsAdmin)
@@ -39,3 +41,4 @@ admin.site.register(UptimeReport, UptimeMonitoringAdmin)
 admin.site.register(UserDatasetFile, UserDatasetFileAdmin)
 admin.site.register(DataManagementGroup, DataManagementGroupAdmin)
 admin.site.register(UserManual, UserManualAdmin)
+admin.site.register(CeleryTask, CeleryTasksAdmin)
