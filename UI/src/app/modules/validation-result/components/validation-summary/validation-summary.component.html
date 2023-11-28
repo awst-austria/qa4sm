@@ -180,8 +180,9 @@
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 
-        <li *ngIf="validationRun.progress === -1; else elseProgress">The validation was cancelled.</li>
-        <ng-template #elseProgress>
+        <li *ngIf="validationRun.progress === -1">The validation was cancelled.</li>
+        <li *ngIf="validationRun.progress === -100">This validation was cancelled due to service outage. You can easily restart it using 'Load settings' button.</li>
+        <ng-template *ngIf="validationRun.progress === -1 && validationRun.progress === -100">
           <li *ngIf="!forComparison && validationRun.total_points !== 0" [ngClass]="{'alert-danger': errorRate > 0}">
             for {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
             of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
