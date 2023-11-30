@@ -4,7 +4,7 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {environment} from '../../../../environments/environment';
 import {UserDataFileDto} from './user-data-file.dto';
 import {DataManagementGroupsDto} from './data-management-groups.dto';
-
+import {saveAs} from 'file-saver-es';
 
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
@@ -15,6 +15,7 @@ const updateMetadataUrl: string = urlPrefix + '/update-metadata';
 const userDataFileUrl: string = urlPrefix + '/get-user-file-by-id';
 const dataManagementGroupsUrl: string = urlPrefix + '/data-management-groups';
 const manageDataInGroupUrl: string = urlPrefix + '/manage-data-in-management-group';
+const getISMNListUrl: string = urlPrefix + '/get-ismn-list-file';
 
 
 const csrfToken = '{{csrf_token}}';
@@ -96,4 +97,9 @@ export class UserDatasetsService {
 
     return `${Math.round(properSize * 10) / 10} ${units}`;
   }
+
+  getISMNList(): void{
+    saveAs(getISMNListUrl);
+  }
+
 }

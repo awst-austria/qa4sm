@@ -29,9 +29,19 @@
           </button>
         </div>
       </div>
+      <div class="col-3 sm:col-1">
+        <div class="p-fluid">
+          <button
+            id="ismnList"
+            pTooltip="Click here to download list of ISMN stations available for validation. (*) this list is only intended for registered qa4sm users and must not be redistributed outside."
+            pButton
+            label="Get ISMN station coordinates"
+            (click)="getISMNList()">
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-
 </div>
 
 <p-dialog id="user-data-form" header="Upload your own data" [(visible)]="dialogVisible">
@@ -121,8 +131,10 @@
 
 <p-dialog id="uploading-data-spinner" [modal]="true" [showHeader]="false" [(visible)]="spinnerVisible">
   <span class="pi pi-spinner loading-spinner" title="We are uploading your data..."></span>
-  <div class="uploading-message">Do not close this tab. We are uploading your data... </div>
-  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{uploadProgress|async}} % </div>
-  <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need a few seconds to preprocess it.. </div>
+  <div class="uploading-message">Do not close this tab. We are uploading your data...</div>
+  <div *ngIf="(uploadProgress|async) < 100" class="uploading-message pt-3">Progress {{uploadProgress|async}} %</div>
+  <div *ngIf="(uploadProgress|async) === 100" class="uploading-message pt-3">Your file has been uploaded. We still need
+    a few seconds to preprocess it..
+  </div>
 </p-dialog>
 
