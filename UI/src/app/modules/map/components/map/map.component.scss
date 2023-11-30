@@ -3,3 +3,33 @@
 .ol-attribution {
   left: 100px;
 }
+.ol-tooltip {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+::ng-deep .ol-tooltip table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 2px solid #555;
+  margin-bottom: 10px; /* Margin between tables */
+}
+
+::ng-deep .ol-tooltip td, ::ng-deep .ol-tooltip th {
+  border: 1px solid #ddd;
+  padding: 4px;
+}
+
+::ng-deep .ol-tooltip th {
+  background-color: #f2f2f2;
+}
+
+/* Add this to ensure the last table doesn't have a margin at the bottom */
+::ng-deep .ol-tooltip table:last-child {
+  margin-bottom: 0;
+}

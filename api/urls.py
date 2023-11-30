@@ -5,6 +5,7 @@ from api.views.data_filter_view import data_filter, data_parameterised_filter, d
 # data_parameterised_filter_by_config
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
+from api.views.dataset_version_geojson import dataset_version_geojson_by_id
 from api.views.dataset_version_view import dataset_version, dataset_version_by_id, dataset_version_by_dataset
 from api.views.dataset_view import dataset, dataset_by_id
 from api.views.ismn_network_view import get_ismn_networks
@@ -118,6 +119,8 @@ urlpatterns = [
          name='Get user file by ID'),
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
     path('scaling-methods', get_scaling_methods, name='Scaling methods'),
+    path('support-request', send_support_request, name='Support request'),
+    re_path(r'^dataset-version-geojson/(?P<version_id>.+)/$', dataset_version_geojson_by_id),
     path('support-request', send_support_request, name='Support request'),
     path('data-management-groups', get_data_management_groups, name='Get data management groups'),
     path('manage-data-in-management-group', manage_data_in_group,

@@ -60,23 +60,24 @@
                                        [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
                   </qa-threshold-filter>
 
-                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
-                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
-                  </qa-threshold-filter>
-                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
-                    <qa-ismn-network-filter
-
-                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
-                  </div>
-                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
-                    <qa-ismn-depth-filter
-                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
-                    </qa-ismn-depth-filter>
-                  </div>
+              <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
+                                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                   [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
+                                   [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
+              </qa-threshold-filter>
+              <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
+                <qa-ismn-network-filter
+                  (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"
+                  [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
+              </div>
+              <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
+                <qa-ismn-depth-filter
+                  (depthSelectionChanged)="onIsmnNetworkSelectionChange($event)"
+                  [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
+                </qa-ismn-depth-filter>
+              </div>
 
                   <div style="width: 100%;text-align: right">
                     <button pButton type="button"
@@ -135,22 +136,22 @@
               (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
           </div>
 
-              <!--             temporal reference-->
-              <div>
-                <label for="temporal-reference"
-                       class="mb-4"
-                       pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
-                       tooltipPosition="bottom">
-                  <span class="pi pi-question-circle"></span>
-                  Temporal reference
-                </label>
-                <qa-validation-reference
-                  id="temporal-reference"
-                  #temporalReference
-                  [validationModel]="validationModel"
-                  [referenceType]="'temporalReference$'"
-                  (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
-              </div>
+          <!--             temporal reference-->
+          <div>
+            <label for="temporal-reference"
+                   class="mb-4"
+                   pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
+                   tooltipPosition="bottom">
+              <span class="pi pi-question-circle"></span>
+              Temporal reference
+            </label>
+            <qa-validation-reference
+              id="temporal-reference"
+              #temporalReference
+              [validationModel]="validationModel"
+              [referenceType]="'temporalReference$'"
+              (hoverOverDataset)="onHoverOverReferenceDataset($event)"></qa-validation-reference>
+          </div>
 
 
             </p-panel>
