@@ -15,10 +15,6 @@ class Command(BaseCommand):
            "doesn't exist yet."
 
     def add_arguments(self, parser):
-        parser.add_argument("target_path", type=str,
-                            help='Directory where the ISMN sensor location '
-                                 'list will be stored in (existing file will '
-                                 'be overwritten).', )
         parser.add_argument('-s', '--short_name', type=str,
                             help='Optional. Short Name of the ISMN version '
                                  'to base the list on. If not specified, '
