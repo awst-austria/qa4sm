@@ -23,14 +23,17 @@ class Command(BaseCommand):
                                  'we use the latest version (based on the ID '
                                  'in the fixtures).', )
 
-    def _get_path_latest_ismn_version(self):
+    def _get_path_ismn_version(self, version_short_name=None):
         for dataset in Dataset.objects.all():
             if dataset.short_name == "ISMN":
-                latest_version = [v for v in dataset.versions.all()][-1]
-                return dataset, latest_version
+                if version_short_name is None:
+                    version = [v for v in dataset.versions.all()][-1]
+                else:
+                    version = dataset.versions.get(short_name=version_short_name)
+                return dataset, version
 
     def handle(self, *args, **options):
-        dataset, version = self._get_path_latest_ismn_version()
+        dataset, version = self._get_path_ismn_version(options['short_name'])
 
         target_path = options['target_path']
 

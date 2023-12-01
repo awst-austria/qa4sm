@@ -7,6 +7,7 @@ import logging
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import pandas as pd
+import os
 
 from dateutil.tz.tz import tzlocal
 from django.conf import settings
@@ -269,6 +270,9 @@ class TestCommands(TestCase):
         with TemporaryDirectory() as out_path:
             call_command('generateismnlist', out_path)
             df = pd.read_csv(out_path + '/ismn_station_list.csv')
-            assert df.index.size > 0
-            assert df.columns.size > 0
+            assert not df.empty
+            os.remove(out_path + '/ismn_station_list.csv')
+            call_command('generateismnlist', out_path, '-s', 'ISMN_V20191211')
+            df = pd.read_csv(out_path + '/ismn_station_list.csv')
+            assert not df.empty
 
