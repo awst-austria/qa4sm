@@ -37,7 +37,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dataset, version = self._get_path_ismn_version(options['short_name'])
 
-        target_path = options['target_path']
+        target_path = Dataset.objects.get(short_name='ISMN').storage_path
+        # target_path = options['target_path']
 
         print(f"Create user ISMN station list: \n "
               f"From data: {dataset.storage_path}/{version.short_name} \n "
