@@ -18,6 +18,7 @@ from django.utils import timezone
 from validator.models import Dataset
 from validator.models import ValidationRun
 from validator.tests.testutils import set_dataset_paths
+from validator.validation import ISMN_LIST_FILE_NAME
 
 from django.contrib.auth import get_user_model
 
@@ -26,7 +27,6 @@ User = get_user_model()
 
 # See https://stackoverflow.com/a/6513372/
 class TestCommands(TestCase):
-
     fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
     __logger = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class TestCommands(TestCase):
             'email': 'noreply@awst.at',
             'first_name': 'Chuck',
             'last_name': 'Norris',
-            }
+        }
 
         try:
             self.testuser = User.objects.get(username=user_data['username'])
@@ -88,7 +88,8 @@ class TestCommands(TestCase):
         ## 20% of warning period has passed
         run2 = ValidationRun()
         run2.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        run2.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.8)
+        run2.end_time = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.8)
         run2.user = self.testuser
         run2.save()
         runid2 = run2.id
@@ -96,7 +97,8 @@ class TestCommands(TestCase):
         ## 80% of warning period has passed
         run3 = ValidationRun()
         run3.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        run3.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.2)
+        run3.end_time = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.2)
         run3.user = self.testuser
         run3.save()
         runid3 = run3.id
@@ -165,8 +167,8 @@ class TestCommands(TestCase):
         assert run3.expiry_notified
         assert run4.expiry_notified
         assert run5.expiry_notified
-        assert len(non_user_val) == 0 # there should be no validation anymore, because it was already removed
-        assert not no_user_run_published.expiry_notified # no notification sent
+        assert len(non_user_val) == 0  # there should be no validation anymore, because it was already removed
+        assert not no_user_run_published.expiry_notified  # no notification sent
 
         ## the validations may have been extended in the previous step, undo that to get them really deleted in the next call
         run1.last_extended = None
@@ -199,7 +201,6 @@ class TestCommands(TestCase):
                 num_changed += 1
                 self.__logger.debug('setting empty path for: ' + dataset.short_name)
 
-
         ## instruct the command to change only the empty paths, give no default path, and set a new path every time
         user_input = [
             'u',
@@ -208,7 +209,7 @@ class TestCommands(TestCase):
         user_input.extend([new_test_path] * num_changed)
         args = []
         opts = {}
-        with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
+        with patch('builtins.input', side_effect=user_input):  ## this mocks user input for the command
             # run the command
             call_command('setdatasetpaths', *args, **opts)
 
@@ -220,7 +221,6 @@ class TestCommands(TestCase):
             else:
                 assert new_test_path not in dataset.storage_path
 
-
         ## second round of testing!
 
         ## instruct the command to change all paths, give a default path, and accept the suggestion every time
@@ -231,7 +231,7 @@ class TestCommands(TestCase):
         user_input.extend([''] * Dataset.objects.count())
         args = []
         opts = {}
-        with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
+        with patch('builtins.input', side_effect=user_input):  ## this mocks user input for the command
             # run the command
             call_command('setdatasetpaths', *args, **opts)
 
@@ -239,7 +239,6 @@ class TestCommands(TestCase):
         for counter, dataset in enumerate(Dataset.objects.all().order_by('id')):
             self.__logger.debug('checking path second time for ' + dataset.short_name)
             assert new_test_path2 in dataset.storage_path
-
 
         ## third round of testing!
 
@@ -251,7 +250,7 @@ class TestCommands(TestCase):
         user_input.extend([''] * Dataset.objects.count())
         args = []
         opts = {}
-        with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
+        with patch('builtins.input', side_effect=user_input):  ## this mocks user input for the command
             # run the command
             call_command('setdatasetpaths', *args, **opts)
 
@@ -261,17 +260,19 @@ class TestCommands(TestCase):
             assert new_test_path2 in dataset.storage_path
             assert dataset.short_name in dataset.storage_path
 
-
-        with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
+        with patch('builtins.input', side_effect=user_input):  ## this mocks user input for the command
             # run the command to list the paths
             call_command('getdatasetpaths', *args, **opts)
 
     def test_generateismnlist(self):
-        with TemporaryDirectory() as out_path:
-            call_command('generateismnlist', out_path)
-            df = pd.read_csv(out_path + '/ismn_station_list.csv')
-            assert not df.empty
-            os.remove(out_path + '/ismn_station_list.csv')
-            call_command('generateismnlist', out_path, '-s', 'ISMN_V20191211')
-            df = pd.read_csv(out_path + '/ismn_station_list.csv')
-            assert not df.empty
+        args = []
+        opts = {}
+        call_command('generateismnlist', *args, **opts)
+        out_path = os.path.join(Dataset.objects.get(short_name='ISMN').storage_path, ISMN_LIST_FILE_NAME)
+        df = pd.read_csv(out_path)
+        assert not df.empty
+        os.remove(out_path)
+        call_command('generateismnlist', *args, '-s', 'ISMN_V20191211')
+        df = pd.read_csv(out_path)
+        assert not df.empty
+
