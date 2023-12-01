@@ -265,7 +265,6 @@ class TestCommands(TestCase):
             call_command('getdatasetpaths', *args, **opts)
 
     def test_generateismnlist(self):
-        # with TemporaryDirectory() as out_path:
         args = []
         opts = {}
         call_command('generateismnlist', *args, **opts)
@@ -276,3 +275,4 @@ class TestCommands(TestCase):
         call_command('generateismnlist', *args, '-s', 'ISMN_V20191211')
         df = pd.read_csv(out_path)
         assert not df.empty
+
