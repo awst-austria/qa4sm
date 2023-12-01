@@ -4,7 +4,10 @@ Test our custom django commands
 
 from datetime import datetime, timedelta
 import logging
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
+import pandas as pd
+import os
 
 from dateutil.tz.tz import tzlocal
 from django.conf import settings
@@ -17,6 +20,7 @@ from validator.models import ValidationRun
 from validator.tests.testutils import set_dataset_paths
 
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 
@@ -182,8 +186,6 @@ class TestCommands(TestCase):
         ended_vals3 = ValidationRun.objects.filter(end_time__isnull=False).count()
         assert ended_vals + 4 == ended_vals3
 
-
-
     def test_setdatasetpaths(self):
         new_test_path = 'new_test_path/'
         new_test_path2 = 'another_test_path/'
@@ -263,3 +265,13 @@ class TestCommands(TestCase):
         with patch('builtins.input', side_effect=user_input): ## this mocks user input for the command
             # run the command to list the paths
             call_command('getdatasetpaths', *args, **opts)
+
+    def test_generateismnlist(self):
+        with TemporaryDirectory() as out_path:
+            call_command('generateismnlist', out_path)
+            df = pd.read_csv(out_path + '/ismn_station_list.csv')
+            assert not df.empty
+            os.remove(out_path + '/ismn_station_list.csv')
+            call_command('generateismnlist', out_path, '-s', 'ISMN_V20191211')
+            df = pd.read_csv(out_path + '/ismn_station_list.csv')
+            assert not df.empty
