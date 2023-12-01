@@ -3,6 +3,8 @@ import os
 
 from validator.models import DatasetVersion, Dataset
 from ismn.interface import ISMN_Interface
+
+from validator.validation import ISMN_LIST_FILE_NAME
 from validator.validation.readers import create_reader
 
 
@@ -69,6 +71,6 @@ class Command(BaseCommand):
         df.columns = new_names
         df.index.name = 'index'
 
-        fname = os.path.join(target_path, "ismn_station_list.csv")
+        fname = os.path.join(target_path, ISMN_LIST_FILE_NAME)
 
         df.to_csv(fname, index=False)

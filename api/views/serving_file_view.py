@@ -15,7 +15,7 @@ from validator.models import ValidationRun, DatasetConfiguration, Dataset
 import mimetypes
 from wsgiref.util import FileWrapper
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
-from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
+from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
 
 
 @api_view(['GET'])
@@ -208,7 +208,7 @@ def get_summary_statistics(request):
 @permission_classes([IsAuthenticated])
 def get_ismn_list_file(request):
     ismn_ds = get_object_or_404(Dataset, short_name='ISMN')
-    file_path = f'{ismn_ds.storage_path}/ismn_v202301_station_list.csv'
+    file_path = f'{ismn_ds.storage_path}/{ISMN_LIST_FILE_NAME}'
 
     if os.path.exists(file_path):
         with open(file_path, 'rb') as file:
