@@ -1,4 +1,5 @@
 import base64
+import csv
 import os
 from collections import OrderedDict
 
@@ -8,13 +9,14 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from validator.models import ValidationRun, DatasetConfiguration, UserManual
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from validator.models import ValidationRun, DatasetConfiguration, Dataset, UserManual
 
 import mimetypes
 from wsgiref.util import FileWrapper
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
-from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
+from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
+
 
 
 @api_view(['GET'])
@@ -212,3 +214,17 @@ def get_user_manual(request):
         response = HttpResponse(pdf.read(), content_type='application/pdf')
         response['Content-Disposition'] = 'filename="your_filename.pdf"'
         return response
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_ismn_list_file(request):
+    ismn_ds = get_object_or_404(Dataset, short_name='ISMN')
+    file_path = f'{ismn_ds.storage_path}/{ISMN_LIST_FILE_NAME}'
+
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="data.csv"'
+            return response
+    else:
+        return HttpResponse("File not found", status=404)
