@@ -7,28 +7,29 @@
            (change)="onFileSelected($event)" #fileUpload>
     <span class="label-button text-center">{{file ? file.name : "No file chosen yet."}}</span>
   </div>
-  <div class="lg:w-2 w-12">
-    <div class="p-fluid">
-      <button pButton
-              label="Select file"
-              [disabled]="authService.currentUser.space_left === 0"
-              (click)="dialogVisible=true">
-        <!--                  (click)="fileUpload.click()">-->
-      </button>
-    </div>
-  </div>
-  <div class="lg:w-2 w-12">
-    <div class="p-fluid">
-      <button pButton
-              [disabled]="!file || !metadataForm.valid"
-              label="Upload file"
-              (click)="sendForm()">
-      </button>
-    </div>
-    <!--      </div>-->
-  </div>
-    <div class="lg:w-2 w-12">
-    <div class="p-fluid">
+  <div class="lg:w-6 w-12 flex flex-column row-gap-1 justify-content-center align-items-center text-center">
+    <div class="flex flex-row w-12 column-gap-1">
+      <div class="lg:w-6 w-12">
+        <div class="p-fluid">
+          <button pButton
+                  label="Select file"
+                  [disabled]="authService.currentUser.space_left === 0"
+                  (click)="dialogVisible=true">
+            <!--                  (click)="fileUpload.click()">-->
+          </button>
+        </div>
+      </div>
+      <div class="lg:w-6 w-12">
+        <div class="p-fluid">
+          <button pButton
+                  [disabled]="!file || !metadataForm.valid"
+                  label="Upload file"
+                  (click)="sendForm()">
+          </button>
+        </div>
+              </div>
+      </div>
+    <div class="flex flex-row w-12">
           <button
             id="ismnList"
             pTooltip="Click here to download list of ISMN stations available for validation. (*) this list is only intended for registered qa4sm users and must not be redistributed outside."
@@ -37,7 +38,6 @@
             (click)="getISMNList()">
           </button>
     </div>
-    <!--      </div>-->
   </div>
 </div>
 
