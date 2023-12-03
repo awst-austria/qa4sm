@@ -1790,6 +1790,12 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   font-size: 1.25rem;
 }
 
+#ismnList.p-button {
+  width: 100%;
+  background: orange;
+  border-color: orange;
+}
+
 .p-button:enabled:hover {
   background: $button-hover-color;
   color: #ffffff;
