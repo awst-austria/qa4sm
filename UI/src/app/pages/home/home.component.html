@@ -182,19 +182,6 @@
             </a>
           </div>
         </div>
-        <!--        CESBIO -->
-        <div [ngClass]="applicationTeamClass.partner">
-          <div [ngClass]="applicationTeamClass.partnerDesc">
-            Within the <b>FRM4SM</b> project, <b>QA4SM</b> has been scientifically developed in cooperation with
-            <a href="https://www.cesbio.cnrs.fr/homepage/">CESBIO</a>
-          </div>
-          <div [ngClass]="applicationTeamClass.partnerLogo">
-            <a href="https://www.cesbio.cnrs.fr/homepage/" target="_blank" class="text-center">
-              <p-image width="150" height="90" alt="CESBIO logo" [src]="logoFiles[4].plot"></p-image>
-            </a>
-          </div>
-        </div>
-
 
         <div class="horizontal-line my-2"></div>
         <!--        TU -->
@@ -210,7 +197,7 @@
             Research Group Climate and Environmental Remote Sensing (CLIMERS)<br>
             <b>Website: </b> <a href="https://www.tuwien.at/en/mg/geo/climers" target="_blank">
             CLIMERS</a><br>
-            <b>Contact:</b> Wouter Dorigo (wouter.dorigo (at) tuwien.ac.at)<br>
+            <b>Contact:</b> Alexander Gruber (alexander.gruber (at) geo.tuwien.ac.at)<br>
             <b>Tasks:</b> Scientific lead and research, dataset support
           </div>
         </div>
@@ -228,6 +215,19 @@
             <b>Website:</b> <a href="https://www.awst.at" target="_blank"> AWST</a><br>
             <b>Contact: </b> Alexander Boresch (boresch (at) awst.at)<br>
             <b>Tasks: </b> Project management, technical lead, webservice development and operations
+          </div>
+        </div>
+
+        <!--        CESBIO -->
+        <div [ngClass]="applicationTeamClass.team">
+          <div [ngClass]="applicationTeamClass.teamLogo">
+            <a href="https://www.cesbio.cnrs.fr/homepage/" target="_blank">
+              <p-image width="165" height="90" alt="CESBIO logo" [src]="logoFiles[4].plot"></p-image>
+            </a>
+          </div>
+          <div [ngClass]="applicationTeamClass.teamDesc">
+            Within the <b>FRM4SM</b> project, <b>QA4SM</b> has been scientifically developed in cooperation with
+            <a href="https://www.cesbio.cnrs.fr/homepage/">CESBIO</a>
           </div>
         </div>
       </div>
@@ -255,11 +255,4 @@
 
 
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
-  <div class="background-link lg:text-base md:text-sm text-xs">
-    <a href="https://www.esa.int/ESA_Multimedia/Images/2017/11/FSSCat"
-       target="_blank">
-      Image: ESA
-    </a>
-  </div>
-
 </div>
