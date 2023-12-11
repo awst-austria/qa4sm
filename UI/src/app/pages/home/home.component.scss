@@ -10,7 +10,7 @@ $home-page-link-color: #CF8400;
 
 div#background {
   display: block;
-  background: url("../../../../../validator/static/images/home/background.jpg") center center;
+  background: url("../../../../../validator/static/images/home/background.webp") center center;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -29,7 +29,7 @@ div#wrapper {
 
 div#landing {
   height: 100vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.35)) center center;
+  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.25)) center center;
   background-size: cover;
   display: flex;
   flex-direction: column;
@@ -47,7 +47,7 @@ div#title-box {
 
 .page-title {
   text-align: center;
-  text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, .5);
+  text-shadow: .1rem .1rem .1rem rgba(0, 0, 0, .45);
   z-index: 1;
   line-height: 1.1;
 }
@@ -80,7 +80,7 @@ div#about-app {
   flex-direction: column;
   align-items: center; /* Center horizontally */
   background-size: cover;
-  background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55));
+  background: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.45));
   transition: filter .5s ease, opacity 1s ease;
 }
 
