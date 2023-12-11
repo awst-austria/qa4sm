@@ -1,13 +1,12 @@
-<div class="flex w-12 justify-content-center align-content-center">
-  <div class="flex flex-row lg:flex-nowrap flex-wrap w-5 justify-content-center align-content-center gap-3 w-12">
-    <!--    <div class="grid">-->
-    <div class="lg:w-3 md:w-4 w-10 flex justify-content-center align-items-center text-center">
+<div class="flex flex-column w-12 justify-content-center align-content-center gap-4">
+  <div class="flex flex-row lg:flex-nowrap flex-wrap justify-content-center align-content-center gap-3 w-12">
+    <div class="lg:w-2 md:w-4 w-10 flex justify-content-center align-items-center text-center">
       <input type="file" class="file-input text-center"
              [accept]="allowedExtensions.join(',')"
              (change)="onFileSelected($event)" #fileUpload>
       <span class="label-button text-center">{{ file ? file.name : "No file chosen yet." }}</span>
     </div>
-    <div class="lg:w-3 md:w-4 w-10 flex flex-column row-gap-1 justify-content-center align-items-center text-center">
+    <div class="lg:w-2 md:w-4 w-10 flex flex-column row-gap-1 justify-content-center align-items-center text-center">
       <div class="flex flex-row w-12 column-gap-1">
         <div class="lg:w-6 w-12 h-full">
           <div class="p-fluid h-full">
@@ -22,25 +21,26 @@
         </div>
         <div class="lg:w-6 w-12">
           <div class="p-fluid">
-            <button
-              pTooltip="Click here to download list of ISMN stations available for validation. (*) this list is only intended for registered qa4sm users and must not be redistributed outside."
-              pButton
-              label="Get ISMN station coordinates"
-              (click)="getISMNList()">
+            <button pButton
+                    [disabled]="!file || !metadataForm.valid"
+                    label="Upload file"
+                    (click)="sendForm()">
             </button>
+            <!--            <button-->
+            <!--              pTooltip="Click here to download list of ISMN stations available for validation. (*) this list is only intended for registered qa4sm users and must not be redistributed outside."-->
+            <!--              pButton-->
+            <!--              label="Get ISMN station coordinates"-->
+            <!--              (click)="getISMNList()">-->
+            <!--            </button>-->
 
           </div>
         </div>
       </div>
-      <div class="flex flex-row w-12">
-        <button pButton
-                id="uploadData"
-                [disabled]="!file || !metadataForm.valid"
-                label="Upload file"
-                (click)="sendForm()">
-        </button>
-      </div>
     </div>
+  </div>
+  <div class="text-center text-lg text-muted pb-3">
+    <b>Note: </b> To validate your data with in situ observations, consider uploading time series at
+    <a href="javascript:void(0);" (click)="getISMNList()"> ISMN locations</a>
   </div>
 </div>
 
