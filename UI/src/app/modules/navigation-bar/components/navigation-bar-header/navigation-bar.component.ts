@@ -95,7 +95,7 @@ export class NavigationBarComponent implements OnInit {
     };
 
     this.uploadDataHelpMenuItem = {
-      label: 'Upload Data Help',
+      label: 'Data Preparation',
       icon: 'pi pi-fw pi-question',
       routerLink: ['user-data-guidelines']
     };
