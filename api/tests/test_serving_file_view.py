@@ -190,7 +190,7 @@ class TestServingFileView(TestCase):
         assert response.json()['message'] == 'No file names given'
 
         # get static graphic_files
-        files = ['/static/images/home/FSSCat.webp', '/static/images/logo/logo_awst.webp']
+        files = ['/static/images/home/background.webp', '/static/images/logo/logo_awst.webp']
         new_url = get_graphic_files_url + '?'
         for file_name in files:
             new_url += 'file=' + file_name + '&'
