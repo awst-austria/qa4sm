@@ -5,7 +5,6 @@ import pandas as pd
 
 plt.switch_backend('agg')  ## this allows headless graph production
 
-import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
@@ -24,9 +23,16 @@ from io import BytesIO
 import base64
 from parse import *
 
-__logger = logging.getLogger(__name__)
+import logging
+from autologging import traced, TRACE, logged
+logging.basicConfig(
+    level=TRACE,
+    filename=__name__ + '.log',
+    format='%(asctime)s - %(levelname)s:%(name)s:%(funcName)s:%(message)s"',
+)
 
-
+@logged
+@traced
 def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
     """
     Create all default graphs for validation run. This is done
@@ -47,7 +53,7 @@ def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
         return None
 
     zipfilename = path.join(outfolder, 'graphs.zip')
-    __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+    logging.debug('Trying to create zipfile {}'.format(zipfilename))
 
     fnb, fnm, fcsv = plot_all(
         validation_run.output_file.path,

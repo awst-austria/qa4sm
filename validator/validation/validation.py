@@ -29,6 +29,7 @@ from pytesmo.validation_framework.temporal_matchers import (
 import pandas as pd
 from pytesmo.validation_framework.results_manager import netcdf_results_manager
 from pytesmo.validation_framework.validation import Validation
+from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter
 from pytz import UTC
 import pytz
 
@@ -45,6 +46,9 @@ from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 from api.frontend_urls import get_angular_url
 from shutil import copy2
+
+from temporal_window_maker import TemporalWindowMaker
+
 
 __logger = logging.getLogger(__name__)
 
@@ -310,11 +314,29 @@ def create_pytesmo_validation(validation_run):
     else:
         metadata_template = METADATA_TEMPLATE['other_ref']
 
-    pairwise_metrics = PairwiseIntercomparisonMetrics(
-        metadata_template=metadata_template, calc_kendall=False,
-    )
+
+
+    temporal_window=TemporalWindowMaker('months', overlap = 0).custom_temporal_window
+
+    if temporal_window is not None:     # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
+        pairwise_metrics = SubsetsMetricsAdapter(             
+            calculator=PairwiseIntercomparisonMetrics(
+                metadata_template=metadata_template, 
+                calc_kendall=False, 
+                calc_spearman=False,    #! what about spearman? False, True, irrelevant?
+            ),
+            subsets=temporal_window,
+            group_results="join",
+        )
+
+    else:
+        pairwise_metrics = PairwiseIntercomparisonMetrics(
+            metadata_template=metadata_template, 
+            calc_kendall=False,
+        )
 
     metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
+
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         tcol_metrics = TripleCollocationMetrics(
@@ -322,7 +344,7 @@ def create_pytesmo_validation(validation_run):
             metadata_template=metadata_template,
             bootstrap_cis=validation_run.bootstrap_tcol_cis
         )
-        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
+        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})     #! does this intra_annual updated mertic_calculator work for tcol?
 
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
@@ -335,6 +357,8 @@ def create_pytesmo_validation(validation_run):
     temporalwindow_size = validation_run.temporal_matching
     __logger.debug(f"Size of the temporal matching window: {temporalwindow_size} "
                    f"{'hour' if temporalwindow_size == 1 else 'hours'}")
+
+
 
     val = Validation(
         datasets=datamanager,
@@ -350,6 +374,9 @@ def create_pytesmo_validation(validation_run):
     )
 
     return val
+
+TemporalWindowMaker('custom', bleed = 0).custom_temporal_window
+
 
 
 def num_gpis_from_job(job):
@@ -897,8 +924,8 @@ def re_compressor(fpath: str, compression: str = 'zlib', complevel: int = 5) -> 
                 ds.to_netcdf(re_name, mode='w', format='NETCDF4', encoding=encoding_params(ds, compression, complevel))
                 print(f'\n\nRe-compression finished\n\n')
 
-            os.remove(fpath)
-            os.rename(re_name, fpath)
+            # os.remove(fpath)
+            # os.rename(re_name, fpath)
 
         except Exception as e:
             print(f'\n\nRe-compression failed. {e}\nContinue without re-compression.\n\n')
