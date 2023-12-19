@@ -8,7 +8,7 @@ import uuid
 import xarray as xr
 import numpy as np
 import qa4sm_reader
-
+import json
 
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
@@ -44,10 +44,11 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
+from validator.validation.temporal_window_maker import TemporalWindowMaker
 from api.frontend_urls import get_angular_url
 from shutil import copy2
+from typing import Optional, List, Tuple, Dict, Union
 
-from temporal_window_maker import TemporalWindowMaker
 
 
 __logger = logging.getLogger(__name__)
@@ -316,14 +317,14 @@ def create_pytesmo_validation(validation_run):
 
 
 
-    temporal_window=TemporalWindowMaker('months', overlap = 0).custom_temporal_window
+    temporal_window=TemporalWindowMaker('seasons', overlap = 0).custom_temporal_window       #! include this porperly in function argument
+    # temporal_window = None
 
     if temporal_window is not None:     # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
         pairwise_metrics = SubsetsMetricsAdapter(             
             calculator=PairwiseIntercomparisonMetrics(
                 metadata_template=metadata_template, 
                 calc_kendall=False, 
-                calc_spearman=False,    #! what about spearman? False, True, irrelevant?
             ),
             subsets=temporal_window,
             group_results="join",
@@ -344,7 +345,7 @@ def create_pytesmo_validation(validation_run):
             metadata_template=metadata_template,
             bootstrap_cis=validation_run.bootstrap_tcol_cis
         )
-        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})     #! does this intra_annual updated mertic_calculator work for tcol?
+        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})     #? does this intra_annual updated mertic_calculator work for tcol?
 
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
@@ -362,7 +363,7 @@ def create_pytesmo_validation(validation_run):
 
     val = Validation(
         datasets=datamanager,
-        temporal_matcher=make_combined_temporal_matcher(
+        temporal_matcher=make_combined_temporal_matcher(        #? do i have to update that for intra-annual metrics?
             pd.Timedelta(temporalwindow_size / 2, "H")
         ),
         temporal_ref=temporal_ref_name,
@@ -374,9 +375,6 @@ def create_pytesmo_validation(validation_run):
     )
 
     return val
-
-TemporalWindowMaker('custom', bleed = 0).custom_temporal_window
-
 
 
 def num_gpis_from_job(job):
@@ -504,7 +502,12 @@ def run_validation(validation_id):
                 if validation_aborted or not results:
                     validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 else:
-                    results = _pytesmo_to_qa4sm_results(results)
+                    file_path = '/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm/output/tmp_results.txt'
+                    with open(file_path, 'w') as file:
+                        file.write(str(results))
+
+                    # print(results)
+                    results = _pytesmo_to_qa4sm_results(results)                  #! reactivate this!!
                     check_and_store_results(async_result.id, results, run_dir)
                     # If the job ran successfully, we have to check the status
                     # attribute to see if the job actually calculated something
@@ -934,4 +937,156 @@ def re_compressor(fpath: str, compression: str = 'zlib', complevel: int = 5) -> 
     else:
         print(f'\n\nRe-compression failed. Compression has to be {_implemented_compressions} and compression levels other than {_allowed_compression_levels} are not supported. Continue without re-compression.\n\n')
 
+    
+
+class PytesmoResultsToQa4smResults:
+
+    def __init__(self, pytesmo_results: dict, temporal_windows: Union[None, List]):#TemporalWindowMaker('months', overlap = 0).names]):
+        self.pytesmo_results: dict = list(_pytesmo_to_qa4sm_results(pytesmo_results).values())[0]
+
+        print(len(self.pytesmo_results))
+        self.tmp_wdws = temporal_windows
+
+        self._default_non_metrics: list = ['gpi',
+                                    'lon',
+                                    'lat',
+                                    'clay_fraction',
+                                    'climate_KG',
+                                    'climate_insitu',
+                                    'elevation',
+                                    'instrument',
+                                    'latitude',
+                                    'lc_2000',
+                                    'lc_2005',
+                                    'lc_2010',
+                                    'lc_insitu',
+                                    'longitude',
+                                    'network',
+                                    'organic_carbon',
+                                    'sand_fraction',
+                                    'saturation',
+                                    'silt_fraction',
+                                    'station',
+                                    'timerange_from',
+                                    'timerange_to',
+                                    'variable',
+                                    'instrument_depthfrom',
+                                    'instrument_depthto',
+                                    'frm_class']
+    
+        self.tmp_wdws_checker_called = False
+        self.tmp_wdws_check = False             # False indicates the 'bulk case', True indicates the 'intra-annual case'
+
+        self.__lat_arr = np.array(self.non_metrics['lat']['data'], dtype=np.float32)
+        self.__lon_arr = np.array(self.non_metrics['lon']['data'], dtype=np.float32)
+        self.__idx_arr = np.arange(len(self.__lat_arr), dtype=np.int32)
+
+
+    def tmp_wdws_checker(self):
+        self.tmp_wdws_checker_called = True
+        if self.tmp_wdws is None:
+            return False, ['bulk']
+        elif isinstance(self.tmp_wdws, type(TemporalWindowMaker('months', overlap = 0).names)):
+            return True, self.tmp_wdws
+        else:
+            raise TypeError('temporal_windows must be None or a list of strings')
+        
+    @property
+    def non_metrics(self) -> dict:
+        return {key: {'data': val, 'dtype': type(val[0])} for key, val in self.pytesmo_results.items() if key in self._default_non_metrics}
+
+
+    @property
+    def metrics_dict(self) -> dict:
+        _metrics = [key.split('|')[1] for key in self.pytesmo_results.keys() if '|' in key]
+        if not len(_metrics) == 0:                                                                   # in case of intra-annual metrics
+            return {long: long for long in set(_metrics)}
+        else:                                                                                       # bulk metrics
+            return {long: long for long in self.pytesmo_results.keys() if long not in self.non_metrics.keys()}
+        
+    def get_sorted_arr(self) -> dict:
+        if self.tmp_wdws_checker_called == False:
+            self.tmp_wdws_check, self.tmp_wdws = self.tmp_wdws_checker()
+
+        if self.tmp_wdws_check == False:
+            self.sorted_arr ={
+            tmp_wdw: {
+                metric_short: self.pytesmo_results[f'{metric_long}'] for metric_long, metric_short in self.metrics_dict.items()
+            } for tmp_wdw in self.tmp_wdws
+            }
+        
+        elif self.tmp_wdws_check == True:
+            self.sorted_arr ={
+            tmp_wdw: {
+                metric_short: self.pytesmo_results[f'{tmp_wdw}|{metric_long}'] for metric_long, metric_short in self.metrics_dict.items()
+            } for tmp_wdw in self.tmp_wdws
+            }
+
+        else:
+            raise TypeError('temporal_windows must be None or a list of strings')
+
+
+        return self.sorted_arr
+    
+
+    @property
+    def metric_data_array(self):
+        if self.tmp_wdws_checker_called == False:
+            self.tmp_wdws_check, self.tmp_wdws = self.tmp_wdws_checker()
+
+        return {
+            metric_short: xr.DataArray(
+                np.array([self.get_sorted_arr()[tmp_wdw][metric_short] for tmp_wdw in self.tmp_wdws]),
+                dims=('time_windows', 'idx'),
+                coords={
+                    'time_windows': self.tmp_wdws,
+                    'idx': self.__idx_arr,
+                }
+            ) for metric_short in self.metrics_dict.values()
+        }
+
+
+    @property
+    def non_metric_data_array(self):
+        non_metric_data = {
+            non_metric: self.non_metrics[non_metric]['data']
+            for non_metric in self.non_metrics
+            }
+        
+        non_metric_dtypes = {
+            non_metric: self.non_metrics[non_metric]['dtype']
+            for non_metric in self.non_metrics
+            }
+        
+        non_metric_df = pd.DataFrame(non_metric_data)
+        for non_metric, dtype in non_metric_dtypes.items():
+            non_metric_df[non_metric] = non_metric_df[non_metric].astype(dtype)
+
+        return {
+                non_metric: xr.DataArray(
+                    non_metric_df[non_metric].values.T,
+                    dims=('idx',),
+                    coords={'idx': self.__idx_arr},
+                    name=non_metric
+                )
+                for non_metric in non_metric_df.columns
+                }
+    
+
+    def get_translated_dataset(self, write_to_ncfile: bool = False, path: str = None):
+        self.translated_dataset = xr.Dataset(self.metric_data_array)
+
+        
+        self.translated_dataset = xr.merge([self.translated_dataset, *self.non_metric_data_array.values()])
+
+        self.translated_dataset = self.translated_dataset.assign_coords(
+            lat=self.__lat_arr,
+            lon=self.__lon_arr,
+            idx=self.__idx_arr
+        )
+        
+        if write_to_ncfile == True:
+            self.translated_dataset.to_netcdf(path)
+            
+        return self.translated_dataset
     

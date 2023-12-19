@@ -81,7 +81,7 @@ class TemporalWindowMaker(TemporalWindowDefaults):
             raise ValueError(f'Invalid temporal window type. Available types are: {self.available_defaults}')
 
         
-    def date_to_doy(self, date_tuple: Tuple[int, int]) -> int: 
+    def __date_to_doy(self, date_tuple: Tuple[int, int]) -> int: 
         '''Converts a date list [month, day] to a day of the year (doy). Leap years are neglected.
         
         Parameters
@@ -101,7 +101,7 @@ class TemporalWindowMaker(TemporalWindowDefaults):
 
         return _doy
     
-    def doy_to_date(self, doy: int) -> Tuple[int, int]:
+    def __doy_to_date(self, doy: int) -> Tuple[int, int]:
         '''Converts a day of the year (doy) to a date tuple (month, day). Leap years are neglected.
 
         Parameters
@@ -121,7 +121,7 @@ class TemporalWindowMaker(TemporalWindowDefaults):
 
         return int(month), int(day)
     
-    def update_date(self, date: Tuple[int, int], overlap_direction: float) -> Tuple[int, int]:
+    def __update_date(self, date: Tuple[int, int], overlap_direction: float) -> Tuple[int, int]:
         '''Updates a date tuple (month, day) by adding/subtracting the overlap value to/from it.
 
         Parameters
@@ -138,7 +138,7 @@ class TemporalWindowMaker(TemporalWindowDefaults):
         '''
 
         overlap_direction = overlap_direction / abs(overlap_direction)    # making sure it's either -1 or +1
-        _doy = self.date_to_doy(date)
+        _doy = self.__date_to_doy(date)
         _doy += int(overlap_direction * self.overlap)
 
         if _doy < 1:
@@ -146,10 +146,10 @@ class TemporalWindowMaker(TemporalWindowDefaults):
         elif _doy > 365:
             _doy = _doy - 365
         
-        return self.doy_to_date(_doy)
+        return self.__doy_to_date(_doy)
 
     def _custom_temporal_window(self):
-        return {key: (self.update_date(val[0], overlap_direction=-1), self.update_date(val[1], overlap_direction=+1)) for key, val in self.yaml_data[self.tmp_wdw_type].items()}
+        return {key: (self.__update_date(val[0], overlap_direction=-1), self.__update_date(val[1], overlap_direction=+1)) for key, val in self.yaml_data[self.tmp_wdw_type].items()}
         
     
     @property
@@ -169,4 +169,20 @@ class TemporalWindowMaker(TemporalWindowDefaults):
         def tsdistributer(_begin_date: Tuple[int], _end_date: Tuple[int]) -> TsDistributor:
             return TsDistributor(yearless_date_ranges=[(YearlessDatetime(*_begin_date), YearlessDatetime(*_end_date))])
         return {key: tsdistributer(val[0], val[1]) for key, val in self._custom_temporal_window().items()}
+    
+    @property
+    def names(self) -> List[str]:
+        '''Returns the names of the temporal windows.
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        List[str]
+            List containing the names of the temporal windows.
+        '''
+
+        return list(self.custom_temporal_window.keys())
 
