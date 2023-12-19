@@ -40,7 +40,9 @@ export class DatasetComponent implements OnInit {
   @Input() removable = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
-
+  datasetSelectorId: string;
+  versionSelectorId: string;
+  variableSelectorId: string;
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
@@ -70,11 +72,14 @@ export class DatasetComponent implements OnInit {
       }
     });
 
+
     this.selectableDatasetVersions$ = this.sortObservableById(
       this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
 
     this.selectableDatasetVariables$ = this.sortObservableById(
       this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+
+    this.setSelectorsId();
   }
 
   private updateSelectableVersionsAndVariableAndEmmit(): void {
@@ -87,6 +92,7 @@ export class DatasetComponent implements OnInit {
 
 
     this.selectableDatasetVersions$.subscribe(this.selectableDatasetVersionsObserver);
+    this.setSelectorsId();
   }
 
   private onSelectableVersionsNext(versions): void {
@@ -98,6 +104,7 @@ export class DatasetComponent implements OnInit {
       this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
 
     this.selectableDatasetVariables$.subscribe(this.selectableDatasetVariablesObserver)
+    this.setSelectorsId();
   }
 
   private onSelectableVariablesNext(variables): void {
@@ -106,6 +113,7 @@ export class DatasetComponent implements OnInit {
 
   private onSelectableVariablesComplete(): void {
     this.changeDataset.emit(this.selectionModel);
+    this.setSelectorsId();
   }
 
   onDatasetChange(): void {
@@ -129,5 +137,13 @@ export class DatasetComponent implements OnInit {
       });
       return data;
     }));
+  }
+
+  setSelectorsId(): void{
+    const datasetIdentifier = `${this.selectionModel.selectedDataset?.id}_
+    ${this.selectionModel.selectedVersion?.id}_ ${this.selectionModel.selectedVariable?.id}`
+    this.datasetSelectorId = 'dataset_' + datasetIdentifier;
+    this.versionSelectorId = 'version_' + datasetIdentifier;
+    this.variableSelectorId = 'variable_' + datasetIdentifier;
   }
 }

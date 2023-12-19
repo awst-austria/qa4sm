@@ -10,12 +10,13 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from validator.models import ValidationRun, DatasetConfiguration, Dataset
+from validator.models import ValidationRun, DatasetConfiguration, Dataset, UserManual
 
 import mimetypes
 from wsgiref.util import FileWrapper
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
+
 
 
 @api_view(['GET'])
@@ -203,6 +204,16 @@ def get_summary_statistics(request):
             index=False
         ))
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_manual(request):
+    file = get_object_or_404(UserManual, id=1)
+
+    with open(file.file.path, 'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = 'filename="your_filename.pdf"'
+        return response
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

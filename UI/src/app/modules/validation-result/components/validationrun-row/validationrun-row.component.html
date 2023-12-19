@@ -1,17 +1,17 @@
-<p-panel *ngIf="configurations$|async as configurations" class="validation-row">
+<p-panel *ngIf="configurations$|async as configurations" class="py-0 result-row">
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <h5 class="my-0"><span class="font-weight-normal">Name:</span> {{ valName$|async }}</h5>
+    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="line-height-1">Name:</span> {{ valName$|async }}</div>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
-    <h5 class="my-0"> DOI: <a class="doilink" target="_blank"
+    <div class="my-0 lg:text-xl md:text-lg text-base"> DOI: <a title="doi-link" class="doilink" target="_blank"
                               href="{{this.getDoiPrefix()}}{{ validationRun.doi }}">{{ validationRun.doi }}</a>
-    </h5>
+    </div>
   </ng-template>
   <!--  CUSTOM    -->
   <ng-template *ngIf="!published" pTemplate="header">
-    <h5 class="my-0">
+    <div class="my-0 lg:text-xl md:text-lg text-base">
       <!--      if there is expiry date property: -->
       <span *ngIf="validationRun.expiry_date">
           <span *ngIf="validationRun.is_near_expiry && validationRun.progress !== -1  && validationRun.progress !== -100"
@@ -34,7 +34,7 @@
                 class="p-panel-header-icon pi pi-spin pi-spinner expiry-icons"
                 pTooltip="This validation is still running."></span>
 
-          <a class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}" rel="noreferrer">
+          <a title="doi-link" class="doilink" target="_blank" href="{{getDoiPrefix()}}{{ validationRun.doi }}" rel="noreferrer">
             <span *ngIf="validationRun.doi" class="p-panel-header-icon pi pi-book expiry-icons"
                   pTooltip="This result has been published with zenodo. It will NOT be automatically removed during cleanup.">
             </span>
@@ -46,10 +46,10 @@
         </span>
       </span>
 
-      <span *ngIf="!validationRun.is_a_copy" class="font-weight-normal"> Started:
+      <span *ngIf="!validationRun.is_a_copy">
         {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}}
       </span>
-      <span *ngIf="validationRun.is_a_copy" class="font-weight-normal">
+      <span *ngIf="validationRun.is_a_copy">
         Copied: {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}} <br>
         (Date of original run: {{ originalDate|date: 'mediumDate' :timeZone }})
       </span>
@@ -61,13 +61,12 @@
         </span>
       </em>
 
-    </h5>
+    </div>
   </ng-template>
-  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 15rem">
-    <h5 class="my-0">
+  <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 12rem">
+    <div class="my-0 lg:text-xl md:text-lg text-base">
       <span *ngIf="hideElement"
-            class=" font-weight-normal">
-        Name: {{ valName$|async }}
+            class="line-height-1">Name: {{ valName$|async }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="my-0 font-weight-normal">
@@ -79,6 +78,7 @@
         <button
           pButton
           type="button"
+          title="edit-name"
           icon="faIcons.faPencil"
           [ngClass]="{'btn-action edit_name_btn': true, 'hidden': !hideElement}"
           pTooltip="Change Name"
@@ -96,6 +96,7 @@
           <button
             pButton
             type="button"
+            title="save"
             icon="pi pi-save"
             [ngClass]="{'btn-action save_name_btn': true}"
             pTooltip="Save Name"
@@ -105,6 +106,7 @@
           <button
             pButton
             type="button"
+            title="cancel"
             icon="pi pi-ban"
             [ngClass]="{'btn-action cancel_editing_btn': true}"
             pTooltip="Cancel"
@@ -113,13 +115,13 @@
           </button>
         </span>
       </ng-template>
-    </h5>
+    </div>
   </ng-template>
 
   <!-- Body -->
   <!-- Datasets -->
-  <div class="grid mx-0 px-0 my-0">
-    <div class="col">
+  <div class="flex flex-row lg:flex-nowrap flex-wrap mx-0 px-0 my-0">
+    <div class="md:w-8 w-12 p-2">
       <strong>Data:</strong><br/>
       <span *ngFor="let config of configurations">
         <span [style.color]="config.fileExists ? 'inherit' : 'red'"
@@ -135,7 +137,7 @@
         </span>
       </span>
     </div>
-    <div class="col status">
+    <div class="md:w-2 w-6 p-2">
       <!--    PUBLISHED -->
       <div *ngIf="published">
         <strong>Created:</strong><br/>
@@ -149,7 +151,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="col-3" style="max-width: 10rem">
+    <div class="md:w-2 w-6 p-2" style="max-width: 10rem">
       <qa-buttons [validationList]="true" [validationRun]="validationRun" [published]="published"
                   [canBeRerun]="validationRun.all_files_exist"></qa-buttons>
     </div>

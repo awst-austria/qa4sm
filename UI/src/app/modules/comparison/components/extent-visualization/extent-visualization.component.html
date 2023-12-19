@@ -5,9 +5,9 @@
   <h4> Extent plot not available! </h4>
 </div>
 
-<div *ngIf="!showLoadingSpinner && ! errorHappened" class="grid no-gutters">
-  <div *ngIf="img === 'Raise message to check box', else noError" class="col-12">
-    <p-panel>
+<div *ngIf="!showLoadingSpinner && ! errorHappened" class="flex no-gutters pb-2">
+  <div *ngIf="img === 'Raise message to check box', else noError" class="w-12">
+    <p-panel class="validation-row">
       <ng-template pTemplate="header">
         <div class="text-center my-1" style="width: 92%">
           <h4 class="my-0 font-weight-normal">Warning</h4>
@@ -28,7 +28,7 @@
     </p-panel>
   </div>
   <ng-template #noError>
-    <div class="col-12">
+    <div class="w-12">
       <p-panel [toggleable]="true" [collapsed]="true">
         <ng-template pTemplate="header">
           <div class="text-center my-1" style="width: 92%">
@@ -36,10 +36,10 @@
           </div>
         </ng-template>
         <ng-template pTemplate="icons">
-          <label class="mb-0"
+          <label class="mb-0 p-panel-header-icon "
                  pTooltip="Representation of the comparison spatial extent selected through the 'Spatial extent' dialogue box."
                  tooltipPosition="bottom">
-            <span class="p-panel-header-icon pi pi-question-circle help-icon"></span>
+            <span class="pi pi-question-circle help-icon"></span>
           </label>
         </ng-template>
 
@@ -53,8 +53,8 @@
             "is the only option when the validations belong to the same run, e.g. multiple non-reference datasets)."
             }}
           </div>
-          <div class="grid center py-0">
-            <div class='col'>
+          <div class="flex center py-0">
+            <div class='w-auto'>
               <p-image width="100%"
                        [src]="sanitizePlotUrl(img)"
                        [ngClass]="{'result-plot':true, 'pcol6': true}"

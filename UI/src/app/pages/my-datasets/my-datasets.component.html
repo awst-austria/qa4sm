@@ -8,17 +8,15 @@
     </div>
   </div>
 
-  <div *ngIf="!hasNoSpaceAssigned">
+  <div *ngIf="!hasNoSpaceAssigned && !maintenanceMode">
     <div class="center">
-      <!--    <div class="col-9 text-center">-->
       <h1>Upload your data</h1>
-      <!--    </div>-->
     </div>
     <div class="text-center lead text-muted pt-3">
       {{getLimitMessage()}}
     </div>
     <!--    <hr class="featurette-divider">-->
-    <div class="text-center pt-5">
+    <div class="flex flex-column pt-5 justify-content-center align-content-center">
       <qa-user-file-upload></qa-user-file-upload>
     </div>
     <hr class="featurette-divider">
@@ -45,8 +43,8 @@
             <div>
               Above you can find a list of datasets you have uploaded: <span *ngIf="!readMore">...</span>
               <span *ngIf="!readMore" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-down">
-          Read more
-        </span>
+              Read more
+            </span>
             </div>
             <div *ngIf="readMore">
               <ul>
@@ -81,6 +79,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="maintenanceMode" class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+    <h1 class="jumbotron-heading">Maintenance...</h1>
+    <p class="lead text-muted">Sorry! Currently, you can't upload new files because we're doing maintenance on
+      the service. Please come back later.</p>
   </div>
 
 
