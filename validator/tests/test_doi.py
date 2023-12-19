@@ -25,9 +25,9 @@ from validator.validation.globals import OUTPUT_FOLDER
 
 
 # use zenodo test sandbox to avoid generating real dois
-# @pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
+@pytest.mark.skipif(not 'DOI_ACCESS_TOKEN_ENV' in os.environ, reason="No access token set in global variables")
 @override_settings(DOI_REGISTRATION_URL = "https://sandbox.zenodo.org/api/deposit/depositions")
-# @pytest.mark.long_running
+@pytest.mark.long_running
 class TestDOI(TestCase):
     fixtures = ['variables', 'versions', 'datasets', 'filters', 'users']
 
