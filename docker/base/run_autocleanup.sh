@@ -1,5 +1,4 @@
 #!/bin/bash
-echo "Auto cleanup"
 APP_DIR="/var/lib/qa4sm-web-val"
 MINICONDA_PATH="/opt/miniconda"
 PYTHON_ENV_DIR="$APP_DIR/virtenv"
