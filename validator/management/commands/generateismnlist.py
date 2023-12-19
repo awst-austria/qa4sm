@@ -21,7 +21,7 @@ class Command(BaseCommand):
                                  'we use the latest version (based on the ID '
                                  'in the fixtures).', )
 
-    def _get_path_ismn_version(self, version_short_name=None):
+    def _get_path_ismn_version(self, version_short_name: str = None) -> tuple:
         for dataset in Dataset.objects.all():
             if dataset.short_name == "ISMN":
                 if version_short_name is None:
@@ -42,10 +42,13 @@ class Command(BaseCommand):
 
         ds: ISMN_Interface = create_reader(dataset, version)
 
+        meta = ds.metadata.loc[ds.metadata[('variable', 'val')] == 'soil_moisture']
+
         columns = [
             ('network', 'val'),
             ('station', 'val'),
             ('instrument', 'val'),
+            ('variable', 'val'),
             ('latitude', 'val'),
             ('longitude', 'val'),
             ('instrument', 'depth_from'),
@@ -54,16 +57,16 @@ class Command(BaseCommand):
             ('timerange_to', 'val'),
         ]
 
-        new_names = ['Network name', 'Station name', 'Instrument',
+        new_names = ['Network name', 'Station name', 'Instrument', 'Variable',
                      'Latitude [deg]', 'Longitude [deg]',
                      'Depth from [cm]', 'Depth to [cm]',
                      'Period from', 'Period to']
 
-        if 'frm_class' in ds.metadata.columns.get_level_values(0):
+        if 'frm_class' in meta.columns.get_level_values(0):
             columns.append(('frm_class', 'val'))
             new_names.append('FRM Class')
 
-        df = ds.metadata.loc[:, columns]
+        df = meta.loc[:, columns]
         df.columns = df.columns.droplevel(1)
         df.columns = new_names
         df.index.name = 'index'
