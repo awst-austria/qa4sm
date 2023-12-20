@@ -4,7 +4,7 @@ set -x
 APP_DIR="/var/lib/qa4sm-web-val/valentina"
 export C_FORCE_ROOT="true"
 
-service cron restart
+/etc/init.d/cron restart
 
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
