@@ -21,18 +21,20 @@ class Command(BaseCommand):
         __logger.debug(
             "I'm running auto cleanup, so the cronjob works properly"
         )
-        print('At least I am trying to run it...')
-        # users = User.objects.all()
-        # cleaned_up = []
-        # notified = []
-        # for user in users:
-        #     ## no, you can't filter for is_expired because it isn't in the database. but you can exclude running validations
-        #     good_validations = ValidationRun.objects.filter(end_time__isnull=False).filter(user=user)
-        #     canceled_validations = ValidationRun.objects.filter(progress=-1).filter(user=user)
-        #     validations = good_validations.union(canceled_validations)
-        #     validations_near_expiring = []
-        #     for validation in validations:
-        #         ## notify user about upcoming expiry if not already done
+        users = User.objects.all()
+        cleaned_up = []
+        notified = []
+        for user in users:
+            ## no, you can't filter for is_expired because it isn't in the database. but you can exclude running validations
+            good_validations = ValidationRun.objects.filter(end_time__isnull=False).filter(user=user)
+            canceled_validations = ValidationRun.objects.filter(progress__in=[-1, -100]).filter(user=user)
+            validations = good_validations.union(canceled_validations)
+            validations_near_expiring = []
+            for validation in validations:
+                __logger.debug(
+                    f'{validation.id} / {user}'
+                )
+                ## notify user about upcoming expiry if not already done
         #         if ((validation.is_near_expiry) and (not validation.expiry_notified)):
         #             ## if already a quarter of the warning period has passed without a notification being sent (could happen when service is down),
         #             ## extend the validation so that the user gets the full warning period

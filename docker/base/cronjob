@@ -20,4 +20,4 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
 # m h  dom mon dow   command
-* * * * * www-data /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
+* * * * * root bash /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
