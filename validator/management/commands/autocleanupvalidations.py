@@ -21,7 +21,10 @@ class Command(BaseCommand):
         __logger.debug(
             "I'm running auto cleanup, so the cronjob works properly"
         )
-        users = User.objects.all()
+        try:
+            users = User.objects.all()
+        except Exception as e:
+            print(e)
         cleaned_up = []
         notified = []
         for user in users:
