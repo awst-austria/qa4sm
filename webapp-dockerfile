@@ -1,6 +1,6 @@
 FROM awst/qa4sm-base:latest
 RUN apt-get update && apt-get -y install apt-utils
-RUN apt-get -y upgrade && apt-get -y install curl apache2 apache2-dev libapache2-mod-wsgi-py3 git gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git postgresql-client
+RUN apt-get -y upgrade && apt-get -y install curl apache2 apache2-dev libapache2-mod-wsgi-py3 git gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git postgresql-client cron rsyslog nanoRUN apt-get -y upgrade && apt-get -y install curl apache2 apache2-dev libapache2-mod-wsgi-py3 git gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git postgresql-client cron rsyslog nano
 RUN update-rc.d apache2 disable
 
 ADD ./ /tmp/qa4sm-git
@@ -8,4 +8,14 @@ COPY ./docker/webapp/entrypoint.sh /usr/bin/entrypoint.sh
 RUN bash /tmp/qa4sm-git/docker/webapp/install.sh
 COPY ./docker/webapp/entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/entrypoint.sh /entrypoint.sh # backwards compat
+
+COPY ./docker/base/run_autocleanup.sh /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
+COPY ./docker/base/cronjob /etc/cron.d/cronjob
+
+# Giving executable permission to crontab file
+RUN chmod 0644 /etc/cron.d/cronjob
+
+# Running crontab
+RUN crontab /etc/cron.d/cronjob
+
 ENTRYPOINT ["entrypoint.sh"]
