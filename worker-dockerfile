@@ -3,7 +3,6 @@ RUN apt-get update && apt-get -y install apt-utils
 RUN apt-get -y install curl gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git cron
 ADD ./ /tmp/qa4sm-git
 
-COPY ./docker/base/run_autocleanup.sh /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
 COPY ./docker/base/cronjob /etc/cron.d/cronjob
 
 # Giving executable permission to crontab file
