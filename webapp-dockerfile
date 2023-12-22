@@ -9,7 +9,6 @@ RUN bash /tmp/qa4sm-git/docker/webapp/install.sh
 COPY ./docker/webapp/entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/entrypoint.sh /entrypoint.sh # backwards compat
 
-COPY ./docker/base/run_autocleanup.sh /var/lib/qa4sm-web-val/valentina/run_autocleanup.sh
 COPY ./docker/base/cronjob /etc/cron.d/cronjob
 
 # Giving executable permission to crontab file
