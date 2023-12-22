@@ -8,7 +8,7 @@ ADMIN_PASS="12admin34"
 . /opt/miniconda/etc/profile.d/conda.sh
 
 # make sure that cronjob is running
-/etc/init.d/cron
+/etc/init.d/cron restart
 
 conda activate /var/lib/qa4sm-web-val/virtenv
 export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
