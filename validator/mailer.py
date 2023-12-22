@@ -192,6 +192,14 @@ def send_user_link_to_reset_password(user, message):
                 body=message)
 
 
+def send_some_test_notification(user, message):
+    __logger.info('Sending test email to user {}...'.format(user.username))
+    subject = '[QA4SM] This is a test mail, please ignore it'
+    _send_email(recipients=[user.email],
+                subject=subject,
+                body=message)
+
+
 def _send_user_help_request(user_name, user_email, message, send_copy_to_user):
     __logger.info(f'Sending user request from  {user_name}')
     subject = "[USER MESSAGE] - Sent via contact form"
