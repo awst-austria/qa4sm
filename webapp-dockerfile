@@ -1,6 +1,6 @@
 FROM awst/qa4sm-base:latest
 RUN apt-get update && apt-get -y install apt-utils
-RUN apt-get -y upgrade && apt-get -y install curl apache2 apache2-dev libapache2-mod-wsgi-py3 git gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git postgresql-client cron rsyslog nanoRUN apt-get -y upgrade && apt-get -y install curl apache2 apache2-dev libapache2-mod-wsgi-py3 git gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git postgresql-client cron rsyslog nano
+RUN apt-get -y upgrade && apt-get -y install curl apache2 apache2-dev libapache2-mod-wsgi-py3 git gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git postgresql-client cron rsyslog nano
 RUN update-rc.d apache2 disable
 
 ADD ./ /tmp/qa4sm-git
