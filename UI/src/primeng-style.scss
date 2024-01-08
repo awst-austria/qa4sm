@@ -6270,6 +6270,9 @@ div.carousel-caption {
   border-radius: 4px;
   box-shadow: none;
   transition: box-shadow 0.15s;
+  position: fixed;
+  bottom: 20px; /* Adjust as needed */
+  left: 20px; /* Adjust as needed */
 }
 
 .p-scrolltop.p-link {
