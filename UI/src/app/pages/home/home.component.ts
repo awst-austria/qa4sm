@@ -43,17 +43,17 @@ export class HomeComponent implements OnInit {
   videos = [
     {
       video: this.sanitizer
-        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/PUONm_hYi6A?si=4RtVwWnc3MwgPh9i'),
+        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/aFWkxouccRQ?si=gmmbsFsDfo9484TL'),
       title: 'QA4SM - validation set up'
     },
     {
       video: this.sanitizer
-        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/cNswYu3ZjAI?si=bT1yV7qiR32keGN0'),
+        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/4pnFyOFfkqk?si=Qimkb5sEBv81t1cM'),
       title: 'QA4SM - validation results'
     },
     {
       video: this.sanitizer
-        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/8EEvyJPKvoI?si=6-LZg2NzpRix5Wfw'),
+        .bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/rCnUbscpvwY?si=RFdLKN1maRK2IqBv'),
       title: 'QA4SM - upload custom data'
     }
   ];
