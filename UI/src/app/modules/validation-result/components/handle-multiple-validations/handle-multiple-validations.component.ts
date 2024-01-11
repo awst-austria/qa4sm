@@ -115,11 +115,11 @@ export class HandleMultipleValidationsComponent implements OnInit {
     })
   }
 
-  archiveMultipleValidations(): void {
+  archiveMultipleValidations(archive: boolean): void {
     if (!confirm('Do you really want to delete selected validations?')) {
       return;
     }
-    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response => {
+    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue(), archive).subscribe(response => {
       this.validationrunService.refreshComponent('page');
     })
   }
@@ -128,7 +128,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
     if (this.action === 'delete') {
       this.deleteMultipleValidations()
     } else if (this.action === 'archive') {
-      this.archiveMultipleValidations()
+      this.archiveMultipleValidations(true)
     }
     this.closeAndCleanSelection()
   }

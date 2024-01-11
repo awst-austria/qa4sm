@@ -131,13 +131,13 @@ export class ValidationrunService {
     return this.httpClient.delete(removeMultipleValidationUrl, {params});
   }
 
-  archiveMultipleValidation(validationId: string[]): Observable<any> {
-    let params = new HttpParams();
+  archiveMultipleValidation(validationId: string[], archive): Observable<any> {
+    let params = new HttpParams().set('archive', archive);
     validationId.forEach(id => {
       params = params.append('id', id);
     })
 
-    return this.httpClient.post(archiveMultipleValidationUrl, {params});
+    return this.httpClient.post(archiveMultipleValidationUrl, {}, {headers, observe: 'body', params: params, responseType: 'text'});
   }
 
   getSummaryStatistics(params: any): Observable<any> {
