@@ -1,3 +1,5 @@
+import json
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
@@ -77,6 +79,7 @@ def archive_result(request, result_uuid):
         return HttpResponse('Validation has been published', status=405)
 
     patch_params = request.data
+
     archive_mode = patch_params['archive']
 
     if not type(archive_mode) is bool:
@@ -84,6 +87,26 @@ def archive_result(request, result_uuid):
 
     val_run.archive(unarchive=(not archive_mode))
     return HttpResponse(val_run.expiry_date, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def archive_multiple_results(request):
+    id_list = request.GET.getlist('id')
+    archive_mode = json.loads(request.GET.get('archive'))
+
+    validations_to_archive = (ValidationRun.objects.filter(id__in=id_list)
+                              .filter(doi='')
+                              .exclude(is_archived=archive_mode)
+                              .filter(user=request.user))
+
+    if not type(archive_mode) is bool:
+        return HttpResponse("Wrong action parameter.", status=400)
+
+    for validation in validations_to_archive:
+        validation.archive(unarchive=(not archive_mode))
+
+    return HttpResponse(status=200)
 
 
 @api_view(['PATCH'])
