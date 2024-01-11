@@ -19,6 +19,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   deleteItems: MenuItem;
   archiveItems: MenuItem;
+  unArchiveItems: MenuItem;
   items: MenuItem[];
 
   action: string = null;
@@ -65,24 +66,45 @@ export class HandleMultipleValidationsComponent implements OnInit {
         ]
       }
 
+    this.unArchiveItems =
+      {
+        label: 'Un-Archive',
+        icon: 'pi pi-calendar',
+        items: [
+          {
+            label: 'Select all',
+            icon: 'pi pi-fw pi-check-square',
+            command: () => this.activateSelection(true, 'unarchive')
+          },
+          {
+            label: 'Select individually',
+            icon: 'pi pi-fw pi-stop',
+            command: () => this.activateSelection(false, 'unarchive')
+          }
+
+        ]
+      }
+
     this.items = [
       {
         label: 'Modify multiple validations',
         items: [
           this.deleteItems,
-          this.archiveItems
+          this.archiveItems,
+          this.unArchiveItems
         ]
 
       }
     ]
     this.actions = {
       delete: this.deleteItems,
-      archive: this.archiveItems
+      archive: this.archiveItems,
+      unarchive: this.unArchiveItems
     }
   }
 
   activateSelection(allSelected: boolean, action: string): void {
-    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected, action)})
+    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected, action), action: action})
     this.selectionActive$.next(true);
     this.action = action;
   }
@@ -95,9 +117,10 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   selectValidations(all: boolean, action: string): BehaviorSubject<string[]> {
     const selectedValidations = [];
-    if (all) {
+    const select_archived= action === 'unarchive';
+    if (all && action !== 'unarchived') {
       this.validations.forEach(val => {
-        if (!val.is_archived && val.is_unpublished) {
+        if (val.is_archived === select_archived && val.is_unpublished) {
           selectedValidations.push(val.id)
         }
       })
@@ -127,7 +150,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
   handleMultipleValidations(): void {
     if (this.action === 'delete') {
       this.deleteMultipleValidations()
-    } else if (this.action === 'archive') {
+    } else if (this.action === 'archive' || this.action === 'unarchive') {
       this.archiveMultipleValidations(true)
     }
     this.closeAndCleanSelection()
