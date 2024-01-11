@@ -17,13 +17,18 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   selectionActive$ = new BehaviorSubject(false);
 
-  deleteItems: MenuItem[];
+  deleteItems: MenuItem;
+  archiveItems: MenuItem;
+  items: MenuItem[];
+
+  action: string = null;
+  actions: {}
 
   constructor(private validationrunService: ValidationrunService) {
   }
 
   ngOnInit() {
-    this.deleteItems = [
+    this.deleteItems =
       {
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
@@ -31,31 +36,64 @@ export class HandleMultipleValidationsComponent implements OnInit {
           {
             label: 'Select all',
             icon: 'pi pi-fw pi-check-square',
-            command: () => this.activateSelection(true)
+            command: () => this.activateSelection(true, 'delete')
           },
           {
             label: 'Select individually',
             icon: 'pi pi-fw pi-stop',
-            command: () => this.activateSelection(false)
+            command: () => this.activateSelection(false, 'delete')
+          }
+        ]
+      }
+
+    this.archiveItems =
+      {
+        label: 'Archive',
+        icon: 'pi pi-fw pi-folder',
+        items: [
+          {
+            label: 'Select all',
+            icon: 'pi pi-fw pi-check-square',
+            command: () => this.activateSelection(true, 'archive')
+          },
+          {
+            label: 'Select individually',
+            icon: 'pi pi-fw pi-stop',
+            command: () => this.activateSelection(false, 'archive')
           }
 
         ]
       }
+
+    this.items = [
+      {
+        label: 'Modify multiple validations',
+        items: [
+          this.deleteItems,
+          this.archiveItems
+        ]
+
+      }
     ]
+    this.actions = {
+      delete: this.deleteItems,
+      archive: this.archiveItems
+    }
   }
 
-  activateSelection(allSelected: boolean): void {
-    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected)})
+  activateSelection(allSelected: boolean, action: string): void {
+    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected, action)})
     this.selectionActive$.next(true);
+    this.action = action;
   }
 
   closeAndCleanSelection(): void {
-    this.selectionActive.emit({activate: false, selected: this.selectValidations(false)})
+    this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
     this.selectionActive$.next(false)
-
+    this.action = null;
   }
 
-  selectValidations(all: boolean): BehaviorSubject<string[]> {
+  selectValidations(all: boolean, action: string): BehaviorSubject<string[]> {
     const selectedValidations = [];
     if (all) {
       this.validations.forEach(val => {
@@ -72,10 +110,27 @@ export class HandleMultipleValidationsComponent implements OnInit {
     if (!confirm('Do you really want to delete selected validations?')) {
       return;
     }
-    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response =>{
+    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response => {
       this.validationrunService.refreshComponent('page');
-      this.closeAndCleanSelection()
     })
+  }
+
+  archiveMultipleValidations(): void {
+    if (!confirm('Do you really want to delete selected validations?')) {
+      return;
+    }
+    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response => {
+      this.validationrunService.refreshComponent('page');
+    })
+  }
+
+  handleMultipleValidations(): void {
+    if (this.action === 'delete') {
+      this.deleteMultipleValidations()
+    } else if (this.action === 'archive') {
+      this.archiveMultipleValidations()
+    }
+    this.closeAndCleanSelection()
   }
 
 

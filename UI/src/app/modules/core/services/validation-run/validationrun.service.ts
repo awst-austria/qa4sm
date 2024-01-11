@@ -31,6 +31,7 @@ const publishResultUrl = urlPrefix + '/publish-result/00000000-0000-0000-0000-00
 const addValidationUrl = urlPrefix + '/add-validation/00000000-0000-0000-0000-000000000000';
 const removeValidationUrl = urlPrefix + '/remove-validation/00000000-0000-0000-0000-000000000000';
 const removeMultipleValidationUrl = urlPrefix + '/delete-multiple-validations';
+const archiveMultipleValidationUrl = urlPrefix + '/archive-multiple-validations';
 const deleteResultUrl = urlPrefix + '/delete-validation/00000000-0000-0000-0000-000000000000';
 const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
@@ -128,6 +129,15 @@ export class ValidationrunService {
     })
 
     return this.httpClient.delete(removeMultipleValidationUrl, {params});
+  }
+
+  archiveMultipleValidation(validationId: string[]): Observable<any> {
+    let params = new HttpParams();
+    validationId.forEach(id => {
+      params = params.append('id', id);
+    })
+
+    return this.httpClient.post(archiveMultipleValidationUrl, {params});
   }
 
   getSummaryStatistics(params: any): Observable<any> {
