@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {MenuItem} from 'primeng/api';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -17,13 +16,13 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   selectionActive$ = new BehaviorSubject(false);
 
-  deleteItems: MenuItem;
-  archiveItems: MenuItem;
-  unArchiveItems: MenuItem;
-  items: MenuItem[];
+  deleteItems: {};
+  archiveItems: {};
+  unArchiveItems: {};
 
   action: string = null;
-  actions: {}
+  allSelected: boolean;
+  actions: any[];
 
   constructor(private validationrunService: ValidationrunService) {
   }
@@ -31,88 +30,43 @@ export class HandleMultipleValidationsComponent implements OnInit {
   ngOnInit() {
     this.deleteItems =
       {
+        action: 'delete',
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
-        items: [
-          {
-            label: 'Select all',
-            icon: 'pi pi-fw pi-check-square',
-            command: () => this.activateSelection(true, 'delete')
-          },
-          {
-            label: 'Select individually',
-            icon: 'pi pi-fw pi-stop',
-            command: () => this.activateSelection(false, 'delete')
-          }
-        ]
       }
 
     this.archiveItems =
       {
+        action: 'archive',
         label: 'Archive',
         icon: 'pi pi-fw pi-folder',
-        items: [
-          {
-            label: 'Select all',
-            icon: 'pi pi-fw pi-check-square',
-            command: () => this.activateSelection(true, 'archive')
-          },
-          {
-            label: 'Select individually',
-            icon: 'pi pi-fw pi-stop',
-            command: () => this.activateSelection(false, 'archive')
-          }
-
-        ]
       }
 
     this.unArchiveItems =
       {
+        action: 'unarchive',
         label: 'Un-Archive',
         icon: 'pi pi-calendar',
-        items: [
-          {
-            label: 'Select all',
-            icon: 'pi pi-fw pi-check-square',
-            command: () => this.activateSelection(true, 'unarchive')
-          },
-          {
-            label: 'Select individually',
-            icon: 'pi pi-fw pi-stop',
-            command: () => this.activateSelection(false, 'unarchive')
-          }
-
-        ]
       }
 
-    this.items = [
-      {
-        label: 'Modify multiple validations',
-        items: [
-          this.deleteItems,
-          this.archiveItems,
-          this.unArchiveItems
-        ]
-
-      }
+    this.actions = [
+      this.deleteItems,
+      this.archiveItems,
+      this.unArchiveItems
     ]
-    this.actions = {
-      delete: this.deleteItems,
-      archive: this.archiveItems,
-      unarchive: this.unArchiveItems
-    }
   }
 
   activateSelection(allSelected: boolean, action: string): void {
-    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected, action), action: action})
+    this.allSelected = allSelected;
     this.selectionActive$.next(true);
-    this.action = action;
+    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected, action), action: action})
   }
 
   closeAndCleanSelection(): void {
     this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
     this.selectionActive$.next(false)
     this.action = null;
+    this.allSelected = false;
   }
 
   selectValidations(all: boolean, action: string): BehaviorSubject<string[]> {
