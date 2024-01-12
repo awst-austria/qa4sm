@@ -29,6 +29,7 @@ import {
 import {PanelMenuModule} from 'primeng/panelmenu';
 import {FieldsetModule} from 'primeng/fieldset';
 import {CheckboxModule} from 'primeng/checkbox';
+import {SelectButtonModule} from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -68,7 +69,8 @@ import {CheckboxModule} from 'primeng/checkbox';
         DialogModule,
         PanelMenuModule,
         FieldsetModule,
-        CheckboxModule
+        CheckboxModule,
+        SelectButtonModule
     ]
 })
 export class ValidationResultModule {

@@ -20,6 +20,8 @@ export class HandleMultipleValidationsComponent implements OnInit {
   archiveItems: {};
   unArchiveItems: {};
 
+  selectOptions: any[];
+
   action: string = null;
   allSelected: boolean;
   actions: any[];
@@ -54,19 +56,22 @@ export class HandleMultipleValidationsComponent implements OnInit {
       this.archiveItems,
       this.unArchiveItems
     ]
+
+    this.selectOptions = [
+      {label: 'Select all', allSelected: true},
+      {label: 'Select individually', allSelected: false},
+    ]
   }
 
-  activateSelection(allSelected: boolean, action: string): void {
-    this.allSelected = allSelected;
+  activateSelection(): void {
     this.selectionActive$.next(true);
-    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected, action), action: action})
+    this.selectionActive.emit({activate: true, selected: this.selectValidations(this.allSelected, this.action), action: this.action})
   }
 
   closeAndCleanSelection(): void {
     this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
     this.selectionActive$.next(false)
     this.action = null;
-    this.allSelected = false;
   }
 
   selectValidations(all: boolean, action: string): BehaviorSubject<string[]> {

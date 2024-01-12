@@ -3,22 +3,30 @@
   <p-dropdown
     [options]="actions"
     [(ngModel)]="action"
-    (onChange)="selectionActive.emit({activate: true, selected: selectValidations(allSelected, action), action: action})"
+    (onChange)="selectionActive.emit({activate: this.selectionActive$.value, selected: selectValidations(allSelected, action), action: action})"
     optionLabel="label"
     optionValue="action"
     placeholder="Select action">
   </p-dropdown>
   <div *ngIf="action" class="mt-3">
-    <p-button
-      label="Select all"
-      icon="pi pi-fw pi-check-square"
-      (onClick)="this.activateSelection(true, action)">
-    </p-button>
-    <p-button
-      label="Select individually"
-      icon="pi pi-fw pi-stop"
-      (onClick)="this.activateSelection(false, action)">
-    </p-button>
+    <p-selectButton
+      [options]="selectOptions"
+      [(ngModel)]="allSelected"
+      (onChange)="activateSelection()"
+      optionLabel="label"
+      optionValue="allSelected">
+
+    </p-selectButton>
+<!--    <p-button-->
+<!--      label="Select all"-->
+<!--      icon="pi pi-fw pi-check-square"-->
+<!--      (onClick)="this.activateSelection(true, action)">-->
+<!--    </p-button>-->
+<!--    <p-button-->
+<!--      label="Select individually"-->
+<!--      icon="pi pi-fw pi-stop"-->
+<!--      (onClick)="this.activateSelection(false, action)">-->
+<!--    </p-button>-->
   </div>
   <div *ngIf="(selectionActive$|async)" class="mt-3">
     <p-button
