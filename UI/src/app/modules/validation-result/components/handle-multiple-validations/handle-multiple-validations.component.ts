@@ -63,20 +63,26 @@ export class HandleMultipleValidationsComponent implements OnInit {
     ]
   }
 
-  activateSelection(): void {
+  startSelection(selectAll = false): void {
     this.selectionActive$.next(true);
-    this.selectionActive.emit({activate: true, selected: this.selectValidations(this.allSelected, this.action), action: this.action})
+    this.selectionActive.emit({
+      activate: true,
+      selected: this.selectValidations(selectAll, this.action),
+      action: this.action
+    })
   }
 
   closeAndCleanSelection(): void {
     this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
     this.selectionActive$.next(false)
     this.action = null;
+    this.allSelected = false;
   }
+
 
   selectValidations(all: boolean, action: string): BehaviorSubject<string[]> {
     const selectedValidations = [];
-    const select_archived= action === 'unarchive';
+    const select_archived = action === 'unarchive';
     if (all && action !== 'unarchived') {
       this.validations.forEach(val => {
         if (val.is_archived === select_archived && val.is_unpublished) {
@@ -89,28 +95,25 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
 
   deleteMultipleValidations(): void {
-    if (!confirm('Do you really want to delete selected validations?')) {
-      return;
-    }
     this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response => {
       this.validationrunService.refreshComponent('page');
     })
   }
 
   archiveMultipleValidations(archive: boolean): void {
-    if (!confirm('Do you really want to delete selected validations?')) {
-      return;
-    }
     this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue(), archive).subscribe(response => {
       this.validationrunService.refreshComponent('page');
     })
   }
 
   handleMultipleValidations(): void {
+    if (!confirm(`Do you really want to ${this.action} selected validations?`)) {
+      return;
+    }
     if (this.action === 'delete') {
       this.deleteMultipleValidations()
     } else if (this.action === 'archive' || this.action === 'unarchive') {
-      this.archiveMultipleValidations(true)
+      this.archiveMultipleValidations(this.action === 'archive')
     }
     this.closeAndCleanSelection()
   }

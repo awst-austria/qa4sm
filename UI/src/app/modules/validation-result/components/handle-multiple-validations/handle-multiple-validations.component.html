@@ -1,47 +1,46 @@
 <div class="card flex sm:w-auto xl:px-4 lg:px-3 sm:px-2 py-3">
   <div class="side-menu-header my-3 ml-2">Modify multiple validations</div>
+  <span class="p-float-label">
   <p-dropdown
+    id="selectAction"
     [options]="actions"
     [(ngModel)]="action"
-    (onChange)="selectionActive.emit({activate: this.selectionActive$.value, selected: selectValidations(allSelected, action), action: action})"
+    (onChange)="startSelection(allSelected)"
     optionLabel="label"
     optionValue="action"
-    placeholder="Select action">
+    placeholder="Select action"
+    [style]="{'width': '100%'}">
   </p-dropdown>
+    <label for="{{selectAction}}">Select action</label>
+  </span>
   <div *ngIf="action" class="mt-3">
-    <p-selectButton
-      [options]="selectOptions"
+    <p-toggleButton
+      [style]="{'width': '100%'}"
       [(ngModel)]="allSelected"
-      (onChange)="activateSelection()"
-      optionLabel="label"
-      optionValue="allSelected">
-
-    </p-selectButton>
-<!--    <p-button-->
-<!--      label="Select all"-->
-<!--      icon="pi pi-fw pi-check-square"-->
-<!--      (onClick)="this.activateSelection(true, action)">-->
-<!--    </p-button>-->
-<!--    <p-button-->
-<!--      label="Select individually"-->
-<!--      icon="pi pi-fw pi-stop"-->
-<!--      (onClick)="this.activateSelection(false, action)">-->
-<!--    </p-button>-->
+      onLabel="Select individually"
+      offLabel="Select All"
+      (onChange)="startSelection(allSelected)">
+    </p-toggleButton>
   </div>
-  <div *ngIf="(selectionActive$|async)" class="mt-3">
-    <p-button
-      label="Cancel"
-      icon="pi pi-ban"
-      (onClick)="closeAndCleanSelection()">
-    </p-button>
-    <button
-      pButton
-      type="button"
-      class="p-button-warning mx-2"
-      [ngClass]="{'p-button-danger': action === 'delete'}"
-      label="Apply to selected"
-      (click)="handleMultipleValidations()">
-    </button>
+  <div *ngIf="(selectionActive$|async)"
+       class="mt-3 flex flex-row lg:flex-nowrap column-gap-1 justify-content-center align-content-center w-12">
+    <div class="flex flex-column w-6">
+      <p-button
+        [style]="{'width': '100%'}"
+        label="Cancel"
+        icon="pi pi-ban"
+        (onClick)="closeAndCleanSelection()">
+      </p-button>
+    </div>
+    <div class="flex flex-column w-6">
+      <p-button
+        [style]="{'width': '100%'}"
+        styleClass="p-button-outlined p-button-warning"
+        label="Apply"
+        (onClick)="handleMultipleValidations()">
+      </p-button>
+    </div>
+
   </div>
 </div>
 
