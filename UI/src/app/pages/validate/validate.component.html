@@ -1,5 +1,5 @@
 <main>
-  <div class="flex flex-wrap align-content-center justify-content-center w-12"
+  <div class="flex flex-column flex-wrap align-content-center justify-content-center w-12"
        [ngClass]="{'non-scrollable': isExistingValidationWindowOpen}">
     <div *ngIf="(authService.authenticated|async)===false"
          class="flex flex-column w-12 alert py-2 mb-2 text-center align-content-center">
@@ -13,7 +13,7 @@
       </h5>
 
     </div>
-    <div class="flex flex-column flex-wrap w-8 justify-content-center">
+    <div class="flex flex-column flex-wrap w-8 justify-content-center align-content-center">
 
       <div *ngIf="!maintenanceMode"
            class="flex flex-column flex-wrap align-content-center justify-content-center flex-wrap">
@@ -227,11 +227,11 @@
         <!--      </div>-->
 
         <!-- Name -->
-        <div class="w-10 p-2 flex flex-row">
-          <div class="label w-3 lg:text-2xl md:text-xl text-base">
+        <div class="w-10 p-2 flex flex-row md:flex-nowrap flex-wrap">
+          <div class="label md:w-3 w-12 lg:text-2xl text-xl md:px-1 px-2 text-center">
             <label for="name">Name your validation</label>
           </div>
-          <input class="form-field w-8"
+          <input class="form-field md:w-8 w-11"
                  id="name"
                  type="text"
                  pInputText

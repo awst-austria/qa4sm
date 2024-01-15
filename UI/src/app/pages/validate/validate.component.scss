@@ -59,3 +59,13 @@ div {
   background-color: rgba(220, 220, 220, 0.2);
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
+
+@media screen and (max-width: 767px){
+  .label{
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 0;
+  }
+  .help-field{
+    border-top-right-radius: 0;
+  }
+}
