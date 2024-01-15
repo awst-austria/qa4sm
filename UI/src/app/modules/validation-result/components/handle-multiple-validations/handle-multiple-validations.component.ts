@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {MenuItem} from 'primeng/api';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -17,65 +16,114 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   selectionActive$ = new BehaviorSubject(false);
 
-  deleteItems: MenuItem[];
+  deleteItems: {};
+  archiveItems: {};
+  unArchiveItems: {};
+
+  selectOptions: any[];
+
+  action: string = null;
+  allSelected: boolean;
+  actions: any[];
+  numberOfAllValidations: number;
 
   constructor(private validationrunService: ValidationrunService) {
   }
 
   ngOnInit() {
-    this.deleteItems = [
+    this.selectedValidationsId$.subscribe(data => {
+      if (this.numberOfAllValidations > data.length){
+        this.allSelected = false;
+      }
+    })
+    this.deleteItems =
       {
+        action: 'delete',
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
-        items: [
-          {
-            label: 'Select all',
-            icon: 'pi pi-fw pi-check-square',
-            command: () => this.activateSelection(true)
-          },
-          {
-            label: 'Select individually',
-            icon: 'pi pi-fw pi-stop',
-            command: () => this.activateSelection(false)
-          }
-
-        ]
       }
+
+    this.archiveItems =
+      {
+        action: 'archive',
+        label: 'Archive',
+        icon: 'pi pi-fw pi-folder',
+      }
+
+    this.unArchiveItems =
+      {
+        action: 'unarchive',
+        label: 'Un-Archive',
+        icon: 'pi pi-calendar',
+      }
+
+    this.actions = [
+      this.deleteItems,
+      this.archiveItems,
+      this.unArchiveItems
+    ]
+
+    this.selectOptions = [
+      {label: 'Select all', allSelected: true},
+      {label: 'Select individually', allSelected: false},
     ]
   }
 
-  activateSelection(allSelected: boolean): void {
-    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected)})
+  startSelection(selectAll = false): void {
     this.selectionActive$.next(true);
+    this.selectionActive.emit({
+      activate: true,
+      selected: this.selectValidations(selectAll, this.action),
+      allSelected: selectAll,
+      action: this.action
+    })
   }
 
   closeAndCleanSelection(): void {
-    this.selectionActive.emit({activate: false, selected: this.selectValidations(false)})
+    this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
     this.selectionActive$.next(false)
-
+    this.action = null;
+    this.allSelected = false;
   }
 
-  selectValidations(all: boolean): BehaviorSubject<string[]> {
+
+  selectValidations(all: boolean, action: string): BehaviorSubject<string[]> {
     const selectedValidations = [];
-    if (all) {
+    const select_archived = action === 'unarchive';
+    if (all && action !== 'unarchived') {
       this.validations.forEach(val => {
-        if (!val.is_archived && val.is_unpublished) {
+        if (val.is_archived === select_archived && val.is_unpublished) {
           selectedValidations.push(val.id)
         }
       })
     }
+    this.numberOfAllValidations = selectedValidations.length;
     return new BehaviorSubject(selectedValidations)
   }
 
 
   deleteMultipleValidations(): void {
-    if (!confirm('Do you really want to delete selected validations?')) {
+    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response => {
+      this.validationrunService.refreshComponent('page');
+    })
+  }
+
+  archiveMultipleValidations(archive: boolean): void {
+    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue(), archive).subscribe(response => {
+      this.validationrunService.refreshComponent('page');
+    })
+  }
+
+  handleMultipleValidations(): void {
+    if (!confirm(`Do you really want to ${this.action} selected validations?`)) {
       return;
     }
-    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response =>{
-      this.validationrunService.refreshComponent('page');
-      this.closeAndCleanSelection()
-    })
+    if (this.action === 'delete') {
+      this.deleteMultipleValidations()
+    } else if (this.action === 'archive' || this.action === 'unarchive') {
+      this.archiveMultipleValidations(this.action === 'archive')
+    }
+    this.closeAndCleanSelection()
   }
 
 

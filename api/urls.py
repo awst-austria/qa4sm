@@ -126,6 +126,7 @@ urlpatterns = [
     path('delete-multiple-validations', delete_multiple_result, name='Delete Multiple Validations'),
     path('user-manual', get_user_manual, name='Get user manual'),
     path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
+    path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

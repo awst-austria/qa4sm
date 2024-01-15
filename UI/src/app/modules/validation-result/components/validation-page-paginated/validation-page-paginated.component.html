@@ -41,7 +41,7 @@
                class="validation-row-area">
             <p-checkbox
               class="modify-checkbox"
-              *ngIf="(selectionActive$|async) && valrun.is_unpublished && !valrun.is_archived"
+              *ngIf="(selectionActive$|async) && valrun.is_unpublished && ((action$|async) !== 'unarchive' ? !valrun.is_archived : valrun.is_archived)"
               [value]="valrun.id"
               [ngModel]="selectedValidations$ | async"
               (ngModelChange)="updateSelectedValidations($event, valrun.id)"
