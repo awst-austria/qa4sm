@@ -25,11 +25,17 @@ export class HandleMultipleValidationsComponent implements OnInit {
   action: string = null;
   allSelected: boolean;
   actions: any[];
+  numberOfAllValidations: number;
 
   constructor(private validationrunService: ValidationrunService) {
   }
 
   ngOnInit() {
+    this.selectedValidationsId$.subscribe(data => {
+      if (this.numberOfAllValidations != data.length){
+        this.allSelected = false;
+      }
+    })
     this.deleteItems =
       {
         action: 'delete',
@@ -90,6 +96,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
         }
       })
     }
+    this.numberOfAllValidations = selectedValidations.length;
     return new BehaviorSubject(selectedValidations)
   }
 
