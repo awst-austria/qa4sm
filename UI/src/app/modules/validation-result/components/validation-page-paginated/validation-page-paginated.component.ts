@@ -18,6 +18,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   offset = 0;
   order = '-start_time';
   selectionActive$ = new BehaviorSubject(false);
+  allSelected$ = new BehaviorSubject(false);
   action$ = new BehaviorSubject(null);
   selectedValidations$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
@@ -82,6 +83,17 @@ export class ValidationPagePaginatedComponent implements OnInit {
       if (validations.length) {
         this.validations = this.validations.concat(validations);
 
+        if (this.allSelected$.value){
+          const selectedValidations = [];
+          const select_archived = this.action$.value === 'unarchive';
+          this.validations.forEach(val => {
+            if (val.is_archived === select_archived && val.is_unpublished) {
+              selectedValidations.push(val.id)
+            }
+          })
+          this.selectedValidations$.next(selectedValidations);
+        }
+
         if (this.currentPage > this.maxNumberOfPages) {
           this.setEndOfPage();
         }
@@ -126,6 +138,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.selectionActive$.next(event.activate);
     this.action$.next(event.action);
     this.selectedValidations$.next(event.selected.value);
+    this.allSelected$.next(event.allSelected)
   }
 
   updateSelectedValidations(checked: string[], id: string): void {

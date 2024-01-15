@@ -32,7 +32,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   ngOnInit() {
     this.selectedValidationsId$.subscribe(data => {
-      if (this.numberOfAllValidations != data.length){
+      if (this.numberOfAllValidations > data.length){
         this.allSelected = false;
       }
     })
@@ -74,6 +74,7 @@ export class HandleMultipleValidationsComponent implements OnInit {
     this.selectionActive.emit({
       activate: true,
       selected: this.selectValidations(selectAll, this.action),
+      allSelected: selectAll,
       action: this.action
     })
   }
