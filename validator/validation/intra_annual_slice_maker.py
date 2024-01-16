@@ -202,7 +202,7 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
             List containing the names of the intra annual slices.
         '''
 
-        return list(self.custom_intra_annual_slice.keys())
+        return list(self._custom_intra_annual_slice().keys())
 
     @property
     def metadata(self) -> dict:

@@ -1,9 +1,10 @@
 import xarray as xr
 import numpy as np
-from typing import List, Dict, Tuple, Union
+from typing import List, Dict, Tuple, Union, Optional
 import pandas as pd
 from validator.validation.intra_annual_slice_maker import IntraAnnualSlicer
 from validator.validation.globals import METADATA_TEMPLATE
+import os
 
 
 class Pytesmo2Qa4smResultsTranscriber:
@@ -17,7 +18,7 @@ class Pytesmo2Qa4smResultsTranscriber:
         The pytesmo results dictionary.
     intra_annual_slices : Union[None, IntraAnnualSlicer]
         The intra annual slices for the results. Default is None, which means that no intra-annual intra annual slices are
-        used, but only the 'bulk'. If an instance of `valdiator.validation.IntraAnnualSlicer` is provided,
+        used, but only the 'bulk'. If an instance of `validator.validation.IntraAnnualSlicer` is provided,
         the intra annual slices are used as provided by the IntraAnnualSlicer instance.
     """
 
@@ -39,35 +40,8 @@ class Pytesmo2Qa4smResultsTranscriber:
             'instrument_depthfrom', 'instrument_depthto', 'frm_class'
         ]
 
-        # self.METADATA_TEMPLATE: Dict[str, Union[None, Dict[str, Union[
-        #     np.ndarray, np.float32, np.array]]]] = {
-        #         'other_ref': None,
-        #         'ismn_ref': {
-        #             'clay_fraction': np.float32([np.nan]),
-        #             'climate_KG': np.array([' ' * 256]),
-        #             'climate_insitu': np.array([' ' * 256]),
-        #             'elevation': np.float32([np.nan]),
-        #             'instrument': np.array([' ' * 256]),
-        #             'latitude': np.float32([np.nan]),
-        #             'lc_2000': np.float32([np.nan]),
-        #             'lc_2005': np.float32([np.nan]),
-        #             'lc_2010': np.float32([np.nan]),
-        #             'lc_insitu': np.array([' ' * 256]),
-        #             'longitude': np.float32([np.nan]),
-        #             'network': np.array([' ' * 256]),
-        #             'organic_carbon': np.float32([np.nan]),
-        #             'sand_fraction': np.float32([np.nan]),
-        #             'saturation': np.float32([np.nan]),
-        #             'silt_fraction': np.float32([np.nan]),
-        #             'station': np.array([' ' * 256]),
-        #             'timerange_from': np.array([' ' * 256]),
-        #             'timerange_to': np.array([' ' * 256]),
-        #             'variable': np.array([' ' * 256]),
-        #             'instrument_depthfrom': np.float32([np.nan]),
-        #             'instrument_depthto': np.float32([np.nan]),
-        #             'frm_class': np.array([' ' * 256]),
-        #         }
-        #     }
+        self.METADATA_TEMPLATE: Dict[str, Union[None, Dict[str, Union[
+            np.ndarray, np.float32, np.array]]]] = METADATA_TEMPLATE
 
         self.intra_annual_slices_checker_called: bool = False
         self.intra_annual_slices_check: bool = False
@@ -137,7 +111,7 @@ class Pytesmo2Qa4smResultsTranscriber:
             for metric in results[key]:
                 # static 'metrics' (e.g. metadata, geoinfo) are not related to datasets
                 statics = ["gpi", "n_obs", "lat", "lon"]
-                statics.extend(METADATA_TEMPLATE["ismn_ref"])
+                statics.extend(self.METADATA_TEMPLATE["ismn_ref"])
                 if metric in statics:
                     new_key = metric
                 else:
@@ -391,3 +365,82 @@ class Pytesmo2Qa4smResultsTranscriber:
             self.transcribed_dataset.to_netcdf(path)
 
         return self.transcribed_dataset
+
+    def build_outname(self, root: str, keys: List[Tuple[str]]) -> str:
+        """
+        Build the output name for the NetCDF file. Slight alteration of the original function from pytesmo
+        `pytesmo.validation_framework.results_manager.build_filename`.
+
+        Parameters
+        ----------
+        root : str
+            The root path, where the file is to be written to.
+        keys : List[Tuple[str]]
+            The keys of the pytesmo results.
+
+        Returns
+        -------
+        str
+            The output name for the NetCDF file.
+
+        """
+
+        ds_names = []
+        for key in keys:
+            for ds in key:
+                if isinstance(ds, tuple):
+                    ds_names.append(".".join(list(ds)))
+                else:
+                    ds_names.append(ds)
+
+        fname = "_with_".join(sorted(set(ds_names)))
+        ext = "nc"
+        if len(os.path.join(root, ".".join([fname, ext]))) > 255:
+            ds_names = [str(ds[0]) for ds in key]
+            fname = "_with_".join(ds_names)
+
+            if len(os.path.join(root, ".".join([fname, ext]))) > 255:
+                fname = "validation"
+
+        return os.path.join(root, ".".join([fname, ext]))
+
+    def write_to_netcdf(self,
+                        path: str,
+                        mode: Optional[str] = 'w',
+                        format: Optional[str] = 'NETCDF4',
+                        engine: Optional[str] = 'netcdf4',
+                        encoding: Optional[Dict] = {
+                            "zlib": True,
+                            "complevel": 5
+                        },
+                        compute: Optional[bool] = True,
+                        **kwargs) -> str:
+        """
+        Write the transcribed dataset to a NetCDF file, based on `xarray.Dataset.to_netcdf`
+
+        Parameters
+        ----------
+        path : str
+            The path to write the NetCDF file
+        mode : Optional[str], optional
+            The mode to open the NetCDF file, by default 'w'
+        format : Optional[str], optional
+            The format of the NetCDF file, by default 'NETCDF4'
+        engine : Optional[str], optional
+            The engine to use, by default 'netcdf4'
+        encoding : Optional[Dict], optional
+            The encoding to use, by default {"zlib": True, "complevel": 5}
+        compute : Optional[bool], optional
+            Whether to compute the dataset, by default True
+        **kwargs : dict
+            Keyword arguments passed to `xarray.Dataset.to_netcdf`.
+
+        Returns
+        -------
+        str
+            The path to the NetCDF file.
+
+        """
+
+        self.transcribed_dataset.to_netcdf(path, mode, **kwargs)
+        return path

@@ -6,31 +6,37 @@ from validator.models import ValidationRun
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
-METRICS = {'R': 'Pearson\'s r',
-           'p_R': 'Pearson\'s r p-value',
-           'rho': 'Spearman\'s rho',
-           'p_rho': 'Spearman\'s rho p-value',
-           'RMSD': 'Root-mean-square deviation',
-           'BIAS': 'Bias (difference of means)',
-           'n_obs': '# observations',
-           'status': '# status',
-           'urmsd': 'Unbiased root-mean-square deviation',
-           'RSS': 'Residual sum of squares',
-           'mse': 'Mean square error',
-           'mse_corr': 'Mean square error correlation',
-           'mse_bias': 'Mean square error bias',
-           'mse_var': 'Mean square error variance', }
+METRICS = {
+    'R': 'Pearson\'s r',
+    'p_R': 'Pearson\'s r p-value',
+    'rho': 'Spearman\'s rho',
+    'p_rho': 'Spearman\'s rho p-value',
+    'RMSD': 'Root-mean-square deviation',
+    'BIAS': 'Bias (difference of means)',
+    'n_obs': '# observations',
+    'status': '# status',
+    'urmsd': 'Unbiased root-mean-square deviation',
+    'RSS': 'Residual sum of squares',
+    'mse': 'Mean square error',
+    'mse_corr': 'Mean square error correlation',
+    'mse_bias': 'Mean square error bias',
+    'mse_var': 'Mean square error variance',
+}
 
-METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_",
-                   "{metric}"]
+METRIC_TEMPLATE = [
+    "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
+]
 
-TC_METRICS = {'snr': 'TC: Signal-to-noise ratio',
-              'err_std': 'TC: Error standard deviation',
-              'beta': 'TC: Scaling coefficient', }
+TC_METRICS = {
+    'snr': 'TC: Signal-to-noise ratio',
+    'err_std': 'TC: Error standard deviation',
+    'beta': 'TC: Scaling coefficient',
+}
 
-TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
-                      "_{metric}",
-                      "_for_{id_met}-{ds_met}"]
+TC_METRIC_TEMPLATE = [
+    "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
+    "_{metric}", "_for_{id_met}-{ds_met}"
+]
 
 C3SC = 'C3S_combined'
 ISMN = 'ISMN'
@@ -122,57 +128,67 @@ SMOS_SBPCA_sm = 'SMOS_SBPCA_sm'
 NOT_AS_REFERENCE = []
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
-VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to', 'temporal_matching']
-DS_FIELDS = ['dataset', 'version', 'is_spatial_reference', 'is_temporal_reference']
+VR_FIELDS = [
+    'interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon',
+    'tcol', 'bootstrap_tcol_cis', 'anomalies', 'anomalies_from',
+    'anomalies_to', 'temporal_matching'
+]
+DS_FIELDS = [
+    'dataset', 'version', 'is_spatial_reference', 'is_temporal_reference'
+]
 
-IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
-                   'SMOS_L3': 0.25,
-                   'SMOS_IC': 0.25,
-                   'ASCAT': 0.1,
-                   'SMOS_L2': 0.135,  # 15km
-                   'SMOS_SBPCA': 0.135,  # 15km
-                   'SMAP_L2': 0.35, }  # 35km
+IRREGULAR_GRIDS = {
+    'SMAP_L3': 0.35,
+    'SMOS_L3': 0.25,
+    'SMOS_IC': 0.25,
+    'ASCAT': 0.1,
+    'SMOS_L2': 0.135,  # 15km
+    'SMOS_SBPCA': 0.135,  # 15km
+    'SMAP_L2': 0.35,
+}  # 35km
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
 
-METADATA_TEMPLATE = {'other_ref': None,
-                     'ismn_ref': {'clay_fraction': np.float32([np.nan]),
-                                  'climate_KG': np.array([' ' * 256]),
-                                  'climate_insitu': np.array([' ' * 256]),
-                                  'elevation': np.float32([np.nan]),
-                                  'instrument': np.array([' ' * 256]),
-                                  'latitude': np.float32([np.nan]),
-                                  'lc_2000': np.float32([np.nan]),
-                                  'lc_2005': np.float32([np.nan]),
-                                  'lc_2010': np.float32([np.nan]),
-                                  'lc_insitu': np.array([' ' * 256]),
-                                  'longitude': np.float32([np.nan]),
-                                  'network': np.array([' ' * 256]),
-                                  'organic_carbon': np.float32([np.nan]),
-                                  'sand_fraction': np.float32([np.nan]),
-                                  'saturation': np.float32([np.nan]),
-                                  'silt_fraction': np.float32([np.nan]),
-                                  'station': np.array([' ' * 256]),
-                                  'timerange_from': np.array([' ' * 256]),
-                                  'timerange_to': np.array([' ' * 256]),
-                                  'variable': np.array([' ' * 256]),
-                                  'instrument_depthfrom': np.float32([np.nan]),
-                                  'instrument_depthto': np.float32([np.nan]),
-                                  # only available for FRM4SM ISMN version(s)
-                                  'frm_class': np.array([' ' * 256]),
-                                  }
-                     }
+METADATA_TEMPLATE = {
+    'other_ref': None,
+    'ismn_ref': {
+        'clay_fraction': np.float32([np.nan]),
+        'climate_KG': np.array([' ' * 256]),
+        'climate_insitu': np.array([' ' * 256]),
+        'elevation': np.float32([np.nan]),
+        'instrument': np.array([' ' * 256]),
+        'latitude': np.float32([np.nan]),
+        'lc_2000': np.float32([np.nan]),
+        'lc_2005': np.float32([np.nan]),
+        'lc_2010': np.float32([np.nan]),
+        'lc_insitu': np.array([' ' * 256]),
+        'longitude': np.float32([np.nan]),
+        'network': np.array([' ' * 256]),
+        'organic_carbon': np.float32([np.nan]),
+        'sand_fraction': np.float32([np.nan]),
+        'saturation': np.float32([np.nan]),
+        'silt_fraction': np.float32([np.nan]),
+        'station': np.array([' ' * 256]),
+        'timerange_from': np.array([' ' * 256]),
+        'timerange_to': np.array([' ' * 256]),
+        'variable': np.array([' ' * 256]),
+        'instrument_depthfrom': np.float32([np.nan]),
+        'instrument_depthto': np.float32([np.nan]),
+        # only available for FRM4SM ISMN version(s)
+        'frm_class': np.array([' ' * 256]),
+    }
+}
 
 INSTRUMENT_META = "instrument"
 MEASURE_DEPTH_FROM = "instrument_depthfrom"
 MEASURE_DEPTH_TO = "instrument_depthto"
-METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
-                       "Climate classification": "metadata_climate_KG",
-                       "Soil type classification": "metadata_instrument_depth_and_soil_type",
-                       "FRM classification": "metadata_frm_class",
-                       }
+METADATA_PLOT_NAMES = {
+    "Land cover classification": "metadata_lc_2010",
+    "Climate classification": "metadata_climate_KG",
+    "Soil type classification": "metadata_instrument_depth_and_soil_type",
+    "FRM classification": "metadata_frm_class",
+}
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
 
@@ -183,4 +199,6 @@ USER_DATASET_MIN_ID = 200
 USER_DATASET_VERSION_MIN_ID = 500
 USER_DATASET_VARIABLE_MIN_ID = 500
 
-
+# netcdf compression means
+IMPLEMENTED_COMPRESSIONS = ['zlib']
+ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
