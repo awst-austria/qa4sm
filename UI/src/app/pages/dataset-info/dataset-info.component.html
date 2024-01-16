@@ -1,67 +1,71 @@
 <main *ngIf="datasetInfo$ | async as datasets">
-    <div id="help-panel" class="flex flex-column w-12 justify-content-center align-items-center">
-      <div class="flex flex-column lg:w-10 w-11 justify-content-center align-content-center">
-        <h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated and to be used as a reference</h1>
-        <p>
-          The following datasets can be validated within the QA4SM tool. These datasets are available in both the "data"
-          and the 'reference' sections and of the validate page. Click on the dataset name to get detailed information.
-        </p>
-      </div>
+  <div id="help-panel" class="flex flex-column w-12 justify-content-center align-items-center">
+    <div class="flex flex-column lg:w-10 w-11 justify-content-center align-content-center">
+      <h1 class="h3 mb-3 font-weight-normal">Datasets - Data to be validated and to be used as a reference</h1>
+      <p>
+        The following datasets can be validated within the QA4SM tool. These datasets are available in both the "data"
+        and the 'reference' sections and of the validate page. Click on the dataset name to get detailed information.
+      </p>
+    </div>
 
-      <div class="flex flex-column lg:w-10 w-11 justify-content-center align-content-center">
-        <div *ngFor="let dataset of datasets">
-          <p-accordion [multiple]="true">
-            <p-accordionTab [header]="dataset.pretty_name">
-              <div class="flex flex-column w-12 align-content-center justify-content-center gap-3">
-                <div class="flex flex-column text-justify w-12">
-                  <h5>Description:</h5>
-                  <div [innerHTML]="dataset.detailed_description"></div>
-                  <div [innerHTML]="dataset.source_reference"></div>
-                  <div>Citation: <span [innerHTML]="dataset.citation"></span></div>
-                  <div *ngIf="dataset.not_as_reference"> Please note that the dataset can not be used as the spatial reference for technical reasons. </div>
-                </div>
-                <div class="flex flex-column text-justify w-12">
-                  <h5>Filters:</h5>
-                  <ol class="text-justify">
-                    <li *ngFor="let filter of dataset.filtersDescription; let ind = index" class="ml-2">
-                      {{filter}}: {{dataset.filtersHelpText[ind]}}
-                    </li>
-                  </ol>
-                </div>
-                <div class="flex flex-column text-justify w-12">
-                  <h5>Supported versions with time range covered</h5>
-                  <ul>
-                    <li *ngFor="let version of dataset.versions; let ind=index" class="ml-2">
-                      <b>{{ version }}</b>
-                      <span *ngIf="dataset.versionsHelpText[ind] !== '-' && dataset.versionsHelpText[ind] !==''">
-                        ({{ dataset.versionsHelpText[ind] }}) <br>
-                      </span>
-                      <span>
-                        Filters: {{
-                          String(
-                            getPositionsOfElementsInList(dataset.filtersIds, dataset.versionsFilters[ind])
-                          ).replaceAll(',', ', ') // don't know why it's marked as an error, it's actually working
-                        }}
-                      </span>
-                      <br>
-
-                      <span *ngIf="dataset.versionsStart[ind] === '' && dataset.versionsEnd[ind] === ''; else elseTimeRange">
-                Time coverage is station dependent
-              </span>
-                      <ng-template #elseTimeRange>
-                        From: {{ dataset.versionsStart[ind]}} <br>
-                        To: {{dataset.versionsEnd[ind]}}
-                      </ng-template>
-                    </li>
-                  </ul>
+    <div class="flex flex-column lg:w-10 w-11 justify-content-center align-content-center">
+      <div *ngFor="let dataset of datasets">
+        <p-accordion [multiple]="true">
+          <p-accordionTab [header]="dataset.pretty_name">
+            <div class="flex flex-column w-12 align-content-center justify-content-center gap-3">
+              <div class="flex flex-column text-justify w-12">
+                <h5>Description:</h5>
+                <div [innerHTML]="dataset.detailed_description"></div>
+                <div [innerHTML]="dataset.source_reference"></div>
+                <div>Citation: <span [innerHTML]="dataset.citation"></span></div>
+                <div *ngIf="dataset.not_as_reference"> Please note that the dataset can not be used as the spatial
+                  reference for technical reasons.
                 </div>
               </div>
+              <div class="flex flex-column text-justify w-12">
+                <h5>Filters:</h5>
+                <ol class="text-justify">
+                  <li *ngFor="let filter of dataset.filtersDescription; let ind = index" class="ml-2">
+                    {{ filter }}: {{ dataset.filtersHelpText[ind] }}
+                  </li>
+                </ol>
+              </div>
+              <div class="flex flex-column text-justify w-12">
+                <h5>Supported versions with time range covered</h5>
+                <ul>
+                  <li *ngFor="let version of dataset.versions; let ind=index" class="ml-2">
+                    <b>{{ version }}</b>
+                    <span *ngIf="dataset.versionsHelpText[ind] !== '-' && dataset.versionsHelpText[ind] !==''">
+                        ({{ dataset.versionsHelpText[ind] }}) <br>
+                      </span>
+                    <span>
+                        Filters: {{
+                        String(
+                          getPositionsOfElementsInList(dataset.filtersIds, dataset.versionsFilters[ind])
+                        ).replaceAll(',', ', ') // don't know why it's marked as an error, it's actually working
+
+                      }}
+                      </span>
+                    <br>
+
+                    <span
+                      *ngIf="dataset.versionsStart[ind] === '' && dataset.versionsEnd[ind] === ''; else elseTimeRange">
+                Time coverage is station dependent
+              </span>
+                    <ng-template #elseTimeRange>
+                      From: {{ dataset.versionsStart[ind] }} <br>
+                      To: {{ dataset.versionsEnd[ind] }}
+                    </ng-template>
+                  </li>
+                </ul>
+              </div>
+            </div>
 
 
-            </p-accordionTab>
-          </p-accordion>
-        </div>
+          </p-accordionTab>
+        </p-accordion>
       </div>
     </div>
+  </div>
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>
