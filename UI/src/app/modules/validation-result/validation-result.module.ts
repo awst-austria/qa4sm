@@ -31,6 +31,7 @@ import {FieldsetModule} from 'primeng/fieldset';
 import {CheckboxModule} from 'primeng/checkbox';
 import {SelectButtonModule} from 'primeng/selectbutton';
 import {ToggleButtonModule} from 'primeng/togglebutton';
+import {MenuModule} from 'primeng/menu';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -54,26 +55,27 @@ import {ToggleButtonModule} from 'primeng/togglebutton';
         PublishingComponent,
         ExistingValidationComponent,
     ],
-  imports: [
-    CommonModule,
-    PanelModule,
-    TooltipModule,
-    FontAwesomeModule,
-    RouterModule,
-    DropdownModule,
-    FormsModule,
-    InputTextModule,
-    NgDompurifyModule,
-    ButtonModule,
-    ReactiveFormsModule,
-    GalleriaModule,
-    DialogModule,
-    PanelMenuModule,
-    FieldsetModule,
-    CheckboxModule,
-    SelectButtonModule,
-    ToggleButtonModule
-  ]
+    imports: [
+        CommonModule,
+        PanelModule,
+        TooltipModule,
+        FontAwesomeModule,
+        RouterModule,
+        DropdownModule,
+        FormsModule,
+        InputTextModule,
+        NgDompurifyModule,
+        ButtonModule,
+        ReactiveFormsModule,
+        GalleriaModule,
+        DialogModule,
+        PanelMenuModule,
+        FieldsetModule,
+        CheckboxModule,
+        SelectButtonModule,
+        ToggleButtonModule,
+        MenuModule
+    ]
 })
 export class ValidationResultModule {
 }
