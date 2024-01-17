@@ -135,7 +135,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   handleMultipleSelection(event): void {
-    this.selectionActive$.next(event.activate);
+    this.selectionActive$.next(event.active);
     this.action$.next(event.action);
     this.selectedValidations$.next(event.selected.value);
     this.allSelected$.next(event.allSelected)

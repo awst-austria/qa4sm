@@ -1,5 +1,6 @@
-<main class="flex flex-column align-items-center">
-  <div id="help-panel" class="flex flex-column lg:w-6 w-11 align-content-center justify-content-center text-justify">
+<main class="flex flex-column align-items-center justify-content-center">
+  <div id="help-panel"
+       class="flex flex-column lg:w-6 w-9 md:text-base text-sm  align-content-center justify-content-center text-justify">
     <h1 class="h4 mb-3 font-weight-normal">Go to section</h1>
     <p>
       <a routerLink="{{pageUrl}}" fragment="ncstack">Option 1: NetCDF4 Image Stacks</a><br/>
@@ -7,7 +8,7 @@
       <a routerLink="{{pageUrl}}" fragment="examplefiles">Example Files</a><br/>
     </p>
 
-    <h1 id="intro" class="h1 mb-3 font-weight-normal">User Data Upload</h1>
+    <h1 id="intro" class="h1 mb-3 font-weight-normal md:text-5xl text-3xl">User Data Upload</h1>
 
     <p>
       With this new, experimental feature we allow users to ingest (parts of) their own data sets into QA4SM for
@@ -42,26 +43,28 @@
         <a href="mailto: support@qa4sm.eu">support@qa4sm.eu</a>. Otherwise we will delete your data again at some point.
       </li>
       <li>
-        The upload feature is in an early stage, if you find any bugs or need help with structuring your files correctly,
+        The upload feature is in an early stage, if you find any bugs or need help with structuring your files
+        correctly,
         contact us at <a href="mailto: support@qa4sm.eu">support@qa4sm.eu</a>.
       </li>
 
     </ol>
 
     <a id="ncstack"></a>
-    <h2 class="h2 mb-3 font-weight-normal">Option 1: Upload NetCDF4 Image Stacks</h2>
+    <h2 class="h2 mb-3 font-weight-normal md:text-5xl text-3xl">Option 1: Upload NetCDF4 Image Stacks</h2>
     <p>
       Most Level 3 and Level 4 soil moisture data is usually provided in image format with three data dimensions
       (latitude, longitude, time). Images can be concatenated along the time dimension to create image stacks / data
       cubes.
       From these data cubes, time series can be extracted, which is the basis for our validation algorithm.
     </p>
-    <h3 class="h3 mb-3 font-weight-normal">General Requirements</h3>
+    <h3 class="h3 mb-3 font-weight-normal md:text-4xl text-2xl">General Requirements</h3>
     <p>
       QA4SM supports image stacks in NetCDF4 format only. NetCDF is the most common format for climate data records and
       detailed CF conventions to create those files exist
       (<a target="_blank" href="https://cfconventions.org/cf-conventions/cf-conventions">available here</a>).
-      In general we use the python library <a target="_blank" href="https://xarray.dev/">xarray</a> to open netCDF files.
+      In general we use the python library <a target="_blank" href="https://xarray.dev/">xarray</a> to open netCDF
+      files.
       If your data is
       compatible with xarray, there are only a few more things to consider.
     </p>
@@ -76,17 +79,20 @@
         <b>integer, float or real</b>, or <b>double</b>.
       </li>
       <li>
-        All variables, dimensions and attributes in the file should be named using only letters, digits, and underscores.
+        All variables, dimensions and attributes in the file should be named using only letters, digits, and
+        underscores.
         Required attributes (see next chapter) are case sensitive.
         Variable names, long names and standard names should not exceed a length of <b>30</b> characters.
       </li>
       <li>
         Only 'coordinate data', i.e. 3-dimensional raster data, are supported as netCDF validation input.
-        As data variables must be 3-dimensional, 1 coordinate variable for each dimension (latitude, longitude, time) must
+        As data variables must be 3-dimensional, 1 coordinate variable for each dimension (latitude, longitude, time)
+        must
         be present in the file (see <a routerLink="{{pageUrl}}" fragment="ncdims">this section</a>).
       </li>
       <li>
-        Latitude and Longitude coordinates assigned to soil moisture observations must always refer to the WGS84 reference
+        Latitude and Longitude coordinates assigned to soil moisture observations must always refer to the WGS84
+        reference
         system (i.e. Longitudes from -180 to 180 &deg;E, Latitudes between -90 and 90 &deg;N.
       </li>
       <li>
@@ -97,7 +103,7 @@
 
 
     <a id="ncdims"></a>
-    <h3 class="h3 mb-3 font-weight-normal">Required dimensions and dimension attributes</h3>
+    <h3 class="h3 mb-3 font-weight-normal md:text-4xl text-2xl">Required dimensions and dimension attributes</h3>
     <h4 class="h4 mb-3 font-weight-normal">Latitude and Longitude</h4>
     <p>
       Two of the three dimensions in a netCDF image stack refer to the location of a grid cell and assign latitude and
@@ -105,85 +111,91 @@
     </p>
     <ol>
       <li>
-        Latitude and longitude can be 1-dimensional coordinate variables, with a dimension of the same name assigned, that
+        Latitude and longitude can be 1-dimensional coordinate variables, with a dimension of the same name assigned,
+        that
         contain the coordinate values directly (148 longitude values in the following example).
         The coordinates along the two axes then span a 2-dimension grid that contains the information on the location of
         all points. The longitude variable is structured accordingly.
-        <table class="my-4 variable-table">
-          <tr>
-            <td><b>Variable</b></td>
-            <td colspan="2">lat</td>
-          </tr>
-          <tr>
-            <td rowspan="4"><b>Attributes (dimensions)</b></td>
-            <td colspan="2">
-              lat (lat: 148)
-            </td>
-          </tr>
-          <tr>
-            <td>standard_name:</td>
-            <td>latitude</td>
-          </tr>
-          <tr>
-            <td>units:</td>
-            <td>degrees_north</td>
-          </tr>
-          <tr>
-            <td>valid_range:</td>
-            <td>[-90. 90]</td>
-          </tr>
-          <tr>
-            <td><b>Coordinates [dtype]</b></td>
-            <td colspan="2">lat (lat) [float64]</td>
-          </tr>
-          <tr>
-            <td><b>Data / Values</b></td>
-            <td colspan="2">[69.88, 69.62, &#8230;, 33.38, 33.1]</td>
-          </tr>
-        </table>
+        <div class="flex align-items-center justify-content-center">
+          <table class="my-4 variable-table">
+            <tr>
+              <td><b>Variable</b></td>
+              <td colspan="2">lat</td>
+            </tr>
+            <tr>
+              <td rowspan="4"><b>Attributes (dimensions)</b></td>
+              <td colspan="2">
+                lat (lat: 148)
+              </td>
+            </tr>
+            <tr>
+              <td>standard_name:</td>
+              <td>latitude</td>
+            </tr>
+            <tr>
+              <td>units:</td>
+              <td>degrees_north</td>
+            </tr>
+            <tr>
+              <td>valid_range:</td>
+              <td>[-90. 90]</td>
+            </tr>
+            <tr>
+              <td><b>Coordinates [dtype]</b></td>
+              <td colspan="2">lat (lat) [float64]</td>
+            </tr>
+            <tr>
+              <td><b>Data / Values</b></td>
+              <td colspan="2">[69.88, 69.62, &#8230;, 33.38, 33.1]</td>
+            </tr>
+          </table>
+        </div>
+
       </li>
       <li>
         Alternatively latitude and longitude can also be 2-dimensionsional coordinate variables, which <b>both</b> have
         two dimensions (in x and y direction; different name as the variables)
         assigned that contain the data point locations directly (16*35 data points in the following example). The
         longitude variable is structured accordingly.
-        <table class="my-4 variable-table">
-          <tr>
-            <td><b>Variable</b></td>
-            <td colspan="2"> lat</td>
-          </tr>
-          <tr>
-            <td rowspan="4"><b>Attributes (dimensions)</b></td>
-            <td colspan="2">
-              lat (y: 16, x: 35)
-            </td>
-          </tr>
-          <tr>
-            <td>standard_name:</td>
-            <td>latitude</td>
-          </tr>
-          <tr>
-            <td>units:</td>
-            <td>degrees_north</td>
-          </tr>
-          <tr>
-            <td>valid_range:</td>
-            <td>[-90. 90]</td>
-          </tr>
-          <tr>
-            <td><b>Coordinates [dtypes]</b></td>
-            <td colspan="2">lat (y, x) [float64] <br> lon (y, x) [float64]</td>
-          </tr>
-          <tr>
-            <td><b>Data / Values</b></td>
-            <td colspan="2"> [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
-              [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
-              <div>&#8942;</div>
-              [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
-              [5.125, 5.375, &#8230;, 13.375, 13.625]
-            </td>
-          </tr>
-        </table>
+        <div class="flex align-items-center justify-content-center">
+          <table class="my-4 variable-table">
+            <tr>
+              <td><b>Variable</b></td>
+              <td colspan="2"> lat</td>
+            </tr>
+            <tr>
+              <td rowspan="4"><b>Attributes (dimensions)</b></td>
+              <td colspan="2">
+                lat (y: 16, x: 35)
+              </td>
+            </tr>
+            <tr>
+              <td>standard_name:</td>
+              <td>latitude</td>
+            </tr>
+            <tr>
+              <td>units:</td>
+              <td>degrees_north</td>
+            </tr>
+            <tr>
+              <td>valid_range:</td>
+              <td>[-90. 90]</td>
+            </tr>
+            <tr>
+              <td><b>Coordinates [dtypes]</b></td>
+              <td colspan="2">lat (y, x) [float64] <br> lon (y, x) [float64]</td>
+            </tr>
+            <tr>
+              <td><b>Data / Values</b></td>
+              <td colspan="2"> [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
+                [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
+                <div>&#8942;</div>
+                [5.125, 5.375, &#8230;, 13.375, 13.625] <br>
+                [5.125, 5.375, &#8230;, 13.375, 13.625]
+              </td>
+            </tr>
+          </table>
+        </div>
       </li>
     </ol>
     <p>
@@ -193,7 +205,8 @@
       <li>
         <b>Longitude</b>: 'units: degrees_east' or one of 'units: degree_east', 'units: degree_E', 'units: degrees_E',
         'units: degreeE', and 'units: degreesE'.
-        If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i> attribute
+        If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i>
+        attribute
         with value 'longitude' also identifies longitude coordinates.
         If no standard name is provided, the <i>axis</i> attribute with value 'X', otherwise the variable names (case
         insensitive) 'longitude' and 'lon' should also work.
@@ -201,7 +214,8 @@
       <li>
         <b>Latitude</b>: 'units: degrees_north' or one of 'units: degree_north', 'units: degree_N', 'units: degrees_N',
         'units: degreeN', and 'units: degreesN'.
-        If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i> attribute
+        If no unit is assigned or multiple coordinate variables of that unit are found, the <i>standard_name</i>
+        attribute
         with value 'latitude' also identifies latitude coordinates.
         If no standard name is provided, the <i>axis</i> attribute with value 'Y', otherwise the variable names (case
         insensitive) 'latitude' and 'lat' should also work.
@@ -218,44 +232,48 @@
       <b>&lt;UNIT&gt; since &lt;REF DATE&gt;</b>, e.g. 'Days since 2000-01-01T00:00:00+00:00'
       (see also the <a target="_blank" href="http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate">CF
       conventions</a>).
-      If multiple potential time variables are found, the variable with attribute 'axis: T', the 'standard_name: time' or
+      If multiple potential time variables are found, the variable with attribute 'axis: T', the 'standard_name: time'
+      or
       the variable name 'time' identify the time coordinate variable.
-      A calendar name should be specified in the attributes but is not required (assumes 'calendar: standard', i.e. mixed
+      A calendar name should be specified in the attributes but is not required (assumes 'calendar: standard', i.e.
+      mixed
       Gregorian/Julian calendar).
     </p>
-    <table>
-      <tr>
-        <td><b>Variable</b></td>
-        <td colspan="2">time</td>
-      </tr>
-      <tr>
-        <td rowspan="4"><b>Attributes (dimensions)</b></td>
-        <td colspan="2">
-          time (time=10)
-        </td>
-      </tr>
-      <tr>
-        <td>standard_name:</td>
-        <td>time</td>
-      </tr>
-      <tr>
-        <td>units:</td>
-        <td>days since 2019-01-01 00:00:00</td>
-      </tr>
-      <tr>
-        <td>calendar:</td>
-        <td>proleptic_gregorian</td>
-      </tr>
+    <div class="flex align-items-center justify-content-center">
+      <table>
+        <tr>
+          <td><b>Variable</b></td>
+          <td colspan="2">time</td>
+        </tr>
+        <tr>
+          <td rowspan="4"><b>Attributes (dimensions)</b></td>
+          <td colspan="2">
+            time (time=10)
+          </td>
+        </tr>
+        <tr>
+          <td>standard_name:</td>
+          <td>time</td>
+        </tr>
+        <tr>
+          <td>units:</td>
+          <td>days since 2019-01-01 00:00:00</td>
+        </tr>
+        <tr>
+          <td>calendar:</td>
+          <td>proleptic_gregorian</td>
+        </tr>
 
-      <tr>
-        <td><b>Coordinates [dtype]</b></td>
-        <td colspan="2">time (time) [datetime64[ns]]</td>
-      </tr>
-      <tr>
-        <td><b>Data / Values</b></td>
-        <td colspan="2">['2019-01-01T00:00:00.0', &#8230;, '2019-01-10T00:00:00.0']</td>
-      </tr>
-    </table>
+        <tr>
+          <td><b>Coordinates [dtype]</b></td>
+          <td colspan="2">time (time) [datetime64[ns]]</td>
+        </tr>
+        <tr>
+          <td><b>Data / Values</b></td>
+          <td colspan="2">['2019-01-01T00:00:00.0', &#8230;, '2019-01-10T00:00:00.0']</td>
+        </tr>
+      </table>
+    </div>
     <p>
       Often, time stamps cannot be applied globally. In this case the values provided in 'time' is the basis to which a
       time offset is added. The time offset must be given as a separate, 3-dimensional variable (same size as the soil
@@ -263,7 +281,7 @@
     </p>
 
     <a id="ncoptattrs"></a>
-    <h3 class="h3 mb-3 font-weight-normal">Optional variable attributes</h3>
+    <h3 class="h3 mb-3 font-weight-normal md:text-4xl text-2xl">Optional variable attributes</h3>
 
     <ul>
       <li>
@@ -295,26 +313,28 @@
 
 
     <a id="csvfiles"></a>
-    <h2 class="h2 mb-3 font-weight-normal">Option 2: Upload Time Series</h2>
+    <h2 class="h2 mb-3 font-weight-normal md:text-5xl text-3xl">Option 2: Upload Time Series</h2>
 
     <p>
       As a more flexible way of providing data (which requires some pre-processing on the user side), we also allow
       uploading a collection of individual time series stored in <b>.csv</b> format.
       This is especially useful for datasets with non-orthogonal time steps (i.e. different time stamps at different
       locations) and to reduce the amount of uploaded data
-      (as e.g. only time series at in situ locations can be extracted beforehand). This data can be uploaded to QA4SM as a
+      (as e.g. only time series at in situ locations can be extracted beforehand). This data can be uploaded to QA4SM as
+      a
       <b>zip achive</b> of individual time series stored in a separate CSV file for each location.
       The location metadata (latitude, longitude, unique grid point index) has to be included in the individual file
       names. Dataset wide metadata (units, variable names) are provided in a <b>yaml</b> file in the
       same zip archive.
     </p>
 
-    <h3 class="h3 my-3 font-weight-normal">File name conventions</h3>
+    <h3 class="h3 my-3 font-weight-normal md:text-4xl text-2xl">File name conventions</h3>
     <p>
       The file name of an individual CSV file in the zip archive must match the following pattern:
     </p>
 
-    <div class="code-example"><i><b>&lt;DATASET_NAME&gt;</b>_gpi=<b>&lt;GPI&gt;</b>_lat=<b>&lt;LAT&gt;</b>_lon=<b>&lt;LON&gt;</b>.csv</i></div>
+    <div class="code-example"><i><b>&lt;DATASET_NAME&gt;</b>_gpi=<b>&lt;GPI&gt;</b>_lat=<b>&lt;LAT&gt;</b>_lon=<b>&lt;LON&gt;</b>.csv</i>
+    </div>
     <p>
       with:
     <p>
@@ -342,7 +362,7 @@
     </p>
     <div class="code-example"><i>myDataset_gpi=000001_lat=38.887_lon=-101.043.csv</i></div>
 
-    <h3 class="h3 my-3 font-weight-normal">File format</h3>
+    <h3 class="h3 my-3 font-weight-normal md:text-4xl text-2xl">File format</h3>
     <p>
       All CSV files must follow the same format, which consists of
     </p>
@@ -352,7 +372,8 @@
       </li>
       <li>
         A date index column in a format that dateutil can parse (see <a target="_blank"
-                                                                        href="https://dateutil.readthedocs.io/en/stable/parser.html">this page</a>
+                                                                        href="https://dateutil.readthedocs.io/en/stable/parser.html">this
+        page</a>
         for more info).
       </li>
       <li>
@@ -363,13 +384,15 @@
       Below is an example for the contents of a single csv time series file containing values for one soil moisture
       variable:
     </p>
-    <div class="yml">
-      Time,SM<br>
-      01-Jun-2016 01:30:07,0.18278<br>
-      02-Jun-2016 00:51:39,0.2003<br>
-      02-Jun-2016 12:08:07,0.181<br>
-      04-Jun-2016 01:13:32,0.22323<br>
-      &nbsp;&#8942;<br>
+    <div class="flex align-content-center justify-content-center">
+      <div class="yml">
+        Time,SM<br>
+        01-Jun-2016 01:30:07,0.18278<br>
+        02-Jun-2016 00:51:39,0.2003<br>
+        02-Jun-2016 12:08:07,0.181<br>
+        04-Jun-2016 01:13:32,0.22323<br>
+        &nbsp;&#8942;<br>
+      </div>
     </div>
 
     <p>
@@ -379,34 +402,38 @@
     </p>
     <div class="code-example"><i>pandas.read_csv(<b>&lt;FNAME&gt;</b>, index_col=0, parse_dates=True)</i></div>
 
-    <h3 class="h3 my-3 font-weight-normal">Metadata</h3>
+    <h3 class="h3 my-3 font-weight-normal md:text-4xl text-2xl">Metadata</h3>
     <p>
-      Metadata for the individual data variables (columns) in the CSV files (e.g. units, long name) can be provided in an
+      Metadata for the individual data variables (columns) in the CSV files (e.g. units, long name) can be provided in
+      an
       additional file with the name
       'metadata.yml' alongside the CSV files (stored in the same zip archive). This should have a similar format to this
       example for a 'metadata.yml' file:
     </p>
 
-    <div class="yml">
-      SM:<br>
-      &nbsp;&nbsp; long_name: soil moisture <br>
-      &nbsp;&nbsp; units: m^3/m^3<br>
-      &nbsp;&#8942;<br>
-      myvarnameX:<br>
-      &nbsp;&nbsp; long_name: soil moisture x<br>
-      &nbsp;&nbsp; units: m^3/m^3<br>
+    <div class="flex align-content-center justify-content-center">
+      <div class="yml">
+        SM:<br>
+        &nbsp;&nbsp; long_name: soil moisture <br>
+        &nbsp;&nbsp; units: m^3/m^3<br>
+        &nbsp;&#8942;<br>
+        myvarnameX:<br>
+        &nbsp;&nbsp; long_name: soil moisture x<br>
+        &nbsp;&nbsp; units: m^3/m^3<br>
+      </div>
     </div>
 
-    <h3 class="h3 mb-3 font-weight-normal">Upload format</h3>
+    <h3 class="h3 mb-3 font-weight-normal md:text-4xl text-2xl">Upload format</h3>
     <p>
       All CSV files and optionally the metadata file have to be in the same directory. This directory has to be uploaded
       as zip file.
     </p>
 
     <a id="examplefiles"></a>
-    <h2 class="h2 mb-3 font-weight-normal">Example Files</h2>
+    <h2 class="h2 mb-3 font-weight-normal md:text-5xl text-3xl">Example Files</h2>
     Example files that fulfill the above described requirements to various degrees can be downloaded from
-    <a target="_blank" href="https://github.com/awst-austria/qa4sm-testdata/tree/master/user_data">this GitHub package</a>.
+    <a target="_blank" href="https://github.com/awst-austria/qa4sm-testdata/tree/master/user_data">this GitHub
+      package.</a>
 
   </div>
 

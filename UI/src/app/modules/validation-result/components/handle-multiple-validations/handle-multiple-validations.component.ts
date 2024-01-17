@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {MenuItem} from 'primeng/api';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -20,9 +21,10 @@ export class HandleMultipleValidationsComponent implements OnInit {
   archiveItems: {};
   unArchiveItems: {};
 
-  selectOptions: any[];
+  selectOptions: MenuItem[];
 
   action: string = null;
+  buttonLabel: string;
   allSelected: boolean;
   actions: any[];
   numberOfAllValidations: number;
@@ -31,66 +33,62 @@ export class HandleMultipleValidationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.selectedValidationsId$.subscribe(data => {
-      if (this.numberOfAllValidations > data.length){
-        this.allSelected = false;
-      }
-    })
+    // this.selectedValidationsId$.subscribe(data => {
+    //   if (this.numberOfAllValidations > data.length){
+    //     this.allSelected = false;
+    //   }
+    // });
+
     this.deleteItems =
       {
         action: 'delete',
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
-      }
+      };
 
     this.archiveItems =
       {
         action: 'archive',
         label: 'Archive',
         icon: 'pi pi-fw pi-folder',
-      }
+      };
 
     this.unArchiveItems =
       {
         action: 'unarchive',
         label: 'Un-Archive',
         icon: 'pi pi-calendar',
-      }
+      };
 
     this.actions = [
       this.deleteItems,
       this.archiveItems,
       this.unArchiveItems
-    ]
+    ];
 
-    this.selectOptions = [
-      {label: 'Select all', allSelected: true},
-      {label: 'Select individually', allSelected: false},
-    ]
-  }
+    this.selectOptions = [{
+      label: 'Select validations',
+      items: [
+        {
+          label: 'All',
+          icon: 'pi pi-fw pi-check-square',
+          command: () => this.emitSelection(true),
+        },
+        {
+          label: "Clear selection",
+          icon: 'pi pi-fw pi-stop',
+          command: () => this.emitSelection(false)
+        }
+      ]
 
-  startSelection(selectAll = false): void {
-    this.selectionActive$.next(true);
-    this.selectionActive.emit({
-      activate: true,
-      selected: this.selectValidations(selectAll, this.action),
-      allSelected: selectAll,
-      action: this.action
-    })
-  }
-
-  closeAndCleanSelection(): void {
-    this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
-    this.selectionActive$.next(false)
-    this.action = null;
-    this.allSelected = false;
+    }];
   }
 
 
-  selectValidations(all: boolean, action: string): BehaviorSubject<string[]> {
+  selectValidations(select: boolean, action: string): BehaviorSubject<string[]> {
     const selectedValidations = [];
     const select_archived = action === 'unarchive';
-    if (all && action !== 'unarchived') {
+    if (select) {
       this.validations.forEach(val => {
         if (val.is_archived === select_archived && val.is_unpublished) {
           selectedValidations.push(val.id)
@@ -100,6 +98,38 @@ export class HandleMultipleValidationsComponent implements OnInit {
     this.numberOfAllValidations = selectedValidations.length;
     return new BehaviorSubject(selectedValidations)
   }
+
+
+  emitSelection(select: boolean): void {
+    this.selectionActive.emit({
+      active: true,
+      selected: this.selectValidations(select, this.action),
+      allSelected: select,
+      action: this.action
+    })
+  }
+
+  actionChange(): void{
+    if (!this.selectionActive$.value){
+      this.selectionActive$.next(true);
+    }
+    this.selectionActive.emit({
+      active: true,
+      selected: new BehaviorSubject([]),
+      allSelected: false,
+      action: this.action
+    })
+
+    this.buttonLabel = this.actions.find(element => element.action == this.action).label
+  }
+
+  closeAndCleanSelection(): void {
+    this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
+    this.selectionActive$.next(false)
+    this.action = null;
+  }
+
+
 
 
   deleteMultipleValidations(): void {
@@ -125,6 +155,5 @@ export class HandleMultipleValidationsComponent implements OnInit {
     }
     this.closeAndCleanSelection()
   }
-
 
 }

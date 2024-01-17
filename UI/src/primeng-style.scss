@@ -5200,6 +5200,13 @@ div.carousel-caption {
   .p-menubar .p-menubar-root-list .p-submenu-list .p-menuitem-active > .p-menuitem-content > .p-menuitem-link > .p-submenu-icon {
     transform: rotate(-90deg);
   }
+  .p-menubar .p-submenu-list {
+    padding: 0.5rem 0;
+    background: rgba(230, 230, 230, 0.4);
+    border: 1px solid rgba(200, 200, 200, 0.6);
+    box-shadow: none;
+    width: 13.5rem;
+  }
   //.p-menubar .p-menubar-root-list .p-menuitem .p-subemnu-list
   .p-menubar .p-menubar-root-list .p-menuitem {
     width: 100%;
