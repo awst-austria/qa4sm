@@ -151,4 +151,16 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.selectedValidations$.next(selectedValidations);
   }
 
+  checkIfEnabled(valrun): boolean{
+    let condition = valrun.is_unpublished
+
+    if (this.action$.value === 'unarchive'){
+      condition = condition && valrun.is_archived
+    } else if (this.action$.value === 'archive'){
+      condition = condition && !valrun.is_archived
+    }
+
+    return condition
+  }
+
 }

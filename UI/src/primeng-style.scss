@@ -512,6 +512,10 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
+.p-checkbox-box.p-disabled{
+  background: gray;
+}
+
 .p-checkbox .p-checkbox-box .p-checkbox-icon {
   transition-duration: 0.15s;
   color: #ffffff;
