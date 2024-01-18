@@ -6660,7 +6660,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
   }
 }
 
-@media screen and (max-width: 505px) {
+@media screen and (max-width: 600px) {
   .p-scrolltop {
     position: fixed;
     bottom: 10px; /* Adjust as needed */
@@ -6668,7 +6668,7 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
   }
 }
 
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 500px) {
   .p-scrolltop {
     width: 10px;
     height: 10px;
@@ -6677,9 +6677,11 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
     bottom: 5px; /* Adjust as needed */
     left: 5px; /* Adjust as needed */
   }
+}
 
-  .p-scrolltop.p-link {
-    opacity: 0.5;
+@media screen and (max-width: 500px) {
+  .p-scrolltop {
+    display: none;
   }
 }
 
