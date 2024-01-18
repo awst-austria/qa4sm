@@ -512,7 +512,7 @@ p-cascadeselect.ng-dirty.ng-invalid > .p-cascadeselect {
   transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 
-.p-checkbox-box.p-disabled{
+.p-checkbox-box.p-disabled {
   background: gray;
 }
 
@@ -1075,7 +1075,7 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   width: 90%;
 }
 
-#orderSelector .p-dropdown{
+#orderSelector .p-dropdown {
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
@@ -1786,7 +1786,7 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
   padding-right: 1.5rem;
 }
 
-#compareButton .p-button{
+#compareButton .p-button {
   width: 9rem
 }
 
@@ -2090,8 +2090,8 @@ p-selectbutton.ng-dirty.ng-invalid > .p-selectbutton > .p-button {
 
 .p-button.p-button-success, .p-buttonset.p-button-success > .p-button, .p-splitbutton.p-button-success > .p-button {
   color: #ffffff;
-  background:  #218838;
-  border: 1px solid  #218838;
+  background: #218838;
+  border: 1px solid #218838;
 }
 
 .p-button.p-button-success:enabled:hover, .p-buttonset.p-button-success > .p-button:enabled:hover, .p-splitbutton.p-button-success > .p-button:enabled:hover {
@@ -4028,7 +4028,7 @@ div.carousel-caption {
 }
 
 .p-panel .p-panel-header {
-  border: 1px solid  $base-color;
+  border: 1px solid $base-color;
   padding: $panel-header-padding;
   background: $base-color;
   color: #ffffff;
@@ -4254,7 +4254,7 @@ div.carousel-caption {
   width: 550px;
 }
 
-#depthFromInput .p-inputnumber, #depthToInput .p-inputnumber{
+#depthFromInput .p-inputnumber, #depthToInput .p-inputnumber {
   height: 2.5rem;
 }
 
@@ -5082,12 +5082,12 @@ div.carousel-caption {
 }
 
 .p-menubar .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover,
-.p-menubar.p-menubar-mobile-active .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover{
+.p-menubar.p-menubar-mobile-active .p-menuitem.p-menuitem-active > .p-element .p-menuitem-link:hover {
   background: $main-page-color-1;
   text-decoration: none;
 }
 
-.p-menubar .p-submenu-list .p-menuitem > .p-menuitem-content > .p-menuitem-link.p-menuitem-link-active{
+.p-menubar .p-submenu-list .p-menuitem > .p-menuitem-content > .p-menuitem-link.p-menuitem-link-active {
   background: $main-page-color-1-trans;
   text-decoration: none;
 }
@@ -6660,11 +6660,26 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
   }
 }
 
-//@media screen and (max-width: 767.9px){
-//  div.p-grid{
-//    font-size: 0.875rem;
-//  }
-//  .status{
-//    max-width: 5rem;
-//  }
-//}
+@media screen and (max-width: 505px) {
+  .p-scrolltop {
+    position: fixed;
+    bottom: 10px; /* Adjust as needed */
+    left: 10px; /* Adjust as needed */
+  }
+}
+
+@media screen and (max-width: 300px) {
+  .p-scrolltop {
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    position: fixed;
+    bottom: 5px; /* Adjust as needed */
+    left: 5px; /* Adjust as needed */
+  }
+
+  .p-scrolltop.p-link {
+    opacity: 0.5;
+  }
+}
+
