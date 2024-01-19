@@ -13,6 +13,8 @@ import {map} from 'rxjs/operators';
 export class DatasetInfoComponent implements OnInit {
 
   datasetInfo$: Observable<any>;
+  toggleOption = [];
+  allSelected: boolean;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -22,7 +24,12 @@ export class DatasetInfoComponent implements OnInit {
   ngOnInit(): void {
     this.updateDatasetInfo();
     this.sort();
-
+    this.toggleOption = [
+      {label: 'Expand all',
+      value: true},
+      {label: 'Close all',
+      value: false}
+    ]
   }
 
   private updateDatasetInfo(): void {
