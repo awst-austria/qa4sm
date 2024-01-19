@@ -33,11 +33,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.selectedValidationsId$.subscribe(data => {
-    //   if (this.numberOfAllValidations > data.length){
-    //     this.allSelected = false;
-    //   }
-    // });
 
     this.deleteItems =
       {
@@ -166,5 +161,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
     }
     this.closeAndCleanSelection()
   }
+
 
 }
