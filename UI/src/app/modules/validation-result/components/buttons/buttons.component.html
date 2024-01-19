@@ -184,8 +184,9 @@
 </div>
 
 <!--Buttons shown on the single validation page (both custom and published)-->
-<div *ngIf="!validationList" class="col-sm pb-4" style="text-align: right;">
+<div *ngIf="!validationList" class="flex flex-column w-12 align-content-end flex-wrap" style="text-align: right;">
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
+       class="flex flex-row w-12 align-content-end justify-content-end flex-wrap gap-1"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
     <button pButton
             type="button"

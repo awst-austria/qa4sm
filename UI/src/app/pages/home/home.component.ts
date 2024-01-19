@@ -114,7 +114,7 @@ export class HomeComponent implements OnInit {
     partnerLogo: 'md:w-3 w-12 partner-logo align-items-center justify-content-center text-center fadeInRight',
     team: 'flex flex-row flex-wrap gap-2 w-12 align-items-center justify-content-center mb-2',
     teamDesc: 'md:w-9 w-12 text-justify team-desc md:pl-8 pl-2 lg:text-xl md:text-base text-xs fadeInRight',
-    teamLogo: 'md:w-2 w-12 md:ml-5 ml-3 partner-logo flex align-items-center justify-content-center fadeInLeft'
+    teamLogo: 'md:w-2 w-12 md:ml-5 ml-3 partner-logo flex align-items-center justify-content-center text-center fadeInLeft'
   }
 
   constructor(private authService: AuthService,

@@ -7,11 +7,19 @@
         and the 'reference' sections and of the validate page. Click on the dataset name to get detailed information.
       </p>
     </div>
+    <div class="flex flex-row flex wrap w-11 justify-content-center align-content-end pb-3">
+      <p-selectButton
+        [options]="toggleOption"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="allSelected">
+      </p-selectButton>
+    </div>
 
     <div class="flex flex-column lg:w-10 w-11 justify-content-center align-content-center">
       <div *ngFor="let dataset of datasets">
         <p-accordion [multiple]="true">
-          <p-accordionTab [header]="dataset.pretty_name">
+          <p-accordionTab [header]="dataset.pretty_name" [selected]="allSelected">
             <div class="flex flex-column w-12 align-content-center justify-content-center gap-3">
               <div class="flex flex-column text-justify w-12">
                 <h5>Description:</h5>
@@ -43,6 +51,7 @@
                         String(
                           getPositionsOfElementsInList(dataset.filtersIds, dataset.versionsFilters[ind])
                         ).replaceAll(',', ', ') // don't know why it's marked as an error, it's actually working
+
 
                       }}
                       </span>

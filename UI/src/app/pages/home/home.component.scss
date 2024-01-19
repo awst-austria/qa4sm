@@ -265,3 +265,15 @@ div#about-app {
     left: 0.5%;
   }
 }
+
+@media screen and (max-width: 1000px) {
+  .partner-logo {
+    scale: 0.9;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .partner-logo {
+    scale: 0.8;
+  }
+}

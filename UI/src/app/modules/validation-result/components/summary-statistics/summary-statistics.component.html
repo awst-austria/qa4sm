@@ -1,41 +1,43 @@
-<div class="grid mx-0">
-      <div class="col-12">
-        <p-panel [toggleable]="true" [collapsed]="true">
-          <ng-template pTemplate="header">
-            <div class="text-center my-1" style="width: 92%">
-              <h4 class="my-0 font-weight-normal">Summary statistics</h4>
-            </div>
-          </ng-template>
-          <ng-template pTemplate="icons">
-            <label class="p-panel-header-icon mb-0" pTooltip="Expand this section to inspect a table of statistics of the validation results."
-                   tooltipPosition="bottom">
-              <span class="pi pi-question-circle help-icon"></span>
-            </label>
-          </ng-template>
-          <div *ngIf="(table$|async) as table" class="pb-3">
-            <ng-template [ngIf]="table==='error file size'" [ngIfElse]="showTable" class="pb-3">
-              This validation has resulted in a file whose size
-              exceeds the maximum limit. For this reason, the statistics table cannot be generated on the fly.
-            </ng-template>
-            <ng-template #showTable>
-              <div class="pb-3">The mean, median and standard deviation are calculated on the validation results aggregated by metric
-                and dataset. The spatial reference dataset used is {{ (refDataset$ | async)?.pretty_name }}
-                ({{ (refDatasetVersion$ | async)?.short_name }}, {{ (refDatasetVariable$ | async)?.pretty_name }}).
-              </div>
-              <span [innerHtml]="table | dompurify"></span>
-              <div class="d-flex justify-content-between align-items-center">
-                <button pButton
-                        type="button"
-                        icon="pi pi-download"
-                        label="Download .csv table"
-                        class="btn-action-large"
-                        pTooltip="Download the table to a .csv file"
-                        [life]="globals.tooltipLifetime"
-                        (click)="getSummaryStatisticsAsCsv()">
-                </button>
-              </div>
-            </ng-template>
-          </div>
-        </p-panel>
+<div class="flex flex-column w-12 mx-0">
+  <!--      <div class="col-12">-->
+  <p-panel [toggleable]="true" [collapsed]="true">
+    <ng-template pTemplate="header">
+      <div class="text-center my-1" style="width: 92%">
+        <h4 class="my-0 font-weight-normal">Summary statistics</h4>
       </div>
+    </ng-template>
+    <ng-template pTemplate="icons">
+      <label class="p-panel-header-icon mb-0"
+             pTooltip="Expand this section to inspect a table of statistics of the validation results."
+             tooltipPosition="bottom">
+        <span class="pi pi-question-circle help-icon"></span>
+      </label>
+    </ng-template>
+    <div *ngIf="(table$|async) as table" class="pb-3">
+      <ng-template [ngIf]="table==='error file size'" [ngIfElse]="showTable" class="pb-3">
+        This validation has resulted in a file whose size
+        exceeds the maximum limit. For this reason, the statistics table cannot be generated on the fly.
+      </ng-template>
+      <ng-template #showTable>
+        <div class="pb-3 text-justify">The mean, median and standard deviation are calculated on the validation results aggregated by
+          metric
+          and dataset. The spatial reference dataset used is {{ (refDataset$ | async)?.pretty_name }}
+          ({{ (refDatasetVersion$ | async)?.short_name }}, {{ (refDatasetVariable$ | async)?.pretty_name }}).
+        </div>
+        <span [innerHtml]="table | dompurify" class="lg:text-base text-sm"></span>
+        <div class="d-flex justify-content-between align-items-center">
+          <button pButton
+                  type="button"
+                  icon="pi pi-download"
+                  label="Download .csv table"
+                  class="btn-action-large"
+                  pTooltip="Download the table to a .csv file"
+                  [life]="globals.tooltipLifetime"
+                  (click)="getSummaryStatisticsAsCsv()">
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </p-panel>
+  <!--      </div>-->
 </div>

@@ -1,40 +1,43 @@
 <main>
-  <div class="grid">
-    <div class="col-12">
-      <div *ngIf="(validationModel.validationRun|async) as validationRun" class="d-flex justify-content-center">
-        <div *ngIf="(validationModel.datasetConfigs|async) as configs">
+  <!--  <div class="flex flex-column align-content-center justify-content-center w-12">-->
+  <div class="flex flex-column flex-wrap w-12 align-items-center justify-content-center">
+    <div *ngIf="(validationModel.validationRun|async) as validationRun"
+         class="flex flex-column align-content-center justify-content-center w-12">
+      <div *ngIf="(validationModel.datasetConfigs|async) as configs"
+           class="flex flex-column align-items-center justify-content-center w-12">
 
-          <div *ngIf="!validationRun.end_time" class="container text-center mb-5 mt-4"
-               style="max-width: 40rem;">
-            <h1>Validation Running...</h1>
-            <p class="lead text-muted">
-              Your validation is still running. You'll be notified via e-mail once it's finished.</p>
-            <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
-          </div>
-
-          <div *ngIf="validationRun.end_time" class="container mb-5 mt-4"
-               style="max-width: 60rem;">
-            <h1 class="text-center">Validation Results</h1>
-            <div class="col-12">
-              <qa-validation-summary [validationModel]="validationModel" [validationRun]="validationRun"
-                                     (doRefresh)="update()"></qa-validation-summary>
-            </div>
-            <div *ngIf="validationRun.progress === 100 && validationRun.output_file" class="col-12">
-              <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"></qa-summary-statistics>
-            </div>
-            <div *ngIf="validationRun.progress === 100 && validationRun.output_file" class="col-12">
-              <qa-result-files [validation]="validationRun"></qa-result-files>
-            </div>
-          </div>
-
+        <div *ngIf="!validationRun.end_time" class="text-center mb-5 mt-4 w-12">
+          <h1>Validation Running...</h1>
+          <p class="lead text-muted">
+            Your validation is still running. You'll be notified via e-mail once it's finished.</p>
+          <p class="lead text-muted">You don't have to keep this page open for the validation to run.</p>
         </div>
-      </div>
-      <div *ngIf="(validationModel.validationRun|async)===false" class="d-flex justify-content-center">
-        <p class="lead text-muted">
-          Sorry, looks like the validation you are trying to open does not exist anymore.
-        </p>
+
+        <div *ngIf="validationRun.end_time"
+             class="mb-5 mt-4 flex flex-column flex-wrap align-items-center justify-content-center xl:w-6 lg:w-8 w-10 gap-2">
+          <h1 class="text-center">Validation Results</h1>
+          <div class="flex flex-column w-12">
+            <qa-validation-summary [validationModel]="validationModel" [validationRun]="validationRun"
+                                   (doRefresh)="update()"></qa-validation-summary>
+          </div>
+          <div *ngIf="validationRun.progress === 100 && validationRun.output_file" class="flex flex-column w-12">
+            <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"></qa-summary-statistics>
+          </div>
+          <div *ngIf="validationRun.progress === 100 && validationRun.output_file"
+               class="flex flex-column w-12 align-content-center justify-content-center">
+            <qa-result-files [validation]="validationRun"></qa-result-files>
+          </div>
+        </div>
+
       </div>
     </div>
+    <div *ngIf="(validationModel.validationRun|async)===false"
+         class="flex flex-column align-content-center justify-content-center w-12">
+      <p class="lead text-muted">
+        Sorry, looks like the validation you are trying to open does not exist anymore.
+      </p>
+    </div>
   </div>
+  <!--  </div>-->
   <p-scrollTop styleClass="scroll-button"></p-scrollTop>
 </main>

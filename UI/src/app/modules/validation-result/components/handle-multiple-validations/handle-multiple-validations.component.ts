@@ -33,11 +33,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.selectedValidationsId$.subscribe(data => {
-    //   if (this.numberOfAllValidations > data.length){
-    //     this.allSelected = false;
-    //   }
-    // });
 
     this.deleteItems =
       {
@@ -90,13 +85,24 @@ export class HandleMultipleValidationsComponent implements OnInit {
     const select_archived = action === 'unarchive';
     if (select) {
       this.validations.forEach(val => {
-        if (val.is_archived === select_archived && val.is_unpublished) {
+        if (this.checkIfActionApplicable(val, action)) {
           selectedValidations.push(val.id)
         }
       })
     }
     this.numberOfAllValidations = selectedValidations.length;
     return new BehaviorSubject(selectedValidations)
+  }
+
+  checkIfActionApplicable(valrun: ValidationrunDto, action: string): boolean{
+    let condition = valrun.is_unpublished
+
+    if (action === 'unarchive'){
+      condition = condition && valrun.is_archived
+    } else if (action === 'archive'){
+      condition = condition && !valrun.is_archived
+    }
+    return condition;
   }
 
 
@@ -155,5 +161,6 @@ export class HandleMultipleValidationsComponent implements OnInit {
     }
     this.closeAndCleanSelection()
   }
+
 
 }

@@ -1,5 +1,5 @@
-<main class="grid mx-0">
-  <p-panel class="col-12 py-0 px-1"
+<main class="flex flex-column sm:w-12 mx-0 sm:text-base text-sm">
+  <p-panel class="flex flex-column py-0 lg:px-1"
            [ngClass]="{'for-comparison-body': forComparison}">
     <ng-template *ngIf="forComparison" pTemplate="header">
       <div class="text-center" style="width:100%">
@@ -7,7 +7,7 @@
       </div>
     </ng-template>
     <ng-template *ngIf="!forComparison" pTemplate="header">
-      <div class="text-center" style="width:100%">
+      <div class="text-center flex flex-column w-12">
         <h4 class="my-0 font-weight-normal">
           Summary:
           <span *ngIf="validationRun.is_unpublished && isOwner">
@@ -62,14 +62,14 @@
         </h4>
       </div>
     </ng-template>
-    <div *ngIf="configurations$| async as configurations" class="card-body">
+    <div *ngIf="configurations$| async as configurations" class="flex flex-column">
       <div *ngIf="!validationRun.all_files_exist" [ngClass]="'alert-danger p-2'">
         <b>
           At least one of the data set files has been removed, therefore there is no possibility of rerunning this validation.
         </b>
       </div>
 
-      <ul [ngClass]="{'for-comparison-list': forComparison}">
+      <ul [ngClass]="{'for-comparison-list': forComparison}" class="md:mx-5 md:px-3 mx-1 px-1">
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
           original validation run on {{this.originalDate| date: 'mediumDate' :timeZone }}.
