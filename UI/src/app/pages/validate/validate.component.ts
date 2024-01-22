@@ -558,17 +558,17 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   onIsmnNetworkSelectionChange(selectedNetworks: string): void {
-    console.log("onIsmnNetworkSelectionChange: ", selectedNetworks);
+    // console.log("onIsmnNetworkSelectionChange: ", selectedNetworks);
     this.updateMap();
   }
 
   onIsmnDepthSelectionChange(selectedNetworks: string): void {
-    console.log("onIsmnDepthSelectionChange: ", selectedNetworks);
+    // console.log("onIsmnDepthSelectionChange: ", selectedNetworks);
     this.updateMap();
   }
 
   updateMap() {
-    console.log("Updating MAP", this.validationModel)
+    // console.log("Updating MAP", this.validationModel)
     // if (this.validationModel.referenceConfigurations.spatial && this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion) {
     //   console.log('Updating reference selection: ', this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion.id)
     //   //todo filtering also here
@@ -577,7 +577,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     let geojsons: Observable<any>[] = [];
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel.selectedVersion) {
-        console.log("Processing geodata for ", config.datasetModel.selectedVersion)
+        // console.log("Processing geodata for ", config.datasetModel.selectedVersion)
         geojsons.push(this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).pipe(map(value => {
           //console.log("GEOJSON: ",JSON.parse(value));
           let filteredGeoJson: any = JSON.parse(value);
@@ -590,7 +590,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           if (config.ismnNetworkFilter$.value != null) {
             filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
           }
-          console.log("In observable")
+          // console.log("In observable")
           return filteredGeoJson;
         }),
           catchError(error => of(undefined))
@@ -598,7 +598,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
 
-    console.log("map databobservables: ",geojsons);
+    // console.log("map databobservables: ",geojsons);
     forkJoin(geojsons).subscribe(data => {
       this.mapComponent.clearSelection();
       data.forEach(mapData => {
@@ -634,7 +634,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
             return true;
           }
           if ((minDepthValue <= minVal && maxDepthValue >= maxVal) == false) {
-            console.log("Excluded by depth filter")
+            // console.log("Excluded by depth filter")
           }
           return minDepthValue <= minVal && maxDepthValue >= maxVal;
         });
