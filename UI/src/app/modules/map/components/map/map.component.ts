@@ -47,78 +47,6 @@ export class MapComponent implements AfterViewInit {
   @Output() mapReady = new EventEmitter<Map>();
 
 
-  geojsonObject = {
-    "type": "FeatureCollection",
-    "features": [
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "MultiPoint",
-          "coordinates": [
-            [12.3155, 45.4408],
-            [12.3195, 45.4408],
-            [12.3235, 45.4408],
-            [12.3275, 45.4408]
-          ]
-        },
-        "properties": {
-          "datasetName": "exampleDataset",
-          "datasetVersion": "1.0",
-          "datasetProperties": [
-            {"propertyName": "prop1", "propertyValue": "value1"},
-            {"propertyName": "prop2", "propertyValue": "value2"},
-            {"propertyName": "prop3", "propertyValue": "value3"}
-          ]
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "MultiPoint",
-          "coordinates": [
-            [12.3155, 45.4518],
-            [12.3195, 45.4518],
-            [12.3235, 45.4518],
-            [12.3275, 45.4518]
-          ]
-        },
-        "properties": {
-          "datasetName": "exampleDataset",
-          "datasetVersion": "2.0",
-          "datasetProperties": [
-            {"propertyName": "prop1", "propertyValue": "value1"},
-            {"propertyName": "prop2", "propertyValue": "value2"},
-            {"propertyName": "prop3", "propertyValue": "value3"},
-            {"markerColor": "#FF5733"}
-          ]
-        }
-      },
-      {
-        "type": "Feature",
-        "geometry": {
-          "type": "MultiPoint",
-          "coordinates": [
-            [12.3155, 45.4628],
-            [12.3195, 45.4628],
-            [12.3235, 45.4628],
-            [12.3275, 45.4628]
-          ]
-        },
-        "properties": {
-          "datasetName": "exampleDataset",
-          "datasetVersion": "3.0",
-          "datasetProperties": [
-            {"propertyName": "prop1", "propertyValue": "value1"},
-            {"propertyName": "prop2", "propertyValue": "value2"},
-            {"propertyName": "prop3", "propertyValue": "value3"},
-            {"markerColor": "#33FF57"}
-          ]
-        }
-      }
-    ]
-  }
-
-
   constructor(private zone: NgZone, private cd: ChangeDetectorRef, private toastService: ToastService, private elementRef: ElementRef) {
   }
 
@@ -130,7 +58,7 @@ export class MapComponent implements AfterViewInit {
 
   public addGeoJson(geoJson: string) {
     console.log("ADD geojson-----------------------------------------------------");
-    var features = new GeoJSON().readFeatures(geoJson, {
+    let features = new GeoJSON().readFeatures(geoJson, {
       dataProjection: 'EPSG:4326',
       featureProjection: 'EPSG:3857'
     });
@@ -227,7 +155,7 @@ export class MapComponent implements AfterViewInit {
       }
     };
 
-    var clusterSource = new Cluster({
+    let clusterSource = new Cluster({
       source: this.clusteredSource,
       distance: 20 // Pixel distance between features to be clustered
     });
@@ -268,7 +196,7 @@ export class MapComponent implements AfterViewInit {
     });
     this.Map.addControl(new BoundingBoxControl(this.Map, this.spatialSubset, this.toastService, this.zone));
     this.Map.addOverlay(tooltipOverlay);
-    for (var vec in this.Map.getAllLayers()) {
+    for (let vec in this.Map.getAllLayers()) {
       console.log('LAyer: ', vec)
     }
 
@@ -309,13 +237,13 @@ export class MapComponent implements AfterViewInit {
     hex = hex.replace('#', '');
 
     // Parse the hexadecimal value to get separate R, G, and B values
-    var bigint = parseInt(hex, 16);
-    var r = (bigint >> 16) & 255;
-    var g = (bigint >> 8) & 255;
-    var b = bigint & 255;
+    let bigint = parseInt(hex, 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
 
     // Calculate the alpha value (opacity)
-    var alpha = opacity || 1.0;
+    let alpha = opacity || 1.0;
 
     // Return the RGBA value
     return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
