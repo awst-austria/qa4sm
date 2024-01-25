@@ -279,6 +279,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     features.forEach(feature => {
       const properties = feature.get('datasetProperties');
       let tableHTML = '<table>';
+      let textHTML = '<div class="flex flex-row">Station information:</div>';
 
       // Add the table header
       tableHTML += `
@@ -298,13 +299,21 @@ export class MapComponent implements AfterViewInit, OnInit {
             <td>${property.propertyValue}</td>
           </tr>
         `;
+        textHTML += `<div class="flex flex-row"><b>${this.stylePropertyName(property.propertyName)}:</b> ${property.propertyValue}</div>`
       });
 
       tableHTML += '</tbody></table>';
-      combinedTableHTML += tableHTML;
+      combinedTableHTML += '<div class="flex flex-column">' + textHTML + '</div>';
     });
 
     return combinedTableHTML;
+  }
+
+  stylePropertyName(propertyName: string): string{
+    return propertyName
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }
 
