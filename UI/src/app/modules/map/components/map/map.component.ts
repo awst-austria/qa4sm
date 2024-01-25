@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   NgZone,
+  OnInit,
   Output
 } from '@angular/core';
 import {Map, Overlay, View} from 'ol';
@@ -26,13 +27,14 @@ import VectorLayer from "ol/layer/Vector";
 import {Circle, Fill, Stroke, Style} from "ol/style";
 import {addCommon as addCommonProjections} from 'ol/proj.js';
 import {Cluster} from "ol/source";
+import {LegendItem} from '../legend-item';
 
 @Component({
   selector: 'qa-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss']
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnInit {
 
   @Input() center: Coordinate;
   @Input() zoom: number;
@@ -46,10 +48,34 @@ export class MapComponent implements AfterViewInit {
   nonClusteredSource: VectorSource = new VectorSource();
   @Output() mapReady = new EventEmitter<Map>();
 
+  singleSensorMarkerRadius = 5;
+  multipleSensorMarkerRadius = 8;
+  multipleSensorStrokeColor = 'blue';
+  multipleSensorStrokeWidth = 2;
+  legendItems: LegendItem[];
 
   constructor(private zone: NgZone, private cd: ChangeDetectorRef, private toastService: ToastService, private elementRef: ElementRef) {
   }
 
+  ngOnInit() {
+    this.legendItems = [
+      {
+        label: "Multiple sensors",
+        tooltip: 'Location with multiple sensors. Zoom in to see single sensor. ',
+        strokeColor: this.multipleSensorStrokeColor,
+        radius: this.multipleSensorMarkerRadius,
+        strokeWidth: this.multipleSensorStrokeWidth,
+      },
+      {
+        label: 'Single Sensor',
+        tooltip: 'Location with a single sensor. Different colors indicate different networks. Hover over the point to find out more about the sensor.',
+        strokeWidth: 0,
+        fillColor: 'black',
+        strokeColor: 'black',
+        radius: this.singleSensorMarkerRadius
+      },
+    ];
+  }
 
   public clearSelection() {
     this.clusteredSource.clear();
@@ -88,7 +114,6 @@ export class MapComponent implements AfterViewInit {
       center: transform(this.center, 'EPSG:4326', 'EPSG:3857'),
       zoom: this.zoom,
       projection: this.projection,
-      // extent: [-572513.341856, 5211017.966314, 916327.095083, 6636950.728974]
     });
 
 
@@ -98,17 +123,15 @@ export class MapComponent implements AfterViewInit {
 
       if (feature.get('features') != undefined) {
         //function called from a cluster source
-
-        // console.log("Feature count: " + feature.get('features').length, feature.get('features'))
         if (feature.get('features').length > 1) {
           //clustered representation of multiple points
 
           return new Style({
             image: new Circle({
-              radius: 8,
+              radius: this.multipleSensorMarkerRadius,
               stroke: new Stroke({
-                color: 'blue',
-                width: 2,
+                color: this.multipleSensorStrokeColor,
+                width: this.multipleSensorStrokeWidth,
               })
             })
           });
@@ -118,9 +141,10 @@ export class MapComponent implements AfterViewInit {
           if (feature.get('features')[0].get('markerColor') != undefined) {
             markerColor = feature.get('features')[0].get('markerColor');
           }
+
           return new Style({
             image: new Circle({
-              radius: 5,
+              radius: this.singleSensorMarkerRadius,
               fill: new Fill({color: markerColor})
             })
           });
@@ -211,12 +235,13 @@ export class MapComponent implements AfterViewInit {
             if (!features.includes(feature)) {
               features.push(feature);
             }
-          }
-          else if(feature.get('features')){ //this branch covers cluster points
-            if(feature.get('features').length==1){
+          } else if (feature.get('features')) { //this branch covers cluster points
+            if (feature.get('features').length == 1) {
               if (!features.includes(feature.get('features')[0])) {
                 features.push(feature.get('features')[0]);
               }
+            } else {
+              console.log(feature.get('features'))
             }
           }
         });
@@ -251,10 +276,7 @@ export class MapComponent implements AfterViewInit {
 
   private generateMultipleTables(features): string {
     let combinedTableHTML = '';
-
-    console.log("Features: ", features)
     features.forEach(feature => {
-      console.log("Feature: ", feature)
       const properties = feature.get('datasetProperties');
       let tableHTML = '<table>';
 
