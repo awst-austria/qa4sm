@@ -47,15 +47,15 @@ from validator.validation.pytesmoresultstoqa4smresults import IntraAnnualSlicer,
 from api.frontend_urls import get_angular_url
 from shutil import copy2
 from typing import Optional, List, Tuple, Dict, Union
-import time
+import json
 
 __logger = logging.getLogger(__name__)
 
 ####################-----Implement this in the proper way-----####################
 slicer_instance = IntraAnnualSlicer('months', overlap=0)
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
-# intra_annual_slices = None
-print(intra_annual_slices)
+# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
+print(slicer_instance)
 ##################################################################################
 
 
@@ -117,11 +117,10 @@ def set_outfile(validation_run, run_dir):
         validation_run.output_file.name = outfile
 
 
-def save_validation_config(validation_run,
-                           transcriber: pytesmoresultstoqa4smresults.
-                           Pytesmo2Qa4smResultsTranscriber):
+def save_validation_config(validation_run, transcriber):
     try:
-        with Dataset(transcriber.output_file_name, "a",
+        with Dataset(os.path.join(OUTPUT_FOLDER, transcriber.output_file_name),
+                     "a",
                      format="NETCDF4") as ds:
 
             ds.qa4sm_version = settings.APP_VERSION
@@ -242,10 +241,6 @@ def save_validation_config(validation_run,
                 ds.val_spatial_subset = "[{}, {}, {}, {}]".format(
                     validation_run.min_lat, validation_run.min_lon,
                     validation_run.max_lat, validation_run.max_lon)
-
-        re_compressor(fpath=transcriber.output_file_name,
-                      compression='zlib',
-                      complevel=9)
 
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
@@ -469,33 +464,42 @@ def execute_job(self, validation_id, job):
         self.retry(countdown=2, exc=e)
 
 
-def check_and_store_results(
-    validation_run, run_dir: str, results: Dict,
-    transcriber: pytesmoresultstoqa4smresults.Pytesmo2Qa4smResultsTranscriber
-) -> None:
-    """
-    Check if the results are valid and store them in a netcdf file.
+# def check_and_store_results_2(
+#     validation_run, run_dir: str, results: Dict,
+#     transcriber: pytesmoresultstoqa4smresults.Pytesmo2Qa4smResultsTranscriber
+# ) -> None:
+#     """
+#     Check if the results are valid and store them in a netcdf file.
 
-    Parameters
-    ----------
-    validation_run : ValidationRun
-        The validation run for which the results were calculated.
-    run_dir : str
-        The directory where the results are stored.
-    results : dict
-        The results of the validation run.
-    transcriber : Pytesmo2Qa4smResultsTranscriber
-        The transcriber that converts the results to the QA4SM format.
-    """
+#     Parameters
+#     ----------
+#     validation_run : ValidationRun
+#         The validation run for which the results were calculated.
+#     run_dir : str
+#         The directory where the results are stored.
+#     results : dict
+#         The results of the validation run.
+#     transcriber : Pytesmo2Qa4smResultsTranscriber
+#         The transcriber that converts the results to the QA4SM format.
+#     """
 
+#     if len(results) < 1:
+#         __logger.warning('Potentially problematic job: {} - no results'.format(
+#             validation_run.id))
+#         return None
+
+#     transcriber.output_file_name = transcriber.build_outname(
+#         run_dir, results.keys())
+#     transcriber.write_to_netcdf(transcriber.output_file_name)
+
+
+def check_and_store_results(job_id, results, save_path):
     if len(results) < 1:
-        __logger.warning('Potentially problematic job: {} - no results'.format(
-            validation_run.id))
-        return None
+        __logger.warning(
+            'Potentially problematic job: {} - no results'.format(job_id))
+        return
 
-    transcriber.output_file_name = transcriber.build_outname(
-        run_dir, results.keys())
-    transcriber.write_to_netcdf(transcriber.output_file_name)
+    netcdf_results_manager(results, save_path)
 
 
 def track_celery_task(validation_run, task_id):
@@ -588,13 +592,19 @@ def run_validation(validation_id):
                     validation_run.error_points += num_gpis_from_job(
                         job_table[async_result.id])
                 else:
+                    '''
                     transcriber = Pytesmo2Qa4smResultsTranscriber(
                         results, slicer_instance)
                     restructured_results = transcriber.get_transcribed_dataset(
                     )
 
-                    check_and_store_results(async_result, run_dir, results,
-                                            transcriber)
+                    check_and_store_results_2(async_result, run_dir, results,
+                                              transcriber)'''
+
+                    results = _pytesmo_to_qa4sm_results(results)
+                    check_and_store_results(async_result.id, results, run_dir)
+
+                    # set_outfile(validation_run, run_dir)
 
                     # If the job ran successfully, we have to check the status
                     # attribute to see if the job actually calculated something
@@ -650,13 +660,28 @@ def run_validation(validation_id):
         # once all tasks are finished:
         # only store parameters and produce graphs if validation wasn't cancelled and
         # we have metrics for at least one gpi - otherwise no netcdf output file
+
         if (not validation_aborted):
-            validation_run.save()
+            set_outfile(validation_run, run_dir)
+
+            transcriber = Pytesmo2Qa4smResultsTranscriber(
+                os.path.join(OUTPUT_FOLDER, validation_run.output_file.name),
+                slicer_instance)
+            restructured_results = transcriber.get_transcribed_dataset()
+            transcriber.output_file_name = transcriber.build_outname(
+                run_dir, results.keys())
+            transcriber.write_to_netcdf(transcriber.output_file_name)
+
             save_validation_config(validation_run, transcriber)
-            generate_all_graphs(
-                validation_run,
-                run_dir,
-                save_metadata=validation_run.plots_save_metadata)
+
+            re_compressor(fpath=transcriber.output_file_name,
+                          compression='zlib',
+                          complevel=9)
+
+            # generate_all_graphs(
+            #     validation_run,
+            #     run_dir,
+            #     save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(

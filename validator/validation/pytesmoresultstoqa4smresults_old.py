@@ -1,29 +1,29 @@
 import xarray as xr
 import numpy as np
+from typing import List, Dict, Tuple, Union, Optional
+import pandas as pd
 from validator.validation.intra_annual_slice_maker import IntraAnnualSlicer
 from validator.validation.globals import METADATA_TEMPLATE
-from typing import List, Dict, Optional, Union, Tuple
-import pandas as pd
 import os
 
 
 class Pytesmo2Qa4smResultsTranscriber:
     """
-    Transcribes (=converts) the pytesmo results netCDF4 file format to a more user friendly format, that
+    Transcribes (=converts) the new pytesmo results dictionary format to a more user friendly format, that
     is used by QA4SM.
 
     Parameters
     ----------
-    pytesmo_results : str
-        Path to results netCDF4 written by `qa4sm.validation.validation.check_and_store_results`, which is in the old `pytesmo` format.
+    pytesmo_results : dict
+        The pytesmo results dictionary.
     intra_annual_slices : Union[None, IntraAnnualSlicer]
         The intra annual slices for the results. Default is None, which means that no intra-annual intra annual slices are
-        used, but only the 'bulk'. If an instance of `valdiator.validation.IntraAnnualSlicer` is provided,
+        used, but only the 'bulk'. If an instance of `validator.validation.IntraAnnualSlicer` is provided,
         the intra annual slices are used as provided by the IntraAnnualSlicer instance.
     """
 
     def __init__(self,
-                 pytesmo_results: str,
+                 pytesmo_results: dict,
                  intra_annual_slices: Union[None, IntraAnnualSlicer] = None):
 
         self.intra_annual_slices: Union[
@@ -38,7 +38,7 @@ class Pytesmo2Qa4smResultsTranscriber:
             'organic_carbon', 'sand_fraction', 'saturation', 'silt_fraction',
             'station', 'timerange_from', 'timerange_to', 'variable',
             'instrument_depthfrom', 'instrument_depthto', 'frm_class'
-        ]
+        ]  #? export to validator.validation.globals.METADATA_TEMPLATE?
 
         self.METADATA_TEMPLATE: Dict[str, Union[None, Dict[str, Union[
             np.ndarray, np.float32, np.array]]]] = METADATA_TEMPLATE
@@ -46,12 +46,8 @@ class Pytesmo2Qa4smResultsTranscriber:
         self.intra_annual_slices_checker_called: bool = False
         self.intra_annual_slices_check: bool = False
 
-        with xr.open_dataset(pytesmo_results) as pr:
-            self.pytesmo_results: xr.Dataset = pr
-
-        self.pytesmo_ncfile = f'{pytesmo_results}'
-        # os.remove(pytesmo_results)
-        # os.rename(pytesmo_results, self.pytesmo_ncfile)
+        self.pytesmo_results: dict = list(
+            self._pytesmo_to_qa4sm_results(pytesmo_results).values())[0]
 
         self.__lat_arr: np.ndarray = np.array(self.non_metrics['lat']['data'],
                                               dtype=np.float32)
@@ -144,20 +140,20 @@ class Pytesmo2Qa4smResultsTranscriber:
         Dict[str, Dict[str, Union[np.ndarray, type]]]
             The non-metrics.
         """
-
         return {
-            non_metric: {
-                'data': self.pytesmo_results[non_metric].values,
-                'dtype': self.pytesmo_results[non_metric].dtype
+            key: {
+                'data': val,
+                'dtype': type(val[0])
             }
-            for non_metric in self._default_non_metrics
+            for key, val in self.pytesmo_results.items()
+            if key in self._default_non_metrics
         }
 
     @property
     def metrics_dict(self) -> Dict[str, str]:
         """
         Get the metrics dictionary. Whole procedure based on the premise, that metric names of valdiations of intra-annual
-        intra annual slices are of the form: `metric_long_name = 'intra_annual_slice|metric_short_name'`. If this is not the
+        slices are of the form: `metric_long_name = 'intra_annual_slice|metric_short_name'`. If this is not the
         case, it is assumed the 'bulk' case is present and the metric names are assumed to be the same as the metric
         short names.
 
@@ -167,17 +163,15 @@ class Pytesmo2Qa4smResultsTranscriber:
             The metrics dictionary.
         """
         _metrics = [
-            metric.split('|')[1] for metric in self.pytesmo_results
-            if '|' in metric
+            key.split('|')[1] for key in self.pytesmo_results.keys()
+            if '|' in key
         ]
-        if len(
-                _metrics
-        ) != 0:  # bulk case             #? check if this is the best way to check for bulk case
+        if len(_metrics) != 0:  # bulk case
             return {long: long for long in set(_metrics)}
         else:  # intra-annual case
             return {
                 long: long
-                for long in self.pytesmo_results
+                for long in self.pytesmo_results.keys()
                 if long not in self.non_metrics.keys()
             }
 
@@ -225,7 +219,7 @@ class Pytesmo2Qa4smResultsTranscriber:
     def metric_data_dict(self) -> Dict[str, xr.DataArray]:
         """
         Get the metric data dictionary. In general, metric data is always a function of location of the spatial
-        reference point and of the intra annual slice used. The metric data dictionary is a dictionary of xarray.DataArrays,
+        reference point and of the intra annual slice used. The metric data dictionary is a dictionary of `xarray.DataArrays`,
         containing the metric data for each intra annual slice.
 
         Returns
@@ -257,7 +251,7 @@ class Pytesmo2Qa4smResultsTranscriber:
     def non_metric_data_dict(self) -> Dict[str, xr.DataArray]:
         """
         Get the non-metric data dictionary. In general, non-metric data is always *only* a function of location of the
-        spatial reference point. The non-metric data dictionary is a dictionary of xarray.DataArrays, containing the
+        spatial reference point. The non-metric data dictionary is a dictionary of `xarray.DataArrays`, containing the
         non-metric data for each spatial reference point.
 
         Returns
@@ -336,16 +330,15 @@ class Pytesmo2Qa4smResultsTranscriber:
             self._intra_annual_slices.metadata['Names_Dates [MM-DD]'],
         )
 
-    def get_pytesmo_attrs(self) -> None:
-        for attr in self.pytesmo_results.attrs:
-            self.transcribed_dataset.attrs[attr] = self.pytesmo_results.attrs[
-                attr]
-
-    def get_transcribed_dataset(self) -> xr.Dataset:
+    def get_transcribed_dataset(
+            self) -> xr.Dataset:  #! remove option to write to ncfile
         """
         Get the transcribed dataset, containing all metric and non-metric data provided by the pytesmo results. Metadata
         is not yet included.
 
+        Parameters
+        ----------
+        None
 
         Returns
         -------
@@ -361,7 +354,6 @@ class Pytesmo2Qa4smResultsTranscriber:
             lat=self.__lat_arr, lon=self.__lon_arr, idx=self.__idx_arr)
 
         self.set_coordinate_attrs()
-        self.get_pytesmo_attrs()
 
         return self.transcribed_dataset
 
@@ -392,7 +384,7 @@ class Pytesmo2Qa4smResultsTranscriber:
                 else:
                     ds_names.append(ds)
 
-        fname = "_with_".join(ds_names)
+        fname = "_with_".join(sorted(set(ds_names)))
         ext = "nc"
         if len(os.path.join(root, ".".join([fname, ext]))) > 255:
             ds_names = [str(ds[0]) for ds in key]
@@ -406,13 +398,6 @@ class Pytesmo2Qa4smResultsTranscriber:
     def write_to_netcdf(self,
                         path: str,
                         mode: Optional[str] = 'w',
-                        format: Optional[str] = 'NETCDF4',
-                        engine: Optional[str] = 'netcdf4',
-                        encoding: Optional[dict] = {
-                            "zlib": True,
-                            "complevel": 5
-                        },
-                        compute: Optional[bool] = True,
                         **kwargs) -> str:
         """
         Write the transcribed dataset to a NetCDF file, based on `xarray.Dataset.to_netcdf`
@@ -423,14 +408,6 @@ class Pytesmo2Qa4smResultsTranscriber:
             The path to write the NetCDF file
         mode : Optional[str], optional
             The mode to open the NetCDF file, by default 'w'
-        format : Optional[str], optional
-            The format of the NetCDF file, by default 'NETCDF4'
-        engine : Optional[str], optional
-            The engine to use, by default 'netcdf4'
-        encoding : Optional[dict], optional
-            The encoding to use, by default {"zlib": True, "complevel": 5}
-        compute : Optional[bool], optional
-            Whether to compute the dataset, by default True
         **kwargs : dict
             Keyword arguments passed to `xarray.Dataset.to_netcdf`.
 
@@ -441,7 +418,5 @@ class Pytesmo2Qa4smResultsTranscriber:
 
         """
 
-        os.rename(self.pytesmo_ncfile, f'{self.pytesmo_ncfile}.old')
         self.transcribed_dataset.to_netcdf(path, mode, **kwargs)
-
         return path
