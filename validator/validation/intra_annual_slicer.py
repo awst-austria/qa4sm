@@ -1,55 +1,52 @@
 from pytesmo.validation_framework.metric_calculators_adapters import TsDistributor
 from pytesmo.time_series.grouping import YearlessDatetime
+from validator.validation.globals import INTRA_ANNUAL_SLICES
 from typing import Optional, List, Tuple, Dict
-import yaml
 import os
 from datetime import datetime
+import json
 
 
 class IntraAnnualSlicesDefault:
     '''
-    Class to load intra annual slice definitions from a YAML file.
-    Such a file should contain a dictionaries with the following structure:
+    Class to load intra annual slice definitions from the `validator.validation.globals` file.
+    Intra annual slice definitions are stored in dictionaries with the following structure:
 
-    seasons:
-        S1: [[12, 1], [2, 28]]      # December 1st to February 28th
-        S2: [[3, 1], [5, 31]]       # March 1st to May 31st
-        S3: [[6, 1], [8, 31]]       # June 1st to August 31st
-        S4: [[9, 1], [11, 30]]      # September 1st to November 30th
+    {"seasons":
+        {"S1": [[12, 1], [2, 28]]      # December 1st to February 28th
+        "S2": [[3, 1], [5, 31]]       # March 1st to May 31st
+        "S3": [[6, 1], [8, 31]]       # June 1st to August 31st
+        "S4": [[9, 1], [11, 30]] }}     # September 1st to November 30th
 
     These dictionaries will be loaded as properties of the class, so that they can be accessed later on and be treated as the default.
 
     Parameters
     ----------
 
-    default_file : str, optional
-        Path to the YAML file containing the intra annual slice definitions, by default None
+    custom_file : str, optional
+        JSON File containing the intra annual slice definitions in the same format as in `validator.validation.globals`, by default None. If None, the default as defined in `validator.validation.globals` will be used.
 
     '''
 
-    def __init__(self, default_file: Optional[str] = None) -> None:
-        if not default_file:
-            default_file = os.path.abspath(
-                'intra_annual_slices_definition.yml'
-            )  # if no file is provided, use the default one
-
-        if not os.path.isfile(default_file):
-            raise FileNotFoundError(
-                f'File {default_file} not found. Please provide a valid path to a YAML file, containing the intra annual slice definitions.'
-            )
+    def __init__(self, custom_file: Optional[str] = None) -> None:
+        if not custom_file:
+            self.intra_annual_slices_dict = INTRA_ANNUAL_SLICES
+            self.available_slices = list(self.intra_annual_slices_dict.keys())
+        elif os.path.isfile(custom_file):
+            self.intra_annual_slices_dict = self.__load_json_data(custom_file)
+            self.available_slices = list(self.intra_annual_slices_dict.keys())
         else:
-            self.__default_file = default_file
+            raise FileNotFoundError(
+                f'File {custom_file} not found. Please provide a valid path to a JSON file, containing the intra annual slice definitions.'
+            )
 
-        # Load YAML data upon initialization
-        self.yaml_data = self.__load_yaml_data()
-        self.available_defaults = list(self.yaml_data.keys())
-
-    def __load_yaml_data(self) -> dict:
-        '''Reads and loads the YAML file into a dictionary.
+    def __load_json_data(self, json_path: str) -> dict:
+        '''Reads and loads the JSON file into a dictionary.
 
         Parameters
         ----------
-        None
+        json_path : str
+            Path to the JSON file containing the intra annual slice definitions.
 
         Returns
         -------
@@ -57,8 +54,8 @@ class IntraAnnualSlicesDefault:
             Dictionary containing the default intra annual slice definitions.
         '''
 
-        with open(self.__default_file, 'r') as f:
-            return yaml.safe_load(f)
+        with open(json_path, 'r') as f:
+            return json.load(f)
 
 
 class IntraAnnualSlicer(IntraAnnualSlicesDefault):
@@ -70,21 +67,21 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         Type of intra annual slice to be created. Must be one of the available default types. Officially, "months" and "seasons" are implemented. The user can implement their own defaults, though (see `IntraAnnualSlicesDefault`). Default is "months".
     overlap : int, optional
         Number of days to be added/subtracted to the beginning/end of the intra annual slice. Default is 0.
-    default_file : str, optional
-        Path to the YAML file containing the intra annual slice definitions, by default None (meaning the default file will be used)
+    custom_file : str, optional
+        Path to the JSON file containing the intra annual slice definitions, by default None (meaning the defaults as defined in `validator.validation.globals` will be used)
     '''
 
     def __init__(self,
                  intra_annual_slice_type: Optional[str] = 'months',
                  overlap: Optional[int] = 0,
-                 default_file: Optional[str] = None):
+                 custom_file: Optional[str] = None):
         self.overlap = overlap
         self.intra_annual_slice_type = intra_annual_slice_type
-        super().__init__(default_file=default_file)
+        super().__init__(custom_file=custom_file)
 
-        if self.intra_annual_slice_type not in self.available_defaults:
+        if self.intra_annual_slice_type not in self.available_slices:
             raise ValueError(
-                f'Invalid intra annual slice type. Available types are: {self.available_defaults}'
+                f'Invalid intra annual slice type. Available types are: {self.available_slices}'
             )
 
     def __date_to_doy(self, date_tuple: Tuple[int, int]) -> int:
@@ -160,7 +157,7 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         return {
             key: (self.__update_date(val[0], overlap_direction=-1),
                   self.__update_date(val[1], overlap_direction=+1))
-            for key, val in self.yaml_data[
+            for key, val in self.intra_annual_slices_dict[
                 self.intra_annual_slice_type].items()
         }
 

@@ -23,8 +23,22 @@ METRICS = {
     'mse_var': 'Mean square error variance',
 }
 
+NON_METRICS = [
+    'gpi', 'lon', 'lat', 'clay_fraction', 'climate_KG', 'climate_insitu',
+    'elevation', 'instrument', 'latitude', 'lc_2000', 'lc_2005', 'lc_2010',
+    'lc_insitu', 'longitude', 'network', 'organic_carbon', 'sand_fraction',
+    'saturation', 'silt_fraction', 'station', 'timerange_from', 'timerange_to',
+    'variable', 'instrument_depthfrom', 'instrument_depthto', 'frm_class'
+]
+
 METRIC_TEMPLATE = [
     "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
+]
+
+INTRA_ANNUAL_SEPARATOR = '|'
+
+INTRA_ANNUAL_METRIC_TEMPLATE = [
+    "{temp_slice}", INTRA_ANNUAL_SEPARATOR, "{metric}"
 ]
 
 TC_METRICS = {
@@ -202,3 +216,27 @@ USER_DATASET_VARIABLE_MIN_ID = 500
 # netcdf compression means
 IMPLEMENTED_COMPRESSIONS = ['zlib']
 ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# intra annual slices
+INTRA_ANNUAL_SLICES = {
+    "seasons": {
+        "S1": [[12, 1], [2, 28]],
+        "S2": [[3, 1], [5, 31]],
+        "S3": [[6, 1], [8, 31]],
+        "S4": [[9, 1], [11, 30]],
+    },
+    "months": {
+        "Jan": [[1, 1], [1, 31]],
+        "Feb": [[2, 1], [2, 28]],
+        "Mar": [[3, 1], [3, 31]],
+        "Apr": [[4, 1], [4, 30]],
+        'May': [[5, 1], [5, 31]],
+        "Jun": [[6, 1], [6, 30]],
+        "Jul": [[7, 1], [7, 31]],
+        "Aug": [[8, 1], [8, 31]],
+        "Sep": [[9, 1], [9, 30]],
+        "Oct": [[10, 1], [10, 31]],
+        "Nov": [[11, 1], [11, 30]],
+        "Dec": [[12, 1], [12, 31]],
+    }
+}

@@ -35,24 +35,24 @@ from valentina.celery import app
 from validator.mailer import send_val_done_notification
 from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
-from validator.validation import pytesmoresultstoqa4smresults
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in, deprecated
-from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS
-from validator.validation.pytesmoresultstoqa4smresults import IntraAnnualSlicer, Pytesmo2Qa4smResultsTranscriber
+from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
+from validator.validation.netcdf_transcription import IntraAnnualSlicer, Pytesmo2Qa4smResultsTranscriber
 from api.frontend_urls import get_angular_url
 from shutil import copy2
 from typing import Optional, List, Tuple, Dict, Union
-import json
 
 __logger = logging.getLogger(__name__)
 
 ####################-----Implement this in the proper way-----####################
-slicer_instance = IntraAnnualSlicer('months', overlap=0)
+slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
+                                    overlap=0,
+                                    custom_file=None)
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
 # slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
@@ -592,19 +592,8 @@ def run_validation(validation_id):
                     validation_run.error_points += num_gpis_from_job(
                         job_table[async_result.id])
                 else:
-                    '''
-                    transcriber = Pytesmo2Qa4smResultsTranscriber(
-                        results, slicer_instance)
-                    restructured_results = transcriber.get_transcribed_dataset(
-                    )
-
-                    check_and_store_results_2(async_result, run_dir, results,
-                                              transcriber)'''
-
                     results = _pytesmo_to_qa4sm_results(results)
                     check_and_store_results(async_result.id, results, run_dir)
-
-                    # set_outfile(validation_run, run_dir)
 
                     # If the job ran successfully, we have to check the status
                     # attribute to see if the job actually calculated something
@@ -620,8 +609,7 @@ def run_validation(validation_id):
                     status_result_keys = list(
                         filter(lambda s: "status" in s, res.keys()))
                     ok = res[status_result_keys[0]] == 0
-                    for statkey in status_result_keys[
-                            1:]:  #? why slicing starts from 1? bc 0: spatial_ref, 1: temporal_ref, 2: other? or bc the line above checks 0?
+                    for statkey in status_result_keys[1:]:
                         ok = ok & (res[statkey] == 0)
                     ngpis = num_gpis_from_job(
                         job_table[async_result.id]
@@ -665,8 +653,9 @@ def run_validation(validation_id):
             set_outfile(validation_run, run_dir)
 
             transcriber = Pytesmo2Qa4smResultsTranscriber(
-                os.path.join(OUTPUT_FOLDER, validation_run.output_file.name),
-                slicer_instance)
+                pytesmo_results=os.path.join(OUTPUT_FOLDER,
+                                             validation_run.output_file.name),
+                intra_annual_slices=slicer_instance)
             restructured_results = transcriber.get_transcribed_dataset()
             transcriber.output_file_name = transcriber.build_outname(
                 run_dir, results.keys())
@@ -674,9 +663,9 @@ def run_validation(validation_id):
 
             save_validation_config(validation_run, transcriber)
 
-            re_compressor(fpath=transcriber.output_file_name,
-                          compression='zlib',
-                          complevel=9)
+            transcriber.compress(path=transcriber.output_file_name,
+                                 compression='zlib',
+                                 complevel=9)
 
             # generate_all_graphs(
             #     validation_run,
@@ -1041,70 +1030,3 @@ def copy_validationrun(run_to_copy, new_user):
         'run_id': run_id,
     }
     return response
-
-
-def re_compressor(fpath: str,
-                  compression: str = 'zlib',
-                  complevel: int = 5) -> None:
-    """
-    Opens the generated results netCDF file and writes to a new netCDF file with new compression parameters.
-
-    Parameters
-    ----------
-    fpath: str
-        Path to the netCDF file to be re-compressed.
-    compression: str
-        Compression algorithm to be used. Currently only 'zlib' is implemented.
-    complevel: int
-        Compression level to be used. The higher the level, the better the compression, but the longer it takes.
-
-    Returns
-    -------
-    None
-    """
-
-    if compression in IMPLEMENTED_COMPRESSIONS and complevel in ALLOWED_COMPRESSION_LEVELS:
-
-        def encoding_params(ds: xr.Dataset, compression: str,
-                            complevel: int) -> dict:
-            return {
-                str(var): {
-                    compression: True,
-                    'complevel': complevel
-                }
-                for var in ds.variables
-                if not np.issubdtype(ds[var].dtype, np.object_)
-            }
-
-        try:
-            with xr.open_dataset(fpath) as ds:
-                parent_dir, file = os.path.split(fpath)
-                re_name = os.path.join(parent_dir, f're_{file}')
-                ds.to_netcdf(re_name,
-                             mode='w',
-                             format='NETCDF4',
-                             encoding=encoding_params(ds, compression,
-                                                      complevel))
-                print(f'\n\nRe-compression finished\n\n')
-
-            # for small initial files, the re-compressed file might be larger than the original
-            # delete the larger file and keep the smaller; rename the smaller file to the original name if necessary
-            fpath_size = os.path.getsize(fpath)
-            re_name_size = os.path.getsize(re_name)
-
-            if fpath_size < re_name_size:
-                os.remove(re_name)
-            else:
-                os.remove(fpath)
-                os.rename(re_name, fpath)
-
-        except Exception as e:
-            print(
-                f'\n\nRe-compression failed. {e}\nContinue without re-compression.\n\n'
-            )
-            os.remove(re_name) if os.path.exists(re_name) else None
-
-    else:
-        print(
-            f'\n\nRe-compression failed. Compression has to be {IMPLEMENTED_COMPRESSIONS} and compression levels other than {ALLOWED_COMPRESSION_LEVELS} are not supported. Continue without re-compression.\n\n'
-        )
