@@ -2,7 +2,7 @@ import xarray as xr
 import numpy as np
 from validator.validation.intra_annual_slicer import IntraAnnualSlicer
 from validator.validation.globals import NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, INTRA_ANNUAL_SEPARATOR
-from typing import List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pandas as pd
 import os
 
@@ -52,6 +52,12 @@ class Pytesmo2Qa4smResultsTranscriber:
                                               dtype=np.float32)
         self.__idx_arr: np.ndarray = np.arange(len(self.__lat_arr),
                                                dtype=np.int32)
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(pytesmo_results="{self.pytesmo_ncfile}", intra_annual_slices={self.intra_annual_slices.__repr__()})'
+
+    def __str__(self) -> str:
+        return f'{self.__class__.__name__}("{os.path.basename(self.pytesmo_ncfile)}", {self.intra_annual_slices})'
 
     def intra_annual_slices_checker(
             self) -> Tuple[bool, Union[List[str], None]]:

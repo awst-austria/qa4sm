@@ -29,6 +29,7 @@ class IntraAnnualSlicesDefault:
     '''
 
     def __init__(self, custom_file: Optional[str] = None) -> None:
+        self.custom_file = custom_file
         if not custom_file:
             self.intra_annual_slices_dict = INTRA_ANNUAL_SLICES
             self.available_slices = list(self.intra_annual_slices_dict.keys())
@@ -39,6 +40,12 @@ class IntraAnnualSlicesDefault:
             raise FileNotFoundError(
                 f'File {custom_file} not found. Please provide a valid path to a JSON file, containing the intra annual slice definitions.'
             )
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(custom_file={self.custom_file})'
+
+    def __str__(self) -> str:
+        return f'{self.__class__.__name__}({os.path.basename(self.custom_file)})'
 
     def __load_json_data(self, json_path: str) -> dict:
         '''Reads and loads the JSON file into a dictionary.
@@ -83,6 +90,12 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
             raise ValueError(
                 f'Invalid intra annual slice type. Available types are: {self.available_slices}'
             )
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(intra_annual_slice_type={self.intra_annual_slice_type}, overlap={self.overlap})'
+
+    def __str__(self) -> str:
+        return f'{self.__class__.__name__}({self.intra_annual_slice_type}, {self.overlap})'
 
     def __date_to_doy(self, date_tuple: Tuple[int, int]) -> int:
         '''Converts a date list [month, day] to a day of the year (doy). Leap years are neglected.

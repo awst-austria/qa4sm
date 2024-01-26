@@ -42,7 +42,8 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in, deprecated
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.netcdf_transcription import IntraAnnualSlicer, Pytesmo2Qa4smResultsTranscriber
+from validator.validation.intra_annual_slicer import IntraAnnualSlicer
+from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 from api.frontend_urls import get_angular_url
 from shutil import copy2
 from typing import Optional, List, Tuple, Dict, Union
