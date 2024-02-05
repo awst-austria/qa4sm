@@ -254,64 +254,46 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
-  getMultipleSensorInformation(sensors): string {
+  private getMultipleSensorInformation(sensors, numberOfLocations: number): string {
     const numberOfSensors = sensors.length;
-    const networks = [];
-    const minDepths = [];
-    const maxDepths = [];
-    const timeRangeFrom = [];
-    const timeRangeTo = [];
+    let textToReturn = '';
+    if (numberOfLocations > 1) {
+      textToReturn +=
+        `There are ${numberOfSensors} sensors at ${numberOfLocations} locations. Zoom in to see more details.`
+    } else {
+      const stationProperties = sensors[0].get('datasetProperties');
+      textToReturn +=
+        `<div class="flex flex-row">
+            <b class="mr-1">Station: </b><span>${this.getPropertyValue(stationProperties, this.propertyNames.station)}</span>
+         </div>` +
+        `<div class="flex flex-row">
+            <b class="mr-1">Network: </b><span>${this.getPropertyValue(stationProperties, this.propertyNames.network)}</span>
+         </div>`
+      sensors.forEach((sensor, index) => {
+        const sensorProperties = sensor.get('datasetProperties');
+        textToReturn += this.getSensorInformation(sensorProperties, index);
 
+      })
+    }
 
-    sensors.forEach(sensor => {
-      const sensorProperties = sensor.get('datasetProperties');
-      const network = this.getPropertyValue(sensorProperties, this.propertyNames.network);
-      const depthFrom = parseFloat(this.getPropertyValue(sensorProperties, this.propertyNames.depthFrom));
-      const depthTo = parseFloat(this.getPropertyValue(sensorProperties, this.propertyNames.depthTo));
-      const dateFrom =
-        new Date(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeFrom).split(' ')[0]);
-      const dateTo =
-        new Date(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeTo).split(' ')[0]);
-
-
-      if (networks.length == 0 || !networks.find(element => element == network)) {
-        networks.push(network);
-      }
-
-      if (minDepths.length == 0 || !minDepths.filter(element => element == depthFrom).length) {
-        minDepths.push(depthFrom);
-      }
-
-      if (maxDepths.length == 0 || !maxDepths.filter(element => element == depthTo).length) {
-        maxDepths.push(depthTo);
-      }
-
-      if (timeRangeFrom.length == 0 || !timeRangeFrom.find(element => element == dateFrom)) {
-        timeRangeFrom.push(dateFrom);
-      }
-
-      if (timeRangeTo.length == 0 || !timeRangeTo.find(element => element == dateTo)) {
-        timeRangeTo.push(dateTo);
-      }
-
-    })
-
-    const earliestDate = (new Date(Math.min.apply(null, timeRangeFrom)))
-      .toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
-    const latestDate = (new Date(Math.max.apply(null, timeRangeTo)))
-      .toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
-
-    return `
-    There are ${numberOfSensors} sensors in a depth from ${minDepths} to ${maxDepths} m, of network(s)
-    ${networks.map(network => network)} located here. Data is available from ${earliestDate} to ${latestDate}.`
-
+    return textToReturn
   }
 
-  getPropertyValue(properties, propertyName): string {
+  private getSensorInformation(sensorProperties, index: number): string {
+    return `<div class="flex flex-row">
+            <b class="mr-1">Sensor ${index + 1}</b>
+            (${this.getPropertyValue(sensorProperties, this.propertyNames.depthFrom)}
+              - ${this.getPropertyValue(sensorProperties, this.propertyNames.depthTo)} m):
+              ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeFrom))}
+              - ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeTo))}
+         </div>`
+  }
+
+  private getPropertyValue(properties, propertyName): string {
     return properties.find(property => property.propertyName == propertyName).propertyValue
   }
 
-  styleDate(date: string): string {
+  private styleDate(date: string): string {
     let dateAsDate = new Date(date);
     return dateAsDate ? dateAsDate.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) : null
   }
@@ -334,51 +316,48 @@ export class MapComponent implements AfterViewInit, OnInit {
     return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
   }
 
+  private checkNumberOfLocations(features): number {
+    let coordinates = []
+    features.forEach(feature => {
+      let featureCoordinates = feature.getGeometry().getCoordinates();
+      if (!coordinates.find(coords => coords.every((value, index) => value === featureCoordinates[index]))) {
+        coordinates.push(featureCoordinates)
+      }
+    })
+    return coordinates.length
+  }
+
   private generateSensorInformation(features): string {
+    const numberOfLocations = this.checkNumberOfLocations(features)
     if (features.length > 1) {
-      return this.generateMultipleSensorInformation(features);
+      return this.generateMultipleSensorInformation(features, numberOfLocations)
     } else {
       return this.generateSingleSensorTooltip(features[0]);
     }
   }
 
 
-  private generateMultipleSensorInformation(features): string {
-    return `<div class="flex flex-column text-base p-1 text-justify max-w-20rem">
-            ${this.getMultipleSensorInformation(features)}
+  private generateMultipleSensorInformation(features, numberOfLocations): string {
+    return `<div class="flex flex-column text-base p-1 text-justify">
+            ${this.getMultipleSensorInformation(features, numberOfLocations)}
             </div>`;
   }
 
   private generateSingleSensorTooltip(feature): string {
     const properties = feature.get('datasetProperties');
     return '<div class="flex flex-column text-base p-1 border-round-bottom-md"> ' +
-        `<div class="flex flex-row">
+      `<div class="flex flex-row">
             <b class="mr-1">Station: </b>
             <span>${this.getPropertyValue(properties, this.propertyNames.station)}</span>
         </div>` +
-        `<div class="flex flex-row">
+      `<div class="flex flex-row">
             <b class="mr-1">Network: </b>
             <span>${this.getPropertyValue(properties, this.propertyNames.network)}</span>
         </div>` +
-        `<div class="flex flex-row">
-            <b class="mr-1">Depths: </b>
-            <span>${this.getPropertyValue(properties, this.propertyNames.depthFrom)}
-            - ${this.getPropertyValue(properties, this.propertyNames.depthTo)} m</span>
-        </div>` +
-        `<div class="flex flex-row">
-            <b class="mr-1">Time range: </b>
-            <span>${this.styleDate(this.getPropertyValue(properties, this.propertyNames.timeRangeFrom))}
-            - ${this.styleDate(this.getPropertyValue(properties, this.propertyNames.timeRangeTo))}</span>
-        </div>` +
+      this.getSensorInformation(properties, 0) +
       '</div>';
   }
 
-  // stylePropertyName(propertyName: string): string {
-  //   return propertyName
-  //     .split('_')
-  //     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-  //     .join(' ');
-  // }
 }
 
 
