@@ -50,6 +50,7 @@ from typing import Optional, List, Tuple, Dict, Union
 
 __logger = logging.getLogger(__name__)
 
+#$$
 ####################-----Implement this in the proper way-----####################
 slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
                                     overlap=0,
@@ -116,14 +117,14 @@ def set_outfile(validation_run, run_dir):
         validation_run.output_file.name = outfile
 
 
-def save_validation_config(validation_run, transcriber):
+def save_validation_config(validation_run, transcriber):  #$$
     try:
         with Dataset(os.path.join(OUTPUT_FOLDER, transcriber.output_file_name),
                      "a",
                      format="NETCDF4") as ds:
 
             ds.qa4sm_version = settings.APP_VERSION
-            ds.qa4sm_reader_version = qa4sm_reader.__version__
+            ds.qa4sm_reader_version = qa4sm_reader.__version__  #$$
             ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(
                 settings.APP_VERSION)
             ds.url = settings.SITE_URL + get_angular_url(
@@ -370,7 +371,7 @@ def create_pytesmo_validation(validation_run):
     _pairwise_metrics = PairwiseIntercomparisonMetrics(
         metadata_template=metadata_template,
         calc_kendall=False,
-    )
+    )  #$$
 
     if isinstance(
             intra_annual_slices, dict
@@ -379,7 +380,7 @@ def create_pytesmo_validation(validation_run):
             calculator=_pairwise_metrics,
             subsets=intra_annual_slices,
             group_results="join",
-        )
+        )  #$$
 
     elif intra_annual_slices is None:
         pairwise_metrics = _pairwise_metrics
@@ -387,7 +388,7 @@ def create_pytesmo_validation(validation_run):
     else:
         raise ValueError(
             f"Invalid value for intra_annual_slices: {intra_annual_slices}. Please specify either None or a custom intra-annual slicing function."
-        )
+        )  #$$
 
     metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
 
@@ -396,10 +397,7 @@ def create_pytesmo_validation(validation_run):
             spatial_ref_name,
             metadata_template=metadata_template,
             bootstrap_cis=validation_run.bootstrap_tcol_cis)
-        metric_calculators.update({
-            (ds_num, 3): tcol_metrics.calc_metrics
-        })  #? does this intra_annual updated mertic_calculator work for tcol?
-
+        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
     else:
@@ -492,7 +490,7 @@ def untrack_celery_task(task_id):
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
 
-def run_validation(validation_id):
+def run_validation(validation_id):  #$$
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_aborted = False
@@ -625,8 +623,8 @@ def run_validation(validation_id):
             transcriber = Pytesmo2Qa4smResultsTranscriber(
                 pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                              validation_run.output_file.name),
-                intra_annual_slices=slicer_instance)
-            if transcriber.exists:
+                intra_annual_slices=slicer_instance)  #$$
+            if transcriber.exists:  #$$
                 restructured_results = transcriber.get_transcribed_dataset()
                 transcriber.output_file_name = transcriber.build_outname(
                     run_dir, results.keys())
