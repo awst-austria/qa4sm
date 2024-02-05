@@ -49,10 +49,19 @@ export class MapComponent implements AfterViewInit, OnInit {
   @Output() mapReady = new EventEmitter<Map>();
 
   singleSensorMarkerRadius = 5;
-  multipleSensorMarkerRadius = 8;
-  multipleSensorStrokeColor = 'blue';
-  multipleSensorStrokeWidth = 2;
+  multipleSensorMarkerRadius = 6;
+  multipleSensorStrokeColor = '#118278';
+  multipleSensorStrokeWidth = 4;
   legendItems: LegendItem[];
+
+  propertyNames = {
+    station: 'station',
+    network: 'network',
+    depthFrom: 'depth_from',
+    depthTo: 'depth_to',
+    timeRangeFrom: 'timerange_from',
+    timeRangeTo: 'timerange_to',
+  };
 
   constructor(private zone: NgZone, private cd: ChangeDetectorRef, private toastService: ToastService, private elementRef: ElementRef) {
   }
@@ -61,14 +70,14 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.legendItems = [
       {
         label: "Multiple sensors",
-        tooltip: 'Location with multiple sensors. Zoom in to see single sensor. ',
+        tooltip: 'Hover over a point to get more information about the location. Zoom in to see more exact sensor locations. ',
         strokeColor: this.multipleSensorStrokeColor,
         radius: this.multipleSensorMarkerRadius,
         strokeWidth: this.multipleSensorStrokeWidth,
       },
       {
         label: 'Single Sensor',
-        tooltip: 'Location with a single sensor. Different colors indicate different networks. Hover over the point to find out more about the sensor.',
+        tooltip: 'Location with a single sensor. Different colors indicate different networks. Hover over a point to find out more about the sensor.',
         strokeWidth: 0,
         fillColor: 'black',
         strokeColor: 'black',
@@ -83,7 +92,6 @@ export class MapComponent implements AfterViewInit, OnInit {
   }
 
   public addGeoJson(geoJson: string) {
-    console.log("ADD geojson-----------------------------------------------------");
     let features = new GeoJSON().readFeatures(geoJson, {
       dataProjection: 'EPSG:4326',
       featureProjection: 'EPSG:3857'
@@ -109,7 +117,6 @@ export class MapComponent implements AfterViewInit, OnInit {
     addCommonProjections();
     let mapProjectionString = 'EPSG:3857';
     this.projection = GetProjection(mapProjectionString);
-    // this.projection.setExtent(this.extent);
     this.view = new View({
       center: transform(this.center, 'EPSG:4326', 'EPSG:3857'),
       zoom: this.zoom,
@@ -135,7 +142,6 @@ export class MapComponent implements AfterViewInit, OnInit {
               })
             })
           });
-
 
         } else {
           if (feature.get('features')[0].get('markerColor') != undefined) {
@@ -205,50 +211,41 @@ export class MapComponent implements AfterViewInit, OnInit {
       offset: [0, -10],
     });
 
-    //map.addOverlay(tooltipOverlay);
-//----
-
 
     this.Map = new Map({
       layers: [new TileLayer({
         source: new OSM({})
       }), clusteredSourceLayer, nonClusteredSourceLayer],
       target: 'map',
-      // controls: DefaultControls({attribution: false}).extend([new MyControl(),new Attribution({collapsible: true,})]),
       controls: [new Attribution({collapsible: true})],
       view: this.view,
     });
     this.Map.addControl(new BoundingBoxControl(this.Map, this.spatialSubset, this.toastService, this.zone));
     this.Map.addOverlay(tooltipOverlay);
-    for (let vec in this.Map.getAllLayers()) {
-      console.log('LAyer: ', vec)
-    }
-
 
     this.Map.addOverlay(tooltipOverlay);
 
     this.Map.on('pointermove', (evt) => {
       this.zone.runOutsideAngular(() => {
         const features = [];
+        let multipleSensor: boolean;
         this.Map.forEachFeatureAtPixel(evt.pixel, (feature) => {
+          const sensorList = feature.get('features');
+
           if (feature.get('datasetProperties')) { // this branch covers simple polygons and points
             if (!features.includes(feature)) {
               features.push(feature);
             }
-          } else if (feature.get('features')) { //this branch covers cluster points
-            if (feature.get('features').length == 1) {
-              if (!features.includes(feature.get('features')[0])) {
-                features.push(feature.get('features')[0]);
-              }
-            } else {
-              console.log(feature.get('features'))
-            }
+          } else if (sensorList) { //this branch covers cluster points
+
+            sensorList.forEach(sensor => features.push(sensor))
+
           }
         });
 
         if (features.length > 0) {
           const coordinates = evt.coordinate;
-          tooltipContent.innerHTML = this.generateMultipleTables(features);
+          tooltipContent.innerHTML = this.generateSensorInformation(features);
           tooltipOverlay.setPosition(coordinates);
         } else {
           tooltipOverlay.setPosition(undefined);
@@ -256,6 +253,69 @@ export class MapComponent implements AfterViewInit, OnInit {
       });
     });
   }
+
+  getMultipleSensorInformation(sensors): string {
+    const numberOfSensors = sensors.length;
+    const networks = [];
+    const minDepths = [];
+    const maxDepths = [];
+    const timeRangeFrom = [];
+    const timeRangeTo = [];
+
+
+    sensors.forEach(sensor => {
+      const sensorProperties = sensor.get('datasetProperties');
+      const network = this.getPropertyValue(sensorProperties, this.propertyNames.network);
+      const depthFrom = parseFloat(this.getPropertyValue(sensorProperties, this.propertyNames.depthFrom));
+      const depthTo = parseFloat(this.getPropertyValue(sensorProperties, this.propertyNames.depthTo));
+      const dateFrom =
+        new Date(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeFrom).split(' ')[0]);
+      const dateTo =
+        new Date(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeTo).split(' ')[0]);
+
+
+      if (networks.length == 0 || !networks.find(element => element == network)) {
+        networks.push(network);
+      }
+
+      if (minDepths.length == 0 || !minDepths.filter(element => element == depthFrom).length) {
+        minDepths.push(depthFrom);
+      }
+
+      if (maxDepths.length == 0 || !maxDepths.filter(element => element == depthTo).length) {
+        maxDepths.push(depthTo);
+      }
+
+      if (timeRangeFrom.length == 0 || !timeRangeFrom.find(element => element == dateFrom)) {
+        timeRangeFrom.push(dateFrom);
+      }
+
+      if (timeRangeTo.length == 0 || !timeRangeTo.find(element => element == dateTo)) {
+        timeRangeTo.push(dateTo);
+      }
+
+    })
+
+    const earliestDate = (new Date(Math.min.apply(null, timeRangeFrom)))
+      .toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+    const latestDate = (new Date(Math.max.apply(null, timeRangeTo)))
+      .toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+
+    return `
+    There are ${numberOfSensors} sensors in a depth from ${minDepths} to ${maxDepths} m, of network(s)
+    ${networks.map(network => network)} located here. Data is available from ${earliestDate} to ${latestDate}.`
+
+  }
+
+  getPropertyValue(properties, propertyName): string {
+    return properties.find(property => property.propertyName == propertyName).propertyValue
+  }
+
+  styleDate(date: string): string {
+    let dateAsDate = new Date(date);
+    return dateAsDate ? dateAsDate.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}) : null
+  }
+
 
   private hexToRgba(hex, opacity): string {
     // Remove the hash character, if any
@@ -274,47 +334,51 @@ export class MapComponent implements AfterViewInit, OnInit {
     return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + alpha + ')';
   }
 
-  private generateMultipleTables(features): string {
-    let combinedTableHTML = '';
-    features.forEach(feature => {
-      const properties = feature.get('datasetProperties');
-      let tableHTML = '<table>';
-      let textHTML = '<div class="flex flex-row">Station information:</div>';
-
-      // Add the table header
-      tableHTML += `
-        <thead>
-          <tr>
-            <th>Property</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-      `;
-
-      properties.forEach(property => {
-        tableHTML += `
-          <tr>
-            <td>${property.propertyName}</td>
-            <td>${property.propertyValue}</td>
-          </tr>
-        `;
-        textHTML += `<div class="flex flex-row"><b>${this.stylePropertyName(property.propertyName)}:</b> ${property.propertyValue}</div>`
-      });
-
-      tableHTML += '</tbody></table>';
-      combinedTableHTML += '<div class="flex flex-column">' + textHTML + '</div>';
-    });
-
-    return combinedTableHTML;
+  private generateSensorInformation(features): string {
+    if (features.length > 1) {
+      return this.generateMultipleSensorInformation(features);
+    } else {
+      return this.generateSingleSensorTooltip(features[0]);
+    }
   }
 
-  stylePropertyName(propertyName: string): string{
-    return propertyName
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+
+  private generateMultipleSensorInformation(features): string {
+    return `<div class="flex flex-column text-base p-1 text-justify max-w-20rem">
+            ${this.getMultipleSensorInformation(features)}
+            </div>`;
   }
+
+  private generateSingleSensorTooltip(feature): string {
+    const properties = feature.get('datasetProperties');
+    return '<div class="flex flex-column text-base p-1 border-round-bottom-md"> ' +
+        `<div class="flex flex-row">
+            <b class="mr-1">Station: </b>
+            <span>${this.getPropertyValue(properties, this.propertyNames.station)}</span>
+        </div>` +
+        `<div class="flex flex-row">
+            <b class="mr-1">Network: </b>
+            <span>${this.getPropertyValue(properties, this.propertyNames.network)}</span>
+        </div>` +
+        `<div class="flex flex-row">
+            <b class="mr-1">Depths: </b>
+            <span>${this.getPropertyValue(properties, this.propertyNames.depthFrom)}
+            - ${this.getPropertyValue(properties, this.propertyNames.depthTo)} m</span>
+        </div>` +
+        `<div class="flex flex-row">
+            <b class="mr-1">Time range: </b>
+            <span>${this.styleDate(this.getPropertyValue(properties, this.propertyNames.timeRangeFrom))}
+            - ${this.styleDate(this.getPropertyValue(properties, this.propertyNames.timeRangeTo))}</span>
+        </div>` +
+      '</div>';
+  }
+
+  // stylePropertyName(propertyName: string): string {
+  //   return propertyName
+  //     .split('_')
+  //     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  //     .join(' ');
+  // }
 }
 
 

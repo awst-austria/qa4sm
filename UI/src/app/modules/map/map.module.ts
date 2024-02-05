@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {MapComponent} from './components/map/map.component';
 import {MapLegendComponent} from './components/map-legend/map-legend.component';
 import {TooltipModule} from 'primeng/tooltip';
+import {ScrollPanelModule} from 'primeng/scrollpanel';
 
 
 @NgModule({
@@ -11,10 +12,11 @@ import {TooltipModule} from 'primeng/tooltip';
     MapComponent,
     MapLegendComponent
   ],
-  imports: [
-    CommonModule,
-    TooltipModule
-  ]
+    imports: [
+        CommonModule,
+        TooltipModule,
+        ScrollPanelModule
+    ]
 })
 export class MapModule {
 }

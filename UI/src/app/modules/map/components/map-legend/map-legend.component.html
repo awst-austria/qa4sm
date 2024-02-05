@@ -5,7 +5,7 @@
       [innerHTML]="getCircleSVG(legendItem)"
       class="flex flex-column w-1 lg:p-0 justify-content-center align-items-center">
     </div>
-    <div class="legend-label flex flex-column w-auto p-1">{{ legendItem.label }}</div>
-    <div class="pi pi-question-circle flex flex-column w-1" [pTooltip]="legendItem.tooltip"></div>
+    <div class="legend-label flex flex-column w-auto p-1 justify-content-center align-items-center">{{ legendItem.label }}</div>
+    <div class="pi pi-question-circle flex flex-column w-1 justify-content-center align-items-center" [pTooltip]="legendItem.tooltip"></div>
   </div>
 </div>
