@@ -50,17 +50,18 @@ NON_METRICS = [
     'instrument_depthfrom',
     'instrument_depthto',
     'frm_class',
-]
+]  #$$
 
-BAD_METRICS = ['time']
+BAD_METRICS = ['time']  #$$
 
 METRIC_TEMPLATE = [
     "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
 ]
 
-INTRA_ANNUAL_SEPARATOR = '|'
+INTRA_ANNUAL_SEPARATOR = '|'  #$$
 
-INTRA_ANNUAL_METRIC_TEMPLATE = ["{tsw}", INTRA_ANNUAL_SEPARATOR, "{metric}"]
+INTRA_ANNUAL_METRIC_TEMPLATE = ["{tsw}", INTRA_ANNUAL_SEPARATOR,
+                                "{metric}"]  #$$
 
 TC_METRICS = {
     'snr': 'TC: Signal-to-noise ratio',
@@ -235,10 +236,10 @@ USER_DATASET_VERSION_MIN_ID = 500
 USER_DATASET_VARIABLE_MIN_ID = 500
 
 # netcdf compression means
-IMPLEMENTED_COMPRESSIONS = ['zlib']
-ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+IMPLEMENTED_COMPRESSIONS = ['zlib']  #$$
+ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #$$
 
-# intra annual slices
+# default intra annual slices
 INTRA_ANNUAL_SLICES = {
     "seasons": {
         "S1": [[12, 1], [2, 28]],
@@ -260,4 +261,4 @@ INTRA_ANNUAL_SLICES = {
         "Nov": [[11, 1], [11, 30]],
         "Dec": [[12, 1], [12, 31]],
     }
-}
+}  #$$
