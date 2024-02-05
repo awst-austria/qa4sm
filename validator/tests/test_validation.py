@@ -175,7 +175,7 @@ class TestValidation(TestCase):
                       run,
                       transcriber: Pytesmo2Qa4smResultsTranscriber,
                       is_tcol_run=False,
-                      meta_plots=True):
+                      meta_plots=True):  #$$
 
         try:
             self._check_validation_configuration_consistency(run)
@@ -205,9 +205,8 @@ class TestValidation(TestCase):
         # check netcdf output
         length = -1
         num_vars = -1
-        with netCDF4.Dataset(transcriber.output_file_name, mode='r') as ds:
-            # with netCDF4.Dataset(run.output_file.path, mode='r') as ds:
-            print(f'\n\n{run.output_file.path}\n\n')
+        with netCDF4.Dataset(transcriber.output_file_name,
+                             mode='r') as ds:  #$$
             assert ds.qa4sm_version == settings.APP_VERSION
             assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(
                 settings.APP_VERSION)
@@ -267,10 +266,9 @@ class TestValidation(TestCase):
                         assert length > 0, 'Variable {} has no entries'.format(
                             m_var.name)
                     else:
-                        if m_var.name not in non_metrics:
-                            values = values[0]
-                            print(f'\n\n{m_var.name}')
-                            print(f'{len(values)}\n\n')
+                        if m_var.name not in non_metrics:  #$$
+                            values = values[0]  #$$
+
                         assert len(
                             values
                         ) == length, 'Variable q{} doesn\'t match other variables in length'.format(
@@ -376,7 +374,7 @@ class TestValidation(TestCase):
 
             assert ds.val_scaling_method == run.scaling_method, ' Wrong validation config attribute. [scaling_method]'
 
-        #no plotting currently
+        #no plotting currently #$$
         '''
         # check zipfile of graphics
         zipfile = os.path.join(outdir, 'graphs.zip')
@@ -491,7 +489,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        slicer_instance = None  # assume bulk case
+        slicer_instance = None  # assume bulk case #$$
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
@@ -502,7 +500,7 @@ class TestValidation(TestCase):
         self.check_results(new_run,
                            transcriber,
                            is_tcol_run=False,
-                           meta_plots=True)
+                           meta_plots=True)  #$$
         self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1558,9 +1556,8 @@ class TestValidation(TestCase):
 
         ## save config
         validation_run = ValidationRun()
-        print(f'\n\noutput file name: {validation_run.output_file_name}\n\n')
 
-        slicer_instance = None  # assume bulk case
+        slicer_instance = None  # assume bulk case #$$
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          'not_existing_file.nc'),
