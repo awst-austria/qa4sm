@@ -40,7 +40,7 @@ from validator.validation.filters import setup_filtering
 from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
-from validator.validation.util import mkdir_if_not_exists, first_file_in, deprecated
+from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 from validator.validation.intra_annual_slicer import IntraAnnualSlicer
 from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
@@ -55,7 +55,7 @@ slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
                                     overlap=0,
                                     custom_file=None)
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
-# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
+slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
 ##################################################################################
 
@@ -109,8 +109,6 @@ def _get_spatial_reference_reader(val_run) -> ('Reader', str, dict):
     return ref_reader, read_name, read_kwargs
 
 
-@deprecated(
-    'This function has been depracated and will be removed in the future.')
 def set_outfile(validation_run, run_dir):
     outfile = first_file_in(run_dir, '.nc')
     if outfile is not None:
@@ -465,35 +463,6 @@ def execute_job(self, validation_id, job):
         self.retry(countdown=2, exc=e)
 
 
-# def check_and_store_results_2(
-#     validation_run, run_dir: str, results: Dict,
-#     transcriber: pytesmoresultstoqa4smresults.Pytesmo2Qa4smResultsTranscriber
-# ) -> None:
-#     """
-#     Check if the results are valid and store them in a netcdf file.
-
-#     Parameters
-#     ----------
-#     validation_run : ValidationRun
-#         The validation run for which the results were calculated.
-#     run_dir : str
-#         The directory where the results are stored.
-#     results : dict
-#         The results of the validation run.
-#     transcriber : Pytesmo2Qa4smResultsTranscriber
-#         The transcriber that converts the results to the QA4SM format.
-#     """
-
-#     if len(results) < 1:
-#         __logger.warning('Potentially problematic job: {} - no results'.format(
-#             validation_run.id))
-#         return None
-
-#     transcriber.output_file_name = transcriber.build_outname(
-#         run_dir, results.keys())
-#     transcriber.write_to_netcdf(transcriber.output_file_name)
-
-
 def check_and_store_results(job_id, results, save_path):
     if len(results) < 1:
         __logger.warning(
@@ -657,21 +626,22 @@ def run_validation(validation_id):
                 pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                              validation_run.output_file.name),
                 intra_annual_slices=slicer_instance)
-            restructured_results = transcriber.get_transcribed_dataset()
-            transcriber.output_file_name = transcriber.build_outname(
-                run_dir, results.keys())
-            transcriber.write_to_netcdf(transcriber.output_file_name)
+            if transcriber.exists:
+                restructured_results = transcriber.get_transcribed_dataset()
+                transcriber.output_file_name = transcriber.build_outname(
+                    run_dir, results.keys())
+                transcriber.write_to_netcdf(transcriber.output_file_name)
 
-            save_validation_config(validation_run, transcriber)
+                save_validation_config(validation_run, transcriber)
 
-            transcriber.compress(path=transcriber.output_file_name,
-                                 compression='zlib',
-                                 complevel=9)
+                transcriber.compress(path=transcriber.output_file_name,
+                                     compression='zlib',
+                                     complevel=9)
 
-            # generate_all_graphs(
-            #     validation_run,
-            #     run_dir,
-            #     save_metadata=validation_run.plots_save_metadata)
+                # generate_all_graphs(
+                #     validation_run,
+                #     run_dir,
+                #     save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(
@@ -704,9 +674,6 @@ def stop_running_validation(validation_id):
         task.delete()
 
 
-@deprecated(
-    "It has been moved to pytesmoresultstoqa4smresults.Pytesmo2Qa4smResultsTranscriber. Use this method instead."
-)
 def _pytesmo_to_qa4sm_results(results: dict) -> dict:
     """
     Converts the new pytesmo results dictionary format to the old format that

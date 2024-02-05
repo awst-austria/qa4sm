@@ -1,7 +1,7 @@
 import xarray as xr
 import numpy as np
 from validator.validation.intra_annual_slicer import IntraAnnualSlicer
-from validator.validation.globals import NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, INTRA_ANNUAL_SEPARATOR
+from validator.validation.globals import BAD_METRICS, NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, INTRA_ANNUAL_SEPARATOR
 from typing import Any, List, Dict, Optional, Union, Tuple
 import pandas as pd
 import os
@@ -17,9 +17,9 @@ class Pytesmo2Qa4smResultsTranscriber:
     pytesmo_results : str
         Path to results netCDF4 written by `qa4sm.validation.validation.check_and_store_results`, which is in the old `pytesmo` format.
     intra_annual_slices : Union[None, IntraAnnualSlicer]
-        The intra annual slices for the results. Default is None, which means that no intra-annual intra annual slices are
+        The temporal sub-windows for the results. Default is None, which means that no temporal sub-windows are
         used, but only the 'bulk'. If an instance of `valdiator.validation.IntraAnnualSlicer` is provided,
-        the intra annual slices are used as provided by the IntraAnnualSlicer instance.
+        the temporal sub-windows are used as provided by the IntraAnnualSlicer instance.
     """
 
     def __init__(self,
@@ -39,10 +39,19 @@ class Pytesmo2Qa4smResultsTranscriber:
         self.intra_annual_slices_checker_called: bool = False
         self.intra_annual_slices_check: bool = False
 
+        self.pytesmo_ncfile = f'{pytesmo_results}'
+        if not os.path.isfile(pytesmo_results):
+            print(
+                f'FileNotFoundError: \n\nFile {pytesmo_results} not found. Please provide a valid path to a pytesmo results netCDF file.'
+            )
+            self.exists = False
+            return None
+        else:
+            self.exists = True
+
         with xr.open_dataset(pytesmo_results) as pr:
             self.pytesmo_results: xr.Dataset = pr
 
-        self.pytesmo_ncfile = f'{pytesmo_results}'
         # os.remove(pytesmo_results)
         # os.rename(pytesmo_results, self.pytesmo_ncfile)
 
@@ -62,15 +71,15 @@ class Pytesmo2Qa4smResultsTranscriber:
     def intra_annual_slices_checker(
             self) -> Tuple[bool, Union[List[str], None]]:
         """
-        Checks the intra annual slices and returns which case of intra annual slice is used, as well as a list of the
-        intra annual slices. Keeps track of whether the method has been called before.
+        Checks the temporal sub-windows and returns which case of temporal sub-window is used, as well as a list of the
+        temporal sub-windows. Keeps track of whether the method has been called before.
 
         Returns
         -------
         Tuple[bool, Union[List[str], None]]
-            A tuple indicating the intra annual slice type and the list of intra annual slices.
+            A tuple indicating the temporal sub-window type and the list of temporal sub-windows.
             bulk case: (False, ['bulk']),
-            intra-annual windows case: (True, list of intra annual slices)
+            intra-annual windows case: (True, list of temporal sub-windows)
         """
 
         self.intra_annual_slices_checker_called = True
@@ -84,55 +93,6 @@ class Pytesmo2Qa4smResultsTranscriber:
                 'intra_annual_slices must be None or an instance of `IntraAnnualSlicer`'
             )
 
-    def _pytesmo_to_qa4sm_results(self, results: dict) -> dict:
-        """
-        Converts the new pytesmo results dictionary format to the old format that
-        is still used by QA4SM.
-
-        Parameters
-        ----------
-        results : dict
-            Each key in the dictionary is a tuple of ``((ds1, col1), (d2, col2))``,
-            and the values contain the respective results for this combination of
-            datasets/columns.
-
-        Returns
-        -------
-        qa4sm_results : dict
-            Dictionary in the format required by QA4SM. This involves merging the
-            different dictionary entries from `results` to a single dictionary and
-            renaming the metrics to avoid name clashes, using the naming convention
-            from the old metric calculators.
-        """
-        # each key is a tuple of ((ds1, col1), (ds2, col2))
-        # this adds all tuples to a single list, and then only
-        # keeps unique entries
-        qa4sm_key = tuple(sorted(set(sum(map(list, results.keys()), []))))
-
-        qa4sm_res = {qa4sm_key: {}}
-        for key in results:
-            for metric in results[key]:
-                # static 'metrics' (e.g. metadata, geoinfo) are not related to datasets
-                statics = ["gpi", "n_obs", "lat", "lon"]
-                statics.extend(self.METADATA_TEMPLATE["ismn_ref"])
-                if metric in statics:
-                    new_key = metric
-                else:
-                    datasets = list(map(lambda t: t[0], key))
-                    if isinstance(metric, tuple):
-                        # happens only for triple collocation metrics, where the
-                        # metric key is a tuple of (metric, dataset)
-                        if metric[1].startswith("0-"):
-                            # triple collocation metrics for the reference should
-                            # not show up in the results
-                            continue
-                        new_metric = "_".join(metric)
-                    else:
-                        new_metric = metric
-                    new_key = f"{new_metric}_between_{'_and_'.join(datasets)}"
-                qa4sm_res[qa4sm_key][new_key] = results[key][metric]
-        return qa4sm_res
-
     @property
     def non_metrics(self) -> Dict[str, Dict[str, Union[np.ndarray, type]]]:
         """
@@ -144,18 +104,24 @@ class Pytesmo2Qa4smResultsTranscriber:
             The non-metrics.
         """
 
-        return {
-            non_metric: {
-                'data': self.pytesmo_results[non_metric].values,
-                'dtype': self.pytesmo_results[non_metric].dtype
-            }
-            for non_metric in self._default_non_metrics
-        }
+        non_metrics_dict = {}
+        for non_metric in self._default_non_metrics:
+            try:
+                non_metrics_dict[non_metric] = {
+                    'data': self.pytesmo_results[non_metric].values,
+                    'dtype': self.pytesmo_results[non_metric].dtype
+                }
+            except KeyError as e:
+                print(
+                    f'KeyError: {e}\n\nNon-metric \'{non_metric}\' not contained in pytesmo results. Skipping...'
+                )
+                continue
+        return non_metrics_dict
 
     @property
     def metrics_dict(self) -> Dict[str, str]:
         """Get the metrics dictionary. Whole procedure based on the premise, that metric names of valdiations of intra-annual
-        intra annual slices are of the form: `metric_long_name = 'intra_annual_slice{validator.validation.globals.INTRA_ANNUAL_SEPARATOR}metric_short_name'`. If this is not the
+        temporal sub-windows are of the form: `metric_long_name = 'intra_annual_slice{validator.validation.globals.INTRA_ANNUAL_SEPARATOR}metric_short_name'`. If this is not the
         case, it is assumed the 'bulk' case is present and the metric names are assumed to be the same as the metric
         short names.
 
@@ -164,16 +130,16 @@ class Pytesmo2Qa4smResultsTranscriber:
         Dict[str, str]
             The metrics dictionary.
         """
+
+        # check if the metric names are of the form: `metric_long_name = 'intra_annual_slice{INTRA_ANNUAL_SEPARATOR}metric_short_name'` and if not, assume the 'bulk' case
         _metrics = [
             metric.split(INTRA_ANNUAL_SEPARATOR)[1]
             for metric in self.pytesmo_results
             if INTRA_ANNUAL_SEPARATOR in metric
         ]
-        if len(
-                _metrics
-        ) != 0:  # bulk case             #? check if this is the best way to check for bulk case
+        if len(_metrics) != 0:  # intra-annual case
             return {long: long for long in set(_metrics)}
-        else:  # intra-annual case
+        else:  # bulk case
             return {
                 long: long
                 for long in self.pytesmo_results
@@ -183,7 +149,7 @@ class Pytesmo2Qa4smResultsTranscriber:
     def get_sorted_metric_precursor(self) -> Dict[str, Dict[str, np.array]]:
         """
         Creates a precursor dictionary of sorted metrics, based on the pytesmo results and later on used to construct
-        the metric data dictionary. The sorting is done according to the provided intra annual slices.
+        the metric data dictionary. The sorting is done according to the provided temporal sub-windows.
 
         Returns
         -------
@@ -205,16 +171,22 @@ class Pytesmo2Qa4smResultsTranscriber:
             }
 
         elif self.intra_annual_slices_check is True:
-            self.sorted_metric_precursor = {
-                intra_annual_slice: {
-                    metric_short:
-                    self.pytesmo_results[''.join(
-                        INTRA_ANNUAL_METRIC_TEMPLATE).format(
-                            temp_slice=intra_annual_slice, metric=metric_long)]
-                    for metric_long, metric_short in self.metrics_dict.items()
+            try:
+                self.sorted_metric_precursor = {
+                    intra_annual_slice: {
+                        metric_short:
+                        self.pytesmo_results[''.join(
+                            INTRA_ANNUAL_METRIC_TEMPLATE).format(
+                                tsw=intra_annual_slice, metric=metric_long)]
+                        for metric_long, metric_short in
+                        self.metrics_dict.items()
+                    }
+                    for intra_annual_slice in self.intra_annual_slices
                 }
-                for intra_annual_slice in self.intra_annual_slices
-            }
+            except KeyError as e:
+                print(
+                    f'KeyError: {e}\n\nCheck if the metric names are of the form: `metric_long_name = \'intra_annual_slice{INTRA_ANNUAL_SEPARATOR}metric_short_name\'`, employing \'{INTRA_ANNUAL_SEPARATOR}\' as the separator'
+                )
         else:
             raise TypeError(
                 'intra_annual_slices must be None or a list of strings')
@@ -225,33 +197,37 @@ class Pytesmo2Qa4smResultsTranscriber:
     def metric_data_dict(self) -> Dict[str, xr.DataArray]:
         """
         Get the metric data dictionary. In general, metric data is always a function of location of the spatial
-        reference point and of the intra annual slice used. The metric data dictionary is a dictionary of xarray.DataArrays,
-        containing the metric data for each intra annual slice.
+        reference point and of the temporal sub-window used. The metric data dictionary is a dictionary of xarray.DataArrays,
+        containing the metric data for each temporal sub-window.
 
         Returns
         -------
         Dict[str, xr.DataArray]
             The metric data dictionary. `Keys` are the (short name) metrics and `vals` xarray.DataArrays, containing all
-            data of the corresponding metric for each intra annual slice .
+            data of the corresponding metric for each temporal sub-window .
         """
         if self.intra_annual_slices_checker_called is False:
             self.intra_annual_slices_check, self.intra_annual_slices = self.intra_annual_slices_checker(
             )
 
-        return {
-            metric_short:
-            xr.DataArray(np.array([
-                self.get_sorted_metric_precursor()[intra_annual_slice]
-                [metric_short]
-                for intra_annual_slice in self.intra_annual_slices
-            ]),
-                         dims=('temp_slice', 'idx'),
-                         coords={
-                             'temp_slice': self.intra_annual_slices,
-                             'idx': self.__idx_arr,
-                         })
-            for metric_short in self.metrics_dict.values()
-        }
+        metric_data = {}
+        for metric_short in self.metrics_dict.values():
+            print('metric_short:', metric_short)
+            if metric_short in BAD_METRICS:
+                continue
+            metric_data_arr = []
+            for intra_annual_slice in self.intra_annual_slices:
+                metric_data_arr.append(self.get_sorted_metric_precursor()
+                                       [intra_annual_slice][metric_short])
+            metric_data[metric_short] = xr.DataArray(
+                np.array(metric_data_arr),
+                dims=('tsw', 'idx'),
+                coords={
+                    'tsw': self.intra_annual_slices,
+                    'idx': self.__idx_arr,
+                })
+
+        return metric_data
 
     @property
     def non_metric_data_dict(self) -> Dict[str, xr.DataArray]:
@@ -318,20 +294,20 @@ class Pytesmo2Qa4smResultsTranscriber:
             axis="Z",
             description="Index values for the dataset")
 
-        self.transcribed_dataset['temp_slice'].attrs = dict(
-            long_name="intra annual slice",
-            standard_name="intra annual slice",
+        self.transcribed_dataset['tsw'].attrs = dict(
+            long_name="temporal sub-window",
+            standard_name="temporal sub-window",
             units="1",
             valid_range=np.array([0, len(self.intra_annual_slices)]),
             axis="T",
-            description="Intra annual slice name for the dataset",
-            intra_annual_slice_type="No intra annual slices used"
+            description="temporal sub-window name for the dataset",
+            intra_annual_slice_type="No temporal sub-windows used"
             if self.intra_annual_slices_check is False else
             self._intra_annual_slices.metadata['Intra annual slice type'],
-            overlap="No intra annual slices used"
+            overlap="No temporal sub-windows used"
             if self.intra_annual_slices_check is False else
             self._intra_annual_slices.metadata['Overlap'],
-            intra_annual_slice_definition="No intra annual slices used"
+            intra_annual_slice_definition="No temporal sub-windows used"
             if self.intra_annual_slices_check is False else
             self._intra_annual_slices.metadata['Names_Dates [MM-DD]'],
         )

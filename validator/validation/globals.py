@@ -24,12 +24,35 @@ METRICS = {
 }
 
 NON_METRICS = [
-    'gpi', 'lon', 'lat', 'clay_fraction', 'climate_KG', 'climate_insitu',
-    'elevation', 'instrument', 'latitude', 'lc_2000', 'lc_2005', 'lc_2010',
-    'lc_insitu', 'longitude', 'network', 'organic_carbon', 'sand_fraction',
-    'saturation', 'silt_fraction', 'station', 'timerange_from', 'timerange_to',
-    'variable', 'instrument_depthfrom', 'instrument_depthto', 'frm_class'
+    'gpi',
+    'lon',
+    'lat',
+    'clay_fraction',
+    'climate_KG',
+    'climate_insitu',
+    'elevation',
+    'instrument',
+    'latitude',
+    'lc_2000',
+    'lc_2005',
+    'lc_2010',
+    'lc_insitu',
+    'longitude',
+    'network',
+    'organic_carbon',
+    'sand_fraction',
+    'saturation',
+    'silt_fraction',
+    'station',
+    'timerange_from',
+    'timerange_to',
+    'variable',
+    'instrument_depthfrom',
+    'instrument_depthto',
+    'frm_class',
 ]
+
+BAD_METRICS = ['time']
 
 METRIC_TEMPLATE = [
     "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
@@ -37,9 +60,7 @@ METRIC_TEMPLATE = [
 
 INTRA_ANNUAL_SEPARATOR = '|'
 
-INTRA_ANNUAL_METRIC_TEMPLATE = [
-    "{temp_slice}", INTRA_ANNUAL_SEPARATOR, "{metric}"
-]
+INTRA_ANNUAL_METRIC_TEMPLATE = ["{tsw}", INTRA_ANNUAL_SEPARATOR, "{metric}"]
 
 TC_METRICS = {
     'snr': 'TC: Signal-to-noise ratio',

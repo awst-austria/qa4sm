@@ -16,17 +16,3 @@ def first_file_in(the_dir, extension):
         if file.endswith(extension):
             return path.join(the_dir, file)
     return None
-
-
-def deprecated(explanation):
-
-    def decorator(func):
-
-        def wrapper(*args, **kwargs):
-            warnings.warn(f"{func.__name__} is deprecated. {explanation}",
-                          DeprecationWarning)
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
