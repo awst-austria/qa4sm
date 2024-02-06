@@ -1,13 +1,17 @@
+#%%
 import warnings
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import numpy as np
 plt.switch_backend('agg')  ## this allows headless graph production
 
+import logging
 from os import path, remove
 from zipfile import ZipFile, ZIP_DEFLATED
 
+import sys
+sys.path.append('/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm-reader/src/')
 from qa4sm_reader.plot_all import plot_all, get_img_stats
 from qa4sm_reader.comparing import QA4SMComparison, ComparisonError, SpatialExtentError
 
@@ -15,25 +19,17 @@ from django.conf import settings
 
 from cartopy import config as cconfig
 
-cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
+# cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-from validator.validation.globals import *
+# from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE
 import os
 from io import BytesIO
 import base64
-from parse import *
+from parse import parse
 
-import logging
-from autologging import traced, TRACE, logged
-logging.basicConfig(
-    level=TRACE,
-    filename=__name__ + '.log',
-    format='%(asctime)s - %(levelname)s:%(name)s:%(funcName)s:%(message)s"',
-)
+__logger = logging.getLogger(__name__)
 
-@logged
-@traced
-def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
+def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfolder: str, save_metadata='threshold'):
     """
     Create all default graphs for validation run. This is done
     using the qa4sm-reader plotting library.
@@ -53,16 +49,18 @@ def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
         return None
 
     zipfilename = path.join(outfolder, 'graphs.zip')
-    logging.debug('Trying to create zipfile {}'.format(zipfilename))
+    __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
     fnb, fnm, fcsv = plot_all(
         validation_run.output_file.path,
+        temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
         out_type='png',
         save_metadata=save_metadata
     )
     fnb_svg, fnm_svg, fcsv = plot_all(
         validation_run.output_file.path,
+        temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
         out_type='svg',
         save_metadata=save_metadata
@@ -186,7 +184,7 @@ def get_inspection_table(validation_run):
     ----------
     validation_run : ValidationRun
         The validation run to make plots for.
-        
+
     Returns
     -------
     table : pd.DataFrame
@@ -389,3 +387,15 @@ def get_extent_image(
 
     except ComparisonError:
         return "error encountered"
+
+#%%
+if __name__ == '__main__':
+    dirpath = '/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm/output/381f63ce-2078-4615-9b8a-fdf1170e6bd0_c'
+    fnb, fnm, fcsv = plot_all(
+    filepath=os.path.join(dirpath, '0-ISMN.soil_moisture_with_1-C3S_combined.sm.nc'),
+    out_dir=os.path.join(dirpath, 'graphs'),
+    out_type='png',
+    save_metadata='threshold'
+    )
+
+# %%

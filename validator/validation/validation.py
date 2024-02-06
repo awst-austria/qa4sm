@@ -56,7 +56,7 @@ slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
                                     overlap=0,
                                     custom_file=None)
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
-slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
+# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
 ##################################################################################
 
@@ -636,10 +636,18 @@ def run_validation(validation_id):  #$$
                                      compression='zlib',
                                      complevel=9)
 
-                # generate_all_graphs(
-                #     validation_run,
-                #     run_dir,
-                #     save_metadata=validation_run.plots_save_metadata)
+                if intra_annual_slices is None:
+                    intra_annual_slice_names =  np.array(['bulk'])
+                else:
+                    intra_annual_slice_names = np.array(slicer_instance.names)
+
+                print(f'\n\n\nintra_annual_slice_names: {intra_annual_slice_names}\n\n\n')
+
+                generate_all_graphs(
+                    validation_run = validation_run,
+                    outfolder = run_dir,
+                    temporal_sub_windows=intra_annual_slice_names,
+                    save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(
