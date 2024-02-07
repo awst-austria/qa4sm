@@ -10,7 +10,9 @@
   padding: 4px;
   border: 1px solid #ccc;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
+  pointer-events: all;
+  overflow: auto;
+  max-height: 150px;
 }
 
 ::ng-deep .ol-tooltip table {

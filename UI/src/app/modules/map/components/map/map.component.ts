@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  NgZone,
-  OnInit,
-  Output
-} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, NgZone, OnInit, Output} from '@angular/core';
 import {Map, Overlay, View} from 'ol';
 import {Coordinate} from 'ol/coordinate';
 import {Attribution} from 'ol/control';
@@ -50,12 +40,18 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   singleSensorMarkerRadius = 5;
   multipleSensorMarkerRadius = 6;
-  multipleSensorStrokeColor = '#118278';
+  multipleSensorStrokeColor = '#FFAC04';
   multipleSensorStrokeWidth = 4;
+
+  singleLocationMarkerRadius = 5;
+  singleLocationStrokeColor = 'black';
+  singleLocationStrokeWidth = 3;
+  showPointTooltip: boolean = false
+
   legendItems: LegendItem[];
 
   propertyNames = {
-    station: 'station',
+    station: 'network', // change to station when the geojson is fixed or remove this option
     network: 'network',
     depthFrom: 'depth_from',
     depthTo: 'depth_to',
@@ -63,17 +59,26 @@ export class MapComponent implements AfterViewInit, OnInit {
     timeRangeTo: 'timerange_to',
   };
 
-  constructor(private zone: NgZone, private cd: ChangeDetectorRef, private toastService: ToastService, private elementRef: ElementRef) {
+  constructor(private zone: NgZone,
+              private toastService: ToastService,
+              private elementRef: ElementRef) {
   }
 
   ngOnInit() {
     this.legendItems = [
       {
-        label: "Multiple sensors",
-        tooltip: 'Hover over a point to get more information about the location. Zoom in to see more exact sensor locations. ',
+        label: "Multiple locations",
+        tooltip: 'Zoom in to get more exact locations. ',
         strokeColor: this.multipleSensorStrokeColor,
         radius: this.multipleSensorMarkerRadius,
         strokeWidth: this.multipleSensorStrokeWidth,
+      },
+      {
+        label: "Single location",
+        tooltip: 'There are multiple sensors at the location. Click on it to get more details',
+        strokeColor: this.singleLocationStrokeColor,
+        radius: this.singleLocationMarkerRadius,
+        strokeWidth: this.singleLocationStrokeWidth,
       },
       {
         label: 'Single Sensor',
@@ -127,10 +132,10 @@ export class MapComponent implements AfterViewInit, OnInit {
     const styleFunction = (feature) => {
 
       let markerColor = '#808080'; // Default color: gray
-
+      const numberOfLocations = this.checkNumberOfLocations(feature.get('features'))
       if (feature.get('features') != undefined) {
         //function called from a cluster source
-        if (feature.get('features').length > 1) {
+        if (feature.get('features').length > 1 && numberOfLocations > 1) {
           //clustered representation of multiple points
 
           return new Style({
@@ -143,6 +148,16 @@ export class MapComponent implements AfterViewInit, OnInit {
             })
           });
 
+        } else if (feature.get('features').length > 1 && numberOfLocations === 1) {
+          return new Style({
+            image: new Circle({
+              radius: this. singleLocationMarkerRadius,
+              stroke: new Stroke({
+                color: feature.get('features')[0].get('markerColor'),
+                width: this. singleLocationStrokeWidth,
+              })
+            })
+          });
         } else {
           if (feature.get('features')[0].get('markerColor') != undefined) {
             markerColor = feature.get('features')[0].get('markerColor');
@@ -225,10 +240,9 @@ export class MapComponent implements AfterViewInit, OnInit {
 
     this.Map.addOverlay(tooltipOverlay);
 
-    this.Map.on('pointermove', (evt) => {
+    this.Map.on('click', (evt) => {
       this.zone.runOutsideAngular(() => {
         const features = [];
-        let multipleSensor: boolean;
         this.Map.forEachFeatureAtPixel(evt.pixel, (feature) => {
           const sensorList = feature.get('features');
 
@@ -237,9 +251,7 @@ export class MapComponent implements AfterViewInit, OnInit {
               features.push(feature);
             }
           } else if (sensorList) { //this branch covers cluster points
-
             sensorList.forEach(sensor => features.push(sensor))
-
           }
         });
 
