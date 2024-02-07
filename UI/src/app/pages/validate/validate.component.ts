@@ -556,13 +556,17 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   onIsmnNetworkSelectionChange(selectedNetworks: string): void {
-    // console.log("onIsmnNetworkSelectionChange: ", selectedNetworks);
     this.updateMap();
   }
 
   onIsmnDepthSelectionChange(selectedNetworks: string): void {
-    // console.log("onIsmnDepthSelectionChange: ", selectedNetworks);
     this.updateMap();
+  }
+
+  onBasicFilterMapUpdate($event): void{
+    if ($event){
+      this.updateMap()
+    }
   }
 
   updateMap() {
@@ -570,7 +574,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel.selectedVersion) {
         geojsons.push(this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).pipe(map(value => {
-          console.log("GEOJSON: ",JSON.parse(value));
           let filteredGeoJson: any = JSON.parse(value);
 
           if (config.ismnDepthFilter$.value != null) {
@@ -579,6 +582,14 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           if (config.ismnNetworkFilter$.value != null) {
             filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
           }
+
+
+          config.basicFilters.forEach(filter =>{
+            if (filter.filterDto.name === 'FIL_ISMN_FRM_representative' && filter.enabled){
+              filteredGeoJson = this.ismnFrmFilter(filteredGeoJson)
+            }
+          })
+
           return filteredGeoJson;
         }),
           catchError(error => of(undefined))
@@ -639,6 +650,17 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       return filter.includes(actualNetwork);
     });
 
+    return {
+      type: geoJsonObj.type,
+      features: filteredFeatures,
+    };
+  }
+
+  private ismnFrmFilter(geoJsonObj: any): any {
+    const representativeClasses = ['representative', 'very representative'];
+    const filteredFeatures: any[] = geoJsonObj.features.filter((feature: any) =>
+      representativeClasses.includes(feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "frm_class")?.propertyValue)
+    )
     return {
       type: geoJsonObj.type,
       features: filteredFeatures,

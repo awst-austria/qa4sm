@@ -57,6 +57,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     depthTo: 'depth_to',
     timeRangeFrom: 'timerange_from',
     timeRangeTo: 'timerange_to',
+    frmClass: 'frm_class'
   };
 
   constructor(private zone: NgZone,
@@ -274,6 +275,7 @@ export class MapComponent implements AfterViewInit, OnInit {
               - ${this.getPropertyValue(sensorProperties, this.propertyNames.depthTo)} m):
               ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeFrom))}
               - ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeTo))}
+              ${(this.getPropertyValue(sensorProperties, this.propertyNames.frmClass))}
          </div>`
   }
 

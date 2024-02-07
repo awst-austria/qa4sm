@@ -50,7 +50,8 @@
                   [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
                   [filterModel]="filter"
                   (excludeMutual)="this.includeFilter($event, item.basicFilters, false)"
-                  (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
+                  (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)"
+                  (updateMap)="onBasicFilterMapUpdate($event)">
                 </qa-basic-filter>
               </ng-container>
 
@@ -69,11 +70,12 @@
                 <qa-ismn-network-filter
                   (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"
                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
+                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$">
+                </qa-ismn-network-filter>
               </div>
               <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
                 <qa-ismn-depth-filter
-                  (depthSelectionChanged)="onIsmnNetworkSelectionChange($event)"
+                  (depthSelectionChanged)="onIsmnDepthSelectionChange($event)"
                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
                   [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
                 </qa-ismn-depth-filter>
