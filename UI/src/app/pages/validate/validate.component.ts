@@ -579,7 +579,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       if (config.datasetModel.selectedVersion) {
         // console.log("Processing geodata for ", config.datasetModel.selectedVersion)
         geojsons.push(this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).pipe(map(value => {
-          //console.log("GEOJSON: ",JSON.parse(value));
+          console.log("GEOJSON: ",JSON.parse(value));
           let filteredGeoJson: any = JSON.parse(value);
 
           // if(filteredGeoJson.hasOwnProperty(""))
@@ -587,9 +587,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           if (config.ismnDepthFilter$.value != null) {
             filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
           }
-          if (config.ismnNetworkFilter$.value != null) {
-            filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
-          }
+          // if (config.ismnNetworkFilter$.value != null) {
+          //   filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
+          // }
           // console.log("In observable")
           return filteredGeoJson;
         }),
@@ -627,16 +627,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           const maxDepthValue = parseFloat(
             feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "depth_to")?.propertyValue || "0"
           );
-
-
           // If min_depth or max_depth property is missing or not a valid number, include the feature in the result
           if (isNaN(minDepthValue) || isNaN(maxDepthValue)) {
             return true;
           }
-          if ((minDepthValue <= minVal && maxDepthValue >= maxVal) == false) {
-            // console.log("Excluded by depth filter")
-          }
-          return minDepthValue <= minVal && maxDepthValue >= maxVal;
+          return minDepthValue >= minVal && maxDepthValue <= maxVal;
         });
 
         return {
