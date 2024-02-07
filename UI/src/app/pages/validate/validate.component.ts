@@ -395,7 +395,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   private onGetVersionNext(versions, model, defaultVersionName): void {
     model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
     this.loadFiltersForModel(model)
-    // this.
   }
 
   private onGetVersionComplete(): void {
@@ -411,7 +410,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       next: filters => this.onGetFiltersNext(filters, model, reloadingSettings, updatedModel$),
       error: error => this.onGetFiltersError(error, updatedModel$)
     }
-    // console.log(model)
     this.filterService.getFiltersByVersionId(model.datasetModel.selectedVersion.id).subscribe(getFiltersObserver);
     return updatedModel$;
   }
@@ -568,29 +566,19 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   updateMap() {
-    // console.log("Updating MAP", this.validationModel)
-    // if (this.validationModel.referenceConfigurations.spatial && this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion) {
-    //   console.log('Updating reference selection: ', this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion.id)
-    //   //todo filtering also here
-    //   this.versionService.getGeoJSONById(this.validationModel.referenceConfigurations.spatial.datasetModel.selectedVersion.id).subscribe(value => this.mapComponent.addGeoJson(value));
-    // }
     let geojsons: Observable<any>[] = [];
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel.selectedVersion) {
-        // console.log("Processing geodata for ", config.datasetModel.selectedVersion)
         geojsons.push(this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).pipe(map(value => {
           console.log("GEOJSON: ",JSON.parse(value));
           let filteredGeoJson: any = JSON.parse(value);
 
-          // if(filteredGeoJson.hasOwnProperty(""))
-
           if (config.ismnDepthFilter$.value != null) {
             filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
           }
-          // if (config.ismnNetworkFilter$.value != null) {
-          //   filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
-          // }
-          // console.log("In observable")
+          if (config.ismnNetworkFilter$.value != null) {
+            filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
+          }
           return filteredGeoJson;
         }),
           catchError(error => of(undefined))
@@ -598,7 +586,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
 
-    // console.log("map databobservables: ",geojsons);
     forkJoin(geojsons).subscribe(data => {
       this.mapComponent.clearSelection();
       data.forEach(mapData => {
@@ -608,8 +595,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     });
 
-    // geojsons.push(JSON.stringify(filteredGeoJson))
-    // //this.mapComponent.addGeoJson(JSON.stringify(filteredGeoJson));
   }
 
   private ismnDepthFilter(filter: string, geoJson: any): any {
