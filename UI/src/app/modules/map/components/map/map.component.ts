@@ -39,19 +39,19 @@ export class MapComponent implements AfterViewInit, OnInit {
   @Output() mapReady = new EventEmitter<Map>();
 
   singleSensorMarkerRadius = 5;
+
   multipleSensorMarkerRadius = 6;
   multipleSensorStrokeColor = '#FFAC04';
   multipleSensorStrokeWidth = 4;
 
   singleLocationMarkerRadius = 5;
-  singleLocationStrokeColor = 'black';
+  singleLocationStrokeColor = '#00aa00';
   singleLocationStrokeWidth = 3;
-  showPointTooltip: boolean = false
 
   legendItems: LegendItem[];
 
   propertyNames = {
-    station: 'network', // change to station when the geojson is fixed or remove this option
+    station: 'station',
     network: 'network',
     depthFrom: 'depth_from',
     depthTo: 'depth_to',
@@ -67,14 +67,14 @@ export class MapComponent implements AfterViewInit, OnInit {
   ngOnInit() {
     this.legendItems = [
       {
-        label: "Multiple locations",
-        tooltip: 'Zoom in to get more exact locations. ',
+        label: "Multiple stations",
+        tooltip: 'Zoom in to get more exact station locations. ',
         strokeColor: this.multipleSensorStrokeColor,
         radius: this.multipleSensorMarkerRadius,
         strokeWidth: this.multipleSensorStrokeWidth,
       },
       {
-        label: "Single location",
+        label: "Single station",
         tooltip: 'There are multiple sensors at the location. Click on it to get more details',
         strokeColor: this.singleLocationStrokeColor,
         radius: this.singleLocationMarkerRadius,
@@ -82,10 +82,10 @@ export class MapComponent implements AfterViewInit, OnInit {
       },
       {
         label: 'Single Sensor',
-        tooltip: 'Location with a single sensor. Different colors indicate different networks. Hover over a point to find out more about the sensor.',
+        tooltip: 'Station with a single sensor. Hover over a point to find out more about the sensor.',
         strokeWidth: 0,
-        fillColor: 'black',
-        strokeColor: 'black',
+        fillColor: this.singleLocationStrokeColor,
+        strokeColor: this.singleLocationStrokeColor,
         radius: this.singleSensorMarkerRadius
       },
     ];
@@ -153,48 +153,24 @@ export class MapComponent implements AfterViewInit, OnInit {
             image: new Circle({
               radius: this. singleLocationMarkerRadius,
               stroke: new Stroke({
-                color: feature.get('features')[0].get('markerColor'),
+                color: this.singleLocationStrokeColor,
                 width: this. singleLocationStrokeWidth,
               })
             })
           });
         } else {
-          if (feature.get('features')[0].get('markerColor') != undefined) {
-            markerColor = feature.get('features')[0].get('markerColor');
-          }
-
           return new Style({
             image: new Circle({
               radius: this.singleSensorMarkerRadius,
-              fill: new Fill({color: markerColor})
+              fill: new Fill({color: this.singleLocationStrokeColor})
             })
           });
         }
       } else {
-        let markerColor = feature.get('markerColor');
-
-        // If the markerColor property doesn't exist or is not a valid color, set a default color.
-        if (!markerColor) {
-          markerColor = '#808080';
-        }
-
-        if (feature.getGeometry().getType() === 'Polygon') {
-          return new Style({
-            stroke: new Stroke({
-              color: 'blue',
-              lineDash: [4],
-              width: 1,
-            }),
-            fill: new Fill({
-              color: this.hexToRgba(markerColor, 0.5),
-            }),
-          })
-        }
-
         return new Style({
           image: new Circle({
             radius: 5,
-            fill: new Fill({color: markerColor})
+            fill: new Fill({color: this.singleLocationStrokeColor})
           })
         });
       }
