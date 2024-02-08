@@ -245,7 +245,7 @@ dependencies:
     - gldas==0.7.0
     - h5netcdf==1.1.0
     - h5py==3.8.0
-    - ismn==1.3.3
+    - git+https://github.com/TUW-GEO/ismn.git@master
     - joblib==1.2.0
     - kombu==5.2.4
     - llvmlite==0.40.0
