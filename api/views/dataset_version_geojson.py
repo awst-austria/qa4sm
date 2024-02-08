@@ -5,11 +5,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-from validator.validation.globals import ISMN
+from validator.validation.globals import ISMN, GEOJSON_FILE_NAME
 
 from validator.models import DatasetVersion
-
-GEOJSON_FILE_NAME = "ismn_sensors.json"
 
 
 @api_view(['GET'])
