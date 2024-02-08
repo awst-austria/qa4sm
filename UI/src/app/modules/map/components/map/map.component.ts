@@ -275,7 +275,6 @@ export class MapComponent implements AfterViewInit, OnInit {
               - ${this.getPropertyValue(sensorProperties, this.propertyNames.depthTo)} m):
               ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeFrom))}
               - ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeTo))}
-              ${(this.getPropertyValue(sensorProperties, this.propertyNames.frmClass))}
          </div>`
   }
 
