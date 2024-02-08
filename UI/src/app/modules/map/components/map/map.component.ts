@@ -45,7 +45,7 @@ export class MapComponent implements AfterViewInit, OnInit {
   multipleSensorStrokeWidth = 4;
 
   singleLocationMarkerRadius = 5;
-  singleLocationStrokeColor = '#00aa00';
+  singleLocationStrokeColor = '#005D00';
   singleLocationStrokeWidth = 3;
 
   legendItems: LegendItem[];
@@ -217,6 +217,19 @@ export class MapComponent implements AfterViewInit, OnInit {
 
     this.Map.addOverlay(tooltipOverlay);
 
+    this.Map.on('pointermove', (evt) =>{
+      const feature  = this.Map.forEachFeatureAtPixel(evt.pixel, (feature) => {
+        return feature
+      })
+
+      if (feature) {
+        this.Map.getTargetElement().style.cursor = 'pointer';
+      } else {
+        this.Map.getTargetElement().style.cursor = '';
+      }
+
+    })
+
     this.Map.on('click', (evt) => {
       this.zone.runOutsideAngular(() => {
         const features = [];
@@ -257,7 +270,8 @@ export class MapComponent implements AfterViewInit, OnInit {
          </div>` +
         `<div class="flex flex-row">
             <b class="mr-1">Network: </b><span>${this.getPropertyValue(stationProperties, this.propertyNames.network)}</span>
-         </div>`
+         </div>` +
+        `<div><b>Sensors details: </b></div>`
       sensors.forEach((sensor, index) => {
         const sensorProperties = sensor.get('datasetProperties');
         textToReturn += this.getSensorInformation(sensorProperties, index);
@@ -270,9 +284,9 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   private getSensorInformation(sensorProperties, index: number): string {
     return `<div class="flex flex-row">
-            <b class="mr-1">Sensor ${index + 1}</b>
-            (${this.getPropertyValue(sensorProperties, this.propertyNames.depthFrom)}
-              - ${this.getPropertyValue(sensorProperties, this.propertyNames.depthTo)} m):
+            <b class="mr-1">${index + 1}. </b>
+            ${this.getPropertyValue(sensorProperties, this.propertyNames.depthFrom)}
+              - ${this.getPropertyValue(sensorProperties, this.propertyNames.depthTo)} m;
               ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeFrom))}
               - ${this.styleDate(this.getPropertyValue(sensorProperties, this.propertyNames.timeRangeTo))}
          </div>`
@@ -343,6 +357,7 @@ export class MapComponent implements AfterViewInit, OnInit {
             <b class="mr-1">Network: </b>
             <span>${this.getPropertyValue(properties, this.propertyNames.network)}</span>
         </div>` +
+      `<div><b>Sensor details: </b></div>` +
       this.getSensorInformation(properties, 0) +
       '</div>';
   }
