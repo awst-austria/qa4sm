@@ -5,10 +5,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from validator.validation.globals import ISMN
 
 from validator.models import DatasetVersion
 
-GEOJSON_FILE_NAME = "geoinfo.json"
+GEOJSON_FILE_NAME = "ismn_sensors.json"
 
 
 @api_view(['GET'])
@@ -16,6 +17,10 @@ GEOJSON_FILE_NAME = "geoinfo.json"
 def dataset_version_geojson_by_id(request, **kwargs):
 
     version = get_object_or_404(DatasetVersion, id=kwargs['version_id'])
+
+    if version.versions.all().first().pretty_name != ISMN:
+        return JsonResponse({'message': 'Not ISMN'}, status=status.HTTP_200_OK)
+
     if version.versions.count() != 1:
         return JsonResponse({'message': 'Dataset could not be determined'},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR, safe=False)
