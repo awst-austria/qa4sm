@@ -266,8 +266,8 @@ class TestValidation(TestCase):
                         assert length > 0, 'Variable {} has no entries'.format(
                             m_var.name)
                     else:
-                        if m_var.name not in non_metrics:  #$$
-                            values = values[0]  #$$
+                        # if m_var.name not in non_metrics:  #$$
+                        #     values = values[0]  #$$
 
                         assert len(
                             values

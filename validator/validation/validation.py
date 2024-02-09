@@ -631,7 +631,7 @@ def run_validation(validation_id):  #$$
         if (not validation_aborted):
             set_outfile(validation_run, run_dir)
 
-            transcriber = Pytesmo2Qa4smResultsTranscriber2(
+            transcriber = Pytesmo2Qa4smResultsTranscriber(
                 pytesmo_results=path.join(OUTPUT_FOLDER,
                                              validation_run.output_file.name),
                 intra_annual_slices=slicer_instance)  #$$
