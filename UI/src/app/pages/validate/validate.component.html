@@ -50,7 +50,8 @@
                   [isIncluded]="isIncluded(filter.filterDto.id, item.basicFilters)"
                   [filterModel]="filter"
                   (excludeMutual)="this.includeFilter($event, item.basicFilters, false)"
-                  (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)">
+                  (includeMutual)="this.includeFilter($event, item.basicFilters, filter.enabled)"
+                  (updateMap)="onBasicFilterMapUpdate($event)">
                 </qa-basic-filter>
               </ng-container>
 
@@ -60,23 +61,25 @@
                                        [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
                   </qa-threshold-filter>
 
-                  <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
-                                       [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                                       [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
-                                       [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
-                  </qa-threshold-filter>
-                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
-                    <qa-ismn-network-filter
-
-                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$"></qa-ismn-network-filter>
-                  </div>
-                  <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
-                    <qa-ismn-depth-filter
-                      [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
-                      [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
-                    </qa-ismn-depth-filter>
-                  </div>
+              <qa-threshold-filter *ngIf="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$|async"
+                                   [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                                   [filterModel$]="validationModel.datasetConfigurations[datasetIdx].smosChi2Filter$"
+                                   [minThreshold]="0." [increment]="0.05" maxThreshold="1." [units]="' [-]'">
+              </qa-threshold-filter>
+              <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$|async">
+                <qa-ismn-network-filter
+                  (networkSelectionChanged)="onIsmnNetworkSelectionChange($event)"
+                  [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnNetworkFilter$">
+                </qa-ismn-network-filter>
+              </div>
+              <div *ngIf="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$|async">
+                <qa-ismn-depth-filter
+                  (depthSelectionChanged)="onIsmnDepthSelectionChange($event)"
+                  [datasetModel]="validationModel.datasetConfigurations[datasetIdx].datasetModel"
+                  [filterModel$]="validationModel.datasetConfigurations[datasetIdx].ismnDepthFilter$">
+                </qa-ismn-depth-filter>
+              </div>
 
                   <div style="width: 100%;text-align: right">
                     <button pButton type="button"
