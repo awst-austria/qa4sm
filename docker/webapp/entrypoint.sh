@@ -12,15 +12,15 @@ python $APP_DIR/manage.py collectstatic --noinput
 
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
-ls -d "$DATA_FOLDER"/*/ | while IFS= read -r dir; do
+ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
     echo "$dir"
     # Check if the directory contains "ismn_sensors.json"
-    if [ -f "${dir}/ismn_sensors.json" ]; then
+    if [ -f "${dir}ismn_sensors.json" ]; then
       # Print a message indicating the presence of "ismn_sensors.json"
       echo "'ismn_sensors.json' already exists in directory."
     else
       # Run the ISMN export_geojson command
-      ismn export_geojson "${dir}" -f network -f station -f depth -f timerange -f frm_class
+      ismn export_geojson "${dir}" -f network -f station -f depth -f timerange -f frm_class -var soil_moisture
       echo "Created ismn_sensors.json in ${dir}"
     fi
 done
