@@ -11,19 +11,17 @@ export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
 # generate ISMN geojson files if they don't exist
-DATA_FOLDER="${QA4SM_DATA_FOLDER}ISMN"
-for dir in "$DATA_FOLDER"/*/; do
-    # Check if the directory name contains "ISMN"
-    if [[ $dir == *"ISMN"* ]]; then
-        # Check if the directory contains "ismn_sensors.json"
-        if [ ! -f "${dir}ismn_sensors.json" ]; then
-            # Run the ISMN export_geojson command
-            ismn export_geojson "${dir}" -f network -f station -f depth -f timerange -f frm_class
-            echo "Created ismn_sensors.json in ${dir}"
-        else
-            # Print a message indicating the presence of "ismn_sensors.json"
-            echo "'ismn_sensors.json' already exists in directory."
-        fi
+DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
+ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
+    echo "$dir"
+    # Check if the directory contains "ismn_sensors.json"
+    if [ -f "${dir}ismn_sensors.json" ]; then
+      # Print a message indicating the presence of "ismn_sensors.json"
+      echo "'ismn_sensors.json' already exists in directory."
+    else
+      # Run the ISMN export_geojson command
+      ismn export_geojson "${dir}" -f network -f station -f depth -f timerange -f frm_class -var soil_moisture
+      echo "Created ismn_sensors.json in ${dir}"
     fi
 done
 
