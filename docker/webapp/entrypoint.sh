@@ -13,6 +13,7 @@ python $APP_DIR/manage.py collectstatic --noinput
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="${QA4SM_DATA_FOLDER}ISMN/"
 for dir in "$DATA_FOLDER"/*/; do
+ echo $dir
     # Check if the directory name contains "ISMN"
     if [[ $dir == *"ISMN"* ]]; then
         # Check if the directory contains "ismn_sensors.json"
