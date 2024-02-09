@@ -31,6 +31,7 @@ services:
       QA4SM_DB_USER: "${QA4SM_DB_USER}"
       QA4SM_DB_PASSWORD: "${QA4SM_DB_PASSWORD}"
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
+      QA4SM_DATA_FOLDER: "${QA4SM_DATA_FOLDER}"
 
     volumes:
       - type: bind
