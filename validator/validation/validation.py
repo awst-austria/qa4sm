@@ -7,6 +7,9 @@ from re import sub as regex_sub
 import uuid
 import xarray as xr
 import numpy as np
+import sys
+sys.path.append(
+    '/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm-reader/src/')
 import qa4sm_reader
 
 from celery.app import shared_task
@@ -45,7 +48,7 @@ from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
 from validator.validation.intra_annual_slicer import IntraAnnualSlicer
 from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 from api.frontend_urls import get_angular_url
-from shutil import copy2
+from shutil import copy2, copytree
 from typing import Optional, List, Tuple, Dict, Union
 
 __logger = logging.getLogger(__name__)
@@ -994,7 +997,10 @@ def copy_validationrun(run_to_copy, new_user):
                 for file_name in old_files:
                     new_file = new_dir + '/' + file_name
                     old_file = old_dir + '/' + file_name
-                    copy2(old_file, new_file)
+                    try:
+                        copy2(old_file, new_file)
+                    except IsADirectoryError as e:          #$$
+                        copytree(old_file, new_file)        # with the restructuring of netCDF files, all graphics etc are now stored in dedicated directories
                     if '.nc' in new_file:
                         run_to_copy.output_file = str(run_id) + '/' + file_name
                         run_to_copy.save()
