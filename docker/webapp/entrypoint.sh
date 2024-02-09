@@ -11,7 +11,7 @@ export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
 # generate ISMN geojson files if they don't exist
-DATA_FOLDER="${QA4SM_DATA_FOLDER}ISMN"
+DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
 ls -d "$DATA_FOLDER"/*/ | while IFS= read -r dir; do
     echo "$dir"
     # Check if the directory contains "ismn_sensors.json"
