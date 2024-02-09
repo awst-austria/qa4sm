@@ -21,6 +21,8 @@ ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
     else
       # Run the ISMN export_geojson command
       ismn export_geojson "${dir}" -f network -f station -f depth -f timerange -f frm_class -var soil_moisture
+      chown 100000:100033 ismn_sensors.json
+      chmod 775 ismn_sensors.json
       echo "Created ismn_sensors.json in ${dir}"
     fi
 done
