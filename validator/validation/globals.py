@@ -239,6 +239,10 @@ USER_DATASET_VARIABLE_MIN_ID = 500
 IMPLEMENTED_COMPRESSIONS = ['zlib']  #$$
 ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #$$
 
+
+DEFAULT_TSW = 'bulk' # default temporal sub-window (in the case of no temporal sub-windowing)
+INTRA_ANNUAL_WINDOW_NC_COORD_NAME = 'tsw' # name of the period coordinate in the netcdf file (Temporal Sub-Window)
+
 # default intra annual slices
 INTRA_ANNUAL_SLICES = {
     "seasons": {

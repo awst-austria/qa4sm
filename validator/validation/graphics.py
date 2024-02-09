@@ -19,9 +19,9 @@ from django.conf import settings
 
 from cartopy import config as cconfig
 
-# cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
+cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-# from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE
+from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE
 import os
 from io import BytesIO
 import base64

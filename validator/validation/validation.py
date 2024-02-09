@@ -1,8 +1,8 @@
-import os
 import netCDF4
 from datetime import datetime
 import logging
 from os import path
+import os
 from re import sub as regex_sub
 import uuid
 import xarray as xr
@@ -37,7 +37,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -50,13 +50,24 @@ from typing import Optional, List, Tuple, Dict, Union
 
 __logger = logging.getLogger(__name__)
 
+
+#------------------debugging------------------#
+import warnings
+
+# Filter out UserWarnings
+# warnings.filterwarnings("ignore", category=UserWarning)
+def do_nothing(*args, **kwargs):
+    pass
+# print = do_nothing
+#------------------debugging------------------#
+
 #$$
 ####################-----Implement this in the proper way-----####################
 slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
                                     overlap=0,
                                     custom_file=None)
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
-# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
+slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
 ##################################################################################
 
@@ -620,8 +631,8 @@ def run_validation(validation_id):  #$$
         if (not validation_aborted):
             set_outfile(validation_run, run_dir)
 
-            transcriber = Pytesmo2Qa4smResultsTranscriber(
-                pytesmo_results=os.path.join(OUTPUT_FOLDER,
+            transcriber = Pytesmo2Qa4smResultsTranscriber2(
+                pytesmo_results=path.join(OUTPUT_FOLDER,
                                              validation_run.output_file.name),
                 intra_annual_slices=slicer_instance)  #$$
             if transcriber.exists:  #$$
@@ -637,7 +648,7 @@ def run_validation(validation_id):  #$$
                                      complevel=9)
 
                 if intra_annual_slices is None:
-                    intra_annual_slice_names =  np.array(['bulk'])
+                    intra_annual_slice_names =  np.array([DEFAULT_TSW])
                 else:
                     intra_annual_slice_names = np.array(slicer_instance.names)
 
@@ -1004,3 +1015,5 @@ def copy_validationrun(run_to_copy, new_user):
         'run_id': run_id,
     }
     return response
+
+# %%

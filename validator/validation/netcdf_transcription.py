@@ -1,9 +1,8 @@
 import xarray as xr
 import numpy as np
 from validator.validation.intra_annual_slicer import IntraAnnualSlicer
-from validator.validation.globals import BAD_METRICS, NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, INTRA_ANNUAL_SEPARATOR
+from validator.validation.globals import METRICS, NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, INTRA_ANNUAL_SEPARATOR, DEFAULT_TSW, INTRA_ANNUAL_WINDOW_NC_COORD_NAME
 from typing import Any, List, Dict, Optional, Union, Tuple
-import pandas as pd
 import os
 
 
@@ -37,7 +36,7 @@ class Pytesmo2Qa4smResultsTranscriber:
             np.ndarray, np.float32, np.array]]]] = METADATA_TEMPLATE
 
         self.intra_annual_slices_checker_called: bool = False
-        self.intra_annual_slices_check: bool = False
+        self.bulk_case_present: bool = True
 
         self.pytesmo_ncfile = f'{pytesmo_results}'
         if not os.path.isfile(pytesmo_results):
@@ -48,19 +47,11 @@ class Pytesmo2Qa4smResultsTranscriber:
             return None
         else:
             self.exists = True
-
         with xr.open_dataset(pytesmo_results) as pr:
             self.pytesmo_results: xr.Dataset = pr
 
         # os.remove(pytesmo_results)
         # os.rename(pytesmo_results, self.pytesmo_ncfile)
-
-        self.__lat_arr: np.ndarray = np.array(self.non_metrics['lat']['data'],
-                                              dtype=np.float32)
-        self.__lon_arr: np.ndarray = np.array(self.non_metrics['lon']['data'],
-                                              dtype=np.float32)
-        self.__idx_arr: np.ndarray = np.arange(len(self.__lat_arr),
-                                               dtype=np.int32)
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(pytesmo_results="{self.pytesmo_ncfile}", intra_annual_slices={self.intra_annual_slices.__repr__()})'
@@ -78,48 +69,69 @@ class Pytesmo2Qa4smResultsTranscriber:
         -------
         Tuple[bool, Union[List[str], None]]
             A tuple indicating the temporal sub-window type and the list of temporal sub-windows.
-            bulk case: (False, ['bulk']),
-            intra-annual windows case: (True, list of temporal sub-windows)
+            bulk case: (True, [`globals.DEFAULT_TSW`]),
+            intra-annual windows case: (False, list of temporal sub-windows)
         """
 
         self.intra_annual_slices_checker_called = True
         if self.intra_annual_slices is None:
-            return False, ['bulk']
+            return True, [DEFAULT_TSW]
         elif isinstance(self.intra_annual_slices, IntraAnnualSlicer):
             self.intra_annual_slices = self.intra_annual_slices.names
-            return True, self.intra_annual_slices
+            return False, self.intra_annual_slices
         else:
             raise TypeError(
                 'intra_annual_slices must be None or an instance of `IntraAnnualSlicer`'
             )
 
     @property
-    def non_metrics(self) -> Dict[str, Dict[str, Union[np.ndarray, type]]]:
+    def non_metrics_list(self) -> List[str]:
         """
-        Get the non-metrics from the pytesmo results.
+            Get the non-metrics from the pytesmo results.
 
-        Returns
-        -------
-        Dict[str, Dict[str, Union[np.ndarray, type]]]
-            The non-metrics.
-        """
+            Returns
+            -------
+            List[str]
+                A list of non-metric names.
 
-        non_metrics_dict = {}
+            Raises
+            ------
+            None
+            """
+
+        non_metrics_lst = []
         for non_metric in self._default_non_metrics:
-            try:
-                non_metrics_dict[non_metric] = {
-                    'data': self.pytesmo_results[non_metric].values,
-                    'dtype': self.pytesmo_results[non_metric].dtype
-                }
-            except KeyError as e:
+            if non_metric in self.pytesmo_results:
+                non_metrics_lst.append(non_metric)
+            else:
                 print(
-                    f'KeyError: {e}\n\nNon-metric \'{non_metric}\' not contained in pytesmo results. Skipping...'
+                    f'Non-metric \'{non_metric}\' not contained in pytesmo results. Skipping...'
                 )
                 continue
-        return non_metrics_dict
+        return non_metrics_lst
+
+    def is_valid_metric_name(self, metric_name):
+        """
+        Checks if a given metric name is valid, based on the defined `globals.INTRA_ANNUAL_METRIC_TEMPLATE`.
+
+        Parameters:
+        metric_name (str): The metric name to be checked.
+
+        Returns:
+        bool: True if the metric name is valid, False otherwise.
+        """
+
+        valid_prefixes = [
+            "".join(
+                template.format(tsw=tsw, metric=metric)
+                for template in INTRA_ANNUAL_METRIC_TEMPLATE)
+            for tsw in self.intra_annual_slices for metric in METRICS
+        ]
+
+        return any(metric_name.startswith(prefix) for prefix in valid_prefixes)
 
     @property
-    def metrics_dict(self) -> Dict[str, str]:
+    def metrics_list(self) -> List[str]:
         """Get the metrics dictionary. Whole procedure based on the premise, that metric names of valdiations of intra-annual
         temporal sub-windows are of the form: `metric_long_name = 'intra_annual_slice{validator.validation.globals.INTRA_ANNUAL_SEPARATOR}metric_short_name'`. If this is not the
         case, it is assumed the 'bulk' case is present and the metric names are assumed to be the same as the metric
@@ -132,221 +144,48 @@ class Pytesmo2Qa4smResultsTranscriber:
         """
 
         # check if the metric names are of the form: `metric_long_name = 'intra_annual_slice{INTRA_ANNUAL_SEPARATOR}metric_short_name'` and if not, assume the 'bulk' case
+
         _metrics = [
-            metric.split(INTRA_ANNUAL_SEPARATOR)[1]
-            for metric in self.pytesmo_results
-            if INTRA_ANNUAL_SEPARATOR in metric
+            metric for metric in self.pytesmo_results
+            if self.is_valid_metric_name(metric)
         ]
+
         if len(_metrics) != 0:  # intra-annual case
-            return {long: long for long in set(_metrics)}
+            return list(set(_metrics))
         else:  # bulk case
-            return {
-                long: long
-                for long in self.pytesmo_results
-                if long not in self.non_metrics.keys()
-            }
-
-    def get_sorted_metric_precursor(self) -> Dict[str, Dict[str, np.array]]:
-        """
-        Creates a precursor dictionary of sorted metrics, based on the pytesmo results and later on used to construct
-        the metric data dictionary. The sorting is done according to the provided temporal sub-windows.
-
-        Returns
-        -------
-        Dict[str, Dict[str, np.array]]
-            The sorted dictionary.
-        """
-        if self.intra_annual_slices_checker_called is False:
-            self.intra_annual_slices_check, self.intra_annual_slices = self.intra_annual_slices_checker(
-            )
-
-        if self.intra_annual_slices_check is False:
-            self.sorted_metric_precursor = {
-                intra_annual_slice: {
-                    metric_short: self.pytesmo_results[f'{metric_long}']
-                    for metric_long, metric_short in self.metrics_dict.items(
-                    )  #! check if metric_long and metric_short aren't the same anyhow and if self.metrics_dict is needed
-                }
-                for intra_annual_slice in self.intra_annual_slices
-            }
-
-        elif self.intra_annual_slices_check is True:
-            try:
-                self.sorted_metric_precursor = {
-                    intra_annual_slice: {
-                        metric_short:
-                        self.pytesmo_results[''.join(
-                            INTRA_ANNUAL_METRIC_TEMPLATE).format(
-                                tsw=intra_annual_slice, metric=metric_long)]
-                        for metric_long, metric_short in
-                        self.metrics_dict.items()
-                    }
-                    for intra_annual_slice in self.intra_annual_slices
-                }
-            except KeyError as e:
-                print(
-                    f'KeyError: {e}\n\nCheck if the metric names are of the form: `metric_long_name = \'intra_annual_slice{INTRA_ANNUAL_SEPARATOR}metric_short_name\'`, employing \'{INTRA_ANNUAL_SEPARATOR}\' as the separator'
-                )
-        else:
-            raise TypeError(
-                'intra_annual_slices must be None or a list of strings')
-
-        return self.sorted_metric_precursor
-
-    @property
-    def metric_data_dict(self) -> Dict[str, xr.DataArray]:
-        """
-        Get the metric data dictionary. In general, metric data is always a function of location of the spatial
-        reference point and of the temporal sub-window used. The metric data dictionary is a dictionary of xarray.DataArrays,
-        containing the metric data for each temporal sub-window.
-
-        Returns
-        -------
-        Dict[str, xr.DataArray]
-            The metric data dictionary. `Keys` are the (short name) metrics and `vals` xarray.DataArrays, containing all
-            data of the corresponding metric for each temporal sub-window .
-        """
-        if self.intra_annual_slices_checker_called is False:
-            self.intra_annual_slices_check, self.intra_annual_slices = self.intra_annual_slices_checker(
-            )
-
-        metric_data = {}
-        for metric_short in self.metrics_dict.values():
-            if metric_short in BAD_METRICS:
-                continue
-            metric_data_arr = []
-            for intra_annual_slice in self.intra_annual_slices:
-                metric_data_arr.append(self.get_sorted_metric_precursor()
-                                       [intra_annual_slice][metric_short])
-            metric_data[metric_short] = xr.DataArray(
-                np.array(metric_data_arr),
-                dims=('tsw', 'idx'),
-                coords={
-                    'tsw': self.intra_annual_slices,
-                    'idx': self.__idx_arr,
-                })
-
-        return metric_data
-
-    @property
-    def non_metric_data_dict(self) -> Dict[str, xr.DataArray]:
-        """
-        Get the non-metric data dictionary. In general, non-metric data is always *only* a function of location of the
-        spatial reference point. The non-metric data dictionary is a dictionary of xarray.DataArrays, containing the
-        non-metric data for each spatial reference point.
-
-        Returns
-        -------
-        Dict[str, xr.DataArray]
-            The non-metric data dictionary. `Keys` are the non-metrics and `vals` xarray.DataArrays, containing all
-            data of the corresponding non-metric for each spatial reference point.
-        """
-        non_metric_data = {
-            non_metric: self.non_metrics[non_metric]['data']
-            for non_metric in self.non_metrics
-        }
-
-        non_metric_dtypes = {
-            non_metric: self.non_metrics[non_metric]['dtype']
-            for non_metric in self.non_metrics
-        }
-
-        non_metric_df = pd.DataFrame(non_metric_data)
-        for non_metric, dtype in non_metric_dtypes.items():
-            non_metric_df[non_metric] = non_metric_df[non_metric].astype(dtype)
-
-        return {
-            non_metric:
-            xr.DataArray(non_metric_df[non_metric].values.T,
-                         dims=('idx', ),
-                         coords={'idx': self.__idx_arr},
-                         name=non_metric)
-            for non_metric in non_metric_df.columns
-        }
-
-    def set_coordinate_attrs(self) -> None:
-        """
-        Set the attributes of the coordinates.
-        """
-
-        self.transcribed_dataset['lon'].attrs = dict(
-            long_name="location longitude",
-            standard_name="longitude",
-            units="degrees_east",
-            valid_range=np.array([-180, 180]),
-            axis="X",
-            description="Longitude values for the dataset")
-
-        self.transcribed_dataset['lat'].attrs = dict(
-            long_name="location latitude",
-            standard_name="latitude",
-            units="degrees_north",
-            valid_range=np.array([-90, 90]),
-            axis="Y",
-            description="Latitude values for the dataset")
-
-        self.transcribed_dataset['idx'].attrs = dict(
-            long_name="location index",
-            standard_name="index",
-            units="1",
-            valid_range=np.array([0, len(self.__idx_arr)]),
-            axis="Z",
-            description="Index values for the dataset")
-
-        self.transcribed_dataset['tsw'].attrs = dict(
-            long_name="temporal sub-window",
-            standard_name="temporal sub-window",
-            units="1",
-            valid_range=np.array([0, len(self.intra_annual_slices)]),
-            axis="T",
-            description="temporal sub-window name for the dataset",
-            intra_annual_slice_type="No temporal sub-windows used"
-            if self.intra_annual_slices_check is False else
-            self._intra_annual_slices.metadata['Intra annual slice type'],
-            overlap="No temporal sub-windows used"
-            if self.intra_annual_slices_check is False else
-            self._intra_annual_slices.metadata['Overlap'],
-            intra_annual_slice_definition="No temporal sub-windows used"
-            if self.intra_annual_slices_check is False else
-            self._intra_annual_slices.metadata['Names_Dates [MM-DD]'],
-        )
+            return [
+                long for long in self.pytesmo_results
+                if long not in self.non_metrics_list
+            ]
 
     def get_pytesmo_attrs(self) -> None:
+        """
+        Get the attributes of the pytesmo results and add them to the transcribed dataset.
+        """
         for attr in self.pytesmo_results.attrs:
             self.transcribed_dataset.attrs[attr] = self.pytesmo_results.attrs[
                 attr]
 
-    def make_loc_dim(self, ds: xr.Dataset) -> xr.Dataset:   # better to integrate that earlier somewhere than to rearrange the dataset only later on
+    def trim_n_obs_name(self) -> None:
         """
-        Takes a dataset with coords 'idx', 'lon, 'lat' (possibly amongst others) and combines them into a single 'loc' dimension, the new main dimension of the dataset.
-
-        Parameters
-        ----------
-        ds : xr.Dataset
-            Dataset to be processed.
-
-        Returns
-        -------
-        xr.Dataset
-            Dataset with 'loc' as the main dimension.
+        Trim the 'n_obs' variable name to 'n_obs' if it's not already named so.
         """
 
-        eds_idx_data = ds['idx'].data
-        eds_idx_attrs = ds['idx'].attrs
-        eds_lon_attrs = ds['lon'].attrs
-        eds_lat_attrs = ds['lat'].attrs
+        def get_n_obs_var_name() -> str:
+            return [var for var in self.transcribed_dataset
+                    if 'n_obs' in var][0]
 
-        eds = ds.drop_vars(['idx', 'lon', 'lat'])
-        eds['idx'] = eds_idx_data
-        eds['idx'].attrs = eds_idx_attrs
-        eds = eds.swap_dims({'idx': 'loc'})
-        eds['lon'] = eds['longitude']
-        eds['lon'].attrs = eds_lon_attrs
-        eds['lat'] = eds['latitude']
-        eds['lat'].attrs = eds_lat_attrs
-        eds = eds.set_coords(['lon', 'lat', 'idx'])
-        return eds
+        if get_n_obs_var_name() != 'n_obs':
+            self.transcribed_dataset = self.transcribed_dataset.rename(
+                {get_n_obs_var_name(): 'n_obs'})
 
+    def drop_obs_dim(self) -> None:
+        """
+        Drops the 'obs' dimension from the transcribed dataset, if it exists.
+        """
+        if 'obs' in self.transcribed_dataset.dims:
+            self.transcribed_dataset = self.transcribed_dataset.drop_dims(
+                'obs')
 
     def get_transcribed_dataset(self) -> xr.Dataset:
         """
@@ -359,17 +198,58 @@ class Pytesmo2Qa4smResultsTranscriber:
         xr.Dataset
             The transcribed, metadata-less dataset.
         """
-        self.transcribed_dataset = xr.Dataset(self.metric_data_dict)
+        self.bulk_case_present, self.intra_annual_slices = self.intra_annual_slices_checker(
+        )
 
-        self.transcribed_dataset = xr.merge(
-            [self.transcribed_dataset, *self.non_metric_data_dict.values()])
+        self.pytesmo_results[
+            INTRA_ANNUAL_WINDOW_NC_COORD_NAME] = self.intra_annual_slices
 
-        self.transcribed_dataset = self.transcribed_dataset.assign_coords(
-            lat=self.__lat_arr, lon=self.__lon_arr, idx=self.__idx_arr)
+        metric_vars = self.metrics_list
 
-        self.set_coordinate_attrs()
+        self.transcribed_dataset = xr.Dataset()
+
+        for var_name in metric_vars:
+            new_name = var_name
+            if not self.bulk_case_present:
+                new_name = new_name.split(INTRA_ANNUAL_SEPARATOR)[1]
+            self.transcribed_dataset[new_name] = self.pytesmo_results[
+                var_name].expand_dims(
+                    {
+                        INTRA_ANNUAL_WINDOW_NC_COORD_NAME:
+                        self.intra_annual_slices
+                    },
+                    axis=-1)
+            # Copy attributes from the original variable to the new variable
+            self.transcribed_dataset[new_name].attrs = self.pytesmo_results[
+                var_name].attrs
+
+        # Add non-metric variables directly
+        self.transcribed_dataset = self.transcribed_dataset.merge(
+            self.pytesmo_results[self.non_metrics_list])
+
         self.get_pytesmo_attrs()
-        self.transcribed_dataset = self.make_loc_dim(self.transcribed_dataset)
+        self.trim_n_obs_name()
+        self.drop_obs_dim()
+
+        self.transcribed_dataset[
+            INTRA_ANNUAL_WINDOW_NC_COORD_NAME].attrs = dict(
+                long_name="temporal sub-window",
+                standard_name="temporal sub-window",
+                units="1",
+                valid_range=np.array([0, len(self.intra_annual_slices)]),
+                axis="T",
+                description="temporal sub-window name for the dataset",
+                intra_annual_slice_type="No temporal sub-windows used"
+                if self.bulk_case_present is True else
+                self._intra_annual_slices.metadata['Intra annual slice type'],
+                overlap="No temporal sub-windows used"
+                if self.bulk_case_present is True else
+                self._intra_annual_slices.metadata['Overlap'],
+                intra_annual_slice_definition="No temporal sub-windows used"
+                if self.bulk_case_present is True else
+                self._intra_annual_slices.metadata['Names_Dates [MM-DD]'],
+            )
+
         return self.transcribed_dataset
 
     def build_outname(self, root: str, keys: List[Tuple[str]]) -> str:
