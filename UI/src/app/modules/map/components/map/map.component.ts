@@ -37,6 +37,7 @@ export class MapComponent implements AfterViewInit, OnInit {
   clusteredSource: VectorSource = new VectorSource();
   nonClusteredSource: VectorSource = new VectorSource();
   @Output() mapReady = new EventEmitter<Map>();
+  @Output() noIsmnPoints = new EventEmitter<boolean>(false);
 
   singleSensorMarkerRadius = 5;
 
@@ -103,13 +104,13 @@ export class MapComponent implements AfterViewInit, OnInit {
       featureProjection: 'EPSG:3857'
     });
 
-    if (features.length > 0 && features[0].getGeometry().getType() === 'Polygon') {
-      //Satellite datasets
-      this.nonClusteredSource.addFeatures(features);
+    if (features.length > 0){
+      features[0].getGeometry().getType() === 'Polygon' ? this.nonClusteredSource.addFeatures(features) : this.clusteredSource.addFeatures(features);
     } else {
-      //ISMN
-      this.clusteredSource.addFeatures(features);
+      this.toastService.showAlertWithHeader('No stations available',
+        'Due to the filter selection, there are no ISMN points available.')
     }
+    this.noIsmnPoints.emit(features.length == 0);
   }
 
   ngAfterViewInit(): void {

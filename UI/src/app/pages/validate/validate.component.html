@@ -179,7 +179,8 @@
             <qa-map class="map" #qwerty
                     [spatialSubset]="validationModel.spatialSubsetModel"
                     [center]="[10, 52.5]"
-                    [zoom]="2.5"></qa-map>
+                    [zoom]="2.5"
+                    (noIsmnPoints)="checkIsmnPoints($event)"></qa-map>
           </p-panel>
 
         </div>
@@ -258,7 +259,7 @@
                   id="validateButton"
                   label="Validate"
                   icon="pi pi-play"
-                  [disabled]="disableValidateButton(validationModel)"
+                  [disabled]="disableValidateButton(validationModel) || (noIsmnPoints|async)"
                   (onClick)="startValidation(true)">
                 </p-button>
               </span>
