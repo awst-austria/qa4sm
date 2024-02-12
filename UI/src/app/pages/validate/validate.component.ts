@@ -99,6 +99,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   isThereValidation: ExistingValidationDto;
   public isExistingValidationWindowOpen: boolean;
   maintenanceMode = false;
+  noIsmnPoints = new BehaviorSubject(false);
 
   defMaxLon = 48.3;
   defMinLon = -11.2;
@@ -934,6 +935,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   disableValidateButton(validationModel): boolean {
     return validationModel.datasetConfigurations
       .filter(config => config.datasetModel?.selectedVariable?.short_name === '--none--').length !== 0;
+  }
+
+  public checkIsmnPoints(evt): void {
+    console.log(evt)
+    this.noIsmnPoints.next(evt)
   }
 
 }

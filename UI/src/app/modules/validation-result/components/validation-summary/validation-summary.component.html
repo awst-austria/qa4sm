@@ -3,7 +3,7 @@
            [ngClass]="{'for-comparison-body': forComparison}">
     <ng-template *ngIf="forComparison" pTemplate="header">
       <div class="text-center" style="width:100%">
-        <h4 class="my-0 comparison-header">Description of validation {{validationRun.id}}</h4>
+        <h4 class="my-0 comparison-header">Description of validation {{ validationRun.id }}</h4>
       </div>
     </ng-template>
     <ng-template *ngIf="!forComparison" pTemplate="header">
@@ -11,7 +11,7 @@
         <h4 class="my-0 font-weight-normal">
           Summary:
           <span *ngIf="validationRun.is_unpublished && isOwner">
-          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{valName$|async}} </span>
+          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{ valName$|async }} </span>
           <button
             pButton
             type="button"
@@ -50,12 +50,12 @@
           </span>
         </span>
           <span *ngIf="!validationRun.is_unpublished"
-                class="my-0 font-weight-normal no_edit_name">{{valName$|async}}
+                class="my-0 font-weight-normal no_edit_name">{{ valName$|async }}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
           <span *ngIf="!isOwner && validationRun.is_unpublished"
-                class="my-0 font-weight-normal no_edit_name">{{valName$|async}}
+                class="my-0 font-weight-normal no_edit_name">{{ valName$|async }}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
@@ -65,39 +65,43 @@
     <div *ngIf="configurations$| async as configurations" class="flex flex-column">
       <div *ngIf="!validationRun.all_files_exist" [ngClass]="'alert-danger p-2'">
         <b>
-          At least one of the data set files has been removed, therefore there is no possibility of rerunning this validation.
+          At least one of the data set files has been removed, therefore there is no possibility of rerunning this
+          validation.
         </b>
       </div>
 
       <ul [ngClass]="{'for-comparison-list': forComparison}" class="md:mx-5 md:px-3 mx-1 px-1">
         <li *ngIf="validationRun.is_a_copy">
-          Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}},
-          original validation run on {{this.originalDate| date: 'mediumDate' :timeZone }}.
+          Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }},
+          original validation run on {{ this.originalDate| date: 'mediumDate' :timeZone }}.
         </li>
         <li *ngIf="!validationRun.is_a_copy">Started validation
-          on {{ validationRun.start_time | date: dateFormat :timeZone }} {{timeZone}}, finished
-          on {{ validationRun.end_time | date: dateFormat :timeZone }} {{timeZone}}.
+          on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }}, finished
+          on {{ validationRun.end_time | date: dateFormat :timeZone }} {{ timeZone }}.
         </li>
-        <li>Compared {{ configurations.length  }} datasets:
+        <li>Compared {{ configurations.length }} datasets:
           <ol style="list-style: none">
             <li *ngFor="let config of configurations; let ind = index">
-<!--              <em>Dataset {{ind + 1}}: </em>-->
-              <span style="font-weight: 600">{{config.is_spatial_reference ? 0 : ind + 1}}-{{config.dataset}} ({{config.version}}, {{config.variable}}
-                {{config.variableUnit ? '[' + config.variableUnit + ']': ''}}
+              <!--              <em>Dataset {{ind + 1}}: </em>-->
+              <span style="font-weight: 600">{{ config.is_spatial_reference ? 0 : ind + 1 }}-{{ config.dataset }}
+                ({{ config.version }}, {{ config.variable }}
+                {{ config.variableUnit ? '[' + config.variableUnit + ']' : '' }}
                 )</span>
-              <em>{{validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
-                config.is_temporal_reference, config.is_scaling_reference)}}
+              <em>{{
+                  validationConfigService.getInformationOnTheReference(config.is_spatial_reference,
+                    config.is_temporal_reference, config.is_scaling_reference)
+                }}
               </em>
               <span *ngIf="!config.fileExists" style="color: red">(Data set has been removed)</span>
               <br>
               <div *ngIf="config.filters.length > 0 || config.parametrisedFilters.length > 0">
                 Filters:
                 <ul>
-                  <li *ngFor="let filter of config.filters">{{filter}};</li>
+                  <li *ngFor="let filter of config.filters">{{ filter }};</li>
                 </ul>
                 <ul>
                   <li *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
-                    {{paramFilter}}: {{config.parametrisedFiltersValues[indF].split(',').join(', ')}};
+                    {{ paramFilter }}: {{ config.parametrisedFiltersValues[indF].split(',').join(', ') }};
                   </li>
                 </ul>
               </div>
@@ -118,8 +122,8 @@
 
         <li *ngIf="validationRun.interval_from && validationRun.interval_to; else elseTemporal">Validation period /
           temporal
-          filter: {{ validationRun.interval_from | date: dateFormat :timeZone }} {{timeZone}}
-          to {{ validationRun.interval_to | date: dateFormat :timeZone }} {{timeZone}}.
+          filter: {{ validationRun.interval_from | date: dateFormat :timeZone }} {{ timeZone }}
+          to {{ validationRun.interval_to | date: dateFormat :timeZone }} {{ timeZone }}.
         </li>
         <ng-template #elseTemporal>
           <li>Validated over entire available timespan.</li>
@@ -127,7 +131,7 @@
 
         <li *ngIf="validationRun.temporal_matching">
           Temporal matching window size set to {{ validationRun.temporal_matching }}
-          {{validationRun.temporal_matching === 1 ? 'hour' : 'hours'}}.
+          {{ validationRun.temporal_matching === 1 ? 'hour' : 'hours' }}.
         </li>
 
 
@@ -159,12 +163,12 @@
         <li *ngIf="validationRun.scaling_method !== 'none'">Scaling reference:
           <span *ngFor="let config of configurations">
                 <span *ngIf="config.id === validationRun.scaling_ref">
-                  {{config.dataset}} ({{ config.version }}, {{ config.variable }})
+                  {{ config.dataset }} ({{ config.version }}, {{ config.variable }})
 
                   <span *ngIf="config.filters || config.parameterisedFilters; else elseFilters">[Filters:
-                  <span *ngFor="let filter of config.filters"> {{filter}}; </span>
+                  <span *ngFor="let filter of config.filters"> {{ filter }}; </span>
                   <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
-                              {{paramFilter}} {{config.parametrisedFiltersValues[indF]}}
+                              {{ paramFilter }} {{ config.parametrisedFiltersValues[indF] }}
                             </span>
                     ]</span>
                   <ng-template #elseFilters>
@@ -175,36 +179,40 @@
         </li>
 
         <li> Scaling
-          method: {{scalingMethod}}.
+          method: {{ scalingMethod }}.
         </li>
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
 
         <li *ngIf="validationRun.progress === -1">The validation was cancelled.</li>
-        <li *ngIf="validationRun.progress === -100">This validation was cancelled due to service outage. You can easily restart it using 'Load settings' button.</li>
-        <ng-template *ngIf="validationRun.progress === -1 && validationRun.progress === -100">
-          <li *ngIf="!forComparison && validationRun.total_points !== 0" [ngClass]="{'alert-danger': errorRate > 0}">
-            for {{errorRate * 100 | number: '.0'}}% ({{ validationRun.error_points }}
-            of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
-            not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the 'Result files' section.
-          </li>
-          <li *ngIf="!forComparison && validationRun.total_points === 0" [ngClass]="'alert-danger'">
-            <b>There were no spatial reference data points in the selected area. Please select a different spatial subsetting  or select
-              different dataset as a spatial reference.
-            </b>
-          </li>
-        </ng-template>
+        <li *ngIf="validationRun.progress === -100">This validation was cancelled due to service outage. You can easily
+          restart it using 'Load settings' button.
+        </li>
+        <li *ngIf="!forComparison && validationRun.total_points !== 0 && validationRun.progress !== -1
+        && validationRun.progress !== -100" [ngClass]="{'alert-danger': errorRate > 0}">
+          for {{ errorRate * 100 | number: '.0' }}% ({{ validationRun.error_points }}
+          of {{ validationRun.total_points }}) of the processed locations (grid points) the validation metrics could
+          not be calculated. For an overview of potential causes select '# status' (available from version 2.2) in the
+          'Result files' section.
+        </li>
+        <li *ngIf="!forComparison && validationRun.total_points === 0
+        && validationRun.progress !== -1 && validationRun.progress !== -100" [ngClass]="'alert-danger'">
+          <b>
+            There were no spatial reference data points in the selected area. Please select a different spatial
+            subsetting or select different dataset as a spatial reference.
+          </b>
+        </li>
         <li *ngIf="(isArchived$|async)===false && getCurrentUser() === validationRun.user  && !forComparison">
           <span *ngIf="isNearExpiry$|async">
             <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
             This validation will SOON be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone}} {{timeZone}}.
+            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{ timeZone }}.
           </span>
 
           <span *ngIf="(isNearExpiry$|async)===false">
             <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
             This validation will be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{timeZone}}.
+            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{ timeZone }}.
           </span>
 
         </li>
@@ -221,19 +229,23 @@
           <a target="_blank" href="{{getDoiPrefix()}}{{validationRun.doi }}">{{ validationRun.doi }}</a>.
         </li>
       </ul>
-      <qa-buttons *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false" [validationList]="false"
-                  [validationRun]="validationRun" [canBeRerun]="validationRun.all_files_exist" (doUpdate)="update($event)" (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
+      <qa-buttons
+        *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false"
+        [validationList]="false"
+        [validationRun]="validationRun" [canBeRerun]="validationRun.all_files_exist" (doUpdate)="update($event)"
+        (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
 
       <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
            style="float: right">
-         <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i> Publishing in progress...
+        <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i> Publishing in progress...
       </div>
 
     </div>
   </p-panel>
 
   <p-dialog [modal]="true" [(visible)]="isPublishingWindowOpen">
-    <qa-publishing [validationId]="validationRun.id" (openPublishWindow)="handlePublishWindow($event)" (startPublishing)="startPublishing()"></qa-publishing>
+    <qa-publishing [validationId]="validationRun.id" (openPublishWindow)="handlePublishWindow($event)"
+                   (startPublishing)="startPublishing()"></qa-publishing>
   </p-dialog>
 
 </main>

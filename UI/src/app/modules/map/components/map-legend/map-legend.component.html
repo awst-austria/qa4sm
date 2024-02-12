@@ -1,11 +1,20 @@
-<div class="flex flex-row flex-wrap w-12 p-2 justify-content-center align-items-center">
-  <div *ngFor="let legendItem of legendItems"
-       class="legend-item flex flex-row flex-wrap xl:w-4 lg:w-5 w-12 justify-content-center gap-1">
-    <div
-      [innerHTML]="getCircleSVG(legendItem)"
-      class="flex flex-column lg:p-0 justify-content-center align-items-center">
-    </div>
-    <div class="legend-label flex flex-column w-auto p-1 justify-content-center align-items-center">{{ legendItem.label }}</div>
-    <div class="pi pi-question-circle flex flex-column justify-content-center align-items-center" [pTooltip]="legendItem.tooltip"></div>
+<div class="flex flex-row flex-wrap w-12 py-2 justify-content-center align-items-center column-gap-4">
+  <div class="flex flex-row w-auto column-gap-1">
+    <div class="pi pi-info-circle flex flex-row w-auto justify-content-center align-items-center"
+         pTooltip="Please note that the ISMN station layer is displayed only when the ISMN dataset belongs to the data pool and it reflects selected ISMN filters."></div>
+    <div class="legend-label flex flex-row w-auto p-1 justify-content-center align-items-center">ISMN stations legend:</div>
   </div>
+  <div class="flex flex-row flex-wrap w-auto justify-content-center align-items-center column-gap-4">
+    <div *ngFor="let legendItem of legendItems"
+         class="legend-item flex flex-row flex-wrap justify-content-center gap-1">
+      <div
+        [innerHTML]="getCircleSVG(legendItem)"
+        class="flex flex-column lg:p-0 justify-content-center align-items-center">
+      </div>
+      <div class="legend-label flex flex-column w-auto p-1 justify-content-center align-items-center">{{ legendItem.label }}</div>
+      <div class="pi pi-question-circle flex flex-column justify-content-center align-items-center" [pTooltip]="legendItem.tooltip"></div>
+    </div>
+  </div>
+
+
 </div>
