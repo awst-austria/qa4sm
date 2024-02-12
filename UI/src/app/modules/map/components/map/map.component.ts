@@ -83,7 +83,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       },
       {
         label: 'Single Sensor',
-        tooltip: 'Station with a single sensor. Hover over a point to find out more about the sensor.',
+        tooltip: 'Station with a single sensor. Click on a point to find out more about the sensor.',
         strokeWidth: 0,
         fillColor: this.singleLocationStrokeColor,
         strokeColor: this.singleLocationStrokeColor,
