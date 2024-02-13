@@ -508,6 +508,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.checkIfReferenceRemoved('scalingReference$');
 
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+    this.updateMap();
   }
 
   checkIfReferenceRemoved(referenceType: string): void {
