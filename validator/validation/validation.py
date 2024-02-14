@@ -17,8 +17,7 @@ from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
 from netCDF4 import Dataset
-from pytesmo.validation_framework.adapters import AnomalyAdapter, \
-    AnomalyClimAdapter
+from pytesmo.validation_framework.adapters import AnomalyAdapter, AnomalyClimAdapter
 from pytesmo.validation_framework.data_manager import DataManager
 from pytesmo.validation_framework.metric_calculators import (
     get_dataset_names,
@@ -66,11 +65,14 @@ def do_nothing(*args, **kwargs):
 
 #$$
 ####################-----Implement this in the proper way-----####################
-slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
+# slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='custom',
+#                                     overlap=0,
+#                                     custom_file=os.path.join('custom_intra_annual_slices_example.json'))
+slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='seasons',
                                     overlap=0,
                                     custom_file=None)
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
-slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
+# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
 ##################################################################################
 
@@ -347,6 +349,8 @@ def create_pytesmo_validation(validation_run):
         enddate = validation_run.interval_to.astimezone(UTC).replace(
             tzinfo=None)
         period = [startdate, enddate]
+
+    print(f'\n\n\nperiod: {period}\n\n\n')
 
     upscale_parms = None
     if validation_run.upscaling_method != "none":

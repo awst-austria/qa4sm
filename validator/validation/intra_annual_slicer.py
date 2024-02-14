@@ -5,11 +5,13 @@ from typing import Optional, List, Tuple, Dict
 import os
 from datetime import datetime
 import json
+from abc import ABC, abstractmethod
 
 
-class IntraAnnualSlicesDefault:
+class IntraAnnualSlicesDefault(ABC):
     '''
-    Class to load intra annual slice definitions from the `validator.validation.globals` file.
+    Class to load default intra annual slice definitions from the `validator.validation.globals` file.
+    Alternatively, the user can provide a custom JSON file containing the definitions.
     Intra annual slice definitions are stored in dictionaries with the following structure:
 
     {"seasons":
@@ -30,16 +32,6 @@ class IntraAnnualSlicesDefault:
 
     def __init__(self, custom_file: Optional[str] = None) -> None:
         self.custom_file = custom_file
-        if not custom_file:
-            self.intra_annual_slices_dict = INTRA_ANNUAL_SLICES
-            self.available_slices = list(self.intra_annual_slices_dict.keys())
-        elif os.path.isfile(custom_file):
-            self.intra_annual_slices_dict = self.__load_json_data(custom_file)
-            self.available_slices = list(self.intra_annual_slices_dict.keys())
-        else:
-            raise FileNotFoundError(
-                f'File {custom_file} not found. Please provide a valid path to a JSON file, containing the intra annual slice definitions.'
-            )
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(custom_file={self.custom_file})'
@@ -47,7 +39,7 @@ class IntraAnnualSlicesDefault:
     def __str__(self) -> str:
         return f'{self.__class__.__name__}({os.path.basename(self.custom_file)})'
 
-    def __load_json_data(self, json_path: str) -> dict:
+    def _load_json_data(self, json_path: str) -> dict:
         '''Reads and loads the JSON file into a dictionary.
 
         Parameters
@@ -64,6 +56,9 @@ class IntraAnnualSlicesDefault:
         with open(json_path, 'r') as f:
             return json.load(f)
 
+    @abstractmethod
+    def _get_available_slices(self):
+        pass
 
 class IntraAnnualSlicer(IntraAnnualSlicesDefault):
     '''Class to create custom intra annual slices, based on the default definitions.
@@ -86,8 +81,13 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         self.intra_annual_slice_type = intra_annual_slice_type
         super().__init__(custom_file=custom_file)
 
-        if self.intra_annual_slice_type not in self.available_slices:
-            raise ValueError(
+        self.available_slices = self._get_available_slices()
+        if not self.available_slices:
+            raise FileNotFoundError(
+                f'Invalid custom file path. Please provide a valid JSON file containing the intra annual slice definitions.'
+            )
+        elif self.intra_annual_slice_type not in self.available_slices:
+            raise KeyError(
                 f'Invalid intra annual slice type. Available types are: {self.available_slices}'
             )
 
@@ -173,6 +173,16 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
             for key, val in self.intra_annual_slices_dict[
                 self.intra_annual_slice_type].items()
         }
+
+    def _get_available_slices(self):
+        if not self.custom_file:
+            self.intra_annual_slices_dict = INTRA_ANNUAL_SLICES
+            return list(self.intra_annual_slices_dict.keys())
+        elif os.path.isfile(self.custom_file):
+            self.intra_annual_slices_dict = self._load_json_data(self.custom_file)
+            return list(self.intra_annual_slices_dict.keys())
+        else:
+            return None
 
     @property
     def custom_intra_annual_slices(self) -> Dict[str, TsDistributor]:

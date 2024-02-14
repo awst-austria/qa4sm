@@ -42,7 +42,7 @@ from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
-from validator.validation.globals import METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS
+from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 from django.shortcuts import get_object_or_404
@@ -374,8 +374,7 @@ class TestValidation(TestCase):
 
             assert ds.val_scaling_method == run.scaling_method, ' Wrong validation config attribute. [scaling_method]'
 
-        #no plotting currently #$$
-        '''
+
         # check zipfile of graphics
         zipfile = os.path.join(outdir, 'graphs.zip')
         assert os.path.isfile(zipfile)
@@ -412,12 +411,12 @@ class TestValidation(TestCase):
                         for meta_var in out_metadata_plots.values()] + \
                        [f'boxplot_{metric}.png', f'boxplot_{metric}_for_*.png']
             boxplot_pngs = [
-                x for x in os.listdir(outdir)
+                x for x in os.listdir(os.path.join(outdir, globals.DEFAULT_TSW))
                 if any([fnmatch.fnmatch(x, p) for p in patterns])
-            ]
+            ]   #$$ testing the bulk case
 
             self.__logger.debug(f"{metric}: Plots are {len(boxplot_pngs)}, "
-                                f"should: {n_metadata_plots + n_metric_plots}")
+                                f"should: {n_metadata_plots} + {n_metric_plots}")
 
             assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
 
@@ -429,7 +428,7 @@ class TestValidation(TestCase):
             self.__logger.debug(f"{metric}: Plots are {len(overview_pngs)}, "
                                 f"should: {(n_datasets - 1)}")
 
-        assert os.path.isfile(os.path.join(outdir, 'overview_status.png'))'''
+        assert os.path.isfile(os.path.join(outdir, 'overview_status.png'))
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
