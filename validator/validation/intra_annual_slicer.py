@@ -1,12 +1,12 @@
 from pytesmo.validation_framework.metric_calculators_adapters import TsDistributor
 from pytesmo.time_series.grouping import YearlessDatetime
-from validator.validation.globals import INTRA_ANNUAL_SLICES
-from typing import Optional, List, Tuple, Dict
+from validator.validation.globals import INTRA_ANNUAL_SLICES, DEFAULT_TSW
+from typing import Optional, List, Tuple, Dict, Union
 import os
 from datetime import datetime
 import json
 from abc import ABC, abstractmethod
-
+from dataclasses import dataclass
 
 class IntraAnnualSlicesDefault(ABC):
     '''
@@ -60,6 +60,21 @@ class IntraAnnualSlicesDefault(ABC):
     def _get_available_slices(self):
         pass
 
+
+@dataclass(frozen=True)
+class NewSlice:
+    name: str
+    begin_date: datetime
+    end_date: datetime
+
+    @property
+    def begin_date_pretty(self) -> str:
+        return self.begin_date.strftime('%Y-%m-%d')
+
+    @property
+    def end_date_pretty(self) -> str:
+        return self.end_date.strftime('%Y-%m-%d')
+
 class IntraAnnualSlicer(IntraAnnualSlicesDefault):
     '''Class to create custom intra annual slices, based on the default definitions.
 
@@ -90,6 +105,9 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
             raise KeyError(
                 f'Invalid intra annual slice type. Available types are: {self.available_slices}'
             )
+
+        self.custom_intra_annual_slices = self._custom_intra_annual_slices()
+        self.additional_slices_container = {}
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(intra_annual_slice_type={self.intra_annual_slice_type}, overlap={self.overlap})'
@@ -174,7 +192,7 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
                 self.intra_annual_slice_type].items()
         }
 
-    def _get_available_slices(self):
+    def _get_available_slices(self) -> Union[List[str], None]:
         if not self.custom_file:
             self.intra_annual_slices_dict = INTRA_ANNUAL_SLICES
             return list(self.intra_annual_slices_dict.keys())
@@ -184,8 +202,7 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         else:
             return None
 
-    @property
-    def custom_intra_annual_slices(self) -> Dict[str, TsDistributor]:
+    def _custom_intra_annual_slices(self) -> Dict[str, TsDistributor]:
         '''Custom intra annual slice based, on the default definitions and the overlap value.
 
         Parameters
@@ -198,15 +215,33 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
             Dictionary containing the custom intra annual slice definitions.
         '''
 
-        def tsdistributer(_begin_date: Tuple[int],
+        def tsdistributor(_begin_date: Tuple[int],
                           _end_date: Tuple[int]) -> TsDistributor:
             return TsDistributor(yearless_date_ranges=[(YearlessDatetime(
                 *_begin_date), YearlessDatetime(*_end_date))])
 
         return {
-            key: tsdistributer(val[0], val[1])
+            key: tsdistributor(val[0], val[1])
             for key, val in self._custom_intra_annual_slice().items()
         }
+
+    def add_slice(
+            self,
+            new_slice: NewSlice) -> Union[None, Dict[str, TsDistributor]]:
+        self.additional_slices_container[new_slice.name] = new_slice
+        try:
+            if new_slice.name in self.custom_intra_annual_slices:
+                print(
+                    f'Intra annual slice "{new_slice.name}" already exists. Overwriting not possible.\
+                         Please choose a different name.')
+                return None
+            else:
+                self.custom_intra_annual_slices[new_slice.name] = TsDistributor(
+                    date_ranges=[(new_slice.begin_date, new_slice.end_date)])
+                return self.custom_intra_annual_slices
+        except Exception as e:
+            print(f'Error: {e}')
+            return None
 
     @property
     def names(self) -> List[str]:
@@ -222,10 +257,11 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
             List containing the names of the intra annual slices.
         '''
 
-        return list(self._custom_intra_annual_slice().keys())
+        return list(self.custom_intra_annual_slices.keys())
+
 
     @property
-    def metadata(self) -> dict:
+    def metadata(self) -> Dict:
         '''Returns the metadata of the intra annual slices.
 
         Parameters
@@ -241,14 +277,23 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         def _date_formatter(_date: Tuple[int, int]) -> str:
             return f'{_date[0]:02d}-{_date[1]:02d}'
 
-        return {
+        meta_data_dict = {
             'Intra annual slice type':
             self.intra_annual_slice_type,
             'Overlap':
             f'{self.overlap} days',
-            'Names_Dates [MM-DD]':
-            '(MM-DD):' + (', ').join([
+            'Pretty Names [MM-DD]': (', ').join([
                 f'{key}: {_date_formatter(val[0])} to {_date_formatter(val[1])}'
                 for key, val in self._custom_intra_annual_slice().items()
             ])
         }
+
+        if self._custom_intra_annual_slice().items() != self.names:
+            unique_tsws = list(
+                set(self.names) -
+                set(self._custom_intra_annual_slice().keys()))
+            if DEFAULT_TSW in unique_tsws:
+                meta_data_dict[
+                    DEFAULT_TSW] = f'This is the default case "{DEFAULT_TSW}". The user specified it to range from {self.additional_slices_container[DEFAULT_TSW].begin_date_pretty} to {self.additional_slices_container[DEFAULT_TSW].end_date_pretty}. Note: This specified time interval might differ from the actual time interval in which all datasets are available. Refer to the datasets section (https://qa4sm.eu/ui/datasets) for more information.'
+
+        return meta_data_dict

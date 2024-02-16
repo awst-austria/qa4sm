@@ -44,7 +44,7 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.intra_annual_slicer import IntraAnnualSlicer
+from validator.validation.intra_annual_slicer import IntraAnnualSlicer, NewSlice
 from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 from api.frontend_urls import get_angular_url
 from shutil import copy2, copytree
@@ -65,14 +65,14 @@ def do_nothing(*args, **kwargs):
 
 #$$
 ####################-----Implement this in the proper way-----####################
-# slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='custom',
-#                                     overlap=0,
-#                                     custom_file=os.path.join('custom_intra_annual_slices_example.json'))
+slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='special',
+                                    overlap=0,
+                                    custom_file=os.path.join('custom_intra_annual_slices_example.json')) # loading custom temporal sub-windows from a file
 slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='seasons',
                                     overlap=0,
-                                    custom_file=None)
+                                    custom_file=None) # loading default temporal sub-windows from a globals
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
-# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
+slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
 ##################################################################################
 
@@ -350,7 +350,7 @@ def create_pytesmo_validation(validation_run):
             tzinfo=None)
         period = [startdate, enddate]
 
-    print(f'\n\n\nperiod: {period}\n\n\n')
+    print(f'\n\n\nperiod: {period}, {type(period)}\n\n\n')
 
     upscale_parms = None
     if validation_run.upscaling_method != "none":
@@ -391,12 +391,15 @@ def create_pytesmo_validation(validation_run):
         calc_kendall=False,
     )  #$$
 
+    # print(intra_annual_slices)
     if isinstance(
             intra_annual_slices, dict
     ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
+        default_slice = NewSlice(DEFAULT_TSW, *period)
+        slicer_instance.add_slice(default_slice)
         pairwise_metrics = SubsetsMetricsAdapter(
             calculator=_pairwise_metrics,
-            subsets=intra_annual_slices,
+            subsets=slicer_instance.custom_intra_annual_slices,
             group_results="join",
         )  #$$
 
@@ -661,11 +664,11 @@ def run_validation(validation_id):  #$$
 
                 print(f'\n\n\nintra_annual_slice_names: {intra_annual_slice_names}\n\n\n')
 
-                generate_all_graphs(
-                    validation_run = validation_run,
-                    outfolder = run_dir,
-                    temporal_sub_windows=intra_annual_slice_names,
-                    save_metadata=validation_run.plots_save_metadata)
+                # generate_all_graphs(
+                #     validation_run = validation_run,
+                #     outfolder = run_dir,
+                #     temporal_sub_windows=intra_annual_slice_names,
+                #     save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(
