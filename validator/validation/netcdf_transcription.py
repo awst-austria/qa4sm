@@ -203,20 +203,32 @@ class Pytesmo2Qa4smResultsTranscriber:
             INTRA_ANNUAL_WINDOW_NC_COORD_NAME] = self.intra_annual_slices
 
         metric_vars = self.metrics_list
-
         self.transcribed_dataset = xr.Dataset()
 
         for var_name in metric_vars:
             new_name = var_name
             if not self.only_default_case:
-                new_name = new_name.split(INTRA_ANNUAL_SEPARATOR)[1]
-            self.transcribed_dataset[new_name] = self.pytesmo_results[
-                var_name].expand_dims(
-                    {
-                        INTRA_ANNUAL_WINDOW_NC_COORD_NAME:
-                        self.intra_annual_slices
-                    },
-                    axis=-1)
+                _tsw, new_name = new_name.split(INTRA_ANNUAL_SEPARATOR)
+
+            if new_name not in self.transcribed_dataset:
+                # takes the data associated with the metric new_name and adds it as a new variabel
+                # more precisely, it assigns copies of this data to each temporal sub-window, which is the new dimension
+                self.transcribed_dataset[new_name] = self.pytesmo_results[
+                    var_name].expand_dims(
+                        {
+                            INTRA_ANNUAL_WINDOW_NC_COORD_NAME:
+                            self.intra_annual_slices
+                        },
+                        axis=-1)
+            else:
+                # the variable already exists, but we need to update it with the real data (as opposed to the data of the first temporal sub-window, which is the default behaviour of expand_dims())
+                self.transcribed_dataset = Pytesmo2Qa4smResultsTranscriber.update_dataset_var(
+                    ds=self.transcribed_dataset,
+                    var=new_name,
+                    coord_key=INTRA_ANNUAL_WINDOW_NC_COORD_NAME,
+                    coord_val=_tsw,
+                    data_vals=self.pytesmo_results[var_name].data)
+
             # Copy attributes from the original variable to the new variable
             self.transcribed_dataset[new_name].attrs = self.pytesmo_results[
                 var_name].attrs

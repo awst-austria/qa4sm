@@ -9,7 +9,7 @@ import xarray as xr
 import numpy as np
 import sys
 sys.path.append(
-    '/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm-reader/src/')
+    '/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm-reader/src/')        #$$
 import qa4sm_reader
 
 from celery.app import shared_task
@@ -51,18 +51,6 @@ from shutil import copy2, copytree
 from typing import Optional, List, Tuple, Dict, Union
 
 __logger = logging.getLogger(__name__)
-
-
-#------------------debugging------------------#
-import warnings
-
-# Filter out UserWarnings
-# warnings.filterwarnings("ignore", category=UserWarning)
-def do_nothing(*args, **kwargs):
-    pass
-# print = do_nothing
-#------------------debugging------------------#
-
 #$$
 ####################-----Implement this in the proper way-----####################
 slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='special',
@@ -393,7 +381,7 @@ def create_pytesmo_validation(validation_run):
             intra_annual_slices, dict
     ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
         default_slice = NewSlice(DEFAULT_TSW, *period)
-        slicer_instance.add_slice(default_slice)
+        slicer_instance.add_slice(default_slice)        # always add the default case
         pairwise_metrics = SubsetsMetricsAdapter(
             calculator=_pairwise_metrics,
             subsets=slicer_instance.custom_intra_annual_slices,
