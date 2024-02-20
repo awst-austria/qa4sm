@@ -66,14 +66,14 @@ def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfol
         save_metadata=save_metadata
     )
 
-    with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        for pngfile in fnb + fnm:
-            arcname = path.basename(pngfile)
-            myzip.write(pngfile, arcname=arcname)
-        for svgfile in fnb_svg + fnm_svg:
-            arcname = path.basename(svgfile)
-            myzip.write(svgfile, arcname=arcname)
-            remove(svgfile)
+    # with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+    #     for pngfile in fnb + fnm:
+    #         arcname = path.basename(pngfile)
+    #         myzip.write(pngfile, arcname=arcname)
+    #     for svgfile in fnb_svg + fnm_svg:
+    #         arcname = path.basename(svgfile)
+    #         myzip.write(svgfile, arcname=arcname)
+    #         remove(svgfile)
 
 
 def get_dataset_combis_and_metrics_from_files(validation_run):

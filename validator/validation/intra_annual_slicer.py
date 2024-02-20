@@ -277,7 +277,7 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         def _date_formatter(_date: Tuple[int, int]) -> str:
             return f'{_date[0]:02d}-{_date[1]:02d}'
 
-        meta_data_dict = {
+        metadata_dict = {
             'Intra annual slice type':
             self.intra_annual_slice_type,
             'Overlap':
@@ -293,7 +293,7 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
                 set(self.names) -
                 set(self._custom_intra_annual_slice().keys()))
             if DEFAULT_TSW in unique_tsws:
-                meta_data_dict[
+                metadata_dict[
                     DEFAULT_TSW] = f'This is the default case "{DEFAULT_TSW}". The user specified it to range from {self.additional_slices_container[DEFAULT_TSW].begin_date_pretty} to {self.additional_slices_container[DEFAULT_TSW].end_date_pretty}. Note: This specified time interval might differ from the actual time interval in which all datasets are available. Refer to the datasets section (https://qa4sm.eu/ui/datasets) for more information.'
 
-        return meta_data_dict
+        return metadata_dict

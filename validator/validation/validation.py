@@ -72,7 +72,7 @@ slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='seasons',
                                     overlap=0,
                                     custom_file=None) # loading default temporal sub-windows from a globals
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
-slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
+# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
 ##################################################################################
 
@@ -350,8 +350,6 @@ def create_pytesmo_validation(validation_run):
             tzinfo=None)
         period = [startdate, enddate]
 
-    print(f'\n\n\nperiod: {period}, {type(period)}\n\n\n')
-
     upscale_parms = None
     if validation_run.upscaling_method != "none":
         __logger.debug("Upscaling option is active")
@@ -391,7 +389,6 @@ def create_pytesmo_validation(validation_run):
         calc_kendall=False,
     )  #$$
 
-    # print(intra_annual_slices)
     if isinstance(
             intra_annual_slices, dict
     ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
@@ -662,13 +659,14 @@ def run_validation(validation_id):  #$$
                 else:
                     intra_annual_slice_names = np.array(slicer_instance.names)
 
-                print(f'\n\n\nintra_annual_slice_names: {intra_annual_slice_names}\n\n\n')
+                __logger.info(f'intra_annual_slice_names: {intra_annual_slice_names}')
 
-                # generate_all_graphs(
-                #     validation_run = validation_run,
-                #     outfolder = run_dir,
-                #     temporal_sub_windows=intra_annual_slice_names,
-                #     save_metadata=validation_run.plots_save_metadata)
+
+                generate_all_graphs(
+                    validation_run = validation_run,
+                    outfolder = run_dir,
+                    temporal_sub_windows=intra_annual_slice_names,
+                    save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
         __logger.exception('Unexpected exception during validation {}:'.format(
