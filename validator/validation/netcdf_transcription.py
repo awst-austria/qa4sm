@@ -185,6 +185,37 @@ class Pytesmo2Qa4smResultsTranscriber:
             self.transcribed_dataset = self.transcribed_dataset.drop_dims(
                 'obs')
 
+    @staticmethod
+    def update_dataset_var(ds: xr.Dataset, var: str, coord_key: str,
+                           coord_val: str, data_vals: List) -> xr.Dataset:
+        """
+        Update a variable of given coordinate in the dataset.
+
+        Parameters
+        ----------
+        ds : xr.Dataset
+            The dataset to be updated.
+        var : str
+            The variable to be updated.
+        coord_key : str
+            The name of the coordinate of the variable to be updated.
+        coord_val : str
+            The value of the coordinate of the variable to be updated.
+        data_vals : List
+            The data to be updated.
+
+        Returns
+        -------
+        xr.Dataset
+            The updated dataset.
+        """
+
+        ds[var] = ds[var].copy(
+        )  # ugly, but necessary, as xr.Dataset objects are immutable
+        ds[var].loc[{coord_key: coord_val}] = data_vals
+
+        return ds
+
     def get_transcribed_dataset(self) -> xr.Dataset:
         """
         Get the transcribed dataset, containing all metric and non-metric data provided by the pytesmo results. Metadata
