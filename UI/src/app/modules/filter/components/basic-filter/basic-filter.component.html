@@ -4,7 +4,7 @@
                 [disabled]="filterModel.readonly"
                 [readonly]=filterModel.filterDto.readonly
                 [binary]="true"
-                (onChange)="include_filters($event); exclude_filters($event)"
+                (onChange)="includeFilters($event); excludeFilters($event); checkIfUpdateMap(filterModel.filterDto.name)"
                 [ngClass]="{'readonly-filter-checkbox': filterModel.filterDto.readonly}"
     ></p-checkbox>
     <label class="pl-2" for="{{filterModel.filterDto.id}}"> {{filterModel.filterDto.description}}</label>

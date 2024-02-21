@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {FilterModel} from '../basic-filter/filter-model';
 import {TreeNode} from 'primeng/api';
 import {IsmnNetworkService} from '../../../core/services/filter/ismn-network-service';
@@ -16,6 +16,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
 
   @Input() filterModel$: BehaviorSubject<FilterModel>;
   @Input() datasetModel: DatasetComponentSelectionModel;
+  @Output() networkSelectionChanged = new EventEmitter<string>();
 
   networkSelectorVisible = false;
 
@@ -97,6 +98,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
     });
 
     this.filterModel$.value.parameters$.next(newSelection);
+    this.networkSelectionChanged.emit(newSelection);
   }
 
   private initComponent(): void {

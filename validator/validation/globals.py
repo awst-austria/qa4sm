@@ -184,5 +184,6 @@ USER_DATASET_VERSION_MIN_ID = 500
 USER_DATASET_VARIABLE_MIN_ID = 500
 
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
+GEOJSON_FILE_NAME = 'ismn_sensors.json'
 
 

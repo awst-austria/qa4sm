@@ -7,6 +7,7 @@ import {shareReplay} from 'rxjs/operators';
 import {DataCache} from '../../tools/DataCache';
 
 const DATASET_VERSION_URL: string = environment.API_URL + 'api/dataset-version';
+const DATASET_VERSION_GEOJSON_URL: string = environment.API_URL + 'api/dataset-version-geojson';
 const CACHE_KEY_ALL_VERSIONS = -1;
 
 @Injectable({
@@ -53,7 +54,11 @@ export class DatasetVersionService {
       this.singleRequestCache.push(versionId, datasetVersion$);
       return datasetVersion$;
     }
+  }
 
+  getGeoJSONById(versionId:number):Observable<any>{
+    const getURL = DATASET_VERSION_GEOJSON_URL + '/' + versionId;
+    return this.httpClient.get<any>(getURL).pipe(shareReplay());
   }
 
 }

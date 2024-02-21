@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {
   DatasetComponentSelectionModel
@@ -36,11 +36,11 @@ import {ValidationRunConfigService} from './service/validation-run-config.servic
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject, of, ReplaySubject} from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable, of, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
-import {delay} from 'rxjs/operators';
+import {catchError, delay, map} from 'rxjs/operators';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {
   TemporalMatchingModel
@@ -60,8 +60,8 @@ const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either co
   templateUrl: './validate.component.html',
   styleUrls: ['./validate.component.scss'],
 })
-export class ValidateComponent implements OnInit {
-  @ViewChild(MapComponent) child: MapComponent;
+export class ValidateComponent implements OnInit, AfterViewInit {
+  @ViewChild(MapComponent) mapComponent: MapComponent;
   @ViewChild(AnomaliesComponent) anomaliesChild: AnomaliesComponent;
   @ViewChild(ScalingComponent) scalingChild: ScalingComponent;
   @ViewChild('spatialReference') spatialReferenceChild: ValidationReferenceComponent;
@@ -99,6 +99,7 @@ export class ValidateComponent implements OnInit {
   isThereValidation: ExistingValidationDto;
   public isExistingValidationWindowOpen: boolean;
   maintenanceMode = false;
+  noIsmnPoints = new BehaviorSubject(false);
 
   defMaxLon = 48.3;
   defMinLon = -11.2;
@@ -129,6 +130,10 @@ export class ValidateComponent implements OnInit {
               private modalWindowService: ModalWindowService,
               private settingsService: SettingsService,
               public authService: AuthService) {
+  }
+
+  ngAfterViewInit(): void {
+    this.updateMap();
   }
 
 
@@ -391,7 +396,6 @@ export class ValidateComponent implements OnInit {
   private onGetVersionNext(versions, model, defaultVersionName): void {
     model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
     this.loadFiltersForModel(model)
-    // this.
   }
 
   private onGetVersionComplete(): void {
@@ -407,7 +411,6 @@ export class ValidateComponent implements OnInit {
       next: filters => this.onGetFiltersNext(filters, model, reloadingSettings, updatedModel$),
       error: error => this.onGetFiltersError(error, updatedModel$)
     }
-    // console.log(model)
     this.filterService.getFiltersByVersionId(model.datasetModel.selectedVersion.id).subscribe(getFiltersObserver);
     return updatedModel$;
   }
@@ -505,6 +508,7 @@ export class ValidateComponent implements OnInit {
     this.checkIfReferenceRemoved('scalingReference$');
 
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+    this.updateMap();
   }
 
   checkIfReferenceRemoved(referenceType: string): void {
@@ -547,7 +551,124 @@ export class ValidateComponent implements OnInit {
     this.setDefaultValidationPeriod();
     this.setLimitationsOnGeographicalRange();
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+
+
+    //map update
+    this.updateMap();
   }
+
+  onIsmnNetworkSelectionChange(selectedNetworks: string): void {
+    this.updateMap();
+  }
+
+  onIsmnDepthSelectionChange(selectedNetworks: string): void {
+    this.updateMap();
+  }
+
+  onBasicFilterMapUpdate($event): void{
+    if ($event){
+      this.updateMap()
+    }
+  }
+
+  updateMap() {
+    let geojsons: Observable<any>[] = [];
+    this.validationModel.datasetConfigurations.forEach(config => {
+      if (config.datasetModel.selectedVersion) {
+        geojsons.push(this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).pipe(map(value => {
+          let filteredGeoJson: any = JSON.parse(value);
+
+          if (config.ismnDepthFilter$.value != null) {
+            filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
+          }
+          if (config.ismnNetworkFilter$.value != null) {
+            filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
+          }
+
+
+          config.basicFilters.forEach(filter =>{
+            if (filter.filterDto.name === 'FIL_ISMN_FRM_representative' && filter.enabled){
+              filteredGeoJson = this.ismnFrmFilter(filteredGeoJson)
+            }
+          })
+
+          return filteredGeoJson;
+        }),
+          catchError(error => of(undefined))
+        ));
+      }
+    });
+
+    forkJoin(geojsons).subscribe(data => {
+      this.mapComponent.clearSelection();
+      data.forEach(mapData => {
+        if(mapData!=undefined){
+          this.mapComponent.addGeoJson(JSON.stringify(mapData));
+        }
+      });
+    });
+
+  }
+
+  private ismnDepthFilter(filter: string, geoJson: any): any {
+    const numbers: string[] = filter.split(',');
+    const geoJsonObj = geoJson;
+    if (numbers.length === 2) {
+      const minVal: number = parseFloat(numbers[0]);
+      const maxVal: number = parseFloat(numbers[1]);
+      if (!isNaN(minVal) && !isNaN(maxVal)) {
+
+        const filteredFeatures: any[] = geoJsonObj.features.filter((feature: any) => {
+          const minDepthValue = parseFloat(
+            feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "depth_from")?.propertyValue || "0"
+          );
+          const maxDepthValue = parseFloat(
+            feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "depth_to")?.propertyValue || "0"
+          );
+          // If min_depth or max_depth property is missing or not a valid number, include the feature in the result
+          if (isNaN(minDepthValue) || isNaN(maxDepthValue)) {
+            return true;
+          }
+          return minDepthValue >= minVal && maxDepthValue <= maxVal;
+        });
+
+        return {
+          type: geoJsonObj.type,
+          features: filteredFeatures,
+        };
+      } else {
+        console.error("Invalid ISMN depth filter param. value:", filter);
+      }
+    } else {
+      console.error("Invalid ISMN depth filter param. value:", filter);
+    }
+
+
+  }
+
+  private ismnNetworkFilter(filter: string, geoJsonObj: any): any {
+    const filteredFeatures: any[] = geoJsonObj.features.filter((feature: any) => {
+      const actualNetwork = feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "network")?.propertyValue || "Unknown"
+      return filter.includes(actualNetwork);
+    });
+
+    return {
+      type: geoJsonObj.type,
+      features: filteredFeatures,
+    };
+  }
+
+  private ismnFrmFilter(geoJsonObj: any): any {
+    const representativeClasses = ['representative', 'very representative'];
+    const filteredFeatures: any[] = geoJsonObj.features.filter((feature: any) =>
+      representativeClasses.includes(feature.properties.datasetProperties.find((prop: any) => prop.propertyName === "frm_class")?.propertyValue)
+    )
+    return {
+      type: geoJsonObj.type,
+      features: filteredFeatures,
+    };
+  }
+
 
   private getISMN(configs: DatasetConfigModel[]): DatasetConfigModel[] {
     return configs.filter(config => config.datasetModel.selectedDataset.short_name === 'ISMN');
@@ -815,6 +936,11 @@ export class ValidateComponent implements OnInit {
   disableValidateButton(validationModel): boolean {
     return validationModel.datasetConfigurations
       .filter(config => config.datasetModel?.selectedVariable?.short_name === '--none--').length !== 0;
+  }
+
+  public checkIsmnPoints(evt): void {
+    console.log(evt)
+    this.noIsmnPoints.next(evt)
   }
 
 }
