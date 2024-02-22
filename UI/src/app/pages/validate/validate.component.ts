@@ -939,7 +939,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   public checkIsmnPoints(evt): void {
-    console.log(evt)
     this.noIsmnPoints.next(evt)
   }
 
