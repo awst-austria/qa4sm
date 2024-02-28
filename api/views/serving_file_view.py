@@ -18,7 +18,6 @@ from validator.validation import get_inspection_table, get_dataset_combis_and_me
 from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
 
 
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_results(request):
@@ -209,11 +208,11 @@ def get_summary_statistics(request):
 @permission_classes([AllowAny])
 def get_user_manual(request):
     file = get_object_or_404(UserManual, id=1)
-
     with open(file.file.path, 'rb') as pdf:
         response = HttpResponse(pdf.read(), content_type='application/pdf')
-        response['Content-Disposition'] = 'filename="your_filename.pdf"'
+        response['Content-Disposition'] = f'filename={file.file}'
         return response
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
