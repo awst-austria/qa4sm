@@ -30,7 +30,7 @@
       </div>
 
       <div *ngIf="validations.length" class="w-12 my-2">
-        <qa-sorting-form (orderQueryName)="getOrder($event)"></qa-sorting-form>
+        <qa-sorting-form (orderQueryName)="getOrder($event)"/>
       </div>
 
       <!-- Rows -->
@@ -48,7 +48,7 @@
               [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
               inputId="{{valrun.id}}}">
             </p-checkbox>
-            <qa-validationrun-row [published]=published [validationRun]="valrun"></qa-validationrun-row>
+            <qa-validationrun-row [published]=published [validationRun]="valrun"/>
             <br/>
           </div>
         </div>
