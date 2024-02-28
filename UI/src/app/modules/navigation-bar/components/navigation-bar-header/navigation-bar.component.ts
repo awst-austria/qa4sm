@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, HostListener, OnInit, signal} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {Event, NavigationEnd, Router} from '@angular/router';
@@ -13,28 +13,107 @@ import {SettingsService} from '../../../core/services/global/settings.service';
 export class NavigationBarComponent implements OnInit {
 
   items: MenuItem[];
-  homeMenuItem: MenuItem;
-  validateMenuItem: MenuItem;
-  myResultsMenuItem: MenuItem;
-  publishedResultsMenuItem: MenuItem;
-  resultsMenuItem: MenuItem;
-  compareResultsMenuItem: MenuItem;
-  uploadDataMenuItem: MenuItem;
-  uploadDataHelpMenuItem: MenuItem;
-  datasetUploadMenuItem: MenuItem;
-  helpMenuItem: MenuItem;
-  userManualMenuItem: MenuItem;
-  datasetMenuItem: MenuItem;
-  termsMenuItem: MenuItem;
-  infoMenuItem: MenuItem;
-  contactMenuItem: MenuItem;
-  userMenuItem: MenuItem;
-  loginMenuItem: MenuItem;
-  logoutMenuItem: MenuItem;
-  userProfileMenuItem: MenuItem;
+  homeMenuItem: MenuItem = {
+    label: 'Home',
+    icon: 'pi pi-fw pi-home',
+    routerLink: ['home'],
+    command: () => this.setPreviousUrl('home')
+  };
+  validateMenuItem: MenuItem = {
+    label: 'Validate',
+    icon: 'pi pi-fw pi-wrench',
+    routerLink: ['validate'],
+    command: () => this.setPreviousUrl('validate')
+  };
+  myResultsMenuItem: MenuItem = {
+    label: 'My validations',
+    icon: 'pi pi-fw pi-folder',
+    routerLink: ['my-validations']
+  };
+  publishedResultsMenuItem: MenuItem = {
+    label: 'Published validations',
+    icon: 'pi pi-fw pi-globe',
+    routerLink: ['published-validations']
+  };
+  resultsMenuItem: MenuItem = {
+    label: 'Results',
+    icon: 'pi pi-fw pi-folder',
+    items: [
+      this.myResultsMenuItem,
+      this.publishedResultsMenuItem,
+    ]
+  };
+  compareResultsMenuItem: MenuItem = {
+    label: 'Compare validations',
+    icon: 'pi pi-fw pi-th-large',
+    routerLink: ['comparison'],
+  };
+  uploadDataMenuItem: MenuItem = {
+    label: 'My datasets',
+    icon: 'pi pi-fw pi-upload',
+    routerLink: ['my-datasets'],
+  };
+
+  uploadDataHelpMenuItem: MenuItem = {
+    label: 'Data Preparation',
+    icon: 'pi pi-fw pi-question',
+    routerLink: ['user-data-guidelines']
+  };
+
+  datasetUploadMenuItem: MenuItem = {
+    label: 'Dataset upload',
+    icon: 'pi pi-fw pi-upload',
+    items: [
+      this.uploadDataHelpMenuItem,
+      this.uploadDataMenuItem,
+    ]
+  };
+
+  helpMenuItem: MenuItem = {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']};
+  userManualMenuItem: MenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '', target: '_blank'}
+  datasetMenuItem: MenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']};
+  termsMenuItem: MenuItem = {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']};
+  infoMenuItem: MenuItem = {
+    label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
+      this.helpMenuItem,
+      this.userManualMenuItem,
+      this.datasetMenuItem,
+      this.termsMenuItem,
+    ]
+  };
+  contactMenuItem: MenuItem = {label: 'Contact Us', icon: 'pi pi-fw pi-envelope', routerLink: ['contact-us']};
+
+  loginMenuItem: MenuItem = {
+    label: 'Log in',
+    icon: 'pi pi-fw pi-sign-in',
+    routerLink: ['login'],
+    command: () => this.setPreviousUrl('user-profile'),
+    visible: !this.authService.authenticated.value
+  };
+
+  logoutMenuItem: MenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout()};
+  userProfileMenuItem: MenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile']};
+
+  userMenuItem: MenuItem = {
+    label: `My account`,
+    icon: 'pi pi-fw pi-user',
+    items: [
+      this.userProfileMenuItem,
+      this.logoutMenuItem,
+    ],
+  };
 
   isAuthenticated: boolean;
-  currentRoute: string = "";
+  isHomePage = signal<boolean | undefined>(undefined)
+  isLogoDisplayed = signal<boolean>(true)
+
+  longLogo: Logo = {path:  '/static/images/logo/qa4sm_logo_long.webp', height: '45', shape: 'rectangle'}
+  squareLogo: Logo = {path: '/static/images/logo/qa4sm_logo_square.webp', height: '80', shape: 'square'}
+  logo = signal<Logo>({path: undefined, height: undefined, shape: undefined});
+
+  minWindowWidthFullLogo = 1583;
+  maxWindowWidthForSquareLogo = 960;
+  noLogoWindowWidth = 660;
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -43,112 +122,28 @@ export class NavigationBarComponent implements OnInit {
 
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
-        this.currentRoute = event.url;
+        this.isHomePage.set(event.url.includes('/home'))
       }
     });
 
-    this.homeMenuItem = {
-      label: 'Home',
-      icon: 'pi pi-fw pi-home',
-      routerLink: ['home'],
-      command: () => this.setPreviousUrl('home')
-    };
-
-    this.validateMenuItem = {
-      label: 'Validate',
-      icon: 'pi pi-fw pi-wrench',
-      routerLink: ['validate'],
-      command: () => this.setPreviousUrl('validate')
-    };
-
-    this.myResultsMenuItem = {
-      label: 'My validations',
-      icon: 'pi pi-fw pi-folder',
-      routerLink: ['my-validations']
-    };
-
-    this.publishedResultsMenuItem = {
-      label: 'Published validations',
-      icon: 'pi pi-fw pi-globe',
-      routerLink: ['published-validations']
-    };
-
-    this.resultsMenuItem = {
-      label: 'Results',
-      icon: 'pi pi-fw pi-folder',
-      items: [
-        this.myResultsMenuItem,
-        this.publishedResultsMenuItem,
-      ]
-    };
-
-    this.compareResultsMenuItem = {
-      label: 'Compare validations',
-      icon: 'pi pi-fw pi-th-large',
-      routerLink: ['comparison'],
-    };
-
-    this.uploadDataMenuItem = {
-      label: 'My datasets',
-      icon: 'pi pi-fw pi-upload',
-      routerLink: ['my-datasets'],
-    };
-
-    this.uploadDataHelpMenuItem = {
-      label: 'Data Preparation',
-      icon: 'pi pi-fw pi-question',
-      routerLink: ['user-data-guidelines']
-    };
-
-    this.datasetUploadMenuItem = {
-      label: 'Dataset upload',
-      icon: 'pi pi-fw pi-upload',
-      items: [
-        this.uploadDataHelpMenuItem,
-        this.uploadDataMenuItem,
-      ]
-    };
-
-    this.helpMenuItem = {label: 'Help', icon: 'pi pi-fw pi-question', routerLink: ['help']};
-    this.userManualMenuItem = {label: 'User Manual', icon: 'pi pi-fw pi-book', url: '', target: '_blank'}
-    this.datasetMenuItem = {label: 'Datasets', icon: 'pi pi-fw pi-save', routerLink: ['datasets']};
-    this.termsMenuItem = {label: 'Terms', icon: 'pi pi-fw pi-briefcase', routerLink: ['terms']};
-    this.infoMenuItem = {
-      label: 'Info', icon: 'pi pi-fw pi-info-circle', items: [
-        this.helpMenuItem,
-        this.userManualMenuItem,
-        this.datasetMenuItem,
-        this.termsMenuItem,
-      ]
-    };
-
-    this.contactMenuItem = {label: 'Contact Us', icon: 'pi pi-fw pi-envelope', routerLink: ['contact-us']};
-
-    this.loginMenuItem = {
-      label: 'Log in',
-      icon: 'pi pi-fw pi-sign-in',
-      routerLink: ['login'],
-      command: () => this.setPreviousUrl('user-profile'),
-      visible: !this.authService.authenticated.value
-    };
-
-
-    this.userProfileMenuItem = {label: 'User profile', icon: 'pi pi-fw pi-user', routerLink: ['user-profile']};
-    this.logoutMenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout()};
-    this.userMenuItem = {
-      label: `My account`,
-      icon: 'pi pi-fw pi-user',
-      items: [
-        this.userProfileMenuItem,
-        this.logoutMenuItem,
-      ],
-    };
+    this.updateLogo(window.innerWidth);
   }
 
 
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.authStatusChanged(authenticated));
     this.setSumLink();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.updateLogo(event.target.innerWidth)
+  }
+
+  private updateLogo(windowWidth: number): void {
+    this.isLogoDisplayed.set(windowWidth > this.noLogoWindowWidth);
+    (windowWidth > this.minWindowWidthFullLogo || windowWidth <= this.maxWindowWidthForSquareLogo)
+      ? this.logo.set(this.longLogo) : this.logo.set(this.squareLogo);
   }
 
   private authStatusChanged(authenticated: boolean): void {
@@ -197,4 +192,11 @@ export class NavigationBarComponent implements OnInit {
     });
   }
 
+  protected readonly window = window;
+}
+
+interface Logo {
+  path: string | undefined,
+  height: string | undefined,
+  shape: 'square' | 'rectangle' | undefined
 }
