@@ -18,9 +18,7 @@
             <qa-dataset *ngIf="selectedDatasetModel[0].datasetModel.selectedDataset"
                         [removable]="false"
                         (changeDataset)="onDatasetChange()"
-                        [selectionModel]="selectedDatasetModel[0].datasetModel">
-
-            </qa-dataset>
+                        [selectionModel]="selectedDatasetModel[0].datasetModel"/>
 
           </p-accordionTab>
         </p-accordion>
@@ -115,8 +113,7 @@
           <qa-spatial-extent
             [extentModel]="this.spatialExtent"
             [disabled]="this.spatialExtentDisabled()"
-            (ifChecked)="unionChecked($event)">
-          </qa-spatial-extent>
+            (ifChecked)="unionChecked($event)"/>
         </div>
       </div>
     </p-panel>
