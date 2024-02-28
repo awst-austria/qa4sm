@@ -12,20 +12,20 @@
   <div class="flex flex-column flex-wrap align-content-center justify-content-center">
     <div class="flex flex-column w-8">
       <!--   validations selection   -->
-      <qa-validation-selector></qa-validation-selector>
+      <qa-validation-selector/>
       <div class="flex flex-column flex-wrap mb-5 mt-4 align-content-center justify-content-center">
         <!--       summary of the selected comparison  -->
         <div *ngIf="showComparisonResults" class="flex flex-column w-10 mt-3 comparison-result-container">
           <div  class="text-center">
             <h3 class="my-3">Validation comparison results</h3>
           </div>
-          <qa-comparison-summary></qa-comparison-summary>
+          <qa-comparison-summary/>
           <!--        visualize the validation extent-->
-          <qa-extent-visualization (isError)="handleError($event)"></qa-extent-visualization>
+          <qa-extent-visualization (isError)="handleError($event)"/>
           <!--  table section  -->
-          <qa-table-comparison (isError)="handleError($event)"></qa-table-comparison>
+          <qa-table-comparison (isError)="handleError($event)"/>
           <!--  plots section  -->
-          <qa-plots (isError)="handleError($event)"></qa-plots>
+          <qa-plots (isError)="handleError($event)"/>
         </div>
 
       </div>

@@ -18,14 +18,14 @@
           <h1 class="text-center">Validation Results</h1>
           <div class="flex flex-column w-12">
             <qa-validation-summary [validationModel]="validationModel" [validationRun]="validationRun"
-                                   (doRefresh)="update()"></qa-validation-summary>
+                                   (doRefresh)="update()"/>
           </div>
           <div *ngIf="validationRun.progress === 100 && validationRun.output_file" class="flex flex-column w-12">
-            <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"></qa-summary-statistics>
+            <qa-summary-statistics [validationRun]="validationRun" [configs]="configs"/>
           </div>
           <div *ngIf="validationRun.progress === 100 && validationRun.output_file"
                class="flex flex-column w-12 align-content-center justify-content-center">
-            <qa-result-files [validation]="validationRun"></qa-result-files>
+            <qa-result-files [validation]="validationRun"/>
           </div>
         </div>
 

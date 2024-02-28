@@ -4,7 +4,7 @@ import {DomSanitizer} from '@angular/platform-browser';
 
 
 @Component({
-  selector: 'app-map-legend',
+  selector: 'qa-map-legend',
   templateUrl: './map-legend.component.html',
   styleUrls: ['./map-legend.component.scss']
 })

@@ -233,7 +233,7 @@
         *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false"
         [validationList]="false"
         [validationRun]="validationRun" [canBeRerun]="validationRun.all_files_exist" (doUpdate)="update($event)"
-        (openPublishWindow)="handlePublishWindow($event)"></qa-buttons>
+        (openPublishWindow)="handlePublishWindow($event)"/>
 
       <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
            style="float: right">
@@ -245,7 +245,7 @@
 
   <p-dialog [modal]="true" [(visible)]="isPublishingWindowOpen">
     <qa-publishing [validationId]="validationRun.id" (openPublishWindow)="handlePublishWindow($event)"
-                   (startPublishing)="startPublishing()"></qa-publishing>
+                   (startPublishing)="startPublishing()"/>
   </p-dialog>
 
 </main>

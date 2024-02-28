@@ -17,7 +17,7 @@
     </div>
     <!--    <hr class="featurette-divider">-->
     <div class="flex flex-column pt-5 justify-content-center align-content-center">
-      <qa-user-file-upload></qa-user-file-upload>
+      <qa-user-file-upload/>
     </div>
     <hr class="featurette-divider">
     <div class="center">
@@ -33,9 +33,7 @@
           <div>
             <div *ngFor="let userDataset of userDatasetList" class="mb-3">
               <qa-user-data-row [userDataset]="userDataset"
-                                [dataManagementGroups]="dataManagementGroups">
-
-              </qa-user-data-row>
+                                [dataManagementGroups]="dataManagementGroups"/>
             </div>
           </div>
           <hr class="featurette-divider">
@@ -100,8 +98,7 @@
 
 <!--&lt;!&ndash;    <qa-share-user-data [userDataset]="userDataset"&ndash;&gt;-->
 <!--&lt;!&ndash;                        [dataManagementGroups]="dataManagementGroups"&ndash;&gt;-->
-<!--&lt;!&ndash;                        (openShareDataWindow)="manageSharingWindow($event)">&ndash;&gt;-->
-<!--&lt;!&ndash;    </qa-share-user-data>&ndash;&gt;-->
+<!--&lt;!&ndash;                        (openShareDataWindow)="manageSharingWindow($event)"/>&ndash;&gt;-->
 <!--</p-dialog>-->
 
 
