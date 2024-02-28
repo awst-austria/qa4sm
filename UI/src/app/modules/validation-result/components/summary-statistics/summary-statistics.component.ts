@@ -11,6 +11,7 @@ import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
 import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
+import {SettingsService} from '../../../core/services/global/settings.service';
 
 @Component({
   selector: 'qa-summary-statistics',
@@ -27,16 +28,26 @@ export class SummaryStatisticsComponent implements OnInit {
   refDatasetVersion$: Observable<DatasetVersionDto>;
   refDatasetVariable$: Observable<DatasetVariableDto>;
 
+  userManualLink: string;
+
   constructor(private validationService: ValidationrunService,
               private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
-              public globals: GlobalParamsService) {
+              public globals: GlobalParamsService,
+              private settingsService: SettingsService) {
   }
 
   ngOnInit(): void {
     this.getSummaryStatistics();
     this.getRefConfig();
+    this.setSumLink();
+  }
+
+  setSumLink(): void {
+    this.settingsService.getAllSettings().subscribe(data => {
+      this.userManualLink = data[0].sum_link;
+    });
   }
 
   getSummaryStatistics(): void {
