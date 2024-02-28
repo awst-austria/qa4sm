@@ -4,6 +4,7 @@ import {NavigationBarComponent} from './components/navigation-bar-header/navigat
 import {RouterModule} from '@angular/router';
 import {MenubarModule} from 'primeng/menubar';
 import {NavigationFooterComponent} from './components/navigation-footer/navigation-footer.component';
+import {ImageModule} from 'primeng/image';
 
 
 @NgModule({
@@ -12,11 +13,12 @@ import {NavigationFooterComponent} from './components/navigation-footer/navigati
     NavigationBarComponent,
     NavigationFooterComponent
   ],
-  imports: [
-    CommonModule,
-    RouterModule,
-    MenubarModule
-  ]
+    imports: [
+        CommonModule,
+        RouterModule,
+        MenubarModule,
+        ImageModule
+    ]
 })
 export class NavigationBarModule {
 }

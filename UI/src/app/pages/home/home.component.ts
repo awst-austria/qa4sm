@@ -37,7 +37,11 @@ export class HomeComponent implements OnInit {
     plot: logoUrlPrefix + 'logo_cesbio_transparent.webp',
     link: 'https://www.cesbio.cnrs.fr/homepage/',
     description: 'CESBIO'
-  },];
+  },{
+    plot: logoUrlPrefix + 'qa4sm_logo_long.webp',
+    link: '/home',
+    description: 'QA4SM'
+  }];
 
 
   videos = [
