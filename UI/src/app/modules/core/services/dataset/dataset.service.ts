@@ -1,15 +1,16 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {DatasetDto} from './dataset.dto';
-import {Observable} from 'rxjs';
+import {EMPTY, Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
-import {shareReplay} from 'rxjs/operators';
+import {catchError, shareReplay} from 'rxjs/operators';
 import {DataCache} from '../../tools/DataCache';
 
 const datasetUrl: string = environment.API_URL + 'api/dataset';
-const CACHE_KEY_ALL_DATASETS = -1;
-const CACHE_USER_DATA_INFO = -2;
-const CACHE_FILE_INFO = -2;
+// const datasetUrl: string = environment.API_URL + 'api/dataset';
+const CACHE_KEY_ALL_DATASETS = 'allDatasets';
+const CACHE_USER_DATA_INFO = 'userDataInfo';
+const CACHE_FILE_INFO = 'isThereFileInfo';
 
 @Injectable({
   providedIn: 'root'
@@ -28,19 +29,27 @@ export class DatasetService {
   }
 
   getAllDatasets(userData = false, excludeNoFiles = true): Observable<DatasetDto[]> {
+
     if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS) && this.userDataInfoCache
       .get(CACHE_USER_DATA_INFO) === userData && this.userDataInfoCache.get(CACHE_FILE_INFO) === excludeNoFiles) {
-      return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS);
+      return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS)
     } else {
       const params = new HttpParams().set('userData', String(userData))
         .set('excludeNoFiles', String(excludeNoFiles));
-      const datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, {params})
-        .pipe(shareReplay());
+      let datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, {params});
       this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, datasets$);
       this.userDataInfoCache.push(CACHE_USER_DATA_INFO, userData);
       this.userDataInfoCache.push(CACHE_FILE_INFO, excludeNoFiles);
-      return datasets$;
+      return datasets$
+        .pipe(
+          shareReplay(),
+          catchError(err => {
+            // console.error(err)
+            return EMPTY
+          })
+        );
     }
+
   }
 
   getDatasetById(datasetId: number): Observable<DatasetDto> {
@@ -53,5 +62,9 @@ export class DatasetService {
       return dataset$;
     }
   }
+
+  // errorHandlerGet(): {
+  //
+  // }
 
 }

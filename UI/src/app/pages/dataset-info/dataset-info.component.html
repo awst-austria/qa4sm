@@ -48,11 +48,7 @@
                       </span>
                     <span>
                         Filters: {{
-                        String(
-                          getPositionsOfElementsInList(dataset.filtersIds, dataset.versionsFilters[ind])
-                        ).replaceAll(',', ', ') // don't know why it's marked as an error, it's actually working
-
-
+                          getPositionsOfElementsInList(dataset.filtersIds, dataset.versionsFilters[ind]).replaceAll(',', ', ') // don't know why it's marked as an error, it's actually working
                       }}
                       </span>
                     <br>
