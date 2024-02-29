@@ -1,13 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {DatasetDto} from './dataset.dto';
-import {EMPTY, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {environment} from '../../../../../environments/environment';
 import {catchError, shareReplay} from 'rxjs/operators';
 import {DataCache} from '../../tools/DataCache';
+import {HttpErrorService} from '../global/http-error.service';
 
+// const datasetUrl: string = environment.API_URL + 'api/wrongAdress';
 const datasetUrl: string = environment.API_URL + 'api/dataset';
-// const datasetUrl: string = environment.API_URL + 'api/dataset';
 const CACHE_KEY_ALL_DATASETS = 'allDatasets';
 const CACHE_USER_DATA_INFO = 'userDataInfo';
 const CACHE_FILE_INFO = 'isThereFileInfo';
@@ -25,7 +26,8 @@ export class DatasetService {
   userDataInfoCache = new DataCache<boolean>(5);
   userFileInfoCache = new DataCache<boolean>(5);
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private httpError: HttpErrorService) {
   }
 
   getAllDatasets(userData = false, excludeNoFiles = true): Observable<DatasetDto[]> {
@@ -43,10 +45,7 @@ export class DatasetService {
       return datasets$
         .pipe(
           shareReplay(),
-          catchError(err => {
-            // console.error(err)
-            return EMPTY
-          })
+          catchError(err => this.httpError.handleError(err))
         );
     }
 
@@ -59,12 +58,9 @@ export class DatasetService {
       let getURL = datasetUrl + '/' + datasetId;
       let dataset$ = this.httpClient.get<DatasetDto>(getURL).pipe(shareReplay());
       this.singleRequestCache.push(datasetId, dataset$);
-      return dataset$;
+      return dataset$.pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
     }
   }
-
-  // errorHandlerGet(): {
-  //
-  // }
-
 }

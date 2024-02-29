@@ -2,8 +2,8 @@ import {Component} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
-import {forkJoin, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {EMPTY, forkJoin, Observable} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 
 @Component({
   selector: 'qa-dataset-info',
@@ -62,6 +62,9 @@ export class DatasetInfoComponent {
         return a.id < b.id ? -1 : 1;
       });
       return data;
+    }),
+    catchError(err => {
+      return EMPTY;
     })
   );
 
