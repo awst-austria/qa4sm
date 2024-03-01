@@ -45,8 +45,6 @@ export class ValidationrunService {
   private refresh: BehaviorSubject<string> = new BehaviorSubject('');
 
   doRefresh = this.refresh.asObservable();
-  customValidationrun$: Observable<ValidationSetDto>;
-  publishedValidationrun$: Observable<ValidationSetDto>;
 
   constructor(private httpClient: HttpClient,
               private httpError: HttpErrorService) {
