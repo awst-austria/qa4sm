@@ -39,7 +39,6 @@ export class PlotsComponent implements OnInit {
 
   getComparisonPlotsObserver = {
     next: data => this.onGetComparisonPlotsNext(data),
-    error: () => this.onGetComparisonPlotsError()
   }
 
   constructor(private comparisonService: ComparisonService,
@@ -116,7 +115,11 @@ export class PlotsComponent implements OnInit {
       parameters = parameters.append('plot_types', plotType);
     });
 
-    this.comparisonService.getComparisonPlots(parameters).subscribe(
+    this.comparisonService.getComparisonPlots(parameters)
+      .pipe(
+        catchError(() => this.onGetComparisonPlotsError())
+      )
+      .subscribe(
       this.getComparisonPlotsObserver
     );
   }
@@ -128,10 +131,11 @@ export class PlotsComponent implements OnInit {
     }
   }
 
-  private onGetComparisonPlotsError(): void {
+  private onGetComparisonPlotsError(): Observable<never> {
     this.showLoadingSpinner = false;
     this.errorHappened = true;
     this.isError.emit(true);
+    return EMPTY
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
