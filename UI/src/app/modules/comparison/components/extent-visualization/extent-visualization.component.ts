@@ -5,6 +5,8 @@ import {SafeUrl} from '@angular/platform-browser';
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
+import {catchError} from 'rxjs/operators';
+import {EMPTY, Observable} from 'rxjs';
 
 @Component({
   selector: 'qa-extent-visualization',
@@ -56,10 +58,13 @@ export class ExtentVisualizationComponent implements OnInit {
 
     const getComparisonExtentImageObserver = {
       next: data => this.onGetComparisonExtentImageNext(data),
-      error: () => this.onGetComparisonExtentImageError()
     }
 
-    this.comparisonService.getComparisonExtentImage(parameters).subscribe(getComparisonExtentImageObserver);
+    this.comparisonService.getComparisonExtentImage(parameters)
+      .pipe(
+        catchError(() => this.onGetComparisonExtentImageError())
+      )
+      .subscribe(getComparisonExtentImageObserver);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
@@ -73,10 +78,11 @@ export class ExtentVisualizationComponent implements OnInit {
     }
   }
 
-  private onGetComparisonExtentImageError(): void {
+  private onGetComparisonExtentImageError(): Observable<never> {
     this.showLoadingSpinner = false;
     this.errorHappened = true;
     this.isError.emit(true);
+    return EMPTY;
   }
 
 }
