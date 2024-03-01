@@ -18,8 +18,7 @@ export class TableComparisonComponent implements OnInit {
   showLoadingSpinner = true;
   errorHappened = false;
   getComparisonTableObserver = {
-    next: data => this.onGetComparisonTableNext(data),
-    error: () => this.onGetComparisonTableError()
+    next: data => this.onGetComparisonTableNext(data)
   }
 
   constructor(private comparisonService: ComparisonService) {
@@ -70,7 +69,11 @@ export class TableComparisonComponent implements OnInit {
   }
 
   getComparisonTable(parameters): void {
-    this.comparisonService.getComparisonTable(parameters).subscribe(this.getComparisonTableObserver);
+    this.comparisonService.getComparisonTable(parameters)
+      .pipe(
+        catchError(() => this.onGetComparisonTableError())
+      )
+      .subscribe(this.getComparisonTableObserver);
   }
 
   private onGetComparisonTableNext(data): void {
@@ -80,10 +83,11 @@ export class TableComparisonComponent implements OnInit {
     }
   }
 
-  private onGetComparisonTableError(): void {
+  private onGetComparisonTableError(): Observable<never> {
     this.showLoadingSpinner = false;
     this.errorHappened = true;
     this.isError.emit(true);
+    return EMPTY
   }
 
   getComparisonTableAsCsv(): void {
