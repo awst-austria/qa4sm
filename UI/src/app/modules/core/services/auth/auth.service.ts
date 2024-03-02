@@ -5,6 +5,7 @@ import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
+import {HttpErrorService} from '../global/http-error.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +44,8 @@ export class AuthService {
   private passwordResetToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private previousUrl: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private httpError: HttpErrorService) {
     this.init();
   }
 
@@ -113,28 +115,46 @@ export class AuthService {
 
 
   signUp(userForm: any): Observable<any> {
-    return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'});
+    return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   updateUser(userForm: any): Observable<any> {
-    return this.httpClient.patch(this.userUpdateUrl, userForm);
+    return this.httpClient.patch(this.userUpdateUrl, userForm)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   deactivateUser(username: any): Observable<any> {
-    return this.httpClient.delete<UserDto>(this.userDeleteUrl, username);
+    return this.httpClient.delete<UserDto>(this.userDeleteUrl, username)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   resetPassword(resetPasswordForm: any): Observable<any> {
-    return this.httpClient.post(this.passwordResetUrl, resetPasswordForm);
+    return this.httpClient.post(this.passwordResetUrl, resetPasswordForm)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   setPassword(setPasswordForm: any, token: string): Observable<any> {
     const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
-    return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm);
+    return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm)
+      .pipe(
+      catchError(err => this.httpError.handleError(err))
+    );
   }
 
   validateResetPasswordToken(tkn: string): Observable<any> {
-    return this.httpClient.post(this.validateTokenUrl, {token: tkn});
+    return this.httpClient.post(this.validateTokenUrl, {token: tkn})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   checkPasswordResetToken(): Observable<string> {
@@ -154,7 +174,10 @@ export class AuthService {
   }
 
   sendSupportRequest(messageForm): Observable<any> {
-    return this.httpClient.post(this.contactUrl, messageForm);
+    return this.httpClient.post(this.contactUrl, messageForm)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
 }
