@@ -36,7 +36,7 @@ import {ValidationRunConfigService} from './service/validation-run-config.servic
 
 import {ToastService} from '../../modules/core/services/toast/toast.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject, forkJoin, Observable, of, ReplaySubject} from 'rxjs';
+import {BehaviorSubject, EMPTY, forkJoin, Observable, of, ReplaySubject} from 'rxjs';
 import {MapComponent} from '../../modules/map/components/map/map.component';
 import {ModalWindowService} from '../../modules/core/services/global/modal-window.service';
 import {ExistingValidationDto} from '../../modules/core/services/validation-run/existing-validation.dto';
@@ -249,7 +249,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       newDatasetConfigModel.temporalReference$.next(datasetConfig.is_temporal_reference);
       newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
 
-      this.datasetService.getDatasetById(datasetConfig.dataset_id).subscribe(dataset => {
+      this.datasetService.getDatasetById(datasetConfig.dataset_id)
+        .pipe(
+          catchError(() => EMPTY)
+        )
+        .subscribe(dataset => {
         newDatasetConfigModel.datasetModel.selectedDataset = dataset;
 
         if (datasetConfig.is_spatial_reference) {
@@ -369,7 +373,11 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     );
     targetArray.push(model);
     // get all datasets
-    this.datasetService.getAllDatasets(userData).subscribe(datasets => {
+    this.datasetService.getAllDatasets(userData)
+      .pipe(
+        catchError(() => EMPTY)
+      )
+      .subscribe(datasets => {
       model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === defaultDatasetName);
 
 
