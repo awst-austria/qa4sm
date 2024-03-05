@@ -8,7 +8,6 @@ import {ValidationResultComponent} from './pages/validation-result/validation-re
 import {UserProfileComponent} from './pages/user-profile/user-profile.component';
 import {PublishedValidationsComponent} from './pages/published-validations/published-validations.component';
 import {ValidationsComponent} from './pages/validations/validations.component';
-import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
