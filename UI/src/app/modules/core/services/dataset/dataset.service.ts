@@ -34,17 +34,21 @@ export class DatasetService {
 
     if (this.arrayRequestCache.isCached(CACHE_KEY_ALL_DATASETS) && this.userDataInfoCache
       .get(CACHE_USER_DATA_INFO) === userData && this.userDataInfoCache.get(CACHE_FILE_INFO) === excludeNoFiles) {
-      return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS)
+      return this.arrayRequestCache.get(CACHE_KEY_ALL_DATASETS).pipe(
+        catchError(err => this.httpError.handleError(err))
+      )
     } else {
       const params = new HttpParams().set('userData', String(userData))
         .set('excludeNoFiles', String(excludeNoFiles));
-      let datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, {params});
+      const datasets$ = this.httpClient.get<DatasetDto[]>(datasetUrl, {params})
+        .pipe(
+          shareReplay()
+        );
       this.arrayRequestCache.push(CACHE_KEY_ALL_DATASETS, datasets$);
       this.userDataInfoCache.push(CACHE_USER_DATA_INFO, userData);
       this.userDataInfoCache.push(CACHE_FILE_INFO, excludeNoFiles);
       return datasets$
         .pipe(
-          shareReplay(),
           catchError(err => this.httpError.handleError(err))
         );
     }
