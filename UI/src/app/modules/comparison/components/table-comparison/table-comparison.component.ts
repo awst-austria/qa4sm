@@ -2,7 +2,8 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {ComparisonService} from '../../services/comparison.service';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
-import {debounceTime} from 'rxjs/operators';
+import {catchError, debounceTime} from 'rxjs/operators';
+import {EMPTY, Observable} from 'rxjs';
 
 @Component({
   selector: 'qa-table-comparison',
@@ -17,8 +18,7 @@ export class TableComparisonComponent implements OnInit {
   showLoadingSpinner = true;
   errorHappened = false;
   getComparisonTableObserver = {
-    next: data => this.onGetComparisonTableNext(data),
-    error: () => this.onGetComparisonTableError()
+    next: data => this.onGetComparisonTableNext(data)
   }
 
   constructor(private comparisonService: ComparisonService) {
@@ -46,7 +46,11 @@ export class TableComparisonComponent implements OnInit {
     ids.forEach(id => {
       parameters = parameters.append('ids', id);
     });
-    this.comparisonService.getMetrics4Comparison(parameters).subscribe(response => {
+    this.comparisonService.getMetrics4Comparison(parameters)
+      .pipe(
+        catchError(() => this.getComparisonMetricsErrorHandler())
+      )
+      .subscribe(response => {
       if (response) {
         response.forEach(metric => {
           // comparisonMetrics.push(metric.metric_query_name);
@@ -58,8 +62,18 @@ export class TableComparisonComponent implements OnInit {
     });
   }
 
+  getComparisonMetricsErrorHandler(): Observable<never>{
+    this.errorHappened = true;
+    this.showLoadingSpinner = false;
+    return EMPTY
+  }
+
   getComparisonTable(parameters): void {
-    this.comparisonService.getComparisonTable(parameters).subscribe(this.getComparisonTableObserver);
+    this.comparisonService.getComparisonTable(parameters)
+      .pipe(
+        catchError(() => this.onGetComparisonTableError())
+      )
+      .subscribe(this.getComparisonTableObserver);
   }
 
   private onGetComparisonTableNext(data): void {
@@ -69,10 +83,11 @@ export class TableComparisonComponent implements OnInit {
     }
   }
 
-  private onGetComparisonTableError(): void {
+  private onGetComparisonTableError(): Observable<never> {
     this.showLoadingSpinner = false;
     this.errorHappened = true;
     this.isError.emit(true);
+    return EMPTY
   }
 
   getComparisonTableAsCsv(): void {

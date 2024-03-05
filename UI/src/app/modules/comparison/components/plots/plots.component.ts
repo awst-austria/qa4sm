@@ -3,11 +3,12 @@ import {ComparisonService} from '../../services/comparison.service';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {MetricsComparisonDto} from '../../services/metrics-comparison.dto';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {SafeUrl} from '@angular/platform-browser';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {ExtentModel} from '../spatial-extent/extent-model';
-import {debounceTime} from 'rxjs/operators';
+import {catchError, debounceTime} from 'rxjs/operators';
+import {EMPTY, Observable} from 'rxjs';
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'mapplot'];
@@ -38,11 +39,9 @@ export class PlotsComponent implements OnInit {
 
   getComparisonPlotsObserver = {
     next: data => this.onGetComparisonPlotsNext(data),
-    error: () => this.onGetComparisonPlotsError()
   }
 
   constructor(private comparisonService: ComparisonService,
-              private domSanitizer: DomSanitizer,
               private plotService: WebsiteGraphicsService) {
   }
 
@@ -71,7 +70,13 @@ export class PlotsComponent implements OnInit {
       params = params.append('ids', id);
     });
     this.comparisonMetrics = [];
-    this.comparisonService.getMetrics4Comparison(params).subscribe(
+    this.comparisonService.getMetrics4Comparison(params)
+      .pipe(
+        catchError(err => {
+          return this.getComparisonMetricsErrorHandler(err)
+        })
+      )
+      .subscribe(
       response => {
         if (response && response.length > 1) {
           response.forEach(metric => {
@@ -80,10 +85,15 @@ export class PlotsComponent implements OnInit {
           });
           this.selectedMetric = this.comparisonMetrics[0];
           this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
-        } else {
-          this.metricsErrorMessage = response[0].message; // this message can be shown somewhere so users know what is wrong
         }
       });
+  }
+
+  getComparisonMetricsErrorHandler(err: string): Observable<never>{
+    this.metricsErrorMessage = err;
+    this.errorHappened = true;
+    this.showLoadingSpinner = false;
+    return EMPTY
   }
 
   showGallery(index: number = 0): void {
@@ -105,7 +115,11 @@ export class PlotsComponent implements OnInit {
       parameters = parameters.append('plot_types', plotType);
     });
 
-    this.comparisonService.getComparisonPlots(parameters).subscribe(
+    this.comparisonService.getComparisonPlots(parameters)
+      .pipe(
+        catchError(() => this.onGetComparisonPlotsError())
+      )
+      .subscribe(
       this.getComparisonPlotsObserver
     );
   }
@@ -117,10 +131,11 @@ export class PlotsComponent implements OnInit {
     }
   }
 
-  private onGetComparisonPlotsError(): void {
+  private onGetComparisonPlotsError(): Observable<never> {
     this.showLoadingSpinner = false;
     this.errorHappened = true;
     this.isError.emit(true);
+    return EMPTY
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {

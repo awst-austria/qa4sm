@@ -2,13 +2,13 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 
-import {Observable} from 'rxjs';
+import {EMPTY, Observable} from 'rxjs';
 import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetComponentSelectionModel} from './dataset-component-selection-model';
 import {DatasetVariableDto} from '../../../core/services/dataset/dataset-variable.dto';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
-import {map} from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 
@@ -52,7 +52,12 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.allDatasets$ = this.datasetService.getAllDatasets(true);
+    this.allDatasets$ = this.datasetService.getAllDatasets(true)
+      .pipe(
+        catchError((err) => {
+          return EMPTY
+        })
+      );
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
       if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0

@@ -1,12 +1,12 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {HttpParams} from '@angular/common/http';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {SafeUrl} from '@angular/platform-browser';
 import {ExtentModel} from '../spatial-extent/extent-model';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
+import {catchError} from 'rxjs/operators';
+import {EMPTY, Observable} from 'rxjs';
 
 @Component({
   selector: 'qa-extent-visualization',
@@ -26,10 +26,7 @@ export class ExtentVisualizationComponent implements OnInit {
   errorHappened = false;
   img: string;
 
-  constructor(private validationRunService: ValidationrunService,
-              private datasetConfigurationService: DatasetConfigurationService,
-              private comparisonService: ComparisonService,
-              private domSanitizer: DomSanitizer,
+  constructor(private comparisonService: ComparisonService,
               private plotService: WebsiteGraphicsService) {
   }
 
@@ -61,10 +58,13 @@ export class ExtentVisualizationComponent implements OnInit {
 
     const getComparisonExtentImageObserver = {
       next: data => this.onGetComparisonExtentImageNext(data),
-      error: () => this.onGetComparisonExtentImageError()
     }
 
-    this.comparisonService.getComparisonExtentImage(parameters).subscribe(getComparisonExtentImageObserver);
+    this.comparisonService.getComparisonExtentImage(parameters)
+      .pipe(
+        catchError(() => this.onGetComparisonExtentImageError())
+      )
+      .subscribe(getComparisonExtentImageObserver);
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
@@ -78,10 +78,11 @@ export class ExtentVisualizationComponent implements OnInit {
     }
   }
 
-  private onGetComparisonExtentImageError(): void {
+  private onGetComparisonExtentImageError(): Observable<never> {
     this.showLoadingSpinner = false;
     this.errorHappened = true;
     this.isError.emit(true);
+    return EMPTY;
   }
 
 }

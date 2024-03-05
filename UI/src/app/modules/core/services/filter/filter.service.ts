@@ -1,11 +1,12 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {shareReplay} from 'rxjs/operators';
+import {catchError, shareReplay} from 'rxjs/operators';
 import {environment} from '../../../../../environments/environment';
 import {FilterDto} from './filter.dto';
 import {DataCache} from '../../tools/DataCache';
 import {ParameterisedFilterDto} from './parameterised-filter.dto';
+import {HttpErrorService} from '../global/http-error.service';
 
 
 const dataFilterUrl: string = environment.API_URL + 'api/data-filter';
@@ -26,7 +27,8 @@ export class FilterService {
   singleRequestCacheParam = new DataCache<Observable<ParameterisedFilterDto>>(5);
 
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private httpError: HttpErrorService) {
   }
 
   getAllFilters(): Observable<FilterDto[]> {
@@ -35,7 +37,10 @@ export class FilterService {
     } else {
       let filters$ = this.httpClient.get<FilterDto[]>(dataFilterUrl).pipe(shareReplay());
       this.arrayRequestCache.push(CACHE_KEY_ALL_FILTERS, filters$);
-      return filters$;
+      return filters$
+        .pipe(
+          catchError(err => this.httpError.handleError(err))
+        );
     }
   }
 
@@ -47,7 +52,10 @@ export class FilterService {
       let getUrl = dataFilterUrl + '/' + datasetId;
       let filters$ = this.httpClient.get<FilterDto[]>(getUrl).pipe(shareReplay());
       this.arrayRequestCache.push(datasetId, filters$);
-      return filters$;
+      return filters$
+        .pipe(
+          catchError(err => this.httpError.handleError(err))
+        );
     }
   }
 
@@ -57,7 +65,10 @@ export class FilterService {
     } else {
       const paramFilters$ = this.httpClient.get<ParameterisedFilterDto[]>(dataParameterisedFilterUrl).pipe(shareReplay());
       this.arrayRequestCacheParam.push(CACHE_KEY_ALL_FILTERS, paramFilters$);
-      return paramFilters$;
+      return paramFilters$
+        .pipe(
+          catchError(err => this.httpError.handleError(err))
+        );
     }
   }
 

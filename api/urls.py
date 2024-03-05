@@ -121,7 +121,6 @@ urlpatterns = [
     path('scaling-methods', get_scaling_methods, name='Scaling methods'),
     path('support-request', send_support_request, name='Support request'),
     re_path(r'^dataset-version-geojson/(?P<version_id>.+)/$', dataset_version_geojson_by_id),
-    path('support-request', send_support_request, name='Support request'),
     path('data-management-groups', get_data_management_groups, name='Get data management groups'),
     path('manage-data-in-management-group', manage_data_in_group,
          name='Add data to management groups'),

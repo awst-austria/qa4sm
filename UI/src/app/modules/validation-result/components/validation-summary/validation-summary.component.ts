@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
-import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable} from 'rxjs';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
@@ -73,13 +73,13 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   private updateConfig(): void {
-    this.configurations$ = combineLatest(
-      this.validationModel.datasetConfigs,
+    this.configurations$ = forkJoin(
+      [this.validationModel.datasetConfigs,
       this.datasetService.getAllDatasets(true, false),
       this.datasetVersionService.getAllVersions(),
       this.datasetVariableService.getAllVariables(),
       this.filterService.getAllFilters(),
-      this.filterService.getAllParameterisedFilters()
+      this.filterService.getAllParameterisedFilters()]
     ).pipe(
       map(([configurations,
              datasets,

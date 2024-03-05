@@ -8,6 +8,8 @@ import {Validations2CompareModel} from '../components/validation-selector/valida
 import {ExtentModel} from '../components/spatial-extent/extent-model';
 import {PlotDto} from '../../core/services/global/plot.dto';
 import {saveAs} from 'file-saver-es';
+import {catchError} from 'rxjs/operators';
+import {HttpErrorService} from '../../core/services/global/http-error.service';
 
 const urlPrefix = environment.API_URL + 'api';
 const comparisonPlotsUrl: string = urlPrefix + '/plots-comparison';
@@ -31,7 +33,8 @@ export class ComparisonService {
   private comparisonModelSubject = new BehaviorSubject<Validations2CompareModel>(this.comparisonModel);
   currentComparisonModel = this.comparisonModelSubject.asObservable();
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private httpError: HttpErrorService) {
   }
 
   sendComparisonModel(newModel: Validations2CompareModel): void{
@@ -49,12 +52,18 @@ export class ComparisonService {
 
   getMetrics4Comparison(params: any): Observable<MetricsComparisonDto[]> {
     // return all the metrics for the comparison configuration
-    return this.httpClient.get<MetricsComparisonDto[]>(metrics4ComparisonUrl, {params});
+    return this.httpClient.get<MetricsComparisonDto[]>(metrics4ComparisonUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getComparisonTable(params: any): Observable<any> {
     // create htm table in comparison page
-    return this.httpClient.get(comparisonTableUrl, {params, headers, responseType: 'text'});
+    return this.httpClient.get(comparisonTableUrl, {params, headers, responseType: 'text'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   downloadComparisonTableCsv(ids: string[], metricList: string[], getIntersection: boolean, extent: string): void {
@@ -77,10 +86,12 @@ export class ComparisonService {
   }
 
   getComparisonPlots(params: any): Observable<PlotDto[]> {
-    return this.httpClient.get<PlotDto[]>(comparisonPlotsUrl, {params});
+    return this.httpClient.get<PlotDto[]>(comparisonPlotsUrl, {params})
+      .pipe(catchError(err => this.httpError.handleError(err)));
   }
 
   getComparisonExtentImage(params: any): Observable<string> {
-    return this.httpClient.get<string>(comparisonExtentImageUrl, {params});
+    return this.httpClient.get<string>(comparisonExtentImageUrl, {params})
+      .pipe(catchError(err => this.httpError.handleError(err)));
   }
 }
