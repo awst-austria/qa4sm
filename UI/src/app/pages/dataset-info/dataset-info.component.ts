@@ -19,6 +19,7 @@ export class DatasetInfoComponent {
       value: false}
   ]
   allSelected: boolean;
+  errorOccured = false;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -64,6 +65,7 @@ export class DatasetInfoComponent {
       return data;
     }),
     catchError(err => {
+      this.errorOccured = true;
       return EMPTY;
     })
   );
