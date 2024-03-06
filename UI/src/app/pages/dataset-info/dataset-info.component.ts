@@ -2,7 +2,7 @@ import {Component} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../modules/core/services/dataset/dataset-version.service';
 import {FilterService} from '../../modules/core/services/filter/filter.service';
-import {EMPTY, forkJoin, Observable} from 'rxjs';
+import {combineLatest, EMPTY, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 @Component({
@@ -26,7 +26,7 @@ export class DatasetInfoComponent {
   }
 
 
-  datasetInfo$: Observable<any> = forkJoin([
+  datasetInfo$: Observable<any> = combineLatest([
     this.datasetService.getAllDatasets(),
     this.versionService.getAllVersions(),
     this.filterService.getAllFilters()
