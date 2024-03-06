@@ -743,16 +743,16 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private onStartValidationError(error) {
-    if (this.authService.authenticated.getValue()) {
+    if (this.authService.authenticated$.getValue()) {
       const validationErrorMessage = this.messageAboutValidationErrors(error);
       this.toastService.showErrorWithHeader('Error', 'Your validation could not be started. \n\n' + validationErrorMessage);
     } else {
-      this.logInToValidate = !this.authService.authenticated.getValue();
+      this.logInToValidate = !this.authService.authenticated$.getValue();
     }
   }
 
   setLoggedIn(): void {
-    this.authService.authenticated.subscribe(authenticated => {
+    this.authService.authenticated$.subscribe(authenticated => {
       this.logInToValidate = !authenticated;
     });
   }

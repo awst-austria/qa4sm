@@ -1,7 +1,6 @@
 import {Component, HostListener, OnInit, Renderer2} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {DomSanitizer} from '@angular/platform-browser';
 
@@ -62,8 +61,6 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  settings$: Observable<any>;
-
   userLoggedIn: boolean;
 
   animationFadeInDownClass = ['fadeindown', 'animation-duration-1000', 'animation-iteration-1']
@@ -121,6 +118,8 @@ export class HomeComponent implements OnInit {
     teamLogo: 'md:w-2 w-12 md:ml-5 ml-3 partner-logo flex align-items-center justify-content-center text-center fadeInLeft'
   }
 
+  settings$ = this.settingsService.getAllSettings();
+
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
               private router: Router,
@@ -129,8 +128,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
-    this.settings$ = this.settingsService.getAllSettings();
+    this.authService.authenticated$.subscribe(authenticated => this.userLoggedIn = authenticated);
   }
 
   goToNews(): void {

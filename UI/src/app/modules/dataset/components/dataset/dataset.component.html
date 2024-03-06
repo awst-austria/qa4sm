@@ -7,13 +7,13 @@
       <ng-template let-item pTemplate="item">
           <span>
             <span>{{item.pretty_name}} <em
-              *ngIf="authService.authenticated.value">{{item.user === authService.currentUser.id ? "  (user data)" :
+              *ngIf="authService.authenticated$.value">{{item.user === authService.currentUser.id ? "  (user data)" :
               (item.user !== authService.currentUser.id && item.is_shared ? ' (shared data)' : "")}}</em> </span>
           </span>
       </ng-template>
       <ng-template let-item pTemplate="selectedItem">
          <span>{{item.pretty_name}} <em
-           *ngIf="authService.authenticated.value">{{item.user === authService.currentUser.id ? "  (user data)" :
+           *ngIf="authService.authenticated$.value">{{item.user === authService.currentUser.id ? "  (user data)" :
            (item.user !== authService.currentUser.id && item.is_shared ? " (shared data)" : "")}}</em> </span>
       </ng-template>
     </p-dropdown>

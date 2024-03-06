@@ -39,7 +39,7 @@ export class AuthService {
     is_staff: false,
     is_superuser: false
   };
-  public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public authenticated$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
   private passwordResetToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
   private previousUrl: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -55,7 +55,7 @@ export class AuthService {
       .subscribe(
         data => {
           this.currentUser = data;
-          this.authenticated.next(true);
+          this.authenticated$.next(true);
         }
       );
   }
@@ -81,12 +81,12 @@ export class AuthService {
 
   private onLoginNext(data, authResult): void {
     this.currentUser = data;
-    this.authenticated.next(true);
+    this.authenticated$.next(true);
     authResult.next(true);
   }
 
   private onLoginError(error, authResult): void {
-    this.authenticated.next(false);
+    this.authenticated$.next(false);
     authResult.next(false);
   }
 
@@ -105,7 +105,7 @@ export class AuthService {
 
   private onLogoutNext(data, logoutResult): void {
     this.currentUser = this.emptyUser;
-    this.authenticated.next(false);
+    this.authenticated$.next(false);
     logoutResult.next(true);
   }
 

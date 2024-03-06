@@ -127,7 +127,7 @@ export class UserFormComponent implements OnInit {
     this.userService.deactivateUser(username).subscribe(
       () => {
         this.userService.currentUser = this.userService.emptyUser;
-        this.userService.authenticated.next(false);
+        this.userService.authenticated$.next(false);
         this.router.navigate(['/deactivate-user-complete']);
       }
     );
