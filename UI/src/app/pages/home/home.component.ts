@@ -1,12 +1,10 @@
-import {Component, HostListener, OnInit, Renderer2} from '@angular/core';
+import {Component, HostListener, Renderer2} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
 import {Router} from '@angular/router';
 import {DomSanitizer} from '@angular/platform-browser';
 
-const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
-const videosPrefix = 'static/videos/'
 
 
 @Component({
@@ -14,7 +12,7 @@ const videosPrefix = 'static/videos/'
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
 
   logoFiles = [{
     plot: logoUrlPrefix + 'logo_awst.webp',
@@ -61,7 +59,7 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  userLoggedIn: boolean;
+  userLoggedIn$ = this.authService.authenticated$;
 
   animationFadeInDownClass = ['fadeindown', 'animation-duration-1000', 'animation-iteration-1']
   animationFadeInClass = ['fadein', 'animation-duration-3000', 'animation-iteration-1']
@@ -127,14 +125,9 @@ export class HomeComponent implements OnInit {
               private renderer: Renderer2) {
   }
 
-  ngOnInit(): void {
-    this.authService.authenticated$.subscribe(authenticated => this.userLoggedIn = authenticated);
-  }
-
   goToNews(): void {
     this.router.navigate([], {fragment: "qa4smNews"});
   }
-
 
   animations(element): string[] {
     if (element.includes('fadeInOut')) {
