@@ -13,16 +13,7 @@ const globalContextUrl: string = environment.API_URL + 'api/globals';
 export class GlobalParamsService {
 
   // globalContext$: Observable<GlobalContextDto[]>;
-  public globalContext: GlobalParamsDto = {
-  admin_mail: '',
-  doi_prefix: '',
-  site_url: '',
-  app_version: '',
-  expiry_period: '',
-  warning_period: '',
-  temporal_matching_default: null
-  };
-
+  public globalContext: GlobalParamsDto;
   tooltipLifetime = 2000; // needed to set it somewhere global;
 
   constructor(private httpClient: HttpClient,
