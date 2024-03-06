@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {ExtraOptions, RouterModule, Routes} from '@angular/router';
 import {HomeComponent} from './pages/home/home.component';
 import {ValidateComponent} from './pages/validate/validate.component';
-import {ErrorComponent} from './pages/error/error.component';
+import {ErrorPageComponent} from './pages/error/error-page.component';
 import {AuthGuard} from './auth.guard';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
 import {UserProfileComponent} from './pages/user-profile/user-profile.component';
@@ -51,7 +51,7 @@ const routes: Routes = [
   {path: 'my-datasets', component: MyDatasetsComponent, canActivate: [AuthGuard]},
   {path: 'user-data-guidelines', component: UserDataGuidelinesComponent},
   {path: 'contact-us', component: ContactUsComponent},
-  {path: '**', component: ErrorComponent}
+  {path: '**', component: ErrorPageComponent}
 ];
 
 const routerOptions: ExtraOptions = {

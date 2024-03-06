@@ -10,7 +10,7 @@ import {NavigationBarModule} from './modules/navigation-bar/navigation-bar.modul
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import {ErrorComponent} from './pages/error/error.component';
+import {ErrorPageComponent} from './pages/error/error-page.component';
 
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
@@ -82,7 +82,7 @@ import {SelectButtonModule} from 'primeng/selectbutton';
     AppComponent,
     HomeComponent,
     ValidateComponent,
-    ErrorComponent,
+    ErrorPageComponent,
     ValidationsComponent,
     ValidationResultComponent,
     LoginComponent,
