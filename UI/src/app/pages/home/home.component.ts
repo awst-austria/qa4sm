@@ -59,7 +59,7 @@ export class HomeComponent {
     }
   ];
 
-  userLoggedIn$ = this.authService.authenticated$;
+  userLoggedIn$ = this.authService.authenticated;
 
   animationFadeInDownClass = ['fadeindown', 'animation-duration-1000', 'animation-iteration-1']
   animationFadeInClass = ['fadein', 'animation-duration-3000', 'animation-iteration-1']

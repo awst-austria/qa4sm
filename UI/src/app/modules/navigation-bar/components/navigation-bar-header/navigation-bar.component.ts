@@ -88,7 +88,7 @@ export class NavigationBarComponent implements OnInit {
     icon: 'pi pi-fw pi-sign-in',
     routerLink: ['login'],
     command: () => this.setPreviousUrl('user-profile'),
-    visible: !this.authService.authenticated$.value
+    visible: !this.authService.authenticated.value
   };
 
   logoutMenuItem: MenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout()};
@@ -131,7 +131,7 @@ export class NavigationBarComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.authService.authenticated$.subscribe(authenticated => this.authStatusChanged(authenticated));
+    this.authService.authenticated.subscribe(authenticated => this.authStatusChanged(authenticated));
     this.setSumLink();
   }
 

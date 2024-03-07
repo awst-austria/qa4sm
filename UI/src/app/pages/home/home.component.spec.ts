@@ -17,8 +17,8 @@ describe('HomeComponent', () => {
     const settingsServiceSpy = jasmine.createSpyObj('SettingsService', ['getAllSettings']);
     const galleryServiceSpy = jasmine.createSpyObj('Gallery', ['load']);
     fakeIsAuthenticated$ = new BehaviorSubject<boolean>(false);
-    const fakeAuthService: Pick<AuthService, 'authenticated$'> = {
-      authenticated$: fakeIsAuthenticated$
+    const fakeAuthService: Pick<AuthService, 'authenticated'> = {
+      authenticated: fakeIsAuthenticated$
     };
 
     getAllSettingsSpy = settingsServiceSpy.getAllSettings.and.returnValue(fakeSettings);

@@ -28,7 +28,9 @@ export class LoginComponent implements OnInit {
 
   formMessages = [];
 
-  constructor(private loginService: AuthService, private router: Router, private toastService: ToastService) {
+  constructor(private loginService: AuthService,
+              private router: Router,
+              private toastService: ToastService) {
   }
 
   ngOnInit(): void {
