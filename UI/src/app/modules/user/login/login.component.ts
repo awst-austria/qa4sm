@@ -34,9 +34,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loginService.checkPreviousUrl().subscribe(previousUrl => {
-      this.prevUrl = previousUrl;
-    });
+    this.loginService.previousUrl$.subscribe(previousUrl => this.prevUrl = previousUrl);
   }
 
   onSubmit() {
@@ -57,9 +55,5 @@ export class LoginComponent implements OnInit {
         this.toastService.showErrorWithHeader('Login failed', 'Wrong username or password');
       }
     });
-  }
-
-  get diagnostic() {
-    return JSON.stringify(this.loginDto);
   }
 }

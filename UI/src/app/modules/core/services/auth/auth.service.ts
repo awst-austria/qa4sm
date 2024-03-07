@@ -41,8 +41,12 @@ export class AuthService {
   };
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
-  private passwordResetToken: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  private previousUrl: BehaviorSubject<string> = new BehaviorSubject<string>('');
+
+  private passwordResetTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  passwordResetToken$: Observable<string> = this.passwordResetTokenSubject.asObservable();
+
+  private previousUrlSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  previousUrl$: Observable<string> = this.previousUrlSubject.asObservable();
 
   constructor(private httpClient: HttpClient,
               private httpError: HttpErrorService) {
@@ -157,20 +161,12 @@ export class AuthService {
       );
   }
 
-  checkPasswordResetToken(): Observable<string> {
-    return this.passwordResetToken.asObservable();
-  }
-
   setPasswordResetToken(newToken: string): void {
-    this.passwordResetToken.next(newToken);
-  }
-
-  checkPreviousUrl(): Observable<string> {
-    return this.previousUrl.asObservable();
+    this.passwordResetTokenSubject.next(newToken);
   }
 
   setPreviousUrl(prevUrl: string): void {
-    this.previousUrl.next(prevUrl);
+    this.previousUrlSubject.next(prevUrl);
   }
 
   sendSupportRequest(messageForm): Observable<any> {
