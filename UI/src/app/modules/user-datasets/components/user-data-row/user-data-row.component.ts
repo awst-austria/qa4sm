@@ -22,8 +22,7 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   @Input() dataManagementGroups: DataManagementGroupsDto[];
   // @Output() openShareDataWindow = new EventEmitter<any>()
 
-  datasetGroups$: BehaviorSubject<DataManagementGroupsDto[]> =
-    new BehaviorSubject<DataManagementGroupsDto[]>([])
+  datasetGroups$: BehaviorSubject<DataManagementGroupsDto[]> = new BehaviorSubject<DataManagementGroupsDto[]>([])
   datasetName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   versionName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   variableName: {
