@@ -26,8 +26,6 @@ export class LoginComponent implements OnInit {
     password: new FormControl<string>(this.loginDto.password, Validators.required),
   });
 
-  formMessages = [];
-
   constructor(private loginService: AuthService,
               private router: Router,
               private toastService: ToastService) {
