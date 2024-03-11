@@ -18,7 +18,7 @@ export class HttpErrorService {
     } else {
       console.error(`Problem on the server side. Server returned code: ${err.status}.
       Error message is: ${err.statusText}`)
-      errorMessage = `${err.error.message ? err.error.message : err.statusText}`;
+      errorMessage = `${err.error.message ? err.error.message : ''}`;
     }
     return {status: err.status, message: errorMessage};
   }
@@ -30,7 +30,7 @@ export class HttpErrorService {
 
 }
 
-interface CustomHttpError {
+export interface CustomHttpError {
   status: number,
   message: string
 }
