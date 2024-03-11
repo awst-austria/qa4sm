@@ -3,6 +3,10 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {Router} from '@angular/router';
 import {PasswordResetForm} from '../../modules/core/services/form-interfaces/password-forms';
+import {ToastService} from '../../modules/core/services/toast/toast.service';
+import {catchError} from 'rxjs/operators';
+import {EMPTY, Observable} from 'rxjs';
+import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-password-reset',
@@ -15,30 +19,45 @@ export class PasswordResetComponent {
   resetPasswordForm = new FormGroup<PasswordResetForm>({
     email: new FormControl<string>('', [Validators.required, Validators.email]),
   });
-  formErrors: any;
+  errorMessage: string | undefined = undefined;
 
   resetPasswordObserver = {
-    next: response => this.onResetPasswordNext(response),
-    error: error => this.onResetPasswordError(error)
+    next: (response: { status: string; }) => this.onResetPasswordNext(response),
   }
 
   constructor(private authService: AuthService,
-              private router: Router) {
+              private router: Router,
+              private toastService: ToastService) {
   }
 
   onSubmit(): void {
-    this.authService.resetPassword(this.resetPasswordForm.value).subscribe(
-      this.resetPasswordObserver
-    );
+    this.authService.resetPassword(this.resetPasswordForm.value)
+      .pipe(
+        catchError(err => this.onResetPasswordError(err))
+      )
+      .subscribe(
+        this.resetPasswordObserver
+      );
   }
 
-  private onResetPasswordNext(response): void {
+  private onResetPasswordNext(response: { status: string; }): void {
     if (response.status === 'OK') {
-      this.router.navigate(['password-reset-done']);
+      this.router.navigate(['password-reset-done'])
+        .then(() => this.toastService
+          .showSuccessWithHeader('Request sent.', 'Check your email for further instructions.'));
     }
   }
 
-  private onResetPasswordError(error): void {
-    this.formErrors = error.error;
+  private onResetPasswordError(error: CustomHttpError): Observable<never> {
+    let title = 'Something went wrong.'
+    let message = 'We could not reset your password. Please try again in a few minutes or contact us using our contact form.'
+    if (error.status === 400) {
+      title = 'Wrong email address.';
+      message = 'We couldn\'t find an account associated with the email address you entered. ' +
+        'Please double-check the email address and try again.'
+    }
+    this.errorMessage = title;
+    this.toastService.showErrorWithHeader(title, message);
+    return EMPTY
   }
 }
