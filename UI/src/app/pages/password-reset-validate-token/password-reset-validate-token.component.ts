@@ -1,6 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {ToastService} from '../../modules/core/services/toast/toast.service';
+import {EMPTY, Observable} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-password-reset-validate-token',
@@ -8,44 +12,46 @@ import {ActivatedRoute, Router} from '@angular/router';
   styleUrls: ['./password-reset-validate-token.component.scss']
 })
 export class PasswordResetValidateTokenComponent implements OnInit {
-  tokenValid = true;
+  tokenError = 0;
+
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
-              private router: Router) { }
+              private router: Router,
+              private toastService: ToastService) {
+  }
 
 
   ngOnInit(): void {
-    if (this.router.url !== '/password-reset/set-password'){
-      this.validateToken();
-    }
+    this.validateToken();
   }
 
-  validateToken(): void{
+  validateToken(): void {
     this.route.params.subscribe(params => {
-
-      const validateTokenObserver = {
-        next: response => this.onValidateTokenNext(response, params),
-        error: () => this.onValidateTokenError(),
-        complete: () => this.onValidateTokenComplete()
-      }
-
-      this.authService.validateResetPasswordToken(params.token).subscribe(validateTokenObserver);
+      // check if the passed token is valid, if there is no error use onValidateTokenNext method
+      this.authService.validateResetPasswordToken(params.token)
+        .pipe(
+          catchError(error => this.onValidateTokenError(error))
+        )
+        .subscribe(response => this.onValidateTokenNext(response, params.token));
     });
   }
 
-  private onValidateTokenNext(response, params): void{
-    if (response.status === 'OK'){
-      this.authService.setPasswordResetToken(params.token);
-    } else {
-      this.tokenValid = false;
-    }
+  private onValidateTokenNext(response: { status: string; }, token: string): void {
+      // set token and navigate to set password page
+      this.authService.setPasswordResetToken(token);
+      this.router.navigate(['set-password']);
   }
 
-  private onValidateTokenError(): void{
-    this.tokenValid = false;
+  private onValidateTokenError(error: CustomHttpError): Observable<never> {
+    // it is an external package that handles password reset, therefore I have no impact on the error message;
+    // when the token doesn't exist anymore, the error will have status 404, any other case suggests other server issue
+    let header = error.status === 404 ? 'Invalid password reset link' : 'Something went wrong.'
+    let message = error.status === 404
+      ? "Possibly the link has been already used. Please request a new password reset."
+      :'Setting new password is currently not possible. Please try again later or contact our support team.'
+    this.toastService.showErrorWithHeader(header, message)
+    this.tokenError = error.status;
+    return EMPTY
   }
 
-  private onValidateTokenComplete(): void{
-    this.router.navigate(['set-password']);
-  }
 }
