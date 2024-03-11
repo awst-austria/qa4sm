@@ -37,7 +37,7 @@ export class UserDatasetsService {
   constructor(private httpClient: HttpClient,
               private httpError: HttpErrorService) { }
 
-  userFileUpload(name, file, fileName, metadata): Observable<any> {
+  userFileUpload(name: string, file: Blob, fileName: string, metadata: {}): Observable<any> {
     const formData = new FormData();
     formData.append(name, file, fileName);
     const uploadUrl = uploadUserDataUrl  + '/' + fileName + '/';
