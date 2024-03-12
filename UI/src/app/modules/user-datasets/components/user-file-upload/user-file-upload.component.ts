@@ -122,7 +122,7 @@ export class UserFileUploadComponent {
   private onUploadError(error: CustomHttpError): Observable<never> {
     this.spinnerVisible = false;
     this.toastService.showErrorWithHeader('File not saved',
-      `${error.message}\n File could not be uploaded. Please try again or contact our team.`);
+      `File could not be uploaded. Please try again or contact our team.`);
     return EMPTY
   }
 
