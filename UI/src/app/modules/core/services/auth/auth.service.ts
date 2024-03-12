@@ -142,7 +142,10 @@ export class AuthService {
   resetPassword(resetPasswordForm: any): Observable<any> {
     return this.httpClient.post(this.passwordResetUrl, resetPasswordForm)
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err =>
+          this.httpError.handleError(err, err.error.email ? err.error.email[0] : undefined,
+            err.error.email ? 'Invalid email address' : undefined)
+        )
       );
   }
 
@@ -150,8 +153,8 @@ export class AuthService {
     const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
     return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm)
       .pipe(
-      catchError(err => this.httpError.handleError(err))
-    );
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   validateResetPasswordToken(tkn: string): Observable<any> {
