@@ -18,7 +18,7 @@ export class AuthService {
   private signUpUrl = this.API_URL + 'api/sign-up';
   private userUpdateUrl = this.API_URL + 'api/user-update';
   private userDeleteUrl = this.API_URL + 'api/user-delete';
-  private passwordResetUrl = this.API_URL + 'api/password-reset';
+  private passwordResetUrl = this.API_URL + 'api/password-reset/';
   private setPasswordUrl = this.API_URL + 'api/password-reset/confirm';
   private validateTokenUrl = this.API_URL + 'api/password-reset/validate_token/';
   private contactUrl = this.API_URL + 'api/support-request';
