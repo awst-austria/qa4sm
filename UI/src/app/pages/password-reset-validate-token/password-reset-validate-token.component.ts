@@ -12,7 +12,7 @@ import {CustomHttpError} from '../../modules/core/services/global/http-error.ser
   styleUrls: ['./password-reset-validate-token.component.scss']
 })
 export class PasswordResetValidateTokenComponent implements OnInit {
-  tokenError = 0;
+  tokenError = undefined;
 
   constructor(private authService: AuthService,
               private route: ActivatedRoute,
@@ -43,14 +43,8 @@ export class PasswordResetValidateTokenComponent implements OnInit {
   }
 
   private onValidateTokenError(error: CustomHttpError): Observable<never> {
-    // it is an external package that handles password reset, therefore I have no impact on the error message;
-    // when the token doesn't exist anymore, the error will have status 404, any other case suggests other server issue
-    let header = error.status === 404 ? 'Invalid password reset link' : 'Something went wrong.'
-    let message = error.status === 404
-      ? "Possibly the link has been already used. Please request a new password reset."
-      :'Setting new password is currently not possible. Please try again later or contact our support team.'
-    this.toastService.showErrorWithHeader(header, message)
-    this.tokenError = error.status;
+    this.toastService.showErrorWithHeader(error.header, error.message)
+    this.tokenError = error.header.toLowerCase().includes('something');
     return EMPTY
   }
 
