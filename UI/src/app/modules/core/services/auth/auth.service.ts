@@ -160,7 +160,11 @@ export class AuthService {
   validateResetPasswordToken(tkn: string): Observable<any> {
     return this.httpClient.post(this.validateTokenUrl, {token: tkn})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err,
+          err.status === 404 && err.error.detail
+            ? "Possibly the link has been already used. Please request a new password reset." :
+            'Setting new password is currently not possible. Please try again later or contact our support team.',
+          err.status === 404 && err.error.detail ? 'Invalid password reset link' : 'Something went wrong.'))
       );
   }
 
