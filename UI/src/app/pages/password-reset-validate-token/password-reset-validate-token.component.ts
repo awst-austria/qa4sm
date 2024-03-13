@@ -43,8 +43,8 @@ export class PasswordResetValidateTokenComponent implements OnInit {
   }
 
   private onValidateTokenError(error: CustomHttpError): Observable<never> {
-    this.toastService.showErrorWithHeader(error.header, error.message)
-    this.tokenError = error.header.toLowerCase().includes('something');
+    this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
+    this.tokenError = error.errorMessage.header.toLowerCase().includes('something');
     return EMPTY
   }
 
