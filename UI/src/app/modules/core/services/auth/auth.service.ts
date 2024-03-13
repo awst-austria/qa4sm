@@ -159,7 +159,7 @@ export class AuthService {
   validateResetPasswordToken(tkn: string): Observable<any> {
     return this.httpClient.post(this.validateTokenUrl, {token: tkn})
       .pipe(
-        catchError(err => this.httpError.handleResetPasswordError(err, 'emailReset'))
+        catchError(err => this.httpError.handleResetPasswordError(err, 'tokenValidation'))
       );
   }
 
