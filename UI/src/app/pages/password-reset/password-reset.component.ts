@@ -49,11 +49,8 @@ export class PasswordResetComponent {
   }
 
   private onResetPasswordError(error: CustomHttpError): Observable<never> {
-    let message = error.message ? error.message :
-      'We could not reset your password. Please try again in a few minutes or contact us using our contact form.'
-
-    this.errorMessage = error.header;
-    this.toastService.showErrorWithHeader(error.header, message);
+    this.errorMessage = error.errorMessage.header;
+    this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
     return EMPTY
   }
 }

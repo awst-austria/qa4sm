@@ -143,8 +143,7 @@ export class AuthService {
     return this.httpClient.post(this.passwordResetUrl, resetPasswordForm)
       .pipe(
         catchError(err =>
-          this.httpError.handleError(err, err.error.email ? err.error.email[0] : undefined,
-            err.error.email ? 'Invalid email address' : undefined)
+          this.httpError.handleResetPasswordError(err, 'passwordReset')
         )
       );
   }
@@ -153,18 +152,14 @@ export class AuthService {
     const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
     return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm)
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleResetPasswordError(err, 'settingPassword'))
       );
   }
 
   validateResetPasswordToken(tkn: string): Observable<any> {
     return this.httpClient.post(this.validateTokenUrl, {token: tkn})
       .pipe(
-        catchError(err => this.httpError.handleError(err,
-          err.status === 404 && err.error.detail
-            ? "Possibly the link has been already used. Please request a new password reset." :
-            'Setting new password is currently not possible. Please try again later or contact our support team.',
-          err.status === 404 && err.error.detail ? 'Invalid password reset link' : 'Something went wrong.'))
+        catchError(err => this.httpError.handleResetPasswordError(err, 'emailReset'))
       );
   }
 
