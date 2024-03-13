@@ -12,16 +12,11 @@ export class HttpErrorService {
 
   somethingWentWrongPhrase = 'Something went wrong';
 
-  restPasswordErrorsMessages = {
-    tokenValidation: (error: PasswordResetError) => this.getMessageForTokenValidation(error), // token validation
-    settingPassword: (error: PasswordResetError) => this.getMessageForSettingPassword(error), // setting password
-    passwordReset: (error: PasswordResetError) => this.getMessageForPasswordReset(error) // password reset
-  }
-
   private clientSideErrorFormatter(error: HttpErrorResponse): CustomHttpError {
     console.error(`Client-side or network problem ${error.error.message}.`)
     return {
-      status: error.status, errorMessage: {
+      status: error.status,
+      errorMessage: {
         message: `An error occurred: ${error.error.message}`,
         header: undefined
       }
@@ -33,8 +28,8 @@ export class HttpErrorService {
                                    header: string | undefined): CustomHttpError {
     console.error(
       `Problem on the server side. Server returned code: ${error.status}. Error message is: ${error.statusText}`
-    )
-    const errorHeader = header ? header : this.somethingWentWrongPhrase
+    );
+    const errorHeader = header ? header : this.somethingWentWrongPhrase;
     const errorMessage = message ? message : `${error.error.message ? error.error.message : undefined}`;
     return {status: error.status, errorMessage: {message: errorMessage, header: errorHeader}};
   }
@@ -44,16 +39,16 @@ export class HttpErrorService {
                                    header: string | undefined): CustomHttpError {
 
     if (error.error instanceof ErrorEvent) {
-      return this.clientSideErrorFormatter(error)
+      return this.clientSideErrorFormatter(error);
     } else {
-      return this.serverSideErrorFormatter(error, message, header)
+      return this.serverSideErrorFormatter(error, message, header);
     }
   }
 
   private resetPasswordHttpErrorsFormatter(error: HttpErrorResponse,
                                            key: string): CustomHttpError{
     if (error.error instanceof ErrorEvent) {
-      return this.clientSideErrorFormatter(error)
+      return this.clientSideErrorFormatter(error);
     } else {
       return {status: error.status, errorMessage: this.restPasswordErrorsMessages[key](error.error)};
     }
@@ -62,34 +57,59 @@ export class HttpErrorService {
   handleError(error: HttpErrorResponse,
               message: string | undefined = undefined,
               header: string | undefined = undefined): Observable<never> {
-    return throwError(() => this.customHttpErrorFormatter(error, message, header))
+    return throwError(() => this.customHttpErrorFormatter(error, message, header));
   }
 
   handleResetPasswordError(error: HttpErrorResponse,
                            key: string): Observable<never> {
-    return throwError(() => this.resetPasswordHttpErrorsFormatter(error, key))
+    return throwError(() => this.resetPasswordHttpErrorsFormatter(error, key));
   }
 
+  /**
+   * Below are functions that return messages to handle errors related to the password reset. Normally I'd rather
+   * pass the message from the backend, but for this purpose we are using a separate package, and we have no impact on
+   * the error message. Therefore, we need to handle it here
+   */
 
-  getMessageForTokenValidation(error: PasswordResetError): ErrorMessage {
+  private restPasswordErrorsMessages = {
+    tokenValidation: (error: PasswordResetError) => this.getMessageForTokenValidation(error),
+    settingPassword: (error: PasswordResetError) => this.getMessageForSettingPassword(error),
+    passwordReset: (error: PasswordResetError) => this.getMessageForPasswordReset(error)
+  };
+
+  private getMessageForTokenValidation(error: PasswordResetError): ErrorMessage {
     const message: string = error.detail
       ? "Possibly the link has been already used. Please request a new password reset." :
       'Setting new password is currently not possible. Please try again later or contact our support team.';
-    const header: string = error.detail ? 'Invalid password reset link' : this.somethingWentWrongPhrase
-    return {message: message, header: header}
+    const header: string = error.detail ? 'Invalid password reset link' : this.somethingWentWrongPhrase;
+    console.log(message, header)
+    return {message: message, header: header};
   }
 
-  getMessageForPasswordReset(error: PasswordResetError): ErrorMessage{
+  private getMessageForPasswordReset(error: PasswordResetError): ErrorMessage{
     const message: string = error.email ? error.email[0]
-      : 'We could not reset your password. Please try again in a few minutes or contact us using our contact form.'
-    const header: string = error.email ? 'Invalid email address' : this.somethingWentWrongPhrase
+      : 'We could not reset your password. Please try again in a few minutes or contact us using our contact form.';
+    const header: string = error.email ? 'Invalid email address' : this.somethingWentWrongPhrase;
 
-    console.log(error.email)
-    return {message: message, header: header}
+    return {message: message, header: header};
   }
 
-  getMessageForSettingPassword(error: PasswordResetError): ErrorMessage{
-    return {message: '', header: ''}
+  private getMessageForSettingPassword(error: PasswordResetError): ErrorMessage{
+    let message = '';
+    let header = undefined;
+    if (error.token) {
+      message = 'To get the password reset token, you need to request reset your password using our form. ' +
+        'If that does not work, contact us to get help.';
+      header = 'Invalid password reset token';
+    } else if (error.password){
+      error.password.forEach(msg => message += `${msg}\n`);
+      header = 'Invalid password';
+    } else {
+      message = 'We could not set your password. Please try again later or contact our support team. '
+      header = this.somethingWentWrongPhrase;
+    }
+
+    return {message: message, header: header};
   }
 
 }
