@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {Router} from '@angular/router';
@@ -14,7 +14,7 @@ import {CustomHttpError} from '../../modules/core/services/global/http-error.ser
   templateUrl: './set-password.component.html',
   styleUrls: ['./set-password.component.scss']
 })
-export class SetPasswordComponent implements OnInit, OnDestroy {
+export class SetPasswordComponent implements OnInit {
   token: string;
   setPasswordForm = new FormGroup<PasswordForm>({
     password1: new FormControl<string>('', [Validators.required]),
@@ -62,7 +62,4 @@ export class SetPasswordComponent implements OnInit, OnDestroy {
     return EMPTY
   }
 
-  ngOnDestroy() {
-    console.log(this.sub);
-  }
 }
