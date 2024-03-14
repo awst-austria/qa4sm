@@ -14,13 +14,13 @@ export class GlobalParamsService {
 
   // we can actually provide some hard coded information in case there is an error with the http response
   public globalContext: GlobalParamsDto = {
-  admin_mail: 'support (at) qa4sm.eu',
-  doi_prefix: '',
-  site_url: 'qa4sm.eu/ui',
-  app_version: '2.*.*',
-  expiry_period: '60',
-  warning_period: '7',
-  temporal_matching_default: 12
+    admin_mail: 'support (at) qa4sm.eu',
+    doi_prefix: '',
+    site_url: 'qa4sm.eu/ui',
+    app_version: '2.*.*',
+    expiry_period: '60',
+    warning_period: '7',
+    temporal_matching_default: 12
   };
 
   tooltipLifetime = 2000; // needed to set it somewhere global;
@@ -30,7 +30,7 @@ export class GlobalParamsService {
     this.init();
   }
 
-  private init(): void{
+  private init(): void {
     this.httpClient
       .get<GlobalParamsDto>(globalContextUrl)
       .pipe(
