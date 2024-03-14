@@ -7,7 +7,7 @@ import {catchError} from 'rxjs/operators';
 import {EMPTY} from 'rxjs';
 
 @Component({
-  selector: 'app-validation',
+  selector: 'qa-validation',
   templateUrl: './validation-result.component.html',
   styleUrls: ['./validation-result.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

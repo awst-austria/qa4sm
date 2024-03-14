@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 
 @Component({
-  selector: 'app-validations',
+  selector: 'qa-validations',
   templateUrl: './validations.component.html',
   styleUrls: ['./validations.component.scss']
 })
