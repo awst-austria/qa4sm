@@ -12,8 +12,17 @@ const globalContextUrl: string = environment.API_URL + 'api/globals';
 })
 export class GlobalParamsService {
 
-  // globalContext$: Observable<GlobalContextDto[]>;
-  public globalContext: GlobalParamsDto;
+  // we can actually provide some hard coded information in case there is an error with the http response
+  public globalContext: GlobalParamsDto = {
+  admin_mail: 'support (at) qa4sm.eu',
+  doi_prefix: '',
+  site_url: 'qa4sm.eu/ui',
+  app_version: '2.*.*',
+  expiry_period: '60',
+  warning_period: '7',
+  temporal_matching_default: 12
+  };
+
   tooltipLifetime = 2000; // needed to set it somewhere global;
 
   constructor(private httpClient: HttpClient,
@@ -25,7 +34,7 @@ export class GlobalParamsService {
     this.httpClient
       .get<GlobalParamsDto>(globalContextUrl)
       .pipe(
-        catchError(err => this.httpError.handleError(err)) //todo: here I can actually mock data in case of server error
+        catchError(err => this.httpError.handleError(err))
       )
       .subscribe(
         data => {
