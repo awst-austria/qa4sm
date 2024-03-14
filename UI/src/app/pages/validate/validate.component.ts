@@ -56,7 +56,7 @@ import {AuthService} from '../../modules/core/services/auth/auth.service';
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
 
 @Component({
-  selector: 'app-validate',
+  selector: 'qa-validate',
   templateUrl: './validate.component.html',
   styleUrls: ['./validate.component.scss'],
 })
