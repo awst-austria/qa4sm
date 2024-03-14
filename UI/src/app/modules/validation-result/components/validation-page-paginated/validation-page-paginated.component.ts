@@ -2,7 +2,8 @@ import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, EMPTY} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -27,12 +28,14 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
+  dataFetchError = false;
+
   constructor(private validationrunService: ValidationrunService) {
   }
 
   ngOnInit(): void {
     this.getValidationsAndItsNumber(this.published);
-    this.validationrunService.doRefresh.subscribe(value => {
+    this.validationrunService.doRefresh$.subscribe(value => {
       if (value && value !== 'page') {
         this.updateData(value);
       } else if (value && value === 'page') {
@@ -59,12 +62,26 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
       .set('order', String(this.order));
     if (!published) {
-      this.validationrunService.getMyValidationruns(parameters).subscribe(
+      this.validationrunService.getMyValidationruns(parameters)
+        .pipe(
+          catchError(() => {
+            this.dataFetchError = true;
+            return EMPTY
+          })
+        )
+        .subscribe(
         response => {
           this.handleFetchedValidations(response);
         });
     } else {
-      this.validationrunService.getPublishedValidationruns(parameters).subscribe(
+      this.validationrunService.getPublishedValidationruns(parameters)
+        .pipe(
+          catchError(() => {
+            this.dataFetchError = true;
+            return EMPTY
+          })
+        )
+        .subscribe(
         response => {
           this.handleFetchedValidations(response);
         });
