@@ -8,7 +8,7 @@ import {LoginForm} from '../../core/services/form-interfaces/login-form';
 
 
 @Component({
-  selector: 'app-login',
+  selector: 'qa-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   providers: []
