@@ -102,7 +102,8 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private initComponent(): void {
-    this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
+    this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id)
+      .subscribe(data => {
       this.buildNetworkTree(data, this.filterModel$.value.parameters$.value);
     });
   }

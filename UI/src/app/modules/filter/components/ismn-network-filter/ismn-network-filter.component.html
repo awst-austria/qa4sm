@@ -15,6 +15,8 @@
     You can find more information about the ISMN networks on the <a href="https://ismn.earth/en/networks/"
                                                                     target="_blank">ISMN networks list</a>.
   </div>
-  <p-tree [value]="networkTree" selectionMode="checkbox" (onNodeSelect)="onNetworkSelect($event)" (onNodeUnselect)="onNetworkUnselect($event)"
+  <p-tree [value]="networkTree" selectionMode="checkbox"
+          (onNodeSelect)="onNetworkSelect($event)"
+          (onNodeUnselect)="onNetworkUnselect($event)"
           [(selection)]="selectedNetworks"></p-tree>
 </p-dialog>
