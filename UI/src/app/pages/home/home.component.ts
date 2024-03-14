@@ -8,7 +8,7 @@ const logoUrlPrefix = '/static/images/logo/';
 
 
 @Component({
-  selector: 'app-home',
+  selector: 'qa-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
