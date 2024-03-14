@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
-import {BehaviorSubject, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, of, Subject} from 'rxjs';
 import {LoginDto} from './login.dto';
 import {UserDto} from './user.dto';
 import {catchError, map} from 'rxjs/operators';
@@ -42,6 +42,8 @@ export class AuthService {
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
 
+
+
   private passwordResetTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
   passwordResetToken$: Observable<string> = this.passwordResetTokenSubject.asObservable();
 
@@ -53,9 +55,9 @@ export class AuthService {
     this.init();
   }
 
+  // todo: check if this method is actually needed
   public init() {
-    this.httpClient
-      .get<UserDto>(this.loginUrl)
+    this.httpClient.get<UserDto>(this.loginUrl)
       .subscribe(
         data => {
           this.currentUser = data;
@@ -66,20 +68,21 @@ export class AuthService {
 
   public isAuthenticated(): Observable<boolean> {
     return this.httpClient
-      .get<UserDto>(this.loginUrl).pipe(map(user => {
-        return user != null;
-      }), catchError(error => of(false)));
+      .get<UserDto>(this.loginUrl)
+      .pipe(
+        map(user =>  user != null),
+        catchError(error => of(false)));
   }
 
+  // todo: remove subscription from the service
   login(credentials: LoginDto): Subject<boolean> {
     let authResult = new Subject<boolean>();
-    const loginObserver = {
-      next: data => this.onLoginNext(data, authResult),
-      error: error => this.onLoginError(error, authResult)
-    }
     this.httpClient
       .post<UserDto>(this.loginUrl, credentials)
-      .subscribe(loginObserver);
+      .pipe(
+        catchError(error => this.onLoginError(error, authResult) )
+      )
+      .subscribe(data => this.onLoginNext(data, authResult));
     return authResult;
   }
 
@@ -89,20 +92,20 @@ export class AuthService {
     authResult.next(true);
   }
 
-  private onLoginError(error, authResult): void {
+  private onLoginError(error, authResult): Observable<never> {
     this.authenticated.next(false);
     authResult.next(false);
+    return EMPTY
   }
 
   logout(): Subject<boolean> {
     let logoutResult = new Subject<boolean>();
-    const logoutObserver = {
-      next: data => this.onLogoutNext(data, logoutResult),
-      error: () => this.onLogoutError(logoutResult)
-    }
     this.httpClient
       .post(this.logoutUrl, null)
-      .subscribe(logoutObserver);
+      .pipe(
+        catchError(() => this.onLogoutError(logoutResult))
+      )
+      .subscribe(data => this.onLogoutNext(data, logoutResult));
 
     return logoutResult;
   }
@@ -113,10 +116,10 @@ export class AuthService {
     logoutResult.next(true);
   }
 
-  private onLogoutError(logoutResult): void {
+  private onLogoutError(logoutResult): Observable<never> {
     logoutResult.next(false);
+    return EMPTY
   }
-
 
   signUp(userForm: any): Observable<any> {
     return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'})
