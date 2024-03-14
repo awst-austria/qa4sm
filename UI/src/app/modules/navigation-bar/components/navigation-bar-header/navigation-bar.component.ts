@@ -6,7 +6,7 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
 
 @Component({
-  selector: 'navigation-bar-header',
+  selector: 'qa-navigation-bar-header',
   templateUrl: './navigation-bar.component.html',
   styleUrls: ['./navigation-bar.component.scss']
 })
