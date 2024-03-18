@@ -7,8 +7,8 @@ import {SafeUrl} from '@angular/platform-browser';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {ExtentModel} from '../spatial-extent/extent-model';
-import {catchError, debounceTime} from 'rxjs/operators';
-import {EMPTY, Observable} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'mapplot'];
@@ -39,7 +39,9 @@ export class PlotsComponent implements OnInit {
 
   getComparisonPlotsObserver = {
     next: data => this.onGetComparisonPlotsNext(data),
+    error: () => this.onGetComparisonPlotsError()
   }
+
 
   constructor(private comparisonService: ComparisonService,
               private plotService: WebsiteGraphicsService) {
@@ -51,7 +53,8 @@ export class PlotsComponent implements OnInit {
 
   startComparison(): void {
     // start comparison on button click; updated recursively
-    this.comparisonService.currentComparisonModel.pipe(debounceTime(5000)).subscribe(comparison => {
+    this.comparisonService.currentComparisonModel
+      .pipe(debounceTime(5000)).subscribe(comparison => {
       this.comparisonModel = comparison;
       if ((comparison.selectedValidations.length > 1 && !comparison.multipleNonReference) ||
         (comparison.selectedValidations.length === 1 && comparison.multipleNonReference)) {
@@ -70,30 +73,31 @@ export class PlotsComponent implements OnInit {
       params = params.append('ids', id);
     });
     this.comparisonMetrics = [];
+
+    const getComparisonMetricsObserver = {
+      next: data => this.getComparisonMetricsNext(data, comparisonModel),
+      error: (error: CustomHttpError) => this.getComparisonMetricsErrorHandler(error)
+    }
+
     this.comparisonService.getMetrics4Comparison(params)
-      .pipe(
-        catchError(err => {
-          return this.getComparisonMetricsErrorHandler(err)
-        })
-      )
-      .subscribe(
-      response => {
-        if (response && response.length > 1) {
-          response.forEach(metric => {
-            this.comparisonMetrics.push(
-              new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
-          });
-          this.selectedMetric = this.comparisonMetrics[0];
-          this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
-        }
-      });
+      .subscribe(getComparisonMetricsObserver);
   }
 
-  getComparisonMetricsErrorHandler(err: string): Observable<never>{
-    this.metricsErrorMessage = err;
+  getComparisonMetricsNext(response: any[], comparisonModel: Validations2CompareModel){
+    if (response && response.length > 1) {
+      response.forEach(metric => {
+        this.comparisonMetrics.push(
+          new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
+      });
+      this.selectedMetric = this.comparisonMetrics[0];
+      this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
+    }
+  }
+
+  getComparisonMetricsErrorHandler(err: CustomHttpError): void{
+    this.metricsErrorMessage = err.errorMessage.message;
     this.errorHappened = true;
     this.showLoadingSpinner = false;
-    return EMPTY
   }
 
   showGallery(index: number = 0): void {
@@ -116,9 +120,6 @@ export class PlotsComponent implements OnInit {
     });
 
     this.comparisonService.getComparisonPlots(parameters)
-      .pipe(
-        catchError(() => this.onGetComparisonPlotsError())
-      )
       .subscribe(
       this.getComparisonPlotsObserver
     );
@@ -131,11 +132,10 @@ export class PlotsComponent implements OnInit {
     }
   }
 
-  private onGetComparisonPlotsError(): Observable<never> {
+  private onGetComparisonPlotsError(): void {
     this.showLoadingSpinner = false;
     this.errorHappened = true;
     this.isError.emit(true);
-    return EMPTY
   }
 
   sanitizePlotUrl(plotBase64: string): SafeUrl {
