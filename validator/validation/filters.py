@@ -465,6 +465,14 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             masking_filters.append(('Science_Flags', check_normalized_bits_array, [[3]]))
             continue
 
+        if fil.name == "FIL_SMOSL2_ORBIT_DES":
+            masking_filters.append(('Overpass', check_normalized_bits_array, [[1]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_ORBIT_ASC":
+            masking_filters.append(('Overpass', check_normalized_bits_array, [[0]]))
+            continue
+
         # snow depth in the nc file yet, this is the preliminary one.
         if fil.name == "FIL_ERA5_TEMP_UNFROZEN":
             era_temp_variable = variable.short_name.replace("wv", "t")
