@@ -4,11 +4,10 @@ import {LocalApiService} from '../../core/services/auth/local-api.service';
 import {CountryDto} from '../../core/services/global/country.dto';
 import {UserDto} from '../../core/services/auth/user.dto';
 import {AuthService} from '../../core/services/auth/auth.service';
-import {EMPTY, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {ToastService} from '../../core/services/toast/toast.service';
 import {UserData} from '../../core/services/form-interfaces/UserDataForm';
-import {catchError} from 'rxjs/operators';
 import {CustomHttpError} from '../../core/services/global/http-error.service';
 
 @Component({
@@ -16,7 +15,6 @@ import {CustomHttpError} from '../../core/services/global/http-error.service';
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.scss']
 })
-
 export class UserFormComponent implements OnInit {
   userForm = this.formBuilder.group<UserData>({
     username: ['', [Validators.required, Validators.maxLength(150)]],
@@ -38,8 +36,14 @@ export class UserFormComponent implements OnInit {
   formErrors: any;
   sliderValues = [];
 
-  updateObserver = {
+  signUpObserver = {
+    next: () => this.onSignUpNext(),
+    error: (error: CustomHttpError) => this.onFormSubmitError(error)
+  }
+
+  UpdateObserver = {
     next: (data: UserData) => this.onUpdateNext(data),
+    error: (error: CustomHttpError) => this.onFormSubmitError(error),
     complete: () => this.onUpdateComplete()
   }
 
@@ -65,28 +69,21 @@ export class UserFormComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.userData) {
-      this.userService.signUp(this.userForm.value)
-        .pipe(
-          catchError(error => this.onFormSubmitErrorError(error))
-        )
-        .subscribe(() => this.onSignUpNext());
+      this.userService.signUp(this.userForm.value).subscribe(this.signUpObserver);
     } else {
-      this.userService.updateUser(this.userForm.value)
-        .pipe(
-          catchError(error => this.onFormSubmitErrorError(error))
-        )
-        .subscribe(this.updateObserver);
+      this.userService.updateUser(this.userForm.value).subscribe(this.UpdateObserver);
     }
   }
 
   private onSignUpNext(): void {
     this.formErrors = null;
-    this.router.navigate(['/signup-complete'])
-      .then(() => this.toastService.showSuccess('Data submitted successfully.'));
+    this.router.navigate(['/signup-complete']).then(
+      () => this.toastService.showSuccess('Data submitted successfully.')
+    );
   }
 
   private onUpdateComplete(): void {
-    this.toastService.showSuccess('Your profile has been updated');
+    this.toastService.showSuccess('User profile has been updated');
   }
 
   private onUpdateNext(data: UserData): void {
@@ -95,10 +92,9 @@ export class UserFormComponent implements OnInit {
     this.formErrors = null;
   }
 
-  private onFormSubmitErrorError(error: CustomHttpError): Observable<never> {
-    this.formErrors = error.errorMessage.form;
+  private onFormSubmitError(error: CustomHttpError): void{
+    this.formErrors = error.form;
     this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
-    return EMPTY
   }
 
   setDefaultValues(): void {
