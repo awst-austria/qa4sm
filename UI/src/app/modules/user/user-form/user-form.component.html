@@ -105,7 +105,7 @@
           </p-dropdown>
           <label for="selectCountry">Country (optional)</label>
           <span pTooltip="Optional. The country where your organisation (or you) resides."
-                [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userForm.controls.country.value==''}"
+                [ngClass]="{'pi pi-question-circle': true, 'verticalAlign': this.userForm.controls.country.value===''}"
                 id="countryHelp">
           </span>
         </div>
