@@ -124,14 +124,14 @@ export class AuthService {
   signUp(userForm: any): Observable<any> {
     return this.httpClient.post(this.signUpUrl, userForm, {observe: 'body', responseType: 'json'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleUserFormError(err))
       );
   }
 
   updateUser(userForm: any): Observable<any> {
     return this.httpClient.patch(this.userUpdateUrl, userForm)
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleUserFormError(err))
       );
   }
 

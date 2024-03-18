@@ -54,10 +54,32 @@ export class HttpErrorService {
     }
   }
 
+  private userFormHttpErrorsFormatter(error: HttpErrorResponse): CustomHttpError{
+    if (error.error instanceof ErrorEvent) {
+      return this.clientSideErrorFormatter(error);
+    } else {
+      let errorMessage = 'We could not submit your form. Please try again later or contact our support team.';
+      let errorHeader = 'Something went wrong.'
+      let errorForm = undefined;
+
+      if (typeof error.error === 'object'){
+        errorMessage = 'Please review your input and ensure all fields are correctly filled out.';
+        errorHeader = 'Invalid user data'
+        errorForm = error.error;
+      }
+
+      return {status: error.status, errorMessage: {message: errorMessage, form: errorForm, header: errorHeader}};
+    }
+  }
+
   handleError(error: HttpErrorResponse,
               message: string | undefined = undefined,
               header: string | undefined = undefined): Observable<never> {
     return throwError(() => this.customHttpErrorFormatter(error, message, header));
+  }
+
+  handleUserFormError(error: HttpErrorResponse): Observable<never>{
+    return throwError(() => this.userFormHttpErrorsFormatter(error));
   }
 
   handleResetPasswordError(error: HttpErrorResponse,
@@ -120,7 +142,8 @@ export interface CustomHttpError {
 }
 
 interface ErrorMessage {
-  message: string,
+  message?: string,
+  form? : object | undefined,
   header?: string,
 }
 
