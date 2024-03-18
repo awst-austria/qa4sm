@@ -68,7 +68,7 @@ export class HttpErrorService {
         errorForm = error.error;
       }
 
-      return {status: error.status, errorMessage: {message: errorMessage, form: errorForm, header: errorHeader}};
+      return {status: error.status, errorMessage: {message: errorMessage, header: errorHeader}, form: errorForm};
     }
   }
 
@@ -139,11 +139,11 @@ export class HttpErrorService {
 export interface CustomHttpError {
   status: number,
   errorMessage: ErrorMessage
+  form? : object | undefined,
 }
 
 interface ErrorMessage {
   message?: string,
-  form? : object | undefined,
   header?: string,
 }
 
