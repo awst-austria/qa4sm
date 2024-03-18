@@ -3,8 +3,7 @@ import {FormBuilder, Validators} from '@angular/forms';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {ContactForm} from '../../../core/services/form-interfaces/contact-form';
-import {catchError} from 'rxjs/operators';
-import {EMPTY} from 'rxjs';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-contact-form',
@@ -25,6 +24,7 @@ export class ContactFormComponent {
 
   formObserver = {
     next: () => this.onSubmitNext(),
+    error: (error: CustomHttpError) => this.onSubmitError(error),
     complete: () => this.onSubmitComplete()
   };
 
@@ -36,13 +36,11 @@ export class ContactFormComponent {
 
   public onSubmit(): void {
     this.authService.sendSupportRequest(this.contactForm.value)
-      .pipe(
-        catchError((err) => {
-          this.toastService.showErrorWithHeader('We could not send your message', err.message);
-          return EMPTY
-        })
-      )
       .subscribe(this.formObserver)
+  }
+
+  onSubmitError(error: CustomHttpError){
+    this.toastService.showErrorWithHeader('We could not send your message', error.errorMessage.message);
   }
 
   onSubmitNext(): void {
