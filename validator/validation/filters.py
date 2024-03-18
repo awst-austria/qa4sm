@@ -211,6 +211,12 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('M_AVA0')
                 continue
 
+            if fil.name in (
+                "FIL_SMOSL2_ORBIT_ASC",
+                "FIL_SMOSL2_ORBIT_DES"
+            ):
+                variables.append('Overpass')
+                continue
 
     # meaning these are parametrized filters
     except AttributeError:
