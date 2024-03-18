@@ -55,6 +55,7 @@ export class DatasetComponent implements OnInit {
     this.allDatasets$ = this.datasetService.getAllDatasets(true)
       .pipe(
         catchError((err) => {
+          // todo: this error handling has to be either developed further for the purpose of the validate page or removed
           return EMPTY
         })
       );
