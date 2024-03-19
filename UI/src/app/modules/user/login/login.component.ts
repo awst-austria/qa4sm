@@ -42,6 +42,7 @@ export class LoginComponent implements OnInit {
     this.loginDto.password = this.loginForm.value.password;
 
 
+    // todo: this one should be rewritten the way, that it handles login entirely and sets the current user
     this.loginService.login(this.loginDto).subscribe(authenticated => {
       if (authenticated && this.navigateAfter) {
         this.router.navigate([this.prevUrl]).then(
