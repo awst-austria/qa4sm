@@ -818,5 +818,24 @@
                 44
             ]
         }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 56,
+        "fields": {
+            "short_name": "ISMN_V20240314",
+            "pretty_name": "20240314 global",
+            "help_text": "ISMN from 2024-03-15 (with FRM QIs)",
+            "time_range_start": "",
+            "time_range_end": "2024-03-14",
+            "geographical_range": null,
+            "filters": [
+                1,
+                2,
+                18,
+                24,
+                43
+            ]
+        }
     }
 ]
