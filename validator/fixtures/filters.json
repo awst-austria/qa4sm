@@ -686,5 +686,37 @@
             "default_set_active": false,
             "readonly": false
         }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 45,
+        "fields": {
+            "name": "FIL_SMOSL2_ORBIT_ASC",
+            "description": "Ascending mode only",
+            "help_text": "Use only soil moisture values from ascending overpass (daytime)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "to_exclude": "46",
+            "default_set_active": false,
+            "readonly": false
+        }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 46,
+        "fields": {
+            "name": "FIL_SMOSL2_ORBIT_DES",
+            "description": "Descending mode only",
+            "help_text": "Use only soil moisture values from descending overpass (nighttime)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "to_exclude": "45",
+            "default_set_active": false,
+            "readonly": false
+        }
     }
 ]

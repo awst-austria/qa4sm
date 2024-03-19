@@ -3,7 +3,7 @@ QA4SM Angular UI
 
 ## Development environment - build tools
 Necessary software packages to run and build the UI
-- Node.js (v14)
+- Node.js (v16)
 - npm (6.14.8)
 - angular-cli (11.0.7)
 
@@ -37,9 +37,8 @@ defined in
 
 ## Starting the project
 After installing the project dependencies the angular application can be started by 
-executing `npm run start-with-path`. This custom command is defined in `package.json`.  
+executing `ng serve` from the `UI` directory.
 
-This is basically an alias for `ng serve --deploy-url /ui/ --base-href /ui/`.  
 Since django runs in the root context, the UI application needs another one. (We don't want to 
 mix django, django rest and angular urls). The angular application has the /ui/ context path, 
 all relative urls defined in the application are relative to this path.

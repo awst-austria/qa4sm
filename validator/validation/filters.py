@@ -211,6 +211,12 @@ def get_used_variables(filters, dataset, variable):
                 variables.append('M_AVA0')
                 continue
 
+            if fil.name in (
+                "FIL_SMOSL2_ORBIT_ASC",
+                "FIL_SMOSL2_ORBIT_DES"
+            ):
+                variables.append('Overpass')
+                continue
 
     # meaning these are parametrized filters
     except AttributeError:
@@ -463,6 +469,14 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
 
         if fil.name == "FIL_SMOSL2_TOPO_S":
             masking_filters.append(('Science_Flags', check_normalized_bits_array, [[3]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_ORBIT_DES":
+            masking_filters.append(('Overpass', check_normalized_bits_array, [[1]]))
+            continue
+
+        if fil.name == "FIL_SMOSL2_ORBIT_ASC":
+            masking_filters.append(('Overpass', check_normalized_bits_array, [[0]]))
             continue
 
         # snow depth in the nc file yet, this is the preliminary one.
