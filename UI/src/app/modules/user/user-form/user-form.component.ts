@@ -47,6 +47,11 @@ export class UserFormComponent implements OnInit {
     complete: () => this.onUpdateComplete()
   }
 
+  deactivateObserver = {
+    next: () => this.deactivateAccountNext(),
+    error: () => this.deactivateAccountError()
+  }
+
   @Input() userData: UserDto;
   @Output() doRefresh = new EventEmitter();
 
@@ -92,7 +97,7 @@ export class UserFormComponent implements OnInit {
     this.formErrors = null;
   }
 
-  private onFormSubmitError(error: CustomHttpError): void{
+  private onFormSubmitError(error: CustomHttpError): void {
     this.formErrors = error.form;
     this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
   }
@@ -105,13 +110,21 @@ export class UserFormComponent implements OnInit {
 
   deactivateAccount(): void {
     this.userService.deactivateUser(this.userService.currentUser.username)
-      .subscribe(
-      () => {
-        this.userService.currentUser = this.userService.emptyUser;
-        this.userService.authenticated.next(false);
-        this.router.navigate(['/deactivate-user-complete']);
-      }
-    );
+      .subscribe(this.deactivateObserver);
+  }
+
+  deactivateAccountNext(): void {
+    this.userService.currentUser = this.userService.emptyUser;
+    this.userService.authenticated.next(false);
+    this.router.navigate(['/deactivate-user-complete'])
+      .then(
+        () => this.toastService.showSuccess('Your request has been sent.')
+      );
+  }
+
+  deactivateAccountError(): void {
+    this.toastService.showErrorWithHeader('Something went wrong', 'Your request could not be sent. ' +
+      'Please try again later, or contact our support team.')
   }
 
   handleSliderChange(value: any) {
