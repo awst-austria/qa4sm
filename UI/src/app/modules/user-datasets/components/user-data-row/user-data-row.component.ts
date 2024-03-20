@@ -1,6 +1,6 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit, signal} from '@angular/core';
 import {UserDataFileDto} from '../../services/user-data-file.dto';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {EMPTY, Observable} from 'rxjs';
 import {UserDatasetsService} from '../../services/user-datasets.service';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
@@ -10,6 +10,8 @@ import {DatasetDto} from '../../../core/services/dataset/dataset.dto';
 import {DatasetVersionDto} from '../../../core/services/dataset/dataset-version.dto';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {DataManagementGroupsDto} from '../../services/data-management-groups.dto';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {catchError} from 'rxjs/operators';
 
 @Component({
   selector: 'qa-user-data-row',
@@ -22,19 +24,15 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   @Input() dataManagementGroups: DataManagementGroupsDto[];
   // @Output() openShareDataWindow = new EventEmitter<any>()
 
-  datasetGroups$: BehaviorSubject<DataManagementGroupsDto[]> = new BehaviorSubject<DataManagementGroupsDto[]>([])
-  datasetName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  versionName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  variableName: {
-    shortName$: BehaviorSubject<string>,
-    prettyName$: BehaviorSubject<string>,
-    unit$: BehaviorSubject<string>
-  } =
-    {
-      shortName$: new BehaviorSubject<string>(''),
-      prettyName$: new BehaviorSubject<string>(''),
-      unit$: new BehaviorSubject<string>('')
-    };
+  datasetGroups = signal<DataManagementGroupsDto[]>([])
+  datasetName = signal('');
+  versionName = signal('');
+
+  variable = {
+    shortName:  signal(''),
+    prettyName: signal(''),
+    unit: signal('')
+  };
 
   datasetFieldName = 'dataset_name';
   versionFieldName = 'version_name';
@@ -47,9 +45,15 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   dateFormat = 'medium';
   timeZone = 'UTC';
   filePreprocessingStatus: any;
+
   getUserDataFileByIdObserver = {
-    next: data => this.onGetUserDataFileByIdNext(data),
+    next: (data: any) => this.onGetUserDataFileByIdNext(data),
     error: () => this.onGetUserDataFileByIdError()
+  }
+
+  deleteDataObserver = {
+    next: () => this.refreshAfterRemoval(),
+    error: (error: CustomHttpError) => this.deleteUserDataError(error)
   }
 
   shareDataModalWindow = false;
@@ -66,33 +70,36 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.datasetGroups$.next(
-      this.dataManagementGroups.filter(group => this.userDataset.user_groups.includes(group.id))
-    )
-    this.datasetService.getDatasetById(this.userDataset.dataset).subscribe(datasetData => {
-      this.datasetName$.next(datasetData.pretty_name);
-    });
-    this.datasetVersionService.getVersionById(this.userDataset.version).subscribe(versionData => {
-      this.versionName$.next(versionData.pretty_name);
-    });
+    this.datasetGroups.set(this.dataManagementGroups.filter(group => this.userDataset.user_groups.includes(group.id)));
+    this.datasetService.getDatasetById(this.userDataset.dataset)
+      .pipe(catchError(() => this.fetchMetadataError('Dataset')))
+      .subscribe(datasetData => {
+        this.datasetName.set(datasetData.pretty_name);
+      });
+    this.datasetVersionService.getVersionById(this.userDataset.version)
+      .pipe(catchError(() => this.fetchMetadataError('Version')))
+      .subscribe(versionData => {
+        this.versionName.set(versionData.pretty_name);
+      });
     this.updateVariable();
     this.refreshFilePreprocessingStatus();
   }
 
-  refreshAfterRemoval(): void{
+  refreshAfterRemoval(): void {
     this.userDatasetService.refresh.next(true);
     this.authService.init();
   }
 
-  removeDataset(dataset: UserDataFileDto): void{
+  removeDataset(dataset: UserDataFileDto): void {
     let warning = 'Do you really want to delete the dataset?'
     if (dataset.is_used_in_validation) {
       if (dataset.user_groups.length === 0) {
         warning += '\n\nPlease note that the data you are about to remove has been used in validations. ' +
           '\n\nIf you proceed the validations will become unreproducible.'
       } else {
-        warning += '\n\nPlease note that the data you are about to remove has been used in validations and shared with other users. ' +
-          '\n\nIf you proceed the validations will become unreproducible and other users will lose access to this dataset.'
+        warning += '\n\nPlease note that the data you are about to remove has been used in validations and shared ' +
+          'with other users. ' + '\n\nIf you proceed the validations will become unreproducible and other users will ' +
+          'lose access to this dataset.'
       }
     } else if (dataset.user_groups.length !== 0) {
       warning += '\n\nPlease note that the data you are about to remove has been shared with other users. ' +
@@ -103,24 +110,29 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.userDataset.is_used_in_validation){
-      this.userDatasetService.deleteUserDataFileOnly(dataset.id).subscribe(response => {
-        this.refreshAfterRemoval();
-      })
+    if (this.userDataset.is_used_in_validation) {
+      this.userDatasetService.deleteUserDataFileOnly(dataset.id)
+        .subscribe(this.deleteDataObserver)
     } else {
-      this.userDatasetService.deleteUserData(dataset.id).subscribe(() => {
-        this.refreshAfterRemoval();
-      });
+      this.userDatasetService.deleteUserData(dataset.id)
+        .subscribe(this.deleteDataObserver);
     }
-
   }
 
+  deleteUserDataError(error: CustomHttpError): void {
+    this.toastService.showErrorWithHeader(error.errorMessage.header,
+      'We could not delete your file. Please try again later or contact our support team.')
+  }
+
+
   updateVariable(): void {
-    this.datasetVariableService.getVariableById(this.userDataset.variable, true).subscribe(variableData => {
-      this.variableName.shortName$.next(variableData.short_name);
-      this.variableName.prettyName$.next(variableData.pretty_name);
-      this.variableName.unit$.next(variableData.unit);
-    });
+    this.datasetVariableService.getVariableById(this.userDataset.variable, true)
+      .pipe(catchError(() => this.fetchMetadataError('Variable')))
+      .subscribe(variableData => {
+        this.variable.shortName.set(variableData.short_name);
+        this.variable.prettyName.set(variableData.pretty_name);
+        this.variable.unit.set(variableData.unit);
+      });
   }
 
   getDataset(datasetId): Observable<DatasetDto> {
@@ -131,7 +143,7 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     return this.datasetVersionService.getVersionById(versionId);
   }
 
-  updateMetadata(fieldName, fieldValue, userDataId): void {
+  updateMetadata(fieldName: string, fieldValue: string, userDataId: string): void {
 
     const updateMetadataObserver = {
       next: () => this.onUpdateMetadataNext(fieldName, fieldValue),
@@ -145,16 +157,15 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   private onUpdateMetadataNext(fieldName, fieldValue): void {
     this.toggle(fieldName, false);
     if (fieldName === this.datasetFieldName) {
-      this.datasetName$.next(fieldValue);
+      this.datasetName.set(fieldValue);
     }
     if (fieldName === this.versionFieldName) {
-      this.versionName$.next(fieldValue);
+      this.versionName.set(fieldValue);
     }
     if (fieldName === this.variableFieldName) {
-      this.variableName.prettyName$.next(
-        this.userDataset.all_variables.find(choice => choice.name === fieldValue).long_name);
-      this.variableName.unit$.next(this.userDataset.all_variables.find(choice => choice.name === fieldValue).units);
-      this.variableName.shortName$.next(fieldValue);
+      this.variable.prettyName.set(this.userDataset.all_variables.find(choice => choice.name === fieldValue).long_name);
+      this.variable.unit.set(this.userDataset.all_variables.find(choice => choice.name === fieldValue).units);
+      this.variable.shortName.set(fieldValue);
     }
   }
 
@@ -190,7 +201,8 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   refreshFilePreprocessingStatus(): void {
     if (!this.userDataset.metadata_submitted) {
       this.filePreprocessingStatus = setInterval(() => {
-        this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe(this.getUserDataFileByIdObserver);
+        this.userDatasetService.getUserDataFileById(this.userDataset.id)
+          .subscribe(this.getUserDataFileByIdObserver);
       }, 60 * 1000); // one minute
     }
   }
@@ -198,7 +210,7 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   private onGetUserDataFileByIdNext(data): void {
     if (data.metadata_submitted) {
       this.updateVariable();
-      if (this.variableName.prettyName$.value !== 'none') {
+      if (this.variable.prettyName() !== 'none'){
         this.userDatasetService.refresh.next(true);
       }
     }
@@ -206,9 +218,11 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
 
   private onGetUserDataFileByIdError(): void {
     this.userDatasetService.refresh.next(true);
-    this.toastService.showErrorWithHeader('File preprocessing failed',
-      'File could not be preprocessed. Please make sure that you are uploading a proper file and if the ' +
-      'file fulfills our requirements', 10000);
+    const errorMessage = 'File could not be preprocessed. ' +
+      'Please make sure that you are uploading a proper file and if the file fulfills our requirements';
+    const errorHeader = 'File preprocessing failed';
+
+    this.toastService.showErrorWithHeader(errorHeader, errorMessage, 10000);
   }
 
   public openWindowForDataSharing(): void {
@@ -218,13 +232,23 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   public manageSharingWindow(open): void {
     if (!open) {
       this.shareDataModalWindow = false;
-      this.userDatasetService.getUserDataFileById(this.userDataset.id).subscribe(data => {
+      this.userDatasetService.getUserDataFileById(this.userDataset.id)
+        .subscribe(data => {
           console.log(data)
           this.userDataset = data;
         }
       )
     }
   }
+
+
+  fetchMetadataError(source: string): Observable<never> {
+    this.toastService.showErrorWithHeader('Error fetching metadata',
+      `${source} metadata could not be fetched, there might be information on your dataset missing. ` +
+      'If the error persists, contact our support team.')
+    return EMPTY
+  }
+
 
   ngOnDestroy(): void {
     clearInterval(this.filePreprocessingStatus);

@@ -66,7 +66,10 @@ export class UserDatasetsService {
 
   deleteUserData(dataFileId: string): Observable<any>{
     const deleteUrl = userDataDeleteUrl + '/' + dataFileId + '/';
-    return this.httpClient.delete(deleteUrl, {headers});
+    return this.httpClient.delete(deleteUrl, {headers})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, ''))
+      );
   }
 
   deleteUserDataFileOnly(dataFileId: string): Observable<any>{
