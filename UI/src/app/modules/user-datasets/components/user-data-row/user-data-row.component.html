@@ -21,7 +21,7 @@
         pTooltip="Click to change the name."
         tooltipPosition="bottom"
         (click)="toggle(datasetFieldName, true)"
-      > Name: <b>{{(datasetName$| async)}} </b>
+      > Name: <b>{{(datasetName())}} </b>
         <span class="pi pi-pencil small-edit-icon"></span>
       </div>
 
@@ -29,7 +29,7 @@
         <label for="new-dataset-name">Name: </label>
         <input id="new-dataset-name"
                type="text"
-               value="{{datasetName$|async}}"
+               value="{{datasetName()}}"
                #newDatasetName
                [ngClass]="{'edit_dataset': true}">
         <button
@@ -56,8 +56,9 @@
         style="cursor: pointer"
         pTooltip="Click to change the name."
         tooltipPosition="bottom"
-        (click)="toggle(versionFieldName, true)"
-      > Version: <b>{{(versionName$ | async)}} </b>
+        (click)="toggle(versionFieldName, true)">
+        Version: <b>{{(versionName())}} </b>
+<!--        Version: <b>{{(versionName$ | async)}} </b>-->
         <span class="pi pi-pencil small-edit-icon"></span>
       </div>
 
@@ -65,7 +66,7 @@
         <label for="new-version-name">Version: </label>
         <input id="new-version-name"
                type="text"
-               value="{{versionName$|async}}"
+               value="{{versionName()}}"
                #newVersionName
                [ngClass]="{'edit_dataset': true}">
         <button
@@ -91,13 +92,13 @@
         *ngIf="!(editVariable.opened)"
         (click)="toggle(variableFieldName,true)"
         style="cursor: pointer"
-        [class]="(variableName.shortName$|async) !== '--none--' ? '' : 'warning'"
-        pTooltip="{{(variableName.shortName$|async) !== '--none--' ?
+        [class]="(variable.shortName()) !== '--none--' ? '' : 'warning'"
+        pTooltip="{{variable.shortName() !== '--none--' ?
         'You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation will not be possible.' :
         'We could not retrieve the applicable soil moisture variable name. Please choose the proper one from the list. A validation will fail if no proper variable is set.'}}"
       >
-        Variable: <b>{{(variableName.shortName$|async)}} ({{variableName.prettyName$|async}}
-        ) [{{variableName.unit$|async}}] </b>
+        Variable: <b>{{variable.shortName()}} ({{variable.shortName()}}
+        ) [{{variable.unit()}}] </b>
         <span class="pi pi-question-circle small-edit-icon"></span>
         </span>
       <div *ngIf="(editVariable.opened)">
@@ -106,7 +107,7 @@
           id="variable-dropdown"
           class="form-field"
           [options]="(userDataset.all_variables)"
-          [ngModel]="(variableName.shortName$|async)"
+          [ngModel]="(variable.shortName())"
           (ngModelChange)="updateMetadata(variableFieldName, $event, userDataset.id)"
           [style]="{'width':'6rem', 'height': '2rem'}"
           optionLabel="name"
@@ -151,7 +152,7 @@
     <!-- sharing groups-->
     <div *ngIf="authService.currentUser.is_staff" class="lg:w-2 md:w-6 w-12 pt-2">
       <div><strong>Shared: </strong></div>
-      <p-scrollPanel *ngIf="(datasetGroups$|async) as managementGroups" [style]="{width: '80%', height: '80%'}">
+      <p-scrollPanel *ngIf="(datasetGroups()) as managementGroups" [style]="{width: '80%', height: '80%'}">
         <div *ngIf="managementGroups.length !== 0">
           <div *ngFor="let group of managementGroups; index as ind">
             {{ind + 1}}) {{group.name}}
