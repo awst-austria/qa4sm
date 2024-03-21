@@ -11,6 +11,8 @@ import {HttpErrorService} from '../global/http-error.service';
 import {catchError} from 'rxjs/operators';
 
 const urlPrefix = environment.API_URL + 'api';
+const zeroId = '00000000-0000-0000-0000-000000000000'
+
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
 const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
@@ -24,23 +26,23 @@ const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 
-
 const csrfToken = '{{csrf_token}}';
-const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
-const archiveResultUrl = urlPrefix + '/archive-result/00000000-0000-0000-0000-000000000000';
-const extendResultUrl = urlPrefix + '/extend-result/00000000-0000-0000-0000-000000000000';
-const publishResultUrl = urlPrefix + '/publish-result/00000000-0000-0000-0000-000000000000';
-const addValidationUrl = urlPrefix + '/add-validation/00000000-0000-0000-0000-000000000000';
-const removeValidationUrl = urlPrefix + '/remove-validation/00000000-0000-0000-0000-000000000000';
+const changeNameUrl = urlPrefix + '/change-validation-name/' + zeroId;
+const archiveResultUrl = urlPrefix + '/archive-result/' + zeroId;
+const extendResultUrl = urlPrefix + '/extend-result/' + zeroId;
+const publishResultUrl = urlPrefix + '/publish-result/' + zeroId;
+const addValidationUrl = urlPrefix + '/add-validation/' + zeroId
+const removeValidationUrl = urlPrefix + '/remove-validation/' + zeroId;
 const removeMultipleValidationUrl = urlPrefix + '/delete-multiple-validations';
 const archiveMultipleValidationUrl = urlPrefix + '/archive-multiple-validations';
-const deleteResultUrl = urlPrefix + '/delete-validation/00000000-0000-0000-0000-000000000000';
-const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
+const deleteResultUrl = urlPrefix + '/delete-validation/' + zeroId;
+const stopValidationUrl = urlPrefix + '/stop-validation/' + zeroId;
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ValidationrunService {
   private refresh: BehaviorSubject<string> = new BehaviorSubject('');
 
@@ -86,15 +88,15 @@ export class ValidationrunService {
   }
 
   deleteValidation(validationId: string): Observable<any> {
-    const deleteUrl = deleteResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const deleteUrl = deleteResultUrl.replace(zeroId, validationId);
     return this.httpClient.delete(deleteUrl, {headers})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not delete your validation.'))
       );
   }
 
   stopValidation(validationId: string): Observable<any> {
-    const stopUrl = stopValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const stopUrl = stopValidationUrl.replace(zeroId, validationId);
     return this.httpClient.delete(stopUrl, {headers})
       .pipe(
         catchError(err => this.httpError.handleError(err))
@@ -102,7 +104,7 @@ export class ValidationrunService {
   }
 
   archiveResult(validationId: string, archive: boolean): Observable<any> {
-    const archiveUrl = archiveResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const archiveUrl = archiveResultUrl.replace(zeroId, validationId);
     return this.httpClient.patch(archiveUrl + '/', {archive},
       {headers, observe: 'response', responseType: 'text'})
       .pipe(
@@ -111,7 +113,7 @@ export class ValidationrunService {
   }
 
   extendResult(validationId: string): Observable<any> {
-    const extendUrl = extendResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const extendUrl = extendResultUrl.replace(zeroId, validationId);
     const extend = true;
     return this.httpClient.patch(extendUrl + '/', {extend},
       {headers, observe: 'response', responseType: 'text'})
@@ -121,7 +123,7 @@ export class ValidationrunService {
   }
 
   saveResultsName(validationId: string, newName: string): Observable<any> {
-    const saveUrl = changeNameUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const saveUrl = changeNameUrl.replace(zeroId, validationId);
     const data = {save_name: true, new_name: newName};
     return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
@@ -131,7 +133,7 @@ export class ValidationrunService {
   }
 
   publishResults(validationId: string, publishingData: any): Observable<any> {
-    const publishUrl = publishResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const publishUrl = publishResultUrl.replace(zeroId, validationId);
     const data = {publish: true, publishing_form: publishingData};
     return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'json'})
       .pipe(
@@ -145,7 +147,7 @@ export class ValidationrunService {
   }
 
   addValidation(validationId: string): Observable<any> {
-    const addUrl = addValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const addUrl = addValidationUrl.replace(zeroId, validationId);
     const data = {add_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
@@ -154,7 +156,7 @@ export class ValidationrunService {
   }
 
   removeValidation(validationId: string): Observable<any> {
-    const addUrl = removeValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const addUrl = removeValidationUrl.replace(zeroId, validationId);
     const data = {remove_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
