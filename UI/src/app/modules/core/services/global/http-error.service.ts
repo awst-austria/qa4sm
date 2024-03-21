@@ -11,6 +11,7 @@ export class HttpErrorService {
   }
 
   somethingWentWrongPhrase = 'Something went wrong';
+  defaultMessage = `If the error persist please contact our support team.`
 
   private clientSideErrorFormatter(error: HttpErrorResponse): CustomHttpError {
     console.error(`Client-side or network problem ${error.error.message}.`)
@@ -18,8 +19,9 @@ export class HttpErrorService {
       status: error.status,
       errorMessage: {
         message: `An error occurred: ${error.error.message}`,
-        header: undefined
-      }
+        header: undefined,
+      },
+      form: undefined
     };
   }
 
@@ -30,10 +32,15 @@ export class HttpErrorService {
       `Problem on the server side. Server returned code: ${error.status}. Error message is: ${error.statusText}`
     );
     const errorHeader = header ? header : this.somethingWentWrongPhrase;
-    const errorMessage = message ? message : `${error.error.message ? error.error.message : undefined}`;
-    return {status: error.status, errorMessage: {message: errorMessage, header: errorHeader}};
+    const errorMessage = message ? message + this.defaultMessage : this.defaultMessage;
+    const errorForm = typeof error.error === 'object' ? error.error : undefined;
+    return {status: error.status, errorMessage: {message: errorMessage, header: errorHeader}, form: errorForm};
   }
 
+
+  // this error formatter returns an object with error status, error form if exists, and error message as header and
+  // the message text. The message and header text can be passed to be included, otherwise it is going to be a default
+  // phrase.
   private customHttpErrorFormatter(error: HttpErrorResponse,
                                    message: string | undefined,
                                    header: string | undefined): CustomHttpError {
@@ -54,24 +61,6 @@ export class HttpErrorService {
     }
   }
 
-  private userFormHttpErrorsFormatter(error: HttpErrorResponse): CustomHttpError{
-    if (error.error instanceof ErrorEvent) {
-      return this.clientSideErrorFormatter(error);
-    } else {
-      let errorMessage = 'We could not submit your form. Please try again later or contact our support team.';
-      let errorHeader = 'Something went wrong.'
-      let errorForm = undefined;
-
-      if (typeof error.error === 'object'){
-        errorMessage = 'Please review your input and ensure all fields are correctly filled out.';
-        errorHeader = 'Invalid user data'
-        errorForm = error.error;
-      }
-
-      return {status: error.status, errorMessage: {message: errorMessage, header: errorHeader}, form: errorForm};
-    }
-  }
-
   handleError(error: HttpErrorResponse,
               message: string | undefined = undefined,
               header: string | undefined = undefined): Observable<never> {
@@ -79,7 +68,15 @@ export class HttpErrorService {
   }
 
   handleUserFormError(error: HttpErrorResponse): Observable<never>{
-    return throwError(() => this.userFormHttpErrorsFormatter(error));
+    let errorMessage = 'We could not submit your form. Please try again later or contact our support team.';
+    let errorHeader = 'Something went wrong.'
+
+    if (typeof error.error === 'object'){
+      errorMessage = 'Please review your input and ensure all fields are correctly filled out.';
+      errorHeader = 'Invalid user data'
+    }
+
+    return throwError(() => this.customHttpErrorFormatter(error, errorMessage, errorHeader));
   }
 
   handleResetPasswordError(error: HttpErrorResponse,
