@@ -32,7 +32,7 @@ export class HttpErrorService {
       `Problem on the server side. Server returned code: ${error.status}. Error message is: ${error.statusText}`
     );
     const errorHeader = header ? header : this.somethingWentWrongPhrase;
-    const errorMessage = message ? message + this.defaultMessage : this.defaultMessage;
+    const errorMessage = message ? message + ' ' + this.defaultMessage : this.defaultMessage;
     const errorForm = typeof error.error === 'object' ? error.error : undefined;
     return {status: error.status, errorMessage: {message: errorMessage, header: errorHeader}, form: errorForm};
   }
