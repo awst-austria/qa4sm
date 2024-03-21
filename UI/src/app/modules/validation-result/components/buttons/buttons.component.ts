@@ -77,6 +77,14 @@ export class ButtonsComponent implements OnInit {
     }
   }
 
+  extendResultObserver(validationId: string): Observer<any> {
+    return {
+      next: (resp) => this.onExtendResultsNext(resp, validationId),
+      error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
+      complete: () => this.toastService.showSuccess('Results extended successfully')
+    }
+  }
+
   // next, errors, complete functions
   onDeleteNext(): void {
     this.validationService.refreshComponent('page');
@@ -87,6 +95,11 @@ export class ButtonsComponent implements OnInit {
     this.validationService.refreshComponent(validationId);
     this.isArchived$.next(archive);
     this.doUpdate.emit({key: 'archived', value: resp.body});
+  }
+
+  onExtendResultsNext(resp, validationId): void {
+    this.validationService.refreshComponent(validationId);
+    this.doUpdate.emit({key: 'extended', value: resp.body});
   }
 
 
@@ -105,7 +118,6 @@ export class ButtonsComponent implements OnInit {
     this.validationService.stopValidation(validationId).subscribe(this.stopValidationObserver);
   }
 
-
   archiveResults(validationId: string, archive: boolean): void {
     if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
       + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
@@ -115,16 +127,12 @@ export class ButtonsComponent implements OnInit {
     this.validationService.archiveResult(validationId, archive).subscribe(this.archiveObserver(validationId, archive));
   }
 
+
   extendResults(validationId: string): void {
     if (!confirm('Do you want to extend the lifespan of this result?')) {
       return;
     }
-    this.validationService.extendResult(validationId).subscribe((resp) => {
-      if (resp.statusText === 'OK') {
-        this.validationService.refreshComponent(validationId);
-        this.doUpdate.emit({key: 'extended', value: resp.body});
-      }
-    });
+    this.validationService.extendResult(validationId).subscribe(this.extendResultObserver(validationId));
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void {

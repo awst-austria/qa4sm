@@ -119,7 +119,7 @@ export class ValidationrunService {
     return this.httpClient.patch(extendUrl + '/', {extend},
       {headers, observe: 'response', responseType: 'text'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not extend your results.'))
       );
   }
 
