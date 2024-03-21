@@ -5,7 +5,7 @@ import {HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, Observer} from 'rxjs';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
@@ -56,6 +56,7 @@ export class ButtonsComponent implements OnInit {
     this.isArchived$.next(this.validationRun.is_archived);
   }
 
+  // OBSERVERS
 
   deleteObserver = {
     next: () => this.onDeleteNext(),
@@ -68,11 +69,28 @@ export class ButtonsComponent implements OnInit {
     error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
   }
 
-  onDeleteNext(): void{
+  archiveObserver(validationId: string, archive: boolean): Observer<any> {
+    return {
+      next: (resp: any) => this.onArchiveNext(resp, validationId, archive),
+      error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
+      complete: () => this.toastService.showSuccess(`Results ${archive ? 'archived' : 'un-archived'} successfully.`)
+    }
+  }
+
+  // next, errors, complete functions
+  onDeleteNext(): void {
     this.validationService.refreshComponent('page');
     this.doUpdate.emit({key: 'delete', value: true});
   }
 
+  onArchiveNext(resp, validationId, archive): void {
+    this.validationService.refreshComponent(validationId);
+    this.isArchived$.next(archive);
+    this.doUpdate.emit({key: 'archived', value: resp.body});
+  }
+
+
+  // button functions
   deleteValidation(validationId: string): void {
     if (!confirm('Do you really want to delete the result?')) {
       return;
@@ -93,13 +111,8 @@ export class ButtonsComponent implements OnInit {
       + ' the result' + (archive ? '' : ' (allow auto-cleanup)') + '?')) {
       return;
     }
-    this.validationService.archiveResult(validationId, archive).subscribe((resp) => {
-      if (resp.ok){
-        this.validationService.refreshComponent(validationId);
-        this.isArchived$.next(archive);
-        this.doUpdate.emit({key: 'archived', value: resp.body});
-      }
-    });
+
+    this.validationService.archiveResult(validationId, archive).subscribe(this.archiveObserver(validationId, archive));
   }
 
   extendResults(validationId: string): void {
@@ -107,7 +120,7 @@ export class ButtonsComponent implements OnInit {
       return;
     }
     this.validationService.extendResult(validationId).subscribe((resp) => {
-      if (resp.statusText === 'OK'){
+      if (resp.statusText === 'OK') {
         this.validationService.refreshComponent(validationId);
         this.doUpdate.emit({key: 'extended', value: resp.body});
       }

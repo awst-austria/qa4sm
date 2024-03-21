@@ -108,7 +108,8 @@ export class ValidationrunService {
     return this.httpClient.patch(archiveUrl + '/', {archive},
       {headers, observe: 'response', responseType: 'text'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err =>
+          this.httpError.handleError(err, `We could not ${archive ? 'archive' : 'un-archive'} your results.`))
       );
   }
 
@@ -166,7 +167,9 @@ export class ValidationrunService {
 
   removeMultipleValidation(validationId: string[]): Observable<any> {
     let params = new HttpParams();
-    validationId.forEach(id => {params = params.append('id', id);})
+    validationId.forEach(id => {
+      params = params.append('id', id);
+    })
     return this.httpClient.delete(removeMultipleValidationUrl, {params})
       .pipe(
         catchError(err => this.httpError.handleError(err))
