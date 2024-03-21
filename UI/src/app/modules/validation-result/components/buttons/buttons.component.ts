@@ -85,6 +85,12 @@ export class ButtonsComponent implements OnInit {
     }
   }
 
+  addValidationObserver = {
+    next: (response: any) => this.onAddValidationNext(response),
+    error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
+  }
+
+
   // next, errors, complete functions
   onDeleteNext(): void {
     this.validationService.refreshComponent('page');
@@ -102,6 +108,11 @@ export class ButtonsComponent implements OnInit {
     this.doUpdate.emit({key: 'extended', value: resp.body});
   }
 
+  onAddValidationNext(response): void{
+    this.isTrackedByTheUser.set(true);
+    this.doRefresh.emit(true);
+    this.toastService.showSuccess(response)
+  }
 
   // button functions
   deleteValidation(validationId: string): void {
@@ -141,20 +152,9 @@ export class ButtonsComponent implements OnInit {
 
   addValidation(validationId: string): void {
     this.validationService.addValidation(validationId).subscribe(this.addValidationObserver);
-    // this.authService.init();
   }
 
-  onAddValidationNext(response): void{
-    // this.authService.init();
-    this.isTrackedByTheUser.set(true);
-    this.doRefresh.emit(true);
-    this.toastService.showSuccess(response)
-  }
 
-  addValidationObserver = {
-    next: (response: any) => this.onAddValidationNext(response),
-    error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
-  }
 
   removeValidation(validationId: string): void {
     if (!confirm('Do you really want to remove this validation from your list?')) {

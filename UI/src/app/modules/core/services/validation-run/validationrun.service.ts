@@ -152,7 +152,8 @@ export class ValidationrunService {
     const data = {add_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err =>
+          this.httpError.handleError(err, 'We could not add the validation to the followed validations list.'))
       );
   }
 
