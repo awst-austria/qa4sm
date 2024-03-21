@@ -108,8 +108,8 @@ export class UserDatasetsService {
   }
 
   getTheSizeInProperUnits(sizeInBites): string {
-    let properSize;
-    let units;
+    let properSize: number;
+    let units: string;
     const coeff = Math.pow(10, 6);
     if (sizeInBites < coeff) {
       properSize = sizeInBites / Math.pow(10, 3);
