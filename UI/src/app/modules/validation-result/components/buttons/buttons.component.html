@@ -89,7 +89,8 @@
       </button>
       <span *ngIf="validationRun.is_unpublished"
             [ngClass]="{'collapse': validationRun.publishing_in_progress}">
-        <button pButton
+        <button *ngIf="(isArchived$|async) === false"
+                pButton
                 type="button"
                 class="dropdown-item"
                 pTooltip="Remove this validation run"
@@ -188,15 +189,6 @@
   <div *ngIf="isOwner && validationRun.is_unpublished; else elseSingleValidation" style="float: right"
        class="flex flex-row w-12 align-content-end justify-content-end flex-wrap gap-1"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
-    <button pButton
-            type="button"
-            icon="pi pi-times"
-            class="btn-action-large"
-            pTooltip="Remove this validation run"
-            [life]="globals.tooltipLifetime"
-            label="Delete"
-            (click)="deleteValidation(validationRun.id)">
-    </button>
 
     <button *ngIf="isArchived$|async; else elseIsArchived"
             pButton
@@ -210,6 +202,15 @@
     </button>
 
     <ng-template #elseIsArchived>
+      <button pButton
+              type="button"
+              icon="pi pi-times"
+              class="btn-action-large"
+              pTooltip="Remove this validation run"
+              [life]="globals.tooltipLifetime"
+              label="Delete"
+              (click)="deleteValidation(validationRun.id)">
+      </button>
       <button pButton
               type="button"
               icon="pi pi-calendar-plus"
