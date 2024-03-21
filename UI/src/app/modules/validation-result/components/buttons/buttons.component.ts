@@ -63,6 +63,11 @@ export class ButtonsComponent implements OnInit {
     complete: () => this.toastService.showSuccess('Validation successfully removed.')
   }
 
+  stopValidationObserver = {
+    next: (validationId: string) => this.validationService.refreshComponent(validationId),
+    error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
+  }
+
   onDeleteNext(): void{
     this.validationService.refreshComponent('page');
     this.doUpdate.emit({key: 'delete', value: true});
@@ -79,11 +84,9 @@ export class ButtonsComponent implements OnInit {
     if (!confirm('Do you really want to stop the validation?')) {
       return;
     }
-    this.validationService.stopValidation(validationId).subscribe(
-      () => {
-        this.validationService.refreshComponent(validationId);
-      });
+    this.validationService.stopValidation(validationId).subscribe(this.stopValidationObserver);
   }
+
 
   archiveResults(validationId: string, archive: boolean): void {
     if (!confirm('Do you want to ' + (archive ? 'archive' : 'un-archive')
