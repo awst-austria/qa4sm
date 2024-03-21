@@ -1,11 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {HttpParams} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
-import {BehaviorSubject, Observable, Observer} from 'rxjs';
+import {Observable, Observer} from 'rxjs';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
@@ -36,10 +36,10 @@ export class ButtonsComponent implements OnInit {
 
   isLogged: boolean;
   isOwner: boolean;
-  isTrackedByTheUser$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  isTrackedByTheUser = signal(false);
   status: string;
   publishingInProgress$: Observable<boolean>;
-  isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  isArchived = signal(undefined)
 
 
   constructor(private router: Router,
@@ -52,8 +52,8 @@ export class ButtonsComponent implements OnInit {
   ngOnInit(): void {
     this.isLogged = this.authService.currentUser.id != null;
     this.isOwner = this.authService.currentUser.id === this.validationRun.user;
-    this.isTrackedByTheUser$.next(this.authService.currentUser.copied_runs.includes(this.validationRun.id));
-    this.isArchived$.next(this.validationRun.is_archived);
+    this.isTrackedByTheUser.set(this.authService.currentUser.copied_runs.includes(this.validationRun.id));
+    this.isArchived.set(this.validationRun.is_archived);
   }
 
   // OBSERVERS
@@ -93,7 +93,7 @@ export class ButtonsComponent implements OnInit {
 
   onArchiveNext(resp, validationId, archive): void {
     this.validationService.refreshComponent(validationId);
-    this.isArchived$.next(archive);
+    this.isArchived.set(archive);
     this.doUpdate.emit({key: 'archived', value: resp.body});
   }
 
@@ -140,18 +140,20 @@ export class ButtonsComponent implements OnInit {
   }
 
   addValidation(validationId: string): void {
-    this.validationService.addValidation(validationId).subscribe(
-      response => {
-        // re-initi auth service to update user data - to update list of added runs
-        this.authService.init();
-        this.isTrackedByTheUser$.next(true);
-        // this one is needed to refresh tracked-validations component
-        this.doRefresh.emit(true);
-        alert(response);
+    this.validationService.addValidation(validationId).subscribe(this.addValidationObserver);
+    // this.authService.init();
+  }
 
+  onAddValidationNext(response): void{
+    // this.authService.init();
+    this.isTrackedByTheUser.set(true);
+    this.doRefresh.emit(true);
+    this.toastService.showSuccess(response)
+  }
 
-      });
-    this.authService.init();
+  addValidationObserver = {
+    next: (response: any) => this.onAddValidationNext(response),
+    error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
   }
 
   removeValidation(validationId: string): void {
@@ -162,7 +164,7 @@ export class ButtonsComponent implements OnInit {
       response => {
         // re-initi auth service to update user data - to update list of added runs
         this.authService.init();
-        this.isTrackedByTheUser$.next(false);
+        this.isTrackedByTheUser.set(false);
         // this one is needed to refresh tracked-validations component
         this.doRefresh.emit(true);
         alert(response);

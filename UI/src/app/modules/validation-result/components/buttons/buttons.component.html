@@ -27,7 +27,7 @@
   <span *ngIf="validationRun.end_time && validationRun.is_unpublished && isOwner"
         [ngClass]="{'collapse': validationRun.publishing_in_progress}">
 
-    <button *ngIf="isArchived$|async"
+    <button *ngIf="isArchived()"
             pButton
             type="button"
             title="unarchive"
@@ -38,7 +38,7 @@
             (click)="archiveResults(validationRun.id, false)">
     </button>
 
-    <button *ngIf="(isArchived$|async)===false"
+    <button *ngIf="!isArchived()"
             pButton
             type="button"
             title="archive"
@@ -89,7 +89,7 @@
       </button>
       <span *ngIf="validationRun.is_unpublished"
             [ngClass]="{'collapse': validationRun.publishing_in_progress}">
-        <button *ngIf="(isArchived$|async) === false"
+        <button *ngIf="!isArchived()"
                 pButton
                 type="button"
                 class="dropdown-item"
@@ -99,7 +99,7 @@
                 icon="pi pi-times"
                 (click)=deleteValidation(validationRun.id)>
         </button>
-        <button *ngIf="(isArchived$|async) === false"
+        <button *ngIf="!isArchived()"
                 pButton
                 type="button"
                 label="Extend Life Span"
@@ -125,7 +125,7 @@
             title="reload-settings"
             icon="pi pi-replay">
       </button>
-    <button *ngIf="isLogged && (isTrackedByTheUser$|async)"
+    <button *ngIf="isLogged && (isTrackedByTheUser())"
             pButton
             title="unpin"
             type="button"
@@ -135,7 +135,7 @@
             [life]="globals.tooltipLifetime"
             (click)="removeValidation(validationRun.id)">
     </button>
-    <button *ngIf="isLogged && (isTrackedByTheUser$|async)===false"
+    <button *ngIf="isLogged && (!isTrackedByTheUser())"
             pButton
             title="pin-validation"
             type="button"
@@ -190,7 +190,7 @@
        class="flex flex-row w-12 align-content-end justify-content-end flex-wrap gap-1"
        [ngClass]="{'collapse': validationRun.publishing_in_progress}">
 
-    <button *ngIf="isArchived$|async; else elseIsArchived"
+    <button *ngIf="isArchived(); else elseIsArchived"
             pButton
             type="button"
             icon="pi pi-calendar"
@@ -288,7 +288,7 @@
          [life]="globals.tooltipLifetime">
       </a>
 
-      <button *ngIf="isLogged && (isTrackedByTheUser$|async) && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && (isTrackedByTheUser()) && !validationRun.is_unpublished"
               pButton
               type="button"
               icon="pi pi-times"
@@ -299,7 +299,7 @@
               (click)="removeValidation(validationRun.id)">
       </button>
 
-      <button *ngIf="isLogged && (isTrackedByTheUser$|async)===false && !validationRun.is_unpublished"
+      <button *ngIf="isLogged && (!isTrackedByTheUser())&& !validationRun.is_unpublished"
               class="btn-action-large"
               pButton
               type="button"
