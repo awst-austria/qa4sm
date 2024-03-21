@@ -7,6 +7,8 @@ import {ValidationrunService} from '../../../core/services/validation-run/valida
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
 
 @Component({
@@ -43,7 +45,8 @@ export class ButtonsComponent implements OnInit {
   constructor(private router: Router,
               private validationService: ValidationrunService,
               public authService: AuthService,
-              public globals: GlobalParamsService) {
+              public globals: GlobalParamsService,
+              private toastService: ToastService) {
   }
 
   ngOnInit(): void {
@@ -54,16 +57,22 @@ export class ButtonsComponent implements OnInit {
   }
 
 
+  deleteObserver = {
+    next: () => this.onDeleteNext(),
+    error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
+    complete: () => this.toastService.showSuccess('Validation successfully removed.')
+  }
+
+  onDeleteNext(): void{
+    this.validationService.refreshComponent('page');
+    this.doUpdate.emit({key: 'delete', value: true});
+  }
+
   deleteValidation(validationId: string): void {
     if (!confirm('Do you really want to delete the result?')) {
       return;
     }
-    this.validationService.deleteValidation(validationId).subscribe(
-      () => {
-        this.validationService.refreshComponent('page');
-        this.doUpdate.emit({key: 'delete', value: true});
-      });
-
+    this.validationService.deleteValidation(validationId).subscribe(this.deleteObserver);
   }
 
   stopValidation(validationId: string): void {
