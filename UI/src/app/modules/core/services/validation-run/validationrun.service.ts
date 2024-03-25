@@ -173,7 +173,7 @@ export class ValidationrunService {
     })
     return this.httpClient.delete(removeMultipleValidationUrl, {params})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not remove selected validations.'))
       );
   }
 
@@ -186,7 +186,8 @@ export class ValidationrunService {
     return this.httpClient.post(archiveMultipleValidationUrl, {},
       {headers, observe: 'body', params: params, responseType: 'text'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError
+          .handleError(err, `We could not ${archive ? 'archive' : 'un-archive'} selected validations.`))
       );
   }
 
