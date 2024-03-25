@@ -23,7 +23,7 @@ const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
 const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comparison';
 const publishingFormURL: string = urlPrefix + '/publishing-form';
-const copyValidationUrl: string = urlPrefix + '/copy-validationS';
+const copyValidationUrl: string = urlPrefix + '/copy-validation';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 
 const csrfToken = '{{csrf_token}}';
