@@ -29,7 +29,6 @@ export class ValidationResultComponent implements OnInit {
         this.validationRunService.getValidationRunById(this.validationId)
           .pipe(
             catchError(() => {
-              console.log('Monika')
               this.dataFetchError.set(true);
               return EMPTY;
             })
