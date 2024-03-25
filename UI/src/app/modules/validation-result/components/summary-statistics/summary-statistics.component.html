@@ -19,12 +19,12 @@
         exceeds the maximum limit. For this reason, the statistics table cannot be generated on the fly.
       </ng-template>
       <ng-template #showTable>
-        <div class="pb-3 text-justify">The mean, median and standard deviation are calculated on the validation results aggregated by
+        <div class="pb-3 text-justify" *ngIf="settings$|async as settings">The mean, median and standard deviation are calculated on the validation results aggregated by
           metric
-          and dataset. The spatial reference dataset used is {{ (refDataset$ | async)?.pretty_name }}
-          ({{ (refDatasetVersion$ | async)?.short_name }}, {{ (refDatasetVariable$ | async)?.pretty_name }}).
+          and dataset. The spatial reference dataset used is {{ (refDataset$ | async)?.pretty_name || '...'}}
+          ({{ (refDatasetVersion$ | async)?.short_name  || '...'}}, {{ (refDatasetVariable$ | async)?.pretty_name || '...'}}).
           You can find formulas of each metric in
-          <a [href]="userManualLink + '#page=22'" target="_blank">chapter 4</a> of our user manual.
+          <a [href]="settings[0].sum_link + '#page=22'" target="_blank">chapter 4</a> of our user manual.
         </div>
         <span [innerHtml]="table | dompurify" class="lg:text-base text-sm"></span>
         <div class="d-flex justify-content-between align-items-center">
