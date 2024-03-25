@@ -23,7 +23,7 @@ const downloadStatisticsCsvUrl: string = urlPrefix + '/download-statistics-csv';
 const metricsAndPlotsNamesUrl: string = urlPrefix + '/get-metric-and-plots-names';
 const validations4ComparisonUrl: string = urlPrefix + '/validation-runs-for-comparison';
 const publishingFormURL: string = urlPrefix + '/publishing-form';
-const copyValidationUrl: string = urlPrefix + '/copy-validation';
+const copyValidationUrl: string = urlPrefix + '/copy-validationS';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 
 const csrfToken = '{{csrf_token}}';
@@ -162,7 +162,7 @@ export class ValidationrunService {
     const data = {remove_validation: true};
     return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not remove the validation from your list.'))
       );
   }
 
@@ -224,7 +224,7 @@ export class ValidationrunService {
   copyValidation(params: any): Observable<any> {
     return this.httpClient.get(copyValidationUrl, {params})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not copy the vaidation. '))
       );
   }
 

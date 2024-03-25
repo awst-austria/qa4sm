@@ -90,6 +90,10 @@ export class ButtonsComponent implements OnInit {
     error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
   }
 
+  removeValidationObserver = {
+    next: (response: any) => this.onRemoveValidationNext(response),
+    error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
+  }
 
   // next, errors, complete functions
   onDeleteNext(): void {
@@ -97,22 +101,31 @@ export class ButtonsComponent implements OnInit {
     this.doUpdate.emit({key: 'delete', value: true});
   }
 
-  onArchiveNext(resp, validationId, archive): void {
+  onArchiveNext(resp: { body: any; }, validationId: string, archive: boolean): void {
     this.validationService.refreshComponent(validationId);
     this.isArchived.set(archive);
     this.doUpdate.emit({key: 'archived', value: resp.body});
   }
 
-  onExtendResultsNext(resp, validationId): void {
+  onExtendResultsNext(resp: { body: any; }, validationId: string): void {
     this.validationService.refreshComponent(validationId);
     this.doUpdate.emit({key: 'extended', value: resp.body});
   }
 
-  onAddValidationNext(response): void{
+  onAddValidationNext(response): void {
     this.isTrackedByTheUser.set(true);
     this.doRefresh.emit(true);
+    this.authService.init();
     this.toastService.showSuccess(response)
   }
+
+  onRemoveValidationNext(response): void {
+    this.isTrackedByTheUser.set(false);
+    this.doRefresh.emit(true);
+    this.authService.init();
+    this.toastService.showSuccess(response)
+  }
+
 
   // button functions
   deleteValidation(validationId: string): void {
@@ -138,7 +151,6 @@ export class ButtonsComponent implements OnInit {
     this.validationService.archiveResult(validationId, archive).subscribe(this.archiveObserver(validationId, archive));
   }
 
-
   extendResults(validationId: string): void {
     if (!confirm('Do you want to extend the lifespan of this result?')) {
       return;
@@ -155,36 +167,41 @@ export class ButtonsComponent implements OnInit {
   }
 
 
-
   removeValidation(validationId: string): void {
     if (!confirm('Do you really want to remove this validation from your list?')) {
       return;
     }
-    this.validationService.removeValidation(validationId).subscribe(
-      response => {
-        // re-initi auth service to update user data - to update list of added runs
-        this.authService.init();
-        this.isTrackedByTheUser.set(false);
-        // this one is needed to refresh tracked-validations component
-        this.doRefresh.emit(true);
-        alert(response);
-      });
-    this.authService.init();
+    this.validationService.removeValidation(validationId).subscribe(this.removeValidationObserver);
   }
+
 
   open(): void {
     this.openPublishWindow.emit(true)
   }
 
-  copy(validationId: string): void {
-    let newId: string;
-    const params = new HttpParams().set('validation_id', validationId);
-    this.validationService.copyValidation(params).subscribe(data => {
-      newId = data.run_id;
-      alert('This validation will be copied and add to the list of your validations.');
-      this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
-        this.router.navigate([`validation-result/${newId}`]);
-      });
+
+  copyValidationObserver = {
+    next: (data) => this.onCopyValidationNext(data),
+    error: (error: CustomHttpError) => this.onCopyValidationError(error)
+  }
+
+  onCopyValidationNext(data): void {
+    const newId = data.run_id;
+    this.router.navigateByUrl('/', {skipLocationChange: true}).then(() => {
+      this.router.navigate([`validation-result/${newId}`])
+        .then(() => this.toastService.showSuccess('Validation copied successfully'));
     });
+  }
+
+  onCopyValidationError(error: CustomHttpError): void{
+    this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
+  }
+
+  copy(validationId: string): void {
+    // let newId: string;
+    alert('This validation will be copied and added to the list of your validations.');
+    const params = new HttpParams().set('validation_id', validationId);
+    this.validationService.copyValidation(params)
+      .subscribe(this.copyValidationObserver);
   }
 }
