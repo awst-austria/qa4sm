@@ -7,7 +7,8 @@
     </ng-template>
     <ng-template pTemplate="icons">
     </ng-template>
-    <div *ngIf="updatedMetrics$|async as metrics" style="min-height: 400px" class="flex flex-column align-content-center justify-content-center">
+    <div *ngIf="!fileError && updatedMetrics$|async as metrics else noMetrics" style="min-height: 400px"
+         class="flex flex-column align-content-center justify-content-center">
       <div *ngIf="metrics[metricIndx] && metrics[metricIndx].boxplotFiles|async as boxplots"
            class="flex flex-column w-12 flex-wrap gap-2">
         <div *ngIf="metrics[metricIndx].overviewFiles|async as overviewPlots"
@@ -125,7 +126,11 @@
         </div>
       </div>
     </div>
-
+    <ng-template #noMetrics>
+      <p class="lead text-muted">
+        Results temporarily unavailable.
+      </p>
+    </ng-template>
   </p-panel>
 
 </div>
