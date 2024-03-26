@@ -52,7 +52,8 @@ export class SummaryStatisticsComponent implements OnInit {
   getRefConfig(): void{
     this.refConfig = this.configs.find(config =>
       config.id === this.validationRun.spatial_reference_configuration);
-    this.refDataset$ = this.datasetService.getDatasetById(this.refConfig.dataset)
+    // Here I don't handle an error, if there is no name fetched, then the user will see '...' -> it's handled in the HTML
+    this.refDataset$ = this.datasetService.getDatasetById(this.refConfig.dataset);
     this.refDatasetVersion$ = this.datasetVersionService.getVersionById(this.refConfig.version);
     this.refDatasetVariable$ = this.datasetVariableService.getVariableById(this.refConfig.variable);
   }
