@@ -2,7 +2,7 @@ import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
-import {BehaviorSubject, EMPTY} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 
 @Component({
@@ -64,27 +64,21 @@ export class ValidationPagePaginatedComponent implements OnInit {
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
         .pipe(
-          catchError(() => {
-            this.dataFetchError = true;
-            return EMPTY
-          })
+          catchError(() => this.onDataFetchError())
         )
         .subscribe(
-        response => {
-          this.handleFetchedValidations(response);
-        });
+          response => {
+            this.handleFetchedValidations(response);
+          });
     } else {
       this.validationrunService.getPublishedValidationruns(parameters)
         .pipe(
-          catchError(() => {
-            this.dataFetchError = true;
-            return EMPTY
-          })
+          catchError(() => this.onDataFetchError())
         )
         .subscribe(
-        response => {
-          this.handleFetchedValidations(response);
-        });
+          response => {
+            this.handleFetchedValidations(response);
+          });
     }
   }
 
@@ -100,12 +94,12 @@ export class ValidationPagePaginatedComponent implements OnInit {
       if (validations.length) {
         this.validations = this.validations.concat(validations);
 
-        if (this.allSelected$.value){
+        if (this.allSelected$.value) {
           const selectedValidations = [];
           const select_archived = this.action$.value === 'unarchive';
           this.validations.forEach(val => {
             if (val.is_archived === select_archived && val.is_unpublished) {
-              selectedValidations.push(val.id)
+              selectedValidations.push(val.id);
             }
           })
           this.selectedValidations$.next(selectedValidations);
@@ -134,28 +128,40 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.offset = 0;
   }
 
+
   updateData(validationId: string): void {
-    const indexOfValidation = this.validations.findIndex(validation => validation.id === validationId);
-    this.validationrunService.getValidationRunById(validationId).subscribe(data => {
-      this.validations[indexOfValidation] = data;
-    });
+    const indexOfValidation = this.validations
+      .findIndex(validation => validation.id === validationId);
+    this.validationrunService.getValidationRunById(validationId)
+      .pipe(
+        catchError(() => EMPTY)
+      )
+      .subscribe(data => {
+        this.validations[indexOfValidation] = data;
+      });
   }
 
   refreshPage(): void {
-    const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
+    const parameters = new HttpParams()
+      .set('offset', String(this.offset))
+      .set('limit', String(this.limit))
       .set('order', String(this.order));
-    this.validationrunService.getMyValidationruns(parameters).subscribe(
-      response => {
-        const {validations, length} = response;
-        this.validations = validations;
-      });
+    this.validationrunService.getMyValidationruns(parameters)
+      .pipe(
+        catchError(() => this.onDataFetchError())
+      )
+      .subscribe(
+        response => {
+          const {validations, length} = response;
+          this.validations = validations;
+        });
   }
 
   handleMultipleSelection(event): void {
     this.selectionActive$.next(event.active);
     this.action$.next(event.action);
     this.selectedValidations$.next(event.selected.value);
-    this.allSelected$.next(event.allSelected)
+    this.allSelected$.next(event.allSelected);
   }
 
   updateSelectedValidations(checked: string[], id: string): void {
@@ -163,21 +169,26 @@ export class ValidationPagePaginatedComponent implements OnInit {
     if (checked.includes(id)) {
       selectedValidations = [...selectedValidations, id];
     } else {
-      selectedValidations = selectedValidations.filter(selectedId => selectedId !== id);
+      selectedValidations = selectedValidations.filter((selectedId: string) => selectedId !== id);
     }
     this.selectedValidations$.next(selectedValidations);
   }
 
-  checkIfEnabled(valrun: ValidationrunDto): boolean{
+  checkIfEnabled(valrun: ValidationrunDto): boolean {
     let condition = valrun.is_unpublished;
 
-    if (this.action$.value === 'unarchive'){
+    if (this.action$.value === 'unarchive') {
       condition = condition && valrun.is_archived;
-    } else if (this.action$.value === 'archive'){
+    } else if (this.action$.value === 'archive') {
       condition = condition && !valrun.is_archived;
     }
 
     return condition;
+  }
+
+  onDataFetchError(): Observable<never> {
+    this.dataFetchError = true;
+    return EMPTY;
   }
 
 }
