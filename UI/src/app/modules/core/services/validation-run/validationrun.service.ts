@@ -76,7 +76,7 @@ export class ValidationrunService {
   getCustomTrackedValidations(): Observable<ValidationrunDto[]> {
     return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl)
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not fetch your tracked validations.'))
       );
   }
 
