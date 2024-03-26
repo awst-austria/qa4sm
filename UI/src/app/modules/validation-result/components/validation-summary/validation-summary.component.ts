@@ -1,6 +1,6 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
-import {BehaviorSubject, forkJoin, Observable} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
@@ -36,10 +36,10 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   errorRate: number;
   isOwner: boolean;
   // some BS added to avoid refreshing component every time sth changes
-  valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  isArchived$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
-  expiryDate$: BehaviorSubject<Date> = new BehaviorSubject<Date>(null);
-  isNearExpiry$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
+  valName = signal<string|undefined>(undefined);
+  isArchived  = signal<boolean|undefined>(undefined);
+  expiryDate = signal<Date|undefined>(undefined);
+  isNearExpiry = signal<boolean|undefined>(undefined);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   scalingMethod: string;
@@ -73,7 +73,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   private updateConfig(): void {
-    this.configurations$ = forkJoin(
+    this.configurations$ = combineLatest(
       [this.validationModel.datasetConfigs,
       this.datasetService.getAllDatasets(true, false),
       this.datasetVersionService.getAllVersions(),
@@ -138,10 +138,11 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   saveName(validationId: string, newName: string): void {
-    this.validationService.saveResultsName(validationId, newName).subscribe(
+    this.validationService.saveResultsName(validationId, newName)
+      .subscribe(
       (resp) => {
         if (resp === 'Changed.'){
-          this.valName$.next(newName);
+          this.valName.set(newName);
           this.toggleEditing();
         }
       });
@@ -149,11 +150,11 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
 
   update(doUpdate: any): void {
     if (doUpdate.key === 'archived') {
-      this.isArchived$.next(doUpdate.value === 'None');
-      doUpdate.value !== 'None' ? this.expiryDate$.next(doUpdate.value) : this.expiryDate$.next(null);
+      this.isArchived.set(doUpdate.value === 'None');
+      doUpdate.value !== 'None' ? this.expiryDate.set(doUpdate.value) : this.expiryDate.set(null);
     } else if (doUpdate.key === 'extended'){
-      this.expiryDate$.next(doUpdate.value);
-      this.isNearExpiry$.next(false);
+      this.expiryDate.set(doUpdate.value);
+      this.isNearExpiry.set(false);
     }
     else if (doUpdate.key === 'delete'){
       this.router.navigate(['/my-validations']);
@@ -179,10 +180,10 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     this.errorRate = this.validationRun.total_points !== 0 ?
       (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
     this.isOwner = this.validationRun.user === this.authService.currentUser.id;
-    this.valName$.next(this.validationRun.name_tag);
-    this.isArchived$.next(this.validationRun.is_archived);
-    this.expiryDate$.next(this.validationRun.expiry_date);
-    this.isNearExpiry$.next(this.validationRun.is_near_expiry);
+    this.valName.set(this.validationRun.name_tag);
+    this.isArchived.set(this.validationRun.is_archived);
+    this.expiryDate.set(this.validationRun.expiry_date);
+    this.isNearExpiry.set(this.validationRun.is_near_expiry);
   }
 
   checkIfPublishingInProgress(): void{

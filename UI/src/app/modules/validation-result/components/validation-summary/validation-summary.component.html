@@ -11,7 +11,7 @@
         <h4 class="my-0 font-weight-normal">
           Summary:
           <span *ngIf="validationRun.is_unpublished && isOwner">
-          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{ valName$|async }} </span>
+          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{ valName() }} </span>
           <button
             pButton
             type="button"
@@ -26,7 +26,7 @@
             <label for="new-name"></label>
             <input id="new-name"
                    type="text"
-                   value="{{valName$|async}}"
+                   value="{{valName()}}"
                    #newName
                    [ngClass]="{'edit_name': true}">
             <button
@@ -50,12 +50,12 @@
           </span>
         </span>
           <span *ngIf="!validationRun.is_unpublished"
-                class="my-0 font-weight-normal no_edit_name">{{ valName$|async }}
+                class="my-0 font-weight-normal no_edit_name">{{ valName() }}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
           <span *ngIf="!isOwner && validationRun.is_unpublished"
-                class="my-0 font-weight-normal no_edit_name">{{ valName$|async }}
+                class="my-0 font-weight-normal no_edit_name">{{ valName() }}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
@@ -202,21 +202,21 @@
             subsetting or select different dataset as a spatial reference.
           </b>
         </li>
-        <li *ngIf="(isArchived$|async)===false && getCurrentUser() === validationRun.user  && !forComparison">
-          <span *ngIf="isNearExpiry$|async">
+        <li *ngIf="(isArchived())===false && getCurrentUser() === validationRun.user  && !forComparison">
+          <span *ngIf="isNearExpiry()">
             <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
             This validation will SOON be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{ timeZone }}.
+            on {{ expiryDate() | date: dateFormat : timeZone }} {{ timeZone }}.
           </span>
 
-          <span *ngIf="(isNearExpiry$|async)===false">
+          <span *ngIf="(isNearExpiry())===false">
             <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
             This validation will be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{ timeZone }}.
+            on {{ expiryDate()|date: dateFormat :timeZone }} {{ timeZone }}.
           </span>
 
         </li>
-        <li *ngIf="(isArchived$|async) && validationRun.is_unpublished && !forComparison">
+        <li *ngIf="(isArchived()) && validationRun.is_unpublished && !forComparison">
               <span
                 class="p-panel-header-icon pi expiry-icons">
                 <fa-icon [icon]="faIcons.faArchive"></fa-icon>
