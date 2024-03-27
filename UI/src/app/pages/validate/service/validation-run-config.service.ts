@@ -50,8 +50,12 @@ export class ValidationRunConfigService {
       .pipe(
         catchError(err => this.httpError.handleError(err))
       );
-  }
+  };
 
+  readonly scalingMethods$ = this.httpClient.get<ScalingMethodDto[]>(getScalingMethodsUrl)
+    .pipe(
+      catchError(err => this.httpError.handleError(err))
+    );
 
   public getInformationOnTheReference(isSpatialReference, isTemporalReference, isScalingReference): string {
     const listOfReference = [];
@@ -69,5 +73,5 @@ export class ValidationRunConfigService {
     listOfReference.length !== 0 ? information = ` (${listOfReference.join(', ')} reference)` : information = '';
 
     return information;
-  }
+  };
 }
