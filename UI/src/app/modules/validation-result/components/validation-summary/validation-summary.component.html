@@ -179,7 +179,7 @@
         </li>
 
         <li> Scaling
-          method: {{ scalingMethod }}.
+          method: {{ scalingMethodDescription$|async }}.
         </li>
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
@@ -230,16 +230,21 @@
         </li>
       </ul>
       <qa-buttons
-        *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false"
+        *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress()) === false"
         [validationList]="false"
         [validationRun]="validationRun" [canBeRerun]="validationRun.all_files_exist" (doUpdate)="update($event)"
         (openPublishWindow)="handlePublishWindow($event)"/>
 
-      <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
+      <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress())"
            style="float: right">
         <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i> Publishing in progress...
       </div>
 
+    </div>
+    <div *ngIf="dataFetchError()">
+      <p class="lead text-muted">
+        We could not generate a summary. Please try again later or <a routerLink="/contact-us"> contact </a> our support team.
+      </p>
     </div>
   </p-panel>
 

@@ -128,9 +128,8 @@ export class ValidationrunService {
     const data = {save_name: true, new_name: newName};
     return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not update your validation name.'))
       );
-
   }
 
   publishResults(validationId: string, publishingData: any): Observable<any> {

@@ -1,11 +1,11 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
-import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {combineLatest, EMPTY, Observable, of} from 'rxjs';
 import {DatasetService} from '../../../core/services/dataset/dataset.service';
 import {DatasetVersionService} from '../../../core/services/dataset/dataset-version.service';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
 import {FilterService} from '../../../core/services/filter/filter.service';
-import {map} from 'rxjs/operators';
+import {catchError, map} from 'rxjs/operators';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {AuthService} from '../../../core/services/auth/auth.service';
@@ -13,6 +13,8 @@ import {fas} from '@fortawesome/free-solid-svg-icons';
 import {Router} from '@angular/router';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 
 @Component({
@@ -35,17 +37,23 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   runTime: number;
   errorRate: number;
   isOwner: boolean;
+  dataFetchError = signal(false);
   // some BS added to avoid refreshing component every time sth changes
-  valName = signal<string|undefined>(undefined);
-  isArchived  = signal<boolean|undefined>(undefined);
-  expiryDate = signal<Date|undefined>(undefined);
-  isNearExpiry = signal<boolean|undefined>(undefined);
+  valName = signal<string | undefined>(undefined);
+  isArchived = signal<boolean | undefined>(undefined);
+  expiryDate = signal<Date | undefined>(undefined);
+  isNearExpiry = signal<boolean | undefined>(undefined);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
-  scalingMethod: string;
   public isPublishingWindowOpen: boolean;
   publishingInProgressInterval: any;
-  publishingInProgress$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  publishingInProgress = signal<boolean>(false);
+  scalingMethodDescription$ = this.validationConfigService.scalingMethods$.pipe(
+    map(methods => methods
+      .find(method => method.method === this.validationRun.scaling_method).description
+    ),
+    catchError(() => of('no information'))
+  );
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -55,16 +63,14 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
               private validationService: ValidationrunService,
               private authService: AuthService,
               private router: Router,
-              public validationConfigService: ValidationRunConfigService) {
+              public validationConfigService: ValidationRunConfigService,
+              private toastService: ToastService) {
   }
 
   ngOnInit(): void {
     this.setInitialValues();
     this.updateConfig();
     this.getOriginalDate();
-    this.validationConfigService.getScalingMethods().subscribe(methods => {
-      this.scalingMethod = methods.find(method => method.method === this.validationRun.scaling_method).description;
-    });
     this.checkIfPublishingInProgress();
   }
 
@@ -75,11 +81,11 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   private updateConfig(): void {
     this.configurations$ = combineLatest(
       [this.validationModel.datasetConfigs,
-      this.datasetService.getAllDatasets(true, false),
-      this.datasetVersionService.getAllVersions(),
-      this.datasetVariableService.getAllVariables(),
-      this.filterService.getAllFilters(),
-      this.filterService.getAllParameterisedFilters()]
+        this.datasetService.getAllDatasets(true, false),
+        this.datasetVersionService.getAllVersions(),
+        this.datasetVariableService.getAllVariables(),
+        this.filterService.getAllFilters(),
+        this.filterService.getAllParameterisedFilters()]
     ).pipe(
       map(([configurations,
              datasets,
@@ -118,7 +124,11 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
 
             }
           }
-        ))
+        )),
+      catchError(() => {
+        this.dataFetchError.set(true);
+        return EMPTY
+      })
     );
   }
 
@@ -137,26 +147,31 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     this.hideElement = !this.hideElement;
   }
 
+  saveNameObserver = (newName: string) => {
+    return {
+      next: () => this.onNameSave(newName),
+      error: (error: CustomHttpError) => this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
+      complete: () => this.toastService.showSuccess('Name updated')
+    }
+  }
+
+  onNameSave(newName: string): void{
+    this.valName.set(newName);
+    this.toggleEditing();
+  }
+
   saveName(validationId: string, newName: string): void {
-    this.validationService.saveResultsName(validationId, newName)
-      .subscribe(
-      (resp) => {
-        if (resp === 'Changed.'){
-          this.valName.set(newName);
-          this.toggleEditing();
-        }
-      });
+    this.validationService.saveResultsName(validationId, newName).subscribe(this.saveNameObserver(newName));
   }
 
   update(doUpdate: any): void {
     if (doUpdate.key === 'archived') {
       this.isArchived.set(doUpdate.value === 'None');
       doUpdate.value !== 'None' ? this.expiryDate.set(doUpdate.value) : this.expiryDate.set(null);
-    } else if (doUpdate.key === 'extended'){
+    } else if (doUpdate.key === 'extended') {
       this.expiryDate.set(doUpdate.value);
       this.isNearExpiry.set(false);
-    }
-    else if (doUpdate.key === 'delete'){
+    } else if (doUpdate.key === 'delete') {
       this.router.navigate(['/my-validations']);
     }
   }
@@ -175,7 +190,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     });
   }
 
-  setInitialValues(): void{
+  setInitialValues(): void {
     this.runTime = this.getRunTime(this.validationRun.start_time, this.validationRun.end_time);
     this.errorRate = this.validationRun.total_points !== 0 ?
       (this.validationRun.total_points - this.validationRun.ok_points) / this.validationRun.total_points : 1;
@@ -186,8 +201,8 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     this.isNearExpiry.set(this.validationRun.is_near_expiry);
   }
 
-  checkIfPublishingInProgress(): void{
-    if (this.validationRun.publishing_in_progress || this.publishingInProgress$.getValue()){
+  checkIfPublishingInProgress(): void {
+    if (this.validationRun.publishing_in_progress || this.publishingInProgress()) {
       this.publishingInProgressInterval = setInterval(() => {
         this.validationService.getValidationRunById(this.validationRun.id).subscribe(data => {
           if (!data.publishing_in_progress) {
@@ -199,12 +214,12 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  handlePublishWindow(open): void{
+  handlePublishWindow(open: boolean): void {
     this.isPublishingWindowOpen = open;
   }
 
-  startPublishing(): void{
-    this.publishingInProgress$.next(true)
+  startPublishing(): void {
+    this.publishingInProgress.set(true)
     this.checkIfPublishingInProgress()
   }
 
