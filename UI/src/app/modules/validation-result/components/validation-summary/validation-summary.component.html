@@ -73,7 +73,7 @@
       <ul [ngClass]="{'for-comparison-list': forComparison}" class="md:mx-5 md:px-3 mx-1 px-1">
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }},
-          original validation run on {{ this.originalDate| date: 'mediumDate' :timeZone }}.
+          original validation run on {{ (originalDate() | date: 'mediumDate' :timeZone) || '- no information provided'}}.
         </li>
         <li *ngIf="!validationRun.is_a_copy">Started validation
           on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }}, finished

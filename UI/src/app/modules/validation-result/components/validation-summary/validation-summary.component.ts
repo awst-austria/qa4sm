@@ -33,7 +33,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   dateFormat = 'medium';
   timeZone = 'UTC';
   hideElement = true;
-  originalDate: Date;
+  originalDate = signal<Date | undefined>(undefined)
   runTime: number;
   errorRate: number;
   isOwner: boolean;
@@ -155,7 +155,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  onNameSave(newName: string): void{
+  onNameSave(newName: string): void {
     this.valName.set(newName);
     this.toggleEditing();
   }
@@ -177,15 +177,16 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   getOriginalDate(): void {
-    this.validationModel.validationRun$.subscribe(data => {
+    this.validationModel.validationRun$
+      .subscribe(data => {
       if (data.is_a_copy) {
-        this.validationService.getCopiedRunRecord(data.id).subscribe(copiedRun => {
-          if (copiedRun.original_run_date) {
-            this.originalDate = copiedRun.original_run_date;
-          } else {
-            this.originalDate = data.start_time;
-          }
-        });
+        this.validationService.getCopiedRunRecord(data.id)
+          .subscribe(copiedRun => {
+            // error handled directly in the HTML file
+            copiedRun.original_run_date ?
+              this.originalDate.set(copiedRun.original_run_date) :
+              this.originalDate.set(data.start_time)
+          });
       }
     });
   }
@@ -204,12 +205,14 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   checkIfPublishingInProgress(): void {
     if (this.validationRun.publishing_in_progress || this.publishingInProgress()) {
       this.publishingInProgressInterval = setInterval(() => {
-        this.validationService.getValidationRunById(this.validationRun.id).subscribe(data => {
+        // no need to handle error here, if this method returns error, nothing will be shown
+        this.validationService.getValidationRunById(this.validationRun.id)
+          .subscribe(data => {
           if (!data.publishing_in_progress) {
-            this.doRefresh.emit(true)
+            this.doRefresh.emit(true);
           }
         });
-      }, 20 * 1000)
+      }, 20 * 1000);
 
     }
   }
