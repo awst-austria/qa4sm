@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {EMPTY, Observable, of} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -36,6 +36,7 @@ export class ResultFilesComponent implements OnInit {
   fileError = false;
   errorHeader = 'Files not available'
   errorMessage = 'Result plots are temporarily unavailable. '
+  dataFetchError = signal(false);
 
   constructor(private validationService: ValidationrunService,
               public plotService: WebsiteGraphicsService,
@@ -45,8 +46,10 @@ export class ResultFilesComponent implements OnInit {
 
   updateMetricsObserver = {
     next: (metrics: any) => this.onUpdateMetricsNext(metrics),
-    error: (error: CustomHttpError) =>
-      this.toastService.showErrorWithHeader(this.errorHeader, this.errorMessage + error.errorMessage.message)
+    error: (error: CustomHttpError) => {
+      this.dataFetchError.set(true);
+      this.toastService.showErrorWithHeader(this.errorHeader, this.errorMessage + error.errorMessage.message);
+    }
   }
 
   onUpdateMetricsNext(metrics): void{

@@ -7,69 +7,70 @@
     </ng-template>
     <ng-template pTemplate="icons">
     </ng-template>
-    <div *ngIf="!fileError && updatedMetrics$|async as metrics else noMetrics" style="min-height: 400px"
+    <div *ngIf="!fileError && updatedMetrics$|async as metrics" style="min-height: 400px"
          class="flex flex-column align-content-center justify-content-center">
       <div *ngIf="metrics[metricIndx] && metrics[metricIndx].boxplotFiles|async as boxplots"
            class="flex flex-column w-12 flex-wrap gap-2">
         <div *ngIf="metrics[metricIndx].overviewFiles|async as overviewPlots"
              class="flex flex-row lg:flex-nowrap flex-wrap w-12 align-content-center justify-content-center py-3">
-            <div *ngIf="boxplots.length > 0"
-                 class="flex flex-column lg:w-6 w-10 align-items-center justify-content-center">
-              <p-galleria [value]="boxplots"
-                          [(visible)]="displayBoxplotGallery"
-                          [(activeIndex)]="activeBoxplotIndex"
-                          [circular]="true"
-                          [fullScreen]="true"
-                          [showItemNavigators]="boxplots.length > 1"
-                          [showThumbnails]="false"
-                          [baseZIndex]="100000">
-                <ng-template pTemplate="item" let-item>
-                  <img [src]="sanitizePlotUrl(item.plot)"
-                       alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}"
-                       style="width: 100%;
+          <div *ngIf="boxplots.length > 0"
+               class="flex flex-column lg:w-6 w-10 align-items-center justify-content-center">
+            <p-galleria [value]="boxplots"
+                        [(visible)]="displayBoxplotGallery"
+                        [(activeIndex)]="activeBoxplotIndex"
+                        [circular]="true"
+                        [fullScreen]="true"
+                        [showItemNavigators]="boxplots.length > 1"
+                        [showThumbnails]="false"
+                        [baseZIndex]="100000">
+              <ng-template pTemplate="item" let-item>
+                <img [src]="sanitizePlotUrl(item.plot)"
+                     alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}"
+                     style="width: 100%;
                              display: block;"/>
-                </ng-template>
-              </p-galleria>
-              <img width="85%"
-                   height="95%"
-                   [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
-                   (click)="showGallery(boxplotIndx, 'boxplot')"
-                   [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
-                   alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}">
-            </div>
-            <div class="flex flex-row flex-wrap lg:w-6 w-10 align-content-center justify-content-center gap-3">
-                <div *ngFor="let plot of overviewPlots; let ind = index"
-                     [ngClass]="{'image-container': true,
+              </ng-template>
+            </p-galleria>
+            <img width="85%"
+                 height="95%"
+                 [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
+                 (click)="showGallery(boxplotIndx, 'boxplot')"
+                 [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
+                 alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}">
+          </div>
+          <div class="flex flex-row flex-wrap lg:w-6 w-10 align-content-center justify-content-center gap-3">
+            <div *ngFor="let plot of overviewPlots; let ind = index"
+                 [ngClass]="{'image-container': true,
                              'w-12': overviewPlots.length === 1,
                              'w-9': overviewPlots.length === 2,
                              'w-5': overviewPlots.length > 2}">
                     <span class="image-label">
                       {{ metrics[metricIndx].datasets[ind] }}
                     </span>
-                  <p-galleria [value]="overviewPlots"
-                              [(visible)]="displayOverviewGallery"
-                              [(activeIndex)]="activeOverviewIndex"
-                              [circular]="true"
-                              [fullScreen]="true"
-                              [showItemNavigators]="overviewPlots.length > 1"
-                              [showThumbnails]="false"
-                              [baseZIndex]="100000">
-                    <ng-template pTemplate="item" let-item>
-                      <img [src]="sanitizePlotUrl(item.plot)"
-                           alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}"
-                           style="width: 100%;
+              <p-galleria [value]="overviewPlots"
+                          [(visible)]="displayOverviewGallery"
+                          [(activeIndex)]="activeOverviewIndex"
+                          [circular]="true"
+                          [fullScreen]="true"
+                          [showItemNavigators]="overviewPlots.length > 1"
+                          [showThumbnails]="false"
+                          [baseZIndex]="100000">
+                <ng-template pTemplate="item" let-item>
+                  <img [src]="sanitizePlotUrl(item.plot)"
+                       alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}"
+                       style="width: 100%;
                              display: block;"/>
-                    </ng-template>
-                  </p-galleria>
-                  <img width="95%" height="95%"
-                       [src]="sanitizePlotUrl(plot.plot)"
-                       (click)="showGallery(ind, 'overview')"
-                       [ngClass]="{'result-plot':true, 'pcol': true}"
-                       alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}">
-              </div>
+                </ng-template>
+              </p-galleria>
+              <img width="95%" height="95%"
+                   [src]="sanitizePlotUrl(plot.plot)"
+                   (click)="showGallery(ind, 'overview')"
+                   [ngClass]="{'result-plot':true, 'pcol': true}"
+                   alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}">
             </div>
+          </div>
         </div>
-        <div class="flex flex-row w-12 align-content-center justify-content-center my-2 py-3 lg:flex-nowrap flex-wrap gap-2">
+        <div
+          class="flex flex-row w-12 align-content-center justify-content-center my-2 py-3 lg:flex-nowrap flex-wrap gap-2">
           <div class="flex flex-column lg:w-6 w-10  flex-wrap justify-content-center align-content-center gap-4">
             <div class="flex flex-column w-10"
                  *ngIf="boxplots.length > 1">
@@ -97,7 +98,8 @@
                       </span>
             </div>
           </div>
-          <div class="flex flex-row lg:w-6 w-10 lg:flex-nowrap flex-wrap justify-content-center align-content-center gap-2">
+          <div
+            class="flex flex-row lg:w-6 w-10 lg:flex-nowrap flex-wrap justify-content-center align-content-center gap-2">
             <div class="flex flex-column lg:w-5 w-10 justify-content-center">
               <button pButton
                       type="button"
@@ -126,11 +128,11 @@
         </div>
       </div>
     </div>
-    <ng-template #noMetrics>
+    <div *ngIf="dataFetchError()">
       <p class="lead text-muted">
-        Results temporarily unavailable.
+        {{ this.errorMessage }}
       </p>
-    </ng-template>
+    </div>
   </p-panel>
 
 </div>
