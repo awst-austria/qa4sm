@@ -20,7 +20,7 @@
         <tbody>
         <tr>
           <td *ngFor="let validationModel of valResModels" class="py-0 px-0">
-            <qa-validation-summary *ngIf="validationModel.validationRun|async as valRun" [validationModel]="validationModel" [validationRun]="valRun" [forComparison]="true"/>
+            <qa-validation-summary *ngIf="validationModel.validationRun$|async as valRun" [validationModel]="validationModel" [validationRun]="valRun" [forComparison]="true"/>
           </td>
         </tr>
         </tbody>

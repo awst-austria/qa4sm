@@ -1,9 +1,9 @@
 <main>
   <!--  <div class="flex flex-column align-content-center justify-content-center w-12">-->
   <div class="flex flex-column flex-wrap w-12 align-items-center justify-content-center">
-    <div *ngIf="(validationModel.validationRun|async) as validationRun"
+    <div *ngIf="(validationModel.validationRun$|async) as validationRun"
          class="flex flex-column align-content-center justify-content-center w-12">
-      <div *ngIf="validationRun && (validationModel.datasetConfigs|async) as configs"
+      <div *ngIf="validationRun && (validationModel.datasetConfigs$|async) as configs"
            class="flex flex-column align-items-center justify-content-center w-12">
 
         <div *ngIf="!validationRun.end_time" class="text-center mb-5 mt-4 w-12">

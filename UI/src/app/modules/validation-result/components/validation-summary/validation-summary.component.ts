@@ -80,7 +80,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
 
   private updateConfig(): void {
     this.configurations$ = combineLatest(
-      [this.validationModel.datasetConfigs,
+      [this.validationModel.datasetConfigs$,
         this.datasetService.getAllDatasets(true, false),
         this.datasetVersionService.getAllVersions(),
         this.datasetVariableService.getAllVariables(),
@@ -177,7 +177,7 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   }
 
   getOriginalDate(): void {
-    this.validationModel.validationRun.subscribe(data => {
+    this.validationModel.validationRun$.subscribe(data => {
       if (data.is_a_copy) {
         this.validationService.getCopiedRunRecord(data.id).subscribe(copiedRun => {
           if (copiedRun.original_run_date) {

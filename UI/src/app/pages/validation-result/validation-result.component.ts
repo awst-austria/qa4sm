@@ -45,7 +45,7 @@ export class ValidationResultComponent implements OnInit {
   }
 
   update(): void{
-    this.validationModel.validationRun = this.validationRunService.getValidationRunById(this.validationId)
+    this.validationModel.validationRun$ = this.validationRunService.getValidationRunById(this.validationId)
       .pipe(
       catchError(() => {
         this.dataFetchError.set(true);
