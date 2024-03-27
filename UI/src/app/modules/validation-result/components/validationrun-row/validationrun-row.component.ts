@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
@@ -31,7 +31,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
   originalDate: Date;
-  valName$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  valName = signal <string | undefined>(undefined);
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -47,7 +47,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
       this.getOriginalDate(this.validationRun);
     }
     this.updateConfig();
-    this.valName$.next(this.validationRun.name_tag);
+    this.valName.set(this.validationRun.name_tag);
     this.validationStatus$.next(this.getStatusFromProgress(this.validationRun));
     this.refreshStatus();
   }
@@ -110,10 +110,11 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   }
 
   saveName(validationId: string, newName: string): void {
-    this.validationService.saveResultsName(validationId, newName).subscribe(
+    this.validationService.saveResultsName(validationId, newName)
+      .subscribe(
       (resp) => {
         if (resp === 'Changed.'){
-          this.valName$.next(newName);
+          this.valName.set(newName);
           this.toggleEditing();
         }
       });

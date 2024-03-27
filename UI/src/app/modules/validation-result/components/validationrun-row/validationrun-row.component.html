@@ -2,7 +2,7 @@
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="line-height-1">Name:</span> {{ valName$|async }}</div>
+    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="line-height-1">Name:</span> {{ valName() }}</div>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
     <div class="my-0 lg:text-xl md:text-lg text-base"> DOI: <a title="doi-link" class="doilink" target="_blank"
@@ -66,7 +66,7 @@
   <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 12rem">
     <div class="my-0 lg:text-xl md:text-lg text-base">
       <span *ngIf="hideElement"
-            class="line-height-1">Name: {{ valName$|async }}
+            class="line-height-1">Name: {{ valName() }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="my-0 font-weight-normal">
@@ -90,7 +90,7 @@
           <label for="new-name">Name: </label>
           <input id="new-name"
                  type="text"
-                 value="{{valName$|async}}"
+                 value="{{valName()}}"
                  #newName
                  [ngClass]="{'edit_name': true}">
           <button
