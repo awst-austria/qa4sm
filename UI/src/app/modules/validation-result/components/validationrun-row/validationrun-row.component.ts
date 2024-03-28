@@ -7,9 +7,11 @@ import {DatasetVersionService} from 'src/app/modules/core/services/dataset/datas
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {combineLatest, EMPTY, Observable, Observer} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 
 @Component({
@@ -23,15 +25,15 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   @Input() validationRun: ValidationrunDto;
   @Output() doRefresh = new EventEmitter();
   configurations$: Observable<any>;
-  validationStatus: any;
-  validationStatus$: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  validationStatusInterval: any;
+  validationStatus = signal<string | undefined>(undefined);
 
   dateFormat = 'medium';
   timeZone = 'UTC';
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   hideElement = true;
-  originalDate: Date;
-  valName = signal <string | undefined>(undefined);
+  originalDate = signal<Date | undefined>(undefined)
+  valName = signal<string | undefined>(undefined);
 
   constructor(private datasetConfigService: DatasetConfigurationService,
               private datasetService: DatasetService,
@@ -39,7 +41,8 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
               private datasetVariableService: DatasetVariableService,
               public globalParamsService: GlobalParamsService,
               private validationService: ValidationrunService,
-              public validationConfigService: ValidationRunConfigService,) {
+              public validationConfigService: ValidationRunConfigService,
+              public toastService: ToastService) {
   }
 
   ngOnInit(): void {
@@ -48,16 +51,18 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     }
     this.updateConfig();
     this.valName.set(this.validationRun.name_tag);
-    this.validationStatus$.next(this.getStatusFromProgress(this.validationRun));
+    this.validationStatus.set(this.getStatusFromProgress(this.validationRun));
     this.refreshStatus();
   }
 
   private updateConfig(): void {
     this.configurations$ = combineLatest(
-      this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
-      this.datasetService.getAllDatasets(true, false),
-      this.datasetVersionService.getAllVersions(),
-      this.datasetVariableService.getAllVariables()
+      [
+        this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
+        this.datasetService.getAllDatasets(true, false),
+        this.datasetVersionService.getAllVersions(),
+        this.datasetVariableService.getAllVariables()
+      ]
     ).pipe(
       map(([configurations, datasets, versions, variables]) =>
         configurations.map(
@@ -94,8 +99,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
       status = 'Scheduled';
     } else if (valrun.progress === 100 && valrun.end_time) {
       status = 'Done';
-    }
-    else if (valrun.progress === -1 || valrun.progress === -100) {
+    } else if (valrun.progress === -1 || valrun.progress === -100) {
       status = 'Cancelled';
     } else if (valrun.end_time != null || valrun.total_points == 0) {
       status = 'ERROR';
@@ -105,51 +109,68 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     return status;
   }
 
-  toggleEditing(): void{
+  toggleEditing(): void {
     this.hideElement = !this.hideElement;
+  }
+
+  saveNameObserver = (newName: string): Observer<any> => {
+    return {
+      next: () => this.onSaveNameNext(newName),
+      error: (error: CustomHttpError) =>
+        this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message),
+      complete: () => this.toastService.showSuccess('Name updated')
+    }
+  }
+
+  onSaveNameNext(newName): void {
+    this.valName.set(newName);
+    this.toggleEditing();
   }
 
   saveName(validationId: string, newName: string): void {
     this.validationService.saveResultsName(validationId, newName)
-      .subscribe(
-      (resp) => {
-        if (resp === 'Changed.'){
-          this.valName.set(newName);
-          this.toggleEditing();
-        }
+      .subscribe(this.saveNameObserver(newName));
+  }
+
+
+  getOriginalDate(copiedRun: ValidationrunDto): void {
+    // error handled in the HTML file
+    this.validationService.getCopiedRunRecord(copiedRun.id)
+      .subscribe(data => {
+        data.original_run_date ?
+          this.originalDate.set(data.original_run_date) :
+          this.originalDate.set(copiedRun.start_time);
       });
   }
 
-  getOriginalDate(copiedRun: ValidationrunDto): void {
-    this.validationService.getCopiedRunRecord(copiedRun.id).subscribe(data => {
-      if (data.original_run_date){
-        this.originalDate = data.original_run_date;
-      } else{
-        this.originalDate = copiedRun.start_time;
-      }
-    });
-  }
-
-  refreshStatus(): void{
+  refreshStatus(): void {
     if (
       (this.validationRun.progress !== -1 && this.validationRun.progress !== -100) &&
       !(this.validationRun.progress === 100 &&
         this.validationRun.end_time !== null) &&
       !(this.validationRun.progress === 0 &&
-        this.validationRun.end_time !== null)){
-      this.validationStatus = setInterval(() => {
-        this.validationService.getValidationRunById(this.validationRun.id).subscribe(data => {
-          this.validationStatus$.next(this.getStatusFromProgress(data));
-          if (data.progress === 100 && data.end_time) {
-            this.validationService.refreshComponent(this.validationRun.id);
-          }
-        });
+        this.validationRun.end_time !== null)) {
+      this.validationStatusInterval = setInterval(() => {
+        this.validationService.getValidationRunById(this.validationRun.id)
+          .pipe(
+            catchError(() => {
+              this.validationStatus.set('Unknown');
+              clearInterval(this.validationStatusInterval);
+              return EMPTY
+            })
+          )
+          .subscribe(data => {
+            this.validationStatus.set(this.getStatusFromProgress(data));
+            if (data.progress === 100 && data.end_time) {
+              this.validationService.refreshComponent(this.validationRun.id);
+            }
+          });
       }, 60 * 1000); // one minute
     }
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.validationStatus);
+    clearInterval(this.validationStatusInterval);
   }
 
 }

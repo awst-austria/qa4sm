@@ -51,7 +51,7 @@
       </span>
       <span *ngIf="validationRun.is_a_copy">
         Copied: {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}} <br>
-        (Date of original run: {{ originalDate|date: 'mediumDate' :timeZone }})
+        (Date of original run: {{ (originalDate() |date: 'mediumDate' :timeZone) || 'no information available' }})
       </span>
       <em *ngIf="!validationRun.all_files_exist" class="ml-2">
         Validation can not be reproduced
@@ -145,8 +145,10 @@
       </div>
       <!--    CUSTOM -->
       <div *ngIf="!published">
-        <strong>Status:</strong><br/>
-        {{validationStatus$|async}}
+        <span *ngIf="validationStatus()==='Unknown'" class="pi pi-question-circle"
+              [pTooltip]="'The validation is still running, but we could not provide progress information.'"></span>
+        <strong> Status:</strong><br/>
+        {{validationStatus()}}
       </div>
     </div>
 
