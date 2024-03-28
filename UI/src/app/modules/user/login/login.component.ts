@@ -42,7 +42,8 @@ export class LoginComponent implements OnInit {
     this.loginDto.password = this.loginForm.value.password;
 
 
-    // todo: this one should be rewritten the way, that it handles login entirely and sets the current user
+    // todo: this one should be rewritten the way, that it handles login entirely and sets the current user,
+    // also the message should be updated; it's not only wrong credentials that may fail
     this.loginService.login(this.loginDto).subscribe(authenticated => {
       if (authenticated && this.navigateAfter) {
         this.router.navigate([this.prevUrl]).then(
