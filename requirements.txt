@@ -14,8 +14,8 @@ netCDF4==1.6.3
 numpy==1.24.3
 pandas==1.5.3
 parse==1.19.0
-Pillow==9.5.0
-Pillow==9.5.0
+Pillow==10.3.0
+Pillow==10.3.0
 pygeobase==0.6.2
 pynetcf==0.5.0
 PySide2==5.15.2.1
