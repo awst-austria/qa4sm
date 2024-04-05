@@ -1,4 +1,4 @@
-import {Component, HostListener, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
@@ -28,7 +28,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
-  dataFetchError = false;
+  dataFetchError = signal(false);
 
   constructor(private validationrunService: ValidationrunService) {
   }
@@ -187,7 +187,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   onDataFetchError(): Observable<never> {
-    this.dataFetchError = true;
+    this.dataFetchError.set(true);
     return EMPTY;
   }
 

@@ -5,12 +5,12 @@
       [validations]="validations"
       [selectedValidationsId$]="selectedValidations$"
       (selectionActive)="handleMultipleSelection($event)"
-      *ngIf="!published && !dataFetchError"/>
+      *ngIf="!published && !dataFetchError()"/>
   </div>
 
   <div class="flex flex-column w-12 align-content-center justify-content-center">
     <!-- custom -->
-    <div *ngIf="!published && !dataFetchError" class="text-center w-12">
+    <div *ngIf="!published && !dataFetchError()" class="text-center w-12">
       <h1>My validations</h1>
       <p *ngIf="!validations.length" class="lead text-muted">
         You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
@@ -19,7 +19,7 @@
     </div>
 
     <!-- published -->
-    <div *ngIf="published && !dataFetchError" class="text-center w-12 my-2">
+    <div *ngIf="published && !dataFetchError()" class="text-center w-12 my-2">
       <h1>Published validations</h1>
       <p class="lead text-muted">
         The QA4SM validations below have been published by their owners to
@@ -29,11 +29,11 @@
       </p>
     </div>
 
-    <div *ngIf="dataFetchError" class="text-center w-12 my-2">
+    <div *ngIf="dataFetchError()" class="text-center w-12 my-2">
       <qa-error></qa-error>
     </div>
 
-    <div *ngIf="validations.length" class="w-12 my-2">
+    <div *ngIf="validations.length && !dataFetchError()" class="w-12 my-2">
       <qa-sorting-form (orderQueryName)="getOrder($event)"/>
     </div>
 
@@ -52,7 +52,7 @@
             [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
             inputId="{{valrun.id}}}">
           </p-checkbox>
-          <qa-validationrun-row [published]=published [validationRun]="valrun"/>
+          <qa-validationrun-row [published]=published [validationRun]="valrun" (emitError)="dataFetchError.set($event)"/>
           <br/>
         </div>
       </div>

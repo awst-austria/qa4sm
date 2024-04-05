@@ -23,7 +23,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   @Input() published = false;
   @Input() validationRun: ValidationrunDto;
-  @Output() doRefresh = new EventEmitter();
+  @Output() emitError = new EventEmitter();
   configurations$: Observable<any>;
   validationStatusInterval: any;
   validationStatus = signal<string | undefined>(undefined);
@@ -85,7 +85,11 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
             }
           }
         )
-      )
+      ),
+      catchError(() => {
+        this.emitError.emit(true);
+        return EMPTY
+      })
     );
   }
 
