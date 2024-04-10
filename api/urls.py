@@ -28,7 +28,7 @@ from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
 from api.views.support_request_view import *
 from api.views.custom_dataset_view import *
-
+from rest_framework.authtoken import views
 # schema_view = get_schema_view(
 #     openapi.Info(
 #         title="Snippets API",
@@ -130,6 +130,7 @@ urlpatterns = [
     path('user-manual', get_user_manual, name='Get user manual'),
     path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
     path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
+    path('api-token-auth/', views.obtain_auth_token)
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
