@@ -82,8 +82,12 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
     this.configurations$ = combineLatest(
       [this.validationModel.datasetConfigs$,
         this.datasetService.getAllDatasets(true, false),
-        this.datasetVersionService.getAllVersions(),
-        this.datasetVariableService.getAllVariables(),
+        this.datasetVersionService.getAllVersions().pipe(
+          catchError(() => of([]))
+        ),
+        this.datasetVariableService.getAllVariables().pipe(
+          catchError(() => of([]))
+        ),
         this.filterService.getAllFilters(),
         this.filterService.getAllParameterisedFilters()]
     ).pipe(
@@ -103,14 +107,14 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
 
               fileExists: datasetInfo?.storage_path.length > 0,
 
-              version: versions.find(dsVersion =>
-                config.version === dsVersion.id).pretty_name,
+              version: versions.length ? versions.find(dsVersion =>
+                config.version === dsVersion.id).pretty_name : '...',
 
-              variable: variables.find(dsVar =>
-                config.variable === dsVar.id).short_name,
+              variable: variables.length ? variables.find(dsVar =>
+                config.variable === dsVar.id).short_name : '...',
 
-              variableUnit: variables.find(dsVar =>
-                config.variable === dsVar.id).unit,
+              variableUnit: variables.length ? variables.find(dsVar =>
+                config.variable === dsVar.id).unit : '...',
 
               filters: config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
 
