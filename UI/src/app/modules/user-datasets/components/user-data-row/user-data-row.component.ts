@@ -177,20 +177,14 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
     this.toastService.showSuccess('Metadata has been updated');
   }
 
-  toggle(fieldName, open): void {
-    let editableField;
-    switch (fieldName) {
-      case this.datasetFieldName:
-        editableField = this.editDataset;
-        break;
-      case this.versionFieldName:
-        editableField = this.editVersion;
-        break;
-      case this.variableFieldName:
-        editableField = this.editVariable;
-        break;
+  toggle(fieldName: string, open: boolean): void {
+    if (fieldName === this.datasetFieldName && this.datasetName()){
+      this.editDataset.opened = open;
+    } else if (fieldName === this.versionFieldName && this.versionName()) {
+      this.editVersion.opened = open;
+    } else if (fieldName === this.variableFieldName && this.variable.shortName()){
+      this.editVariable.opened = open;
     }
-    editableField.opened = open;
   }
 
   getTheFileSize(): string {
@@ -234,15 +228,14 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
       this.shareDataModalWindow = false;
       this.userDatasetService.getUserDataFileById(this.userDataset.id)
         .subscribe(data => {
-          console.log(data)
           this.userDataset = data;
         }
       )
     }
   }
 
-
   fetchMetadataError(source: string): Observable<never> {
+    console.log(this.variable.prettyName(), this.datasetName(), this.versionName())
     this.toastService.showErrorWithHeader('Error fetching metadata',
       `${source} metadata could not be fetched, there might be information on your dataset missing. ` +
       'If the error persists, contact our support team.')

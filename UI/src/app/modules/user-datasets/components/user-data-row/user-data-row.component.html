@@ -18,7 +18,7 @@
       <div
         *ngIf="!editDataset.opened"
         style="cursor: pointer"
-        pTooltip="Click to change the name."
+        [pTooltip]="datasetName() ? 'Click to change the name. ' : 'Sorry, we could not fetch dataset name.'"
         tooltipPosition="bottom"
         (click)="toggle(datasetFieldName, true)"
       > Name: <b>{{(datasetName())}} </b>
@@ -54,7 +54,7 @@
       <div
         *ngIf="!editVersion.opened"
         style="cursor: pointer"
-        pTooltip="Click to change the name."
+        [pTooltip]="versionName() ? 'Click to change the name.' : 'Sorry, we could not fetch proper version name.' "
         tooltipPosition="bottom"
         (click)="toggle(versionFieldName, true)">
         Version: <b>{{(versionName())}} </b>
@@ -93,9 +93,11 @@
         (click)="toggle(variableFieldName,true)"
         style="cursor: pointer"
         [class]="(variable.shortName()) !== '--none--' ? '' : 'warning'"
-        pTooltip="{{variable.shortName() !== '--none--' ?
+        pTooltip="{{variable.shortName() !== '--none--' && variable.shortName() ?
         'You can choose another name by clicking here. Please note, if the chosen variable name is incorrect, data validation will not be possible.' :
-        'We could not retrieve the applicable soil moisture variable name. Please choose the proper one from the list. A validation will fail if no proper variable is set.'}}"
+        variable.shortName() === '--none--' ?
+        'We could not retrieve the applicable soil moisture variable name. Please choose the proper one from the list. A validation will fail if no proper variable is set.'
+        : 'Sorry, we could not fetch variable name.'}}"
       >
         Variable: <b>{{variable.shortName()}} ({{variable.shortName()}}
         ) [{{variable.unit()}}] </b>
@@ -104,6 +106,7 @@
       <div *ngIf="(editVariable.opened)">
         <label for="variable-dropdown">Variable: </label>
         <p-dropdown
+          [disabled]="!variable.shortName()"
           id="variable-dropdown"
           class="form-field"
           [options]="(userDataset.all_variables)"
