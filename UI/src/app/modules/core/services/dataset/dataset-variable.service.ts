@@ -34,7 +34,7 @@ export class DatasetVariableService {
       this.arrayRequestCache.push(CACHE_KEY_ALL_VERSIONS, datasetVariables$);
       return datasetVariables$
         .pipe(
-          catchError(err => this.httpError.handleError(err))
+          catchError(err => this.httpError.handleError(err, 'We could not fetch variables.'))
         );
     }
 
@@ -49,7 +49,7 @@ export class DatasetVariableService {
       this.arrayRequestCache.push(datasetId, datasetVariables$);
       return datasetVariables$
         .pipe(
-          catchError(err => this.httpError.handleError(err))
+          catchError(err => this.httpError.handleError(err, 'We could not fetch variables for selected dataset.')),
         );
     }
   }
@@ -64,7 +64,7 @@ export class DatasetVariableService {
       this.singleRequestCache.push(variableId, datasetVariable$);
       return datasetVariable$
         .pipe(
-          catchError(err => this.httpError.handleError(err))
+          catchError(err => this.httpError.handleError(err, 'We could not fetch proper variable.')),
         );
     }
 
