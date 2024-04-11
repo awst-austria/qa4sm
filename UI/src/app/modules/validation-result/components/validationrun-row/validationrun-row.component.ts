@@ -7,7 +7,7 @@ import {DatasetVersionService} from 'src/app/modules/core/services/dataset/datas
 import {DatasetVariableService} from 'src/app/modules/core/services/dataset/dataset-variable.service';
 import {fas} from '@fortawesome/free-solid-svg-icons';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {combineLatest, EMPTY, Observable, Observer} from 'rxjs';
+import {combineLatest, EMPTY, Observable, Observer, of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
@@ -60,8 +60,12 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
       [
         this.datasetConfigService.getConfigByValidationrun(this.validationRun.id),
         this.datasetService.getAllDatasets(true, false),
-        this.datasetVersionService.getAllVersions(),
-        this.datasetVariableService.getAllVariables()
+        this.datasetVersionService.getAllVersions().pipe(
+          catchError(() => of([]))
+        ),
+        this.datasetVariableService.getAllVariables().pipe(
+          catchError(() => of([]))
+        )
       ]
     ).pipe(
       map(([configurations, datasets, versions, variables]) =>
@@ -74,14 +78,14 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
               fileExists: datasetInfo?.storage_path.length > 0,
 
-              version: versions.find(dsVersion =>
-                config.version === dsVersion.id).pretty_name,
+              version: versions.length ? versions.find(dsVersion =>
+                config.version === dsVersion.id).pretty_name : '...',
 
-              variable: variables.find(dsVar =>
-                config.variable === dsVar.id).short_name,
+              variable: variables.length ? variables.find(dsVar =>
+                config.variable === dsVar.id).short_name : '...',
 
-              variableUnit: variables.find(dsVar =>
-                config.variable === dsVar.id).unit,
+              variableUnit: variables.length ? variables.find(dsVar =>
+                config.variable === dsVar.id).unit : '...',
             }
           }
         )
