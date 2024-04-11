@@ -16,7 +16,7 @@ from api.views.validation_config_view import start_validation, get_validation_co
 from api.views.uptime_view import uptime_ping, get_uptime
 from api.views.comparison_view import get_comparison_table, get_comparison_plots_for_metric, \
     download_comparison_table, get_comparison_metrics, get_spatial_extent
-from api.views.user_view import signup_post, user_update, user_delete
+from api.views.user_view import signup_post, user_update, user_delete, get_user_token
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
     custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_validation
@@ -29,6 +29,7 @@ from api.views.upload_user_data_view import *
 from api.views.support_request_view import *
 from api.views.custom_dataset_view import *
 from rest_framework.authtoken import views
+
 # schema_view = get_schema_view(
 #     openapi.Info(
 #         title="Snippets API",
@@ -130,7 +131,8 @@ urlpatterns = [
     path('user-manual', get_user_manual, name='Get user manual'),
     path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
     path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
-    path('api-token-auth/', views.obtain_auth_token)
+    path('api-obtain-token/', views.obtain_auth_token),
+    path('api-display-token', get_user_token, name='Get User Token')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

@@ -6,13 +6,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
 from validator.models import User
 from django.contrib.auth import update_session_auth_hash
-from api.views.auxiliary_functions import get_fields_as_list
+from rest_framework.authtoken.models import Token
+
 
 def _get_querydict_from_user_data(request, userdata):
     user_data_dict = QueryDict(mutable=True)
@@ -78,6 +78,15 @@ def user_delete(request):
     send_user_status_changed(request.user, False)
     logout(request)
     return HttpResponse(status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_token(request):
+    token_list = Token.objects.filter(user=request.user)
+    token = token_list[0].key if len(token_list) else None
+    response = {'token': token, 'exists': token is not None}
+    return JsonResponse(response, status=200)
 
 
 class UserSerializer(ModelSerializer):
