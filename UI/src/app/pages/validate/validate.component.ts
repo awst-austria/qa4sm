@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnInit, signal, ViewChild} from '@angular/core';
 import {DatasetService} from '../../modules/core/services/dataset/dataset.service';
 import {
   DatasetComponentSelectionModel
@@ -51,6 +51,7 @@ import {
   ValidationReferenceComponent
 } from '../../modules/validation-reference/components/validation-reference/validation-reference.component';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
+import {CustomHttpError} from '../../modules/core/services/global/http-error.service';
 
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
@@ -99,7 +100,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   isThereValidation: ExistingValidationDto;
   public isExistingValidationWindowOpen: boolean;
   maintenanceMode = false;
-  noIsmnPoints = new BehaviorSubject(false);
+  noIsmnPoints = signal(false);
+  noVariable = signal(false);
+  noVersion = signal(false);
+  validationDisabledMessage = new BehaviorSubject(''); // can not be signal, because it is used in html
 
   defMaxLon = 48.3;
   defMinLon = -11.2;
@@ -254,18 +258,18 @@ export class ValidateComponent implements OnInit, AfterViewInit {
           catchError(() => EMPTY)
         )
         .subscribe(dataset => {
-        newDatasetConfigModel.datasetModel.selectedDataset = dataset;
+          newDatasetConfigModel.datasetModel.selectedDataset = dataset;
 
-        if (datasetConfig.is_spatial_reference) {
-          this.spatialReferenceChild.setReference(newDatasetConfigModel);
-        }
-        if (datasetConfig.is_temporal_reference) {
-          this.temporalReferenceChild.setReference(newDatasetConfigModel);
-        }
-        if (datasetConfig.is_scaling_reference) {
-          this.scalingChild.setSelection(validationRunConfig.scaling_method, newDatasetConfigModel);
-        }
-      });
+          if (datasetConfig.is_spatial_reference) {
+            this.spatialReferenceChild.setReference(newDatasetConfigModel);
+          }
+          if (datasetConfig.is_temporal_reference) {
+            this.temporalReferenceChild.setReference(newDatasetConfigModel);
+          }
+          if (datasetConfig.is_scaling_reference) {
+            this.scalingChild.setSelection(validationRunConfig.scaling_method, newDatasetConfigModel);
+          }
+        });
 
 
     });
@@ -378,32 +382,48 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         catchError(() => EMPTY)
       )
       .subscribe(datasets => {
-      model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === defaultDatasetName);
+        model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === defaultDatasetName);
 
 
-      const getVersionsByDatasetObserver = {
-        next: versions => this.onGetVersionNext(versions, model, defaultVersionName),
-        complete: () => this.onGetVersionComplete(),
-      }
+        const getVersionsByDatasetObserver = {
+          next: versions => this.onGetVersionNext(versions, model, defaultVersionName),
+          error: (error: CustomHttpError) => this.onGetVersionError(error),
+          complete: () => this.onGetVersionComplete(),
+        }
 
-      // then get all versions for the first dataset in the result list
-      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(
-        getVersionsByDatasetObserver
-      );
+        const getVariablesByDatasetObserver = {
+          next: variables => model.datasetModel.selectedVariable = variables[0],
+          error: (error: CustomHttpError) => this.onGetVariableError(error),
+        }
 
-      // at the same time get the variables too
-      this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
-        model.datasetModel.selectedVariable = variables[0];
+        // then get all versions for the first dataset in the result list
+        this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(
+          getVersionsByDatasetObserver
+        );
+
+        // at the same time get the variables too
+        this.variableService.getVariablesByDataset(model.datasetModel.selectedDataset.id)
+          .subscribe(getVariablesByDatasetObserver);
+
+        // and the filters
+        // this.loadFiltersForModel(model);
       });
-
-      // and the filters
-      // this.loadFiltersForModel(model);
-    });
   }
+
+  private onGetVariableError(error: CustomHttpError): void{
+    this.noVariable.set(true);
+    this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
+  }
+
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
     model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
     this.loadFiltersForModel(model)
+  }
+
+  private onGetVersionError(error: CustomHttpError): void{
+    this.noVersion.set(true);
+    this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
   }
 
   private onGetVersionComplete(): void {
@@ -573,8 +593,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.updateMap();
   }
 
-  onBasicFilterMapUpdate($event): void{
-    if ($event){
+  onBasicFilterMapUpdate($event): void {
+    if ($event) {
       this.updateMap()
     }
   }
@@ -584,24 +604,24 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationModel.datasetConfigurations.forEach(config => {
       if (config.datasetModel.selectedVersion) {
         geojsons.push(this.versionService.getGeoJSONById(config.datasetModel.selectedVersion.id).pipe(map(value => {
-          let filteredGeoJson: any = JSON.parse(value);
+            let filteredGeoJson: any = JSON.parse(value);
 
-          if (config.ismnDepthFilter$.value != null) {
-            filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
-          }
-          if (config.ismnNetworkFilter$.value != null) {
-            filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
-          }
-
-
-          config.basicFilters.forEach(filter =>{
-            if (filter.filterDto.name === 'FIL_ISMN_FRM_representative' && filter.enabled){
-              filteredGeoJson = this.ismnFrmFilter(filteredGeoJson)
+            if (config.ismnDepthFilter$.value != null) {
+              filteredGeoJson = this.ismnDepthFilter(config.ismnDepthFilter$.value.parameters$.value, filteredGeoJson);
             }
-          })
+            if (config.ismnNetworkFilter$.value != null) {
+              filteredGeoJson = this.ismnNetworkFilter(config.ismnNetworkFilter$.value.parameters$.value, filteredGeoJson);
+            }
 
-          return filteredGeoJson;
-        }),
+
+            config.basicFilters.forEach(filter => {
+              if (filter.filterDto.name === 'FIL_ISMN_FRM_representative' && filter.enabled) {
+                filteredGeoJson = this.ismnFrmFilter(filteredGeoJson)
+              }
+            })
+
+            return filteredGeoJson;
+          }),
           catchError(error => of(undefined))
         ));
       }
@@ -610,7 +630,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     forkJoin(geojsons).subscribe(data => {
       this.mapComponent.clearSelection();
       data.forEach(mapData => {
-        if(mapData!=undefined){
+        if (mapData != undefined) {
           this.mapComponent.addGeoJson(JSON.stringify(mapData));
         }
       });
@@ -650,7 +670,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     } else {
       console.error("Invalid ISMN depth filter param. value:", filter);
     }
-
 
   }
 
@@ -725,7 +744,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       name_tag: this.validationModel.nameTag$.getValue(),
       temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
-
 
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation)
       .subscribe(this.startValidationObserver);
@@ -942,12 +960,24 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   disableValidateButton(validationModel): boolean {
-    return validationModel.datasetConfigurations
+    const noneVariable = validationModel.datasetConfigurations
       .filter(config => config.datasetModel?.selectedVariable?.short_name === '--none--').length !== 0;
+    let message = 'You can not start a validation, ';
+    if (noneVariable) {
+      message += 'because one of the chosen dataset has no variable assigned.'
+    } else if (this.noIsmnPoints()) {
+      message += 'because there are not ISMN points available for comparison.'
+    } else if (this.noVersion()) {
+      message += 'because no version is available.'
+    } else if (this.noVariable) {
+      message += 'because no variable is available.'
+    }
+    this.validationDisabledMessage.next(message);
+    return noneVariable || this.noIsmnPoints() || this.noVariable() || this.noVersion()
   }
 
   public checkIsmnPoints(evt): void {
-    this.noIsmnPoints.next(evt)
+    this.noIsmnPoints.set(evt)
   }
 
 }
