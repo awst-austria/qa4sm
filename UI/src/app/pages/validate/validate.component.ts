@@ -246,9 +246,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
       });
 
-      this.variableService.getVariableById(datasetConfig.variable_id).subscribe(variableDto => {
-        newDatasetConfigModel.datasetModel.selectedVariable = variableDto;
-      });
+      this.variableService.getVariableById(datasetConfig.variable_id)
+        .subscribe({
+          next: variableDto => newDatasetConfigModel.datasetModel.selectedVariable = variableDto,
+          error: (error: CustomHttpError) => this.onGetVariableError(error)
+        });
+
       newDatasetConfigModel.spatialReference$.next(datasetConfig.is_spatial_reference);
       newDatasetConfigModel.temporalReference$.next(datasetConfig.is_temporal_reference);
       newDatasetConfigModel.scalingReference$.next(datasetConfig.is_scaling_reference);
@@ -410,7 +413,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
   }
 
-  private onGetVariableError(error: CustomHttpError): void{
+  private onGetVariableError(error: CustomHttpError): void {
     this.noVariable.set(true);
     this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
   }
@@ -421,7 +424,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.loadFiltersForModel(model)
   }
 
-  private onGetVersionError(error: CustomHttpError): void{
+  private onGetVersionError(error: CustomHttpError): void {
     this.noVersion.set(true);
     this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
   }
