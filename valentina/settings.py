@@ -120,7 +120,7 @@ if DBSM == "postgresql":
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'valentina_local_test',
+            'NAME': 'valentina',
             'USER': 'django',
             'PASSWORD': DB_PASSWORD,
             'HOST': DB_HOST,
