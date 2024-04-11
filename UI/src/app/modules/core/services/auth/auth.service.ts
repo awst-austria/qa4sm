@@ -14,7 +14,7 @@ export class AuthService {
   private API_URL = environment.API_URL;
 
   private loginUrl = this.API_URL + 'api/auth/login';
-  private logoutUrl = this.API_URL + 'api/auth/logoutS';
+  private logoutUrl = this.API_URL + 'api/auth/logout';
   private signUpUrl = this.API_URL + 'api/sign-up';
   private userUpdateUrl = this.API_URL + 'api/user-update';
   private userDeleteUrl = this.API_URL + 'api/user-delete';
