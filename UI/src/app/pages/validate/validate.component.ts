@@ -219,30 +219,33 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(false)
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
-      this.versionService.getVersionById(datasetConfig.version_id).subscribe(versionDto => {
-        newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
+      this.versionService.getVersionById(datasetConfig.version_id).subscribe( {
+        next: versionDto => {
+          newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
 
-        this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
-          .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
-            datasetConfig.basic_filters.forEach(basicFilterConfig => {
-              datasetConfigModel.basicFilters.forEach(filter => {
-                if (basicFilterConfig === filter.filterDto.id) {
-                  filter.enabled = true;
+          this.loadFiltersForModel(newDatasetConfigModel, true) // Load the available filters for the dataset, set default parameters
+            .subscribe(datasetConfigModel => { // when it is loaded, set the parameter values from the config
+              datasetConfig.basic_filters.forEach(basicFilterConfig => {
+                datasetConfigModel.basicFilters.forEach(filter => {
+                  if (basicFilterConfig === filter.filterDto.id) {
+                    filter.enabled = true;
+                  }
+                });
+              });
+              datasetConfig.parametrised_filters.forEach(paramFilter => {
+                if (paramFilter.id === SMOS_RFI_FILTER_ID) {
+                  datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
+                  datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
+                }
+                if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
+                  datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
                 }
               });
             });
-            datasetConfig.parametrised_filters.forEach(paramFilter => {
-              if (paramFilter.id === SMOS_RFI_FILTER_ID) {
-                datasetConfigModel.smosRfiFilter$.value.parameters$.next(paramFilter.parameters);
-              }
-              if (paramFilter.id === ISMN_NETWORK_FILTER_ID) {
-                datasetConfigModel.ismnNetworkFilter$.value.parameters$.next(paramFilter.parameters);
-              }
-              if (paramFilter.id === ISMN_DEPTH_FILTER_ID) {
-                datasetConfigModel.ismnDepthFilter$.value.parameters$.next(paramFilter.parameters);
-              }
-            });
-          });
+        },
+        error: (error: CustomHttpError) => this.onGetVersionError(error)
 
       });
 
