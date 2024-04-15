@@ -103,6 +103,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   noIsmnPoints = signal(false);
   noVariable = signal(false);
   noVersion = signal(false);
+  noFilters = signal(false);
   validationDisabledMessage = new BehaviorSubject(''); // can not be signal, because it is used in html
 
   defMaxLon = 48.3;
@@ -526,6 +527,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private onGetFiltersError(error, updatedModel$): void {
+    this.noFilters.set(true);
     updatedModel$.error(error);
   }
 
@@ -975,11 +977,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       message += 'because there are not ISMN points available for comparison.'
     } else if (this.noVersion()) {
       message += 'because no version is available.'
-    } else if (this.noVariable) {
+    } else if (this.noVariable()) {
       message += 'because no variable is available.'
+    } else if (this.noFilters()) {
+      message += 'because we could not fetch filters properly.'
     }
     this.validationDisabledMessage.next(message);
-    return noneVariable || this.noIsmnPoints() || this.noVariable() || this.noVersion()
+    return noneVariable || this.noIsmnPoints() || this.noVariable() || this.noVersion() || this.noFilters()
   }
 
   public checkIsmnPoints(evt): void {
