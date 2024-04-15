@@ -73,7 +73,8 @@
       <ul [ngClass]="{'for-comparison-list': forComparison}" class="md:mx-5 md:px-3 mx-1 px-1">
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }},
-          original validation run on {{ (originalDate() | date: 'mediumDate' :timeZone) || '- no information provided'}}.
+          original validation run
+          on {{ (originalDate() | date: 'mediumDate' :timeZone) || '- no information provided' }}.
         </li>
         <li *ngIf="!validationRun.is_a_copy">Started validation
           on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }}, finished
@@ -94,7 +95,7 @@
               </em>
               <span *ngIf="!config.fileExists" style="color: red">(Data set has been removed)</span>
               <br>
-              <div *ngIf="config.filters.length > 0 || config.parametrisedFilters.length > 0">
+              <div *ngIf="config.filters.length > 0 || config.parametrisedFilters.length > 0; else noFilters">
                 Filters:
                 <ul>
                   <li *ngFor="let filter of config.filters">{{ filter }};</li>
@@ -105,6 +106,8 @@
                   </li>
                 </ul>
               </div>
+              <ng-template #noFilters><em style="color: gray">We could not fetch list of applied filters.</em>
+              </ng-template>
 
             </li>
           </ol>
@@ -243,7 +246,8 @@
     </div>
     <div *ngIf="dataFetchError()">
       <p class="lead text-muted">
-        We could not generate a summary. Please try again later or <a routerLink="/contact-us"> contact </a> our support team.
+        We could not generate a summary. Please try again later or <a routerLink="/contact-us"> contact </a> our support
+        team.
       </p>
     </div>
   </p-panel>

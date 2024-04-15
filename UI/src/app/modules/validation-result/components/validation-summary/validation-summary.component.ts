@@ -88,7 +88,9 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
         this.datasetVariableService.getAllVariables().pipe(
           catchError(() => of([]))
         ),
-        this.filterService.getAllFilters(),
+        this.filterService.getAllFilters().pipe(
+          catchError(() => of([]))
+        ),
         this.filterService.getAllParameterisedFilters()]
     ).pipe(
       map(([configurations,
@@ -116,9 +118,12 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
               variableUnit: variables.length ? variables.find(dsVar =>
                 config.variable === dsVar.id).unit : '...',
 
-              filters: config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
+              filters: dataFilters.length ?
+                config.filters.map(f => dataFilters.find(dsF => dsF.id === f).description) : [],
 
-              parametrisedFilters: config.parametrised_filters.map(f => dataFilters.find(dsF => dsF.id === f).description),
+              parametrisedFilters: dataFilters.length ?
+                config.parametrised_filters.map(f => dataFilters.find(dsF => dsF.id === f).description)
+                : [],
 
               parametrisedFiltersValues: config.parametrised_filters
                 .map(fId => config.parametrisedfilter_set
