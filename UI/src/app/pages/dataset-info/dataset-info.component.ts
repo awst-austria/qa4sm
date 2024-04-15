@@ -26,7 +26,8 @@ export class DatasetInfoComponent {
               private filterService: FilterService) {
   }
 
-
+  // here it actually doesn't make sense to handle errors separately for datasets, versions and filters; if part of
+  // the information is missing, it doesn't make sense to show it at all.
   datasetInfo$: Observable<any> = combineLatest([
     this.datasetService.getAllDatasets(),
     this.versionService.getAllVersions(),
