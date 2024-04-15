@@ -13,7 +13,10 @@
   <div class="pb-3" style="max-width: 350px">
     Click on a continent to unfold its list of networks.<br/>
     You can find more information about the ISMN networks on the <a href="https://ismn.earth/en/networks/"
-                                                                    target="_blank">ISMN networks list</a>.
+                                                                    target="_blank">ISMN networks list</a>. <br>
+      <div style="color: gray" *ngIf="networkFetchError()">
+        {{errorMessage}}
+      </div>
   </div>
   <p-tree [value]="networkTree" selectionMode="checkbox"
           (onNodeSelect)="onNetworkSelect($event)"
