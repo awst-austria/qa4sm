@@ -43,6 +43,8 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
   isArchived = signal<boolean | undefined>(undefined);
   expiryDate = signal<Date | undefined>(undefined);
   isNearExpiry = signal<boolean | undefined>(undefined);
+  noFilters = signal(false);
+  noParamFilters = signal(false);
 
   faIcons = {faArchive: fas.faArchive, faPencil: fas.faPen};
   public isPublishingWindowOpen: boolean;
@@ -86,12 +88,21 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
           catchError(() => of([]))
         ),
         this.datasetVariableService.getAllVariables().pipe(
-          catchError(() => of([]))
+          catchError(() => of([])
+          )
         ),
         this.filterService.getAllFilters().pipe(
-          catchError(() => of([]))
+          catchError(() => {
+            this.noFilters.set(true);
+            return of([])
+          })
         ),
-        this.filterService.getAllParameterisedFilters()]
+        this.filterService.getAllParameterisedFilters().pipe(
+          catchError(() => {
+            this.noParamFilters.set(true);
+            return of([])
+          })
+        )]
     ).pipe(
       map(([configurations,
              datasets,
@@ -125,12 +136,11 @@ export class ValidationSummaryComponent implements OnInit, OnDestroy {
                 config.parametrised_filters.map(f => dataFilters.find(dsF => dsF.id === f).description)
                 : [],
 
-              parametrisedFiltersValues: config.parametrised_filters
+              parametrisedFiltersValues: paramFilters.length ? config.parametrised_filters
                 .map(fId => config.parametrisedfilter_set
                   .map(pf => [paramFilters.find(pF => pF.id === pf).filter_id, paramFilters
                     .find(pF => pF.id === pf).parameters])
-                  .find(f => f[0] === fId)[1])
-
+                  .find(f => f[0] === fId)[1]) : []
             }
           }
         )),

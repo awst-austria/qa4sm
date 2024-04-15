@@ -95,19 +95,20 @@
               </em>
               <span *ngIf="!config.fileExists" style="color: red">(Data set has been removed)</span>
               <br>
-              <div *ngIf="config.filters.length > 0 || config.parametrisedFilters.length > 0; else noFilters">
+              <div *ngIf="config.filters.length > 0 || config.parametrisedFilters.length > 0">
                 Filters:
                 <ul>
                   <li *ngFor="let filter of config.filters">{{ filter }};</li>
                 </ul>
-                <ul>
+                <ul *ngIf="config.parametrisedFiltersValues.length">
                   <li *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
                     {{ paramFilter }}: {{ config.parametrisedFiltersValues[indF].split(',').join(', ') }};
                   </li>
                 </ul>
               </div>
-              <ng-template #noFilters><em style="color: gray">We could not fetch list of applied filters.</em>
-              </ng-template>
+              <div *ngIf="noFilters() || noParamFilters()"><em style="color: gray">
+                We could not fetch the full list of applied filters.</em>
+              </div>
 
             </li>
           </ol>
@@ -168,12 +169,16 @@
                 <span *ngIf="config.id === validationRun.scaling_ref">
                   {{ config.dataset }} ({{ config.version }}, {{ config.variable }})
 
-                  <span *ngIf="config.filters || config.parameterisedFilters; else elseFilters">[Filters:
-                  <span *ngFor="let filter of config.filters"> {{ filter }}; </span>
-                  <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
-                              {{ paramFilter }} {{ config.parametrisedFiltersValues[indF] }}
-                            </span>
-                    ]</span>
+                  <span *ngIf="(config.filters) || (config.parameterisedFilters) ; else elseFilters">[Filters:
+                    <span *ngFor="let filter of config.filters"> {{ filter }}; </span>
+                    <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
+                                {{ paramFilter }} {{ config.parametrisedFiltersValues[indF] }}
+                              </span>
+                    <span *ngIf="noFilters() || noParamFilters()"><em style="color: gray">
+                      We could not fetch the full list of applied filters.</em>
+                    </span>
+                      ]
+                  </span>
                   <ng-template #elseFilters>
                     none
                   </ng-template>
