@@ -6,7 +6,7 @@ import {environment} from '../../../../../environments/environment';
 import {catchError, shareReplay} from 'rxjs/operators';
 import {DataCache} from '../../tools/DataCache';
 
-const settingsURL: string = environment.API_URL + 'api/settingsS';
+const settingsURL: string = environment.API_URL + 'api/settings';
 const CACHE_KEY_ALL_SETTINGS = -1;
 
 @Injectable({
