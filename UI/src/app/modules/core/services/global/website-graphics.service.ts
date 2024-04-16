@@ -8,7 +8,7 @@ import {catchError} from 'rxjs/operators';
 import {HttpErrorService} from './http-error.service';
 
 const urlPrefix = environment.API_URL + 'api';
-const getPlotsUrl: string = urlPrefix + '/get-graphic-filesS';
+const getPlotsUrl: string = urlPrefix + '/get-graphic-files';
 @Injectable({
   providedIn: 'root'
 })
