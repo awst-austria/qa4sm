@@ -1,10 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {ComparisonService} from '../../services/comparison.service';
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {ValidationResultModel} from '../../../../pages/validation-result/validation-result-model';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
+import {catchError} from 'rxjs/operators';
+import {EMPTY} from 'rxjs';
 
 @Component({
   selector: 'qa-comparison-summary',
@@ -18,6 +20,7 @@ export class ComparisonSummaryComponent implements OnInit {
   );
   isSingle = true;
   valResModels: ValidationResultModel[] = [];
+  noSummaryError = signal(false);
 
   constructor(private validationRunService: ValidationrunService,
               private datasetConfigurationService: DatasetConfigurationService,
@@ -46,7 +49,12 @@ export class ComparisonSummaryComponent implements OnInit {
     for (const val of comparisonModel.selectedValidations) {
       this.valResModels.push(
         new ValidationResultModel(
-          this.validationRunService.getValidationRunById(val.id),
+          this.validationRunService.getValidationRunById(val.id).pipe(
+            catchError(() => {
+              this.noSummaryError.set(true);
+              return EMPTY
+            })
+          ),
           this.datasetConfigurationService.getConfigByValidationrun(val.id)
         )
       );
