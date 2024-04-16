@@ -20,7 +20,7 @@
                         (changeDataset)="onDatasetChange()"
                         [selectionModel]="selectedDatasetModel[0].datasetModel"/>
 
-            <div *ngIf="datasetErrorSelector" style="color: darkred">
+            <div *ngIf="datasetErrorSelector" style="color: gray">
               There was an error and no datasets could be fetched. Please try again later.
             </div>
 
@@ -76,7 +76,7 @@
                   </p-dropdown>
                   <label *ngIf="selectedDatasetModel[0]" for="validationSelector">{{ selectValidationLabel }}</label>
                 </div>
-                <div *ngIf="noValidationsError" style="color: darkred">
+                <div *ngIf="noValidationsError" style="color: gray">
                   There was an error and validations could not be fetched. Please try again later.
                 </div>
               </div>
