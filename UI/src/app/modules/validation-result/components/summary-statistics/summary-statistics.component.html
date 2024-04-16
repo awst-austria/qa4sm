@@ -1,5 +1,4 @@
 <div class="flex flex-column w-12 mx-0">
-  <!--      <div class="col-12">-->
   <p-panel [toggleable]="true" [collapsed]="true">
     <ng-template pTemplate="header">
       <div class="text-center my-1" style="width: 92%">
@@ -13,7 +12,7 @@
         <span class="pi pi-question-circle help-icon"></span>
       </label>
     </ng-template>
-    <div *ngIf="(table$|async) as table" class="pb-3">
+    <div *ngIf="(table$|async) as table; else noTable" class="pb-3">
       <ng-template [ngIf]="table==='error file size'" [ngIfElse]="showTable" class="pb-3">
         This validation has resulted in a file whose size
         exceeds the maximum limit. For this reason, the statistics table cannot be generated on the fly.
@@ -40,6 +39,11 @@
         </div>
       </ng-template>
     </div>
+    <ng-template #noTable>
+      <p class="lead text-muted">
+        We could not fetch statistics. Please try again later or <a routerLink="/contact-us"> contact </a> our support
+        team.
+      </p>
+    </ng-template>
   </p-panel>
-  <!--      </div>-->
 </div>
