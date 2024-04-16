@@ -137,7 +137,7 @@ export class ValidationrunService {
     const data = {publish: true, publishing_form: publishingData};
     return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'json'})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err, 'We could not publish your results.'))
       );
   }
 
