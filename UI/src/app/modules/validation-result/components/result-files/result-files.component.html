@@ -7,7 +7,7 @@
     </ng-template>
     <ng-template pTemplate="icons">
     </ng-template>
-    <div *ngIf="!fileError && updatedMetrics$|async as metrics" style="min-height: 400px"
+    <div *ngIf="!fileError() && updatedMetrics$|async as metrics" style="min-height: 400px"
          class="flex flex-column align-content-center justify-content-center">
       <div *ngIf="metrics[metricIndx] && metrics[metricIndx].boxplotFiles|async as boxplots"
            class="flex flex-column w-12 flex-wrap gap-2">
@@ -128,9 +128,9 @@
         </div>
       </div>
     </div>
-    <div *ngIf="dataFetchError()">
+    <div *ngIf="dataFetchError() || fileError()">
       <p class="lead text-muted">
-        {{ this.errorMessage }}
+        Result plots are temporarily unavailable.
       </p>
     </div>
   </p-panel>

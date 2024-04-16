@@ -33,9 +33,7 @@ export class ResultFilesComponent implements OnInit {
   activeOverviewIndex = 0;
   activeBoxplotIndex = 0;
 
-  fileError = false;
-  errorHeader = 'Files not available'
-  errorMessage = 'Result plots are temporarily unavailable. '
+  fileError = signal(false);
   dataFetchError = signal(false);
 
   constructor(private validationService: ValidationrunService,
@@ -48,7 +46,7 @@ export class ResultFilesComponent implements OnInit {
     next: (metrics: any) => this.onUpdateMetricsNext(metrics),
     error: (error: CustomHttpError) => {
       this.dataFetchError.set(true);
-      this.toastService.showErrorWithHeader(this.errorHeader, this.errorMessage + error.errorMessage.message);
+      this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
     }
   }
 
@@ -116,9 +114,9 @@ export class ResultFilesComponent implements OnInit {
 
     return this.plotService.getPlots(params).pipe(
       catchError((error: CustomHttpError) => {
-        this.fileError = true;
-        this.toastService.showErrorWithHeader(this.errorHeader, this.errorMessage + error.errorMessage.message)
-        return EMPTY
+        this.fileError.set(true);
+        this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
+        return EMPTY;
       })
     );
   }

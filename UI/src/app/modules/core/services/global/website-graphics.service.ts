@@ -8,8 +8,7 @@ import {catchError} from 'rxjs/operators';
 import {HttpErrorService} from './http-error.service';
 
 const urlPrefix = environment.API_URL + 'api';
-const getPlotsUrl: string = urlPrefix + '/get-graphic-files';
-const getSinglePlotUrl: string = urlPrefix + '/get-graphic-file';
+const getPlotsUrl: string = urlPrefix + '/get-graphic-filesS';
 @Injectable({
   providedIn: 'root'
 })
@@ -23,7 +22,9 @@ export class WebsiteGraphicsService {
   getPlots(params: any): Observable<PlotDto[]>{
     return this.httpClient.get<PlotDto[]>(getPlotsUrl, {params})
       .pipe(
-        catchError(err => this.httpError.handleError(err))
+        catchError(err => this.httpError.handleError(err,
+          'Result plots are temporarily unavailable. ',
+          'Files not available'))
       );
   }
 
