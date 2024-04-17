@@ -224,7 +224,7 @@ export class ValidationrunService {
   copyValidation(params: any): Observable<any> {
     return this.httpClient.get(copyValidationUrl, {params})
       .pipe(
-        catchError(err => this.httpError.handleError(err, 'We could not copy the vaidation. '))
+        catchError(err => this.httpError.handleError(err, 'We could not copy the validation.'))
       );
   }
 
