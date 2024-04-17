@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
@@ -31,12 +31,18 @@ export class PublishingComponent implements OnInit {
     error: (error: CustomHttpError) => this.onPublishResultError(error)
   }
 
+  metadataFetchError = signal(false);
+
 
   // todo: this error handling will be added after restructuring the code that calls this feature
   getPublishingFormDataObserver = {
     next: (data: any) => this.onGetPublishingFormDataNext(data),
-    // error: (error: CustomHttpError) => this.toastService.showAlertWithHeader(error.errorMessage.header,
-    //     'We could not fetch metadata, but you can still fill the form and publish your validation.')
+    error: () => this.onFetchMetdataError()
+  }
+
+  onFetchMetdataError(): void{
+    this.publishingForm.controls.keywords.setValue('soil moisture, validation, qa4sm')
+    this.metadataFetchError.set(true);
   }
 
   constructor(
