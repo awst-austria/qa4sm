@@ -20,9 +20,15 @@
         <tbody>
         <tr>
           <td *ngFor="let validationModel of valResModels" class="py-0 px-0">
-            <qa-validation-summary *ngIf="validationModel.validationRun|async as valRun" [validationModel]="validationModel" [validationRun]="valRun" [forComparison]="true"/>
+            <qa-validation-summary *ngIf="validationModel.validationRun$|async as valRun" [validationModel]="validationModel" [validationRun]="valRun" [forComparison]="true"/>
           </td>
         </tr>
+        <div *ngIf="noSummaryError()">
+          <p class="lead text-muted">
+            We could not generate a summary. Please try again later or <a routerLink="/contact-us"> contact </a> our support
+            team.
+          </p>
+        </div>
         </tbody>
       </table>
     </p-panel>

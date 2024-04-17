@@ -16,6 +16,7 @@ export class TableComparisonComponent implements OnInit {
   table: string;
   showLoadingSpinner = true;
   errorHappened = false;
+
   getComparisonTableObserver = {
     next: data => this.onGetComparisonTableNext(data),
     error: () => this.onGetComparisonTableError()
@@ -46,20 +47,34 @@ export class TableComparisonComponent implements OnInit {
     ids.forEach(id => {
       parameters = parameters.append('ids', id);
     });
-    this.comparisonService.getMetrics4Comparison(parameters).subscribe(response => {
-      if (response) {
-        response.forEach(metric => {
-          // comparisonMetrics.push(metric.metric_query_name);
-          parameters = parameters.append('metric_list', metric.metric_query_name);
-        });
-        this.comparisonParameters = parameters;
-        this.getComparisonTable(parameters);
-      }
-    });
+    const getMetricsObserver = {
+      next: response => this.getComparisonMetricsNext(response, parameters),
+      error: () => this.getComparisonMetricsErrorHandler()
+    }
+
+    this.comparisonService.getMetrics4Comparison(parameters)
+      .subscribe(getMetricsObserver);
+  }
+
+  getComparisonMetricsNext(response, parameters): void {
+    if (response) {
+      response.forEach(metric => {
+        // comparisonMetrics.push(metric.metric_query_name);
+        parameters = parameters.append('metric_list', metric.metric_query_name);
+      });
+      this.comparisonParameters = parameters;
+      this.getComparisonTable(parameters);
+    }
+  }
+
+  getComparisonMetricsErrorHandler(): void {
+    this.errorHappened = true;
+    this.showLoadingSpinner = false;
   }
 
   getComparisonTable(parameters): void {
-    this.comparisonService.getComparisonTable(parameters).subscribe(this.getComparisonTableObserver);
+    this.comparisonService.getComparisonTable(parameters)
+      .subscribe(this.getComparisonTableObserver);
   }
 
   private onGetComparisonTableNext(data): void {

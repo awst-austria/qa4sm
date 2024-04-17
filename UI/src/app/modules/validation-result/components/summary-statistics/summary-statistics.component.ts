@@ -28,7 +28,7 @@ export class SummaryStatisticsComponent implements OnInit {
   refDatasetVersion$: Observable<DatasetVersionDto>;
   refDatasetVariable$: Observable<DatasetVariableDto>;
 
-  userManualLink: string;
+  settings$ = this.settingsService.getAllSettings();
 
   constructor(private validationService: ValidationrunService,
               private datasetService: DatasetService,
@@ -41,14 +41,8 @@ export class SummaryStatisticsComponent implements OnInit {
   ngOnInit(): void {
     this.getSummaryStatistics();
     this.getRefConfig();
-    this.setSumLink();
   }
 
-  setSumLink(): void {
-    this.settingsService.getAllSettings().subscribe(data => {
-      this.userManualLink = data[0].sum_link;
-    });
-  }
 
   getSummaryStatistics(): void {
     const parameters = new HttpParams().set('id', this.validationRun.id);
@@ -56,7 +50,9 @@ export class SummaryStatisticsComponent implements OnInit {
   }
 
   getRefConfig(): void{
-    this.refConfig = this.configs.find(config => config.id === this.validationRun.spatial_reference_configuration);
+    this.refConfig = this.configs.find(config =>
+      config.id === this.validationRun.spatial_reference_configuration);
+    // Here I don't handle an error, if there is no name fetched, then the user will see '...' -> it's handled in the HTML
     this.refDataset$ = this.datasetService.getDatasetById(this.refConfig.dataset);
     this.refDatasetVersion$ = this.datasetVersionService.getVersionById(this.refConfig.version);
     this.refDatasetVariable$ = this.datasetVariableService.getVariableById(this.refConfig.variable);

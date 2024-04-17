@@ -1,8 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {Observable} from 'rxjs';
-import {HttpParams} from '@angular/common/http';
+import {EMPTY, Observable} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
+import {catchError} from 'rxjs/operators';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-tracked-validations',
@@ -11,17 +13,23 @@ import {ValidationrunDto} from '../../../core/services/validation-run/validation
 })
 export class TrackedValidationsComponent implements OnInit {
 
-  constructor(private validationrunService: ValidationrunService) { }
+  constructor(private validationrunService: ValidationrunService,
+              private toastService: ToastService) { }
 
   trackedRuns$: Observable<ValidationrunDto[]>;
-  parameters = new HttpParams().set('tracked', String(true));
 
   ngOnInit(): void {
-    this.trackedRuns$ = this.validationrunService.getCustomTrackedValidations();
+    this.getData();
   }
 
-  refresh(): void{
-    this.ngOnInit();
+  getData(): void{
+    this.trackedRuns$ = this.validationrunService.getCustomTrackedValidations()
+      .pipe(
+        catchError((error: CustomHttpError) => {
+          this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
+          return EMPTY
+        })
+      );
   }
 
 }

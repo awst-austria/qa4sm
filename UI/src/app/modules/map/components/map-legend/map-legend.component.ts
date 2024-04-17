@@ -1,4 +1,4 @@
-import {Component, Input, OnInit,} from '@angular/core';
+import {Component, Input,} from '@angular/core';
 import {LegendItem} from '../legend-item';
 import {DomSanitizer} from '@angular/platform-browser';
 
@@ -8,14 +8,10 @@ import {DomSanitizer} from '@angular/platform-browser';
   templateUrl: './map-legend.component.html',
   styleUrls: ['./map-legend.component.scss']
 })
-export class MapLegendComponent implements OnInit{
+export class MapLegendComponent {
   @Input() legendItems: LegendItem[] = [];
 
   constructor(private sanitizer: DomSanitizer)  { }
-  ngOnInit() {
-    // console.log(this.legendItems[0].style.getImage())
-    // console.log(this.legendItems[1].style.getImage())
-  }
 
 
   getCircleSVG(properties: LegendItem): any {
