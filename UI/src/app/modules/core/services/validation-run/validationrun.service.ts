@@ -176,7 +176,7 @@ export class ValidationrunService {
       );
   }
 
-  archiveMultipleValidation(validationId: string[], archive): Observable<any> {
+  archiveMultipleValidation(validationId: string[], archive: boolean): Observable<any> {
     let params = new HttpParams().set('archive', archive);
     validationId.forEach(id => {
       params = params.append('id', id);
