@@ -8,7 +8,7 @@ import {LoginForm} from '../../core/services/form-interfaces/login-form';
 
 
 @Component({
-  selector: 'app-login',
+  selector: 'qa-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   providers: []
@@ -26,15 +26,13 @@ export class LoginComponent implements OnInit {
     password: new FormControl<string>(this.loginDto.password, Validators.required),
   });
 
-  formMessages = [];
-
-  constructor(private loginService: AuthService, private router: Router, private toastService: ToastService) {
+  constructor(private loginService: AuthService,
+              private router: Router,
+              private toastService: ToastService) {
   }
 
   ngOnInit(): void {
-    this.loginService.checkPreviousUrl().subscribe(previousUrl => {
-      this.prevUrl = previousUrl;
-    });
+    this.loginService.previousUrl$.subscribe(previousUrl => this.prevUrl = previousUrl);
   }
 
   onSubmit() {
@@ -44,6 +42,8 @@ export class LoginComponent implements OnInit {
     this.loginDto.password = this.loginForm.value.password;
 
 
+    // todo: this one should be rewritten the way, that it handles login entirely and sets the current user,
+    // also the message should be updated; it's not only wrong credentials that may fail
     this.loginService.login(this.loginDto).subscribe(authenticated => {
       if (authenticated && this.navigateAfter) {
         this.router.navigate([this.prevUrl]).then(
@@ -55,9 +55,5 @@ export class LoginComponent implements OnInit {
         this.toastService.showErrorWithHeader('Login failed', 'Wrong username or password');
       }
     });
-  }
-
-  get diagnostic() {
-    return JSON.stringify(this.loginDto);
   }
 }

@@ -32,6 +32,7 @@ import {CheckboxModule} from 'primeng/checkbox';
 import {SelectButtonModule} from 'primeng/selectbutton';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {MenuModule} from 'primeng/menu';
+import {CoreModule} from '../core/core.module';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
@@ -74,7 +75,8 @@ import {MenuModule} from 'primeng/menu';
         CheckboxModule,
         SelectButtonModule,
         ToggleButtonModule,
-        MenuModule
+        MenuModule,
+        CoreModule
     ]
 })
 export class ValidationResultModule {

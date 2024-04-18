@@ -27,7 +27,7 @@ export class ScalingComponent implements OnInit {
   }
   ngOnInit(): void {
     // prepare method choices
-    this.validationConfigService.getScalingMethods().subscribe(methods => {
+    this.validationConfigService.scalingMethods$.subscribe(methods => {
       this.scalingMethods = methods;
       this.selectedScalingMethod$.next(methods.find(method => method.method === 'none'));
       this.setScalingMethod();
@@ -76,7 +76,7 @@ export class ScalingComponent implements OnInit {
 
   public setSelection(scalingMethodName: string, reference: DatasetConfigModel): void {
 
-    this.validationConfigService.getScalingMethods().subscribe(methods => {
+    this.validationConfigService.scalingMethods$.subscribe(methods => {
       methods.forEach(scalingMethod => {
         if (scalingMethod.method === scalingMethodName) {
           this.selectedScalingMethod$.next(scalingMethod);

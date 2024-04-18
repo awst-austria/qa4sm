@@ -1,23 +1,18 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {AnomaliesModel} from '../anomalies/anomalies-model';
-import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'qa-anom-climatology',
   templateUrl: './anom-climatology.component.html',
   styleUrls: ['./anom-climatology.component.scss']
 })
-export class AnomClimatologyComponent implements OnInit {
+export class AnomClimatologyComponent  {
   public minYear = 1971;
   public maxYear = 2100;
-  public yearFrom$ = new BehaviorSubject(this.minYear);
 
   @Input() anomaliesModel: AnomaliesModel;
 
   constructor() {
-  }
-
-  ngOnInit(): void {
   }
 
   setDate(year): Date {

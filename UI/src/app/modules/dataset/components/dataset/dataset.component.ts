@@ -43,6 +43,7 @@ export class DatasetComponent implements OnInit {
   datasetSelectorId: string;
   versionSelectorId: string;
   variableSelectorId: string;
+
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
               private datasetVariableService: DatasetVariableService,
@@ -52,23 +53,25 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.allDatasets$ = this.datasetService.getAllDatasets(true);
+    this.allDatasets$ = this.datasetService.getAllDatasets(true)
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
       if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0
         && this.selectionModel.selectedDataset?.short_name !== 'ISMN') {
-        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-          return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
-        }));
-      } else if(configs.filter(config => config.datasetModel.selectedDataset?.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user){
-        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-          return this.sortById(datasets.filter(dataset => !dataset.user));
-        }));
-      }
-      else {
-        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-          return this.sortById(datasets);
-        }));
+        this.datasets$ = this.allDatasets$
+          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+            return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
+          }));
+      } else if (configs.filter(config => config.datasetModel.selectedDataset?.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user) {
+        this.datasets$ = this.allDatasets$
+          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+            return this.sortById(datasets.filter(dataset => !dataset.user));
+          }));
+      } else {
+        this.datasets$ = this.allDatasets$
+          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+            return this.sortById(datasets);
+          }));
       }
     });
 
@@ -139,7 +142,7 @@ export class DatasetComponent implements OnInit {
     }));
   }
 
-  setSelectorsId(): void{
+  setSelectorsId(): void {
     const datasetIdentifier = `${this.selectionModel.selectedDataset?.id}_
     ${this.selectionModel.selectedVersion?.id}_ ${this.selectionModel.selectedVariable?.id}`
     this.datasetSelectorId = 'dataset_' + datasetIdentifier;

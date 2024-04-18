@@ -3,6 +3,8 @@ import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {MenuItem} from 'primeng/api';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -29,7 +31,8 @@ export class HandleMultipleValidationsComponent implements OnInit {
   actions: any[];
   numberOfAllValidations: number;
 
-  constructor(private validationrunService: ValidationrunService) {
+  constructor(private validationrunService: ValidationrunService,
+              private toastService: ToastService) {
   }
 
   ngOnInit() {
@@ -135,19 +138,21 @@ export class HandleMultipleValidationsComponent implements OnInit {
     this.action = null;
   }
 
-
+  multipleValidationActionObserver = {
+    next: () => this.validationrunService.refreshComponent('page'),
+    error: (error: CustomHttpError) =>
+      this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
+  }
 
 
   deleteMultipleValidations(): void {
-    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response => {
-      this.validationrunService.refreshComponent('page');
-    })
+    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue())
+      .subscribe(this.multipleValidationActionObserver)
   }
 
   archiveMultipleValidations(archive: boolean): void {
-    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue(), archive).subscribe(response => {
-      this.validationrunService.refreshComponent('page');
-    })
+    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue(), archive)
+      .subscribe(this.multipleValidationActionObserver)
   }
 
   handleMultipleValidations(): void {

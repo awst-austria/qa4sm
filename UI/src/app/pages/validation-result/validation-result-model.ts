@@ -3,8 +3,8 @@ import {DatasetConfigurationDto} from '../../modules/validation-result/services/
 import {Observable} from 'rxjs';
 
 export class ValidationResultModel {
-  constructor(public validationRun: Observable<ValidationrunDto>,
-              public datasetConfigs: Observable<DatasetConfigurationDto[]>) {
+  constructor(public validationRun$: Observable<ValidationrunDto>,
+              public datasetConfigs$: Observable<DatasetConfigurationDto[]>) {
   }
 
 

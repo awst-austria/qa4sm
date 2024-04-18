@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
 import {FilterModel} from '../basic-filter/filter-model';
 import {TreeNode} from 'primeng/api';
 import {IsmnNetworkService} from '../../../core/services/filter/ismn-network-service';
 import {BehaviorSubject} from 'rxjs';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
 import {IsmnNetworkDto} from '../../../core/services/filter/ismn-network.dto';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 
 @Component({
@@ -22,8 +23,12 @@ export class IsmnNetworkFilterComponent implements OnInit {
 
   networkTree: TreeNode[];
   selectedNetworks: TreeNode[] = [];
+  networkFetchError = signal(false);
+  errorMessage = 'We could not fetch network for selection, but you can still run validation with default settings. ' +
+    'If you keep getting this error, please contact our support team.'
 
-  constructor(public networkService: IsmnNetworkService) {
+  constructor(public networkService: IsmnNetworkService,
+              private toastService: ToastService,) {
   }
 
   ngOnInit(): void {
@@ -102,8 +107,18 @@ export class IsmnNetworkFilterComponent implements OnInit {
   }
 
   private initComponent(): void {
-    this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id).subscribe(data => {
-      this.buildNetworkTree(data, this.filterModel$.value.parameters$.value);
-    });
+    this.networkService.getNetworksByDatasetVersionId(this.datasetModel.selectedVersion.id)
+      .subscribe(this.networkObserver);
   }
+
+  networkObserver = {
+    next: data =>  this.buildNetworkTree(data, this.filterModel$.value.parameters$.value),
+    error: () => this.onNetworkError()
+  }
+
+  onNetworkError(): void{
+    this.networkFetchError.set(true);
+    this.toastService.showAlertWithHeader('ISMN network problem',this.errorMessage)
+  }
+
 }

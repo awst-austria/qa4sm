@@ -5,6 +5,8 @@ import {environment} from '../../../../environments/environment';
 import {UserDataFileDto} from './user-data-file.dto';
 import {DataManagementGroupsDto} from './data-management-groups.dto';
 import {saveAs} from 'file-saver-es';
+import {HttpErrorService} from '../../core/services/global/http-error.service';
+import {catchError} from 'rxjs/operators';
 
 const urlPrefix = environment.API_URL + 'api';
 const uploadUserDataUrl: string = urlPrefix + '/upload-user-data';
@@ -32,40 +34,59 @@ export class UserDatasetsService {
   public openSharingDataWindow: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false)
   doOpenSharingDataWindow = this.openSharingDataWindow.asObservable();
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private httpClient: HttpClient,
+              private httpError: HttpErrorService) { }
 
-  userFileUpload(name, file, fileName, metadata): Observable<any> {
+  userFileUpload(name: string, file: Blob, fileName: string, metadata: {}): Observable<any> {
     const formData = new FormData();
     formData.append(name, file, fileName);
     const uploadUrl = uploadUserDataUrl  + '/' + fileName + '/';
     const fileHeaders = new HttpHeaders({'X-CSRFToken': csrfToken, fileMetadata: JSON.stringify(metadata)});
     return this.httpClient.post(uploadUrl, formData.get(name),
-      {headers: fileHeaders, reportProgress: true, observe: 'events', responseType: 'json'});
+      {headers: fileHeaders, reportProgress: true, observe: 'events', responseType: 'json'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getUserDataList(): Observable<UserDataFileDto[]>{
-    return this.httpClient.get<UserDataFileDto[]>(userDataListUrl);
+    return this.httpClient.get<UserDataFileDto[]>(userDataListUrl)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getUserDataFileById(fileId: string): Observable<UserDataFileDto>{
     const userDataFileUrlWithId = userDataFileUrl + '/'  + fileId + '/';
-    return this.httpClient.get<UserDataFileDto>(userDataFileUrlWithId);
+    return this.httpClient.get<UserDataFileDto>(userDataFileUrlWithId)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   deleteUserData(dataFileId: string): Observable<any>{
     const deleteUrl = userDataDeleteUrl + '/' + dataFileId + '/';
-    return this.httpClient.delete(deleteUrl, {headers});
+    return this.httpClient.delete(deleteUrl, {headers})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, ''))
+      );
   }
 
   deleteUserDataFileOnly(dataFileId: string): Observable<any>{
     const deleteUrl = userDeleteFileOnlyUrl + '/' + dataFileId + '/';
-    return this.httpClient.delete(deleteUrl, {headers});
+    return this.httpClient.delete(deleteUrl, {headers})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
 
   updateMetadata(fieldName: string, fieldValue: string, dataFileId: string): Observable<any>{
     const updateUrl = updateMetadataUrl + '/' + dataFileId + '/';
-    return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue});
+    return this.httpClient.put(updateUrl, {field_name: fieldName, field_value: fieldValue})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getDataManagementGroups(ids=[]): Observable<DataManagementGroupsDto[]>{
@@ -74,15 +95,21 @@ export class UserDatasetsService {
       params = params.append('id', id)
     });
     return this.httpClient.get<DataManagementGroupsDto[]>(dataManagementGroupsUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   manageDataInManagementGroup(group_id: number, data_id: string, action: string): Observable<any>{
     return this.httpClient.put<any>(manageDataInGroupUrl, {group_id, data_id, action})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      )
   }
 
   getTheSizeInProperUnits(sizeInBites): string {
-    let properSize;
-    let units;
+    let properSize: number;
+    let units: string;
     const coeff = Math.pow(10, 6);
     if (sizeInBites < coeff) {
       properSize = sizeInBites / Math.pow(10, 3);
