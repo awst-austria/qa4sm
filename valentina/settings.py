@@ -46,12 +46,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'django_rest_passwordreset'
-
+    'django_rest_passwordreset',
+    'rest_framework.authtoken'
 ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -110,10 +111,10 @@ WSGI_APPLICATION = 'valentina.wsgi.application'
 DB_HOST = os.getenv('QA4SM_DB_HOST')
 DB_ENV_PASSWORD = os.getenv('QA4SM_DB_PASSWORD')
 if DB_ENV_PASSWORD is not None:
-    DB_PASSWORD=DB_ENV_PASSWORD
+    DB_PASSWORD = DB_ENV_PASSWORD
 
 if DB_HOST is None:
-    DB_HOST='localhost'
+    DB_HOST = 'localhost'
 
 if DBSM == "postgresql":
     DATABASES = {
