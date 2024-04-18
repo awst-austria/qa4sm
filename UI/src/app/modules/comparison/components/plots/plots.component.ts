@@ -3,11 +3,12 @@ import {ComparisonService} from '../../services/comparison.service';
 import {HttpParams} from '@angular/common/http';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {MetricsComparisonDto} from '../../services/metrics-comparison.dto';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {SafeUrl} from '@angular/platform-browser';
 import {PlotDto} from '../../../core/services/global/plot.dto';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {debounceTime} from 'rxjs/operators';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
 // types of plots to show up. Shouldn't be hardcoded
 const PLOT_TYPES = ['boxplot', 'mapplot'];
@@ -41,8 +42,8 @@ export class PlotsComponent implements OnInit {
     error: () => this.onGetComparisonPlotsError()
   }
 
+
   constructor(private comparisonService: ComparisonService,
-              private domSanitizer: DomSanitizer,
               private plotService: WebsiteGraphicsService) {
   }
 
@@ -52,7 +53,8 @@ export class PlotsComponent implements OnInit {
 
   startComparison(): void {
     // start comparison on button click; updated recursively
-    this.comparisonService.currentComparisonModel.pipe(debounceTime(5000)).subscribe(comparison => {
+    this.comparisonService.currentComparisonModel
+      .pipe(debounceTime(5000)).subscribe(comparison => {
       this.comparisonModel = comparison;
       if ((comparison.selectedValidations.length > 1 && !comparison.multipleNonReference) ||
         (comparison.selectedValidations.length === 1 && comparison.multipleNonReference)) {
@@ -71,19 +73,31 @@ export class PlotsComponent implements OnInit {
       params = params.append('ids', id);
     });
     this.comparisonMetrics = [];
-    this.comparisonService.getMetrics4Comparison(params).subscribe(
-      response => {
-        if (response && response.length > 1) {
-          response.forEach(metric => {
-            this.comparisonMetrics.push(
-              new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
-          });
-          this.selectedMetric = this.comparisonMetrics[0];
-          this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
-        } else {
-          this.metricsErrorMessage = response[0].message; // this message can be shown somewhere so users know what is wrong
-        }
+
+    const getComparisonMetricsObserver = {
+      next: data => this.getComparisonMetricsNext(data, comparisonModel),
+      error: (error: CustomHttpError) => this.getComparisonMetricsErrorHandler(error)
+    }
+
+    this.comparisonService.getMetrics4Comparison(params)
+      .subscribe(getComparisonMetricsObserver);
+  }
+
+  getComparisonMetricsNext(response: any[], comparisonModel: Validations2CompareModel){
+    if (response && response.length > 1) {
+      response.forEach(metric => {
+        this.comparisonMetrics.push(
+          new MetricsComparisonDto(metric.metric_query_name, metric.metric_pretty_name));
       });
+      this.selectedMetric = this.comparisonMetrics[0];
+      this.getComparisonPlots(this.selectedMetric.metric_query_name, comparisonModel);
+    }
+  }
+
+  getComparisonMetricsErrorHandler(err: CustomHttpError): void{
+    this.metricsErrorMessage = err.errorMessage.message;
+    this.errorHappened = true;
+    this.showLoadingSpinner = false;
   }
 
   showGallery(index: number = 0): void {
@@ -105,7 +119,8 @@ export class PlotsComponent implements OnInit {
       parameters = parameters.append('plot_types', plotType);
     });
 
-    this.comparisonService.getComparisonPlots(parameters).subscribe(
+    this.comparisonService.getComparisonPlots(parameters)
+      .subscribe(
       this.getComparisonPlotsObserver
     );
   }

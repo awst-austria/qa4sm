@@ -8,6 +8,7 @@ import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {ToastService} from '../../core/services/toast/toast.service';
 import {UserData} from '../../core/services/form-interfaces/UserDataForm';
+import {CustomHttpError} from '../../core/services/global/http-error.service';
 
 @Component({
   selector: 'qa-user-form',
@@ -29,7 +30,7 @@ export class UserFormComponent implements OnInit {
     active: false,
     honeypot: [0, [Validators.required, Validators.min(100)]]
   });
-  countries: CountryDto[];
+
   countries$: Observable<CountryDto[]>;
   selectedCountry: CountryDto;
   formErrors: any;
@@ -37,13 +38,18 @@ export class UserFormComponent implements OnInit {
 
   signUpObserver = {
     next: () => this.onSignUpNext(),
-    error: error => this.onSignupError(error)
+    error: (error: CustomHttpError) => this.onFormSubmitError(error)
   }
 
   UpdateObserver = {
-    next: data => this.onUpdateNext(data),
-    error: error => this.onUpdateError(error),
+    next: (data: UserData) => this.onUpdateNext(data),
+    error: (error: CustomHttpError) => this.onFormSubmitError(error),
     complete: () => this.onUpdateComplete()
+  }
+
+  deactivateObserver = {
+    next: () => this.deactivateAccountNext(),
+    error: () => this.deactivateAccountError()
   }
 
   @Input() userData: UserDto;
@@ -57,7 +63,6 @@ export class UserFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.getListOfCountries();
     this.countries$ = this.userFormService.getCountryList();
     if (this.userData) {
       this.setDefaultValues();
@@ -77,60 +82,49 @@ export class UserFormComponent implements OnInit {
 
   private onSignUpNext(): void {
     this.formErrors = null;
-    this.router.navigate(['/signup-complete']);
+    this.router.navigate(['/signup-complete']).then(
+      () => this.toastService.showSuccess('Data submitted successfully.')
+    );
   }
 
-  private onSignupError(error): void{
-    this.formErrors = error.error;
-  }
   private onUpdateComplete(): void {
-    this.toastService.showSuccessWithHeader('', 'User profile has been updated');
+    this.toastService.showSuccess('User profile has been updated');
   }
 
-  private onUpdateNext(data): void {
-    this.userService.currentUser.email = data.email;
-    this.userService.currentUser.first_name = data.first_name;
-    this.userService.currentUser.last_name = data.last_name;
-    this.userService.currentUser.organisation = data.organisation;
-    this.userService.currentUser.country = data.country;
-    this.userService.currentUser.orcid = data.orcid;
+  private onUpdateNext(data: UserData): void {
+    Object.assign(this.userService.currentUser, data)
     this.doRefresh.emit(true);
     this.formErrors = null;
   }
 
-  private onUpdateError(error): void {
-    this.formErrors = error.error;
-  }
-
-  getListOfCountries(): void {
-    this.userFormService.getCountryList().subscribe(countries => {
-      this.countries = countries;
-    });
+  private onFormSubmitError(error: CustomHttpError): void {
+    this.formErrors = error.form;
+    this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
   }
 
   setDefaultValues(): void {
-    this.userForm.controls.username.setValue(this.userData.username);
+    this.userForm.patchValue(this.userData)
     this.userForm.controls.username.disable();
-    this.userForm.controls.email.setValue(this.userData.email);
-    this.userForm.controls.password1.clearValidators();
-    this.userForm.controls.password2.clearValidators();
-    this.userForm.controls.first_name.setValue(this.userData.first_name);
-    this.userForm.controls.last_name.setValue(this.userData.last_name);
-    this.userForm.controls.organisation.setValue(this.userData.organisation);
-    this.userForm.controls.country.setValue(this.userData.country);
-    this.userForm.controls.orcid.setValue(this.userData.orcid);
     this.userForm.controls.terms_consent.setValue(true);
   }
 
   deactivateAccount(): void {
-    const username = this.userService.currentUser.username;
-    this.userService.deactivateUser(username).subscribe(
-      () => {
-        this.userService.currentUser = this.userService.emptyUser;
-        this.userService.authenticated.next(false);
-        this.router.navigate(['/deactivate-user-complete']);
-      }
-    );
+    this.userService.deactivateUser(this.userService.currentUser.username)
+      .subscribe(this.deactivateObserver);
+  }
+
+  deactivateAccountNext(): void {
+    this.userService.currentUser = this.userService.emptyUser;
+    this.userService.authenticated.next(false);
+    this.router.navigate(['/deactivate-user-complete'])
+      .then(
+        () => this.toastService.showSuccess('Your request has been sent.')
+      );
+  }
+
+  deactivateAccountError(): void {
+    this.toastService.showErrorWithHeader('Something went wrong', 'Your request could not be sent. ' +
+      'Please try again later, or contact our support team.')
   }
 
   handleSliderChange(value: any) {

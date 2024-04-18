@@ -12,7 +12,7 @@ from validator.mailer import _send_user_help_request
 def send_support_request(request):
     user_name, user_email, message, send_copy_to_user, is_active, slider = request.data.values()
     if is_active or slider == 0:
-        return JsonResponse({"message": ''}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({"message": 'Sorry, looks like you are not a real person.'}, status=status.HTTP_400_BAD_REQUEST)
     try:
         _send_user_help_request(user_name, user_email, message, send_copy_to_user)
         return JsonResponse({'message': 'Ok'}, status=status.HTTP_200_OK)

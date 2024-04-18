@@ -7,8 +7,12 @@ import {ValidationSetDto} from '../../../validation-result/services/validation.s
 import {saveAs} from 'file-saver-es';
 import {MetricsPlotsDto} from './metrics-plots.dto';
 import {PublishingFormDto} from './publishing-form.dto';
+import {HttpErrorService} from '../global/http-error.service';
+import {catchError} from 'rxjs/operators';
 
 const urlPrefix = environment.API_URL + 'api';
+const zeroId = '00000000-0000-0000-0000-000000000000'
+
 const publishedValidationRunUrl: string = urlPrefix + '/published-results';
 const customValidationRunUrl: string = urlPrefix + '/my-results';
 const validationRunsUrl: string = urlPrefix + '/validation-runs';
@@ -22,87 +26,119 @@ const publishingFormURL: string = urlPrefix + '/publishing-form';
 const copyValidationUrl: string = urlPrefix + '/copy-validation';
 const copiedValidationRecordUrl: string = urlPrefix + '/copied-validation-record';
 
-
 const csrfToken = '{{csrf_token}}';
-const changeNameUrl = urlPrefix + '/change-validation-name/00000000-0000-0000-0000-000000000000';
-const archiveResultUrl = urlPrefix + '/archive-result/00000000-0000-0000-0000-000000000000';
-const extendResultUrl = urlPrefix + '/extend-result/00000000-0000-0000-0000-000000000000';
-const publishResultUrl = urlPrefix + '/publish-result/00000000-0000-0000-0000-000000000000';
-const addValidationUrl = urlPrefix + '/add-validation/00000000-0000-0000-0000-000000000000';
-const removeValidationUrl = urlPrefix + '/remove-validation/00000000-0000-0000-0000-000000000000';
+const changeNameUrl = urlPrefix + '/change-validation-name/' + zeroId;
+const archiveResultUrl = urlPrefix + '/archive-result/' + zeroId;
+const extendResultUrl = urlPrefix + '/extend-result/' + zeroId;
+const publishResultUrl = urlPrefix + '/publish-result/' + zeroId;
+const addValidationUrl = urlPrefix + '/add-validation/' + zeroId
+const removeValidationUrl = urlPrefix + '/remove-validation/' + zeroId;
 const removeMultipleValidationUrl = urlPrefix + '/delete-multiple-validations';
 const archiveMultipleValidationUrl = urlPrefix + '/archive-multiple-validations';
-const deleteResultUrl = urlPrefix + '/delete-validation/00000000-0000-0000-0000-000000000000';
-const stopValidationUrl = urlPrefix + '/stop-validation/00000000-0000-0000-0000-000000000000';
+const deleteResultUrl = urlPrefix + '/delete-validation/' + zeroId;
+const stopValidationUrl = urlPrefix + '/stop-validation/' + zeroId;
 const headers = new HttpHeaders({'X-CSRFToken': csrfToken});
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ValidationrunService {
   private refresh: BehaviorSubject<string> = new BehaviorSubject('');
 
-  doRefresh = this.refresh.asObservable();
-  customValidationrun$: Observable<ValidationSetDto>;
-  publishedValidationrun$: Observable<ValidationSetDto>;
+  doRefresh$ = this.refresh.asObservable();
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient,
+              private httpError: HttpErrorService) {
   }
 
   getPublishedValidationruns(params: any): Observable<ValidationSetDto> {
-    this.publishedValidationrun$ = this.httpClient.get<ValidationSetDto>(publishedValidationRunUrl, {params});
-    return this.publishedValidationrun$;
+    return this.httpClient.get<ValidationSetDto>(publishedValidationRunUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getMyValidationruns(params: any): Observable<ValidationSetDto> {
-    this.customValidationrun$ = this.httpClient.get<ValidationSetDto>(customValidationRunUrl, {params});
-    return this.customValidationrun$;
+    return this.httpClient.get<ValidationSetDto>(customValidationRunUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getValidationRunById(id: string): Observable<ValidationrunDto> {
-    return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`);
+    return this.httpClient.get<ValidationrunDto>(`${validationRunsUrl}/${id}`)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getCustomTrackedValidations(): Observable<ValidationrunDto[]> {
-    return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl);
+    return this.httpClient.get<ValidationrunDto[]>(trackedCustomRunsUrl)
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not fetch your tracked validations.'))
+      );
   }
 
   getValidationsForComparison(params: any): Observable<ValidationrunDto[]> {
-    return this.httpClient.get<ValidationrunDto[]>(validations4ComparisonUrl, {params});
+    return this.httpClient.get<ValidationrunDto[]>(validations4ComparisonUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   deleteValidation(validationId: string): Observable<any> {
-    const deleteUrl = deleteResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    return this.httpClient.delete(deleteUrl, {headers});
+    const deleteUrl = deleteResultUrl.replace(zeroId, validationId);
+    return this.httpClient.delete(deleteUrl, {headers})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not delete your validation.'))
+      );
   }
 
   stopValidation(validationId: string): Observable<any> {
-    const stopUrl = stopValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    return this.httpClient.delete(stopUrl, {headers});
+    const stopUrl = stopValidationUrl.replace(zeroId, validationId);
+    return this.httpClient.delete(stopUrl, {headers})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not stop the validation.'))
+      );
   }
 
   archiveResult(validationId: string, archive: boolean): Observable<any> {
-    const archiveUrl = archiveResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
-    return this.httpClient.patch(archiveUrl + '/', {archive}, {headers, observe: 'response', responseType: 'text'});
+    const archiveUrl = archiveResultUrl.replace(zeroId, validationId);
+    return this.httpClient.patch(archiveUrl + '/', {archive},
+      {headers, observe: 'response', responseType: 'text'})
+      .pipe(
+        catchError(err =>
+          this.httpError.handleError(err, `We could not ${archive ? 'archive' : 'un-archive'} your results.`))
+      );
   }
 
   extendResult(validationId: string): Observable<any> {
-    const extendUrl = extendResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const extendUrl = extendResultUrl.replace(zeroId, validationId);
     const extend = true;
-    return this.httpClient.patch(extendUrl + '/', {extend}, {headers, observe: 'response', responseType: 'text'});
+    return this.httpClient.patch(extendUrl + '/', {extend},
+      {headers, observe: 'response', responseType: 'text'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not extend your results.'))
+      );
   }
 
   saveResultsName(validationId: string, newName: string): Observable<any> {
-    const saveUrl = changeNameUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const saveUrl = changeNameUrl.replace(zeroId, validationId);
     const data = {save_name: true, new_name: newName};
-    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
-
+    return this.httpClient.patch(saveUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not update your validation name.'))
+      );
   }
 
   publishResults(validationId: string, publishingData: any): Observable<any> {
-    const publishUrl = publishResultUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const publishUrl = publishResultUrl.replace(zeroId, validationId);
     const data = {publish: true, publishing_form: publishingData};
-    return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'json'});
+    return this.httpClient.patch(publishUrl + '/', data, {headers, observe: 'body', responseType: 'json'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not publish your results.'))
+      );
   }
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void {
@@ -111,15 +147,22 @@ export class ValidationrunService {
   }
 
   addValidation(validationId: string): Observable<any> {
-    const addUrl = addValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const addUrl = addValidationUrl.replace(zeroId, validationId);
     const data = {add_validation: true};
-    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
+    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
+      .pipe(
+        catchError(err =>
+          this.httpError.handleError(err, 'We could not add the validation to the followed validations list.'))
+      );
   }
 
   removeValidation(validationId: string): Observable<any> {
-    const addUrl = removeValidationUrl.replace('00000000-0000-0000-0000-000000000000', validationId);
+    const addUrl = removeValidationUrl.replace(zeroId, validationId);
     const data = {remove_validation: true};
-    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'});
+    return this.httpClient.post(addUrl + '/', data, {headers, observe: 'body', responseType: 'text'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not remove the validation from your list.'))
+      );
   }
 
   removeMultipleValidation(validationId: string[]): Observable<any> {
@@ -127,21 +170,31 @@ export class ValidationrunService {
     validationId.forEach(id => {
       params = params.append('id', id);
     })
-
-    return this.httpClient.delete(removeMultipleValidationUrl, {params});
+    return this.httpClient.delete(removeMultipleValidationUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not remove selected validations.'))
+      );
   }
 
-  archiveMultipleValidation(validationId: string[], archive): Observable<any> {
+  archiveMultipleValidation(validationId: string[], archive: boolean): Observable<any> {
     let params = new HttpParams().set('archive', archive);
     validationId.forEach(id => {
       params = params.append('id', id);
     })
 
-    return this.httpClient.post(archiveMultipleValidationUrl, {}, {headers, observe: 'body', params: params, responseType: 'text'});
+    return this.httpClient.post(archiveMultipleValidationUrl, {},
+      {headers, observe: 'body', params: params, responseType: 'text'})
+      .pipe(
+        catchError(err => this.httpError
+          .handleError(err, `We could not ${archive ? 'archive' : 'un-archive'} selected validations.`))
+      );
   }
 
   getSummaryStatistics(params: any): Observable<any> {
-    return this.httpClient.get(summaryStatisticsUrl, {params, headers, responseType: 'text'});
+    return this.httpClient.get(summaryStatisticsUrl, {params, headers, responseType: 'text'})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   downloadSummaryStatisticsCsv(validationId: string): void {
@@ -150,11 +203,17 @@ export class ValidationrunService {
   }
 
   getMetricsAndPlotsNames(params: any): Observable<MetricsPlotsDto[]> {
-    return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params});
+    return this.httpClient.get<MetricsPlotsDto[]>(metricsAndPlotsNamesUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   getPublishingFormData(params: any): Observable<PublishingFormDto> {
-    return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params});
+    return this.httpClient.get<PublishingFormDto>(publishingFormURL, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
   refreshComponent(validationIdOrPage: string): void {
@@ -163,12 +222,18 @@ export class ValidationrunService {
   }
 
   copyValidation(params: any): Observable<any> {
-    return this.httpClient.get(copyValidationUrl, {params});
+    return this.httpClient.get(copyValidationUrl, {params})
+      .pipe(
+        catchError(err => this.httpError.handleError(err, 'We could not copy the validation.'))
+      );
   }
 
   getCopiedRunRecord(validationId: string): Observable<any> {
     const urlWithParam = copiedValidationRecordUrl + '/' + validationId;
-    return this.httpClient.get(urlWithParam);
+    return this.httpClient.get(urlWithParam)
+      .pipe(
+        catchError(err => this.httpError.handleError(err))
+      );
   }
 
 }

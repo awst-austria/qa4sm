@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {GlobalParamsService} from '../../modules/core/services/global/global-params.service';
 
 @Component({
@@ -6,12 +6,11 @@ import {GlobalParamsService} from '../../modules/core/services/global/global-par
   templateUrl: './terms.component.html',
   styleUrls: ['./terms.component.scss']
 })
-export class TermsComponent implements OnInit {
+export class TermsComponent {
   public pageUrl = '/terms';
   constructor(private globalParamsService: GlobalParamsService) { }
 
-  ngOnInit(): void {
-  }
+
   getAdminMail(): string {
     return this.globalParamsService.globalContext.admin_mail;
   }

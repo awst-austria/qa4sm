@@ -20,9 +20,7 @@ export const ANOMALIES_35D_MA_DESC: string = '35 day moving average';
 export class AnomaliesComponent implements OnInit {
 
   // these fields are required because templates have no access to constants
-  readonly anomaliesNone: string = ANOMALIES_NONE;
   readonly anomaliesClimatology: string = ANOMALIES_CLIMATOLOGY;
-  readonly anomalies35DMa: string = ANOMALIES_35D_MA;
 
   availableAnomalyMethodModels: AnomaliesModel[] = [];
   selectedMethod$: BehaviorSubject<AnomaliesModel> = new BehaviorSubject<AnomaliesModel>(null);
