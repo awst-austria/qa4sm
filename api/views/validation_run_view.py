@@ -3,12 +3,13 @@ from django.db.models import Q, ExpressionWrapper, F, BooleanField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 
 
 
@@ -52,6 +53,7 @@ def published_results(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
 def my_results(request):
     current_user = request.user
     limit = request.query_params.get('limit', None)
