@@ -6,7 +6,7 @@ from api.views.data_filter_view import data_filter, data_parameterised_filter, d
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
 from api.views.dataset_version_geojson import dataset_version_geojson_by_id
-from api.views.dataset_version_view import dataset_version, dataset_version_by_id, dataset_version_by_dataset
+from api.views.dataset_version_view import *
 from api.views.dataset_view import dataset, dataset_by_id
 from api.views.ismn_network_view import get_ismn_networks
 from api.views.login_view import api_login
@@ -131,7 +131,8 @@ urlpatterns = [
     path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
     path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
     path('api-obtain-token/', views.obtain_auth_token),
-    path('api-display-token', get_user_token, name='Get User Token')
+    path('api-display-token', get_user_token, name='Get User Token'),
+    path('update-dataset-version', update_dataset_version, name='Update Dataset Version')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]
