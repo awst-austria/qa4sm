@@ -80,15 +80,6 @@ def user_delete(request):
     return HttpResponse(status=200)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_user_token(request):
-    token_list = Token.objects.filter(user=request.user)
-    token = token_list[0].key if len(token_list) else None
-    response = {'token': token, 'exists': token is not None}
-    return JsonResponse(response, status=200)
-
-
 class UserSerializer(ModelSerializer):
     last_login = DateTimeField(read_only=True)
     date_joined = DateTimeField(read_only=True)
