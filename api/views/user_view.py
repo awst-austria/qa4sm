@@ -104,4 +104,5 @@ class UserSerializer(ModelSerializer):
                   'space_limit_value',
                   'space_left',
                   'is_staff',
-                  'is_superuser']
+                  'is_superuser',
+                  'auth_token']
