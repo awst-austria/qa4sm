@@ -130,7 +130,7 @@ urlpatterns = [
     path('user-manual', get_user_manual, name='Get user manual'),
     path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
     path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
-    path('api-obtain-token/', views.obtain_auth_token),
+    path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
     path('api-display-token', get_user_token, name='Get User Token'),
     path('update-dataset-version', update_dataset_version, name='Update Dataset Version')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
