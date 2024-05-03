@@ -380,8 +380,8 @@ class Pytesmo2Qa4smResultsTranscriber:
 
         """
 
-        # os.remove(self.pytesmo_ncfile)
-        os.rename(self.pytesmo_ncfile, self.pytesmo_ncfile + '.old')
+        os.remove(self.pytesmo_ncfile)
+        # os.rename(self.pytesmo_ncfile, self.pytesmo_ncfile + '.old')
         self.transcribed_dataset.to_netcdf(path, mode, **kwargs)
 
         return path

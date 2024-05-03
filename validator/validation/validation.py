@@ -53,12 +53,12 @@ from typing import Optional, List, Tuple, Dict, Union
 __logger = logging.getLogger(__name__)
 #$$
 ####################-----Implement this in the proper way-----####################
-slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='special',
-                                    overlap=0,
+slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='custom',
+                                    overlap=3,
                                     custom_file=os.path.join('custom_intra_annual_slices_example.json')) # loading custom temporal sub-windows from a file
-slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='seasons',
-                                    overlap=0,
-                                    custom_file=None) # loading default temporal sub-windows from a globals
+# slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
+#                                     overlap=0,
+#                                     custom_file=None) # loading default temporal sub-windows from a globals
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
 # slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
@@ -91,7 +91,7 @@ def _get_actual_time_range(val_run, dataset_version_id):
     return [actual_start, actual_end]
 
 
-def _get_spatial_reference_reader(val_run) -> ('Reader', str, dict):
+def _get_spatial_reference_reader(val_run) -> Tuple['Reader', str, dict]:
     ref_reader = create_reader(val_run.spatial_reference_configuration.dataset,
                                val_run.spatial_reference_configuration.version)
 

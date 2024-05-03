@@ -51,14 +51,14 @@ def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfol
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-    fnb, fnm, fcsv = plot_all(
+    fnb, fnm, fcsv, fncb_png = plot_all(
         validation_run.output_file.path,
         temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
         out_type='png',
         save_metadata=save_metadata
     )
-    fnb_svg, fnm_svg, fcsv = plot_all(
+    fnb_svg, fnm_svg, fcsv, fncb_svg = plot_all(
         validation_run.output_file.path,
         temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
@@ -66,14 +66,16 @@ def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfol
         save_metadata=save_metadata
     )
 
-    # with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-    #     for pngfile in fnb + fnm:
-    #         arcname = path.basename(pngfile)
-    #         myzip.write(pngfile, arcname=arcname)
-    #     for svgfile in fnb_svg + fnm_svg:
-    #         arcname = path.basename(svgfile)
-    #         myzip.write(svgfile, arcname=arcname)
-    #         remove(svgfile)
+    root_dir = os.path.dirname(os.path.commonprefix(fnb + fnm + fncb_png + fnb_svg + fnm_svg + fncb_svg))
+    with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+        for pngfile in set(fnb + fnm + fncb_png):
+            arcname = os.path.relpath(pngfile, root_dir)
+            myzip.write(pngfile, arcname=arcname)
+        for svgfile in set(fnb_svg + fnm_svg + fncb_svg):
+            arcname = os.path.relpath(svgfile, root_dir)
+            myzip.write(svgfile, arcname=arcname)
+            remove(svgfile)
+
 
 
 def get_dataset_combis_and_metrics_from_files(validation_run):

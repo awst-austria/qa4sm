@@ -63,16 +63,47 @@ class IntraAnnualSlicesDefault(ABC):
 
 @dataclass(frozen=True)
 class NewSlice:
+    """
+    Dataclass to store the name and the begin and end date of a new intra annual slice.
+
+    Parameters
+    ----------
+    name : str
+        Name of the new intra annual slice.
+    begin_date : datetime
+        Begin date of the new intra annual slice.
+    end_date : datetime
+        End date of the new intra annual slice.
+
+    """
     name: str
     begin_date: datetime
     end_date: datetime
 
     @property
     def begin_date_pretty(self) -> str:
+        """
+        Returns the begin date in a pretty format.
+
+        Returns
+        -------
+        str
+            Pretty formatted begin date.
+
+        """
         return self.begin_date.strftime('%Y-%m-%d')
 
     @property
     def end_date_pretty(self) -> str:
+        """
+        Returns the end date in a pretty format.
+
+        Returns
+        -------
+        str
+            Pretty formatted end date.
+
+        """
         return self.end_date.strftime('%Y-%m-%d')
 
 class IntraAnnualSlicer(IntraAnnualSlicesDefault):
@@ -228,6 +259,20 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
     def add_slice(
             self,
             new_slice: NewSlice) -> Union[None, Dict[str, TsDistributor]]:
+        '''Adds a new custom intra annual slice to the existing ones.
+
+        Parameters
+        ----------
+        new_slice : NewSlice
+            Dataclass containing the name, begin date, and end date of the new intra annual slice.
+
+        Returns
+        -------
+        Union[None, Dict[str, TsDistributor]]
+            None if the new slice already exists. Otherwise, the dictionary containing the custom intra annual slice definitions.
+
+        '''
+
         self.additional_slices_container[new_slice.name] = new_slice
         try:
             if new_slice.name in self.custom_intra_annual_slices:
