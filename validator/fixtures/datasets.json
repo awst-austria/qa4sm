@@ -206,7 +206,8 @@
             "citation": "See <a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/How+to+acknowledge%2C+cite+and+reference+data+published+on+the+Climate+Data+Store\" rel=\"noreferrer\">here</a> and <a target=\"_blank\" href=\"https://doi.org/10.1002/qj.3803\" rel=\"noreferrer\">here</a> ",
             "is_spatial_reference": false,
             "versions": [
-                15
+                15,
+                57
             ],
             "variables": [
                 11
