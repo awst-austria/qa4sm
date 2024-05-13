@@ -8,20 +8,20 @@ plt.switch_backend('agg')  ## this allows headless graph production
 
 import logging
 from os import path, remove
+from shutil import rmtree
 from zipfile import ZipFile, ZIP_DEFLATED
 
-import sys
-sys.path.append('/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm-reader/src/')
 from qa4sm_reader.plot_all import plot_all, get_img_stats
 from qa4sm_reader.comparing import QA4SMComparison, ComparisonError, SpatialExtentError
 
 from django.conf import settings
 
 from cartopy import config as cconfig
+from typing import List
 
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE
+from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW
 import os
 from io import BytesIO
 import base64
@@ -38,6 +38,8 @@ def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfol
     ----------
     validation_run : ValidationRun
         The validation run to make plots for.
+    temporal_sub_windows: np.ndarray
+        Temporal sub windows to plot.
     outfolder : str
         Directoy where graphs are stored.
     save_metadata: str, optional (default: 'threshold')
@@ -76,6 +78,10 @@ def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfol
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
 
+    collect_statitics_files(dir = root_dir)
+
+    clean_output_folder(dir = root_dir,
+                        to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
 
 
 def get_dataset_combis_and_metrics_from_files(validation_run):
@@ -390,14 +396,50 @@ def get_extent_image(
     except ComparisonError:
         return "error encountered"
 
-#%%
-if __name__ == '__main__':
-    dirpath = '/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm/output/381f63ce-2078-4615-9b8a-fdf1170e6bd0_c'
-    fnb, fnm, fcsv = plot_all(
-    filepath=os.path.join(dirpath, '0-ISMN.soil_moisture_with_1-C3S_combined.sm.nc'),
-    out_dir=os.path.join(dirpath, 'graphs'),
-    out_type='png',
-    save_metadata='threshold'
-    )
 
-# %%
+def collect_statitics_files(dir: str) -> None:
+    """
+    Collect all statistics files in a directory and store them in a zip file.
+
+    Parameters
+    ----------
+    dir : str
+        Directory to store the zip file
+
+    Returns
+    -------
+    None
+    """
+    zipfilename = path.join(dir, 'statistics.zip')
+    __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+
+    with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+        for root, dirs, files in os.walk(dir):
+            for f in files:
+                if f.endswith('.csv'):
+                    arcname = os.path.relpath(path.join(root, f), dir)
+                    myzip.write(path.join(root, f), arcname=arcname)
+
+def clean_output_folder(dir: str, to_be_deleted: List[str]) -> None:
+    """
+    Clean a specified directory of given elements.
+
+    Parameters
+    ----------
+    dir : str
+        Directory to be cleaned
+    to_be_deleted : List[str]
+        List of elements (files, dirs) to be deleted
+
+    Returns
+    -------
+    None
+    """
+    if os.path.exists(dir):
+        for element in to_be_deleted:
+            element_path = os.path.join(dir, element)
+            if os.path.exists(element_path):
+                if os.path.isfile(element_path):    remove(element_path)
+                elif os.path.isdir(element_path):   rmtree(element_path)
+    else:
+        warnings.warn(f"Directory {dir} does not exist")

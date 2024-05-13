@@ -407,28 +407,36 @@ class TestValidation(TestCase):
             else:
                 n_metadata_plots = len(out_metadata_plots)
 
-            patterns = [f"boxplot_{metric}_metadata_{'_and_'.join(meta_var)}.png"
+            patterns = [f"{globals.DEFAULT_TSW}_boxplot_{metric}_metadata_{'_and_'.join(meta_var)}.png"
                         for meta_var in out_metadata_plots.values()] + \
-                       [f'boxplot_{metric}.png', f'boxplot_{metric}_for_*.png']
+                       [f'{globals.DEFAULT_TSW}_boxplot_{metric}.png', f'{globals.DEFAULT_TSW}_boxplot_{metric}_for_*.png']
+
+            self.__logger.debug(f"{patterns=}")
+
             boxplot_pngs = [
                 x for x in os.listdir(os.path.join(outdir, globals.DEFAULT_TSW))
                 if any([fnmatch.fnmatch(x, p) for p in patterns])
             ]   #$$ testing the bulk case
 
+            self.__logger.debug(f"{boxplot_pngs=}")
             self.__logger.debug(f"{metric}: Plots are {len(boxplot_pngs)}, "
                                 f"should: {n_metadata_plots} + {n_metric_plots}")
 
             assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
 
             overview_pngs = [
-                x for x in os.listdir(outdir)
-                if fnmatch.fnmatch(x, f'overview*_{metric}.png')
+                x for x in os.listdir(os.path.join(outdir, globals.DEFAULT_TSW))
+                if fnmatch.fnmatch(x, f'{globals.DEFAULT_TSW}_overview*_{metric}.png')
             ]
 
+            self.__logger.debug(f"{overview_pngs=}")
             self.__logger.debug(f"{metric}: Plots are {len(overview_pngs)}, "
                                 f"should: {(n_datasets - 1)}")
 
-        assert os.path.isfile(os.path.join(outdir, 'overview_status.png'))
+        assert os.path.isfile(os.path.join(outdir,
+                                           globals.DEFAULT_TSW,
+                                           f'{globals.DEFAULT_TSW}_overview_status.png')
+                              )
 
     # delete output of test validations, clean up after ourselves
     def delete_run(self, run):
@@ -488,7 +496,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        slicer_instance = None  # assume bulk case #$$
+        slicer_instance = None  # TODO: for now just assume bulk case #$$
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
@@ -502,6 +510,7 @@ class TestValidation(TestCase):
                            meta_plots=True)  #$$
         self.delete_run(new_run)
 
+    # TODO: fails, if validation contains intrannual slices. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
@@ -1123,6 +1132,7 @@ class TestValidation(TestCase):
                            meta_plots=True)
         self.delete_run(new_run)
 
+    # TODO: works only if the validation doesn't contain intrannual slices
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:No data for:UserWarning",
@@ -1307,6 +1317,7 @@ class TestValidation(TestCase):
                            meta_plots=False)
         self.delete_run(new_run)
 
+    # TODO: fails, if validation contains intrannual slices. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:No data for:UserWarning",

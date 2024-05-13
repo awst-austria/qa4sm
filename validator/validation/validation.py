@@ -1,3 +1,4 @@
+import warnings
 import netCDF4
 from datetime import datetime
 import logging
@@ -7,9 +8,6 @@ from re import sub as regex_sub
 import uuid
 import xarray as xr
 import numpy as np
-import sys
-sys.path.append(
-    '/home/nbader/Documents/QA4SM_tasks/jira-744/qa4sm-reader/src/')        #$$
 import qa4sm_reader
 
 from celery.app import shared_task
@@ -56,9 +54,9 @@ __logger = logging.getLogger(__name__)
 slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='custom',
                                     overlap=3,
                                     custom_file=os.path.join('custom_intra_annual_slices_example.json')) # loading custom temporal sub-windows from a file
-# slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
-#                                     overlap=0,
-#                                     custom_file=None) # loading default temporal sub-windows from a globals
+slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
+                                    overlap=0,
+                                    custom_file=None) # loading default temporal sub-windows from a globals
 intra_annual_slices = slicer_instance.custom_intra_annual_slices
 # slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
 print(slicer_instance)
@@ -338,6 +336,7 @@ def create_pytesmo_validation(validation_run):
             tzinfo=None)
         period = [startdate, enddate]
 
+    __logger.debug(f"First: Validation period: {period}")
     upscale_parms = None
     if validation_run.upscaling_method != "none":
         __logger.debug("Upscaling option is active")
@@ -380,7 +379,13 @@ def create_pytesmo_validation(validation_run):
     if isinstance(
             intra_annual_slices, dict
     ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
-        default_slice = NewSlice(DEFAULT_TSW, *period)
+        try:
+            default_slice = NewSlice(DEFAULT_TSW, *period)
+        except TypeError: # TODO: is this the right way to handle this?
+            warnings.warn(f"TypeError: type object argument after * must be an iterable, not NoneType. Setting bulk slice artificially to 01-01-1900 - 31-12-2100.")
+            period = [datetime(1900, 1, 1), datetime(2100, 12, 31)] # artificial period for bulk case
+            default_slice = NewSlice(DEFAULT_TSW, *period)
+
         slicer_instance.add_slice(default_slice)        # always add the default case
         pairwise_metrics = SubsetsMetricsAdapter(
             calculator=_pairwise_metrics,
@@ -411,6 +416,7 @@ def create_pytesmo_validation(validation_run):
 
     __logger.debug(f"Scaling method: {scaling_method}")
     __logger.debug(f"Scaling dataset: {scaling_ref_name}")
+    __logger.debug(f"Validation period: {period}")
 
     temporalwindow_size = validation_run.temporal_matching
     __logger.debug(
