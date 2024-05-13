@@ -10,7 +10,7 @@
                 (click)="close()"><b>X</b>
         </button>
       </ng-template>
-      <div *ngIf="foundValidation|async as validation">
+      <div *ngIf="foundValidation$|async as validation">
         <div *ngIf="isThereValidation.is_published">
           There exists a published validation with exactly the same settings, run on {{validation.start_time|date: dateFormat :timeZone}}. <br>
           You can run your own validation and wait for the results or you can use the existing one.<br>

@@ -1,21 +1,18 @@
-import {Component, HostListener, OnInit, Renderer2} from '@angular/core';
+import {Component, HostListener, Renderer2} from '@angular/core';
 import {AuthService} from '../../modules/core/services/auth/auth.service';
 import {SettingsService} from '../../modules/core/services/global/settings.service';
-import {Observable} from 'rxjs';
 import {Router} from '@angular/router';
 import {DomSanitizer} from '@angular/platform-browser';
 
-const homeUrlPrefix = '/static/images/home/';
 const logoUrlPrefix = '/static/images/logo/';
-const videosPrefix = 'static/videos/'
 
 
 @Component({
-  selector: 'app-home',
+  selector: 'qa-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
 
   logoFiles = [{
     plot: logoUrlPrefix + 'logo_awst.webp',
@@ -62,9 +59,7 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  settings$: Observable<any>;
-
-  userLoggedIn: boolean;
+  userLoggedIn$ = this.authService.authenticated;
 
   animationFadeInDownClass = ['fadeindown', 'animation-duration-1000', 'animation-iteration-1']
   animationFadeInClass = ['fadein', 'animation-duration-3000', 'animation-iteration-1']
@@ -121,6 +116,8 @@ export class HomeComponent implements OnInit {
     teamLogo: 'md:w-2 w-12 md:ml-5 ml-3 partner-logo flex align-items-center justify-content-center text-center fadeInLeft'
   }
 
+  settings$ = this.settingsService.getAllSettings();
+
   constructor(private authService: AuthService,
               private settingsService: SettingsService,
               private router: Router,
@@ -128,15 +125,9 @@ export class HomeComponent implements OnInit {
               private renderer: Renderer2) {
   }
 
-  ngOnInit(): void {
-    this.authService.authenticated.subscribe(authenticated => this.userLoggedIn = authenticated);
-    this.settings$ = this.settingsService.getAllSettings();
-  }
-
   goToNews(): void {
     this.router.navigate([], {fragment: "qa4smNews"});
   }
-
 
   animations(element): string[] {
     if (element.includes('fadeInOut')) {

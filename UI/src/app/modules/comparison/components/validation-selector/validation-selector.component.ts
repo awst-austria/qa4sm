@@ -10,8 +10,9 @@ import {ValidationrunDto} from '../../../core/services/validation-run/validation
 import {ExtentModel} from '../spatial-extent/extent-model';
 import {ComparisonService} from '../../services/comparison.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, EMPTY} from 'rxjs';
 import {DatasetVariableService} from '../../../core/services/dataset/dataset-variable.service';
+import {catchError} from 'rxjs/operators';
 
 const N_MAX_VALIDATIONS = 2; // A maximum of two validation results can be compared, at the moment - this shouldn't be hardcoded
 
@@ -30,12 +31,14 @@ export class ValidationSelectorComponent implements OnInit {
   spatialExtent: ExtentModel = new ExtentModel(true);
   // all the possible validations given filters
   validations4Comparison: ValidationrunDto[] = [];
+  noValidationsError: boolean = false;
   // model that stores all the inputs for the comparison run
   comparisonModel: Validations2CompareModel = new Validations2CompareModel(
     [],
     new ExtentModel(true).getIntersection,
     this.multipleNonReference
   );
+  datasetErrorSelector: boolean = false;
 
   constructor(private datasetService: DatasetService,
               private versionService: DatasetVersionService,
@@ -75,16 +78,34 @@ export class ValidationSelectorComponent implements OnInit {
 
     selected.push(model);
     // get all datasets
-    this.datasetService.getAllDatasets(true).subscribe(datasets => {
+    this.datasetService.getAllDatasets(true)
+      .pipe(
+       catchError(() => {
+         this.datasetErrorSelector = true;
+         return EMPTY
+       })
+      )
+      .subscribe(datasets => {
       model.datasetModel.selectedDataset = datasets.find(dataset => dataset.short_name === 'ISMN');
       this.selectValidationLabel = 'Wait for validations to be loaded';
       // then get all versions for the first dataset in the result list
-      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id).subscribe(versions => {
+      this.versionService.getVersionsByDataset(model.datasetModel.selectedDataset.id)
+        .pipe(
+          //todo: when updating the component think of a better way of handling this error here
+          catchError(() => EMPTY)
+        )
+        .subscribe(versions => {
         model.datasetModel.selectedVersion = versions.find(version => version.pretty_name === '20210131 global');
         this.getValidations4comparison(String(model.datasetModel.selectedDataset.short_name),
           String(model.datasetModel.selectedVersion.short_name));
         // get all variables
-        this.datasetVariableService.getVariablesByDataset(model.datasetModel.selectedDataset.id).subscribe(variables => {
+        this.datasetVariableService.getVariablesByDataset(model.datasetModel.selectedDataset.id)
+          .pipe(
+            //todo: when updating the component think of a better way of handling this error here
+            //todo: fix the issue of empty variable for the comparison summary
+            catchError(() => EMPTY)
+          )
+          .subscribe(variables => {
           model.datasetModel.selectedVariable = variables[0];
         });
       });
@@ -102,17 +123,28 @@ export class ValidationSelectorComponent implements OnInit {
       // number of non-reference datasets
       .set('max_datasets', String(this.checkbox2NonReferenceNumber()));
     this.selectValidationLabel = 'Wait for validations to be loaded';
-    this.validationrunService.getValidationsForComparison(parameters).subscribe(response => {
+    this.validationrunService.getValidationsForComparison(parameters)
+      .pipe(
+        catchError(() => {
+          this.noValidationsError = true;
+          return EMPTY
+        })
+      )
+      .subscribe(response => {
       if (response) {
         this.validations4Comparison = response;
         this.selectedValidation = response[0];
         this.selectValidationLabel = 'Select a validation';
       } else {
-        this.validations4Comparison = [];
-        this.selectValidationLabel = 'There are no validations available';
+         this.noValidationsAvailable()
       }
     });
 
+  }
+
+  noValidationsAvailable(): void{
+    this.validations4Comparison = [];
+    this.selectValidationLabel = 'There are no validations available';
   }
 
   multipleNonReferenceChange(): void {

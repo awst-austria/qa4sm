@@ -1,8 +1,10 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
 import {PublishingForm} from '../../../core/services/form-interfaces/publishing-form';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-publishing',
@@ -26,16 +28,27 @@ export class PublishingComponent implements OnInit {
 
   publishResultsObserver = {
     next: () => this.onPublishResultNext(),
-    error: error => this.onPublishResultError(error)
+    error: (error: CustomHttpError) => this.onPublishResultError(error)
   }
 
+  metadataFetchError = signal(false);
+
+
+  // todo: this error handling will be added after restructuring the code that calls this feature
   getPublishingFormDataObserver = {
-    next: data => this.onGetPublishingFormDataNext(data)
+    next: (data: any) => this.onGetPublishingFormDataNext(data),
+    error: () => this.onFetchMetdataError()
+  }
+
+  onFetchMetdataError(): void{
+    this.publishingForm.controls.keywords.setValue('soil moisture, validation, qa4sm')
+    this.metadataFetchError.set(true);
   }
 
   constructor(
     private validationrunService: ValidationrunService,
     private formBuilder: FormBuilder,
+    private toastService: ToastService
   ) {
   }
 
@@ -58,23 +71,25 @@ export class PublishingComponent implements OnInit {
     this.handleModalWindow(false);
   }
 
-  private onPublishResultError(error): void {
-    this.formErrors = error.error;
-    this.handleModalWindow(true)
+  private onPublishResultError(error: CustomHttpError): void {
+    if (error.form) {
+      this.formErrors = error.form;
+      this.toastService.showErrorWithHeader('Invalid metadata',
+        'Provided metadata is invalid. Please fix the errors and submit form one more time.')
+    } else {
+      this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
+    }
+    this.handleModalWindow(true);
   }
 
   getPublishingForm(): void {
     const params = new HttpParams().set('id', this.validationId);
-    this.validationrunService.getPublishingFormData(params).subscribe(this.getPublishingFormDataObserver);
+    this.validationrunService.getPublishingFormData(params)
+      .subscribe(this.getPublishingFormDataObserver);
   }
 
   private onGetPublishingFormDataNext(data): void{
-    this.publishingForm.controls.title.setValue(data.title);
-    this.publishingForm.controls.description.setValue(data.description);
-    this.publishingForm.controls.keywords.setValue(data.keywords);
-    this.publishingForm.controls.name.setValue(data.name);
-    this.publishingForm.controls.affiliation.setValue(data.affiliation);
-    this.publishingForm.controls.orcid.setValue(data.orcid);
+    this.publishingForm.patchValue(data);
   }
 
 }

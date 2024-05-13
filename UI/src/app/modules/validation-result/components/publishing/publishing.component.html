@@ -1,10 +1,14 @@
 <div>
     <div class="px-0 py-0">
-      <p class="my-0">
+      <p class="my-0" *ngIf="!metadataFetchError(); else onError">
         Please check the metadata your results will be published with. <br/>
         If you want to permanently set your author details, you can do so on your <a routerLink="/user-profile">profile
         page</a>.
       </p>
+      <ng-template #onError>
+        We could not upload metadata from our database. You can still provide proper information and publish your results.
+        However, if the problem persists, please contact our support team.
+      </ng-template>
     </div>
     <form [formGroup]="publishingForm">
       <div class="pt-3 pb-2 grid">

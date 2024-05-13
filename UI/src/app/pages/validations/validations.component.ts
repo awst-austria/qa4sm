@@ -1,13 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
-  selector: 'app-validations',
+  selector: 'qa-validations',
   templateUrl: './validations.component.html',
   styleUrls: ['./validations.component.scss']
 })
-export class ValidationsComponent implements OnInit {
+export class ValidationsComponent {
   constructor() { }
 
-  ngOnInit(): void {
-  }
 }

@@ -2,7 +2,7 @@
   <!--Header-->
   <!-- PUBLISHED  -->
   <ng-template *ngIf="published" pTemplate="header">
-    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="line-height-1">Name:</span> {{ valName$|async }}</div>
+    <div class="my-0 lg:text-xl md:text-lg text-base"><span class="line-height-1">Name:</span> {{ valName() }}</div>
   </ng-template>
   <ng-template *ngIf="published" pTemplate="icons" class="doilink">
     <div class="my-0 lg:text-xl md:text-lg text-base"> DOI: <a title="doi-link" class="doilink" target="_blank"
@@ -51,7 +51,7 @@
       </span>
       <span *ngIf="validationRun.is_a_copy">
         Copied: {{ validationRun.start_time|date: dateFormat :timeZone }} {{timeZone}} <br>
-        (Date of original run: {{ originalDate|date: 'mediumDate' :timeZone }})
+        (Date of original run: {{ (originalDate() |date: 'mediumDate' :timeZone) || 'no information available' }})
       </span>
       <em *ngIf="!validationRun.all_files_exist" class="ml-2">
         Validation can not be reproduced
@@ -66,7 +66,7 @@
   <ng-template *ngIf="!published" pTemplate="icons" style="min-width: 7rem; max-width: 12rem">
     <div class="my-0 lg:text-xl md:text-lg text-base">
       <span *ngIf="hideElement"
-            class="line-height-1">Name: {{ valName$|async }}
+            class="line-height-1">Name: {{ valName() }}
       </span>
       <span *ngIf="!validationRun.is_unpublished; else elseUnpublished"
             class="my-0 font-weight-normal">
@@ -90,7 +90,7 @@
           <label for="new-name">Name: </label>
           <input id="new-name"
                  type="text"
-                 value="{{valName$|async}}"
+                 value="{{valName()}}"
                  #newName
                  [ngClass]="{'edit_name': true}">
           <button
@@ -145,8 +145,10 @@
       </div>
       <!--    CUSTOM -->
       <div *ngIf="!published">
-        <strong>Status:</strong><br/>
-        {{validationStatus$|async}}
+        <span *ngIf="validationStatus()==='Unknown'" class="pi pi-question-circle"
+              [pTooltip]="'The validation is still running, but we could not provide progress information.'"></span>
+        <strong> Status:</strong><br/>
+        {{validationStatus()}}
       </div>
     </div>
 

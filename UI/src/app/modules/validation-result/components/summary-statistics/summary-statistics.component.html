@@ -1,5 +1,4 @@
 <div class="flex flex-column w-12 mx-0">
-  <!--      <div class="col-12">-->
   <p-panel [toggleable]="true" [collapsed]="true">
     <ng-template pTemplate="header">
       <div class="text-center my-1" style="width: 92%">
@@ -13,18 +12,18 @@
         <span class="pi pi-question-circle help-icon"></span>
       </label>
     </ng-template>
-    <div *ngIf="(table$|async) as table" class="pb-3">
+    <div *ngIf="(table$|async) as table; else noTable" class="pb-3">
       <ng-template [ngIf]="table==='error file size'" [ngIfElse]="showTable" class="pb-3">
         This validation has resulted in a file whose size
         exceeds the maximum limit. For this reason, the statistics table cannot be generated on the fly.
       </ng-template>
       <ng-template #showTable>
-        <div class="pb-3 text-justify">The mean, median and standard deviation are calculated on the validation results aggregated by
+        <div class="pb-3 text-justify" *ngIf="settings$|async as settings">The mean, median and standard deviation are calculated on the validation results aggregated by
           metric
-          and dataset. The spatial reference dataset used is {{ (refDataset$ | async)?.pretty_name }}
-          ({{ (refDatasetVersion$ | async)?.short_name }}, {{ (refDatasetVariable$ | async)?.pretty_name }}).
+          and dataset. The spatial reference dataset used is {{ (refDataset$ | async)?.pretty_name || '...'}}
+          ({{ (refDatasetVersion$ | async)?.short_name  || '...'}}, {{ (refDatasetVariable$ | async)?.pretty_name || '...'}}).
           You can find formulas of each metric in
-          <a [href]="userManualLink + '#page=22'" target="_blank">chapter 4</a> of our user manual.
+          <a [href]="settings[0].sum_link + '#page=22'" target="_blank">chapter 4</a> of our user manual.
         </div>
         <span [innerHtml]="table | dompurify" class="lg:text-base text-sm"></span>
         <div class="d-flex justify-content-between align-items-center">
@@ -40,6 +39,11 @@
         </div>
       </ng-template>
     </div>
+    <ng-template #noTable>
+      <p class="lead text-muted">
+        We could not fetch statistics. Please try again later or <a routerLink="/contact-us"> contact </a> our support
+        team.
+      </p>
+    </ng-template>
   </p-panel>
-  <!--      </div>-->
 </div>

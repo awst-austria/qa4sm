@@ -11,7 +11,7 @@
         <h4 class="my-0 font-weight-normal">
           Summary:
           <span *ngIf="validationRun.is_unpublished && isOwner">
-          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{ valName$|async }} </span>
+          <span *ngIf="hideElement" class="my-0 font-weight-normal no_edit_name">{{ valName() }} </span>
           <button
             pButton
             type="button"
@@ -26,7 +26,7 @@
             <label for="new-name"></label>
             <input id="new-name"
                    type="text"
-                   value="{{valName$|async}}"
+                   value="{{valName()}}"
                    #newName
                    [ngClass]="{'edit_name': true}">
             <button
@@ -50,12 +50,12 @@
           </span>
         </span>
           <span *ngIf="!validationRun.is_unpublished"
-                class="my-0 font-weight-normal no_edit_name">{{ valName$|async }}
+                class="my-0 font-weight-normal no_edit_name">{{ valName() }}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation has been published. There is no possibility of changing its name."> </span>
             </span>
           <span *ngIf="!isOwner && validationRun.is_unpublished"
-                class="my-0 font-weight-normal no_edit_name">{{ valName$|async }}
+                class="my-0 font-weight-normal no_edit_name">{{ valName() }}
             <span class="no_name_change_info pi pi-question-circle help-icon"
                   pTooltip="Validation belongs to another user. There is no possibility of changing its name."> </span>
             </span>
@@ -73,7 +73,8 @@
       <ul [ngClass]="{'for-comparison-list': forComparison}" class="md:mx-5 md:px-3 mx-1 px-1">
         <li *ngIf="validationRun.is_a_copy">
           Validation copied on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }},
-          original validation run on {{ this.originalDate| date: 'mediumDate' :timeZone }}.
+          original validation run
+          on {{ (originalDate() | date: 'mediumDate' :timeZone) || '- no information provided' }}.
         </li>
         <li *ngIf="!validationRun.is_a_copy">Started validation
           on {{ validationRun.start_time | date: dateFormat :timeZone }} {{ timeZone }}, finished
@@ -99,11 +100,14 @@
                 <ul>
                   <li *ngFor="let filter of config.filters">{{ filter }};</li>
                 </ul>
-                <ul>
+                <ul *ngIf="config.parametrisedFiltersValues.length">
                   <li *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
                     {{ paramFilter }}: {{ config.parametrisedFiltersValues[indF].split(',').join(', ') }};
                   </li>
                 </ul>
+              </div>
+              <div *ngIf="noFilters() || noParamFilters()"><em style="color: gray">
+                We could not fetch the full list of applied filters.</em>
               </div>
 
             </li>
@@ -165,12 +169,16 @@
                 <span *ngIf="config.id === validationRun.scaling_ref">
                   {{ config.dataset }} ({{ config.version }}, {{ config.variable }})
 
-                  <span *ngIf="config.filters || config.parameterisedFilters; else elseFilters">[Filters:
-                  <span *ngFor="let filter of config.filters"> {{ filter }}; </span>
-                  <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
-                              {{ paramFilter }} {{ config.parametrisedFiltersValues[indF] }}
-                            </span>
-                    ]</span>
+                  <span *ngIf="(config.filters) || (config.parameterisedFilters) ; else elseFilters">[Filters:
+                    <span *ngFor="let filter of config.filters"> {{ filter }}; </span>
+                    <span *ngFor="let paramFilter of config.parametrisedFilters; let indF = index">
+                                {{ paramFilter }} {{ config.parametrisedFiltersValues[indF] }}
+                              </span>
+                    <span *ngIf="noFilters() || noParamFilters()"><em style="color: gray">
+                      We could not fetch the full list of applied filters.</em>
+                    </span>
+                      ]
+                  </span>
                   <ng-template #elseFilters>
                     none
                   </ng-template>
@@ -179,7 +187,7 @@
         </li>
 
         <li> Scaling
-          method: {{ scalingMethod }}.
+          method: {{ scalingMethodDescription$|async }}.
         </li>
 
         <li *ngIf="!forComparison">Processing took {{ runTime }} minutes (wall time).</li>
@@ -202,21 +210,21 @@
             subsetting or select different dataset as a spatial reference.
           </b>
         </li>
-        <li *ngIf="(isArchived$|async)===false && getCurrentUser() === validationRun.user  && !forComparison">
-          <span *ngIf="isNearExpiry$|async">
+        <li *ngIf="(isArchived())===false && getCurrentUser() === validationRun.user  && !forComparison">
+          <span *ngIf="isNearExpiry()">
             <span class="p-panel-header-icon pi pi-exclamation-triangle expiry-icons"></span>
             This validation will SOON be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{ timeZone }}.
+            on {{ expiryDate() | date: dateFormat : timeZone }} {{ timeZone }}.
           </span>
 
-          <span *ngIf="(isNearExpiry$|async)===false">
+          <span *ngIf="(isNearExpiry())===false">
             <span class="p-panel-header-icon pi pi-calendar expiry-icons"></span>
             This validation will be automatically removed during cleanup
-            on {{ (expiryDate$|async)|date: dateFormat :timeZone }} {{ timeZone }}.
+            on {{ expiryDate()|date: dateFormat :timeZone }} {{ timeZone }}.
           </span>
 
         </li>
-        <li *ngIf="(isArchived$|async) && validationRun.is_unpublished && !forComparison">
+        <li *ngIf="(isArchived()) && validationRun.is_unpublished && !forComparison">
               <span
                 class="p-panel-header-icon pi expiry-icons">
                 <fa-icon [icon]="faIcons.faArchive"></fa-icon>
@@ -230,16 +238,22 @@
         </li>
       </ul>
       <qa-buttons
-        *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress$|async) === false"
+        *ngIf="!forComparison && !validationRun.publishing_in_progress && (this.publishingInProgress()) === false"
         [validationList]="false"
         [validationRun]="validationRun" [canBeRerun]="validationRun.all_files_exist" (doUpdate)="update($event)"
         (openPublishWindow)="handlePublishWindow($event)"/>
 
-      <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress$|async)"
+      <div *ngIf="validationRun.publishing_in_progress || (this.publishingInProgress())"
            style="float: right">
         <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i> Publishing in progress...
       </div>
 
+    </div>
+    <div *ngIf="dataFetchError()">
+      <p class="lead text-muted">
+        We could not generate a summary. Please try again later or <a routerLink="/contact-us"> contact </a> our support
+        team.
+      </p>
     </div>
   </p-panel>
 
