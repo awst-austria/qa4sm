@@ -855,5 +855,22 @@
                 16
             ]
         }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 58,
+        "fields": {
+            "short_name": "C3S_V202312",
+            "pretty_name": "v202312",
+            "help_text": "CDR v202312",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2023-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                6,
+                7
+            ]
+        }
     }
 ]
