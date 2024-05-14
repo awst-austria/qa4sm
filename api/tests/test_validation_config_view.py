@@ -43,47 +43,47 @@ class TestValidationConfigView(TransactionTestCase):
 
         basic_filter_id = DataFilter.objects.get(name='FIL_ALL_VALID_RANGE').id
         self.good_form = {'dataset_configs': [{'dataset_id': Dataset.objects.get(short_name=globals.C3SC).id,
-                                          'variable_id': DataVariable.objects.get(pretty_name=globals.C3S_sm).id,
-                                          'version_id': DatasetVersion.objects.get(short_name=globals.C3S_V201812).id,
-                                          'basic_filters': [basic_filter_id],
-                                          'parametrised_filters': [],
-                                          'is_spatial_reference': False,
-                                          'is_temporal_reference': False,
-                                          'is_scaling_reference': False},
-                                         {'dataset_id': Dataset.objects.get(short_name=globals.SMAP_L3).id,
-                                          'variable_id': DataVariable.objects.get(
-                                              pretty_name=globals.SMAP_soil_moisture).id,
-                                          'version_id': DatasetVersion.objects.get(short_name=globals.SMAP_V6_PM).id,
-                                          'basic_filters': [basic_filter_id],
-                                          'parametrised_filters': [],
-                                          'is_spatial_reference': False,
-                                          'is_temporal_reference': False,
-                                          'is_scaling_reference': False},
-                                         {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
-                                          'variable_id': DataVariable.objects.get(
-                                              pretty_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
-                                          'version_id': DatasetVersion.objects.get(
-                                              short_name=globals.GLDAS_NOAH025_3H_2_1).id,
-                                          'basic_filters': [basic_filter_id],
-                                          'parametrised_filters': [],
-                                          'is_spatial_reference': True,
-                                          'is_temporal_reference': True,
-                                          'is_scaling_reference': False}],
-                     'interval_from': datetime(1978, 1, 1),
-                     'interval_to': datetime(2020, 1, 1),
-                     'min_lat': 18.022843268729,
-                     'min_lon': -161.334244440612,
-                     'max_lat': 23.0954743716834,
-                     'max_lon': -153.802918037877,
-                     'metrics': [{'id': 'tcol', 'value': True}],
-                     'anomalies_method': 'none',
-                     'anomalies_from': None,
-                     'anomalies_to': None,
-                     'scaling_method': ValidationRun.NO_SCALING,
-                     'name_tag': 'test_validation',
-                     'temporal_matching': globals.TEMP_MATCH_WINDOW}
-
-
+                                               'variable_id': DataVariable.objects.get(pretty_name=globals.C3S_sm).id,
+                                               'version_id': DatasetVersion.objects.get(
+                                                   short_name=globals.C3S_V201812).id,
+                                               'basic_filters': [basic_filter_id],
+                                               'parametrised_filters': [],
+                                               'is_spatial_reference': False,
+                                               'is_temporal_reference': False,
+                                               'is_scaling_reference': False},
+                                              {'dataset_id': Dataset.objects.get(short_name=globals.SMAP_L3).id,
+                                               'variable_id': DataVariable.objects.get(
+                                                   pretty_name=globals.SMAP_soil_moisture).id,
+                                               'version_id': DatasetVersion.objects.get(
+                                                   short_name=globals.SMAP_V6_PM).id,
+                                               'basic_filters': [basic_filter_id],
+                                               'parametrised_filters': [],
+                                               'is_spatial_reference': False,
+                                               'is_temporal_reference': False,
+                                               'is_scaling_reference': False},
+                                              {'dataset_id': Dataset.objects.get(short_name=globals.GLDAS).id,
+                                               'variable_id': DataVariable.objects.get(
+                                                   pretty_name=globals.GLDAS_SoilMoi0_10cm_inst).id,
+                                               'version_id': DatasetVersion.objects.get(
+                                                   short_name=globals.GLDAS_NOAH025_3H_2_1).id,
+                                               'basic_filters': [basic_filter_id],
+                                               'parametrised_filters': [],
+                                               'is_spatial_reference': True,
+                                               'is_temporal_reference': True,
+                                               'is_scaling_reference': False}],
+                          'interval_from': datetime(1978, 1, 1),
+                          'interval_to': datetime(2020, 1, 1),
+                          'min_lat': 18.022843268729,
+                          'min_lon': -161.334244440612,
+                          'max_lat': 23.0954743716834,
+                          'max_lon': -153.802918037877,
+                          'metrics': [{'id': 'tcol', 'value': True}],
+                          'anomalies_method': 'none',
+                          'anomalies_from': None,
+                          'anomalies_to': None,
+                          'scaling_method': ValidationRun.NO_SCALING,
+                          'name_tag': 'test_validation',
+                          'temporal_matching': globals.TEMP_MATCH_WINDOW}
 
     def test_start_validation(self):
         start_validation_url = reverse('Run new validation')
@@ -167,13 +167,13 @@ class TestValidationConfigView(TransactionTestCase):
         assert response.status_code == 400
 
         # temporal:
-        good_form['dataset_configs'][0]['is_spatial_reference'] = False # fixing this one
+        good_form['dataset_configs'][0]['is_spatial_reference'] = False  # fixing this one
         good_form['dataset_configs'][0]['is_temporal_reference'] = True
         response = self.client.post(start_validation_url, good_form, format='json')
         assert response.status_code == 400
 
         # scaling
-        good_form['dataset_configs'][0]['is_temporal_reference'] = False # fixing this one
+        good_form['dataset_configs'][0]['is_temporal_reference'] = False  # fixing this one
         good_form['dataset_configs'][0]['is_scaling_reference'] = True
         response = self.client.post(start_validation_url, good_form, format='json')
         assert response.status_code == 400
@@ -185,13 +185,13 @@ class TestValidationConfigView(TransactionTestCase):
         assert response.status_code == 400
 
         # temporal
-        good_form['dataset_configs'][2]['is_spatial_reference'] = True # fixing this one
+        good_form['dataset_configs'][2]['is_spatial_reference'] = True  # fixing this one
         good_form['dataset_configs'][2]['is_temporal_reference'] = False
         response = self.client.post(start_validation_url, good_form, format='json')
         assert response.status_code == 400
 
         # scaling
-        good_form['dataset_configs'][2]['is_temporal_reference'] = True # fixing this one
+        good_form['dataset_configs'][2]['is_temporal_reference'] = True  # fixing this one
         good_form['dataset_configs'][0]['is_scaling_reference'] = False
         good_form['dataset_configs'][2]['is_scaling_reference'] = False
 
@@ -244,8 +244,6 @@ class TestValidationConfigView(TransactionTestCase):
         # non existing validation - 404 expected
         response = self.client.get(reverse('Validation configuration', kwargs={'id': self.wrong_id}))
         assert response.status_code == 404
-
-
 
     # stopping validation tested here, because TransactionTestCase is needed and using it in two places causes some
     # issues
