@@ -72,6 +72,7 @@
 
 <!-- Plot divs -->
 <div id="val_nums_by_users" class="plot_div"></div>
+<div id="space_used_by_users" class="plot_div"></div>
 <div id="validations_in_time" class="plot_div"></div>
 <div id="users_in_time" class="plot_div"></div>
 <div id="datasets_cumulative" class="plot_div"></div>
@@ -300,6 +301,58 @@
 
     Plotly.react(val_nums_by_users_div, val_nums_by_users_plot_data, val_nums_by_user_layout);
 
+
+    // Space used by each user
+
+      var space_used_by_users_div = $('#space_used_by_users')[0];
+    var space_used_by_users_plot_data = [{
+        x: {{stats.user_data.users|safe}},
+        y: {{stats.user_data.space_used|safe}},
+        type: 'bar',
+        marker: {color: basic_color}}]
+
+    var space_used_by_users_layout = {
+        plot_bgcolor: plot_bgcolor,
+        title: {
+            text: 'Space usage',
+            font: {
+                family: title_font_type,
+                size: title_font_size
+            },
+            yref: 'container',
+            y: 0.85
+        },
+        xaxis: {
+            title: {
+                text: 'Users',
+                font: {
+                    family: axis_font_type,
+                    size: axis_font_size
+                },
+                standoff: 10,
+            },
+            tickfont: {
+                size: tick_font_size,
+                family: tick_font_type
+            },
+            automargin: true
+        },
+        yaxis: {
+            title: {
+                text: 'Space',
+                font: {
+                    family: axis_font_type,
+                    size: axis_font_size
+                }
+            },
+            tickfont: {
+                size: tick_font_size,
+                family: tick_font_type
+            },
+        }
+    }
+
+    Plotly.react(space_used_by_users_div, space_used_by_users_plot_data, space_used_by_users_layout);
 
     //==========================================================================================
     // Number of users by time range:

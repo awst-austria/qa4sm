@@ -145,6 +145,11 @@ class StatisticsAdmin(ModelAdmin):
         users_sorted_by_time = User.objects.filter(is_active=True).order_by('date_joined')
         users_names = [user.username for user in users_sorted_by_time]
 
+        users_with_files = User.objects.annotate(number_of_files=Count('user_datasets')).exclude(
+            number_of_files=0).order_by('date_joined')
+
+        users_with_files_names = [user.username for user in users_with_files]
+
         users_time = list(users_sorted_by_time.values_list('date_joined', flat=True))
         # here the date is converted to the format 'YYYY-MM-DD HH:MM' needed to plotply histogram
         time_list = []
@@ -158,11 +163,15 @@ class StatisticsAdmin(ModelAdmin):
         last_time = [f'{last_user.year}-{last_user.month}-{last_user.day} 23:59:59']
 
         validations_num = [user.validationrun_set.all().count() for user in users_sorted_by_time]
+        space_used = [user.used_space for user in users_with_files]
+
         users_dict = {'users': users_names,
+                      'users_with_files': users_with_files_names,
                       'validations_num': validations_num,
                       'users_time': time_list,
                       'first_user_time': first_time,
-                      'last_user_time': last_time
+                      'last_user_time': last_time,
+                      'space_used': space_used
                       }
         return users_dict
 
@@ -229,8 +238,6 @@ class StatisticsAdmin(ModelAdmin):
     @staticmethod
     def get_statistics_on_user_dataset_general():
         user_files = UserDatasetFile.objects.all()
-        users_with_files = User.objects.annotate(number_of_files=Count('user_datasets')).exclude(
-            number_of_files=0)
         number_of_user_files = user_files.count()
 
         largest_file_size = -1
@@ -245,7 +252,6 @@ class StatisticsAdmin(ModelAdmin):
         return {
             'number_of_user_files': number_of_user_files,
             'largest_file_info': largest_file_info,
-            'users_with_files': users_with_files
         }
 
     # @csrf_protect_m
