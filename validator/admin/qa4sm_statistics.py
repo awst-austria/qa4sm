@@ -12,7 +12,8 @@ from django.urls import path
 from django_countries import countries as base_countries
 from itertools import groupby
 
-from validator.models import User, ValidationRun, Dataset, DatasetConfiguration, UptimeReport, UptimeAgent
+from validator.models import User, ValidationRun, Dataset, DatasetConfiguration, UptimeReport, UptimeAgent, \
+    UserDatasetFile
 
 
 def sorted_users_validation_query():
@@ -212,7 +213,7 @@ class StatisticsAdmin(ModelAdmin):
 
     @staticmethod
     def get_kpi_info_for_plot(period, kpi):
-        uptime_reports = UptimeReport.objects.all().filter(period=period).\
+        uptime_reports = UptimeReport.objects.all().filter(period=period). \
             filter(start_time__gte=datetime.date(2021, 6, 1)).order_by('start_time')
         agents = UptimeAgent.objects.all()
 
@@ -224,6 +225,28 @@ class StatisticsAdmin(ModelAdmin):
         combined_agent = get_combined_agent(uptime_reports, kpi)
         output_list.append(('combined_agent', combined_agent))
         return output_list
+
+    @staticmethod
+    def get_statistics_on_user_dataset_general():
+        user_files = UserDatasetFile.objects.all()
+        users_with_files = User.objects.annotate(number_of_files=Count('user_datasets')).exclude(
+            number_of_files=0)
+        number_of_user_files = user_files.count()
+
+        largest_file_size = -1
+        largest_file_info = {}
+        for user_file in user_files:
+            if user_file.file and user_file.file.size > largest_file_size:
+                largest_file_size = user_file.file.size
+                largest_file_info = {'file_id': user_file.id,
+                                     'user': user_file.owner.username,
+                                     'file_size': user_file.file.size}
+
+        return {
+            'number_of_user_files': number_of_user_files,
+            'largest_file_info': largest_file_info,
+            'users_with_files': users_with_files
+        }
 
     # @csrf_protect_m
     def statistics(self, request):
@@ -256,7 +279,9 @@ class StatisticsAdmin(ModelAdmin):
                      'monthly_outage': monthly_outage,
                      'monthly_uptime': monthly_uptime,
                      'daily_outage': daily_outage,
-                     'daily_uptime': daily_uptime}
+                     'daily_uptime': daily_uptime,
+                     'user_dataset_general': self.get_statistics_on_user_dataset_general()
+                     }
             return render(request, 'admin/qa4sm_statistics.html', {'stats': stats})
 
 
@@ -284,6 +309,24 @@ def ajax_user_info(request):
         'last_validation': last_valid_time,
         'last_login': last_login_time,
         'datasets_used': datasets_used,
+        'space_used': convert_file_size(selected_user.used_space)
     }
 
     return JsonResponse(response_data)
+
+
+def convert_file_size(size_in_bytes):
+    """
+    Convert a file size in bytes to a human-readable format with appropriate units (KB, MB, GB, etc.).
+    """
+    # Define the suffixes for file size units
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
+
+    # Determine the appropriate unit for the file size
+    suffix_index = 0
+    while size_in_bytes >= 1024 and suffix_index < len(suffixes) - 1:
+        size_in_bytes /= 1024.0
+        suffix_index += 1
+
+    # Format the file size with the appropriate unit
+    return f"{size_in_bytes:.2f} {suffixes[suffix_index]}"
