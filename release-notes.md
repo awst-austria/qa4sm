@@ -1,15 +1,15 @@
-QA4SM v2.6.1 - Release notes 2024-03-19
+QA4SM v2.7.0 - Release notes 2024-05-16
 =======================================================
-# Updates
-1. QA4SM logo added
-2. Code maintenance applied
 
-QA4SM v2.6.0 - Release notes 2024-02-21
-=======================================================
-# Updates
-1. Layout for small screens updated
-2. Ismn package version updated
+# New features
+1. Token authentication enabled (not available for users yet)
 
-# New Features
-1. ISMN stations presented on the map for better overview
-2. Possibility to archive and unarchive multiple datasets added
+# Updates
+1. SMOS SBPCA overpass filter added;
+2. New versions of C3S and ISMN added;
+3. GLDAS and ERA5 latest versions extended;
+4. Admin panel updated;
+5. Error handling for http requests added
+
+
+
