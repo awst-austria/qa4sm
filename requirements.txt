@@ -25,7 +25,7 @@ python_dateutil==2.8.2
 pytz==2023.3
 qa4sm_preprocessing==0.2
 qa4sm_reader==0.9
-Requests==2.30.0
+Requests==2.32.0
 setuptools==67.7.2
 smap_io==0.5
 smos==0.2
