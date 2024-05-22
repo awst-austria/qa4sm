@@ -52,6 +52,8 @@ if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_
 	  python $APP_DIR/manage.py abortrunningvalidations
 	  python $APP_DIR/manage.py cleancelerytasks
 	  python $APP_DIR/manage.py generateismnlist
+	  python $APP_DIR/manage.py generateautocleanupscript --path /var/lib/qa4sm-web-val/valentina
+
 
 	if [ "$NEW_DB" = "TRUE" ]; then
       echo "Creating admin user"
