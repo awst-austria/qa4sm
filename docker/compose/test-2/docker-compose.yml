@@ -79,9 +79,6 @@ services:
       - type: bind
         source: "${QA4SM_USERMANUAL_FOLDER}"
         target: /var/lib/qa4sm-web-val/valentina/docs
-      - type: bind
-        source: "${QA4SM_WORKSPACE}webapp/run_autocleanup_script.sh"
-        target: /var/lib/qa4sm-web-val/valentina/run_autocleanup_script.sh
     deploy:
       resources:
         limits:
