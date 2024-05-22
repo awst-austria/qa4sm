@@ -33,6 +33,12 @@ if [ "x$DOI_ACCESS_TOKEN_ENV" == "x" ]; then
     export DOI_ACCESS_TOKEN_ENV="notset"
 fi
 
+# this token needs to be set as an evironment variable when this script is run
+# e.g. in the CI (Jenkins credentials or Travis secrets)
+if [ "x$ADMIN_ACCESS_TOKEN" == "x" ]; then
+    export ADMIN_ACCESS_TOKEN="notset"
+fi
+
 DB_PASSWORD=""
 EMAIL_PASSWORD=""
 if [[ -e ~/valentina_db_password ]]; then
@@ -87,5 +93,6 @@ if [ "x$ENV" == "xtestenv" ]; then
 fi
 
 echo $DOI_ACCESS_TOKEN_ENV
+echo $ADMIN_ACCESS_TOKEN
 
-sed -e "s|^[ ]*DOCS_DIR = .*$|DOCS_DIR = 'DOCS_DIR'|g;s|^[ ]*USER_DATA_DIR = .*$|USER_DATA_DIR = '$USER_DATA_DIR'|g;s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
+sed -e "s|^[ ]*DOCS_DIR = .*$|DOCS_DIR = 'DOCS_DIR'|g;s|^[ ]*USER_DATA_DIR = .*$|USER_DATA_DIR = '$USER_DATA_DIR'|g;s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*ADMIN_ACCESS_TOKEN = .*$|ADMIN_ACCESS_TOKEN = '$ADMIN_ACCESS_TOKEN'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
