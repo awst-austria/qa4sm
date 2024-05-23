@@ -1,12 +1,8 @@
 import os
-from datetime import timedelta
-
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from django.conf import settings
-from validator.mailer import send_val_expiry_notification
-from validator.models import ValidationRun, CeleryTask, User
+from validator.models import User
 from django.urls import reverse
 
 
