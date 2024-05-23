@@ -122,6 +122,16 @@ def send_new_user_signed_up(user):
                 body=body)
 
 
+def send_autocleanup_failed(message):
+    __logger.info('Sending mail about failing cleanup')
+    subject = '[QA4SM INTERNAL] Cleanup failed'
+    body = f'Dear admins,\nRunning auto cleanup failed. The error is {message} \nBest regards,\nYour webapp'
+    print(body)
+    _send_email(recipients=[settings.EMAIL_FROM],
+                subject=subject,
+                body=body)
+
+
 def send_user_account_removal_request(user):
     __logger.info('Sending mail about user removal request ({}) to admins...'.format(user.username))
 

@@ -12,6 +12,7 @@ from validator.models import ValidationRun, CeleryTask, User
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
+from validator.mailer import send_autocleanup_failed
 
 
 def auto_cleanup():
@@ -70,10 +71,11 @@ def run_auto_cleanup_script(request):
     if str(request.user.auth_token) == settings.ADMIN_ACCESS_TOKEN:
         try:
             auto_cleanup()
-        except:
+        except Exception as e:
+            send_autocleanup_failed(str(e))
             return JsonResponse({'message': 'something went wrong'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return JsonResponse({'message': 'success'}, status=status.HTTP_200_OK, safe=False)
     else:
-        # todo: add sending email to admins
+        send_autocleanup_failed('provided token does not belong to the admin user.')
         return JsonResponse({'message': 'Provided token does not belong to the admin user.'},
                             status=status.HTTP_401_UNAUTHORIZED)
