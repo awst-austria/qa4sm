@@ -20,3 +20,4 @@ run_celery/
 node_modules
 UI/.angular
 .vscode
+*.code-workspace

@@ -1,4 +1,3 @@
-import warnings
 import netCDF4
 from datetime import datetime
 import logging
@@ -42,7 +41,7 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.intra_annual_slicer import IntraAnnualSlicer, NewSlice
+from validator.validation.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow
 from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 from api.frontend_urls import get_angular_url
 from shutil import copy2, copytree
@@ -50,16 +49,37 @@ from typing import Optional, List, Tuple, Dict, Union
 
 __logger = logging.getLogger(__name__)
 #$$
-####################-----Implement this in the proper way-----####################
-slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='custom',
-                                    overlap=3,
-                                    custom_file=os.path.join('custom_intra_annual_slices_example.json')) # loading custom temporal sub-windows from a file
-slicer_instance = IntraAnnualSlicer(intra_annual_slice_type='months',
-                                    overlap=0,
-                                    custom_file=None) # loading default temporal sub-windows from a globals
-intra_annual_slices = slicer_instance.custom_intra_annual_slices
-# slicer_instance, intra_annual_slices = None, None  # uncomment for bulk case
-print(slicer_instance)
+##################################################################################
+####################-----Implement this in front end-----#########################
+##################################################################################
+
+#####################Loading from custom .json file###############################
+# as a json is required, i am not sure if and how this can be integrated into the front end
+# a means of uploading json files for users would be required...
+
+# temp_sub_wdw_instance = TemporalSubWindowsCreator(
+#     temporal_sub_window_type='custom',
+#     overlap=3,
+#     custom_file=os.path.join('custom_intra_annual_windows_example.json')
+# )  # loading custom temporal sub-windows from a file
+
+
+#####################Using hardcoded/implemented (in globals.py) sub-windows######
+# a dropdown menu in the front end would be required to select the implemented sub-windows: months or seasons (or default, see below)
+# a dropdown menu in the front end would be required to select the overlap value
+temp_sub_wdw_instance = TemporalSubWindowsCreator(
+    temporal_sub_window_type='seasons', overlap=0,
+    custom_file=None)  # loading default temporal sub-windows from globals file
+temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
+
+#####################Default case################################################
+# a dropdown menu in the front end would be required to select the default case or implemented sub-windows: months or seasons (see above)
+# for the default case, no overlap is required
+# temp_sub_wdw_instance, temp_sub_wdws = None, None
+##################################################################################
+##################################################################################
+##################################################################################
+print(f'\n\n{temp_sub_wdws=}\n{temp_sub_wdw_instance=}\n\n')
 ##################################################################################
 
 
@@ -377,38 +397,38 @@ def create_pytesmo_validation(validation_run):
     )  #$$
 
     if isinstance(
-            intra_annual_slices, dict
+            temp_sub_wdws, dict
     ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
-        try:
-            default_slice = NewSlice(DEFAULT_TSW, *period)
-        except TypeError: # TODO: is this the right way to handle this?
-            warnings.warn(f"TypeError: type object argument after * must be an iterable, not NoneType. Setting bulk slice artificially to 01-01-1900 - 31-12-2100.")
-            period = [datetime(1900, 1, 1), datetime(2100, 12, 31)] # artificial period for bulk case
-            default_slice = NewSlice(DEFAULT_TSW, *period)
-
-        slicer_instance.add_slice(default_slice)        # always add the default case
+        default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
+        temp_sub_wdw_instance.add_temp_sub_wndw(
+            default_temp_sub_wndw)  # always add the default case
         pairwise_metrics = SubsetsMetricsAdapter(
             calculator=_pairwise_metrics,
-            subsets=slicer_instance.custom_intra_annual_slices,
+            subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
             group_results="join",
         )  #$$
 
-    elif intra_annual_slices is None:
+    elif temp_sub_wdws is None: # the default case
         pairwise_metrics = _pairwise_metrics
 
     else:
         raise ValueError(
-            f"Invalid value for intra_annual_slices: {intra_annual_slices}. Please specify either None or a custom intra-annual slicing function."
+            f"Invalid value for temp_sub_wdws: {temp_sub_wdws}. Please specify either None or a custom temporal sub windowing function."
         )  #$$
 
     metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
-        tcol_metrics = TripleCollocationMetrics(
-            spatial_ref_name,
-            metadata_template=metadata_template,
-            bootstrap_cis=validation_run.bootstrap_tcol_cis)
-        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
+        __logger.info("Triple Collocation Metrics are deactivated")
+        #Triple Collocation Metrics dont work:
+        # 1) when using only default case: TC metrics are calculated and in the nc file, but the qa4sm-reader throws an error
+        # 2) when using temp. sub-windows: does NOT throw an error, but TC metrcis are not calculated either
+
+        # tcol_metrics = TripleCollocationMetrics(
+        #     spatial_ref_name,
+        #     metadata_template=metadata_template,
+        #     bootstrap_cis=validation_run.bootstrap_tcol_cis)
+        # metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
     else:
@@ -634,8 +654,8 @@ def run_validation(validation_id):  #$$
 
             transcriber = Pytesmo2Qa4smResultsTranscriber(
                 pytesmo_results=path.join(OUTPUT_FOLDER,
-                                             validation_run.output_file.name),
-                intra_annual_slices=slicer_instance)  #$$
+                                          validation_run.output_file.name),
+                intra_annual_slices=temp_sub_wdw_instance)  #$$
             if transcriber.exists:  #$$
                 restructured_results = transcriber.get_transcribed_dataset()
                 transcriber.output_file_name = transcriber.build_outname(
@@ -648,18 +668,20 @@ def run_validation(validation_id):  #$$
                                      compression='zlib',
                                      complevel=9)
 
-                if intra_annual_slices is None:
-                    intra_annual_slice_names =  np.array([DEFAULT_TSW])
+                if temp_sub_wdws is None:
+                    temporal_sub_windows_names = np.array([DEFAULT_TSW])
                 else:
-                    intra_annual_slice_names = np.array(slicer_instance.names)
+                    temporal_sub_windows_names = np.array(
+                        temp_sub_wdw_instance.names)
 
-                __logger.info(f'intra_annual_slice_names: {intra_annual_slice_names}')
-
+                __logger.info(
+                    f'temporal_sub_windows_names: {temporal_sub_windows_names}'
+                )
 
                 generate_all_graphs(
-                    validation_run = validation_run,
-                    outfolder = run_dir,
-                    temporal_sub_windows=intra_annual_slice_names,
+                    validation_run=validation_run,
+                    outfolder=run_dir,
+                    temporal_sub_windows=temporal_sub_windows_names,
                     save_metadata=validation_run.plots_save_metadata)
 
     except Exception as e:
@@ -998,8 +1020,10 @@ def copy_validationrun(run_to_copy, new_user):
                     old_file = old_dir + '/' + file_name
                     try:
                         copy2(old_file, new_file)
-                    except IsADirectoryError as e:          #$$
-                        copytree(old_file, new_file)        # with the restructuring of netCDF files, all graphics etc are now stored in dedicated directories
+                    except IsADirectoryError as e:  #$$
+                        copytree(
+                            old_file, new_file
+                        )  # with the restructuring of netCDF files, all graphics etc are now stored in dedicated directories
                     if '.nc' in new_file:
                         run_to_copy.output_file = str(run_id) + '/' + file_name
                         run_to_copy.save()
@@ -1020,5 +1044,6 @@ def copy_validationrun(run_to_copy, new_user):
         'run_id': run_id,
     }
     return response
+
 
 # %%

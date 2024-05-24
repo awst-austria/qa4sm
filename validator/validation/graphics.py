@@ -1,4 +1,3 @@
-#%%
 import warnings
 
 import matplotlib.pyplot as plt
@@ -78,9 +77,9 @@ def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfol
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
 
-    collect_statitics_files(dir = root_dir)
+    collect_statitics_files(dir = outfolder)
 
-    clean_output_folder(dir = root_dir,
+    clean_output_folder(dir = outfolder,
                         to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
 
 

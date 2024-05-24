@@ -58,9 +58,9 @@ METRIC_TEMPLATE = [
     "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
 ]
 
-INTRA_ANNUAL_SEPARATOR = '|'  #$$
+TEMPORAL_SUB_WINDOW_SEPARATOR = '|'  #$$
 
-INTRA_ANNUAL_METRIC_TEMPLATE = ["{tsw}", INTRA_ANNUAL_SEPARATOR,
+INTRA_ANNUAL_METRIC_TEMPLATE = ["{tsw}", TEMPORAL_SUB_WINDOW_SEPARATOR,
                                 "{metric}"]  #$$
 
 TC_METRICS = {
@@ -241,10 +241,10 @@ ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #$$
 
 
 DEFAULT_TSW = 'bulk' # default temporal sub-window (in the case of no temporal sub-windowing)
-INTRA_ANNUAL_WINDOW_NC_COORD_NAME = 'tsw' # name of the period coordinate in the netcdf file (Temporal Sub-Window)
+TEMPORAL_SUB_WINDOW_NC_COORD_NAME = 'tsw' # name of the period coordinate in the netcdf file (Temporal Sub-Window)
 
-# default intra annual slices
-INTRA_ANNUAL_SLICES = {
+# default temporal sub windows
+TEMPORAL_SUB_WINDOWS = {
     "seasons": {
         "S1": [[12, 1], [2, 28]],
         "S2": [[3, 1], [5, 31]],

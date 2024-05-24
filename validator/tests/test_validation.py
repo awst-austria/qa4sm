@@ -496,11 +496,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        slicer_instance = None  # TODO: for now just assume bulk case #$$
+        temp_sub_wdw_instance = None  # TODO: for now just assume bulk case #$$
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -510,7 +510,7 @@ class TestValidation(TestCase):
                            meta_plots=True)  #$$
         self.delete_run(new_run)
 
-    # TODO: fails, if validation contains intrannual slices. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
+    # TODO: fails, if validation contains temporal sub-windows. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
@@ -563,11 +563,11 @@ class TestValidation(TestCase):
         # the other 4 are okay
         assert new_run.ok_points == 4
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -673,11 +673,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 19
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -736,11 +736,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 8, "Error points are off"
         assert new_run.ok_points == 16, "OK points are off"
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -798,11 +798,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 5, "Error points are off"
         assert new_run.ok_points == 19, "OK points are off"
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -867,11 +867,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 134, "Error points are off"
         assert new_run.ok_points == 6, "OK points are off"
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -935,11 +935,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 6, "Error points are off"
         assert new_run.ok_points == 9, "OK points are off"
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -998,11 +998,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 5, "Error points are off"
         assert new_run.ok_points == 19, "OK points are off"
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1062,11 +1062,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0, "Too many error gpis"
         assert new_run.ok_points == 11, "OK points are off"
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1118,11 +1118,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1
         assert new_run.ok_points == 8
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1132,7 +1132,7 @@ class TestValidation(TestCase):
                            meta_plots=True)
         self.delete_run(new_run)
 
-    # TODO: works only if the validation doesn't contain intrannual slices
+    # TODO: works only if the validation doesn't contain temporal sub-windows
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:No data for:UserWarning",
@@ -1156,11 +1156,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1203,11 +1203,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1250,11 +1250,11 @@ class TestValidation(TestCase):
 
         assert new_run
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1303,11 +1303,11 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1317,7 +1317,7 @@ class TestValidation(TestCase):
                            meta_plots=False)
         self.delete_run(new_run)
 
-    # TODO: fails, if validation contains intrannual slices. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
+    # TODO: fails, if validation contains temporal sub-windows. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:No data for:UserWarning",
@@ -1350,11 +1350,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 12
         assert new_run.ok_points == 4
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1401,11 +1401,11 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1540,11 +1540,11 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 
@@ -1567,11 +1567,11 @@ class TestValidation(TestCase):
         ## save config
         validation_run = ValidationRun()
 
-        slicer_instance = None  # assume bulk case #$$
+        temp_sub_wdw_instance = None  # assume bulk case #$$
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          'not_existing_file.nc'),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(
             OUTPUT_FOLDER, 'neither_existing_file.nc')
 
@@ -2636,11 +2636,11 @@ class TestValidation(TestCase):
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
 
-        slicer_instance = None  # assume bulk case
+        temp_sub_wdw_instance = None  # assume bulk case
         transcriber = Pytesmo2Qa4smResultsTranscriber(
             pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                          new_run.output_file.name),
-            intra_annual_slices=slicer_instance)
+            intra_annual_slices=temp_sub_wdw_instance)
         transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
                                                     new_run.output_file.name)
 

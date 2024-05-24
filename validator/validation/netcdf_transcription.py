@@ -1,7 +1,7 @@
 import xarray as xr
 import numpy as np
-from validator.validation.intra_annual_slicer import IntraAnnualSlicer
-from validator.validation.globals import METRICS, NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, INTRA_ANNUAL_SEPARATOR, DEFAULT_TSW, INTRA_ANNUAL_WINDOW_NC_COORD_NAME
+from validator.validation.intra_annual_temp_windows import TemporalSubWindowsCreator
+from validator.validation.globals import METRICS, NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, TEMPORAL_SUB_WINDOW_SEPARATOR, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_NC_COORD_NAME
 from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 
@@ -14,27 +14,27 @@ class Pytesmo2Qa4smResultsTranscriber:
     ----------
     pytesmo_results : str
         Path to results netCDF4 written by `qa4sm.validation.validation.check_and_store_results`, which is in the old `pytesmo` format.
-    intra_annual_slices : Union[None, IntraAnnualSlicer]
+    intra_annual_slices : Union[None, TemporalSubWindowsCreator]
         The temporal sub-windows for the results. Default is None, which means that no temporal sub-windows are
-        used, but only the 'bulk'. If an instance of `valdiator.validation.IntraAnnualSlicer` is provided,
-        the temporal sub-windows are used as provided by the IntraAnnualSlicer instance.
+        used, but only the 'bulk'. If an instance of `valdiator.validation.TemporalSubWindowsCreator` is provided,
+        the temporal sub-windows are used as provided by the TemporalSubWindowsCreator instance.
     """
 
     def __init__(self,
                  pytesmo_results: str,
-                 intra_annual_slices: Union[None, IntraAnnualSlicer] = None):
+                 intra_annual_slices: Union[None, TemporalSubWindowsCreator] = None):
 
         self.intra_annual_slices: Union[
-            None, IntraAnnualSlicer] = intra_annual_slices
-        self._intra_annual_slices: Union[
-            None, IntraAnnualSlicer] = intra_annual_slices
+            None, TemporalSubWindowsCreator] = intra_annual_slices
+        self._temporal_sub_windows: Union[
+            None, TemporalSubWindowsCreator] = intra_annual_slices
 
         self._default_non_metrics: List[str] = NON_METRICS
 
         self.METADATA_TEMPLATE: Dict[str, Union[None, Dict[str, Union[
             np.ndarray, np.float32, np.array]]]] = METADATA_TEMPLATE
 
-        self.intra_annual_slices_checker_called: bool = False
+        self.temporal_sub_windows_checker_called: bool = False
         self.only_default_case: bool = True
 
         self.pytesmo_ncfile = f'{pytesmo_results}'
@@ -58,7 +58,7 @@ class Pytesmo2Qa4smResultsTranscriber:
     def __str__(self) -> str:
         return f'{self.__class__.__name__}("{os.path.basename(self.pytesmo_ncfile)}", {self.intra_annual_slices})'
 
-    def intra_annual_slices_checker(
+    def temporal_sub_windows_checker(
             self) -> Tuple[bool, Union[List[str], None]]:
         """
         Checks the temporal sub-windows and returns which case of temporal sub-window is used, as well as a list of the
@@ -72,15 +72,15 @@ class Pytesmo2Qa4smResultsTranscriber:
             intra-annual windows case: (False, list of temporal sub-windows)
         """
 
-        self.intra_annual_slices_checker_called = True
+        self.temporal_sub_windows_checker_called = True
         if self.intra_annual_slices is None:
             return True, [DEFAULT_TSW]
-        elif isinstance(self.intra_annual_slices, IntraAnnualSlicer):
+        elif isinstance(self.intra_annual_slices, TemporalSubWindowsCreator):
             self.intra_annual_slices = self.intra_annual_slices.names
             return False, self.intra_annual_slices
         else:
             raise TypeError(
-                'intra_annual_slices must be None or an instance of `IntraAnnualSlicer`'
+                'intra_annual_slices must be None or an instance of `TemporalSubWindowsCreator`'
             )
 
     @property
@@ -131,7 +131,7 @@ class Pytesmo2Qa4smResultsTranscriber:
     @property
     def metrics_list(self) -> List[str]:
         """Get the metrics dictionary. Whole procedure based on the premise, that metric names of valdiations of intra-annual
-        temporal sub-windows are of the form: `metric_long_name = 'intra_annual_slice{validator.validation.globals.INTRA_ANNUAL_SEPARATOR}metric_short_name'`. If this is not the
+        temporal sub-windows are of the form: `metric_long_name = 'intra_annual_window{validator.validation.globals.TEMPORAL_SUB_WINDOW_SEPARATOR}metric_short_name'`. If this is not the
         case, it is assumed the 'bulk' case is present and the metric names are assumed to be the same as the metric
         short names.
 
@@ -141,7 +141,7 @@ class Pytesmo2Qa4smResultsTranscriber:
             The metrics dictionary.
         """
 
-        # check if the metric names are of the form: `metric_long_name = 'intra_annual_slice{INTRA_ANNUAL_SEPARATOR}metric_short_name'` and if not, assume the 'bulk' case
+        # check if the metric names are of the form: `metric_long_name = 'intra_annual_window{TEMPORAL_SUB_WINDOW_SEPARATOR}metric_short_name'` and if not, assume the 'bulk' case
 
         _metrics = [
             metric for metric in self.pytesmo_results
@@ -227,11 +227,11 @@ class Pytesmo2Qa4smResultsTranscriber:
         xr.Dataset
             The transcribed, metadata-less dataset.
         """
-        self.only_default_case, self.intra_annual_slices = self.intra_annual_slices_checker(
+        self.only_default_case, self.intra_annual_slices = self.temporal_sub_windows_checker(
         )
 
         self.pytesmo_results[
-            INTRA_ANNUAL_WINDOW_NC_COORD_NAME] = self.intra_annual_slices
+            TEMPORAL_SUB_WINDOW_NC_COORD_NAME] = self.intra_annual_slices
 
         metric_vars = self.metrics_list
         self.transcribed_dataset = xr.Dataset()
@@ -239,7 +239,7 @@ class Pytesmo2Qa4smResultsTranscriber:
         for var_name in metric_vars:
             new_name = var_name
             if not self.only_default_case:
-                _tsw, new_name = new_name.split(INTRA_ANNUAL_SEPARATOR)
+                _tsw, new_name = new_name.split(TEMPORAL_SUB_WINDOW_SEPARATOR)
 
             if new_name not in self.transcribed_dataset:
                 # takes the data associated with the metric new_name and adds it as a new variabel
@@ -247,7 +247,7 @@ class Pytesmo2Qa4smResultsTranscriber:
                 self.transcribed_dataset[new_name] = self.pytesmo_results[
                     var_name].expand_dims(
                         {
-                            INTRA_ANNUAL_WINDOW_NC_COORD_NAME:
+                            TEMPORAL_SUB_WINDOW_NC_COORD_NAME:
                             self.intra_annual_slices
                         },
                         axis=-1)
@@ -256,7 +256,7 @@ class Pytesmo2Qa4smResultsTranscriber:
                 self.transcribed_dataset = Pytesmo2Qa4smResultsTranscriber.update_dataset_var(
                     ds=self.transcribed_dataset,
                     var=new_name,
-                    coord_key=INTRA_ANNUAL_WINDOW_NC_COORD_NAME,
+                    coord_key=TEMPORAL_SUB_WINDOW_NC_COORD_NAME,
                     coord_val=_tsw,
                     data_vals=self.pytesmo_results[var_name].data)
 
@@ -273,31 +273,31 @@ class Pytesmo2Qa4smResultsTranscriber:
         self.drop_obs_dim()
 
         self.transcribed_dataset[
-            INTRA_ANNUAL_WINDOW_NC_COORD_NAME].attrs = dict(
+            TEMPORAL_SUB_WINDOW_NC_COORD_NAME].attrs = dict(
                 long_name="temporal sub-window",
                 standard_name="temporal sub-window",
                 units="1",
                 valid_range=[0, len(self.intra_annual_slices)],
                 axis="T",
                 description="temporal sub-window name for the dataset",
-                intra_annual_slice_type="No temporal sub-windows used"
+                temporal_sub_window_type="No temporal sub-windows used"
                 if self.only_default_case is True else
-                self._intra_annual_slices.metadata['Intra annual slice type'],
+                self._temporal_sub_windows.metadata['Temporal sub-window type'],
                 overlap="No temporal sub-windows used"
                 if self.only_default_case is True else
-                self._intra_annual_slices.metadata['Overlap'],
-                intra_annual_slice_definition="No temporal sub-windows used"
+                self._temporal_sub_windows.metadata['Overlap'],
+                intra_annual_window_definition="No temporal sub-windows used"
                 if self.only_default_case is True else
-                self._intra_annual_slices.metadata['Pretty Names [MM-DD]'],
+                self._temporal_sub_windows.metadata['Pretty Names [MM-DD]'],
             )
 
         try:
             _dict = {
                 'attr_name': DEFAULT_TSW,
-                'attr_value': self._intra_annual_slices.metadata[DEFAULT_TSW]
+                'attr_value': self._temporal_sub_windows.metadata[DEFAULT_TSW]
             }
             self.transcribed_dataset[
-                INTRA_ANNUAL_WINDOW_NC_COORD_NAME].attrs.update(
+                TEMPORAL_SUB_WINDOW_NC_COORD_NAME].attrs.update(
                     {_dict['attr_name']: _dict['attr_value']})
         except AttributeError:
             pass

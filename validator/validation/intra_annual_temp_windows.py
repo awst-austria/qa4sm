@@ -1,6 +1,6 @@
 from pytesmo.validation_framework.metric_calculators_adapters import TsDistributor
 from pytesmo.time_series.grouping import YearlessDatetime
-from validator.validation.globals import INTRA_ANNUAL_SLICES, DEFAULT_TSW
+from validator.validation.globals import TEMPORAL_SUB_WINDOWS, DEFAULT_TSW
 from typing import Optional, List, Tuple, Dict, Union
 import os
 from datetime import datetime
@@ -8,11 +8,11 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-class IntraAnnualSlicesDefault(ABC):
+class TemporalSubWindowsDefault(ABC):
     '''
-    Class to load default intra annual slice definitions from the `validator.validation.globals` file.
+    Class to load default temporal sub-window definitions from the `validator.validation.globals` file.
     Alternatively, the user can provide a custom JSON file containing the definitions.
-    Intra annual slice definitions are stored in dictionaries with the following structure:
+    temporal sub-window definitions are stored in dictionaries with the following structure:
 
     {"seasons":
         {"S1": [[12, 1], [2, 28]]      # December 1st to February 28th
@@ -26,7 +26,7 @@ class IntraAnnualSlicesDefault(ABC):
     ----------
 
     custom_file : str, optional
-        JSON File containing the intra annual slice definitions in the same format as in `validator.validation.globals`, by default None. If None, the default as defined in `validator.validation.globals` will be used.
+        JSON File containing the temporal sub-window definitions in the same format as in `validator.validation.globals`, by default None. If None, the default as defined in `validator.validation.globals` will be used.
 
     '''
 
@@ -45,35 +45,35 @@ class IntraAnnualSlicesDefault(ABC):
         Parameters
         ----------
         json_path : str
-            Path to the JSON file containing the intra annual slice definitions.
+            Path to the JSON file containing the temporal sub-window definitions.
 
         Returns
         -------
         dict
-            Dictionary containing the default intra annual slice definitions.
+            Dictionary containing the default temporal sub-window definitions.
         '''
 
         with open(json_path, 'r') as f:
             return json.load(f)
 
     @abstractmethod
-    def _get_available_slices(self):
+    def _get_available_temp_sub_wndws(self):
         pass
 
 
 @dataclass(frozen=True)
-class NewSlice:
+class NewSubWindow:
     """
-    Dataclass to store the name and the begin and end date of a new intra annual slice.
+    Dataclass to store the name and the begin and end date of a new temporal sub-window.
 
     Parameters
     ----------
     name : str
-        Name of the new intra annual slice.
+        Name of the new temporal sub-window.
     begin_date : datetime
-        Begin date of the new intra annual slice.
+        Begin date of the new temporal sub-window.
     end_date : datetime
-        End date of the new intra annual slice.
+        End date of the new temporal sub-window.
 
     """
     name: str
@@ -106,45 +106,45 @@ class NewSlice:
         """
         return self.end_date.strftime('%Y-%m-%d')
 
-class IntraAnnualSlicer(IntraAnnualSlicesDefault):
-    '''Class to create custom intra annual slices, based on the default definitions.
+class TemporalSubWindowsCreator(TemporalSubWindowsDefault):
+    '''Class to create custom temporal sub-windows, based on the default definitions.
 
     Parameters
     ----------
-    intra_annual_slice_type : str
-        Type of intra annual slice to be created. Must be one of the available default types. Officially, "months" and "seasons" are implemented. The user can implement their own defaults, though (see `IntraAnnualSlicesDefault`). Default is "months".
+    temporal_sub_window_type : str
+        Type of temporal sub-window to be created. Must be one of the available default types. Officially, "months" and "seasons" are implemented. The user can implement their own defaults, though (see `TemporalSubWindowsDefault`). Default is "months".
     overlap : int, optional
-        Number of days to be added/subtracted to the beginning/end of the intra annual slice. Default is 0.
+        Number of days to be added/subtracted to the beginning/end of the temporal sub-window. Default is 0.
     custom_file : str, optional
-        Path to the JSON file containing the intra annual slice definitions, by default None (meaning the defaults as defined in `validator.validation.globals` will be used)
+        Path to the JSON file containing the temporal sub-window definitions, by default None (meaning the defaults as defined in `validator.validation.globals` will be used)
     '''
 
     def __init__(self,
-                 intra_annual_slice_type: Optional[str] = 'months',
+                 temporal_sub_window_type: Optional[str] = 'months',
                  overlap: Optional[int] = 0,
                  custom_file: Optional[str] = None):
         self.overlap = overlap
-        self.intra_annual_slice_type = intra_annual_slice_type
+        self.temporal_sub_window_type = temporal_sub_window_type
         super().__init__(custom_file=custom_file)
 
-        self.available_slices = self._get_available_slices()
-        if not self.available_slices:
+        self.available_temp_sub_wndws = self._get_available_temp_sub_wndws()
+        if not self.available_temp_sub_wndws:
             raise FileNotFoundError(
-                f'Invalid custom file path. Please provide a valid JSON file containing the intra annual slice definitions.'
+                f'Invalid custom file path. Please provide a valid JSON file containing the temporal sub-window definitions.'
             )
-        elif self.intra_annual_slice_type not in self.available_slices:
+        elif self.temporal_sub_window_type not in self.available_temp_sub_wndws:
             raise KeyError(
-                f'Invalid intra annual slice type. Available types are: {self.available_slices}'
+                f'Invalid temporal sub-window type. Available types are: {self.available_temp_sub_wndws}'
             )
 
-        self.custom_intra_annual_slices = self._custom_intra_annual_slices()
-        self.additional_slices_container = {}
+        self.custom_temporal_sub_windows = self._custom_temporal_sub_windows()
+        self.additional_temp_sub_wndws_container = {}
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}(intra_annual_slice_type={self.intra_annual_slice_type}, overlap={self.overlap})'
+        return f'{self.__class__.__name__}(temporal_sub_window_type={self.temporal_sub_window_type}, overlap={self.overlap})'
 
     def __str__(self) -> str:
-        return f'{self.__class__.__name__}({self.intra_annual_slice_type}, {self.overlap})'
+        return f'{self.__class__.__name__}({self.temporal_sub_window_type}, {self.overlap})'
 
     def __date_to_doy(self, date_tuple: Tuple[int, int]) -> int:
         '''Converts a date list [month, day] to a day of the year (doy). Leap years are neglected.
@@ -215,26 +215,26 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
 
         return self.__doy_to_date(_doy)
 
-    def _custom_intra_annual_slice(self):
+    def _custom_temporal_sub_window(self):
         return {
             key: (self.__update_date(val[0], overlap_direction=-1),
                   self.__update_date(val[1], overlap_direction=+1))
-            for key, val in self.intra_annual_slices_dict[
-                self.intra_annual_slice_type].items()
+            for key, val in self.temporal_sub_windows_dict[
+                self.temporal_sub_window_type].items()
         }
 
-    def _get_available_slices(self) -> Union[List[str], None]:
+    def _get_available_temp_sub_wndws(self) -> Union[List[str], None]:
         if not self.custom_file:
-            self.intra_annual_slices_dict = INTRA_ANNUAL_SLICES
-            return list(self.intra_annual_slices_dict.keys())
+            self.temporal_sub_windows_dict = TEMPORAL_SUB_WINDOWS
+            return list(self.temporal_sub_windows_dict.keys())
         elif os.path.isfile(self.custom_file):
-            self.intra_annual_slices_dict = self._load_json_data(self.custom_file)
-            return list(self.intra_annual_slices_dict.keys())
+            self.temporal_sub_windows_dict = self._load_json_data(self.custom_file)
+            return list(self.temporal_sub_windows_dict.keys())
         else:
             return None
 
-    def _custom_intra_annual_slices(self) -> Dict[str, TsDistributor]:
-        '''Custom intra annual slice based, on the default definitions and the overlap value.
+    def _custom_temporal_sub_windows(self) -> Dict[str, TsDistributor]:
+        '''Custom temporal sub-window based, on the default definitions and the overlap value.
 
         Parameters
         ----------
@@ -243,7 +243,7 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         Returns
         -------
         dict[str, TsDistributor]
-            Dictionary containing the custom intra annual slice definitions.
+            Dictionary containing the custom temporal sub-window definitions.
         '''
 
         def tsdistributor(_begin_date: Tuple[int],
@@ -253,44 +253,44 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
 
         return {
             key: tsdistributor(val[0], val[1])
-            for key, val in self._custom_intra_annual_slice().items()
+            for key, val in self._custom_temporal_sub_window().items()
         }
 
-    def add_slice(
+    def add_temp_sub_wndw(
             self,
-            new_slice: NewSlice) -> Union[None, Dict[str, TsDistributor]]:
-        '''Adds a new custom intra annual slice to the existing ones.
+            new_temp_sub_wndw: NewSubWindow) -> Union[None, Dict[str, TsDistributor]]:
+        '''Adds a new custom temporal sub-window to the existing ones.
 
         Parameters
         ----------
-        new_slice : NewSlice
-            Dataclass containing the name, begin date, and end date of the new intra annual slice.
+        new_temp_sub_wndw : NewSubWindow
+            Dataclass containing the name, begin date, and end date of the new temporal sub-window.
 
         Returns
         -------
         Union[None, Dict[str, TsDistributor]]
-            None if the new slice already exists. Otherwise, the dictionary containing the custom intra annual slice definitions.
+            None if the new temp_sub_wndw already exists. Otherwise, the dictionary containing the custom temporal sub-window definitions.
 
         '''
 
-        self.additional_slices_container[new_slice.name] = new_slice
+        self.additional_temp_sub_wndws_container[new_temp_sub_wndw.name] = new_temp_sub_wndw
         try:
-            if new_slice.name in self.custom_intra_annual_slices:
+            if new_temp_sub_wndw.name in self.custom_temporal_sub_windows:
                 print(
-                    f'Intra annual slice "{new_slice.name}" already exists. Overwriting not possible.\
+                    f'temporal sub-window "{new_temp_sub_wndw.name}" already exists. Overwriting not possible.\
                          Please choose a different name.')
                 return None
             else:
-                self.custom_intra_annual_slices[new_slice.name] = TsDistributor(
-                    date_ranges=[(new_slice.begin_date, new_slice.end_date)])
-                return self.custom_intra_annual_slices
+                self.custom_temporal_sub_windows[new_temp_sub_wndw.name] = TsDistributor(
+                    date_ranges=[(new_temp_sub_wndw.begin_date, new_temp_sub_wndw.end_date)])
+                return self.custom_temporal_sub_windows
         except Exception as e:
             print(f'Error: {e}')
             return None
 
     @property
     def names(self) -> List[str]:
-        '''Returns the names of the intra annual slices.
+        '''Returns the names of the temporal sub-windows.
 
         Parameters
         ----------
@@ -299,15 +299,15 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         Returns
         -------
         List[str]
-            List containing the names of the intra annual slices.
+            List containing the names of the temporal sub-windows.
         '''
 
-        return list(self.custom_intra_annual_slices.keys())
+        return list(self.custom_temporal_sub_windows.keys())
 
 
     @property
     def metadata(self) -> Dict:
-        '''Returns the metadata of the intra annual slices.
+        '''Returns the metadata of the temporal sub-windows.
 
         Parameters
         ----------
@@ -316,29 +316,29 @@ class IntraAnnualSlicer(IntraAnnualSlicesDefault):
         Returns
         -------
         Dict[str, Union[str, List[str]]]
-            Dictionary containing the metadata of the intra annual slices.
+            Dictionary containing the metadata of the temporal sub-windows.
         '''
 
         def _date_formatter(_date: Tuple[int, int]) -> str:
             return f'{_date[0]:02d}-{_date[1]:02d}'
 
         metadata_dict = {
-            'Intra annual slice type':
-            self.intra_annual_slice_type,
+            'Temporal sub-window type':
+            self.temporal_sub_window_type,
             'Overlap':
             f'{self.overlap} days',
             'Pretty Names [MM-DD]': (', ').join([
                 f'{key}: {_date_formatter(val[0])} to {_date_formatter(val[1])}'
-                for key, val in self._custom_intra_annual_slice().items()
+                for key, val in self._custom_temporal_sub_window().items()
             ])
         }
 
-        if self._custom_intra_annual_slice().items() != self.names:
+        if self._custom_temporal_sub_window().items() != self.names:
             unique_tsws = list(
                 set(self.names) -
-                set(self._custom_intra_annual_slice().keys()))
+                set(self._custom_temporal_sub_window().keys()))
             if DEFAULT_TSW in unique_tsws:
                 metadata_dict[
-                    DEFAULT_TSW] = f'This is the default case "{DEFAULT_TSW}". The user specified it to range from {self.additional_slices_container[DEFAULT_TSW].begin_date_pretty} to {self.additional_slices_container[DEFAULT_TSW].end_date_pretty}. Note: This specified time interval might differ from the actual time interval in which all datasets are available. Refer to the datasets section (https://qa4sm.eu/ui/datasets) for more information.'
+                    DEFAULT_TSW] = f'This is the default case "{DEFAULT_TSW}". The user specified it to range from {self.additional_temp_sub_wndws_container[DEFAULT_TSW].begin_date_pretty} to {self.additional_temp_sub_wndws_container[DEFAULT_TSW].end_date_pretty}. Note: This specified time interval might differ from the actual time interval in which all datasets are available. Refer to the datasets section (https://qa4sm.eu/ui/datasets) for more information.'
 
         return metadata_dict
