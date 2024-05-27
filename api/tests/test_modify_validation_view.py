@@ -18,10 +18,20 @@ from validator.validation import mkdir_if_not_exists, set_outfile
 
 User = get_user_model()
 from unittest.mock import patch
+from django.conf import settings
+from django.utils import timezone
+
+from datetime import datetime, timedelta
+from rest_framework.authtoken.models import Token
 
 
 def mock_get_doi(*args, **kwargs):
     return
+
+
+# token keys that will be used for tests
+tkn_key = Token.generate_key()
+wrong_tkn_key = Token.generate_key()
 
 
 @override_settings(CELERY_TASK_EAGER_PROPAGATES=True,
@@ -33,6 +43,7 @@ class TestModifyValidationView(TestCase):
     def setUp(self):
         # creating the main user to run a validation
         self.auth_data, self.test_user = create_test_user()
+
         self.client = APIClient()
         self.client.login(**self.auth_data)
         # creating an alternative user for some tests
@@ -176,13 +187,15 @@ class TestModifyValidationView(TestCase):
         response = self.client.post(archive_validation_url)
 
         assert response.status_code == 200
-        assert len(ValidationRun.objects.filter(is_archived=True)) == 3  # one doesn't belong to the user so it wasn't archived
+        assert len(
+            ValidationRun.objects.filter(is_archived=True)) == 3  # one doesn't belong to the user so it wasn't archived
 
         archive_validation_url = archive_validation_url.replace('true', 'false')
         response = self.client.post(archive_validation_url)
 
         assert response.status_code == 200
-        assert len(ValidationRun.objects.filter(is_archived=False)) == 3  # one validation was marked as published, so it can not be unarchived
+        assert len(ValidationRun.objects.filter(
+            is_archived=False)) == 3  # one validation was marked as published, so it can not be unarchived
 
     def test_extend_result(self):
         extend_result_url = reverse('Extend results', kwargs={'result_uuid': self.run_id})
@@ -573,3 +586,147 @@ class TestModifyValidationView(TestCase):
         self.client.logout()
         response = self.client.get(copy_validation_url + f'?validation_id={self.run_2.id}')
         assert response.status_code == 403
+
+    @override_settings(ADMIN_ACCESS_TOKEN=tkn_key)
+    def test_autocleanupvalidations(self):
+        run_autocleanup_url = reverse('Run Auto Cleanup')
+        response = self.client.post(run_autocleanup_url)
+        assert response.status_code == 401  # no token provided
+
+        token, created = Token.objects.get_or_create(user=self.test_user, key=wrong_tkn_key)
+
+        # authorization method changed
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+
+        response = self.client.post(run_autocleanup_url)
+        assert response.status_code == 403  # no admin credentials
+
+        #  add admin user credentials
+        self.test_user.is_staff = True
+        self.test_user.save()
+
+        response = self.client.post(run_autocleanup_url)
+        assert response.status_code == 401  # this is not the proper admin token key
+
+        token.delete()
+        token, created = Token.objects.get_or_create(user=self.test_user, key=tkn_key)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {token.key}')
+
+        #
+        ended_vals = ValidationRun.objects.filter(end_time__isnull=False).count()
+
+        ## unexpired validation
+        run1 = ValidationRun()
+        run1.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run1.end_time = timezone.now()
+        run1.user = self.test_user
+        run1.save()
+        runid1 = run1.id
+
+        ## 20% of warning period has passed
+        run2 = ValidationRun()
+        run2.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run2.end_time = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.8)
+        run2.user = self.test_user
+        run2.save()
+        runid2 = run2.id
+
+        ## 80% of warning period has passed
+        run3 = ValidationRun()
+        run3.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run3.end_time = timezone.now() - timedelta(
+            days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.2)
+        run3.user = self.test_user
+        run3.save()
+        runid3 = run3.id
+
+        ## just expired validation
+        run4 = ValidationRun()
+        run4.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run4.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        run4.user = self.test_user
+        run4.save()
+        runid4 = run4.id
+
+        ## long expired validation
+        run5 = ValidationRun()
+        run5.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        run5.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 2)
+        run5.user = self.test_user
+        run5.save()
+        runid5 = run5.id
+
+        # test what happens if there is no user assigned to a validation
+        no_user_run = ValidationRun()
+        no_user_run.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        no_user_run.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        no_user_run.user = None
+        no_user_run.save()
+        no_user_run_id = no_user_run.id
+
+        # test what happens if there is no user assigned to a validation, but validation has been published
+        no_user_run_published = ValidationRun()
+        no_user_run_published.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
+        no_user_run_published.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        no_user_run_published.user = None
+        no_user_run_published.doi = '10101/101.010'
+        no_user_run_published.save()
+        no_user_run_published_id = no_user_run_published.id
+
+        ended_vals2 = ValidationRun.objects.filter(end_time__isnull=False).count()
+        assert ended_vals + 7 == ended_vals2
+        assert runid1
+        assert runid2
+        assert runid3
+        assert runid4
+        assert runid5
+        assert no_user_run_id
+        assert no_user_run_published_id
+
+        # run the command
+        args = []
+        opts = {}
+        # call_command('autocleanupvalidations', *args, **opts)
+        response = self.client.post(run_autocleanup_url)
+        assert response.status_code == 200
+
+        ## reload from db because the validations have been changed.
+        run1 = ValidationRun.objects.get(pk=runid1)
+        run2 = ValidationRun.objects.get(pk=runid2)
+        run3 = ValidationRun.objects.get(pk=runid3)
+        run4 = ValidationRun.objects.get(pk=runid4)
+        run5 = ValidationRun.objects.get(pk=runid5)
+        non_user_val = ValidationRun.objects.filter(pk=no_user_run_id)
+        no_user_run_published = ValidationRun.objects.get(pk=no_user_run_published_id)
+
+        ## with the last command call, the user should have been notified about most of our test validations
+        ## but the validations should not have been deleted yet
+        assert not run1.expiry_notified
+        assert run2.expiry_notified
+        assert run3.expiry_notified
+        assert run4.expiry_notified
+        assert run5.expiry_notified
+        assert len(non_user_val) == 0  # there should be no validation anymore, because it was already removed
+        assert not no_user_run_published.expiry_notified  # no notification sent
+
+        ## the validations may have been extended in the previous step, undo that to get them really deleted in the next call
+        run1.last_extended = None
+        run1.save()
+        run2.last_extended = None
+        run2.save()
+        run3.last_extended = None
+        run3.save()
+        run4.last_extended = None
+        run4.save()
+        run5.last_extended = None
+        run5.save()
+
+        # call_command('autocleanupvalidations', *args, **opts)
+
+        response = self.client.post(run_autocleanup_url)
+        assert response.status_code == 200
+
+        ## the two expired validations should be have been deleted now
+        ended_vals3 = ValidationRun.objects.filter(end_time__isnull=False).count()
+        assert ended_vals + 4 == ended_vals3
