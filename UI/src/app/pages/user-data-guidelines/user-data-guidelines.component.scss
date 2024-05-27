@@ -1,7 +1,4 @@
-main{
-  max-width: 50rem;
-}
-
+@import "../../../style.variables";
 div {
   text-align: center;
 }
@@ -9,9 +6,9 @@ div {
   padding: 0.3rem;
   text-align: left;
   width: 15rem;
-  margin-left: 5rem;
   margin-bottom: 2rem;
-  border-width:3px; border-style:solid;
+  border-width:3px;
+  border-style:solid;
 }
 
 img {
@@ -25,8 +22,33 @@ table, th, td {
   padding: 0.3rem;
 }
 
+a {
+  font-weight: 600;
+}
 
+#help-panel {
+  padding: 2rem;
+  background-color: rgba(210, 210, 210, 0.2);
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+}
+.code-example{
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  word-wrap: break-word;
+}
 
+@media screen and (max-width: 500px) {
+  table {
+    scale: 0.8;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  table {
+    scale: 0.6;
+  }
+}
 //.w3-round{
 //  align-content: center;
 //}

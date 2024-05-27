@@ -78,7 +78,7 @@
             "pretty_name": "NOAH025 3H.2.1",
             "help_text": "Version 2.1",
             "time_range_start": "2000-01-01",
-            "time_range_end": "2017-12-31",
+            "time_range_end": "2023-10-31",
             "geographical_range": null,
             "filters": [
                 1,
@@ -794,7 +794,9 @@
                 39,
                 40,
                 41,
-                42
+                42,
+                45,
+                46
             ]
         }
     },
@@ -816,6 +818,58 @@
                 13,
                 14,
                 44
+            ]
+        }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 56,
+        "fields": {
+            "short_name": "ISMN_V20240314",
+            "pretty_name": "20240314 global",
+            "help_text": "ISMN from 2024-03-15 (with FRM QIs)",
+            "time_range_start": "",
+            "time_range_end": "2024-03-14",
+            "geographical_range": null,
+            "filters": [
+                1,
+                2,
+                18,
+                24,
+                43
+            ]
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 57,
+        "fields": {
+            "short_name": "ERA5_latest",
+            "pretty_name": "latest",
+            "help_text": "up-to-date version of 6-hourly ERA5 data",
+            "time_range_start": "1979-01-01",
+            "time_range_end": "2023-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                16
+            ]
+        }
+    },
+        {
+        "model": "validator.datasetversion",
+        "pk": 58,
+        "fields": {
+            "short_name": "C3S_V202312",
+            "pretty_name": "v202312",
+            "help_text": "CDR v202312",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2023-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                6,
+                7
             ]
         }
     }

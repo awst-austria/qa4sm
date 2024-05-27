@@ -31,8 +31,8 @@ export class UserFileUploadComponent {
   allowedExtensions = ['.zip', '.nc', '.nc4'];
 
   uploadObserver = {
-    next: event => this.onUploadNext(event),
-    error: error => this.onUploadError(error),
+    next: (event: any) => this.onUploadNext(event),
+    error: () => this.onUploadError(),
     complete: () => this.onUploadComplete()
   }
 
@@ -96,9 +96,11 @@ export class UserFileUploadComponent {
       this.name = 'uploadedFile';
       this.spinnerVisible = true;
       const upload$ = this.userDatasetService.userFileUpload(this.name, this.file, this.fileName, this.metadataForm.value)
-        .pipe(finalize(() => this.reset));
-
-      this.uploadSub = upload$.subscribe(this.uploadObserver);
+        .pipe(
+          finalize(() => this.reset())
+        );
+      this.uploadSub = upload$
+        .subscribe(this.uploadObserver);
     }
   }
 
@@ -113,14 +115,12 @@ export class UserFileUploadComponent {
     }
   }
 
-  private onUploadError(message): void {
-    this.spinnerVisible = false;
+  private onUploadError(): void {
     this.toastService.showErrorWithHeader('File not saved',
-      `${message.error.error}.\n File could not be uploaded. Please try again or contact our team.`);
+      `File could not be uploaded. Please try again or contact our team.`);
   }
 
   private onUploadComplete(): void {
-    this.spinnerVisible = false;
     this.metadataForm.reset({});
   }
 
@@ -134,6 +134,7 @@ export class UserFileUploadComponent {
   }
 
   reset(): void {
+    this.spinnerVisible = false;
     this.uploadProgress = null;
     this.uploadSub = null;
   }
@@ -142,5 +143,9 @@ export class UserFileUploadComponent {
     return this.userDatasetService.getTheSizeInProperUnits(this.authService.currentUser.space_left);
   }
 
+
+  getISMNList(): void{
+    this.userDatasetService.getISMNList();
+  }
 
 }

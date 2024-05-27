@@ -8,36 +8,36 @@
     </div>
   </div>
 
-  <div *ngIf="!hasNoSpaceAssigned">
+  <div *ngIf="!hasNoSpaceAssigned && !maintenanceMode">
     <div class="center">
-      <!--    <div class="col-9 text-center">-->
       <h1>Upload your data</h1>
-      <!--    </div>-->
     </div>
-    <div class="text-center lead text-muted pt-3">
-      {{getLimitMessage()}}
+    <div *ngIf="!settingsError else noSettingsFetched">
+      <div class="text-center lead text-muted pt-3">
+        {{ getLimitMessage() }}
+      </div>
+      <!--    <hr class="featurette-divider">-->
+      <div class="flex flex-column pt-5 justify-content-center align-content-center">
+        <qa-user-file-upload/>
+      </div>
     </div>
-    <!--    <hr class="featurette-divider">-->
-    <div class="text-center pt-5">
-      <qa-user-file-upload></qa-user-file-upload>
-    </div>
+    <ng-template #noSettingsFetched>
+      <div class="center">
+        <p class="lead text-muted">Sorry, uploading data is not possible now.</p>
+      </div>
+    </ng-template>
+
     <hr class="featurette-divider">
     <div class="center">
-      <!--    <div class="col-9 text-center">-->
       <h2>Uploaded data sets</h2>
-      <!--    </div>-->
     </div>
     <div *ngIf="(userDatasets$ | async) as userDatasetList">
       <div *ngIf="(dataManagementGroups$ | async) as dataManagementGroups">
-
-
         <div *ngIf="userDatasetList.length !== 0" class="container mb-5 mt-4" [ngStyle]="pageStyle">
           <div>
             <div *ngFor="let userDataset of userDatasetList" class="mb-3">
               <qa-user-data-row [userDataset]="userDataset"
-                                [dataManagementGroups]="dataManagementGroups">
-
-              </qa-user-data-row>
+                                [dataManagementGroups]="dataManagementGroups"/>
             </div>
           </div>
           <hr class="featurette-divider">
@@ -45,8 +45,8 @@
             <div>
               Above you can find a list of datasets you have uploaded: <span *ngIf="!readMore">...</span>
               <span *ngIf="!readMore" (click)="toggleReadMore()" class="readMoreOrLess pi pi-arrow-down">
-          Read more
-        </span>
+              Read more
+            </span>
             </div>
             <div *ngIf="readMore">
               <ul>
@@ -81,6 +81,17 @@
         </div>
       </div>
     </div>
+    <div *ngIf="datasetFetchError" class="center">
+      <p class="lead text-muted">
+        Sorry, we couldn't fetch your datasets. Please try again later.
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="maintenanceMode" class="container text-center mb-5 mt-4" style="max-width: 40rem;">
+    <h1 class="jumbotron-heading">Maintenance...</h1>
+    <p class="lead text-muted">Sorry! Currently, you can't upload new files because we're doing maintenance on
+      the service. Please come back later.</p>
   </div>
 
 
@@ -96,8 +107,7 @@
 
 <!--&lt;!&ndash;    <qa-share-user-data [userDataset]="userDataset"&ndash;&gt;-->
 <!--&lt;!&ndash;                        [dataManagementGroups]="dataManagementGroups"&ndash;&gt;-->
-<!--&lt;!&ndash;                        (openShareDataWindow)="manageSharingWindow($event)">&ndash;&gt;-->
-<!--&lt;!&ndash;    </qa-share-user-data>&ndash;&gt;-->
+<!--&lt;!&ndash;                        (openShareDataWindow)="manageSharingWindow($event)"/>&ndash;&gt;-->
 <!--</p-dialog>-->
 
 

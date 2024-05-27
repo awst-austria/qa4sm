@@ -70,16 +70,17 @@ export class ShareUserDataComponent implements OnInit, OnChanges{
   }
 
 
+  // todo: this one is to be still developed
   public manageDataInGroup(groupId: number, dataId: string, action: string): void{
-    this.userDatasetService.manageDataInManagementGroup(groupId, dataId, action).subscribe(data => {
-      console.log(data);
+    this.userDatasetService.manageDataInManagementGroup(groupId, dataId, action)
+      .subscribe(data => {
       this.openShareDataWindow.emit(false)
       // this.shareDataModalWindow = false;
     })
   }
 
   public removeGroup(): void{
-    console.log('I am trying to remove this group')
+    // console.log('I am trying to remove this group')
   }
 
 }

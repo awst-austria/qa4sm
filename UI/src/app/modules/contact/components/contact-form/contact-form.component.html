@@ -28,27 +28,27 @@
       </div>
 
       <div class="py-3" style="line-height: 1rem">
-        <p-checkbox id="copy" formControlName="send_copy_to_user" binary="true"></p-checkbox>
+        <p-checkbox inputId="copy" formControlName="send_copy_to_user" binary="true"></p-checkbox>
         <label for="copy"> Send a copy to me.</label>
       </div>
 
       <div class="form-control-box">
-        <p-checkbox id="active" formControlName="active" binary="true"></p-checkbox>
+        <p-checkbox inputId="active" formControlName="active" binary="true"></p-checkbox>
+        <label for="active">some label</label>
       </div>
 
-      <div class="py-3 " style="line-height: 1rem">
-        <span class="p-float-label">
+      <div class="py-3 flex w-12" style="line-height: 1rem">
+        <div class="p-float-label align-content-center justify-content-center text-center w-12">
           <p-slider id="honeypot" formControlName="honeypot" ></p-slider>
           <label for="honeypot"> To prove you're a real person, slide the handle all the way to the right <span class="pi pi-angle-double-right"></span></label>
-        </span>
+        </div>
 
       </div>
-
       <button id="sendMessageForm"
               pButton
               type="submit"
               label="Send"
-              [disabled]="!contactForm.valid && sliderValues.length < 10">
+              [disabled]="!contactForm.valid">
       </button>
 
 

@@ -1,0 +1,11 @@
+<div class="navbar" [ngClass]="{'header-dark': isHomePage()}">
+  <div *ngIf="!isHomePage() && isLogoDisplayed()"
+       class="flex align-items-center justify-content-center logo-container"
+       [ngClass]="{'w-2': !(logo().shape === 'square'), 'w-1': (logo().shape === 'square')}">
+    <a routerLink="/home" class="lg:pl-0 md:pl-2">
+      <p-image [src]="logo().path" [height]="logo().height" class="xl:mr-8 lg:mr-7 lg:ml-0 mr-0 ml-2"></p-image>
+    </a>
+  </div>
+  <p-menubar [model]="items" [ngClass]="{'lg:w-10': !isHomePage()}">
+  </p-menubar>
+</div>

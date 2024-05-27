@@ -1,4 +1,5 @@
 import base64
+import csv
 import os
 from collections import OrderedDict
 
@@ -8,13 +9,14 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from validator.models import ValidationRun, DatasetConfiguration
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from validator.models import ValidationRun, DatasetConfiguration, Dataset, UserManual
 
 import mimetypes
 from wsgiref.util import FileWrapper
 from validator.validation import get_inspection_table, get_dataset_combis_and_metrics_from_files
-from validator.validation.globals import ISMN, METADATA_PLOT_NAMES
+from validator.validation.globals import ISMN, METADATA_PLOT_NAMES, ISMN_LIST_FILE_NAME
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -75,7 +77,8 @@ def get_csv_with_statistics(request):
 def get_metric_names_and_associated_files(request):
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, pk=validation_id)
-    ref_dataset_name = DatasetConfiguration.objects.get(id=validation.spatial_reference_configuration_id).dataset.pretty_name
+    ref_dataset_name = DatasetConfiguration.objects.get(
+        id=validation.spatial_reference_configuration_id).dataset.pretty_name
 
     try:
         file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
@@ -101,7 +104,9 @@ def get_metric_names_and_associated_files(request):
         barplot_metric = ['status']
 
         boxplot_file = ''
-        boxplot_file_name = 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + metrics[key] + '.png'
+        boxplot_file_name = 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + \
+                                                                                                          metrics[
+                                                                                                              key] + '.png'
 
         if metrics[key] not in independent_metrics:
             overview_plots = [{'file_name': 'overview_' + name_key + '_' + metrics[key] + '.png',
@@ -120,7 +125,8 @@ def get_metric_names_and_associated_files(request):
         # for ISMN there might be also metadata plots
         boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
         if ref_dataset_name == ISMN:
-            metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_" }' + metrics[key] + '_' + metadata_name + '.png'}
+            metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_"}' +
+                                            metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
             for meta_ind, file_dict in enumerate(metadata_plots):
                 if file_dict['file_name'] in files:
@@ -197,3 +203,27 @@ def get_summary_statistics(request):
             index=False
         ))
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_user_manual(request):
+    file = get_object_or_404(UserManual, id=1)
+    with open(file.file.path, 'rb') as pdf:
+        response = HttpResponse(pdf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'filename={file.file}'
+        return response
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_ismn_list_file(request):
+    ismn_ds = get_object_or_404(Dataset, short_name='ISMN')
+    file_path = f'{ismn_ds.storage_path}/{ISMN_LIST_FILE_NAME}'
+
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="data.csv"'
+            return response
+    else:
+        return HttpResponse("File not found", status=404)

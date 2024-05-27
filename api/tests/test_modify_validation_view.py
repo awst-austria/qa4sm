@@ -156,6 +156,34 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 403
         assert new_run.is_archived is False  # nothing has changed
 
+    def test_archive_multiple_results(self):
+        create_default_validation_without_running(self.test_user)
+        create_default_validation_without_running(self.test_user)
+        all_validations = ValidationRun.objects.all()
+
+        assert len(ValidationRun.objects.all()) == 4
+
+        self.run.doi = '19282843'
+        self.run.archive()  # all published validations are archived by default
+        self.run.save()
+
+        archive_validation_url = reverse('Archive Multiple Results') + '?' + f'archive=true&'
+        val_ids = [str(validation.id) for validation in all_validations]
+        for id in val_ids:
+            archive_validation_url += f'id={id}&'
+        archive_validation_url = archive_validation_url.rstrip('&')
+
+        response = self.client.post(archive_validation_url)
+
+        assert response.status_code == 200
+        assert len(ValidationRun.objects.filter(is_archived=True)) == 3  # one doesn't belong to the user so it wasn't archived
+
+        archive_validation_url = archive_validation_url.replace('true', 'false')
+        response = self.client.post(archive_validation_url)
+
+        assert response.status_code == 200
+        assert len(ValidationRun.objects.filter(is_archived=False)) == 3  # one validation was marked as published, so it can not be unarchived
+
     def test_extend_result(self):
         extend_result_url = reverse('Extend results', kwargs={'result_uuid': self.run_id})
 

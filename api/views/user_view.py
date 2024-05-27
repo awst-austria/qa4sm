@@ -6,13 +6,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
 from validator.models import User
 from django.contrib.auth import update_session_auth_hash
-from api.views.auxiliary_functions import get_fields_as_list
+from rest_framework.authtoken.models import Token
+
 
 def _get_querydict_from_user_data(request, userdata):
     user_data_dict = QueryDict(mutable=True)
@@ -104,4 +104,5 @@ class UserSerializer(ModelSerializer):
                   'space_limit_value',
                   'space_left',
                   'is_staff',
-                  'is_superuser']
+                  'is_superuser',
+                  'auth_token']

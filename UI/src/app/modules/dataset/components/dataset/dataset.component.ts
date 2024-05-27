@@ -40,6 +40,9 @@ export class DatasetComponent implements OnInit {
   @Input() removable = false;
   @Output() changeDataset = new EventEmitter<DatasetComponentSelectionModel>();
 
+  datasetSelectorId: string;
+  versionSelectorId: string;
+  variableSelectorId: string;
 
   constructor(private datasetService: DatasetService,
               private datasetVersionService: DatasetVersionService,
@@ -50,31 +53,36 @@ export class DatasetComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.allDatasets$ = this.datasetService.getAllDatasets(true);
+    this.allDatasets$ = this.datasetService.getAllDatasets(true)
 
     this.validationConfigService.listOfSelectedConfigs.subscribe(configs => {
       if (configs.filter(config => config.datasetModel.selectedDataset?.short_name === 'ISMN').length !== 0
         && this.selectionModel.selectedDataset?.short_name !== 'ISMN') {
-        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-          return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
-        }));
-      } else if(configs.filter(config => config.datasetModel.selectedDataset.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user){
-        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-          return this.sortById(datasets.filter(dataset => !dataset.user));
-        }));
-      }
-      else {
-        this.datasets$ = this.allDatasets$.pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
-          return this.sortById(datasets);
-        }));
+        this.datasets$ = this.allDatasets$
+          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+            return this.sortById(datasets.filter(dataset => dataset.pretty_name !== 'ISMN'));
+          }));
+      } else if (configs.filter(config => config.datasetModel.selectedDataset?.user).length == configs.length - 1 && !this.selectionModel.selectedDataset?.user) {
+        this.datasets$ = this.allDatasets$
+          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+            return this.sortById(datasets.filter(dataset => !dataset.user));
+          }));
+      } else {
+        this.datasets$ = this.allDatasets$
+          .pipe(map<DatasetDto[], DatasetDto[]>(datasets => {
+            return this.sortById(datasets);
+          }));
       }
     });
+
 
     this.selectableDatasetVersions$ = this.sortObservableById(
       this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
 
     this.selectableDatasetVariables$ = this.sortObservableById(
       this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
+
+    this.setSelectorsId();
   }
 
   private updateSelectableVersionsAndVariableAndEmmit(): void {
@@ -87,6 +95,7 @@ export class DatasetComponent implements OnInit {
 
 
     this.selectableDatasetVersions$.subscribe(this.selectableDatasetVersionsObserver);
+    this.setSelectorsId();
   }
 
   private onSelectableVersionsNext(versions): void {
@@ -98,6 +107,7 @@ export class DatasetComponent implements OnInit {
       this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
 
     this.selectableDatasetVariables$.subscribe(this.selectableDatasetVariablesObserver)
+    this.setSelectorsId();
   }
 
   private onSelectableVariablesNext(variables): void {
@@ -106,6 +116,7 @@ export class DatasetComponent implements OnInit {
 
   private onSelectableVariablesComplete(): void {
     this.changeDataset.emit(this.selectionModel);
+    this.setSelectorsId();
   }
 
   onDatasetChange(): void {
@@ -129,5 +140,13 @@ export class DatasetComponent implements OnInit {
       });
       return data;
     }));
+  }
+
+  setSelectorsId(): void {
+    const datasetIdentifier = `${this.selectionModel.selectedDataset?.id}_
+    ${this.selectionModel.selectedVersion?.id}_ ${this.selectionModel.selectedVariable?.id}`
+    this.datasetSelectorId = 'dataset_' + datasetIdentifier;
+    this.versionSelectorId = 'version_' + datasetIdentifier;
+    this.variableSelectorId = 'variable_' + datasetIdentifier;
   }
 }

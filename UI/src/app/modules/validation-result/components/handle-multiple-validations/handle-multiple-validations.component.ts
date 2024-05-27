@@ -1,8 +1,10 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {MenuItem} from 'primeng/api';
 import {BehaviorSubject} from 'rxjs';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
+import {MenuItem} from 'primeng/api';
+import {CustomHttpError} from '../../../core/services/global/http-error.service';
+import {ToastService} from '../../../core/services/toast/toast.service';
 
 @Component({
   selector: 'qa-handle-multiple-validations',
@@ -17,65 +19,152 @@ export class HandleMultipleValidationsComponent implements OnInit {
 
   selectionActive$ = new BehaviorSubject(false);
 
-  deleteItems: MenuItem[];
+  deleteItems: {};
+  archiveItems: {};
+  unArchiveItems: {};
 
-  constructor(private validationrunService: ValidationrunService) {
+  selectOptions: MenuItem[];
+
+  action: string = null;
+  buttonLabel: string;
+  allSelected: boolean;
+  actions: any[];
+  numberOfAllValidations: number;
+
+  constructor(private validationrunService: ValidationrunService,
+              private toastService: ToastService) {
   }
 
   ngOnInit() {
-    this.deleteItems = [
+
+    this.deleteItems =
       {
+        action: 'delete',
         label: 'Delete',
         icon: 'pi pi-fw pi-trash',
-        items: [
-          {
-            label: 'Select all',
-            icon: 'pi pi-fw pi-check-square',
-            command: () => this.activateSelection(true)
-          },
-          {
-            label: 'Select individually',
-            icon: 'pi pi-fw pi-stop',
-            command: () => this.activateSelection(false)
-          }
+      };
 
-        ]
-      }
-    ]
+    this.archiveItems =
+      {
+        action: 'archive',
+        label: 'Archive',
+        icon: 'pi pi-fw pi-folder',
+      };
+
+    this.unArchiveItems =
+      {
+        action: 'unarchive',
+        label: 'Un-Archive',
+        icon: 'pi pi-calendar',
+      };
+
+    this.actions = [
+      this.deleteItems,
+      this.archiveItems,
+      this.unArchiveItems
+    ];
+
+    this.selectOptions = [{
+      label: 'Select validations',
+      items: [
+        {
+          label: 'All',
+          icon: 'pi pi-fw pi-check-square',
+          command: () => this.emitSelection(true),
+        },
+        {
+          label: "Clear selection",
+          icon: 'pi pi-fw pi-stop',
+          command: () => this.emitSelection(false)
+        }
+      ]
+
+    }];
   }
 
-  activateSelection(allSelected: boolean): void {
-    this.selectionActive.emit({activate: true, selected: this.selectValidations(allSelected)})
-    this.selectionActive$.next(true);
-  }
 
-  closeAndCleanSelection(): void {
-    this.selectionActive.emit({activate: false, selected: this.selectValidations(false)})
-    this.selectionActive$.next(false)
-
-  }
-
-  selectValidations(all: boolean): BehaviorSubject<string[]> {
+  selectValidations(select: boolean, action: string): BehaviorSubject<string[]> {
     const selectedValidations = [];
-    if (all) {
+    const select_archived = action === 'unarchive';
+    if (select) {
       this.validations.forEach(val => {
-        if (!val.is_archived && val.is_unpublished) {
+        if (this.checkIfActionApplicable(val, action)) {
           selectedValidations.push(val.id)
         }
       })
     }
+    this.numberOfAllValidations = selectedValidations.length;
     return new BehaviorSubject(selectedValidations)
+  }
+
+  checkIfActionApplicable(valrun: ValidationrunDto, action: string): boolean{
+    let condition = valrun.is_unpublished
+
+    if (action === 'unarchive'){
+      condition = condition && valrun.is_archived
+    } else if (action === 'archive'){
+      condition = condition && !valrun.is_archived
+    }
+    return condition;
+  }
+
+
+  emitSelection(select: boolean): void {
+    this.selectionActive.emit({
+      active: true,
+      selected: this.selectValidations(select, this.action),
+      allSelected: select,
+      action: this.action
+    })
+  }
+
+  actionChange(): void{
+    if (!this.selectionActive$.value){
+      this.selectionActive$.next(true);
+    }
+    this.selectionActive.emit({
+      active: true,
+      selected: new BehaviorSubject([]),
+      allSelected: false,
+      action: this.action
+    })
+
+    this.buttonLabel = this.actions.find(element => element.action == this.action).label
+  }
+
+  closeAndCleanSelection(): void {
+    this.selectionActive.emit({activate: false, selected: this.selectValidations(false, null)})
+    this.selectionActive$.next(false)
+    this.action = null;
+  }
+
+  multipleValidationActionObserver = {
+    next: () => this.validationrunService.refreshComponent('page'),
+    error: (error: CustomHttpError) =>
+      this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message)
   }
 
 
   deleteMultipleValidations(): void {
-    if (!confirm('Do you really want to delete selected validations?')) {
+    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue())
+      .subscribe(this.multipleValidationActionObserver)
+  }
+
+  archiveMultipleValidations(archive: boolean): void {
+    this.validationrunService.archiveMultipleValidation(this.selectedValidationsId$.getValue(), archive)
+      .subscribe(this.multipleValidationActionObserver)
+  }
+
+  handleMultipleValidations(): void {
+    if (!confirm(`Do you really want to ${this.action} selected validations?`)) {
       return;
     }
-    this.validationrunService.removeMultipleValidation(this.selectedValidationsId$.getValue()).subscribe(response =>{
-      this.validationrunService.refreshComponent('page');
-      this.closeAndCleanSelection()
-    })
+    if (this.action === 'delete') {
+      this.deleteMultipleValidations()
+    } else if (this.action === 'archive' || this.action === 'unarchive') {
+      this.archiveMultipleValidations(this.action === 'archive')
+    }
+    this.closeAndCleanSelection()
   }
 
 

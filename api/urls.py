@@ -5,7 +5,8 @@ from api.views.data_filter_view import data_filter, data_parameterised_filter, d
 # data_parameterised_filter_by_config
 # from api.views.data_filter_view data_filter_by_id, data_parameterised_filter_by_id
 from api.views.dataset_variable_view import dataset_variable, dataset_variable_by_id, dataset_variable_by_dataset
-from api.views.dataset_version_view import dataset_version, dataset_version_by_id, dataset_version_by_dataset
+from api.views.dataset_version_geojson import dataset_version_geojson_by_id
+from api.views.dataset_version_view import *
 from api.views.dataset_view import dataset, dataset_by_id
 from api.views.ismn_network_view import get_ismn_networks
 from api.views.login_view import api_login
@@ -27,6 +28,7 @@ from api.views.settings_view import backend_settings
 from api.views.upload_user_data_view import *
 from api.views.support_request_view import *
 from api.views.custom_dataset_view import *
+from rest_framework.authtoken import views
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -75,7 +77,7 @@ urlpatterns = [
     path('globals', global_params, name='Global context'),
     path('my-results', my_results, name='My results'),
     re_path(r'^validation-configuration/(?P<id>.+)$', get_validation_configuration, name='Validation configuration'),
-    path('validation-configuration', start_validation, name='Run new validation'),
+    path('start-validation', start_validation, name='Run new validation'),
     path('param-filter', data_parameterised_filter, name='Parameterised filter'),
     path('stop-validation/<uuid:result_uuid>', stop_validation, name='Stop validation'),
     path('custom-tracked-run', custom_tracked_validation_runs, name='Copied custom run'),
@@ -109,7 +111,7 @@ urlpatterns = [
     path('publishing-form', get_publishing_form, name='Get publishing form'),
     path('copy-validation', copy_validation_results, name='Copy validation results'),
     re_path(r'^copied-validation-record/(?P<id>.+)$', get_copied_validations, name='Copied run record'),
-    path('password-reset', include('django_rest_passwordreset.urls', namespace='password-reset')),
+    path('password-reset/', include('django_rest_passwordreset.urls', namespace='password-reset')),
     path('ismn-network', get_ismn_networks, name='Get ISMN networks'),
     path('upload-user-data/<str:filename>/', upload_user_data, name='Upload user data'),
     path('get-list-of-user-data-files', get_list_of_user_data_files, name='Get User Data Files'),
@@ -119,11 +121,17 @@ urlpatterns = [
     path('update-metadata/<uuid:file_uuid>/', update_metadata, name='Update metadata'),
     path('scaling-methods', get_scaling_methods, name='Scaling methods'),
     path('support-request', send_support_request, name='Support request'),
+    re_path(r'^dataset-version-geojson/(?P<version_id>.+)/$', dataset_version_geojson_by_id),
     path('data-management-groups', get_data_management_groups, name='Get data management groups'),
     path('manage-data-in-management-group', manage_data_in_group,
          name='Add data to management groups'),
     path('delete-only-datafile/<str:file_uuid>/', delete_dataset_file_only, name='Delete User Data File Only'),
     path('delete-multiple-validations', delete_multiple_result, name='Delete Multiple Validations'),
+    path('user-manual', get_user_manual, name='Get user manual'),
+    path('get-ismn-list-file', get_ismn_list_file, name='Get ISMN csv file'),
+    path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
+    path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
+    path('update-dataset-version', update_dataset_version, name='Update Dataset Version')
     # path('test-user-dataset/<str:dataset_id>/', test_user_data, name='Test user data'),
     # path('validate-user-data', validate_user_data, name='Validate user data'),
 ]

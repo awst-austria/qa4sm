@@ -242,6 +242,8 @@ ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #$$
 
 DEFAULT_TSW = 'bulk' # default temporal sub-window (in the case of no temporal sub-windowing)
 TEMPORAL_SUB_WINDOW_NC_COORD_NAME = 'tsw' # name of the period coordinate in the netcdf file (Temporal Sub-Window)
+ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
+GEOJSON_FILE_NAME = 'ismn_sensors.json'
 
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = {

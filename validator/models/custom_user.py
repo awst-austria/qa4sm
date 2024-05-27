@@ -37,10 +37,13 @@ class User(AbstractUser):
         return self.get_space_limit_display()
 
     @property
+    def used_space(self):
+        return sum(file.file_size for file in self.user_datasets.all() if file.file)
+
+    @property
     def space_left(self):
         if self.get_space_limit_display():
-            used_space = sum(file.file_size for file in self.user_datasets.all() if file.file)
-            return self.get_space_limit_display() - used_space
+            return self.get_space_limit_display() - self.used_space
 
         return
 

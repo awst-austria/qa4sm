@@ -10,7 +10,7 @@ import {NavigationBarModule} from './modules/navigation-bar/navigation-bar.modul
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import {ErrorComponent} from './pages/error/error.component';
+import {ErrorPageComponent} from './pages/error/error-page.component';
 
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
@@ -43,7 +43,6 @@ import {MetricsModule} from './modules/metrics/metrics.module';
 import {AnomaliesModule} from './modules/anomalies/anomalies.module';
 import {ScalingModule} from './modules/scaling/scaling.module';
 import {MapModule} from './modules/map/map.module';
-import {AboutComponent} from './pages/about/about.component';
 import {TermsComponent} from './pages/terms/terms.component';
 import {DatasetInfoComponent} from './pages/dataset-info/dataset-info.component';
 import {ComparisonComponent} from './pages/comparison/comparison.component';
@@ -76,19 +75,19 @@ import {ImageModule} from 'primeng/image';
 import {ScrollTopModule} from 'primeng/scrolltop';
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import {ContactModule} from './modules/contact/contact.module';
+import {SelectButtonModule} from 'primeng/selectbutton';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     ValidateComponent,
-    ErrorComponent,
+    ErrorPageComponent,
     ValidationsComponent,
     ValidationResultComponent,
     LoginComponent,
     UserProfileComponent,
     PublishedValidationsComponent,
-    AboutComponent,
     TermsComponent,
     DatasetInfoComponent,
     ComparisonComponent,
@@ -106,49 +105,50 @@ import {ContactModule} from './modules/contact/contact.module';
     LoginPageComponent,
     ContactUsComponent,
   ],
-  imports: [
-    LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
-    NavigationBarModule,
-    FormsModule,
-    ReactiveFormsModule,
-    BrowserModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    DatasetModule,
-    NgbModule,
-    FontAwesomeModule,
-    ToastModule,
-    DropdownModule,
-    AccordionModule,
-    PanelModule,
-    TooltipModule,
-    ButtonModule,
-    PasswordModule,
-    InputTextModule,
-    FilterModule,
-    ToastModule,
-    ValidationResultModule,
-    SpatialSubsetModule,
-    TemporalMatchingModule,
-    CarouselModule,
-    ValidationPeriodModule,
-    MetricsModule,
-    AnomaliesModule,
-    ScalingModule,
-    MapModule,
-    ComparisonModule,
-    CoreModule,
-    UserModule,
-    InputNumberModule,
-    UserDatasetsModule,
-    ValidationReferenceModule,
-    DialogModule,
-    ProgressBarModule,
-    ImageModule,
-    ScrollTopModule,
-    ContactModule,
-  ],
+    imports: [
+        LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
+        NavigationBarModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserModule,
+        HttpClientModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        DatasetModule,
+        NgbModule,
+        FontAwesomeModule,
+        ToastModule,
+        DropdownModule,
+        AccordionModule,
+        PanelModule,
+        TooltipModule,
+        ButtonModule,
+        PasswordModule,
+        InputTextModule,
+        FilterModule,
+        ToastModule,
+        ValidationResultModule,
+        SpatialSubsetModule,
+        TemporalMatchingModule,
+        CarouselModule,
+        ValidationPeriodModule,
+        MetricsModule,
+        AnomaliesModule,
+        ScalingModule,
+        MapModule,
+        ComparisonModule,
+        CoreModule,
+        UserModule,
+        InputNumberModule,
+        UserDatasetsModule,
+        ValidationReferenceModule,
+        DialogModule,
+        ProgressBarModule,
+        ImageModule,
+        ScrollTopModule,
+        ContactModule,
+        SelectButtonModule,
+    ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,

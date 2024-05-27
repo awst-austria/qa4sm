@@ -1,3 +1,5 @@
+@import "../../../../../style.variables";
+
 .file-input {
   display: none;
 }
@@ -57,7 +59,7 @@ div.alert{
 
 @keyframes changeColor {
   from {color: #9CF2F6}
-  to {color: #00AAE3;}
+  to {color: $base-color;}
 }
 
 //.loading-spinner{
@@ -81,3 +83,4 @@ div.alert{
   font-weight: bold;
   width: 80%;
 }
+

@@ -1,10 +1,8 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {Validations2CompareModel} from '../validation-selector/validation-selection.model';
 import {HttpParams} from '@angular/common/http';
-import {DomSanitizer, SafeUrl} from '@angular/platform-browser';
+import {SafeUrl} from '@angular/platform-browser';
 import {ExtentModel} from '../spatial-extent/extent-model';
-import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
-import {DatasetConfigurationService} from '../../../validation-result/services/dataset-configuration.service';
 import {ComparisonService} from '../../services/comparison.service';
 import {WebsiteGraphicsService} from '../../../core/services/global/website-graphics.service';
 
@@ -26,10 +24,7 @@ export class ExtentVisualizationComponent implements OnInit {
   errorHappened = false;
   img: string;
 
-  constructor(private validationRunService: ValidationrunService,
-              private datasetConfigurationService: DatasetConfigurationService,
-              private comparisonService: ComparisonService,
-              private domSanitizer: DomSanitizer,
+  constructor(private comparisonService: ComparisonService,
               private plotService: WebsiteGraphicsService) {
   }
 

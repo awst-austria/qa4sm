@@ -1,15 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'qa-deactivate-user-complete',
   templateUrl: './deactivate-user-complete.component.html',
   styleUrls: ['./deactivate-user-complete.component.scss']
 })
-export class DeactivateUserCompleteComponent implements OnInit {
+export class DeactivateUserCompleteComponent {
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

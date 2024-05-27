@@ -10,6 +10,23 @@ conda activate /var/lib/qa4sm-web-val/virtenv
 export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
+# generate ISMN geojson files if they don't exist
+DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
+ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
+    echo "$dir"
+    # Check if the directory contains "ismn_sensors.json"
+    if [ -f "${dir}ismn_sensors.json" ]; then
+      # Print a message indicating the presence of "ismn_sensors.json"
+      echo "'ismn_sensors.json' already exists in directory."
+    else
+      # Run the ISMN export_geojson command
+      ismn export_geojson "${dir}" -f network -f station -f depth -f timerange -f frm_class -var soil_moisture
+      chown 100000:100033 ismn_sensors.json
+      chmod 775 ismn_sensors.json
+      echo "Created ismn_sensors.json in ${dir}"
+    fi
+done
+
 # wait for the db to initialize
 sleep 10s
 NEW_DB="FALSE"
@@ -32,6 +49,9 @@ if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_
 	  python $APP_DIR/manage.py loaddata datasets
 	  python $APP_DIR/manage.py loaddata networks
 	  python $APP_DIR/manage.py setdatasetpaths --path /var/lib/qa4sm-web-val/valentina/data
+	  python $APP_DIR/manage.py abortrunningvalidations
+	  python $APP_DIR/manage.py cleancelerytasks
+	  python $APP_DIR/manage.py generateismnlist
 
 	if [ "$NEW_DB" = "TRUE" ]; then
       echo "Creating admin user"

@@ -17,9 +17,7 @@ def get_ismn_networks(request):
 
     networks = None
 
-    print(request.query_params)
     if dataset_id is not None:
-        print('filter: ' + dataset_id)
         networks = ISMNNetworks.objects.filter(versions__id=dataset_id)
     else:
         networks = ISMNNetworks.objects.all()

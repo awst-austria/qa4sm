@@ -25,6 +25,7 @@ FORCE_SCRIPT_NAME=''
 SSL_SECURITY=""
 DOI_REGISTRATION_URL="https://zenodo.org/api/deposit/depositions"
 USER_DATA_DIR='/var/lib/qa4sm-web-val/valentina/data/user_data'
+DOCS_DIR='/var/lib/qa4sm-web-val/valentina/docs'
 
 # this token needs to be set as an evironment variable when this script is run
 # e.g. in the CI (Jenkins credentials or Travis secrets)
@@ -52,6 +53,7 @@ if [ "x$ENV" == "xjenkins" ]; then
     DBSM="sqlite"
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR="${DIRNAME}/testdata/user_data/"
+    DOCS_DIR="${DIRNAME}/docs/"
 fi
 
 if [ "x$ENV" == "xdev" ]; then
@@ -61,6 +63,7 @@ if [ "x$ENV" == "xdev" ]; then
     DBSM="sqlite"
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR="${DIRNAME}/testdata/user_data/"
+    DOCS_DIR="${DIRNAME}/docs/"
 fi
 
 if [ "x$ENV" == "xtest" ]; then
@@ -71,6 +74,7 @@ if [ "x$ENV" == "xtest" ]; then
     LOGFILE="/tmp/log/valentina/valentina.log"
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR="${DIRNAME}/testdata/user_data/"
+    DOCS_DIR="${DIRNAME}/docs/"
 fi
 
 if [ "x$ENV" == "xtestenv" ]; then
@@ -79,8 +83,9 @@ if [ "x$ENV" == "xtestenv" ]; then
     ALLOWED_HOSTS="['127.0.0.1', 'localhost', '10.48.108.24', 'test.qa4sm.eu', '10.10.10.66','test2.qa4sm.eu']"
     DOI_REGISTRATION_URL="https://sandbox.zenodo.org/api/deposit/depositions"
     USER_DATA_DIR='/var/lib/qa4sm-web-val/valentina/data/user_data'
+    DOCS_DIR="/var/lib/qa4sm-web-val/valentina/docs/"
 fi
 
 echo $DOI_ACCESS_TOKEN_ENV
 
-sed -e "s|^[ ]*USER_DATA_DIR = .*$|USER_DATA_DIR = '$USER_DATA_DIR'|g;s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py
+sed -e "s|^[ ]*DOCS_DIR = .*$|DOCS_DIR = 'DOCS_DIR'|g;s|^[ ]*USER_DATA_DIR = .*$|USER_DATA_DIR = '$USER_DATA_DIR'|g;s|^[ ]*DOI_ACCESS_TOKEN = .*$|DOI_ACCESS_TOKEN = '$DOI_ACCESS_TOKEN_ENV'|g;s|^[ ]*DOI_REGISTRATION_URL = .*$|DOI_REGISTRATION_URL = '$DOI_REGISTRATION_URL'|g;s|^[ ]*SITE_URL = .*$|SITE_URL = '$SITE_URL'|g;s|^[ ]*EMAIL_HOST_PASSWORD = .*$|EMAIL_HOST_PASSWORD = '$EMAIL_PASSWORD'|g;s|^[ ]*DBSM = .*$|DBSM = '$DBSM'|g;s|^[ ]*DB_PASSWORD = .*$|DB_PASSWORD = '$DB_PASSWORD'|g;s|^[ ]*MEDIA_URL = .*$|MEDIA_URL = '$MEDIA_URL'|g;s|^[ ]*STATIC_URL = .*$|STATIC_URL = '$STATIC_URL'|g;s|^[ ]*FORCE_SCRIPT_NAME = .*$|FORCE_SCRIPT_NAME = '$FORCE_SCRIPT_NAME'|g;s|^[ ]*SECRET_KEY = .*$|SECRET_KEY = '$NEWKEY'|g;s|^[ ]*DEBUG =.*$|DEBUG = $DEBUGFLAG|g;s|^[ ]*LOG_FILE = .*$|LOG_FILE = '$LOGFILE'|g;s|^[ ]*ALLOWED_HOSTS =.*$|ALLOWED_HOSTS = ${ALLOWED_HOSTS}${SSL_SECURITY}|g;" $DIRNAME/settings_example_conf.py > $DIRNAME/valentina/settings_conf.py

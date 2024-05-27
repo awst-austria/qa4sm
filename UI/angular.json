@@ -28,6 +28,7 @@
             "aot": true,
             "assets": [
               "src/favicon.ico",
+              "src/favicon.png",
               "src/assets"
             ],
             "styles": [
@@ -49,7 +50,11 @@
               ],
               "optimization": true,
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": {
+                "scripts": true,
+                "styles": true,
+                "hidden": false
+              },
               "namedChunks": false,
               "extractLicenses": true,
               "vendorChunk": false,

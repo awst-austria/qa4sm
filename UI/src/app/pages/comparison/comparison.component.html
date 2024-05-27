@@ -1,35 +1,31 @@
 <!-- custom -->
 <main>
-  <div class="container p-text-center p-mb-5 p-mt-4" style="max-width: 40rem;">
-    <h1>Validation comparison</h1>
-    <p class="lead text-muted">
-      Compare results from your validations or published ones.
-    </p>
+  <div class="flex flex-column mb-5 mt-4 align-content-center justify-content-center w-12">
+    <div class="flex flex-column text-center">
+      <h1>Validation comparison</h1>
+      <p class="lead text-muted">
+        Compare results from your validations or published ones.
+      </p>
+    </div>
   </div>
 
-  <div class="grid no-gutters">
-    <div class="
-    col-12
-    md:col-10 md:col-offset-1
-    lg:col-10 lg:col-offset-1
-    xl:col-8 xl:col-offset-2">
-
+  <div class="flex flex-column flex-wrap align-content-center justify-content-center">
+    <div class="flex flex-column w-8">
       <!--   validations selection   -->
-      <qa-validation-selector></qa-validation-selector>
-      <div class="container mb-5 mt-4"
-           style="max-width: 60rem;">
+      <qa-validation-selector/>
+      <div class="flex flex-column flex-wrap mb-5 mt-4 align-content-center justify-content-center">
         <!--       summary of the selected comparison  -->
-        <div *ngIf="showComparisonResults" class="comparison-result-container">
+        <div *ngIf="showComparisonResults" class="flex flex-column w-10 mt-3 comparison-result-container">
           <div  class="text-center">
             <h3 class="my-3">Validation comparison results</h3>
           </div>
-          <qa-comparison-summary></qa-comparison-summary>
+          <qa-comparison-summary/>
           <!--        visualize the validation extent-->
-          <qa-extent-visualization (isError)="handleError($event)"></qa-extent-visualization>
+          <qa-extent-visualization (isError)="handleError($event)"/>
           <!--  table section  -->
-          <qa-table-comparison (isError)="handleError($event)"></qa-table-comparison>
+          <qa-table-comparison (isError)="handleError($event)"/>
           <!--  plots section  -->
-          <qa-plots (isError)="handleError($event)"></qa-plots>
+          <qa-plots (isError)="handleError($event)"/>
         </div>
 
       </div>

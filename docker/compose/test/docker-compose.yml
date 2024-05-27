@@ -31,6 +31,7 @@ services:
       QA4SM_DB_USER: "${QA4SM_DB_USER}"
       QA4SM_DB_PASSWORD: "${QA4SM_DB_PASSWORD}"
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
+      QA4SM_DATA_FOLDER: "${QA4SM_DATA_FOLDER}"
 
     volumes:
       - type: bind
@@ -48,6 +49,9 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/user_data"
         target: /var/lib/qa4sm-web-val/valentina/data/user_data
+      - type: bind
+        source: "${QA4SM_USERMANUAL_FOLDER}"
+        target: /var/lib/qa4sm-web-val/valentina/docs
 
   proxy:
     image: "awst/qa4sm-proxy:latest"

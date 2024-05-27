@@ -660,8 +660,8 @@
         "pk": 43,
         "fields": {
             "name": "FIL_ISMN_FRM_representative",
-            "description": "Include only representative sensors (0-10 cm)",
-            "help_text": "Only ISMN sensors marked as 'representative' or 'very representative' are used. Other sensors ('not representative' or 'undeducible') are excluded from the validation run. Sensors below 10 cm depth are always excluded!",
+            "description": "Include only representative sensors (FRMs)",
+            "help_text": "Only use sensors classified as 'representative' or 'very representative' following FRM4SM standards; 'not representative' or 'undeducible' sensors are ignored. Sensors below 10 cm depth are always 'not representative'!",
             "parameterised": false,
             "dialog_name": null,
             "default_parameter": null,
@@ -683,6 +683,38 @@
             "default_parameter": null,
             "to_include": null,
             "to_exclude": "10,11",
+            "default_set_active": false,
+            "readonly": false
+        }
+    },
+    {
+        "model": "validator.datafilter",
+        "pk": 45,
+        "fields": {
+            "name": "FIL_SMOSL2_ORBIT_ASC",
+            "description": "Ascending mode only",
+            "help_text": "Use only soil moisture values from ascending overpass (daytime)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "to_exclude": "46",
+            "default_set_active": false,
+            "readonly": false
+        }
+    },
+        {
+        "model": "validator.datafilter",
+        "pk": 46,
+        "fields": {
+            "name": "FIL_SMOSL2_ORBIT_DES",
+            "description": "Descending mode only",
+            "help_text": "Use only soil moisture values from descending overpass (nighttime)",
+            "parameterised": false,
+            "dialog_name": null,
+            "default_parameter": null,
+            "to_include": null,
+            "to_exclude": "45",
             "default_set_active": false,
             "readonly": false
         }

@@ -1,4 +1,4 @@
-export interface UserDto{
+export interface UserDto {
   username: string;
   first_name: string;
   id: number;
@@ -12,5 +12,6 @@ export interface UserDto{
   space_limit_value: number;
   space_left: number;
   is_staff: boolean,
-  is_superuser: boolean
+  is_superuser: boolean,
+  auth_token?: string
 }
