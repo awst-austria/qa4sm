@@ -1,9 +1,11 @@
 '''
 Test our custom django commands
 '''
-
+import tempfile
+import time
 from datetime import datetime, timedelta
 import logging
+from io import StringIO
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import pandas as pd
@@ -11,9 +13,11 @@ import os
 
 from dateutil.tz.tz import tzlocal
 from django.conf import settings
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 
 from validator.models import Dataset
 from validator.models import ValidationRun
@@ -160,3 +164,50 @@ class TestCommands(TestCase):
         call_command('generateismnlist', *args, '-s', 'ISMN_V20191211')
         df = pd.read_csv(out_path)
         assert not df.empty
+
+    def test_generateautocleanupscript(self):
+        file_dir = '/tmp'
+        out = StringIO()
+        call_command('generateautocleanupscript', path=file_dir, stdout=out)
+
+        self.assertIn('No user with admin credentials and token assigned found.', out.getvalue().strip())
+
+        # admin user exists, script gets created
+        admin_user = User.objects.create(username='admin', is_staff=True)
+        tkn = Token.objects.create(user=admin_user)
+        time.sleep(2)
+
+        script_filename = 'run_autocleanup_script.sh'
+
+        full_script_path = os.path.join(file_dir, script_filename)
+
+        cleanup_api_url = f'{settings.SITE_URL}{reverse("Run Auto Cleanup")}'
+        call_command('generateautocleanupscript', path=file_dir)
+        self.assertTrue(os.path.isfile(full_script_path))
+
+        with open(full_script_path, 'r') as f:
+            content = f.read()
+        expected_content = f"""#!/bin/bash 
+        curl -X POST {cleanup_api_url} -H "Authorization: Token {tkn.key}"
+        """
+        self.assertEqual(content, expected_content)
+        self.assertTrue(os.access(full_script_path, os.X_OK))
+
+        out = StringIO()
+        call_command('generateautocleanupscript', path=file_dir, stdout=out)
+        self.assertIn(f"{script_filename} already exists. No changes made.", out.getvalue().strip())
+
+        tkn.delete()
+        new_tkn = Token.objects.create(user=admin_user)
+        time.sleep(2)
+
+        out = StringIO()
+        call_command('generateautocleanupscript', path=file_dir, stdout=out)
+
+        with open(full_script_path, 'r') as f:
+            content = f.read()
+        expected_content = f"""#!/bin/bash 
+        curl -X POST {cleanup_api_url} -H "Authorization: Token {new_tkn.key}"
+        """
+
+        self.assertEqual(content, expected_content)
