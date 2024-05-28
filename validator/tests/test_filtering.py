@@ -132,7 +132,7 @@ class TestValidation(TestCase):
     def test_reading_ColumnCombineAdapter(self) -> None:
         # test that the pytesmo.validation_framework.adapters.ColumnCombineAdapter
         # works properly for SMOS L2
-        self.run = generate_default_validation_smos_l2()
+        self.run = generate_default_validation_smos_l2(sbpca=True)
         self.user_data = {
             'username': 'testuser',
             'password': 'secret',
@@ -181,11 +181,12 @@ class TestValidation(TestCase):
 
         # Check that the 'COMBINED_RFI' field has been created
         index_should = ['Soil_Moisture', 'Chi_2_P', 'RFI_Prob', 'Science_Flags', 'Days',
-                        'Seconds', 'N_RFI_X', 'N_RFI_Y', 'M_AVA0', 'COMBINED_RFI']
-        data_mean_should = np.array([
-            1.677704e-01, 7.746283e-01, 4.264706e-03, 5.465586e+08, 5.191550e+17,
-            3.709878e+04, 4.419643e-01, 2.350315e-01, 1.608335e+02, 4.211758e-03,
-        ])
+                        'Seconds', 'N_RFI_X', 'N_RFI_Y', 'M_AVA0', 'Overpass', 'COMBINED_RFI']
+        data_mean_should = np.array(
+            [1.91801946e-01, 4.79034721e-01, 7.56410237e-03, 5.48010184e+08,
+             5.65984246e+17, 5.92144872e+04, 8.97435897e-01, 5.12820513e-01,
+             1.41410256e+02, 1.53846154e+00, 9.87404715e-03]
+        )
         filtered_mean_should = pd.Series(data=data_mean_should, index=index_should)
 
         # check 'COMBINED_RFI' formula COMBINED_RFI = (N_RFI_X + N_RFI_Y) / M_AVA0
@@ -194,7 +195,7 @@ class TestValidation(TestCase):
 
         assert (filtered.COMBINED_RFI > .1).sum() == 0
         assert (filtered.RFI_Prob > .1).sum() == 0
-        assert len(filtered.index) == 3808
+        assert len(filtered.index) == 39
         pd.testing.assert_series_equal(filtered.mean(), filtered_mean_should)
 
     def test_get_used_variables(self) -> None:

@@ -528,7 +528,7 @@
             "pretty_name": "v700",
             "help_text": "SMOS L2-SM (ESA)",
             "time_range_start": "2010-07-01",
-            "time_range_end": "2022-06-04",
+                "time_range_end": "2024-02-20",
             "geographical_range": null,
             "filters": [
                 1,
@@ -539,7 +539,9 @@
                 39,
                 40,
                 41,
-                42
+                42,
+                45,
+                46
             ]
         }
     },
