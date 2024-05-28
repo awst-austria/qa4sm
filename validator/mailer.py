@@ -100,9 +100,12 @@ def send_val_expiry_notification(val_runs):
         \nQA4SM team
         '''
 
-        _send_email(recipients=[user.email],
-                    subject=subject,
-                    body=body)
+        if user.email:
+            _send_email(recipients=[user.email],
+                        subject=subject,
+                        body=body)
+        else:
+            __logger.exception('The user has no email assigned')
 
 
 def send_new_user_signed_up(user):
@@ -203,6 +206,7 @@ def _send_email(recipients, subject, body, html_message=None):
                 msg.attach_alternative(html_message, "text/html")
             messages.append(msg)
         connection.send_messages(messages)
+        print('email sent')
         connection.close()
     except Exception:
         __logger.exception('E-mail could not be sent.')
