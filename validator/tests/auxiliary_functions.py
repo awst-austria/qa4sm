@@ -102,15 +102,19 @@ def generate_default_validation_smos():
     return run
 
 
-def generate_default_validation_smos_l2():
+def generate_default_validation_smos_l2(sbpca=False):
     run = ValidationRun()
     run.start_time = datetime.now(tzlocal())
     run.save()
 
     data_c = DatasetConfiguration()
     data_c.validation = run
-    data_c.dataset = Dataset.objects.get(short_name='SMOS_L2')
-    data_c.version = DatasetVersion.objects.get(short_name='SMOSL2_v700')
+    if sbpca:
+        data_c.dataset = Dataset.objects.get(short_name='SMOS_SBPCA')
+        data_c.version = DatasetVersion.objects.get(short_name='SMOS_SBPCA_v724')
+    else:
+        data_c.dataset = Dataset.objects.get(short_name='SMOS_L2')
+        data_c.version = DatasetVersion.objects.get(short_name='SMOSL2_v700')
     data_c.variable = DataVariable.objects.get(pretty_name='SMOSL2_sm')
     data_c.is_spatial_reference = False
     data_c.is_temporal_reference = False
