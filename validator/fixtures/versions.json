@@ -524,7 +524,7 @@
         "model": "validator.datasetversion",
         "pk": 39,
         "fields": {
-            "short_name": "SMOSL2_v700",
+            "short_name": "SMOS_L2_v700_with_overpass_new_format",
             "pretty_name": "v700",
             "help_text": "SMOS L2-SM (ESA)",
             "time_range_start": "2010-07-01",
