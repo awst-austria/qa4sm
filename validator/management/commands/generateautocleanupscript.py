@@ -19,8 +19,13 @@ class Command(BaseCommand):
         try:
             authentication_token = User.objects.get(username='admin').auth_token
         except:
-            authentication_token = User.objects.filter(is_superuser=True).filter(
-                auth_token__isnull=False).first().auth_token
+            try:
+                authentication_token = User.objects.filter(is_staff=True).filter(
+                    auth_token__isnull=False).first().auth_token
+            except AttributeError:
+                self.stdout.write(self.style.ERROR('No user with admin credentials and token assigned found.'))
+                return
+
         script_filename = 'run_autocleanup_script.sh'
         script_content = f"""#!/bin/bash 
         curl -X POST {cleanup_api_url} -H "Authorization: Token {authentication_token.key}"
@@ -31,11 +36,12 @@ class Command(BaseCommand):
 
         if not os.path.isfile(full_script_path) or authentication_token.created.timestamp() > os.stat(
                 full_script_path).st_ctime:
-            print(f"Creating {script_filename} with the necessary content.")
+            self.stdout.write(self.style.SUCCESS(f"Creating {script_filename} with the necessary content."))
             with open(full_script_path, 'w') as script_file:
                 script_file.write(script_content)
 
             # Make the script executable
             os.chmod(full_script_path, 0o755)
         else:
-            print(f"{script_filename} already exists. No changes made.")
+            self.stdout.write(self.style.SUCCESS(f"{script_filename} already exists. No changes made."))
+
