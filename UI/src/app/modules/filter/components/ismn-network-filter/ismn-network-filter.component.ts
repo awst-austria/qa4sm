@@ -6,6 +6,7 @@ import {BehaviorSubject} from 'rxjs';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
 import {IsmnNetworkDto} from '../../../core/services/filter/ismn-network.dto';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import * as net from "node:net";
 
 
 @Component({
@@ -68,7 +69,7 @@ export class IsmnNetworkFilterComponent implements OnInit {
     this.selectedNetworks.length = 0;
 
     const shouldSelectNetwork = (net: TreeNode): boolean => {
-      if (networksToBeSelected === 'all') {
+      if (networksToBeSelected === 'ALL') {
         return true;
       } else {
         return networksToBeSelected.includes(net.key);

@@ -264,7 +264,7 @@
             "help_text": "Obligatory filter. \nClick 'select' to chose the ISMN networks to use in this validation. If no network is chosen, there will be no result returned.",
             "parameterised": true,
             "dialog_name": "ismn_networks",
-            "default_parameter": "AMMA-CATCH,BIEBRZA_S-1,BNZ-LTER,CARBOAFRICA,COSMOS,CTP_SMTMN,DAHRA,FLUXNET-AMERIFLUX,FMI,FR_Aqui,HOBE,iRON,LAB-net,MySMNet,OZNET,PBO_H2O,REMEDHUS,RISMA,RSMN,SCAN,SMOSMANIA,TERENO,USCRN,WEGENERNET,WSMN",
+            "default_parameter": "ALL",
             "to_include": null,
             "to_exclude": null,
             "default_set_active": true,
