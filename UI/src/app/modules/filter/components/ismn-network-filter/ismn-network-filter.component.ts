@@ -67,11 +67,10 @@ export class IsmnNetworkFilterComponent implements OnInit {
     // do preselection
     this.selectedNetworks.length = 0;
     this.networkTree.forEach(continent => {
+      // continent.checked = true; // -> this one can get uncommented with PrimeNG 17.
+      continent.partialSelected = true;
       continent.children.forEach(net => {
-        if (networksToBeSelected.includes(net.key)) {
-          continent.partialSelected = true;
           this.selectedNetworks.push(net);
-        }
       });
     });
     this.updateFilterModel();
