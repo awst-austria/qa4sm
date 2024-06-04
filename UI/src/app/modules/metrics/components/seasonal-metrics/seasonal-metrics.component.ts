@@ -22,20 +22,30 @@ export class SeasonalMetricsComponent implements OnInit{
     this.selectedMetric.set(selectedMetric)
     if (selectedMetric.metricName !== 'Default') {
       this.prepareMetricTypes();
-      this.updateSelectedMetric(this.selectedType(), 'type');
-      this.updateSelectedMetric(this.selectedOverlap(), 'overlap');
+      this.updateMetricSelection();
+    } else {
+      this.resetMetricSelection();
     }
   }
 
+  private updateMetricSelection() {
+    this.updateSelectedMetric(this.selectedType(), 'type');
+    this.updateSelectedMetric(this.selectedOverlap(), 'overlap');
+  }
+
+  private resetMetricSelection() {
+    this.updateSelectedMetric(null, 'type');
+    this.updateSelectedMetric(null, 'overlap');
+  }
+
   updateSelectedMetric(value, parameter){
-    this.selectedMetric.update((metric) => this.updateMetric(metric, value, parameter));
+    this.selectedMetric.update((metric) => {
+      metric[parameter] = value;
+      return metric;
+    });
     console.log(this.selectedMetric())
   }
 
-  private updateMetric(metric, value, parameter){
-    metric[parameter] = value;
-    return metric;
-  }
   private prepareSeasonalMetrics(): void{
     this.seasonalMetrics.push(
       {metricName: 'Default',
