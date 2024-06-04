@@ -6,10 +6,13 @@ import {CheckboxModule} from 'primeng/checkbox';
 import {TooltipModule} from 'primeng/tooltip';
 import {PanelModule} from 'primeng/panel';
 import {FormsModule} from '@angular/forms';
+import {DropdownModule} from "primeng/dropdown";
+import {SeasonalMetricsComponent} from './components/seasonal-metrics/seasonal-metrics.component';
+import {InputNumberModule} from "primeng/inputnumber";
 
 
 @NgModule({
-  declarations: [MetricComponent, MetricsComponent],
+  declarations: [MetricComponent, MetricsComponent, SeasonalMetricsComponent],
   exports: [
     MetricsComponent
   ],
@@ -18,7 +21,9 @@ import {FormsModule} from '@angular/forms';
     CheckboxModule,
     TooltipModule,
     PanelModule,
-    FormsModule
+    FormsModule,
+    DropdownModule,
+    InputNumberModule
   ]
 })
 export class MetricsModule { }

@@ -1061,18 +1061,22 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   height: 2.5rem;
 }
 
-#windowSizeSelector .p-inputtext {
+#windowSizeSelector .p-inputtext, #overlapSelector .p-inputtext {
   border-left: none;
   border-right: none;
   border-radius: 0;
 }
 
-#windowSizeSelector, #threshold_filter, #yearFrom, #yearTo {
+#windowSizeSelector, #threshold_filter, #yearFrom, #yearTo, #overlapSelector {
   height: 2.5rem;
 }
 
 #windowSizeSelector .p-inputtext, #yearFrom .p-inputtext, #yearTo .p-inputtext {
   width: 90%;
+}
+
+#overlapSelector .p-inputtext{
+  width: 80%;
 }
 
 #orderSelector .p-dropdown {
@@ -1102,7 +1106,7 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   }
 }
 
-#anomaliesMethodSelector .p-dropdown {
+#anomaliesMethodSelector .p-dropdown, #seasonalMetricTypeSelector .p-dropdown, #seasonalMetricsSelector .p-dropdown {
   height: 2.5rem;
   border-left-style: none;
   border-bottom-left-radius: 0;
