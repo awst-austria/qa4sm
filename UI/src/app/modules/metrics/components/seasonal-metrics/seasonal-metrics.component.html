@@ -22,7 +22,7 @@
         <div class="p-float-label">
           <p-dropdown id="seasonalMetricsSelector"
                       [options]="seasonalMetrics"
-                      [ngModel]="selectedMetric"
+                      [ngModel]="selectedMetric()"
                       (ngModelChange)="onMetricChange($event)"
                       optionLabel="metricName"></p-dropdown>
           <label for="seasonalMetricsSelector">Select</label>
