@@ -43,7 +43,6 @@ export class SeasonalMetricsComponent implements OnInit{
       metric[parameter] = value;
       return metric;
     });
-    console.log(this.selectedMetric())
   }
 
   private prepareSeasonalMetrics(): void{
