@@ -1,5 +1,7 @@
 import logging
+from datetime import timedelta
 
+from django.utils import timezone
 from django.core.mail import send_mail, send_mass_mail, EmailMultiAlternatives
 from django.core import mail
 from django.urls.base import reverse
@@ -82,47 +84,29 @@ def send_val_expiry_notification(val_runs):
     __logger.info('Sending mail about expiry of validation {} to user {}...'.format(val_ids, user))
 
     if user is not None:
-        urls = []
-        val_names = []
-        val_dates = []
         for val_run in val_runs:
-            urls.append(settings.SITE_URL + '/login/?next=' + get_angular_url('result', val_run.id))
-            val_names.append("{} ({})".format(val_run.name_tag, val_run.id) if val_run.name_tag else str(val_run.id))
-            val_dates.append(val_run.expiry_date.strftime("%Y-%m-%d %H:%M"))
-
             val_run.expiry_notified = True
             val_run.save()
 
         subject = '[QA4SM] Validation expiring soon'
+        greetings_form = f'{user.first_name}  {user.last_name}' if user.first_name and user.last_name else user.username
+        threshold_date = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
+        removal_date = timezone.now() + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)
+        help_url = settings.SITE_URL + get_angular_url('help')
 
-        if len(val_runs) == 1:
-            body = 'Dear {} {},\n\nyour validation {} will expire soon.\nIt will be deleted automatically on {} ' \
-                   'if you take no further action.\nIf you want to extend the validation\'s lifetime or archive it,' \
-                   ' please visit\n{}\n(you will need to log in).\nPlease note that archived and published validations' \
-                   ' are not subjected to deletion.\n\nBest regards,\nQA4SM team'.format(
-                user.first_name,
-                user.last_name,
-                val_names[0],
-                val_dates[0],
-                urls[0])
+        body = f'''Dear {greetings_form},
+        \nyour validations started before {threshold_date.date()} will expire soon. \nThey will be deleted automatically on {removal_date.date()} if you take no further action. \nIf you want to extend the validation\'s lifetime or archive it, please visit {settings.SITE_URL}{reverse('My results')} (you will need to log in).
+        \nPlease note that archived and published validations are not subjected to deletion. If you need assistance with archiving or publishing your results, please visit our help ({help_url}) page for detailed guidance and support.
+        \nBest regards,
+        \nQA4SM team
+        '''
+
+        if user.email:
+            _send_email(recipients=[user.email],
+                        subject=subject,
+                        body=body)
         else:
-            body = 'Dear {} {},\n\nyour validations:\n{}\nwill expire soon.\nThey will be deleted automatically on:' \
-                   '\n{}\nif you take no further action.\nIf you want to extend the validations\' ' \
-                   'lifetime or archive them, ' \
-                   'please visit\n{}\n(you will need to log in).\nPlease note that archived and published validations' \
-                   ' are not subjected to deletion.\n\nBest regards,\nQA4SM team'.format(
-                user.first_name,
-                user.last_name,
-                ",\n".join(val_names),
-                ",\n".join(val_dates),
-                ",\n".join(urls))
-
-        _send_email(recipients=[user.email],
-                    subject=subject,
-                    body=body)
-
-        val_run.expiry_notified = True
-        val_run.save()
+            __logger.exception('The user has no email assigned')
 
 
 def send_new_user_signed_up(user):
@@ -137,6 +121,16 @@ def send_new_user_signed_up(user):
         user.username,
         url)
 
+    _send_email(recipients=[settings.EMAIL_FROM],
+                subject=subject,
+                body=body)
+
+
+def send_autocleanup_failed(message):
+    __logger.info('Sending mail about failing cleanup')
+    subject = '[QA4SM INTERNAL] Cleanup failed'
+    body = f'Dear admins,\nRunning auto cleanup failed. The error is {message} \nBest regards,\nYour webapp'
+    print(body)
     _send_email(recipients=[settings.EMAIL_FROM],
                 subject=subject,
                 body=body)
@@ -192,7 +186,7 @@ def send_user_link_to_reset_password(user, message):
                 body=message)
 
 
-def _send_user_help_request(user_name, user_email, message, send_copy_to_user):
+def send_user_help_request(user_name, user_email, message, send_copy_to_user):
     __logger.info(f'Sending user request from  {user_name}')
     subject = "[USER MESSAGE] - Sent via contact form"
     final_message = f'''Sent by: {user_name} \nReply to: {user_email} \n\n{message}'''
@@ -213,6 +207,7 @@ def _send_email(recipients, subject, body, html_message=None):
                 msg.attach_alternative(html_message, "text/html")
             messages.append(msg)
         connection.send_messages(messages)
+        print('email sent')
         connection.close()
     except Exception:
         __logger.exception('E-mail could not be sent.')
