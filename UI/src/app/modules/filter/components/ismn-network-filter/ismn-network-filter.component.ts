@@ -6,6 +6,7 @@ import {BehaviorSubject} from 'rxjs';
 import {DatasetComponentSelectionModel} from '../../../dataset/components/dataset/dataset-component-selection-model';
 import {IsmnNetworkDto} from '../../../core/services/filter/ismn-network.dto';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import * as net from "node:net";
 
 
 @Component({
@@ -66,14 +67,25 @@ export class IsmnNetworkFilterComponent implements OnInit {
 
     // do preselection
     this.selectedNetworks.length = 0;
+
+    const shouldSelectNetwork = (net: TreeNode): boolean => {
+      if (networksToBeSelected === 'ALL') {
+        return true;
+      } else {
+        return networksToBeSelected.includes(net.key);
+      }
+    };
+
     this.networkTree.forEach(continent => {
       continent.children.forEach(net => {
-        if (networksToBeSelected.includes(net.key)) {
+        if (shouldSelectNetwork(net)) {
           continent.partialSelected = true;
+          // continent.checked = true; // uncomment with angular 17
           this.selectedNetworks.push(net);
         }
       });
     });
+
     this.updateFilterModel();
   }
 

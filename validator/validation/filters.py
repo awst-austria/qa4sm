@@ -276,8 +276,12 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             inner_reader = inner_reader.cls
 
         if pfil.filter.name == "FIL_ISMN_NETWORKS" and pfil.parameters:
-
-            if isinstance(inner_reader, ISMN_Interface):
+            if pfil.parameters == 'ALL':
+                networks = [network for network in inner_reader.networks]
+                __logger.debug('Available networks: ' + ';'.join(inner_reader.networks))
+                __logger.debug('All networks selected')
+                inner_reader.activate_network(networks)
+            elif isinstance(inner_reader, ISMN_Interface):
                 param = regex_sub(r'[ ]+,[ ]+', ',', pfil.parameters)  # replace whitespace around commas
                 param = regex_sub(r'(^[ ]+|[ ]+$)', '', param)  # replace whitespace at start and end of string
                 paramnetlist = param.split(',')
