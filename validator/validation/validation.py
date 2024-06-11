@@ -1,4 +1,6 @@
 import os
+import time
+
 import netCDF4
 from datetime import datetime
 import logging
@@ -489,7 +491,8 @@ def run_validation(validation_id):
                     nok = sum(ok)
                     validation_run.ok_points += nok
                     validation_run.error_points += ngpis - nok
-
+                    print('let stop time')
+                    time.sleep(15)
             except Exception as e:
                 validation_run.error_points += num_gpis_from_job(job_table[async_result.id])
                 __logger.exception(
@@ -549,6 +552,12 @@ def stop_running_validation(validation_id):
         app.control.revoke(task.celery_task_id)  # @UndefinedVariable
         task.delete()
 
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
+    __logger.info(f'{run_dir}, {os.listdir(run_dir)}')
+    for file_name in os.listdir(run_dir):
+        if file_name.endswith('.nc'):
+            file_path = os.path.join(run_dir, file_name)
+            os.remove(file_path)
 
 def _pytesmo_to_qa4sm_results(results: dict) -> dict:
     """
