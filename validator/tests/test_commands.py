@@ -1,9 +1,11 @@
 '''
 Test our custom django commands
 '''
-
+import tempfile
+import time
 from datetime import datetime, timedelta
 import logging
+from io import StringIO
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 import pandas as pd
@@ -11,9 +13,11 @@ import os
 
 from dateutil.tz.tz import tzlocal
 from django.conf import settings
-from django.core.management import call_command
+from django.core.management import call_command, CommandError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework.authtoken.models import Token
 
 from validator.models import Dataset
 from validator.models import ValidationRun
@@ -72,121 +76,6 @@ class TestCommands(TestCase):
         assert test_val
         assert test_val.end_time
         assert test_val.progress == -100
-
-    def test_autocleanupvalidations(self):
-
-        ended_vals = ValidationRun.objects.filter(end_time__isnull=False).count()
-
-        ## unexpired validation
-        run1 = ValidationRun()
-        run1.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        run1.end_time = timezone.now()
-        run1.user = self.testuser
-        run1.save()
-        runid1 = run1.id
-
-        ## 20% of warning period has passed
-        run2 = ValidationRun()
-        run2.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        run2.end_time = timezone.now() - timedelta(
-            days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.8)
-        run2.user = self.testuser
-        run2.save()
-        runid2 = run2.id
-
-        ## 80% of warning period has passed
-        run3 = ValidationRun()
-        run3.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        run3.end_time = timezone.now() - timedelta(
-            days=settings.VALIDATION_EXPIRY_DAYS - settings.VALIDATION_EXPIRY_WARNING_DAYS * 0.2)
-        run3.user = self.testuser
-        run3.save()
-        runid3 = run3.id
-
-        ## just expired validation
-        run4 = ValidationRun()
-        run4.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        run4.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
-        run4.user = self.testuser
-        run4.save()
-        runid4 = run4.id
-
-        ## long expired validation
-        run5 = ValidationRun()
-        run5.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        run5.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 2)
-        run5.user = self.testuser
-        run5.save()
-        runid5 = run5.id
-
-        # test what happens if there is no user assigned to a validation
-        no_user_run = ValidationRun()
-        no_user_run.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        no_user_run.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
-        no_user_run.user = None
-        no_user_run.save()
-        no_user_run_id = no_user_run.id
-
-        # test what happens if there is no user assigned to a validation, but validation has been published
-        no_user_run_published = ValidationRun()
-        no_user_run_published.start_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS * 4)
-        no_user_run_published.end_time = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
-        no_user_run_published.user = None
-        no_user_run_published.doi = '10101/101.010'
-        no_user_run_published.save()
-        no_user_run_published_id = no_user_run_published.id
-
-        ended_vals2 = ValidationRun.objects.filter(end_time__isnull=False).count()
-        assert ended_vals + 7 == ended_vals2
-        assert runid1
-        assert runid2
-        assert runid3
-        assert runid4
-        assert runid5
-        assert no_user_run_id
-        assert no_user_run_published_id
-
-        # run the command
-        args = []
-        opts = {}
-        call_command('autocleanupvalidations', *args, **opts)
-
-        ## reload from db because the validations have been changed.
-        run1 = ValidationRun.objects.get(pk=runid1)
-        run2 = ValidationRun.objects.get(pk=runid2)
-        run3 = ValidationRun.objects.get(pk=runid3)
-        run4 = ValidationRun.objects.get(pk=runid4)
-        run5 = ValidationRun.objects.get(pk=runid5)
-        non_user_val = ValidationRun.objects.filter(pk=no_user_run_id)
-        no_user_run_published = ValidationRun.objects.get(pk=no_user_run_published_id)
-
-        ## with the last command call, the user should have been notified about most of our test validations
-        ## but the validations should not have been deleted yet
-        assert not run1.expiry_notified
-        assert run2.expiry_notified
-        assert run3.expiry_notified
-        assert run4.expiry_notified
-        assert run5.expiry_notified
-        assert len(non_user_val) == 0  # there should be no validation anymore, because it was already removed
-        assert not no_user_run_published.expiry_notified  # no notification sent
-
-        ## the validations may have been extended in the previous step, undo that to get them really deleted in the next call
-        run1.last_extended = None
-        run1.save()
-        run2.last_extended = None
-        run2.save()
-        run3.last_extended = None
-        run3.save()
-        run4.last_extended = None
-        run4.save()
-        run5.last_extended = None
-        run5.save()
-
-        call_command('autocleanupvalidations', *args, **opts)
-
-        ## the two expired validations should be have been deleted now
-        ended_vals3 = ValidationRun.objects.filter(end_time__isnull=False).count()
-        assert ended_vals + 4 == ended_vals3
 
     def test_setdatasetpaths(self):
         new_test_path = 'new_test_path/'
@@ -276,3 +165,49 @@ class TestCommands(TestCase):
         df = pd.read_csv(out_path)
         assert not df.empty
 
+    def test_generateautocleanupscript(self):
+        file_dir = '/tmp'
+        out = StringIO()
+        call_command('generateautocleanupscript', path=file_dir, stdout=out)
+
+        self.assertIn('No user with admin credentials and token assigned found.', out.getvalue().strip())
+
+        # admin user exists, script gets created
+        admin_user = User.objects.create(username='admin', is_staff=True)
+        tkn = Token.objects.create(user=admin_user)
+        time.sleep(2)
+
+        script_filename = 'run_autocleanup_script.sh'
+
+        full_script_path = os.path.join(file_dir, script_filename)
+
+        cleanup_api_url = f'{settings.SITE_URL}{reverse("Run Auto Cleanup")}'
+        call_command('generateautocleanupscript', path=file_dir)
+        self.assertTrue(os.path.isfile(full_script_path))
+
+        with open(full_script_path, 'r') as f:
+            content = f.read()
+        expected_content = f"""#!/bin/bash 
+        curl -X POST {cleanup_api_url} -H "Authorization: Token {tkn.key}"
+        """
+        self.assertEqual(content, expected_content)
+        self.assertTrue(os.access(full_script_path, os.X_OK))
+
+        out = StringIO()
+        call_command('generateautocleanupscript', path=file_dir, stdout=out)
+        self.assertIn(f"{script_filename} already exists. No changes made.", out.getvalue().strip())
+
+        tkn.delete()
+        new_tkn = Token.objects.create(user=admin_user)
+        time.sleep(2)
+
+        out = StringIO()
+        call_command('generateautocleanupscript', path=file_dir, stdout=out)
+
+        with open(full_script_path, 'r') as f:
+            content = f.read()
+        expected_content = f"""#!/bin/bash 
+        curl -X POST {cleanup_api_url} -H "Authorization: Token {new_tkn.key}"
+        """
+
+        self.assertEqual(content, expected_content)

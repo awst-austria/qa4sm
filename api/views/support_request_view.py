@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from valentina.settings_conf import EMAIL_HOST_USER
 
-from validator.mailer import _send_user_help_request
+from validator.mailer import send_user_help_request
 
 
 @api_view(['POST'])
@@ -14,7 +14,7 @@ def send_support_request(request):
     if is_active or slider == 0:
         return JsonResponse({"message": 'Sorry, looks like you are not a real person.'}, status=status.HTTP_400_BAD_REQUEST)
     try:
-        _send_user_help_request(user_name, user_email, message, send_copy_to_user)
+        send_user_help_request(user_name, user_email, message, send_copy_to_user)
         return JsonResponse({'message': 'Ok'}, status=status.HTTP_200_OK)
     except:
         return JsonResponse({
