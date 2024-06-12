@@ -424,7 +424,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
-    model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
+    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[0];
     this.loadFiltersForModel(model)
   }
 
