@@ -136,3 +136,7 @@ class TestMailer(TestCase):
 
     def test_error(self):
         val_mail._send_email(['noreply@awst.at'], None, DontMailMe())
+
+    def test_autocleanup_failed(self):
+        val_mail.send_autocleanup_failed('Auto cleanup script could not be run.')
+        self.check_outbox()
