@@ -77,7 +77,7 @@ export class DatasetComponent implements OnInit {
 
 
     this.selectableDatasetVersions$ = this.sortObservableById(
-      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
+      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id), false);
 
     this.selectableDatasetVariables$ = this.sortObservableById(
       this.datasetVariableService.getVariablesByDataset(this.selectionModel.selectedDataset.id));
@@ -91,7 +91,7 @@ export class DatasetComponent implements OnInit {
     }
 
     this.selectableDatasetVersions$ = this.sortObservableById(
-      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id));
+      this.datasetVersionService.getVersionsByDataset(this.selectionModel.selectedDataset.id), false);
 
 
     this.selectableDatasetVersions$.subscribe(this.selectableDatasetVersionsObserver);
@@ -133,10 +133,11 @@ export class DatasetComponent implements OnInit {
     });
   }
 
-  sortObservableById(observableOfListOfElements: Observable<any>): Observable<any> {
+  sortObservableById(observableOfListOfElements: Observable<any>, minToMax = true): Observable<any> {
+    console.log(minToMax)
     return observableOfListOfElements.pipe(map((data) => {
       data.sort((a, b) => {
-        return a.id > b.id ? 1 : -1;
+        return minToMax ? (a.id > b.id ? 1 : -1) : (a.id < b.id ? 1 : -1);
       });
       return data;
     }));
