@@ -134,7 +134,6 @@ export class DatasetComponent implements OnInit {
   }
 
   sortObservableById(observableOfListOfElements: Observable<any>, minToMax = true): Observable<any> {
-    console.log(minToMax)
     return observableOfListOfElements.pipe(map((data) => {
       data.sort((a, b) => {
         return minToMax ? (a.id > b.id ? 1 : -1) : (a.id < b.id ? 1 : -1);
