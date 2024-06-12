@@ -1,4 +1,6 @@
 import os
+import time
+
 import netCDF4
 from datetime import datetime
 import logging
@@ -546,9 +548,16 @@ def stop_running_validation(validation_id):
     celery_tasks = CeleryTask.objects.filter(validation=validation_run)
 
     for task in celery_tasks:
-        app.control.revoke(task.celery_task_id)  # @UndefinedVariable
+        app.control.revoke(str(task.celery_task_id))  # @UndefinedVariable
         task.delete()
 
+    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
+    if os.path.exists(run_dir):
+        __logger.info('Validation got cancelled, so the result files should be cleaned.')
+        for file_name in os.listdir(run_dir):
+            if file_name.endswith('.nc'):
+                file_path = os.path.join(run_dir, file_name)
+                os.remove(file_path)
 
 def _pytesmo_to_qa4sm_results(results: dict) -> dict:
     """
