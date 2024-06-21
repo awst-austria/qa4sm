@@ -11,7 +11,7 @@ export class SeasonalMetricsComponent implements OnInit{
   seasonalMetricTypes: string[] = [];
   selectedMetric = signal<SeasonalMetricModel|null>(null);
   selectedType = signal<string|null>(null);
-  selectedOverlap = signal<number>(1);
+  selectedOverlap = signal<number>(0);
 
 
   ngOnInit() {
@@ -53,7 +53,7 @@ export class SeasonalMetricsComponent implements OnInit{
         description: 'This is a default approach'}
     );
     this.seasonalMetrics.push({
-      metricName: 'Intra Annual',
+      metricName: 'Intra-Annual',
       type: null,
       overlap: null,
       description: 'This is an intra annual approach'
