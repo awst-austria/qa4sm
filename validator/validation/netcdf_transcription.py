@@ -1,7 +1,7 @@
 import xarray as xr
 import numpy as np
 from validator.validation.intra_annual_temp_windows import TemporalSubWindowsCreator
-from validator.validation.globals import METRICS, NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, TEMPORAL_SUB_WINDOW_SEPARATOR, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_NC_COORD_NAME
+from validator.validation.globals import METRICS, TC_METRICS, NON_METRICS, METADATA_TEMPLATE, IMPLEMENTED_COMPRESSIONS, ALLOWED_COMPRESSION_LEVELS, INTRA_ANNUAL_METRIC_TEMPLATE, INTRA_ANNUAL_TCOL_METRIC_TEMPLATE, TEMPORAL_SUB_WINDOW_SEPARATOR, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_NC_COORD_NAME, MAX_NUM_DS_PER_VAL_RUN, DATASETS
 from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 
@@ -18,11 +18,15 @@ class Pytesmo2Qa4smResultsTranscriber:
         The temporal sub-windows for the results. Default is None, which means that no temporal sub-windows are
         used, but only the 'bulk'. If an instance of `valdiator.validation.TemporalSubWindowsCreator` is provided,
         the temporal sub-windows are used as provided by the TemporalSubWindowsCreator instance.
+    keep_pytesmo_ncfile : Optional[bool]
+        Whether to keep the original pytesmo results netCDF file. Default is False. \
+            If True, the original file is kept and indicated by the suffix '.old'.
     """
 
     def __init__(self,
                  pytesmo_results: str,
-                 intra_annual_slices: Union[None, TemporalSubWindowsCreator] = None):
+                 intra_annual_slices: Union[None, TemporalSubWindowsCreator] = None,
+                 keep_pytesmo_ncfile: Optional[bool] = False):
 
         self.intra_annual_slices: Union[
             None, TemporalSubWindowsCreator] = intra_annual_slices
@@ -49,8 +53,7 @@ class Pytesmo2Qa4smResultsTranscriber:
         with xr.open_dataset(pytesmo_results) as pr:
             self.pytesmo_results: xr.Dataset = pr
 
-        # os.remove(pytesmo_results)
-        # os.rename(pytesmo_results, self.pytesmo_ncfile)
+        self.keep_pytesmo_ncfile = keep_pytesmo_ncfile
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(pytesmo_results="{self.pytesmo_ncfile}", intra_annual_slices={self.intra_annual_slices.__repr__()})'
@@ -128,6 +131,29 @@ class Pytesmo2Qa4smResultsTranscriber:
         ]
         return any(metric_name.startswith(prefix) for prefix in valid_prefixes)
 
+    def is_valid_tcol_metric_name(self, tcol_metric_name):
+        """
+        Checks if a given metric name is a valid TCOL metric name, based on the defined `globals.INTRA_ANNUAL_TCOL_METRIC_TEMPLATE`.
+
+        Parameters:
+        tcol_metric_name (str): The metric name to be checked.
+
+        Returns:
+        bool: True if the metric name is valid, False otherwise.
+        """
+
+        valid_prefixes = [
+            "".join(
+                template.format(tsw=tsw, metric=metric, number=number, dataset=dataset)
+                for template in INTRA_ANNUAL_TCOL_METRIC_TEMPLATE)
+            for tsw in self.intra_annual_slices
+            for metric in TC_METRICS
+            for number in range(MAX_NUM_DS_PER_VAL_RUN)
+            for dataset in DATASETS
+        ]
+        return any(tcol_metric_name.startswith(prefix) for prefix in valid_prefixes)
+
+
     @property
     def metrics_list(self) -> List[str]:
         """Get the metrics dictionary. Whole procedure based on the premise, that metric names of valdiations of intra-annual
@@ -145,7 +171,7 @@ class Pytesmo2Qa4smResultsTranscriber:
 
         _metrics = [
             metric for metric in self.pytesmo_results
-            if self.is_valid_metric_name(metric)
+            if self.is_valid_metric_name(metric) or self.is_valid_tcol_metric_name(metric)
         ]
 
         if len(_metrics) != 0:  # intra-annual case
@@ -164,9 +190,10 @@ class Pytesmo2Qa4smResultsTranscriber:
             self.transcribed_dataset.attrs[attr] = self.pytesmo_results.attrs[
                 attr]
 
-    def trim_n_obs_name(self) -> None:
+    def handle_n_obs(self) -> None:
         """
-        Trim the 'n_obs' variable name to 'n_obs' if it's not already named so.
+        Each data variable of the flavor 'n_obs_between_*' contains the same data. Thus, only one is kept and renamned\
+            to plain 'n_obs'.
         """
 
         def get_n_obs_var_name() -> str:
@@ -269,7 +296,7 @@ class Pytesmo2Qa4smResultsTranscriber:
             self.pytesmo_results[self.non_metrics_list])
 
         self.get_pytesmo_attrs()
-        self.trim_n_obs_name()
+        self.handle_n_obs()
         self.drop_obs_dim()
 
         self.transcribed_dataset[
@@ -379,10 +406,13 @@ class Pytesmo2Qa4smResultsTranscriber:
             The path to the NetCDF file.
 
         """
-
-        os.remove(self.pytesmo_ncfile)
-        # os.rename(self.pytesmo_ncfile, self.pytesmo_ncfile + '.old')
-        self.transcribed_dataset.to_netcdf(path, mode, **kwargs)
+        if self.keep_pytesmo_ncfile:
+            os.rename(self.pytesmo_ncfile, self.pytesmo_ncfile + '.old')
+        else:
+            os.remove(self.pytesmo_ncfile)
+        self.transcribed_dataset.to_netcdf(path = path,
+                                           mode = mode,
+                                           **kwargs)
 
         return path
 

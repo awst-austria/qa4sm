@@ -8,6 +8,7 @@ import uuid
 import xarray as xr
 import numpy as np
 import qa4sm_reader
+import ast
 
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
@@ -36,7 +37,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -419,16 +420,28 @@ def create_pytesmo_validation(validation_run):
     metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
-        __logger.info("Triple Collocation Metrics are deactivated")
         #Triple Collocation Metrics dont work:
         # 1) when using only default case: TC metrics are calculated and in the nc file, but the qa4sm-reader throws an error
-        # 2) when using temp. sub-windows: does NOT throw an error, but TC metrcis are not calculated either
+        _tcol_metrics = TripleCollocationMetrics(
+            spatial_ref_name,
+            metadata_template=metadata_template,
+            bootstrap_cis=validation_run.bootstrap_tcol_cis)
 
-        # tcol_metrics = TripleCollocationMetrics(
-        #     spatial_ref_name,
-        #     metadata_template=metadata_template,
-        #     bootstrap_cis=validation_run.bootstrap_tcol_cis)
-        # metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
+        if isinstance(
+                temp_sub_wdws, dict
+        ):
+            tcol_metrics = SubsetsMetricsAdapter(
+                calculator=_tcol_metrics,
+                subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
+                group_results="join",
+            )
+
+        elif temp_sub_wdws is None:
+            tcol_metrics = _tcol_metrics
+
+        metric_calculators.update({(ds_num, 3): tcol_metrics.calc_metrics})
+
+
     if validation_run.scaling_method == validation_run.NO_SCALING:
         scaling_method = None
     else:
@@ -655,7 +668,8 @@ def run_validation(validation_id):  #$$
             transcriber = Pytesmo2Qa4smResultsTranscriber(
                 pytesmo_results=path.join(OUTPUT_FOLDER,
                                           validation_run.output_file.name),
-                intra_annual_slices=temp_sub_wdw_instance)  #$$
+                intra_annual_slices=temp_sub_wdw_instance,
+                keep_pytesmo_ncfile=True)  #$$
             if transcriber.exists:  #$$
                 restructured_results = transcriber.get_transcribed_dataset()
                 transcriber.output_file_name = transcriber.build_outname(
@@ -743,13 +757,20 @@ def _pytesmo_to_qa4sm_results(results: dict) -> dict:
     qa4sm_res = {qa4sm_key: {}}
     for key in results:
         for metric in results[key]:
+            if TEMPORAL_SUB_WINDOW_SEPARATOR in metric:
+                prefix = metric.split(TEMPORAL_SUB_WINDOW_SEPARATOR)[0]
+                metric = metric.split(TEMPORAL_SUB_WINDOW_SEPARATOR)[1]
+            else:
+                prefix = None
             # static 'metrics' (e.g. metadata, geoinfo) are not related to datasets
-            statics = ["gpi", "n_obs", "lat", "lon"]
+            statics = ["gpi", "lat", "lon"]
             statics.extend(METADATA_TEMPLATE["ismn_ref"])
             if metric in statics:
                 new_key = metric
             else:
                 datasets = list(map(lambda t: t[0], key))
+                if metric[0] == '(' and metric[-1] == ')':
+                    metric = ast.literal_eval(metric)   # casts the string representing a tuple to a real tuple
                 if isinstance(metric, tuple):
                     # happens only for triple collocation metrics, where the
                     # metric key is a tuple of (metric, dataset)
@@ -760,7 +781,11 @@ def _pytesmo_to_qa4sm_results(results: dict) -> dict:
                     new_metric = "_".join(metric)
                 else:
                     new_metric = metric
+                if prefix:
+                    new_metric = f"{prefix}{TEMPORAL_SUB_WINDOW_SEPARATOR}{new_metric}"
                 new_key = f"{new_metric}_between_{'_and_'.join(datasets)}"
+            if prefix:
+                metric = f"{prefix}{TEMPORAL_SUB_WINDOW_SEPARATOR}{metric}"
             qa4sm_res[qa4sm_key][new_key] = results[key][metric]
     return qa4sm_res
 
@@ -1044,6 +1069,3 @@ def copy_validationrun(run_to_copy, new_user):
         'run_id': run_id,
     }
     return response
-
-
-# %%

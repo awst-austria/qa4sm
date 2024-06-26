@@ -63,6 +63,10 @@ TEMPORAL_SUB_WINDOW_SEPARATOR = '|'  #$$
 INTRA_ANNUAL_METRIC_TEMPLATE = ["{tsw}", TEMPORAL_SUB_WINDOW_SEPARATOR,
                                 "{metric}"]  #$$
 
+INTRA_ANNUAL_TCOL_METRIC_TEMPLATE = ["{tsw}", TEMPORAL_SUB_WINDOW_SEPARATOR,
+                                "{metric}", "_", "{number}-{dataset}",
+                                "_between_"]
+
 TC_METRICS = {
     'snr': 'TC: Signal-to-noise ratio',
     'err_std': 'TC: Error standard deviation',
@@ -91,6 +95,14 @@ SMOS_L3 = 'SMOS_L3'
 SMOS_L2 = 'SMOS_L2'
 SMAP_L2 = 'SMAP_L2'
 SMOS_SBPCA = 'SMOS_SBPCA'
+
+DATASETS = [
+    C3SC, ISMN, GLDAS, SMAP_L3, ASCAT, CCIC, CCIA, CCIP, SMOS_IC, ERA5,
+    ERA5_LAND, CGLS_CSAR_SSM1km, CGLS_SCATSAR_SWI1km, SMOS_L3, SMOS_L2, SMAP_L2,
+    SMOS_SBPCA
+]
+
+MAX_NUM_DS_PER_VAL_RUN = 6
 
 # dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -242,8 +254,7 @@ ALLOWED_COMPRESSION_LEVELS = [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]  #$$
 
 DEFAULT_TSW = 'bulk' # default temporal sub-window (in the case of no temporal sub-windowing)
 TEMPORAL_SUB_WINDOW_NC_COORD_NAME = 'tsw' # name of the period coordinate in the netcdf file (Temporal Sub-Window)
-ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
-GEOJSON_FILE_NAME = 'ismn_sensors.json'
+
 
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = {
@@ -268,3 +279,6 @@ TEMPORAL_SUB_WINDOWS = {
         "Dec": [[12, 1], [12, 31]],
     }
 }  #$$
+
+ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
+GEOJSON_FILE_NAME = 'ismn_sensors.json'

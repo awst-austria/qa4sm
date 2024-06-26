@@ -99,7 +99,7 @@ export class DatasetComponent implements OnInit {
   }
 
   private onSelectableVersionsNext(versions): void {
-    this.selectionModel.selectedVersion = versions[0];
+    this.selectionModel.selectedVersion = versions[versions.length - 1];
   }
 
   private onSelectableVersionsComplete(): void {
@@ -136,7 +136,7 @@ export class DatasetComponent implements OnInit {
   sortObservableById(observableOfListOfElements: Observable<any>): Observable<any> {
     return observableOfListOfElements.pipe(map((data) => {
       data.sort((a, b) => {
-        return a.id < b.id ? 1 : -1;
+        return a.id > b.id ? 1 : -1;
       });
       return data;
     }));

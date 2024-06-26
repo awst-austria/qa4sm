@@ -18,6 +18,11 @@ from django.conf import settings
 from cartopy import config as cconfig
 from typing import List
 
+import numpy as np
+np.random.seed(0)
+
+
+
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
 from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW
