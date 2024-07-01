@@ -16,10 +16,8 @@ from qa4sm_reader.comparing import QA4SMComparison, ComparisonError, SpatialExte
 from django.conf import settings
 
 from cartopy import config as cconfig
-from typing import List
-
-import numpy as np
-np.random.seed(0)
+from typing import List, Tuple, Dict, Set
+from pathlib import PosixPath
 
 
 
@@ -57,27 +55,28 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-    fnb, fnm, fcsv, fncb_png = plot_all(
+
+    fnb, fnm, fcsv, fncb = plot_all(
         validation_run.output_file.path,
         temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
-        out_type='png',
-        save_metadata=save_metadata
-    )
-    fnb_svg, fnm_svg, fcsv, fncb_svg = plot_all(
-        validation_run.output_file.path,
-        temporal_sub_windows=temporal_sub_windows,
-        out_dir=outfolder,
-        out_type='svg',
+        out_type=['png', 'svg'],
         save_metadata=save_metadata
     )
 
-    root_dir = os.path.dirname(os.path.commonprefix(fnb + fnm + fncb_png + fnb_svg + fnm_svg + fncb_svg))
+    plot_all_output_dict = sort_filenames_to_filetypes((fnb, fnm, fcsv, fncb))
+    flattened_list = [item for inner_dict in plot_all_output_dict.values() for lst in inner_dict.values() for item in lst]
+    root_dir = os.path.dirname(os.path.commonprefix(flattened_list))
+
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        for pngfile in set(fnb + fnm + fncb_png):
+        pngfiles = files_to_zip(plot_all_output_dict, 'png')
+        svgfiles = files_to_zip(plot_all_output_dict, 'svg')
+
+        for pngfile in pngfiles:
             arcname = os.path.relpath(pngfile, root_dir)
             myzip.write(pngfile, arcname=arcname)
-        for svgfile in set(fnb_svg + fnm_svg + fncb_svg):
+
+        for svgfile in svgfiles:
             arcname = os.path.relpath(svgfile, root_dir)
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
@@ -447,3 +446,66 @@ def clean_output_folder(dir: str, to_be_deleted: List[str]) -> None:
                 elif os.path.isdir(element_path):   rmtree(element_path)
     else:
         warnings.warn(f"Directory {dir} does not exist")
+
+def sort_filenames_to_filetypes(plot_output: Tuple[List[PosixPath]]) -> Dict[str, Dict[str, List[PosixPath]]]:
+    """
+    Sorts the files, that are the output of the `qa4sm_reader.plot_all.plot_all()` into a dictionary. \
+        The four keys correspond to the four lists of the `qa4sm_reader.plot_all.plot_all()` output,\
+            with each values being a dictionary of the file types as key and a list of filepaths as value.
+
+
+    Parameters
+    ----------
+    plot_output : Tuple[List[PosixPath]]
+        The output of the `qa4sm_reader.plot_all.plot_all()` function
+
+    Returns
+    -------
+    _out_dict : Dict[str, Dict[str, List[PosixPath]]]
+        A dictionary with the four keys 'fnb', 'fnm', 'fcsv', 'fncb' and each value being a dictionary of the file \
+            types as key and a list of filepaths as value.
+    """
+
+    _out_dict = {'fnb': {},
+                    'fnm': {},
+                    'fcsv': {},
+                    'fncb': {},
+    }
+
+    _out_dict_lut = {0: 'fnb', 1: 'fnm', 2: 'fcsv', 3: 'fncb'}
+
+    for l, lst in enumerate(plot_output):
+        lst_suffixes = list(set([el.suffix for el in lst]))
+        _out_dict[_out_dict_lut[l]] = {suffix.lstrip('.'): [ffile for ffile in lst if ffile.suffix == suffix]
+                                        for suffix in lst_suffixes}
+
+
+    return _out_dict
+
+def files_to_zip(plot_dict: Dict[str, Dict[str, List[PosixPath]]], filetype: str) -> Set[PosixPath]:
+    """
+    Collects the files of a given filetype from the plot_dict and returns them as a set.
+
+    Parameters
+    ----------
+    plot_dict : Dict[str, Dict[str, List[PosixPath]]]
+        The dictionary containing the filepaths of the different filetypes. \
+            This should be the output of the `sort_filenames_to_filetypes()` function.
+    filetype : str
+        The filetype to collect the files from.
+
+    Returns
+    -------
+    _files : Set[PosixPath]
+        A set of the filepaths of the given filetype.
+    """
+    _files = plot_dict['fnb'][filetype] + plot_dict['fnm'][filetype]
+
+    try:
+        _files += plot_dict['fncb'][filetype]
+    except KeyError as e:   # if there are no comparison boxplots the 'fncb' key will not be present
+        warnings.warn(f"KeyError: {e}. No comparison boxplots found. Skipping...")
+    finally:
+        _files = set(_files)
+
+    return _files
