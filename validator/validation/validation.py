@@ -76,7 +76,7 @@ temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
 #####################Default case################################################
 # a dropdown menu in the front end would be required to select the default case or implemented sub-windows: months or seasons (see above)
 # for the default case, no overlap is required
-# temp_sub_wdw_instance, temp_sub_wdws = None, None
+temp_sub_wdw_instance, temp_sub_wdws = None, None
 ##################################################################################
 ##################################################################################
 ##################################################################################
@@ -173,10 +173,15 @@ def save_validation_config(validation_run, transcriber):  #$$
                 if dataset_config.parametrisedfilter_set.all():
                     if filters:
                         filters += ';'
-                    filters += '; '.join([
+                    _list_comp = [
                         pf.filter.description + " " + pf.parameters
                         for pf in dataset_config.parametrisedfilter_set.all()
-                    ])
+                        ]
+                    try:
+                        filters += '; '.join(_list_comp)
+                    except TypeError as e:
+                        __logger.error(f"Error in save_validation_config: {e}. {filters=}{_list_comp=}")
+                        filters = '; '.join(_list_comp)
 
                 if not filters:
                     filters = 'N/A'
@@ -669,7 +674,7 @@ def run_validation(validation_id):  #$$
                 pytesmo_results=path.join(OUTPUT_FOLDER,
                                           validation_run.output_file.name),
                 intra_annual_slices=temp_sub_wdw_instance,
-                keep_pytesmo_ncfile=True)  #$$
+                keep_pytesmo_ncfile=False)  #$$
             if transcriber.exists:  #$$
                 restructured_results = transcriber.get_transcribed_dataset()
                 transcriber.output_file_name = transcriber.build_outname(
@@ -683,10 +688,9 @@ def run_validation(validation_id):  #$$
                                      complevel=9)
 
                 if temp_sub_wdws is None:
-                    temporal_sub_windows_names = np.array([DEFAULT_TSW])
+                    temporal_sub_windows_names = [DEFAULT_TSW]
                 else:
-                    temporal_sub_windows_names = np.array(
-                        temp_sub_wdw_instance.names)
+                    temporal_sub_windows_names = temp_sub_wdw_instance.names
 
                 __logger.info(
                     f'temporal_sub_windows_names: {temporal_sub_windows_names}'

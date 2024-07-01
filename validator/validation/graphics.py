@@ -33,7 +33,7 @@ from parse import parse
 
 __logger = logging.getLogger(__name__)
 
-def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfolder: str, save_metadata='threshold'):
+def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfolder: str, save_metadata='threshold'):
     """
     Create all default graphs for validation run. This is done
     using the qa4sm-reader plotting library.
@@ -42,7 +42,7 @@ def generate_all_graphs(validation_run, temporal_sub_windows: np.ndarray, outfol
     ----------
     validation_run : ValidationRun
         The validation run to make plots for.
-    temporal_sub_windows: np.ndarray
+    temporal_sub_windows: List[str]
         Temporal sub windows to plot.
     outfolder : str
         Directoy where graphs are stored.

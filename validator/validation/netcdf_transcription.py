@@ -196,13 +196,13 @@ class Pytesmo2Qa4smResultsTranscriber:
             to plain 'n_obs'.
         """
 
-        def get_n_obs_var_name() -> str:
-            return [var for var in self.transcribed_dataset
-                    if 'n_obs' in var][0]
+        _n_obs_vars = sorted([var for var in self.transcribed_dataset
+                    if 'n_obs' in var])
 
-        if get_n_obs_var_name() != 'n_obs':
+        if _n_obs_vars[0] != 'n_obs':
+            self.transcribed_dataset = self.transcribed_dataset.drop_vars(_n_obs_vars[1:])
             self.transcribed_dataset = self.transcribed_dataset.rename(
-                {get_n_obs_var_name(): 'n_obs'})
+                {_n_obs_vars[0]: 'n_obs'})
 
     def drop_obs_dim(self) -> None:
         """
