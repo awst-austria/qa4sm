@@ -2,11 +2,12 @@ import warnings
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import numpy as np
 plt.switch_backend('agg')  ## this allows headless graph production
 
 import logging
 from os import path, remove
+from shutil import rmtree
 from zipfile import ZipFile, ZIP_DEFLATED
 
 from qa4sm_reader.plot_all import plot_all, get_img_stats
@@ -15,19 +16,24 @@ from qa4sm_reader.comparing import QA4SMComparison, ComparisonError, SpatialExte
 from django.conf import settings
 
 from cartopy import config as cconfig
+from typing import List
+
+import numpy as np
+np.random.seed(0)
+
+
 
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-from validator.validation.globals import *
+from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW
 import os
 from io import BytesIO
 import base64
-from parse import *
+from parse import parse
 
 __logger = logging.getLogger(__name__)
 
-
-def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
+def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfolder: str, save_metadata='threshold'):
     """
     Create all default graphs for validation run. This is done
     using the qa4sm-reader plotting library.
@@ -36,6 +42,8 @@ def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
     ----------
     validation_run : ValidationRun
         The validation run to make plots for.
+    temporal_sub_windows: List[str]
+        Temporal sub windows to plot.
     outfolder : str
         Directoy where graphs are stored.
     save_metadata: str, optional (default: 'threshold')
@@ -49,27 +57,35 @@ def generate_all_graphs(validation_run, outfolder, save_metadata='threshold'):
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-    fnb, fnm, fcsv = plot_all(
+    fnb, fnm, fcsv, fncb_png = plot_all(
         validation_run.output_file.path,
+        temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
         out_type='png',
         save_metadata=save_metadata
     )
-    fnb_svg, fnm_svg, fcsv = plot_all(
+    fnb_svg, fnm_svg, fcsv, fncb_svg = plot_all(
         validation_run.output_file.path,
+        temporal_sub_windows=temporal_sub_windows,
         out_dir=outfolder,
         out_type='svg',
         save_metadata=save_metadata
     )
 
+    root_dir = os.path.dirname(os.path.commonprefix(fnb + fnm + fncb_png + fnb_svg + fnm_svg + fncb_svg))
     with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
-        for pngfile in fnb + fnm:
-            arcname = path.basename(pngfile)
+        for pngfile in set(fnb + fnm + fncb_png):
+            arcname = os.path.relpath(pngfile, root_dir)
             myzip.write(pngfile, arcname=arcname)
-        for svgfile in fnb_svg + fnm_svg:
-            arcname = path.basename(svgfile)
+        for svgfile in set(fnb_svg + fnm_svg + fncb_svg):
+            arcname = os.path.relpath(svgfile, root_dir)
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
+
+    collect_statitics_files(dir = outfolder)
+
+    clean_output_folder(dir = outfolder,
+                        to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
 
 
 def get_dataset_combis_and_metrics_from_files(validation_run):
@@ -180,7 +196,7 @@ def get_inspection_table(validation_run):
     ----------
     validation_run : ValidationRun
         The validation run to make plots for.
-        
+
     Returns
     -------
     table : pd.DataFrame
@@ -383,3 +399,51 @@ def get_extent_image(
 
     except ComparisonError:
         return "error encountered"
+
+
+def collect_statitics_files(dir: str) -> None:
+    """
+    Collect all statistics files in a directory and store them in a zip file.
+
+    Parameters
+    ----------
+    dir : str
+        Directory to store the zip file
+
+    Returns
+    -------
+    None
+    """
+    zipfilename = path.join(dir, 'statistics.zip')
+    __logger.debug('Trying to create zipfile {}'.format(zipfilename))
+
+    with ZipFile(zipfilename, 'w', ZIP_DEFLATED) as myzip:
+        for root, dirs, files in os.walk(dir):
+            for f in files:
+                if f.endswith('.csv'):
+                    arcname = os.path.relpath(path.join(root, f), dir)
+                    myzip.write(path.join(root, f), arcname=arcname)
+
+def clean_output_folder(dir: str, to_be_deleted: List[str]) -> None:
+    """
+    Clean a specified directory of given elements.
+
+    Parameters
+    ----------
+    dir : str
+        Directory to be cleaned
+    to_be_deleted : List[str]
+        List of elements (files, dirs) to be deleted
+
+    Returns
+    -------
+    None
+    """
+    if os.path.exists(dir):
+        for element in to_be_deleted:
+            element_path = os.path.join(dir, element)
+            if os.path.exists(element_path):
+                if os.path.isfile(element_path):    remove(element_path)
+                elif os.path.isdir(element_path):   rmtree(element_path)
+    else:
+        warnings.warn(f"Directory {dir} does not exist")

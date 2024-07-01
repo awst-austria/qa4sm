@@ -269,7 +269,7 @@ dependencies:
     - pytest-django==4.5.2
     - pytest-mpl==0.16.1
     - qa4sm-preprocessing==0.2
-    - qa4sm-reader==0.9
+    - qa4sm-reader==0.9.1
     - redis==4.5.5
     - repurpose==0.9
     - ruamel-yaml==0.17.26
