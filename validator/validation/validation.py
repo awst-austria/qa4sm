@@ -1,20 +1,18 @@
 import netCDF4
 from datetime import datetime
 import logging
-from os import path
 import os
 from re import sub as regex_sub
 import uuid
-import xarray as xr
-import numpy as np
-import qa4sm_reader
 import ast
+from shutil import copy2, copytree
+from typing import List, Tuple, Dict
 
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
 from dateutil.tz import tzlocal
 from django.conf import settings
-from netCDF4 import Dataset
+
 from pytesmo.validation_framework.adapters import AnomalyAdapter, AnomalyClimAdapter
 from pytesmo.validation_framework.data_manager import DataManager
 from pytesmo.validation_framework.metric_calculators import (
@@ -32,6 +30,9 @@ from pytz import UTC
 import pytz
 
 from valentina.celery import app
+
+from api.frontend_urls import get_angular_url
+
 from validator.mailer import send_val_done_notification
 from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
@@ -42,11 +43,10 @@ from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-from validator.validation.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow
-from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
-from api.frontend_urls import get_angular_url
-from shutil import copy2, copytree
-from typing import Optional, List, Tuple, Dict, Union
+
+import qa4sm_reader
+from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow
+from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 
 __logger = logging.getLogger(__name__)
 #$$
@@ -76,7 +76,7 @@ temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
 #####################Default case################################################
 # a dropdown menu in the front end would be required to select the default case or implemented sub-windows: months or seasons (see above)
 # for the default case, no overlap is required
-# temp_sub_wdw_instance, temp_sub_wdws = None, None
+temp_sub_wdw_instance, temp_sub_wdws = None, None
 ##################################################################################
 ##################################################################################
 ##################################################################################
@@ -142,7 +142,7 @@ def set_outfile(validation_run, run_dir):
 
 def save_validation_config(validation_run, transcriber):  #$$
     try:
-        with Dataset(os.path.join(OUTPUT_FOLDER, transcriber.output_file_name),
+        with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER, transcriber.output_file_name),
                      "a",
                      format="NETCDF4") as ds:
 
@@ -549,7 +549,7 @@ def run_validation(validation_id):  #$$
                                  reply=True)  # @UndefinedVariable
 
     try:
-        run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
+        run_dir = os.path.join(OUTPUT_FOLDER, str(validation_run.id))
         mkdir_if_not_exists(run_dir)
 
         ref_reader, read_name, read_kwargs = _get_spatial_reference_reader(
@@ -669,7 +669,7 @@ def run_validation(validation_id):  #$$
             set_outfile(validation_run, run_dir)
 
             transcriber = Pytesmo2Qa4smResultsTranscriber(
-                pytesmo_results=path.join(OUTPUT_FOLDER,
+                pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                           validation_run.output_file.name),
                 intra_annual_slices=temp_sub_wdw_instance,
                 keep_pytesmo_ncfile=False)  #$$
@@ -776,10 +776,10 @@ def _pytesmo_to_qa4sm_results(results: dict) -> dict:
                 if isinstance(metric, tuple):
                     # happens only for triple collocation metrics, where the
                     # metric key is a tuple of (metric, dataset)
-                    if metric[1].startswith("0-"):
-                        # triple collocation metrics for the reference should
-                        # not show up in the results
-                        continue
+                    # if metric[1].startswith("0-"):
+                    #     # triple collocation metrics for the reference should
+                    #     # not show up in the results
+                    #     continue
                     new_metric = "_".join(metric)
                 else:
                     new_metric = metric
@@ -1058,7 +1058,6 @@ def copy_validationrun(run_to_copy, new_user):
                                                mode='a',
                                                format="NETCDF4")
 
-                        # with netCDF4.Dataset(new_file, mode='a', format="NETCDF4") as file:
                         new_url = settings.SITE_URL + get_angular_url(
                             'result', run_id)
                         file.setncattr('url', new_url)

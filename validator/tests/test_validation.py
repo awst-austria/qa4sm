@@ -44,10 +44,11 @@ import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
-from validator.validation.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 from django.shortcuts import get_object_or_404
 from math import comb
+
 from qa4sm_reader.globals import out_metadata_plots
+from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 
 User = get_user_model()
 
