@@ -8,6 +8,7 @@ from datetime import datetime
 from os import path
 from re import IGNORECASE  # @UnresolvedImport
 from re import search as regex_search
+from re import match as regex_match
 from zipfile import ZipFile
 
 import netCDF4
@@ -222,6 +223,15 @@ class TestValidation(TestCase):
                         name=lambda v: regex_search(
                             r'^{}(.+?_between|$)'.format(metric), v, IGNORECASE
                         ) is not None)
+
+                    # since metric vars for the reference dataset are written to the file, we have to filter them out
+                    # essentially filters such metric vars out: {METRIC}_{DATASET_A}_between_{DATASET_A}_and_{WHATEVER}
+                    #TODO: this is a bit of a hack, we should find a better way to do handle these specific cases
+
+                    self_combination_pattern = r'^(.*?_)([^_]+)(_between_\2_and_.*)$'
+                    metric_vars = [tcmetric_var for tcmetric_var in metric_vars
+                                   if not regex_match(self_combination_pattern, tcmetric_var.name)]
+
                 else:
                     metric_vars = ds.get_variables_by_attributes(
                         name=lambda v: regex_search(
@@ -259,6 +269,7 @@ class TestValidation(TestCase):
 
                 # check the values of the variables for formal criteria (not empty, matches lenght of other variables, doesn't have too many NaNs)
                 for m_var in metric_vars:
+                    self.__logger.debug(f"\nChecking variable {m_var.name}")
                     values = m_var[:]
                     assert values is not None
 
@@ -267,9 +278,6 @@ class TestValidation(TestCase):
                         assert length > 0, 'Variable {} has no entries'.format(
                             m_var.name)
                     else:
-                        # if m_var.name not in non_metrics:  #$$
-                        #     values = values[0]  #$$
-
                         assert len(
                             values
                         ) == length, 'Variable q{} doesn\'t match other variables in length'.format(
@@ -511,7 +519,7 @@ class TestValidation(TestCase):
                            meta_plots=True)  #$$
         self.delete_run(new_run)
 
-    # TODO: fails, if validation contains temporal sub-windows. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
+    # TODO: fails, if validation contains temporal sub-windows
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
@@ -1133,7 +1141,7 @@ class TestValidation(TestCase):
                            meta_plots=True)
         self.delete_run(new_run)
 
-    # TODO: works only if the validation doesn't contain temporal sub-windows
+    # TODO: fails, if validation contains temporal sub-windows
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:No data for:UserWarning",
@@ -1318,7 +1326,7 @@ class TestValidation(TestCase):
                            meta_plots=False)
         self.delete_run(new_run)
 
-    # TODO: fails, if validation contains temporal sub-windows. pytesmo bug: ValueError("Expected a DatetimeIndex, but got <class 'pandas.core.indexes.base.Index'>.")
+    # TODO: fails, if validation contains temporal sub-windows
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:No data for:UserWarning",
