@@ -7,7 +7,7 @@
     </ng-template>
     <ng-template pTemplate="icons">
     </ng-template>
-    <div *ngIf="!fileError() && updatedMetrics$|async as metrics" style="min-height: 400px"
+    <div *ngIf="!fileError() && ! dataFetchError() && updatedMetrics$|async as metrics" style="min-height: 400px"
          class="flex flex-column align-content-center justify-content-center">
       <div *ngIf="metrics[metricIndx] && metrics[metricIndx].boxplotFiles|async as boxplots"
            class="flex flex-column w-12 flex-wrap gap-2">
@@ -78,7 +78,7 @@
                               <p-dropdown id="boxplotSelector"
                                           (onChange)="onBoxPlotChange($event)"
                                           [options]="metrics[metricIndx].boxplot_dicts"
-                                          [(ngModel)]="selectedBoxplot"
+                                          [ngModel]="metrics[metricIndx].boxplot_dicts[boxplotIndx]"
                                           optionLabel="name"
                                           [style]="{'width': '100%'}">
                               </p-dropdown>
@@ -90,7 +90,7 @@
                         <p-dropdown id="metricSelector"
                                     (onChange)="onMetricChange($event)"
                                     [options]="metrics"
-                                    [(ngModel)]="selectedMetrics"
+                                    [ngModel]="metrics[metricIndx]"
                                     optionLabel="metric_pretty_name"
                                     [style]="{'width': '100%'}">
                         </p-dropdown>
