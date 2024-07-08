@@ -19,3 +19,4 @@ run_celery/
 */python_metadata/*
 node_modules
 UI/.angular
+.vscode
