@@ -93,9 +93,10 @@ def send_val_expiry_notification(val_runs):
         threshold_date = timezone.now() - timedelta(days=settings.VALIDATION_EXPIRY_DAYS)
         removal_date = timezone.now() + timedelta(days=settings.VALIDATION_EXPIRY_WARNING_DAYS)
         help_url = settings.SITE_URL + get_angular_url('help')
+        my_results_url = settings.SITE_URL + get_angular_url('validations')
 
         body = f'''Dear {greetings_form},
-        \nyour validations started before {threshold_date.date()} will expire soon. \nThey will be deleted automatically on {removal_date.date()} if you take no further action. \nIf you want to extend the validation\'s lifetime or archive it, please visit {settings.SITE_URL}{reverse('My results')} (you will need to log in).
+        \nyour validations started before {threshold_date.date()} will expire soon. \nThey will be deleted automatically on {removal_date.date()} if you take no further action. \nIf you want to extend the validation\'s lifetime or archive it, please visit {my_results_url}(you will need to log in).
         \nPlease note that archived and published validations are not subjected to deletion. If you need assistance with archiving or publishing your results, please visit our help ({help_url}) page for detailed guidance and support.
         \nBest regards,
         \nQA4SM team

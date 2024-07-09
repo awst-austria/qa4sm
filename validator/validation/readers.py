@@ -27,10 +27,7 @@ import pandas as pd
 
 __logger = logging.getLogger(__name__)
 
-class SBPCAReader(GriddedNcOrthoMultiTs):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+class _SmosL2Read:
     def read(self, *args, **kwargs) -> pd.DataFrame:
         ts = super(SBPCAReader, self).read(*args, **kwargs)
         if (ts is not None) and not ts.empty:
@@ -44,6 +41,15 @@ class SBPCAReader(GriddedNcOrthoMultiTs):
             if 'acquisition_time' in ts.columns:
                 ts = ts.dropna(subset='acquisition_time')
         return ts
+
+
+class SBPCAReader(GriddedNcOrthoMultiTs, _SmosL2Read):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+class SMOSL2Reader(GriddedNcIndexedRaggedTs, _SmosL2Read):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 def create_reader(dataset, version) -> GriddedNcTs:
     """
@@ -111,8 +117,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_L2:
-        reader = GriddedNcIndexedRaggedTs(folder_name, ioclass_kws={'read_bulk': True},
-                                          grid=load_grid(path.join(folder_name, "grid.nc")))
+        reader = SMOSL2Reader(folder_name, ioclass_kws={'read_bulk': True},
+                                grid=load_grid(path.join(folder_name, "grid.nc")))
 
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
