@@ -276,6 +276,10 @@ Go to to your qa4sm folder and run:
 
     pytest
 
+## Set up front-end environment
+
+Go to UI folder -> developers-guide.md
+
 Congratulations, your development environment is now set up and you can develop ;-)
 
 ## Tips and Tricks

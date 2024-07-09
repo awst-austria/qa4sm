@@ -287,3 +287,4 @@ dependencies:
     - wcwidth==0.2.6
     - xarray==2023.1.0
     - zarr==2.14.2
+    - pygrib==2.1.5
