@@ -4,5 +4,10 @@ ENV TZ=Europe/Vienna
 RUN apt-get update && apt-get install -y tzdata
 RUN apt-get update && apt-get -y install apt-utils
 RUN apt-get -y install curl gfortran libgeos-dev build-essential qt5-default rsync libproj-dev wget git
+# Add NodeSource APT repository for Node.js 18.x
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+
+# Install Node.js and npm
+RUN apt-get install -y nodejs
 ADD ./ /tmp/qa4sm-git
 RUN bash /tmp/qa4sm-git/docker/base/install.sh
