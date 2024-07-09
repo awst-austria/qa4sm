@@ -2,6 +2,7 @@ import logging
 from os import path
 import numpy as np
 
+
 from ascat.read_native.cdr import AscatGriddedNcTs
 from c3s_sm.interface import C3STs as c3s_read
 from ecmwf_models.interface import ERATs
@@ -11,7 +12,8 @@ from ismn.interface import ISMN_Interface
 from ismn.custom import CustomSensorMetadataCsv
 from smap_io.interface import SMAPTs
 from smos.smos_ic.interface import SMOSTs
-from pynetcf.time_series import GriddedNcTs
+from pynetcf.time_series import GriddedNcTs, GriddedNcIndexedRaggedTs
+from pygeogrids.netcdf import load_grid
 
 from qa4sm_preprocessing.cgls_hr_ssm_swi.reader import S1CglsTs
 from qa4sm_preprocessing.reading import GriddedNcOrthoMultiTs, GriddedNcContiguousRaggedTs
@@ -109,7 +111,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_L2:
-        reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
+        reader = GriddedNcIndexedRaggedTs(folder_name, ioclass_kws={'read_bulk': True},
+                                          grid=load_grid(path.join(folder_name, "grid.nc")))
 
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
@@ -141,14 +144,14 @@ def adapt_timestamp(reader, dataset, version):
             'base_time_reference': '2000-01-01',
         }
 
-    elif dataset.short_name == globals.SMOS_L2:
-        tadapt_kwargs = {
-            'time_offset_fields': 'Seconds',
-            'time_units': 's',
-            'base_time_field': 'Days',
-            'base_time_units': 'ns',
-            'base_time_reference': '2000-01-01',
-        }
+    # elif dataset.short_name == globals.SMOS_L2:
+    #     tadapt_kwargs = {
+    #         'time_offset_fields': 'Seconds',
+    #         'time_units': 's',
+    #         'base_time_field': 'Days',
+    #         'base_time_units': 'ns',
+    #         'base_time_reference': '2000-01-01',
+    #     }
 
     elif dataset.short_name == globals.SMOS_SBPCA:
         tadapt_kwargs = {

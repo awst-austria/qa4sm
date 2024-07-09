@@ -182,7 +182,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       this.setDefaultGeographicalRange();
     });
     this.addDatasetToValidate('ISMN',
-      '20230110 global', true, true, false, true);
+      undefined, true, true, false, true);
     this.addDatasetToValidate(undefined,
       undefined, undefined, undefined, true);
   }
@@ -362,7 +362,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     return itDoes;
   }
 
-  addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = 'v202012', userData = true,
+  addDatasetToValidate(defaultDatasetName = 'C3S_combined', defaultVersionName = undefined, userData = true,
                        spatialReference = false, temporalReference = false, scalingReference = false): void {
     this.addDataset(this.validationModel.datasetConfigurations, defaultDatasetName, defaultVersionName, userData,
       spatialReference, temporalReference);
@@ -424,7 +424,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
-    model.datasetModel.selectedVersion = versions.find((version => version.pretty_name === defaultVersionName));
+    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[0];
     this.loadFiltersForModel(model)
   }
 

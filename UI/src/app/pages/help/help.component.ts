@@ -20,7 +20,7 @@ export class HelpComponent {
   };
   public pageUrl = '/help';
 
-  plotDivClass = 'w-12 align-items-center inline-block text-center'
+  plotDivClass = 'w-12 align-items-center inline-block text-center py-2'
 
   menuMinus = plotsUrlPrefix + 'menu_minus.webp';
   menuPlus = plotsUrlPrefix + 'menu_plus.webp';
@@ -51,6 +51,10 @@ export class HelpComponent {
   uploadingSpinner = plotsUrlPrefix + 'uploading_spinner.webp';
   dataRow = plotsUrlPrefix + 'data_row.webp';
   userDataOnTheList = plotsUrlPrefix + 'user_data_on_the_list.webp';
+  manageMultipleVals = plotsUrlPrefix + 'manage-multiple.webp';
+  confirmMultipleVals = plotsUrlPrefix + 'confirm-multiple.webp';
+  selectAction = plotsUrlPrefix + 'select-action.webp';
+  selectedAction = plotsUrlPrefix + 'selected-action.webp';
 
   constructor(private globalParamsService: GlobalParamsService,
               public settingsService: SettingsService) {
