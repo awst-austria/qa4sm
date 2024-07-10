@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, signal} from '@angular/core';
-import {EMPTY, Observable, of, tap} from 'rxjs';
+import {EMPTY, Observable, of} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
@@ -58,7 +58,6 @@ export class ResultFilesComponent implements OnInit {
               })
           )
         ),
-        tap(data => console.log(data)),
         catchError((error: CustomHttpError) => {
           this.dataFetchError.set(true);
           this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
