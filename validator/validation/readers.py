@@ -27,9 +27,12 @@ import pandas as pd
 
 __logger = logging.getLogger(__name__)
 
-class _SmosL2Read:
+class SBPCAReader(GriddedNcOrthoMultiTs):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def read(self, *args, **kwargs) -> pd.DataFrame:
-        ts = super(SBPCAReader, self).read(*args, **kwargs)
+        ts = super().read(*args, **kwargs)
         if (ts is not None) and not ts.empty:
             ts = ts[ts.index.notnull()]
             for col in ['Chi_2_P', 'M_AVA0', 'N_RFI_X', 'N_RFI_Y', 'RFI_Prob',
@@ -43,13 +46,24 @@ class _SmosL2Read:
         return ts
 
 
-class SBPCAReader(GriddedNcOrthoMultiTs, _SmosL2Read):
+class SMOSL2Reader(GriddedNcIndexedRaggedTs):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-class SMOSL2Reader(GriddedNcIndexedRaggedTs, _SmosL2Read):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def read(self, *args, **kwargs) -> pd.DataFrame:
+        ts = super().read(*args, **kwargs)
+        if (ts is not None) and not ts.empty:
+            ts = ts[ts.index.notnull()]
+            for col in ['Chi_2_P', 'M_AVA0', 'N_RFI_X', 'N_RFI_Y', 'RFI_Prob',
+                        'Science_Flags']:
+                if col in ts.columns:
+                    ts[col] = ts[col].fillna(0)
+            if 'Soil_Moisture' in ts.columns:
+                ts = ts.dropna(subset='Soil_Moisture')
+            if 'acquisition_time' in ts.columns:
+                ts = ts.dropna(subset='acquisition_time')
+        return ts
+
 
 def create_reader(dataset, version) -> GriddedNcTs:
     """
