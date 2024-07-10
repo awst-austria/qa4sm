@@ -130,7 +130,6 @@ def get_metric_names_and_associated_files(request):
                               for metadata_name in METADATA_PLOT_NAMES.values()]
             meta_ind = 1
             for file_dict in metadata_plots:
-                print(file_dict)
                 if file_dict['file_name'] in files:
                     boxplot_dicts.append({'ind': meta_ind, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
                                           'file': file_path + file_dict['file_name']})
