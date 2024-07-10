@@ -68,14 +68,12 @@ export class ResultFilesComponent implements OnInit {
   }
 
   onMetricChange(option): void {
-    console.log(option.value.ind)
     this.metricIndx = option.value.ind;
     // resetting boxplot index
     this.boxplotIndx = 0;
   }
 
   onBoxPlotChange(event): void {
-    console.log(event.value.ind)
     this.boxplotIndx = event.value.ind;
   }
 
