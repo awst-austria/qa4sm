@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, signal} from '@angular/core';
-import {EMPTY, Observable, of} from 'rxjs';
+import {EMPTY, Observable, of, tap} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
@@ -58,6 +58,7 @@ export class ResultFilesComponent implements OnInit {
               })
           )
         ),
+        tap(data => console.log(data)),
         catchError((error: CustomHttpError) => {
           this.dataFetchError.set(true);
           this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
@@ -67,12 +68,14 @@ export class ResultFilesComponent implements OnInit {
   }
 
   onMetricChange(option): void {
+    console.log(option.value.ind)
     this.metricIndx = option.value.ind;
     // resetting boxplot index
     this.boxplotIndx = 0;
   }
 
   onBoxPlotChange(event): void {
+    console.log(event.value.ind)
     this.boxplotIndx = event.value.ind;
   }
 
