@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, signal} from '@angular/core';
+import {Component, Input, OnInit, signal, WritableSignal} from '@angular/core';
 import {EMPTY, Observable, of, tap} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
@@ -22,14 +22,16 @@ export class ResultFilesComponent implements OnInit {
   @Input() validation: ValidationrunDto;
   faIcons = {faFileDownload: fas.faFileDownload};
 
-  updatedMetrics$: Observable<any>;
-  metricIndx = 0;
+  updatedMetrics$: Observable<MetricsPlotsDto[]>;
+
   boxplotIndx = 0;
   displayOverviewGallery: boolean;
   displayBoxplotGallery: boolean;
 
   activeOverviewIndex = 0;
   activeBoxplotIndex = 0;
+
+  selectedMetric: WritableSignal<MetricsPlotsDto> = signal({} as MetricsPlotsDto);
 
   fileError = signal(false);
   dataFetchError = signal(false);
@@ -46,6 +48,7 @@ export class ResultFilesComponent implements OnInit {
 
   private updateMetricsWithPlots(): void {
     const params = new HttpParams().set('validationId', this.validation.id);
+
     this.updatedMetrics$ = this.validationService.getMetricsAndPlotsNames(params)
       .pipe(
         map((metrics) =>
@@ -58,7 +61,9 @@ export class ResultFilesComponent implements OnInit {
               })
           )
         ),
-        tap(data => console.log(data)),
+        tap(data => {
+          this.selectedMetric.set(data[0]);
+        }),
         catchError((error: CustomHttpError) => {
           this.dataFetchError.set(true);
           this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
@@ -68,14 +73,12 @@ export class ResultFilesComponent implements OnInit {
   }
 
   onMetricChange(option): void {
-    console.log(option.value.ind)
-    this.metricIndx = option.value.ind;
+    this.selectedMetric.set(option.value);
     // resetting boxplot index
     this.boxplotIndx = 0;
   }
 
   onBoxPlotChange(event): void {
-    console.log(event.value.ind)
     this.boxplotIndx = event.value.ind;
   }
 
