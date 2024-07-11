@@ -1,4 +1,5 @@
 import {Observable} from "rxjs";
+import {PlotDto} from "../global/plot.dto";
 
 export interface MetricsPlotsDto {
   metric_query_name: string,
@@ -12,6 +13,6 @@ export interface MetricsPlotsDto {
   metadata_files: string[],
   ind: number,
   datasets: string[],
-  boxplotFiles?: Observable<any>,
-  overviewFiles?: Observable<any>
+  boxplotFiles?: Observable<PlotDto[]>,
+  overviewFiles?: Observable<PlotDto[]>
 }
