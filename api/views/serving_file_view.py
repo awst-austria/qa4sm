@@ -128,12 +128,12 @@ def get_metric_names_and_associated_files(request):
             metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_"}' +
                                             metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
-            meta_ind = 1
-            for file_dict in metadata_plots:
+            plot_ind = 1
+            for meta_ind, file_dict in enumerate(metadata_plots):
                 if file_dict['file_name'] in files:
-                    boxplot_dicts.append({'ind': meta_ind, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
+                    boxplot_dicts.append({'ind': plot_ind, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
                                           'file': file_path + file_dict['file_name']})
-                    meta_ind += 1
+                    plot_ind += 1
 
         metric_dict = {'ind': metric_ind,
                        'metric_query_name': metrics[key],
