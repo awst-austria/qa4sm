@@ -10,8 +10,11 @@ $home-page-link-color: #CF8400;
 
 div#background {
   display: block;
+  height: 100%;
+  background: url("../../../../../validator/static/images/home/background.webp") center center;
   background-size: cover;
-  background: url("../../../../../validator/static/images/home/background.webp") no-repeat fixed center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   position: fixed;
   top: 0;
   left: 0;
