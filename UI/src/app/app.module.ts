@@ -15,7 +15,7 @@ import {ErrorPageComponent} from './pages/error/error-page.component';
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
 import {LoginComponent} from './modules/user/login/login.component';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
 import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
 
@@ -77,41 +77,38 @@ import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import {ContactModule} from './modules/contact/contact.module';
 import {SelectButtonModule} from 'primeng/selectbutton';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    ValidateComponent,
-    ErrorPageComponent,
-    ValidationsComponent,
-    ValidationResultComponent,
-    LoginComponent,
-    UserProfileComponent,
-    PublishedValidationsComponent,
-    TermsComponent,
-    DatasetInfoComponent,
-    ComparisonComponent,
-    HelpComponent,
-    SignupComponent,
-    SignupCompleteComponent,
-    DeactivateUserCompleteComponent,
-    PasswordResetComponent,
-    PasswordResetDoneComponent,
-    SetPasswordComponent,
-    PasswordResetValidateTokenComponent,
-    TemporalMatchingComponent,
-    MyDatasetsComponent,
-    UserDataGuidelinesComponent,
-    LoginPageComponent,
-    ContactUsComponent,
-  ],
-    imports: [
-        LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
+@NgModule({ declarations: [
+        AppComponent,
+        HomeComponent,
+        ValidateComponent,
+        ErrorPageComponent,
+        ValidationsComponent,
+        ValidationResultComponent,
+        LoginComponent,
+        UserProfileComponent,
+        PublishedValidationsComponent,
+        TermsComponent,
+        DatasetInfoComponent,
+        ComparisonComponent,
+        HelpComponent,
+        SignupComponent,
+        SignupCompleteComponent,
+        DeactivateUserCompleteComponent,
+        PasswordResetComponent,
+        PasswordResetDoneComponent,
+        SetPasswordComponent,
+        PasswordResetValidateTokenComponent,
+        TemporalMatchingComponent,
+        MyDatasetsComponent,
+        UserDataGuidelinesComponent,
+        LoginPageComponent,
+        ContactUsComponent,
+    ],
+    bootstrap: [AppComponent], imports: [LoggerModule.forRoot({ level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR }),
         NavigationBarModule,
         FormsModule,
         ReactiveFormsModule,
         BrowserModule,
-        HttpClientModule,
         BrowserAnimationsModule,
         AppRoutingModule,
         DatasetModule,
@@ -147,17 +144,14 @@ import {SelectButtonModule} from 'primeng/selectbutton';
         ImageModule,
         ScrollTopModule,
         ContactModule,
-        SelectButtonModule,
-    ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpTokenInterceptor,
-      multi: true
-    },
-    MessageService
-  ],
-  bootstrap: [AppComponent]
-})
+        SelectButtonModule], providers: [
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: HttpTokenInterceptor,
+            multi: true
+        },
+        MessageService,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule {
 }

@@ -7,11 +7,11 @@
     </ng-template>
     <ng-template pTemplate="icons">
     </ng-template>
-    <div *ngIf="!fileError() && updatedMetrics$|async as metrics" style="min-height: 400px"
+    <div *ngIf="!fileError() && ! dataFetchError() && updatedMetrics$|async as metrics" style="min-height: 400px"
          class="flex flex-column align-content-center justify-content-center">
-      <div *ngIf="metrics[metricIndx] && metrics[metricIndx].boxplotFiles|async as boxplots"
+      <div *ngIf="selectedMetric() && selectedMetric().boxplotFiles|async as boxplots"
            class="flex flex-column w-12 flex-wrap gap-2">
-        <div *ngIf="metrics[metricIndx].overviewFiles|async as overviewPlots"
+        <div *ngIf="selectedMetric().overviewFiles|async as overviewPlots"
              class="flex flex-row lg:flex-nowrap flex-wrap w-12 align-content-center justify-content-center py-3">
           <div *ngIf="boxplots.length > 0"
                class="flex flex-column lg:w-6 w-10 align-items-center justify-content-center">
@@ -25,7 +25,7 @@
                         [baseZIndex]="100000">
               <ng-template pTemplate="item" let-item>
                 <img [src]="sanitizePlotUrl(item.plot)"
-                     alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}"
+                     alt="Boxplot for {{selectedMetric().metric_pretty_name}}"
                      style="width: 100%;
                              display: block;"/>
               </ng-template>
@@ -35,7 +35,7 @@
                  [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
                  (click)="showGallery(boxplotIndx, 'boxplot')"
                  [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
-                 alt="Boxplot for {{metrics[metricIndx].metric_pretty_name}}">
+                 alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
           </div>
           <div class="flex flex-row flex-wrap lg:w-6 w-10 align-content-center justify-content-center gap-3">
             <div *ngFor="let plot of overviewPlots; let ind = index"
@@ -44,7 +44,7 @@
                              'w-9': overviewPlots.length === 2,
                              'w-5': overviewPlots.length > 2}">
                     <span class="image-label">
-                      {{ metrics[metricIndx].datasets[ind] }}
+                      {{ selectedMetric().datasets[ind] }}
                     </span>
               <p-galleria [value]="overviewPlots"
                           [(visible)]="displayOverviewGallery"
@@ -56,7 +56,7 @@
                           [baseZIndex]="100000">
                 <ng-template pTemplate="item" let-item>
                   <img [src]="sanitizePlotUrl(item.plot)"
-                       alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}"
+                       alt="An Overview map for {{selectedMetric().metric_pretty_name}}"
                        style="width: 100%;
                              display: block;"/>
                 </ng-template>
@@ -65,7 +65,7 @@
                    [src]="sanitizePlotUrl(plot.plot)"
                    (click)="showGallery(ind, 'overview')"
                    [ngClass]="{'result-plot':true, 'pcol': true}"
-                   alt="An Overview map for {{metrics[metricIndx].metric_pretty_name}}">
+                   alt="An Overview map for {{selectedMetric().metric_pretty_name}}">
             </div>
           </div>
         </div>
@@ -77,8 +77,8 @@
                           <span class="p-float-label">
                               <p-dropdown id="boxplotSelector"
                                           (onChange)="onBoxPlotChange($event)"
-                                          [options]="metrics[metricIndx].boxplot_dicts"
-                                          [(ngModel)]="selectedBoxplot"
+                                          [options]="selectedMetric().boxplot_dicts"
+                                          [ngModel]="selectedMetric().boxplot_dicts[boxplotIndx]"
                                           optionLabel="name"
                                           [style]="{'width': '100%'}">
                               </p-dropdown>
@@ -90,7 +90,7 @@
                         <p-dropdown id="metricSelector"
                                     (onChange)="onMetricChange($event)"
                                     [options]="metrics"
-                                    [(ngModel)]="selectedMetrics"
+                                    [ngModel]="selectedMetric()"
                                     optionLabel="metric_pretty_name"
                                     [style]="{'width': '100%'}">
                         </p-dropdown>

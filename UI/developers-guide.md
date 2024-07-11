@@ -3,16 +3,24 @@ QA4SM Angular UI
 
 ## Development environment - build tools
 Necessary software packages to run and build the UI
-- Node.js (v16)
-- npm (6.14.8)
-- angular-cli (11.0.7)
-
+- Node.js -> at least v18
+- npm
+- angular-cli
+For the current angular version please check package.json, this will imply which node.js version is needed. 
 
 
 ### Node.js installation
+https://nodejs.org/en/download/package-manager
+
+If you already have node.js on your machine, you can verify version typing:
+
 ```
-curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-sudo apt-get install -y nodejs
+nvm ls
+```
+
+To switch between versions use:
+```
+nvm use vv.v.v
 ```
 
 ### npm
@@ -23,7 +31,7 @@ Install angular cli
 ```
 npm install -g @angular/cli
 ```
-[General dev. env. setup guide from angular](https://angular.io/guide/setup-local)
+[General dev. env. setup guide from angular](https://angular.dev/tools/cli/setup-local)
 
 ## Building the project
 The project root directory is `qa4sm/UI`
