@@ -20,12 +20,12 @@
       </div>
       <div class="w-8 px-0">
         <div class="p-float-label">
-          <p-dropdown id="seasonalMetricsSelector"
-                      [options]="seasonalMetrics"
+          <p-dropdown id="intraAnnualMetricsSelector"
+                      [options]="intraAnnualMetrics"
                       [ngModel]="selectedMetric()"
                       (ngModelChange)="onMetricChange($event)"
                       optionLabel="metricName"></p-dropdown>
-          <label for="seasonalMetricsSelector">Select</label>
+          <label for="intraAnnualMetricsSelector">Select</label>
         </div>
       </div>
     </div>

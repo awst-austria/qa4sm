@@ -20,7 +20,7 @@ import {IntraAnnualMetricModel} from "./intra-annual-metric-model";
   styleUrl: './intra-annual-metrics.component.scss'
 })
 export class IntraAnnualMetricsComponent implements OnInit{
-  seasonalMetrics: IntraAnnualMetricModel[] = [];
+  intraAnnualMetrics: IntraAnnualMetricModel[] = [];
   seasonalMetricTypes: string[] = [];
   selectedMetric = signal<IntraAnnualMetricModel|null>(null);
   selectedType = signal<string|null>(null);
@@ -28,7 +28,7 @@ export class IntraAnnualMetricsComponent implements OnInit{
 
 
   ngOnInit() {
-    this.prepareSeasonalMetrics();
+    this.prepareintraAnnualMetrics();
   }
 
   onMetricChange(selectedMetric: IntraAnnualMetricModel) {
@@ -58,20 +58,20 @@ export class IntraAnnualMetricsComponent implements OnInit{
     });
   }
 
-  private prepareSeasonalMetrics(): void{
-    this.seasonalMetrics.push(
+  private prepareintraAnnualMetrics(): void{
+    this.intraAnnualMetrics.push(
       {metricName: 'Default',
         type: null,
         overlap: null,
         description: 'This is a default approach'}
     );
-    this.seasonalMetrics.push({
+    this.intraAnnualMetrics.push({
       metricName: 'Intra-Annual',
       type: null,
       overlap: null,
       description: 'This is an intra annual approach'
     });
-    this.selectedMetric.set(this.seasonalMetrics[0]);
+    this.selectedMetric.set(this.intraAnnualMetrics[0]);
   }
 
   private prepareMetricTypes(){
