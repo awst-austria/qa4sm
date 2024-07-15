@@ -83,6 +83,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null)),
     new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
+    null,
     new AnomaliesModel(
       new BehaviorSubject<string>(ANOMALIES_NONE),
       ANOMALIES_NONE_DESC,
