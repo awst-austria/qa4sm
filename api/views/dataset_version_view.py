@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import status, serializers
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.serializers import ModelSerializer
@@ -12,7 +12,7 @@ from validator.models import DatasetVersion, Dataset
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version(request):
-    versions = DatasetVersion.objects.all()
+    versions = DatasetVersion.objects.all().order_by('-id')
     serializer = DatasetVersionSerializer(versions, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
@@ -29,7 +29,7 @@ def dataset_version_by_id(request, **kwargs):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def dataset_version_by_dataset(request, **kwargs):
-    versions = get_object_or_404(Dataset, id=kwargs['dataset_id']).versions
+    versions = get_object_or_404(Dataset, id=kwargs['dataset_id']).versions.order_by('id')
     serializer = DatasetVersionSerializer(versions, many=True)
 
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)

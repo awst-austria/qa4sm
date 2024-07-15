@@ -99,7 +99,7 @@ export class DatasetComponent implements OnInit {
   }
 
   private onSelectableVersionsNext(versions): void {
-    this.selectionModel.selectedVersion = versions[versions.length - 1];
+    this.selectionModel.selectedVersion = versions[0];
   }
 
   private onSelectableVersionsComplete(): void {
@@ -111,7 +111,7 @@ export class DatasetComponent implements OnInit {
   }
 
   private onSelectableVariablesNext(variables): void {
-    this.selectionModel.selectedVariable = variables[variables.length - 1];
+    this.selectionModel.selectedVariable = variables[0];
   }
 
   private onSelectableVariablesComplete(): void {

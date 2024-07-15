@@ -1,8 +1,8 @@
 import {TestBed} from '@angular/core/testing';
 
 import {DatasetConfigurationService} from './dataset-configuration.service';
-import {HttpClient} from '@angular/common/http';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
+import {HttpClient, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
+import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 
 describe('DatasetConfigurationService', () => {
   let service: DatasetConfigurationService;
@@ -10,7 +10,7 @@ describe('DatasetConfigurationService', () => {
   let httpTestingController: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+    TestBed.configureTestingModule({ imports: [], providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()] });
     service = TestBed.inject(DatasetConfigurationService);
     httpClient = TestBed.inject(HttpClient);
     httpTestingController = TestBed.inject(HttpTestingController);

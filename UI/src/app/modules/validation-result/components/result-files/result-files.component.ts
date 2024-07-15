@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, signal} from '@angular/core';
-import {EMPTY, Observable, of} from 'rxjs';
+import {Component, Input, OnInit, signal, WritableSignal} from '@angular/core';
+import {EMPTY, Observable, of, tap} from 'rxjs';
 import {MetricsPlotsDto} from '../../../core/services/validation-run/metrics-plots.dto';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {HttpParams} from '@angular/common/http';
@@ -22,16 +22,16 @@ export class ResultFilesComponent implements OnInit {
   @Input() validation: ValidationrunDto;
   faIcons = {faFileDownload: fas.faFileDownload};
 
-  updatedMetrics$: Observable<any>;
-  selectedMetrics: MetricsPlotsDto;
-  metricIndx = 0;
-  selectedBoxplot: any;
+  updatedMetrics$: Observable<MetricsPlotsDto[]>;
+
   boxplotIndx = 0;
   displayOverviewGallery: boolean;
   displayBoxplotGallery: boolean;
 
   activeOverviewIndex = 0;
   activeBoxplotIndex = 0;
+
+  selectedMetric: WritableSignal<MetricsPlotsDto> = signal({} as MetricsPlotsDto);
 
   fileError = signal(false);
   dataFetchError = signal(false);
@@ -42,26 +42,13 @@ export class ResultFilesComponent implements OnInit {
               private toastService: ToastService) {
   }
 
-  updateMetricsObserver = {
-    next: (metrics: any) => this.onUpdateMetricsNext(metrics),
-    error: (error: CustomHttpError) => {
-      this.dataFetchError.set(true);
-      this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
-    }
-  }
-
-  onUpdateMetricsNext(metrics): void{
-    this.selectedMetrics = metrics[0];
-    this.selectedBoxplot = metrics[0].boxplot_dicts[0];
-  }
-
   ngOnInit(): void {
     this.updateMetricsWithPlots();
-    this.updatedMetrics$.subscribe(this.updateMetricsObserver);
   }
 
   private updateMetricsWithPlots(): void {
     const params = new HttpParams().set('validationId', this.validation.id);
+
     this.updatedMetrics$ = this.validationService.getMetricsAndPlotsNames(params)
       .pipe(
         map((metrics) =>
@@ -73,18 +60,26 @@ export class ResultFilesComponent implements OnInit {
                 overviewFiles: this.getPlots(metric.overview_files),
               })
           )
-        )
+        ),
+        tap(data => {
+          this.selectedMetric.set(data[0]);
+        }),
+        catchError((error: CustomHttpError) => {
+          this.dataFetchError.set(true);
+          this.toastService.showErrorWithHeader(error.errorMessage.header, error.errorMessage.message);
+          return of([] as MetricsPlotsDto[])
+        })
       );
   }
 
   onMetricChange(option): void {
-    this.metricIndx = this.selectedMetrics.ind;
+    this.selectedMetric.set(option.value);
     // resetting boxplot index
     this.boxplotIndx = 0;
   }
 
   onBoxPlotChange(event): void {
-    this.boxplotIndx = this.selectedBoxplot.ind;
+    this.boxplotIndx = event.value.ind;
   }
 
   showGallery(index: number = 0, plotType: string): void {
