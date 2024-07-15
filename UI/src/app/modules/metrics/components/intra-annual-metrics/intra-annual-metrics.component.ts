@@ -1,15 +1,28 @@
 import {Component, OnInit, signal} from '@angular/core';
-import {SeasonalMetricModel} from "./seasonal-metric-model";
+import {DropdownModule} from "primeng/dropdown";
+import {InputNumberModule} from "primeng/inputnumber";
+import {NgIf} from "@angular/common";
+import {TooltipModule} from "primeng/tooltip";
+import {FormsModule} from "@angular/forms";
+import {IntraAnnualMetricModel} from "./intra-annual-metric-model";
 
 @Component({
-  selector: 'qa-seasonal-metrics',
-  templateUrl: './seasonal-metrics.component.html',
-  styleUrls: ['./seasonal-metrics.component.scss']
+  selector: 'qa-intra-annual-metrics',
+  standalone: true,
+  imports: [
+    DropdownModule,
+    InputNumberModule,
+    NgIf,
+    TooltipModule,
+    FormsModule
+  ],
+  templateUrl: './intra-annual-metrics.component.html',
+  styleUrl: './intra-annual-metrics.component.scss'
 })
-export class SeasonalMetricsComponent implements OnInit{
-  seasonalMetrics: SeasonalMetricModel[] = [];
+export class IntraAnnualMetricsComponent implements OnInit{
+  seasonalMetrics: IntraAnnualMetricModel[] = [];
   seasonalMetricTypes: string[] = [];
-  selectedMetric = signal<SeasonalMetricModel|null>(null);
+  selectedMetric = signal<IntraAnnualMetricModel|null>(null);
   selectedType = signal<string|null>(null);
   selectedOverlap = signal<number>(0);
 
@@ -18,7 +31,7 @@ export class SeasonalMetricsComponent implements OnInit{
     this.prepareSeasonalMetrics();
   }
 
-  onMetricChange(selectedMetric: SeasonalMetricModel) {
+  onMetricChange(selectedMetric: IntraAnnualMetricModel) {
     this.selectedMetric.set(selectedMetric)
     if (selectedMetric.metricName !== 'Default') {
       this.prepareMetricTypes();
@@ -65,4 +78,5 @@ export class SeasonalMetricsComponent implements OnInit{
     this.seasonalMetricTypes = ['Seasonal', 'Monthly'];
     this.selectedType.set(this.seasonalMetricTypes[0]);
   }
+
 }

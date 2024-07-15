@@ -7,12 +7,12 @@ import {TooltipModule} from 'primeng/tooltip';
 import {PanelModule} from 'primeng/panel';
 import {FormsModule} from '@angular/forms';
 import {DropdownModule} from "primeng/dropdown";
-import {SeasonalMetricsComponent} from './components/seasonal-metrics/seasonal-metrics.component';
 import {InputNumberModule} from "primeng/inputnumber";
+import {IntraAnnualMetricsComponent} from "./components/intra-annual-metrics/intra-annual-metrics.component";
 
 
 @NgModule({
-  declarations: [MetricComponent, MetricsComponent, SeasonalMetricsComponent],
+  declarations: [MetricComponent, MetricsComponent],
   exports: [
     MetricsComponent
   ],
@@ -23,7 +23,8 @@ import {InputNumberModule} from "primeng/inputnumber";
     PanelModule,
     FormsModule,
     DropdownModule,
-    InputNumberModule
+    InputNumberModule,
+    IntraAnnualMetricsComponent
   ]
 })
 export class MetricsModule { }
