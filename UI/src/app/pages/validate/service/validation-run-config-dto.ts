@@ -10,6 +10,7 @@ export interface ValidationRunConfigDto {
   max_lat?: number;
   max_lon?: number;
   metrics: ValidationRunMetricConfigDto[];
+  intra_annual_metrics: IntraAnnualMetricsDto;
   anomalies_method: string;
   anomalies_from?: Date;
   anomalies_to?: Date;
@@ -46,4 +47,11 @@ export interface ConfigurationChanges {
   filters: {dataset: string, filter_desc: string[]}[];
   anomalies: boolean;
   scaling: boolean;
+}
+
+export interface IntraAnnualMetricsDto{
+  name: string;
+  type: string;
+  overlap: number;
+  description: string;
 }

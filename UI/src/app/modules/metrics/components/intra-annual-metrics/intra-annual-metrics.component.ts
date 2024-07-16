@@ -4,7 +4,7 @@ import {InputNumberModule} from "primeng/inputnumber";
 import {NgIf} from "@angular/common";
 import {TooltipModule} from "primeng/tooltip";
 import {FormsModule} from "@angular/forms";
-import {IntraAnnualMetricModel} from "./intra-annual-metric-model";
+import {IntraAnnualMetricsDto} from "../../../../pages/validate/service/validation-run-config-dto";
 
 @Component({
   selector: 'qa-intra-annual-metrics',
@@ -20,21 +20,21 @@ import {IntraAnnualMetricModel} from "./intra-annual-metric-model";
   styleUrl: './intra-annual-metrics.component.scss'
 })
 export class IntraAnnualMetricsComponent implements OnInit {
-  intraAnnualMetrics: IntraAnnualMetricModel[] = [
+  intraAnnualMetrics: IntraAnnualMetricsDto[] = [
     {
-      metricName: 'Default',
+      name: 'Default',
       type: null,
       overlap: null,
       description: 'This is a default approach'
     },
     {
-      metricName: 'Intra-Annual',
+      name: 'Intra-Annual',
       type: null,
       overlap: null,
       description: 'This is an intra annual approach'
     }];
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
-  selectedMetric = model<IntraAnnualMetricModel>()
+  selectedMetric = model<IntraAnnualMetricsDto>()
   selectedType = signal<string>(this.intraAnnualMetricTypes[0]);
   selectedOverlap = signal<number>(0);
 
@@ -43,9 +43,9 @@ export class IntraAnnualMetricsComponent implements OnInit {
     this.selectedMetric.set(this.intraAnnualMetrics[0]);
   }
 
-  onMetricChange(selectedMetric: IntraAnnualMetricModel) {
+  onMetricChange(selectedMetric: IntraAnnualMetricsDto) {
     this.selectedMetric.set(selectedMetric)
-    if (selectedMetric.metricName !== 'Default') {
+    if (selectedMetric.name !== 'Default') {
       this.selectedType.set(this.intraAnnualMetricTypes[0]);
       this.updateMetricSelection();
     } else {

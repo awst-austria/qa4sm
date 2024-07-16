@@ -749,6 +749,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
       max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
       metrics: metricDtos,
+      intra_annual_metrics: this.validationModel.intraAnnualMetrics,
       anomalies_method: this.validationModel.anomalies.method$.getValue(),
       anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
