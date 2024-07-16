@@ -1,4 +1,4 @@
-import {Component, OnInit, signal} from '@angular/core';
+import {Component, model, OnInit, signal} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import {InputNumberModule} from "primeng/inputnumber";
 import {NgIf} from "@angular/common";
@@ -22,13 +22,14 @@ import {IntraAnnualMetricModel} from "./intra-annual-metric-model";
 export class IntraAnnualMetricsComponent implements OnInit{
   intraAnnualMetrics: IntraAnnualMetricModel[] = [];
   seasonalMetricTypes: string[] = [];
-  selectedMetric = signal<IntraAnnualMetricModel|null>(null);
+  selectedMetric = model<IntraAnnualMetricModel>()
   selectedType = signal<string|null>(null);
   selectedOverlap = signal<number>(0);
 
 
   ngOnInit() {
-    this.prepareintraAnnualMetrics();
+    this.prepareiIntraAnnualMetrics();
+    console.log('Intra annual', this.selectedMetric())
   }
 
   onMetricChange(selectedMetric: IntraAnnualMetricModel) {
@@ -58,7 +59,7 @@ export class IntraAnnualMetricsComponent implements OnInit{
     });
   }
 
-  private prepareintraAnnualMetrics(): void{
+  private prepareiIntraAnnualMetrics(): void{
     this.intraAnnualMetrics.push(
       {metricName: 'Default',
         type: null,

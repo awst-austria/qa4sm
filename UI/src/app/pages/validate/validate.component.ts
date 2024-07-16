@@ -161,6 +161,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
+    console.log(this.validationModel)
   }
 
   private onGetValidationConfigNext(valrun): void {
@@ -310,6 +311,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
+    // todo: add intra-annual metrics to reloading
+
+    console.log('here I am')
 
     // Anomalies
     if (validationRunConfig.anomalies_method != null) {
