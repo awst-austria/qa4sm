@@ -730,7 +730,7 @@ def stop_running_validation(validation_id):
         app.control.revoke(str(task.celery_task_id))  # @UndefinedVariable
         task.delete()
 
-    run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
+    run_dir = os.path.join(OUTPUT_FOLDER, str(validation_run.id))
     if os.path.exists(run_dir):
         __logger.info('Validation got cancelled, so the result files should be cleaned.')
         for file_name in os.listdir(run_dir):
