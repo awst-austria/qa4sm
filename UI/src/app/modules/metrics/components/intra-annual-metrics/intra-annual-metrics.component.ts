@@ -19,23 +19,34 @@ import {IntraAnnualMetricModel} from "./intra-annual-metric-model";
   templateUrl: './intra-annual-metrics.component.html',
   styleUrl: './intra-annual-metrics.component.scss'
 })
-export class IntraAnnualMetricsComponent implements OnInit{
-  intraAnnualMetrics: IntraAnnualMetricModel[] = [];
-  seasonalMetricTypes: string[] = [];
+export class IntraAnnualMetricsComponent implements OnInit {
+  intraAnnualMetrics: IntraAnnualMetricModel[] = [
+    {
+      metricName: 'Default',
+      type: null,
+      overlap: null,
+      description: 'This is a default approach'
+    },
+    {
+      metricName: 'Intra-Annual',
+      type: null,
+      overlap: null,
+      description: 'This is an intra annual approach'
+    }];
+  intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
   selectedMetric = model<IntraAnnualMetricModel>()
-  selectedType = signal<string|null>(null);
+  selectedType = signal<string>(this.intraAnnualMetricTypes[0]);
   selectedOverlap = signal<number>(0);
 
 
   ngOnInit() {
-    this.prepareiIntraAnnualMetrics();
-    console.log('Intra annual', this.selectedMetric())
+    this.selectedMetric.set(this.intraAnnualMetrics[0]);
   }
 
   onMetricChange(selectedMetric: IntraAnnualMetricModel) {
     this.selectedMetric.set(selectedMetric)
     if (selectedMetric.metricName !== 'Default') {
-      this.prepareMetricTypes();
+      this.selectedType.set(this.intraAnnualMetricTypes[0]);
       this.updateMetricSelection();
     } else {
       this.resetMetricSelection();
@@ -52,32 +63,12 @@ export class IntraAnnualMetricsComponent implements OnInit{
     this.updateSelectedMetric(null, 'overlap');
   }
 
-  updateSelectedMetric(value, parameter){
+  updateSelectedMetric(value: string | number, parameter: string) {
     this.selectedMetric.update((metric) => {
       metric[parameter] = value;
       return metric;
     });
   }
 
-  private prepareiIntraAnnualMetrics(): void{
-    this.intraAnnualMetrics.push(
-      {metricName: 'Default',
-        type: null,
-        overlap: null,
-        description: 'This is a default approach'}
-    );
-    this.intraAnnualMetrics.push({
-      metricName: 'Intra-Annual',
-      type: null,
-      overlap: null,
-      description: 'This is an intra annual approach'
-    });
-    this.selectedMetric.set(this.intraAnnualMetrics[0]);
-  }
-
-  private prepareMetricTypes(){
-    this.seasonalMetricTypes = ['Seasonal', 'Monthly'];
-    this.selectedType.set(this.seasonalMetricTypes[0]);
-  }
 
 }

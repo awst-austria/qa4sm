@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div *ngIf="selectedMetric().metricName==='Intra-Annual'" class="flex flex-row lg:w-8 w-11">
+    <div *ngIf="selectedMetric().metricName!=='Default'" class="flex flex-row lg:w-8 w-11">
       <div
         class="flex flex-row flex-wrap w-12 lg:pt-0 pt-4 lg:justify-content-center justify-content-start gap-0 lg:ml-3">
         <div class="w-12 lg:w-6 lg:py-2 py-3 flex-nowrap flex lg:justify-content-center justify-content-start">
@@ -40,11 +40,12 @@
             </div>
           </div>
           <div class="p-float-label">
-            <p-dropdown id="seasonalMetricTypeSelector"
-                        [options]="seasonalMetricTypes"
+            <p-dropdown id="intraAnnualMetricTypeSelector"
+                        [options]="intraAnnualMetricTypes"
                         [ngModel]="selectedType()"
-                        (ngModelChange)="updateSelectedMetric($event, 'type')"></p-dropdown>
-            <label for="seasonalMetricTypeSelector">Select</label>
+                        (ngModelChange)="updateSelectedMetric($event, 'type')">
+            </p-dropdown>
+            <label for="intraAnnualMetricTypeSelector">Select</label>
           </div>
         </div>
         <div class="w-12 lg:w-6 lg:py-2 py-3 flex flex-nowrap lg:justify-content-center justify-content-start">
@@ -58,7 +59,7 @@
               id="overlapSelector"
               [showButtons]="true"
               [maxFractionDigits]="0"
-              [suffix]="(selectedOverlap()) === 1 ? ' day' : ' days'"
+              [suffix]="selectedOverlap() === 1 ? ' day' : ' days'"
               [ngModel]="selectedOverlap()"
               (ngModelChange)="updateSelectedMetric($event, 'overlap')"
               [step]="1"
