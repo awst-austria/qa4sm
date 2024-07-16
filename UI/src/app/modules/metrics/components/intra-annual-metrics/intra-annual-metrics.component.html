@@ -24,13 +24,13 @@
                       [options]="intraAnnualMetrics"
                       [ngModel]="selectedMetric()"
                       (ngModelChange)="onMetricChange($event)"
-                      optionLabel="metricName"></p-dropdown>
+                      optionLabel="name"></p-dropdown>
           <label for="intraAnnualMetricsSelector">Select</label>
         </div>
       </div>
     </div>
 
-    <div *ngIf="selectedMetric().metricName!=='Default'" class="flex flex-row lg:w-8 w-11">
+    <div *ngIf="selectedMetric().name!=='Default'" class="flex flex-row lg:w-8 w-11">
       <div
         class="flex flex-row flex-wrap w-12 lg:pt-0 pt-4 lg:justify-content-center justify-content-start gap-0 lg:ml-3">
         <div class="w-12 lg:w-6 lg:py-2 py-3 flex-nowrap flex lg:justify-content-center justify-content-start">
