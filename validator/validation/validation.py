@@ -69,14 +69,14 @@ __logger = logging.getLogger(__name__)
 # a dropdown menu in the front end would be required to select the implemented sub-windows: months or seasons (or default, see below)
 # a dropdown menu in the front end would be required to select the overlap value
 temp_sub_wdw_instance = TemporalSubWindowsCreator(
-    temporal_sub_window_type='seasons', overlap=0,
+    temporal_sub_window_type='months', overlap=0,
     custom_file=None)  # loading default temporal sub-windows from globals file
 temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
 
 #####################Default case################################################
 # a dropdown menu in the front end would be required to select the default case or implemented sub-windows: months or seasons (see above)
 # for the default case, no overlap is required
-# temp_sub_wdw_instance, temp_sub_wdws = None, None
+temp_sub_wdw_instance, temp_sub_wdws = None, None
 ##################################################################################
 ##################################################################################
 ##################################################################################
