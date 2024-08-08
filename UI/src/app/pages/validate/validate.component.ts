@@ -161,7 +161,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       }
     });
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
-    console.log(this.validationModel)
   }
 
   private onGetValidationConfigNext(valrun): void {
@@ -207,6 +206,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
+    console.log('data from db', (validationRunConfig))
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
       const newDatasetConfigModel = new DatasetConfigModel(
@@ -312,8 +312,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     }
 
     // todo: add intra-annual metrics to reloading
-
-    console.log('here I am')
 
     // Anomalies
     if (validationRunConfig.anomalies_method != null) {
@@ -758,8 +756,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       name_tag: this.validationModel.nameTag$.getValue(),
       temporal_matching: this.validationModel.temporalMatchingModel.size$.getValue()
     };
-
-    console.log(newValidation);
 
     this.validationConfigService.startValidation(newValidation, checkForExistingValidation)
       .subscribe(this.startValidationObserver);
