@@ -50,8 +50,7 @@ export interface ConfigurationChanges {
 }
 
 export interface IntraAnnualMetricsDto{
-  displayName: string;
-  type: string;
-  overlap: number;
-  description: string;
+  intra_annual_metrics: boolean;
+  intra_annual_type: string;
+  intra_annual_overlap: number;
 }
