@@ -203,6 +203,8 @@ def get_inspection_table(validation_run):
     """
     outfile = validation_run.output_file
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
+    if "bulk" in os.listdir(run_dir):
+        run_dir += 'bulk/'
     # the first condition checks whether the outfile field has been properly
     # set, the second then whether the file really exists
     if bool(outfile) and path.exists(outfile.path):
