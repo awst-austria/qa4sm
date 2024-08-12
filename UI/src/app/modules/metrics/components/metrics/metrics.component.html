@@ -15,10 +15,11 @@
       <qa-metric [metricModel]="bootstrapTripleCollocationMetrics"
                  [disabled]="checkIfDisabled('btcol')"/>
     </div>
+    <div class="col-12">
+      <qa-intra-annual-metrics [(selectedMetric)]="validationModel.intraAnnualMetrics"/>
+    </div>
   </div>
-  <div class="col-12">
-    <qa-intra-annual-metrics [(selectedMetric)]="validationModel.intraAnnualMetrics"/>
-  </div>
+
 <!--  <qa-seasonal-metrics></qa-seasonal-metrics>-->
 
 </p-panel>

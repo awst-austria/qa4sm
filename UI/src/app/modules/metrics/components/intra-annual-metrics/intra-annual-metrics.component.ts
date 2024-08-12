@@ -23,13 +23,25 @@ import {CheckboxModule} from "primeng/checkbox";
 })
 export class IntraAnnualMetricsComponent {
 
-
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
+  defaultIntraAnnualOverlap: number = 30;
   selectedMetric = model<IntraAnnualMetricsDto>()
 
-  updateSelectedMetric(value: string | number, parameter: string) {
+
+  updateSelectedMetric(value: string | number | boolean, parameter: string) {
     this.selectedMetric.update((metric) => {
       metric[parameter] = value;
+
+      if (parameter === 'intra_annual_metrics') {
+        if (value) {
+          metric.intra_annual_type = this.intraAnnualMetricTypes[0];
+          metric.intra_annual_overlap = this.defaultIntraAnnualOverlap;
+        } else {
+          metric.intra_annual_overlap = null;
+          metric.intra_annual_type = null;
+        }
+      }
+
       return metric;
     });
   }

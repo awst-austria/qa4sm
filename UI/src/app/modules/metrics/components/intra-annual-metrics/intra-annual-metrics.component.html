@@ -1,52 +1,50 @@
-<div class="flex flex-column flex-wrap py-4">
-  <div class="flex flex-row gap-0">
-    <div class="w-auto flex flex-row justify-content-center">
-      <p-checkbox id="intraAnnualMetricsSelector"
-                  [ngModel]="selectedMetric().intra_annual_metrics"
-                  (ngModelChange)="updateSelectedMetric($event, 'intra_annual_metrics')"
-                  binary="true"/>
-      <label class="pl-2" for="intraAnnualMetricsSelector">Include Intra-Annual metrics</label>
-    </div>
+<div class="flex flex-row gap-0">
+  <div class="w-auto flex flex-row justify-content-center">
+    <p-checkbox id="intraAnnualMetricsSelector"
+                [ngModel]="selectedMetric().intra_annual_metrics"
+                (ngModelChange)="updateSelectedMetric($event, 'intra_annual_metrics')"
+                binary="true"/>
+    <label class="pl-2" for="intraAnnualMetricsSelector">Include Intra-Annual metrics</label>
   </div>
+</div>
 
-  <div *ngIf="selectedMetric().intra_annual_metrics" class="flex flex-row lg:w-8 w-11">
-    <div
-      class="flex flex-row flex-wrap w-12 lg:pt-0 pt-4 lg:justify-content-center justify-content-start gap-0 lg:ml-3">
-      <div class="w-12 lg:w-6 lg:py-2 py-3 flex-nowrap flex lg:justify-content-center justify-content-start">
-        <div class="small-label w-4">
-          <div class="p-fluid">
-            <div>Type</div>
-          </div>
-        </div>
-        <div class="p-float-label">
-          <p-dropdown id="intraAnnualMetricTypeSelector"
-                      [options]="intraAnnualMetricTypes"
-                      [ngModel]="selectedMetric().intra_annual_type"
-                      (ngModelChange)="updateSelectedMetric($event, 'intra_annual_type')">
-          </p-dropdown>
-          <label for="intraAnnualMetricTypeSelector">Select</label>
+<div *ngIf="selectedMetric().intra_annual_metrics" class="flex flex-row lg:w-8 w-11">
+  <div
+    class="flex flex-row flex-wrap w-12 lg:pt-0 pt-4 lg:justify-content-center justify-content-start gap-0 lg:ml-3">
+    <div class="w-12 lg:w-6 lg:py-2 py-3 flex-nowrap flex lg:justify-content-center justify-content-start">
+      <div class="small-label w-4">
+        <div class="p-fluid">
+          <div>Type</div>
         </div>
       </div>
-      <div class="w-12 lg:w-6 lg:py-2 py-3 flex flex-nowrap lg:justify-content-center justify-content-start">
-        <div class="small-label w-4" style="max-width: 8rem">
-          <div class="p-fluid">
-            <div>Overlap</div>
-          </div>
+      <div class="p-float-label">
+        <p-dropdown id="intraAnnualMetricTypeSelector"
+                    [options]="intraAnnualMetricTypes"
+                    [ngModel]="selectedMetric().intra_annual_type"
+                    (ngModelChange)="updateSelectedMetric($event, 'intra_annual_type')">
+        </p-dropdown>
+        <label for="intraAnnualMetricTypeSelector">Select</label>
+      </div>
+    </div>
+    <div class="w-12 lg:w-6 lg:py-2 py-3 flex flex-nowrap lg:justify-content-center justify-content-start">
+      <div class="small-label w-4" style="max-width: 8rem">
+        <div class="p-fluid">
+          <div>Overlap</div>
         </div>
-        <div class="flex px-0 p-float-label align-content-center justify-content-start">
-          <p-inputNumber
-            id="overlapSelector"
-            [showButtons]="true"
-            [maxFractionDigits]="0"
-            [suffix]="selectedMetric().intra_annual_overlap === 1 ? ' day' : ' days'"
-            [ngModel]="selectedMetric().intra_annual_overlap"
-            (ngModelChange)="updateSelectedMetric($event, 'intra_annual_overlap')"
-            [step]="1"
-            [min]="0"
-            [max]="185">
-          </p-inputNumber>
-          <label for="overlapSelector">Select overlap</label>
-        </div>
+      </div>
+      <div class="flex px-0 p-float-label align-content-center justify-content-start">
+        <p-inputNumber
+          id="overlapSelector"
+          [showButtons]="true"
+          [maxFractionDigits]="0"
+          [suffix]="selectedMetric().intra_annual_overlap === 1 ? ' day' : ' days'"
+          [ngModel]="selectedMetric().intra_annual_overlap"
+          (ngModelChange)="updateSelectedMetric($event, 'intra_annual_overlap')"
+          [step]="1"
+          [min]="0"
+          [max]="185">
+        </p-inputNumber>
+        <label for="overlapSelector">Select overlap</label>
       </div>
     </div>
   </div>
