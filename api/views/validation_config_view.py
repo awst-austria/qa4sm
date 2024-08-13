@@ -147,9 +147,9 @@ def get_validation_configuration(request, **kwargs):
                    {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
 
-        val_run_dict['intra_annual_metrics'] = val_run.intra_annual_metrics
-        val_run_dict['intra_annual_type'] = val_run.intra_annual_type
-        val_run_dict['intra_annual_overlap'] = val_run.intra_annual_overlap
+        val_run_dict['intra_annual_metrics'] = \
+            {'intra_annual_metrics': val_run.intra_annual_metrics, 'intra_annual_type': val_run.intra_annual_type,
+             'intra_annual_overlap': val_run.intra_annual_overlap}
 
         # dataset configs and filters
         datasets = []
