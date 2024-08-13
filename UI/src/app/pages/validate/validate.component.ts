@@ -206,7 +206,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private modelFromValidationConfig(validationRunConfig: ValidationRunConfigDto): void {
-    console.log('data from db', (validationRunConfig))
     // Prepare dataset config
     validationRunConfig.dataset_configs.forEach(datasetConfig => {
       const newDatasetConfigModel = new DatasetConfigModel(
@@ -311,7 +310,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
-    // todo: add intra-annual metrics to reloading
+    // Intra-Annual Metrics
+    this.validationModel.intraAnnualMetrics = validationRunConfig.intra_annual_metrics;
 
     // Anomalies
     if (validationRunConfig.anomalies_method != null) {
