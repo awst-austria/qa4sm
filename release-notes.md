@@ -1,15 +1,15 @@
-QA4SM v2.7.0 - Release notes 2024-05-16
+QA4SM v2.8.0 - Release notes 2024-07-12
 =======================================================
 
-# New features
-1. Token authentication enabled (not available for users yet)
-
 # Updates
-1. SMOS SBPCA overpass filter added;
-2. New versions of C3S and ISMN added;
-3. GLDAS and ERA5 latest versions extended;
-4. Admin panel updated;
-5. Error handling for http requests added
+1. Angular updated to the version 18;
+2. SMOS data new format applied - reader updated;
+3. All ISMN networks are preselected by default.;
+
+# Fixes
+1. Validation auto-cleanup fixed;
+2. Cancelling validation fixed;
+3. Handling output file when aborting a validation fixed;
 
 
 

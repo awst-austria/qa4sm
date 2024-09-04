@@ -6,6 +6,9 @@ import {CheckboxModule} from 'primeng/checkbox';
 import {TooltipModule} from 'primeng/tooltip';
 import {PanelModule} from 'primeng/panel';
 import {FormsModule} from '@angular/forms';
+import {DropdownModule} from "primeng/dropdown";
+import {InputNumberModule} from "primeng/inputnumber";
+import {IntraAnnualMetricsComponent} from "./components/intra-annual-metrics/intra-annual-metrics.component";
 
 
 @NgModule({
@@ -18,7 +21,10 @@ import {FormsModule} from '@angular/forms';
     CheckboxModule,
     TooltipModule,
     PanelModule,
-    FormsModule
+    FormsModule,
+    DropdownModule,
+    InputNumberModule,
+    IntraAnnualMetricsComponent
   ]
 })
 export class MetricsModule { }

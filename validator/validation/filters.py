@@ -476,11 +476,11 @@ def setup_filtering(reader, filters, param_filters, dataset, variable) -> tuple:
             continue
 
         if fil.name == "FIL_SMOSL2_ORBIT_DES":
-            masking_filters.append(('Overpass', check_normalized_bits_array, [[1]]))
+            masking_filters.append(('Overpass', '==', 2))
             continue
 
         if fil.name == "FIL_SMOSL2_ORBIT_ASC":
-            masking_filters.append(('Overpass', check_normalized_bits_array, [[0]]))
+            masking_filters.append(('Overpass', '==', 1))
             continue
 
         # snow depth in the nc file yet, this is the preliminary one.

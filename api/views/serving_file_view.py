@@ -79,9 +79,12 @@ def get_metric_names_and_associated_files(request):
     validation = get_object_or_404(ValidationRun, pk=validation_id)
     ref_dataset_name = DatasetConfiguration.objects.get(
         id=validation.spatial_reference_configuration_id).dataset.pretty_name
-
+    bulk_prefix = ''
     try:
         file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+        if "bulk" in os.listdir(file_path):
+            file_path += 'bulk/'
+            bulk_prefix = 'bulk_'
     except AttributeError:
         return JsonResponse({'message': 'Given validation has no output directory assigned'}, status=404)
 
@@ -104,15 +107,15 @@ def get_metric_names_and_associated_files(request):
         barplot_metric = ['status']
 
         boxplot_file = ''
-        boxplot_file_name = 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + \
+        boxplot_file_name = bulk_prefix + 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + \
                                                                                                           metrics[
                                                                                                               key] + '.png'
 
         if metrics[key] not in independent_metrics:
-            overview_plots = [{'file_name': 'overview_' + name_key + '_' + metrics[key] + '.png',
+            overview_plots = [{'file_name': bulk_prefix + 'overview_' + name_key + '_' + metrics[key] + '.png',
                                'datasets': name_key} for name_key in combis]
         else:
-            overview_plots = [{'file_name': 'overview_' + metrics[key] + '.png', 'datasets': ''}]
+            overview_plots = [{'file_name': bulk_prefix + 'overview_' + metrics[key] + '.png', 'datasets': ''}]
 
         if boxplot_file_name in files:
             boxplot_file = file_path + boxplot_file_name
@@ -128,10 +131,12 @@ def get_metric_names_and_associated_files(request):
             metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_"}' +
                                             metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
+            plot_ind = 1
             for meta_ind, file_dict in enumerate(metadata_plots):
                 if file_dict['file_name'] in files:
-                    boxplot_dicts.append({'ind': meta_ind + 1, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
+                    boxplot_dicts.append({'ind': plot_ind, 'name': list(METADATA_PLOT_NAMES.keys())[meta_ind],
                                           'file': file_path + file_dict['file_name']})
+                    plot_ind += 1
 
         metric_dict = {'ind': metric_ind,
                        'metric_query_name': metrics[key],

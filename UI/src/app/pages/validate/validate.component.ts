@@ -83,6 +83,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null)),
     new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
+    {intra_annual_metrics: false, intra_annual_type: null, intra_annual_overlap: null},
     new AnomaliesModel(
       new BehaviorSubject<string>(ANOMALIES_NONE),
       ANOMALIES_NONE_DESC,
@@ -309,6 +310,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       });
     }
 
+    // Intra-Annual Metrics
+    this.validationModel.intraAnnualMetrics = validationRunConfig.intra_annual_metrics;
 
     // Anomalies
     if (validationRunConfig.anomalies_method != null) {
@@ -399,7 +402,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         }
 
         const getVariablesByDatasetObserver = {
-          next: variables => model.datasetModel.selectedVariable = variables[0],
+          next: variables => model.datasetModel.selectedVariable = variables[variables.length - 1],
           error: (error: CustomHttpError) => this.onGetVariableError(error),
         }
 
@@ -424,7 +427,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   private onGetVersionNext(versions, model, defaultVersionName): void {
-    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[0];
+    model.datasetModel.selectedVersion = defaultVersionName ? versions.find((version => version.pretty_name === defaultVersionName)) : versions[versions.length - 1];
     this.loadFiltersForModel(model)
   }
 
@@ -744,6 +747,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
       max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
       metrics: metricDtos,
+      intra_annual_metrics: this.validationModel.intraAnnualMetrics,
       anomalies_method: this.validationModel.anomalies.method$.getValue(),
       anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
