@@ -76,7 +76,7 @@ temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
 #####################Default case################################################
 # a dropdown menu in the front end would be required to select the default case or implemented sub-windows: months or seasons (see above)
 # for the default case, no overlap is required
-# temp_sub_wdw_instance, temp_sub_wdws = None, None
+temp_sub_wdw_instance, temp_sub_wdws = None, None
 ##################################################################################
 ##################################################################################
 ##################################################################################
@@ -693,6 +693,8 @@ def run_validation(validation_id):  #$$
                 __logger.info(
                     f'temporal_sub_windows_names: {temporal_sub_windows_names}'
                 )
+
+                __logger.info(f'Model prints: {validation_run.intra_annual_metrics=}, {validation_run.intra_annual_overlap=}, {validation_run.intra_annual_type=}')
 
                 generate_all_graphs(
                     validation_run=validation_run,
