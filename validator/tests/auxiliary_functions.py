@@ -1,7 +1,7 @@
 from validator.models import Dataset, DatasetVersion, DatasetConfiguration, ValidationRun, DataVariable
 from dateutil.tz import tzlocal
 from datetime import datetime
-from validator.validation.globals import ISMN_V20191211, ISMN, ISMN_soil_moisture, C3SC, C3S_sm, C3S_V202012
+from validator.validation.globals import ISMN_V20191211, ISMN, ISMN_soil_moisture, C3SC, C3S_sm, C3S_V202012, DEFAULT_TSW
 
 default_reference_dataset = ISMN
 default_reference_version = ISMN_V20191211
@@ -67,6 +67,15 @@ def generate_default_validation():
 
     run.spatial_reference_configuration = ref_c
     run.temporal_reference_configuration = ref_c
+
+    # run.intra_annual_metrics = False
+    # run.intra_annual_type = [DEFAULT_TSW]
+    # run.intra_annual_overlap = 0
+
+    run.intra_annual_metrics = True
+    run.intra_annual_type = 'Seasonal'
+    run.intra_annual_overlap = 2
+
     run.save()
 
     return run
@@ -172,6 +181,11 @@ def generate_default_validation_triple_coll():
     run.temporal_reference_configuration = ref_c
     run.tcol = True
     run.bootstrap_tcol_cis = True
+
+    run.intra_annual_metrics = False
+    run.intra_annual_type = None
+    run.intra_annual_overlap = 0
+
     run.save()
 
     return run
@@ -204,6 +218,11 @@ def generate_ismn_upscaling_validation():
 
     run.spatial_reference_configuration = ref_c
     run.temporal_reference_configuration = ref_c
+
+    run.intra_annual_metrics = False
+    run.intra_annual_type = None
+    run.intra_annual_overlap = 0
+
     run.save()
 
     return run

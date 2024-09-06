@@ -11,7 +11,7 @@ from re import search as regex_search
 from re import match as regex_match
 from zipfile import ZipFile
 
-import netCDF4
+from netCDF4 import Dataset as ncDataset
 import numpy as np
 import pandas as pd
 import pytest
@@ -175,9 +175,8 @@ class TestValidation(TestCase):
 
     def check_results(self,
                       run,
-                      transcriber: Pytesmo2Qa4smResultsTranscriber,
                       is_tcol_run=False,
-                      meta_plots=True):  #$$
+                      meta_plots=True):
 
         try:
             self._check_validation_configuration_consistency(run)
@@ -207,7 +206,7 @@ class TestValidation(TestCase):
         # check netcdf output
         length = -1
         num_vars = -1
-        with netCDF4.Dataset(transcriber.output_file_name,
+        with ncDataset(run.output_file.path,
                              mode='r') as ds:  #$$
             assert ds.qa4sm_version == settings.APP_VERSION
             assert ds.qa4sm_env_url == settings.ENV_FILE_URL_TEMPLATE.format(
@@ -475,7 +474,10 @@ class TestValidation(TestCase):
         run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
+
         run.save()
+
+        self.__logger.debug(f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}")
 
         for i, config in enumerate(run.dataset_configurations.all()):
             if config == run.spatial_reference_configuration:
@@ -505,18 +507,9 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        temp_sub_wdw_instance = None  # TODO: for now just assume bulk case #$$
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
-                           meta_plots=True)  #$$
+                           meta_plots=True)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
@@ -572,16 +565,7 @@ class TestValidation(TestCase):
         # the other 4 are okay
         assert new_run.ok_points == 4
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=True,
                            meta_plots=True)
         self.delete_run(new_run)
@@ -682,16 +666,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 19
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -745,16 +720,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 8, "Error points are off"
         assert new_run.ok_points == 16, "OK points are off"
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -807,16 +773,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 5, "Error points are off"
         assert new_run.ok_points == 19, "OK points are off"
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -876,16 +833,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 134, "Error points are off"
         assert new_run.ok_points == 6, "OK points are off"
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -944,16 +892,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 6, "Error points are off"
         assert new_run.ok_points == 9, "OK points are off"
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -1006,14 +945,6 @@ class TestValidation(TestCase):
         assert new_run.total_points == 24, "Number of gpis is off"
         assert new_run.error_points == 5, "Error points are off"
         assert new_run.ok_points == 19, "OK points are off"
-
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
 
         self.check_results(new_run,
                            transcriber,
@@ -1071,16 +1002,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0, "Too many error gpis"
         assert new_run.ok_points == 11, "OK points are off"
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -1127,16 +1049,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 1
         assert new_run.ok_points == 8
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=True)
         self.delete_run(new_run)
@@ -1165,16 +1078,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=True)
         self.delete_run(new_run)
@@ -1212,16 +1116,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=True)
         self.delete_run(new_run)
@@ -1259,16 +1154,7 @@ class TestValidation(TestCase):
 
         assert new_run
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=True)
         self.delete_run(new_run)
@@ -1312,16 +1198,7 @@ class TestValidation(TestCase):
 
         new_run = ValidationRun.objects.get(pk=run_id)
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -1359,16 +1236,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 12
         assert new_run.ok_points == 4
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -1410,16 +1278,7 @@ class TestValidation(TestCase):
         new_run = ValidationRun.objects.get(pk=run_id)
         assert new_run
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -1549,16 +1408,7 @@ class TestValidation(TestCase):
         assert new_run.error_points == 0
         assert new_run.ok_points == 9
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=True)
         self.delete_run(new_run)
@@ -1575,16 +1425,7 @@ class TestValidation(TestCase):
 
         ## save config
         validation_run = ValidationRun()
-
-        temp_sub_wdw_instance = None  # assume bulk case #$$
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         'not_existing_file.nc'),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(
-            OUTPUT_FOLDER, 'neither_existing_file.nc')
-
-        val.save_validation_config(validation_run, transcriber)
+        val.save_validation_config(validation_run)
 
     def test_readers(self):
         start_time = time.time()
@@ -2645,16 +2486,7 @@ class TestValidation(TestCase):
         assert copied_run.error_points == 0
         assert copied_run.ok_points == 9
 
-        temp_sub_wdw_instance = None  # assume bulk case
-        transcriber = Pytesmo2Qa4smResultsTranscriber(
-            pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                         new_run.output_file.name),
-            intra_annual_slices=temp_sub_wdw_instance)
-        transcriber.output_file_name = os.path.join(OUTPUT_FOLDER,
-                                                    new_run.output_file.name)
-
         self.check_results(copied_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=True)
 

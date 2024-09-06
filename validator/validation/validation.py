@@ -107,9 +107,9 @@ def set_outfile(validation_run, run_dir):
         validation_run.output_file.name = outfile
 
 
-def save_validation_config(validation_run, transcriber):
+def save_validation_config(validation_run):
     try:
-        with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER, transcriber.output_file_name),
+        with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER, validation_run.output_file.name),
                      "a",
                      format="NETCDF4") as ds:
 
@@ -239,6 +239,139 @@ def save_validation_config(validation_run, transcriber):
 
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
+
+# def save_validation_config(validation_run, transcriber):
+#     try:
+#         with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER, transcriber.output_file_name),
+#                      "a",
+#                      format="NETCDF4") as ds:
+
+#             ds.qa4sm_version = settings.APP_VERSION
+#             ds.qa4sm_reader_version = qa4sm_reader.__version__
+#             ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(
+#                 settings.APP_VERSION)
+#             ds.url = settings.SITE_URL + get_angular_url(
+#                 'result', validation_run.id)
+#             if validation_run.interval_from is None:
+#                 ds.val_interval_from = "N/A"
+#             else:
+#                 ds.val_interval_from = validation_run.interval_from.strftime(
+#                     '%Y-%m-%d %H:%M')
+
+#             if validation_run.interval_to is None:
+#                 ds.val_interval_to = "N/A"
+#             else:
+#                 ds.val_interval_to = validation_run.interval_to.strftime(
+#                     '%Y-%m-%d %H:%M')
+
+#             j = 1
+#             for dataset_config in validation_run.dataset_configurations.all():
+#                 filters = None
+#                 if dataset_config.filters.all():
+#                     filters = '; '.join(
+#                         [x.description for x in dataset_config.filters.all()])
+#                 if dataset_config.parametrisedfilter_set.all():
+#                     if filters:
+#                         filters += ';'
+#                     _list_comp = [
+#                         pf.filter.description + " " + pf.parameters
+#                         for pf in dataset_config.parametrisedfilter_set.all()
+#                         ]
+#                     try:
+#                         filters += '; '.join(_list_comp)
+#                     except TypeError as e:
+#                         __logger.error(f"Error in save_validation_config: {e}. {filters=}{_list_comp=}")
+#                         filters = '; '.join(_list_comp)
+
+#                 if not filters:
+#                     filters = 'N/A'
+
+#                 if (validation_run.spatial_reference_configuration and
+#                     (dataset_config.id
+#                      == validation_run.spatial_reference_configuration.id)):
+#                     i = 0  # reference is always 0
+#                 else:
+#                     i = j
+#                     j += 1
+
+#                 # there is no error for variables!!, there were some inconsistency with short and pretty names,
+#                 # and it should be like that now
+#                 ds.setncattr('val_dc_dataset' + str(i),
+#                              dataset_config.dataset.short_name)
+#                 ds.setncattr('val_dc_version' + str(i),
+#                              dataset_config.version.short_name)
+#                 ds.setncattr('val_dc_variable' + str(i),
+#                              dataset_config.variable.pretty_name)
+#                 ds.setncattr('val_dc_unit' + str(i),
+#                              dataset_config.variable.unit)
+
+#                 ds.setncattr('val_dc_dataset_pretty_name' + str(i),
+#                              dataset_config.dataset.pretty_name)
+#                 ds.setncattr('val_dc_version_pretty_name' + str(i),
+#                              dataset_config.version.pretty_name)
+#                 ds.setncattr('val_dc_variable_pretty_name' + str(i),
+#                              dataset_config.variable.short_name)
+
+#                 ds.setncattr('val_dc_filters' + str(i), filters)
+
+#                 actual_interval_from, actual_interval_to = _get_actual_time_range(
+#                     validation_run, dataset_config.version.id)
+#                 ds.setncattr('val_dc_actual_interval_from' + str(i),
+#                              actual_interval_from)
+#                 ds.setncattr('val_dc_actual_interval_to' + str(i),
+#                              actual_interval_to)
+
+#                 if ((validation_run.spatial_reference_configuration
+#                      is not None) and
+#                     (dataset_config.id
+#                      == validation_run.spatial_reference_configuration.id)):
+#                     ds.val_ref = 'val_dc_dataset' + str(i)
+
+#                     try:
+#                         ds.setncattr(
+#                             'val_resolution',
+#                             validation_run.spatial_reference_configuration.
+#                             dataset.resolution["value"])
+#                         ds.setncattr(
+#                             'val_resolution_unit',
+#                             validation_run.spatial_reference_configuration.
+#                             dataset.resolution["unit"])
+#                     # ISMN has null resolution attribute, therefore
+#                     # we write no output resolution
+#                     except (AttributeError, TypeError):
+#                         pass
+
+#                 if ((validation_run.scaling_ref is not None) and
+#                     (dataset_config.id == validation_run.scaling_ref.id)):
+#                     ds.val_scaling_ref = 'val_dc_dataset' + str(i)
+
+#                 if dataset_config.dataset.short_name in IRREGULAR_GRIDS.keys():
+#                     grid_stepsize = IRREGULAR_GRIDS[
+#                         dataset_config.dataset.short_name]
+#                 else:
+#                     grid_stepsize = 'nan'
+#                 ds.setncattr('val_dc_dataset' + str(i) + '_grid_stepsize',
+#                              grid_stepsize)
+
+#             ds.val_scaling_method = validation_run.scaling_method
+
+#             ds.val_anomalies = validation_run.anomalies
+#             if validation_run.anomalies == ValidationRun.CLIMATOLOGY:
+#                 ds.val_anomalies_from = validation_run.anomalies_from.strftime(
+#                     '%Y-%m-%d %H:%M')
+#                 ds.val_anomalies_to = validation_run.anomalies_to.strftime(
+#                     '%Y-%m-%d %H:%M')
+
+#             if all(x is not None for x in [
+#                     validation_run.min_lat, validation_run.min_lon,
+#                     validation_run.max_lat, validation_run.max_lon
+#             ]):
+#                 ds.val_spatial_subset = "[{}, {}, {}, {}]".format(
+#                     validation_run.min_lat, validation_run.min_lon,
+#                     validation_run.max_lat, validation_run.max_lon)
+
+#     except Exception:
+#         __logger.exception('Validation configuration could not be stored.')
 
 
 def create_pytesmo_validation(validation_run):
@@ -646,7 +779,7 @@ def run_validation(validation_id):
                     run_dir, results.keys())
                 transcriber.write_to_netcdf(transcriber.output_file_name)
 
-                save_validation_config(validation_run, transcriber)
+                save_validation_config(validation_run)
 
                 transcriber.compress(path=transcriber.output_file_name,
                                      compression='zlib',
@@ -1099,7 +1232,7 @@ def define_intra_annual_metrics(val_run: ValidationRun) -> Dict[str, Union[Tempo
 
         period = get_period(val_run)
         if not period:
-            period = ['1978-01-01', datetime.now().strftime('%Y-%m-%d')]    #NOTE bit of a hack, but we need a period for the default case
+            period = [datetime(year=1978, month=1, day=1), datetime.now()]    #NOTE bit of a hack, but we need a period for the default case
 
         default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
         temp_sub_wdw_instance.add_temp_sub_wndw(
