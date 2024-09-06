@@ -24,7 +24,7 @@ import {CheckboxModule} from "primeng/checkbox";
 export class IntraAnnualMetricsComponent {
 
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
-  defaultIntraAnnualOverlap: number = 30;
+  defaultIntraAnnualOverlap: number = 0;
   selectedMetric = model<IntraAnnualMetricsDto>()
 
 
