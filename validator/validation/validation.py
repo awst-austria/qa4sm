@@ -39,7 +39,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -494,6 +494,22 @@ def create_pytesmo_validation(validation_run):
         metadata_template=metadata_template,
         calc_kendall=False,
     )
+
+    # as all testfiles and tests in the qa4sm_reader package still have Kendall's tau included and
+    # qa4sm get's its list of METRICS from the qa4sm_reader.globals.py. In the line above "calc_kendall=False", which
+    # means that in the qa4sm_reader.globals.py the METRICS needs to be manually set to exclude Kendall's tau.
+    # to streamline the process, smth like this could be done:
+
+    # if all(metric in METRICS for metric in ['tau', 'p_tau']):
+    #   _calc_kendall = True
+    # else:
+    #  _calc_kendall = False
+
+    # _pairwise_metrics = PairwiseIntercomparisonMetrics(
+    #     metadata_template=metadata_template,
+    #     calc_kendall=_calc_kendall,
+    # )
+
 
 
     # intra-annual metrics

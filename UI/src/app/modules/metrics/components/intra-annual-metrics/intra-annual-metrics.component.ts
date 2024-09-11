@@ -24,7 +24,7 @@ import {CheckboxModule} from "primeng/checkbox";
 export class IntraAnnualMetricsComponent {
 
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
-  defaultIntraAnnualOverlap: number = 0;
+  defaultIntraAnnualOverlap: number = 0;  //NOTE: could this be imported from the backend globals.py? and the same for the maximum allowed value?
   selectedMetric = model<IntraAnnualMetricsDto>()
 
 
