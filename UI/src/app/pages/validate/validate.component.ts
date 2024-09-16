@@ -83,7 +83,9 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new BehaviorSubject<number>(null)),
     new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
     [],
-    {intra_annual_metrics: false, intra_annual_type: null, intra_annual_overlap: null},
+
+    {intra_annual_metrics: false, intra_annual_type: "", intra_annual_overlap: null},
+    
     new AnomaliesModel(
       new BehaviorSubject<string>(ANOMALIES_NONE),
       ANOMALIES_NONE_DESC,

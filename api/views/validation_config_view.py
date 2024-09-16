@@ -259,7 +259,7 @@ class IntraAnnualMetricsSerializer(serializers.Serializer):
         pass
 
     intra_annual_metrics = serializers.BooleanField(default=False)
-    intra_annual_type = serializers.CharField(max_length=100, allow_null=True)
+    intra_annual_type = serializers.CharField(max_length=100, allow_null=True, allow_blank=True)
     intra_annual_overlap = serializers.IntegerField(allow_null=True)
 
 
