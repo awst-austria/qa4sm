@@ -6,17 +6,17 @@
       <span class="pi pi-question-circle"></span>
     </label>
   </ng-template>
+
   <div class="grid pt-3">
-    <div class="col-12">
-      <qa-metric [metricModel]="tripleCollocationMetrics"
-                 [disabled]="checkIfDisabled('tcol')" (click)="switchOffBootstrap()"/>
+    <div *ngIf="validationModel() as validationModel">
+      <div *ngFor="let metric of validationModel.metrics" class="col-12">
+        <qa-metric [metricModel]="metric"
+                   [disabled]="checkIfDisabled(metric.id)"/>
+      </div>
     </div>
+
     <div class="col-12">
-      <qa-metric [metricModel]="bootstrapTripleCollocationMetrics"
-                 [disabled]="checkIfDisabled('btcol')"/>
-    </div>
-    <div class="col-12">
-      <qa-intra-annual-metrics [(selectedMetric)]="validationModel.intraAnnualMetrics"/>
+      <qa-intra-annual-metrics [(selectedMetric)]="validationModel().intraAnnualMetrics"/>
     </div>
   </div>
 

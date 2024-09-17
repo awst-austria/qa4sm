@@ -1,8 +1,10 @@
-<div class="flex flex-row gap-0">
+<div class="flex flex-row gap-0" *ngIf="metricModel() as metricModel">
   <div class="w-auto flex flex-row justify-content-center">
     <p-checkbox
-      [inputId]="metricModel.id" [ngModel]="metricModel.value$|async"
-                (ngModelChange)="metricModel.value$.next($event)" [binary]="true" [disabled]="disabled"
+      [inputId]="metricModel.id"
+      [ngModel]="metricModel.value()"
+      (ngModelChange)="metricModel.value.set($event)"
+      [binary]="true" [disabled]="disabled"
     ></p-checkbox>
     <label class="pl-2" for="{{metricModel.id}}"> {{metricModel.description}}</label>
   </div>

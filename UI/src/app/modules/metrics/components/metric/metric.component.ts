@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, Input, model} from '@angular/core';
 import {MetricModel} from './metric-model';
 
 @Component({
@@ -8,7 +8,8 @@ import {MetricModel} from './metric-model';
 })
 export class MetricComponent {
 
-  @Input() metricModel: MetricModel;
+  // @Input() metricModel: MetricModel;
+  metricModel = model<MetricModel>(null);
   @Input() disabled: boolean = false;
 
   constructor() {
