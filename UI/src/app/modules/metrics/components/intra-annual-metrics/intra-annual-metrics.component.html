@@ -2,7 +2,7 @@
   <div class="w-auto flex flex-row justify-content-center">
     <p-checkbox id="intraAnnualMetricsSelector"
                 [ngModel]="selectedMetric().intra_annual_metrics"
-                (ngModelChange)="updateSelectedMetric($event, 'intra_annual_metrics')"
+                (ngModelChange)="toggleMetricSelection($event)"
                 binary="true"/>
     <label class="pl-2" for="intraAnnualMetricsSelector">Include Intra-Annual metrics</label>
   </div>
@@ -28,7 +28,7 @@
         <p-dropdown id="intraAnnualMetricTypeSelector"
                     [options]="intraAnnualMetricTypes"
                     [ngModel]="selectedMetric().intra_annual_type"
-                    (ngModelChange)="updateSelectedMetric($event, 'intra_annual_type')">
+                    (ngModelChange)="updateType($event)">
         </p-dropdown>
         <label for="intraAnnualMetricTypeSelector">Select</label>
       </div>
@@ -53,10 +53,10 @@
           [maxFractionDigits]="0"
           [suffix]="selectedMetric().intra_annual_overlap === 1 ? ' day' : ' days'"
           [ngModel]="selectedMetric().intra_annual_overlap"
-          (ngModelChange)="updateSelectedMetric($event, 'intra_annual_overlap')"
+          (ngModelChange)="setOverlap($event)"
           [step]="1"
           [min]="0"
-          [max]="185">
+          [max]="maxIntraAnnualOverlap()">
         </p-inputNumber>
         <label for="overlapSelector">Select overlap</label>
       </div>

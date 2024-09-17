@@ -72,33 +72,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   @ViewChild('spatialReference') spatialReferenceChild: ValidationReferenceComponent;
   @ViewChild('temporalReference') temporalReferenceChild: ValidationReferenceComponent;
 
-  validationModel: ValidationModel = new ValidationModel(
-    [],
-    new ReferenceModel(null, null, null),
-    new SpatialSubsetModel(
-      new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null),
-      new BehaviorSubject<boolean>(false),
-      new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null),
-      new BehaviorSubject<number>(null)),
-    new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
-    [],
-    {intra_annual_metrics: false, intra_annual_type: '', intra_annual_overlap: null},
-    new AnomaliesModel(
-      new BehaviorSubject<string>(ANOMALIES_NONE),
-      ANOMALIES_NONE_DESC,
-      new BehaviorSubject<Date>(null),
-      new BehaviorSubject<Date>(null)),
-    new TemporalMatchingModel(
-      new BehaviorSubject<number>(null),
-      'hours',
-    ),
-    new ScalingModel('', ''),
-    new BehaviorSubject<string>(''));
+  validationModel: ValidationModel;
 
   validationStart: Date = new Date('1978-01-01');
   validationEnd: Date = new Date();
@@ -148,6 +122,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
 
 
   ngOnInit(): void {
+    this.resetValidationModel();
     this.settingsService.getAllSettings().subscribe(setting => {
       this.maintenanceMode = setting[0].maintenance_mode;
     });
@@ -167,6 +142,36 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.validationConfigService.listOfSelectedConfigs.next(this.validationModel.datasetConfigurations);
   }
 
+  resetValidationModel(): void {
+    this.validationModel = new ValidationModel(
+      [],
+      new ReferenceModel(null, null, null),
+      new SpatialSubsetModel(
+        new BehaviorSubject<number>(null),
+        new BehaviorSubject<number>(null),
+        new BehaviorSubject<number>(null),
+        new BehaviorSubject<number>(null),
+        new BehaviorSubject<boolean>(false),
+        new BehaviorSubject<number>(null),
+        new BehaviorSubject<number>(null),
+        new BehaviorSubject<number>(null),
+        new BehaviorSubject<number>(null)),
+      new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
+      [],
+      {intra_annual_metrics: false, intra_annual_type: "", intra_annual_overlap: null},
+      new AnomaliesModel(
+        new BehaviorSubject<string>(ANOMALIES_NONE),
+        ANOMALIES_NONE_DESC,
+        new BehaviorSubject<Date>(null),
+        new BehaviorSubject<Date>(null)),
+      new TemporalMatchingModel(
+        new BehaviorSubject<number>(null),
+        'hours',
+      ),
+      new ScalingModel('', ''),
+      new BehaviorSubject<string>(''));
+  }
+
   private onGetValidationConfigNext(valrun): void {
     this.modelFromValidationConfig(valrun);
     if (valrun.changes) {
@@ -183,6 +188,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   private setDefaultDatasetSettings(): void {
+    this.resetValidationModel();
     of({}).pipe(delay(0)).subscribe(() => {
       this.setDefaultGeographicalRange();
     });
@@ -225,7 +231,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject(false)
       );
       this.validationModel.datasetConfigurations.push(newDatasetConfigModel);
-      this.versionService.getVersionById(datasetConfig.version_id).subscribe( {
+      this.versionService.getVersionById(datasetConfig.version_id).subscribe({
         next: versionDto => {
           newDatasetConfigModel.datasetModel.selectedVersion = versionDto;
 

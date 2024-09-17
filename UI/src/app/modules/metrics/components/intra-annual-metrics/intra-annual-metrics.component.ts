@@ -1,4 +1,4 @@
-import {Component, model} from '@angular/core';
+import {Component, model, signal} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import {InputNumberModule} from "primeng/inputnumber";
 import {NgIf} from "@angular/common";
@@ -24,22 +24,48 @@ import {CheckboxModule} from "primeng/checkbox";
 export class IntraAnnualMetricsComponent {
 
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
-  defaultIntraAnnualOverlap: number = 0;  //NOTE: could this be imported from the backend globals.py? and the same for the maximum allowed value?
-  selectedMetric = model<IntraAnnualMetricsDto>()
+
+  defaultOverlaps: number[] = [30, 1];
+  maxOverlaps: number[] = [185, 15];
 
 
-  updateSelectedMetric(value: string | number | boolean, parameter: string) {
+  defaultIntraAnnualOverlap = signal(30);
+  maxIntraAnnualOverlap = signal(185);
+  selectedMetric = model<IntraAnnualMetricsDto | null>(null)
+
+
+  updateType(value: string) {
     this.selectedMetric.update((metric) => {
-      metric[parameter] = value;
+      metric.intra_annual_type = value;
 
-      if (parameter === 'intra_annual_metrics') {
-        if (value) {
-          metric.intra_annual_type = this.intraAnnualMetricTypes[0];
-          metric.intra_annual_overlap = this.defaultIntraAnnualOverlap;
-        } else {
-          metric.intra_annual_overlap = null;
-          metric.intra_annual_type = null;
-        }
+      const ind = this.intraAnnualMetricTypes.indexOf(value);
+      this.defaultIntraAnnualOverlap.set(this.defaultOverlaps[ind]);
+      this.maxIntraAnnualOverlap.set(this.maxOverlaps[ind]);
+
+      this.setOverlap(this.defaultOverlaps[ind]);
+
+      return metric;
+    });
+  }
+
+  setOverlap(value: number) {
+    this.selectedMetric.update((metric) => {
+      metric.intra_annual_overlap = value;
+      return metric;
+    });
+  }
+
+  toggleMetricSelection(value: boolean) {
+    this.selectedMetric.update((metric) => {
+      metric.intra_annual_metrics = value;
+
+
+      if (value) {
+        metric.intra_annual_type = this.intraAnnualMetricTypes[0];
+        metric.intra_annual_overlap = this.defaultIntraAnnualOverlap();
+      } else {
+        metric.intra_annual_overlap = null;
+        metric.intra_annual_type = null;
       }
 
       return metric;
