@@ -2,13 +2,23 @@ import {Component, model, OnInit} from '@angular/core';
 import {MetricModel} from '../metric/metric-model';
 import {ValidationModel} from '../../../../pages/validate/validation-model';
 
+/**
+If a new metric that requires only a checkbox should be added, follow the comments below.
+If you add a metric properly, there is no need to update validate page. Other updates that are required:
+ValidationRun model, validation_config_view (api view) and validation-summary component to display information if the
+metric has been included or not.
+
+There might be also other updates required, like, including new plots or so, but that's already metric specific
+information.
+ */
+
 @Component({
   selector: 'qa-metrics',
   templateUrl: './metrics.component.html',
   styleUrls: ['./metrics.component.scss']
 })
 export class MetricsComponent implements OnInit {
-  // If a new metric that requires only a checkbox should be added, follow the comments below.
+
   validationModel = model<ValidationModel>(); // don't touch this one.
 
   tripleCollocationMetrics: MetricModel;
@@ -21,6 +31,8 @@ export class MetricsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // define the metric according to the model - the first entry, i.e. the name attribute, should be the same as the
+    // respective entry in the ValidationRun model, this way there will be no need to update serializer in the api views
     this.tripleCollocationMetrics = new MetricModel(
       'tcol',
       'Include Triple Collocation Metrics',
@@ -49,8 +61,7 @@ export class MetricsComponent implements OnInit {
       this.stabilityMetricsDisabled.bind(this),
     )
 
-    // define the metric according to the model (like above) and then push it to the validation model (like below).
-
+    // Push it to the validation model.
     this.validationModel.update(model => {
       model.metrics.push(this.tripleCollocationMetrics, this.bootstrapTripleCollocationMetrics, this.stabilityMetrics)
       return model
