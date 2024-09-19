@@ -144,7 +144,8 @@ def get_validation_configuration(request, **kwargs):
 
         # if one day we decide to remove any of these metrics, we need to check if reloaded settings use them
         metrics = [{'id': 'tcol', 'value': val_run.tcol},
-                   {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
+                   {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis},
+                   {'id': 'stability_metrics', 'value': val_run.stability_metrics}]
         val_run_dict['metrics'] = metrics
 
         val_run_dict['intra_annual_metrics'] = \
@@ -316,10 +317,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
                 setattr(new_val_run, key, value)
 
             for metric in validated_data.get('metrics'):
-                if metric.get('id') == 'tcol':
-                    new_val_run.tcol = metric.get('value')
-                if metric.get('id') == 'bootstrap_tcol_cis':
-                    new_val_run.bootstrap_tcol_cis = metric.get('value')
+                setattr(new_val_run, metric.get('id'), metric.get('value'))
 
             new_val_run.save()
 
