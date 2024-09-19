@@ -22,7 +22,7 @@ from rest_framework.authtoken.models import Token
 from validator.models import Dataset
 from validator.models import ValidationRun
 from validator.tests.testutils import set_dataset_paths
-from validator.validation import ISMN_LIST_FILE_NAME
+from validator.validation.globals import ISMN_LIST_FILE_NAME
 
 from django.contrib.auth import get_user_model
 
@@ -187,7 +187,7 @@ class TestCommands(TestCase):
 
         with open(full_script_path, 'r') as f:
             content = f.read()
-        expected_content = f"""#!/bin/bash 
+        expected_content = f"""#!/bin/bash
         curl -X POST {cleanup_api_url} -H "Authorization: Token {tkn.key}"
         """
         self.assertEqual(content, expected_content)
@@ -206,7 +206,7 @@ class TestCommands(TestCase):
 
         with open(full_script_path, 'r') as f:
             content = f.read()
-        expected_content = f"""#!/bin/bash 
+        expected_content = f"""#!/bin/bash
         curl -X POST {cleanup_api_url} -H "Authorization: Token {new_tkn.key}"
         """
 

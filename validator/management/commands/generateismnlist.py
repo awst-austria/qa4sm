@@ -4,7 +4,7 @@ import os
 from validator.models import DatasetVersion, Dataset
 from ismn.interface import ISMN_Interface
 
-from validator.validation import ISMN_LIST_FILE_NAME
+from validator.validation.globals import ISMN_LIST_FILE_NAME
 from validator.validation.readers import create_reader
 
 

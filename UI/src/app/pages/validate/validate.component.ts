@@ -56,6 +56,10 @@ import {CustomHttpError} from '../../modules/core/services/global/http-error.ser
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
 
+//NOTE the maximum number of datasets is already defined in the backend, maybe it could be used here?
+// from validator.validation.globals import MAX_NUM_DS_PER_VAL_RUN;
+// const MAX_DATASETS_FOR_VALIDATION = MAX_NUM_DS_PER_VAL_RUN;
+
 @Component({
   selector: 'qa-validate',
   templateUrl: './validate.component.html',
@@ -110,7 +114,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private modalWindowService: ModalWindowService,
               private settingsService: SettingsService,
               public authService: AuthService) {
-    console.log('constructor')
   }
 
   ngAfterViewInit(): void {
@@ -126,15 +129,13 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.modalWindowService.watch().subscribe(state => {
       this.isExistingValidationWindowOpen = state === 'open';
     });
-    console.log('on init')
+
     this.route.queryParams.subscribe(params => {
       if (params.validation_id) {
-        console.log('there are params')
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
           this.getValidationConfigObserver
         );
       } else {
-        console.log('there are no params')
         this.setDefaultDatasetSettings();
       }
     });
@@ -157,6 +158,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject<number>(null)),
       new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
       [],
+      {intra_annual_metrics: false, intra_annual_type: "", intra_annual_overlap: null},
       new AnomaliesModel(
         new BehaviorSubject<string>(ANOMALIES_NONE),
         ANOMALIES_NONE_DESC,
@@ -311,13 +313,15 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (validationRunConfig.metrics) {
       validationRunConfig.metrics.forEach(metricDto => {
         this.validationModel.metrics.forEach(metricModel => {
-          if (metricModel.id === metricDto.id) {
-            metricModel.value$.next(metricDto.value);
+          if (metricModel.name === metricDto.id) {
+            metricModel.value = metricDto.value;
           }
         });
       });
     }
 
+    // Intra-Annual Metrics
+    this.validationModel.intraAnnualMetrics = validationRunConfig.intra_annual_metrics;
 
     // Anomalies
     if (validationRunConfig.anomalies_method != null) {
@@ -753,6 +757,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
       max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
       metrics: metricDtos,
+      intra_annual_metrics: this.validationModel.intraAnnualMetrics,
       anomalies_method: this.validationModel.anomalies.method$.getValue(),
       anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
       anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),

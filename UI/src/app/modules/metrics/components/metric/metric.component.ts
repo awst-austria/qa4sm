@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, input, model} from '@angular/core';
 import {MetricModel} from './metric-model';
 
 @Component({
@@ -8,10 +8,19 @@ import {MetricModel} from './metric-model';
 })
 export class MetricComponent {
 
-  @Input() metricModel: MetricModel;
-  @Input() disabled: boolean = false;
+  metricModel = model<MetricModel>(null);
+  // @Input() metricModel: MetricModel;
+  disabled = input<boolean | null>(null);
 
   constructor() {
   }
 
+  onValueChange(newValue: boolean): void {
+    // Update the signal's value
+      this.metricModel().value = newValue;
+
+      // Trigger the onChange callback if it exists
+      this.metricModel().triggerOnChange(newValue);
+
+  }
 }
