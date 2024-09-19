@@ -83,6 +83,10 @@ export class MetricsComponent implements OnInit {
     return this.validationModel().intraAnnualMetrics.intra_annual_metrics;
   }
 
+  intraAnnulMetricDisabled(): boolean{
+    return this.stabilityMetrics.value;
+  }
+
   // If something else should happen, when the metric is checked, add a proper function here
 
   onTripleCollocationMetricsChanged(newValue: boolean): void {

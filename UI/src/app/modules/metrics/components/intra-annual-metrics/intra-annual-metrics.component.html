@@ -3,6 +3,7 @@
     <p-checkbox id="intraAnnualMetricsSelector"
                 [ngModel]="selectedMetric().intra_annual_metrics"
                 (ngModelChange)="toggleMetricSelection($event)"
+                [disabled]="disabled()"
                 binary="true"/>
     <label class="pl-2" for="intraAnnualMetricsSelector">Include Intra-Annual metrics</label>
   </div>

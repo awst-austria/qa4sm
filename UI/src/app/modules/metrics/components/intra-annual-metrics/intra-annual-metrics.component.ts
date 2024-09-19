@@ -1,4 +1,4 @@
-import {Component, model, signal} from '@angular/core';
+import {Component, input, model, signal} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import {InputNumberModule} from "primeng/inputnumber";
 import {NgIf} from "@angular/common";
@@ -29,6 +29,7 @@ export class IntraAnnualMetricsComponent {
 
   defaultIntraAnnualOverlap = signal(30);
   maxIntraAnnualOverlap = signal(185);
+  disabled = input<boolean>();
   selectedMetric = model<IntraAnnualMetricsDto | null>(null)
 
 
