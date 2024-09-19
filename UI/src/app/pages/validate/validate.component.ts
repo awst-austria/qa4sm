@@ -314,7 +314,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       validationRunConfig.metrics.forEach(metricDto => {
         this.validationModel.metrics.forEach(metricModel => {
           if (metricModel.name === metricDto.id) {
-            metricModel.value = (metricDto.value);
+            metricModel.value = metricDto.value;
           }
         });
       });
