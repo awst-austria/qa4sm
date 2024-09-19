@@ -5,13 +5,17 @@ export class MetricModel {
               public description: string,
               public helperText: string,
               public value: boolean,
-              public enabledCallback: () => boolean,
+              public isDisabled: () => boolean,
               public onChange?: (newValue: boolean) => void ) {
     // Computed signal that automatically disables the value if enabledCallback is false
   }
 
-  triggerEnabledCallback(): boolean {
-      return this.enabledCallback();
+  triggerDisabledCheck(): boolean {
+    const disabled = this.isDisabled();
+    if (disabled) {
+      this.value = false;
+    }
+      return disabled;
   }
 
   // Method to trigger the onChange callback when the value changes

@@ -8,7 +8,7 @@ import {ValidationModel} from '../../../../pages/validate/validation-model';
   styleUrls: ['./metrics.component.scss']
 })
 export class MetricsComponent implements OnInit {
-  validationModel = model<ValidationModel | null>(null);
+  validationModel = model<ValidationModel>();
 
   tripleCollocationMetrics: MetricModel;
   bootstrapTripleCollocationMetrics: MetricModel;
@@ -23,7 +23,7 @@ export class MetricsComponent implements OnInit {
       'Include Triple Collocation Metrics',
       'Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.',
       false,
-      this.tripleCollocationEnabled.bind(this),
+      this.tripleCollocationDisabled.bind(this),
       this.onTripleCollocationMetricsChanged.bind(this));
 
     this.bootstrapTripleCollocationMetrics = new MetricModel(
@@ -32,7 +32,7 @@ export class MetricsComponent implements OnInit {
       'Calculates confidence intervals via bootstrapping with 1000 repetitions. ' +
       'This can significantly impact performance, typically increases runtime by a factor of 5.',
       false,
-      this.bootstrapingEnabled.bind(this),
+      this.bootstrapingDisabled.bind(this),
     );
 
     this.stabilityMetrics = new MetricModel(
@@ -40,7 +40,7 @@ export class MetricsComponent implements OnInit {
       'Here we will explain what stability metrics are',
       'stability_metrics',
       false,
-      this.stabilityMetricsEnabled.bind(this),
+      this.stabilityMetricsDisabled.bind(this),
     )
 
 
@@ -48,35 +48,29 @@ export class MetricsComponent implements OnInit {
       model.metrics.push(this.tripleCollocationMetrics, this.bootstrapTripleCollocationMetrics, this.stabilityMetrics)
       return model
     });
-    // this.numberOfDatasets = computed(() => this.validationModel().datasetConfigurations.length);
   }
 
   onTripleCollocationMetricsChanged(newValue: boolean): void {
     if (!newValue) {
       this.bootstrapTripleCollocationMetrics.value = false;
     } else {
-      // this.bootstrapTripleCollocationMetrics.enabled
     }
   }
 
-  tripleCollocationEnabled(): boolean {
-    return this.validationModel().datasetConfigurations.length >= 3;
+  tripleCollocationDisabled(): boolean {
+    return this.validationModel().datasetConfigurations.length < 3;
   }
 
-  bootstrapingEnabled(): boolean {
-    return this.validationModel().datasetConfigurations.length >= 3 && this.tripleCollocationMetrics.value
+  bootstrapingDisabled(): boolean {
+    return this.validationModel().datasetConfigurations.length < 3 || !this.tripleCollocationMetrics.value
   }
 
-  stabilityMetricsEnabled(): boolean {
-    return !this.validationModel().intraAnnualMetrics.intra_annual_metrics;
+  stabilityMetricsDisabled(): boolean {
+    return this.validationModel().intraAnnualMetrics.intra_annual_metrics;
   }
 
   checkIfDisabled(metric: MetricModel): boolean {
-    const disabled = !metric.triggerEnabledCallback();
-    if (disabled) {
-      metric.value = false;
-    }
-    return disabled
+    return metric.triggerDisabledCheck();
   }
 
 

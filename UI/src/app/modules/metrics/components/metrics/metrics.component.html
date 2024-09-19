@@ -8,10 +8,8 @@
   </ng-template>
 
   <div class="grid pt-3">
-    <div *ngIf="validationModel() as validationModel">
-      <div *ngFor="let metric of validationModel.metrics" class="col-12">
-        <qa-metric [metricModel]="metric" [disabled]="checkIfDisabled(metric)"/>
-      </div>
+    <div *ngFor="let metric of validationModel().metrics" class="col-12">
+      <qa-metric [metricModel]="metric" [disabled]="checkIfDisabled(metric)"/>
     </div>
 
     <div class="col-12">
@@ -19,6 +17,6 @@
     </div>
   </div>
 
-<!--  <qa-seasonal-metrics></qa-seasonal-metrics>-->
+  <!--  <qa-seasonal-metrics></qa-seasonal-metrics>-->
 
 </p-panel>
