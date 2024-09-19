@@ -6,7 +6,7 @@ from re import sub as regex_sub
 import uuid
 import ast
 from shutil import copy2, copytree
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Union
 
 from celery.app import shared_task
 from celery.exceptions import TaskRevokedError, TimeoutError
@@ -25,7 +25,8 @@ from pytesmo.validation_framework.temporal_matchers import (
 import pandas as pd
 from pytesmo.validation_framework.results_manager import netcdf_results_manager, build_filename
 from pytesmo.validation_framework.validation import Validation
-from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter
+from pytesmo.validation_framework.metric_calculators_adapters import SubsetsMetricsAdapter, TsDistributor
+
 from pytz import UTC
 import pytz
 
@@ -38,7 +39,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -49,40 +50,6 @@ from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, Ne
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 
 __logger = logging.getLogger(__name__)
-#$$
-##################################################################################
-####################-----Implement this in front end-----#########################
-##################################################################################
-
-#####################Loading from custom .json file###############################
-# as a json is required, i am not sure if and how this can be integrated into the front end
-# a means of uploading json files for users would be required...
-
-# temp_sub_wdw_instance = TemporalSubWindowsCreator(
-#     temporal_sub_window_type='custom',
-#     overlap=3,
-#     custom_file=os.path.join('custom_intra_annual_windows_example.json')
-# )  # loading custom temporal sub-windows from a file
-
-
-#####################Using hardcoded/implemented (in globals.py) sub-windows######
-# a dropdown menu in the front end would be required to select the implemented sub-windows: months or seasons (or default, see below)
-# a dropdown menu in the front end would be required to select the overlap value
-temp_sub_wdw_instance = TemporalSubWindowsCreator(
-    temporal_sub_window_type='seasons', overlap=0,
-    custom_file=None)  # loading default temporal sub-windows from globals file
-temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
-
-#####################Default case################################################
-# a dropdown menu in the front end would be required to select the default case or implemented sub-windows: months or seasons (see above)
-# for the default case, no overlap is required
-# temp_sub_wdw_instance, temp_sub_wdws = None, None
-##################################################################################
-##################################################################################
-##################################################################################
-print(f'\n\n{temp_sub_wdws=}\n{temp_sub_wdw_instance=}\n\n')
-##################################################################################
-
 
 def _get_actual_time_range(val_run, dataset_version_id):
     try:
@@ -140,14 +107,14 @@ def set_outfile(validation_run, run_dir):
         validation_run.output_file.name = outfile
 
 
-def save_validation_config(validation_run, transcriber):  #$$
+def save_validation_config(validation_run):
     try:
-        with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER, transcriber.output_file_name),
+        with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER, validation_run.output_file.name),
                      "a",
                      format="NETCDF4") as ds:
 
             ds.qa4sm_version = settings.APP_VERSION
-            ds.qa4sm_reader_version = qa4sm_reader.__version__  #$$
+            ds.qa4sm_reader_version = qa4sm_reader.__version__
             ds.qa4sm_env_url = settings.ENV_FILE_URL_TEMPLATE.format(
                 settings.APP_VERSION)
             ds.url = settings.SITE_URL + get_angular_url(
@@ -273,7 +240,6 @@ def save_validation_config(validation_run, transcriber):  #$$
     except Exception:
         __logger.exception('Validation configuration could not be stored.')
 
-
 def create_pytesmo_validation(validation_run):
     ds_list = []
     ds_read_names = []
@@ -353,14 +319,7 @@ def create_pytesmo_validation(validation_run):
     datasets = dict(ds_list)
     ds_num = len(ds_list)
 
-    period = None
-    if validation_run.interval_from is not None and validation_run.interval_to is not None:
-        # while pytesmo can't deal with timezones, normalise the validation period to utc; can be removed once pytesmo can do timezones
-        startdate = validation_run.interval_from.astimezone(UTC).replace(
-            tzinfo=None)
-        enddate = validation_run.interval_to.astimezone(UTC).replace(
-            tzinfo=None)
-        period = [startdate, enddate]
+    period = get_period(validation_run)
 
     __logger.debug(f"First: Validation period: {period}")
     upscale_parms = None
@@ -400,19 +359,38 @@ def create_pytesmo_validation(validation_run):
     _pairwise_metrics = PairwiseIntercomparisonMetrics(
         metadata_template=metadata_template,
         calc_kendall=False,
-    )  #$$
+    )
+
+    # as all testfiles and tests in the qa4sm_reader package still have Kendall's tau included and
+    # qa4sm get's its list of METRICS from the qa4sm_reader.globals.py. In the line above "calc_kendall=False", which
+    # means that in the qa4sm_reader.globals.py the METRICS needs to be manually set to exclude Kendall's tau.
+    # to streamline the process, smth like this could be done:
+
+    # if all(metric in METRICS for metric in ['tau', 'p_tau']):
+    #   _calc_kendall = True
+    # else:
+    #  _calc_kendall = False
+
+    # _pairwise_metrics = PairwiseIntercomparisonMetrics(
+    #     metadata_template=metadata_template,
+    #     calc_kendall=_calc_kendall,
+    # )
+
+
+
+    # intra-annual metrics
+    iam_dict = define_intra_annual_metrics(validation_run)
+    temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
+    temp_sub_wdws = iam_dict['temp_sub_wdws']
 
     if isinstance(
             temp_sub_wdws, dict
     ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
-        default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
-        temp_sub_wdw_instance.add_temp_sub_wndw(
-            default_temp_sub_wndw)  # always add the default case
         pairwise_metrics = SubsetsMetricsAdapter(
             calculator=_pairwise_metrics,
             subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
             group_results="join",
-        )  #$$
+        )
 
     elif temp_sub_wdws is None: # the default case
         pairwise_metrics = _pairwise_metrics
@@ -420,7 +398,7 @@ def create_pytesmo_validation(validation_run):
     else:
         raise ValueError(
             f"Invalid value for temp_sub_wdws: {temp_sub_wdws}. Please specify either None or a custom temporal sub windowing function."
-        )  #$$
+        )
 
     metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
 
@@ -538,7 +516,7 @@ def untrack_celery_task(task_id):
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
 
-def run_validation(validation_id):  #$$
+def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_aborted = False
@@ -668,18 +646,22 @@ def run_validation(validation_id):  #$$
         if (not validation_aborted):
             set_outfile(validation_run, run_dir)
 
+            iam_dict = define_intra_annual_metrics(validation_run)
+            temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
+            temp_sub_wdws = iam_dict['temp_sub_wdws']
+
             transcriber = Pytesmo2Qa4smResultsTranscriber(
                 pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                           validation_run.output_file.name),
                 intra_annual_slices=temp_sub_wdw_instance,
-                keep_pytesmo_ncfile=False)  #$$
-            if transcriber.exists:  #$$
+                keep_pytesmo_ncfile=False)
+            if transcriber.exists:
                 restructured_results = transcriber.get_transcribed_dataset()
                 transcriber.output_file_name = transcriber.build_outname(
                     run_dir, results.keys())
                 transcriber.write_to_netcdf(transcriber.output_file_name)
 
-                save_validation_config(validation_run, transcriber)
+                save_validation_config(validation_run)
 
                 transcriber.compress(path=transcriber.output_file_name,
                                      compression='zlib',
@@ -1054,7 +1036,7 @@ def copy_validationrun(run_to_copy, new_user):
                     old_file = old_dir + '/' + file_name
                     try:
                         copy2(old_file, new_file)
-                    except IsADirectoryError as e:  #$$
+                    except IsADirectoryError as e:
                         copytree(
                             old_file, new_file
                         )  # with the restructuring of netCDF files, all graphics etc are now stored in dedicated directories
@@ -1077,3 +1059,69 @@ def copy_validationrun(run_to_copy, new_user):
         'run_id': run_id,
     }
     return response
+
+
+def get_period(val_run: ValidationRun) -> Union[None, List[str]]:
+    '''
+    Extract the validation period from the validation run object.
+
+    Parameters
+    ----------
+    val_run : ValidationRun
+        The validation run object
+
+    Returns
+    -------
+    Union[None, List[str]]
+        The validation period as a list of two strings, the start and end date, respectively. If no period is defined, None is returned.
+    '''
+    if val_run.interval_from is not None and val_run.interval_to is not None:
+        # while pytesmo can't deal with timezones, normalise the validation period to utc; can be removed once pytesmo can do timezones
+        startdate = val_run.interval_from.astimezone(UTC).replace(
+            tzinfo=None)
+        enddate = val_run.interval_to.astimezone(UTC).replace(
+            tzinfo=None)
+        return [startdate, enddate]
+    return None
+
+def define_intra_annual_metrics(val_run: ValidationRun) -> Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]:
+    '''
+    Extract the intra-annual metrics settings from the validation run and instantiate the corresponding objects.
+
+    Parameters
+    ----------
+    val_run : ValidationRun
+        The validation run object
+
+    Returns
+    -------
+    Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]
+        A dictionary containing the temporal sub-window instance and the custom temporal sub-windows, if applicable. Otherwise, filled with None.
+    '''
+    # per default, assume bulk case
+    temp_sub_wdw_instance = None
+    temp_sub_wdws = None
+
+    # in case intra-annual metrics are desired, instantiate corresponding object
+    if val_run.intra_annual_metrics:
+        intra_annual_metric_lut = {'Seasonal': 'seasons',
+                                'Monthly': 'months'}     #TODO implement properly in qa4sm_reader.globals
+
+        temp_sub_wdw_instance = TemporalSubWindowsCreator(
+            temporal_sub_window_type=intra_annual_metric_lut[val_run.intra_annual_type],
+            overlap=int(val_run.intra_annual_overlap),
+            custom_file=None)  # loading default temporal sub-windows from globals file
+
+        period = get_period(val_run)
+        if not period:
+            period = [datetime(year=1978, month=1, day=1), datetime.now()]    #NOTE bit of a hack, but we need a period for the default case
+
+        default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
+        temp_sub_wdw_instance.add_temp_sub_wndw(
+            new_temp_sub_wndw=default_temp_sub_wndw,
+            insert_as_first_wndw=True)  # always add the default case and make it as the first one (wrong order will throw errors later on)
+        temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
+
+    __logger.debug(f"{temp_sub_wdw_instance=}")
+    __logger.debug(f"{temp_sub_wdws=}")
+    return {'temp_sub_wdw_instance': temp_sub_wdw_instance, 'temp_sub_wdws': temp_sub_wdws}

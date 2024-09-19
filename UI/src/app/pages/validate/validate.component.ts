@@ -56,6 +56,10 @@ import {CustomHttpError} from '../../modules/core/services/global/http-error.ser
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
 
+//NOTE the maximum number of datasets is already defined in the backend, maybe it could be used here?
+// from validator.validation.globals import MAX_NUM_DS_PER_VAL_RUN;
+// const MAX_DATASETS_FOR_VALIDATION = MAX_NUM_DS_PER_VAL_RUN;
+
 @Component({
   selector: 'qa-validate',
   templateUrl: './validate.component.html',
