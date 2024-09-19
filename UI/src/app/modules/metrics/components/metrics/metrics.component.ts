@@ -36,9 +36,9 @@ export class MetricsComponent implements OnInit {
     );
 
     this.stabilityMetrics = new MetricModel(
+      'stability_metrics',
       'Include Stability Metrics',
       'Here we will explain what stability metrics are',
-      'stability_metrics',
       false,
       this.stabilityMetricsDisabled.bind(this),
     )
