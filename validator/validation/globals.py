@@ -184,5 +184,12 @@ TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
 
+# overlap parameter interval definiton
+OVERLAP_MIN = 0
+OVERLAP_MAX = 185
+
+# max amount of datasets that can be compared in one validation run
+MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
+
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
 GEOJSON_FILE_NAME = 'ismn_sensors.json'
