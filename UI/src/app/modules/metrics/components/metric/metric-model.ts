@@ -5,14 +5,15 @@ export class MetricModel {
               public description: string,
               public helperText: string,
               public value: boolean,
+              public switchOffIfDisabled: boolean,
               public isDisabled: () => boolean,
-              public onChange?: (newValue: boolean) => void ) {
+              public onChange?: (newValue: boolean) => void) {
     // Computed signal that automatically disables the value if enabledCallback is false
   }
 
-  triggerDisabledCheck(): boolean {
+  triggerDisabledCheck(automaticallySwitchOff): boolean {
     const disabled = this.isDisabled();
-    if (disabled) {
+    if (disabled && automaticallySwitchOff) {
       this.value = false;
     }
       return disabled;

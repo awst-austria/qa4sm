@@ -8,11 +8,14 @@ import {ValidationModel} from '../../../../pages/validate/validation-model';
   styleUrls: ['./metrics.component.scss']
 })
 export class MetricsComponent implements OnInit {
-  validationModel = model<ValidationModel>();
+  // If a new metric that requires only a checkbox should be added, follow the comments below.
+  validationModel = model<ValidationModel>(); // don't touch this one.
 
   tripleCollocationMetrics: MetricModel;
   bootstrapTripleCollocationMetrics: MetricModel;
   stabilityMetrics: MetricModel;
+  // ad a metric instance
+
 
   constructor() {
   }
@@ -23,6 +26,7 @@ export class MetricsComponent implements OnInit {
       'Include Triple Collocation Metrics',
       'Triple collocation analysis is only available if 3 or more data sets (including the reference) are selected.',
       false,
+      true,
       this.tripleCollocationDisabled.bind(this),
       this.onTripleCollocationMetricsChanged.bind(this));
 
@@ -32,6 +36,7 @@ export class MetricsComponent implements OnInit {
       'Calculates confidence intervals via bootstrapping with 1000 repetitions. ' +
       'This can significantly impact performance, typically increases runtime by a factor of 5.',
       false,
+      true,
       this.bootstrapingDisabled.bind(this),
     );
 
@@ -40,9 +45,11 @@ export class MetricsComponent implements OnInit {
       'Include Stability Metrics',
       'Here we will explain what stability metrics are',
       false,
+      true,
       this.stabilityMetricsDisabled.bind(this),
     )
 
+    // define the metric according to the model (like above) and then push it to the validation model (like below).
 
     this.validationModel.update(model => {
       model.metrics.push(this.tripleCollocationMetrics, this.bootstrapTripleCollocationMetrics, this.stabilityMetrics)
@@ -50,12 +57,8 @@ export class MetricsComponent implements OnInit {
     });
   }
 
-  onTripleCollocationMetricsChanged(newValue: boolean): void {
-    if (!newValue) {
-      this.bootstrapTripleCollocationMetrics.value = false;
-    } else {
-    }
-  }
+  // define a function that disables the metric (remember about enabling it as well).
+  // If the metric should be never disabled, just pass '() => false' as isDisabled callback
 
   tripleCollocationDisabled(): boolean {
     return this.validationModel().datasetConfigurations.length < 3;
@@ -69,8 +72,17 @@ export class MetricsComponent implements OnInit {
     return this.validationModel().intraAnnualMetrics.intra_annual_metrics;
   }
 
+  // If something else should happen, when the metric is checked, add a proper function here
+
+  onTripleCollocationMetricsChanged(newValue: boolean): void {
+    if (!newValue) {
+      this.bootstrapTripleCollocationMetrics.value = false;
+    }
+  }
+
+  // this one is triggered to call a function assigned to the particular metric to check if it should be disabled
   checkIfDisabled(metric: MetricModel): boolean {
-    return metric.triggerDisabledCheck();
+    return metric.triggerDisabledCheck(metric.switchOffIfDisabled);
   }
 
 
