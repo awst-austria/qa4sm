@@ -309,8 +309,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (validationRunConfig.metrics) {
       validationRunConfig.metrics.forEach(metricDto => {
         this.validationModel.metrics.forEach(metricModel => {
-          if (metricModel.id === metricDto.id) {
-            metricModel.value.set(metricDto.value);
+          if (metricModel.name === metricDto.id) {
+            metricModel.value = (metricDto.value);
           }
         });
       });
