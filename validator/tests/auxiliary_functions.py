@@ -43,6 +43,9 @@ def generate_default_validation_hires():        # defined, but never used
 
 
 def generate_default_validation():
+    '''
+    Generate a default validation run, as it was always used for tests
+    '''
     run = ValidationRun()
     run.start_time = datetime.now(tzlocal())
     run.save()
@@ -223,7 +226,7 @@ def generate_ismn_upscaling_validation():
 
     return run
 
-#----------------------------------vals for the intra-annual metrics-------------------------------
+# #----------------------------------vals for the intra-annual metrics-------------------------------
 
 def generate_default_seasonal_validation():
     run = generate_default_validation()
@@ -249,140 +252,6 @@ def generate_default_monthly_validation():
 
 def generate_default_seasonal_overlap_validation():
     run = generate_default_validation()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 20
-
-    run.save()
-
-    return run
-
-
-def generate_default_seasonal_validation_triple_coll():
-    run = generate_default_validation_triple_coll()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_default_monthly_validation_triple_coll():
-    run = generate_default_validation_triple_coll()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Months'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_default_seasonal_overlap_validation_triple_coll():
-    run = generate_default_validation_triple_coll()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 20
-
-    run.save()
-
-    return run
-
-def generate_default_seasonal_validation_smos():
-    run = generate_default_validation_smos()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_default_monthly_validation_smos():
-    run = generate_default_validation_smos()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Months'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_default_seasonal_overlap_validation_smos():
-    run = generate_default_validation_smos()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 20
-
-    run.save()
-
-    return run
-
-
-def generate_default_seasonal_validation_smos_l2(sbpca=False):
-    run = generate_default_validation_smos_l2(sbpca=sbpca)
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_default_monthly_validation_smos_l2(sbpca=False):
-    run = generate_default_validation_smos_l2(sbpca=sbpca)
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Months'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_default_seasonal_overlap_validation_smos_l2(sbpca=False):
-    run = generate_default_validation_smos_l2(sbpca=sbpca)
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 20
-
-    run.save()
-
-    return run
-
-def generate_seasonal_ismn_upscaling_validation():
-    run = generate_ismn_upscaling_validation()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Seasonal'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_monthly_ismn_upscaling_validation():
-    run = generate_ismn_upscaling_validation()
-
-    run.intra_annual_metrics = True
-    run.intra_annual_type = 'Months'
-    run.intra_annual_overlap = 0
-
-    run.save()
-
-    return run
-
-def generate_seasonal_overlap_ismn_upscaling_validation():
-    run = generate_ismn_upscaling_validation()
 
     run.intra_annual_metrics = True
     run.intra_annual_type = 'Seasonal'

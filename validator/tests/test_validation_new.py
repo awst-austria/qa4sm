@@ -12,7 +12,7 @@ from re import IGNORECASE  # @UnresolvedImport
 from re import search as regex_search
 from re import match as regex_match
 from zipfile import ZipFile
-from typing import Dict, Union, List, Tuple, Callable
+from typing import Dict, Union, List, Tuple, Callable, Any
 from pathlib import Path
 
 from netCDF4 import Dataset as ncDataset
@@ -23,8 +23,11 @@ from dateutil.tz import tzlocal
 from django.contrib.auth import get_user_model
 from api.tests import test_validation_config_view
 
+from api.views import auxiliary_functions
 from validator.validation.validation import compare_validation_runs, copy_validationrun
-
+# from validator.tests.auxiliary_functions import generate_ismn_upscaling_validation
+from validator.tests.auxiliary_functions_new import generate_ismn_upscaling_validation
+import validator.tests.auxiliary_functions_new as aux
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
@@ -38,24 +41,18 @@ from validator.models import DatasetVersion
 from validator.models import ParametrisedFilter
 from validator.models import ValidationRun
 from validator.models import CopiedValidations
-# from validator.tests.auxiliary_functions import (
-#     generate_ismn_upscaling_validation,
-#     generate_default_validation,
-#     generate_default_validation_triple_coll,
-# )
 from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS, OVERLAP_MIN, OVERLAP_MAX, OUTPUT_FOLDER
 from validator.validation.util import get_function_name
-from validator.tests.testutils import validations_runs_lut, tcol_validations_runs_lut, ismn_upscaling_validations_runs_lut
+from validator.tests.valruns_for_tests import TestValidationRunType, validations_runs_lut, tcol_validations_runs_lut, ismn_upscaling_validations_runs_lut
 from django.shortcuts import get_object_or_404
 from math import comb
 
 from qa4sm_reader.globals import out_metadata_plots, _metadata_exclude, CLUSTERED_BOX_PLOT_SAVENAME
 from qa4sm_reader.utils import transcribe
-
 
 User = get_user_model()
 
@@ -68,17 +65,16 @@ class TestValidation(TestCase):
 
     __logger = logging.getLogger(__name__)
 
-    @property
-    def validation_runs(self):
-        return  validations_runs_lut
-
-    @property
-    def tcol_validation_runs(self):
-        return  tcol_validations_runs_lut
-
-    @property
-    def ismn_upscaling_validation_runs(self):
-        return  ismn_upscaling_validations_runs_lut
+    def get_test_validation_run(self, run_type):
+        """ Unified method to access validation run dictionaries based on run_type """
+        if run_type == 'default':
+            return validations_runs_lut
+        elif run_type == 'tcol':
+            return tcol_validations_runs_lut
+        elif run_type == 'ismn_upscaling':
+            return ismn_upscaling_validations_runs_lut
+        else:
+            raise ValueError(f"Unknown validation run type: {run_type}")
 
     def setUp(self):
         self.metrics = ['gpi', 'lon', 'lat'] + list(METRICS.keys())
@@ -116,7 +112,7 @@ class TestValidation(TestCase):
 
     def _check_validation_configuration_consistency(
             self, validation: ValidationRun,
-            val_params_tbe: Dict[str, Union[str, float, int, None]]) -> None:
+            expected_results: Dict[str, Union[str, float, int, None]]) -> None:
         """
         Checks if validation configuration is proper, i.e. if the scaling, temporal and spatial reference configurations,
         assigned to the particular validation have proper fields set to True, if not throws an error
@@ -194,14 +190,31 @@ class TestValidation(TestCase):
                 'Configuration is not marked as temporal reference.')
 
         # check for intra-annual metrics
-        if validation.intra_annual_metrics != val_params_tbe[
+        if validation.intra_annual_metrics != expected_results[
                 'intra_annual_metrics']:
             raise ValueError(
-                f'Intra-annual metrics are not configured properly. Expected "{val_params_tbe["intra_annual_metrics"]}", but got "{validation.intra_annual_metrics=}".'
+                f'Intra-annual metrics are not configured properly. Expected "{expected_results["intra_annual_metrics"]}", but got "{validation.intra_annual_metrics=}".'
             )
 
+        if validation.intra_annual_type != expected_results[
+                'intra_annual_type']:
+            raise ValueError(
+                f'Intra-annual type is not configured properly. Expected "{expected_results["intra_annual_type"]}", but got "{validation.intra_annual_type=}".'
+            )
+
+        if validation.intra_annual_overlap != expected_results[
+                'intra_annual_overlap']:
+            raise ValueError(
+                f'Intra-annual overlap is not configured properly. Expected "{expected_results["intra_annual_overlap"]}", but got "{validation.intra_annual_overlap=}".'
+            )
+
+        # above the expected results are verified against the actual results
+        # below though, we check if the expected results (which we now know are identical with the actua results) are consistent with what in general makes sense
+        # the purpose is to make sure that the results are not nonsense and follow their respective rules
+        # e.g. just because we expect an overlap of -1 and the actual overlap is -1, doesn't mean that this is a valid configuration
+
         # this is the default case, check default values
-        if val_params_tbe['intra_annual_metrics'] == False:
+        if expected_results['intra_annual_metrics'] == False:
             if validation.intra_annual_overlap != 0:
                 raise ValueError(
                     f'The default intra-annual overlap should be 0, but is found to be {validation.intra_annual_overlap=}.'
@@ -212,7 +225,7 @@ class TestValidation(TestCase):
                     f'The default intra-annual type should be "None", but is found to be {validation.intra_annual_type=}.'
                 )
 
-        elif val_params_tbe['intra_annual_metrics'] == True:
+        elif expected_results['intra_annual_metrics'] == True:
             if validation.intra_annual_overlap < OVERLAP_MIN:
                 raise ValueError(
                     f'The intra-annual overlap should not be below 0, as this does not make sense. Yet, it is found to be {validation.intra_annual_overlap=}.'
@@ -223,10 +236,10 @@ class TestValidation(TestCase):
                     f'The intra-annual overlap should not be above {OVERLAP_MAX}, bit is found to be {validation.intra_annual_overlap=}.'
                 )
 
-            elif validation.intra_annual_overlap != val_params_tbe[
+            elif validation.intra_annual_overlap != expected_results[
                     'intra_annual_overlap']:
                 raise ValueError(
-                    f'The intra-annual overlap should be {val_params_tbe["intra_annual_overlap"]}, but is found to be {validation.intra_annual_overlap=}.'
+                    f'The intra-annual overlap should be {expected_results["intra_annual_overlap"]}, but is found to be {validation.intra_annual_overlap=}.'
                 )
 
             if validation.intra_annual_type not in ['Seasonal', 'Monthly']:
@@ -239,7 +252,7 @@ class TestValidation(TestCase):
         run,
         is_tcol_run=False,
         meta_plots=True,
-        val_params_tbe: Dict[str, Union[str, float, int, None]] = {
+        expected_results: Dict[str, Any] = {
             'intra_annual_metrics': False,
             'intra_annual_type': None,
             'intra_annual_overlap': 0
@@ -247,7 +260,7 @@ class TestValidation(TestCase):
 
         try:
             self._check_validation_configuration_consistency(
-                run, val_params_tbe)
+                run, expected_results)
         except Exception as exc:
             assert False, f"'_check_validation_configuration raised and exception {exc}'"
 
@@ -459,36 +472,52 @@ class TestValidation(TestCase):
         # check files and dirs present in the output directory
         # there should always be 1x netcdf file, 1x graphs.zip, 1x statistics.zip & at least one additional directory called 'bulk'
 
-        files_dirs_tbe = {'dirs': [globals.DEFAULT_TSW],
-                          'zips': ['graphs.zip', 'statistics.zip'],
-                          }
+        files_dirs_tbe = {
+            'dirs': [globals.DEFAULT_TSW],
+            'zips': ['graphs.zip', 'statistics.zip'],
+        }
 
         # zip archives
         if run.intra_annual_metrics:
-            files_dirs_tbe['dirs_in_stats_zip'] = [x for x in files_dirs_tbe['dirs']] # create new list to avoid reference
+            files_dirs_tbe['dirs_in_stats_zip'] = [
+                x for x in files_dirs_tbe['dirs']
+            ]  # create new list to avoid reference
 
             if run.intra_annual_type == 'Seasonal':
-                files_dirs_tbe['dirs_in_stats_zip'].extend(list(globals.TEMPORAL_SUB_WINDOWS['seasons'].keys()))
+                files_dirs_tbe['dirs_in_stats_zip'].extend(
+                    list(globals.TEMPORAL_SUB_WINDOWS['seasons'].keys()))
             elif run.intra_annual_type == 'Monthly':
-                files_dirs_tbe['dirs_in_stats_zip'].extend(list(globals.TEMPORAL_SUB_WINDOWS['months'].keys()))
+                files_dirs_tbe['dirs_in_stats_zip'].extend(
+                    list(globals.TEMPORAL_SUB_WINDOWS['months'].keys()))
 
-            files_dirs_tbe['dirs_in_graphs_zip'] = [x for x in files_dirs_tbe['dirs_in_stats_zip']] # create new list to avoid reference
+            files_dirs_tbe['dirs_in_graphs_zip'] = [
+                x for x in files_dirs_tbe['dirs_in_stats_zip']
+            ]  # create new list to avoid reference
             files_dirs_tbe['dirs_in_graphs_zip'].append('comparison_boxplots')
 
             files_dirs_tbe['dirs'].append('comparison_boxplots')
 
             #-----------------------------------------check comparison boxplots-----------------------------------------
-            comparison_boxplots = [CLUSTERED_BOX_PLOT_SAVENAME.format(metric=x, filetype='png') for x in METRICS if x not in _metadata_exclude and x != 'n_obs']
-            assert set(os.listdir(os.path.join(outdir, 'comparison_boxplots'))) == set(comparison_boxplots)
+            comparison_boxplots = [
+                CLUSTERED_BOX_PLOT_SAVENAME.format(metric=x, filetype='png')
+                for x in METRICS if x not in _metadata_exclude and x != 'n_obs'
+            ]
+            assert set(os.listdir(os.path.join(
+                outdir, 'comparison_boxplots'))) == set(comparison_boxplots)
 
         def test_zips(zip_pth: str, dirs_tbe: List[str]):
             assert os.path.isfile(zip_pth)
 
             with ZipFile(zip_pth, 'r') as myzip:
-                assert myzip.testzip() is None  # check if the zip file is not corrupted
+                assert myzip.testzip(
+                ) is None  # check if the zip file is not corrupted
 
-                directories = {str(Path(info.filename).parent) for info in myzip.infolist()}
-                if directories == set('.'): # happens when no directories are present
+                directories = {
+                    str(Path(info.filename).parent)
+                    for info in myzip.infolist()
+                }
+                if directories == set(
+                        '.'):  # happens when no directories are present
                     directories = set()
                 assert directories == set(dirs_tbe)
 
@@ -496,12 +525,12 @@ class TestValidation(TestCase):
             if 'statistics' in z:
                 try:
                     expected_dirs = files_dirs_tbe['dirs_in_stats_zip']
-                except KeyError: # bulk case, only 'bulk' in statistics.zip
+                except KeyError:  # bulk case, only 'bulk' in statistics.zip
                     expected_dirs = [DEFAULT_TSW]
             elif 'graphs' in z:
                 try:
                     expected_dirs = files_dirs_tbe['dirs_in_graphs_zip']
-                except KeyError: # bulk case, no dirs in graphs.zip
+                except KeyError:  # bulk case, no dirs in graphs.zip
                     expected_dirs = []
 
             test_zips(os.path.join(outdir, z), expected_dirs)
@@ -509,15 +538,23 @@ class TestValidation(TestCase):
             #-------------------------------------------check stats csv files-------------------------------------------
             if 'statistics' in z:
                 with ZipFile(os.path.join(outdir, z), 'r') as myzip:
-                    zipped_csvs = set([info.filename for info in myzip.infolist() if info.filename.endswith('.csv')])
-                    expected_csvs = set([os.path.join(d, f'{d}_statistics_table.csv') for d in expected_dirs])
+                    zipped_csvs = set([
+                        info.filename for info in myzip.infolist()
+                        if info.filename.endswith('.csv')
+                    ])
+                    expected_csvs = set([
+                        os.path.join(d, f'{d}_statistics_table.csv')
+                        for d in expected_dirs
+                    ])
 
                 assert zipped_csvs == expected_csvs
 
-
         #dirs present
-        assert {x for x in os.listdir(outdir) if os.path.isdir(os.path.join(outdir, x))} == set(files_dirs_tbe['dirs'])
-
+        assert {
+            x
+            for x in os.listdir(outdir)
+            if os.path.isdir(os.path.join(outdir, x))
+        } == set(files_dirs_tbe['dirs'])
 
         #-------------------------------------------check all output graphics-------------------------------------------
         for metric in pair_metrics + comm_metrics + tcol_metrics:
@@ -551,23 +588,36 @@ class TestValidation(TestCase):
                        [f'{globals.DEFAULT_TSW}_boxplot_{metric}.png', f'{globals.DEFAULT_TSW}_boxplot_{metric}_for_*.png']
             self.__logger.debug(f"{bulk_png_graphics=}")
             # bulk graphics in .svg format
-            bulk_svg_graphics = [x.replace('.png', '.svg') for x in bulk_png_graphics] #TODO
+            bulk_svg_graphics = [
+                x.replace('.png', '.svg') for x in bulk_png_graphics
+            ]  #TODO
 
             # graphics for temporal sub-windows
             if run.intra_annual_metrics:
-                tsws = [x for x in files_dirs_tbe['dirs_in_graphs_zip'] if x != 'comparison_boxplots' and x != DEFAULT_TSW]
-                tsw_png_graphics = [os.path.join(tsw, f'{tsw}_boxplot_{metric}.png') for tsw in tsws]
-                tsw_svg_graphics = [x.replace('.png', '.svg') for x in tsw_png_graphics]
+                tsws = [
+                    x for x in files_dirs_tbe['dirs_in_graphs_zip']
+                    if x != 'comparison_boxplots' and x != DEFAULT_TSW
+                ]
+                tsw_png_graphics = [
+                    os.path.join(tsw, f'{tsw}_boxplot_{metric}.png')
+                    for tsw in tsws
+                ]
+                tsw_svg_graphics = [
+                    x.replace('.png', '.svg') for x in tsw_png_graphics
+                ]
 
                 self.__logger.debug(f"{tsw_png_graphics=}")
                 with ZipFile(os.path.join(outdir, 'graphs.zip'), 'r') as myzip:
-                    zipped_graphics = set([info.filename for info in myzip.infolist() if info.filename.endswith('.png') or info.filename.endswith('.svg')])
-                    expected_graphics = set(tsw_png_graphics + tsw_svg_graphics)
+                    zipped_graphics = set([
+                        info.filename for info in myzip.infolist()
+                        if info.filename.endswith('.png')
+                        or info.filename.endswith('.svg')
+                    ])
+                    expected_graphics = set(tsw_png_graphics +
+                                            tsw_svg_graphics)
 
                     for graphic in expected_graphics:
                         assert graphic in zipped_graphics
-
-
 
             # check for png bulk graphics in outdir
             boxplot_pngs = [
@@ -582,8 +632,6 @@ class TestValidation(TestCase):
 
             assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
 
-
-
             overview_pngs = [
                 x
                 for x in os.listdir(os.path.join(outdir, globals.DEFAULT_TSW))
@@ -597,12 +645,21 @@ class TestValidation(TestCase):
 
         #---------------------------------------------check tsw status plots---------------------------------------------
         if run.intra_annual_metrics:
-            tsw_status_graphics_png = [os.path.join(tsw, f'{tsw}_barplot_status.png') for tsw in tsws]
-            tsw_status_graphics_svg = [x.replace('.png', '.svg') for x in tsw_status_graphics_png]
+            tsw_status_graphics_png = [
+                os.path.join(tsw, f'{tsw}_barplot_status.png') for tsw in tsws
+            ]
+            tsw_status_graphics_svg = [
+                x.replace('.png', '.svg') for x in tsw_status_graphics_png
+            ]
 
             with ZipFile(os.path.join(outdir, 'graphs.zip'), 'r') as myzip:
-                zipped_graphics = set([info.filename for info in myzip.infolist() if info.filename.endswith('.png') or info.filename.endswith('.svg')])
-                expected_graphics = set(tsw_status_graphics_png + tsw_status_graphics_svg)
+                zipped_graphics = set([
+                    info.filename for info in myzip.infolist()
+                    if info.filename.endswith('.png')
+                    or info.filename.endswith('.svg')
+                ])
+                expected_graphics = set(tsw_status_graphics_png +
+                                        tsw_status_graphics_svg)
 
                 for graphic in expected_graphics:
                     assert graphic in zipped_graphics
@@ -621,19 +678,20 @@ class TestValidation(TestCase):
         run.delete()
         assert not os.path.exists(outdir)
 
-
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
         "ignore: Too few points are available to generate:UserWarning")
     def test_validation(self):
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}'  for {val_run}")
+        """ Test validation runs using different configurations """
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            _run, val_params_tbe_dict = val_run_params
+            run = testvalrun_data.generate_val()
 
-            run = _run()
-
+            # Custom setup for the validation run
             run.plots_save_metadata = 'always'
             run.user = self.testuser
 
@@ -647,10 +705,6 @@ class TestValidation(TestCase):
             run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
             run.save()
-
-            self.__logger.debug(
-                f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}"
-            )
 
             for i, config in enumerate(run.dataset_configurations.all()):
                 if config == run.spatial_reference_configuration:
@@ -680,10 +734,11 @@ class TestValidation(TestCase):
             assert new_run.error_points == 0
             assert new_run.ok_points == 9
 
-            self.check_results(new_run,
-                               is_tcol_run=False,
-                               meta_plots=True,
-                               val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows. I suppose there is too little data to perform the temporal matching
@@ -692,12 +747,12 @@ class TestValidation(TestCase):
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
         "ignore: Too few points are available to generate:UserWarning")
     def test_validation_tcol(self):
-        for val_run, val_run_params in self.tcol_validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}'  for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'tcol').items():
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            _run, val_params_tbe_dict = val_run_params
-
-            run = _run()
+            run = testvalrun_data.generate_val()
             run.plots_save_metadata = 'always'
             run.user = self.testuser
 
@@ -741,12 +796,18 @@ class TestValidation(TestCase):
             assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
             # at 5 locations the validation fails because not all datasets have data
             # assert new_run.error_points == 5
-            assert new_run.error_points == val_params_tbe_dict['new_run_error_points']
+            assert new_run.error_points == testvalrun_data.results_tbe_dict()['test_validation_ccip_ref'][
+                'new_run_error_points']
             # the other 4 are okay
             # assert new_run.ok_points == 4
-            assert new_run.ok_points == val_params_tbe_dict['new_run_ok_points']
+            assert new_run.ok_points == testvalrun_data.results_tbe_dict()['test_validation_ccip_ref'][
+                'new_run_ok_points']
 
-            self.check_results(new_run, is_tcol_run=True, meta_plots=True, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=True,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -754,12 +815,12 @@ class TestValidation(TestCase):
         "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
         "ignore: Too few points are available to generate:UserWarning")
     def test_validation_empty_network(self):
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}' for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            _run, val_params_tbe_dict = val_run_params
-
-            run = _run()
+            run = testvalrun_data.generate_val()
 
             run.plots_save_metadata = 'always'
             run.user = self.testuser
@@ -806,12 +867,13 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_gldas_ref(self):
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}' for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            _run, val_params_tbe_dict = val_run_params
+            run = testvalrun_data.generate_val()
 
-            run = _run()
             run.plots_save_metadata = 'always'
             run.user = self.testuser
 
@@ -855,7 +917,11 @@ class TestValidation(TestCase):
             assert new_run.error_points == 0
             assert new_run.ok_points == 19
 
-            self.check_results(new_run, is_tcol_run=False, meta_plots=False, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -864,12 +930,14 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccip_ref(self):
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}' for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test not adapted to handle differing validation results with intra-annual metrics
+                continue
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            _run, val_params_tbe_dict = val_run_params
-
-            run = _run()
+            run = testvalrun_data.generate_val()
             run.plots_save_metadata = 'always'
             run.user = self.testuser
 
@@ -909,10 +977,14 @@ class TestValidation(TestCase):
             assert new_run
 
             assert new_run.total_points == 24, "Number of gpis is off"
-            assert new_run.error_points == val_params_tbe_dict[get_function_name()]['new_run_error_points'], "Error points are off"
-            assert new_run.ok_points == val_params_tbe_dict[get_function_name()]['new_run_ok_points'], "OK points are off"
+            assert new_run.error_points == testvalrun_data.results_tbe_dict()['new_run_error_points'], "Error points are off"
+            assert new_run.ok_points == testvalrun_data.results_tbe_dict()['new_run_ok_points'], "OK points are off"
 
-            self.check_results(new_run, is_tcol_run=False, meta_plots=False, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -921,50 +993,61 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ccia_ref(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test not adapted to handle differing validation results with intra-annual metrics
+                continue
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        run.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=globals.CCIA)
-        run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.ESA_CCI_SM_A_V06_1)
-        run.spatial_reference_configuration.variable = DataVariable.objects.get(
-            pretty_name=globals.ESA_CCI_SM_A_sm)
-        run.spatial_reference_configuration.filters.add(
-            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
 
-        run.spatial_reference_configuration.save()
+            run.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=globals.CCIA)
+            run.spatial_reference_configuration.version = DatasetVersion.objects.get(
+                short_name=globals.ESA_CCI_SM_A_V06_1)
+            run.spatial_reference_configuration.variable = DataVariable.objects.get(
+                pretty_name=globals.ESA_CCI_SM_A_sm)
+            run.spatial_reference_configuration.filters.add(
+                DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
-        run.min_lat = self.hawaii_coordinates[0]
-        run.min_lon = self.hawaii_coordinates[1]
-        run.max_lat = self.hawaii_coordinates[2]
-        run.max_lon = self.hawaii_coordinates[3]
+            run.spatial_reference_configuration.save()
 
-        run.save()
+            run.interval_from = datetime(2000, 1, 1, tzinfo=UTC)
+            run.interval_to = datetime(2005, 1, 1, tzinfo=UTC)
+            run.min_lat = self.hawaii_coordinates[0]
+            run.min_lon = self.hawaii_coordinates[1]
+            run.max_lat = self.hawaii_coordinates[2]
+            run.max_lon = self.hawaii_coordinates[3]
 
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.filters.add(
-                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+            run.save()
 
-        run_id = run.id
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.filters.add(
+                        DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.save()
 
-        ## run the validation
-        val.run_validation(run_id)
+            run_id = run.id
 
-        new_run = ValidationRun.objects.get(pk=run_id)
-        assert new_run
+            ## run the validation
+            val.run_validation(run_id)
 
-        assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 5, "Error points are off"
-        assert new_run.ok_points == 19, "OK points are off"
+            new_run = ValidationRun.objects.get(pk=run_id)
+            assert new_run
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
-        self.delete_run(new_run)
+            assert new_run.total_points == 24, "Number of gpis is off"
+            assert new_run.error_points == 5, "Error points are off"
+            assert new_run.ok_points == 19, "OK points are off"
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -972,57 +1055,68 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_smap_ref(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test not adapted to handle differing validation results with intra-annual metrics
+                continue
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        run.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=globals.SMAP_L3)
-        run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.SMAP_V5_PM)
-        run.spatial_reference_configuration.variable = DataVariable.objects.get(
-            pretty_name=globals.SMAP_soil_moisture)
-        run.spatial_reference_configuration.filters.add(
-            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
 
-        run.spatial_reference_configuration.save()
+            run.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=globals.SMAP_L3)
+            run.spatial_reference_configuration.version = DatasetVersion.objects.get(
+                short_name=globals.SMAP_V5_PM)
+            run.spatial_reference_configuration.variable = DataVariable.objects.get(
+                pretty_name=globals.SMAP_soil_moisture)
+            run.spatial_reference_configuration.filters.add(
+                DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+            run.spatial_reference_configuration.save()
 
-        run.min_lat = self.hawaii_coordinates[0]
-        run.min_lon = self.hawaii_coordinates[1]
-        run.max_lat = self.hawaii_coordinates[2]
-        run.max_lon = self.hawaii_coordinates[3]
+            run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+            run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
 
-        run.scaling_method = ValidationRun.MEAN_STD
-        run.scaling_ref = run.spatial_reference_configuration
-        run.scaling_ref.is_scaling_reference = True
-        run.scaling_ref.save()
+            run.min_lat = self.hawaii_coordinates[0]
+            run.min_lon = self.hawaii_coordinates[1]
+            run.max_lat = self.hawaii_coordinates[2]
+            run.max_lon = self.hawaii_coordinates[3]
 
-        run.save()
+            run.scaling_method = ValidationRun.MEAN_STD
+            run.scaling_ref = run.spatial_reference_configuration
+            run.scaling_ref.is_scaling_reference = True
+            run.scaling_ref.save()
 
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.filters.add(
-                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+            run.save()
 
-        run_id = run.id
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.filters.add(
+                        DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.save()
 
-        # run the validation
-        val.run_validation(run_id)
+            run_id = run.id
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+            # run the validation
+            val.run_validation(run_id)
 
-        assert new_run
+            new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 140, "Number of gpis is off"
-        assert new_run.error_points == 134, "Error points are off"
-        assert new_run.ok_points == 6, "OK points are off"
+            assert new_run
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
-        self.delete_run(new_run)
+            assert new_run.total_points == 140, "Number of gpis is off"
+            assert new_run.error_points == 134, "Error points are off"
+            assert new_run.ok_points == 6, "OK points are off"
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -1030,56 +1124,67 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat_ref(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test not adapted to handle differing validation results with intra-annual metrics
+                continue
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        run.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=globals.ASCAT)
-        run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.ASCAT_H113)
-        run.spatial_reference_configuration.variable = DataVariable.objects.get(
-            pretty_name=globals.ASCAT_sm)
-        run.spatial_reference_configuration.filters.add(
-            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
 
-        run.spatial_reference_configuration.save()
+            run.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=globals.ASCAT)
+            run.spatial_reference_configuration.version = DatasetVersion.objects.get(
+                short_name=globals.ASCAT_H113)
+            run.spatial_reference_configuration.variable = DataVariable.objects.get(
+                pretty_name=globals.ASCAT_sm)
+            run.spatial_reference_configuration.filters.add(
+                DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
-        # different window is used here, because for the default one there is too much memory needed to create and save
-        # plots
-        run.min_lat = 20.32
-        run.min_lon = -157.47
-        run.max_lat = 21.33
-        run.max_lon = -155.86
+            run.spatial_reference_configuration.save()
 
-        run.scaling_method = ValidationRun.MEAN_STD
-        run.scaling_ref = run.spatial_reference_configuration
-        run.scaling_ref.is_scaling_reference = True
-        run.scaling_ref.save()
-        run.save()
+            run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+            run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+            # different window is used here, because for the default one there is too much memory needed to create and save
+            # plots
+            run.min_lat = 20.32
+            run.min_lon = -157.47
+            run.max_lat = 21.33
+            run.max_lon = -155.86
 
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.filters.add(
-                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+            run.scaling_method = ValidationRun.MEAN_STD
+            run.scaling_ref = run.spatial_reference_configuration
+            run.scaling_ref.is_scaling_reference = True
+            run.scaling_ref.save()
+            run.save()
 
-        run_id = run.id
-        ## run the validation
-        val.run_validation(run_id)
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.filters.add(
+                        DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.save()
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+            run_id = run.id
+            ## run the validation
+            val.run_validation(run_id)
 
-        assert new_run
+            new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 15, "Number of gpis is off"
-        assert new_run.error_points == 6, "Error points are off"
-        assert new_run.ok_points == 9, "OK points are off"
+            assert new_run
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
-        self.delete_run(new_run)
+            assert new_run.total_points == 15, "Number of gpis is off"
+            assert new_run.error_points == 6, "Error points are off"
+            assert new_run.ok_points == 9, "OK points are off"
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -1087,54 +1192,62 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_c3s_ref(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test not adapted to handle differing validation results with intra-annual metrics
+                continue
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        run.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=globals.C3SC)
-        run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.C3S_V202012)
-        run.spatial_reference_configuration.variable = DataVariable.objects.get(
-            pretty_name=globals.C3S_sm)
-        run.spatial_reference_configuration.filters.add(
-            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
 
-        run.spatial_reference_configuration.save()
+            run.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=globals.C3SC)
+            run.spatial_reference_configuration.version = DatasetVersion.objects.get(
+                short_name=globals.C3S_V202012)
+            run.spatial_reference_configuration.variable = DataVariable.objects.get(
+                pretty_name=globals.C3S_sm)
+            run.spatial_reference_configuration.filters.add(
+                DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
 
-        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
-        run.min_lat = self.hawaii_coordinates[0]
-        run.min_lon = self.hawaii_coordinates[1]
-        run.max_lat = self.hawaii_coordinates[2]
-        run.max_lon = self.hawaii_coordinates[3]
+            run.spatial_reference_configuration.save()
 
-        run.save()
+            run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+            run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+            run.min_lat = self.hawaii_coordinates[0]
+            run.min_lon = self.hawaii_coordinates[1]
+            run.max_lat = self.hawaii_coordinates[2]
+            run.max_lon = self.hawaii_coordinates[3]
 
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.filters.add(
-                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+            run.save()
 
-        run_id = run.id
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.filters.add(
+                        DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.save()
 
-        ## run the validation
-        val.run_validation(run_id)
+            run_id = run.id
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+            ## run the validation
+            val.run_validation(run_id)
 
-        assert new_run
+            new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 5, "Error points are off"
-        assert new_run.ok_points == 19, "OK points are off"
+            assert new_run
 
-        self.check_results(new_run,
-                           transcriber,
-                           is_tcol_run=False,
-                           meta_plots=False)
-        self.delete_run(new_run)
+            assert new_run.total_points == 24, "Number of gpis is off"
+            assert new_run.error_points == 5, "Error points are off"
+            assert new_run.ok_points == 19, "OK points are off"
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -1142,52 +1255,61 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_era5_ref(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        run.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=globals.ERA5)
-        run.spatial_reference_configuration.version = DatasetVersion.objects.get(
-            short_name=globals.ERA5_20190613)
-        run.spatial_reference_configuration.variable = DataVariable.objects.get(
-            pretty_name=globals.ERA5_sm)
-        run.spatial_reference_configuration.filters.add(
-            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        #        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
 
-        run.spatial_reference_configuration.save()
+            run.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=globals.ERA5)
+            run.spatial_reference_configuration.version = DatasetVersion.objects.get(
+                short_name=globals.ERA5_20190613)
+            run.spatial_reference_configuration.variable = DataVariable.objects.get(
+                pretty_name=globals.ERA5_sm)
+            run.spatial_reference_configuration.filters.add(
+                DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            #        run.spatial_reference_configuration.filters.add(DataFilter.objects.get(name='FIL_ERA5_TEMP_UNFROZEN'))
 
-        run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
-        run.min_lat = self.hawaii_coordinates[0]
-        run.min_lon = self.hawaii_coordinates[1]
-        run.max_lat = self.hawaii_coordinates[2]
-        run.max_lon = self.hawaii_coordinates[3]
+            run.spatial_reference_configuration.save()
 
-        run.save()
+            run.interval_from = datetime(2017, 1, 1, tzinfo=UTC)
+            run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+            run.min_lat = self.hawaii_coordinates[0]
+            run.min_lon = self.hawaii_coordinates[1]
+            run.max_lat = self.hawaii_coordinates[2]
+            run.max_lon = self.hawaii_coordinates[3]
 
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.filters.add(
-                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+            run.save()
 
-        run_id = run.id
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.filters.add(
+                        DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.save()
 
-        ## run the validation
-        val.run_validation(run_id)
+            run_id = run.id
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+            ## run the validation
+            val.run_validation(run_id)
 
-        assert new_run, "Didn't find validation in database"
+            new_run = ValidationRun.objects.get(pk=run_id)
 
-        assert new_run.total_points == 11, "Number of gpis is off"
-        assert new_run.error_points == 0, "Too many error gpis"
-        assert new_run.ok_points == 11, "OK points are off"
+            assert new_run, "Didn't find validation in database"
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=False)
-        self.delete_run(new_run)
+            assert new_run.total_points == 11, "Number of gpis is off"
+            assert new_run.error_points == 0, "Too many error gpis"
+            assert new_run.ok_points == 11, "OK points are off"
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -1195,44 +1317,55 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_ascat(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test not adapted to handle differing validation results with intra-annual metrics
+                continue
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.dataset = Dataset.objects.get(short_name='ASCAT')
-                config.version = DatasetVersion.objects.get(
-                    short_name='ASCAT_H113')
-                config.variable = DataVariable.objects.get(
-                    pretty_name='ASCAT_sm')
-                config.filters.clear()
-                config.save()
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
 
-        # run.scaling_ref = ValidationRun.SCALE_REF
-        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
-        run.scaling_ref = run.spatial_reference_configuration
-        run.scaling_ref.is_scaling_reference = True
-        run.scaling_ref.save()
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.dataset = Dataset.objects.get(short_name='ASCAT')
+                    config.version = DatasetVersion.objects.get(
+                        short_name='ASCAT_H113')
+                    config.variable = DataVariable.objects.get(
+                        pretty_name='ASCAT_sm')
+                    config.filters.clear()
+                    config.save()
 
-        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
-        run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
+            # run.scaling_ref = ValidationRun.SCALE_REF
+            run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+            run.scaling_ref = run.spatial_reference_configuration
+            run.scaling_ref.is_scaling_reference = True
+            run.scaling_ref.save()
 
-        run.save()
+            run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+            run.interval_to = datetime(2018, 1, 1, tzinfo=UTC)
 
-        run_id = run.id
+            run.save()
 
-        ## run the validation
-        val.run_validation(run_id)
+            run_id = run.id
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+            ## run the validation
+            val.run_validation(run_id)
 
-        assert new_run.total_points == 9
-        assert new_run.error_points == 1
-        assert new_run.ok_points == 8
+            new_run = ValidationRun.objects.get(pk=run_id)
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
-        self.delete_run(new_run)
+            assert new_run.total_points == 9
+            assert new_run.error_points == 1
+            assert new_run.ok_points == 8
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
     @pytest.mark.filterwarnings(
@@ -1240,12 +1373,14 @@ class TestValidation(TestCase):
         "ignore:No data for:UserWarning",
         "ignore: Too few points are available to generate:UserWarning")
     def test_validation_default(self):
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}'  for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test not adapted to handle differing validation results with intra-annual metrics
+                continue
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            _run, val_params_tbe_dict = val_run_params
-
-            run = _run()
+            run = testvalrun_data.generate_val()
             run.plots_save_metadata = 'always'
             run.user = self.testuser
 
@@ -1262,7 +1397,11 @@ class TestValidation(TestCase):
             assert new_run.error_points == 0
             assert new_run.ok_points == 9
 
-            self.check_results(new_run, is_tcol_run=False, meta_plots=True, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1271,35 +1410,45 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_moving_avg(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
-        run.anomalies = ValidationRun.MOVING_AVG_35_D
-        run.save()
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
 
-        run.spatial_reference_configuration.filters.add(
-            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.spatial_reference_configuration.save()
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.filters.add(
-                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        run_id = run.id
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
+            run.anomalies = ValidationRun.MOVING_AVG_35_D
+            run.save()
 
-        ## run the validation
-        val.run_validation(run_id)
+            run.spatial_reference_configuration.filters.add(
+                DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            run.spatial_reference_configuration.save()
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.filters.add(
+                        DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.save()
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+            run_id = run.id
 
-        assert new_run
-        assert new_run.total_points == 9
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+            ## run the validation
+            val.run_validation(run_id)
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
-        self.delete_run(new_run)
+            new_run = ValidationRun.objects.get(pk=run_id)
+
+            assert new_run
+            assert new_run.total_points == 9
+            assert new_run.error_points == 0
+            assert new_run.ok_points == 9
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
         "ignore:No results for gpi:UserWarning",
@@ -1307,12 +1456,13 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_anomalies_climatology(self):
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}'  for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
 
-            _run, val_params_tbe_dict = validation_runs[val_run]
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            run = _run()
+            run = testvalrun_data.generate_val()
 
             run.plots_save_metadata = 'always'
             run.user = self.testuser
@@ -1340,7 +1490,11 @@ class TestValidation(TestCase):
 
             assert new_run
 
-            self.check_results(new_run, is_tcol_run=False, meta_plots=True, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1352,12 +1506,12 @@ class TestValidation(TestCase):
         Test correctness and completedness of netCDF attributes in the output file;
         a validation that doesn't involve ISMN ref is used to check the resolution attributes
         """
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}' for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            _run, val_params_tbe_dict = val_run_params
-
-            run = _run()
+            run = testvalrun_data.generate_val()
 
             run.plots_save_metadata = 'always'
             run.user = self.testuser
@@ -1388,7 +1542,11 @@ class TestValidation(TestCase):
 
             new_run = ValidationRun.objects.get(pk=run_id)
 
-            self.check_results(new_run, is_tcol_run=False, meta_plots=False, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
@@ -1401,12 +1559,13 @@ class TestValidation(TestCase):
         Test a validation of CCIP with ISMN as non-reference, and upscaling option active. All ISMN points are averaged
         and the results should produce 16 points (original c3s points); results are checked with `check_results`
         """
-        for val_run, val_run_params in self.ismn_upscaling_validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}' for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'ismn_upscaling').items():
 
-            _run, val_params_tbe_dict = val_run_params
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            run = _run()
+            run = testvalrun_data.generate_val()
             run.user = self.testuser
 
             # hawaii bounding box
@@ -1429,7 +1588,11 @@ class TestValidation(TestCase):
             assert new_run.error_points == 12
             assert new_run.ok_points == 4
 
-            self.check_results(new_run, is_tcol_run=False, meta_plots=False, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=False,
+                expected_results=testvalrun_data.results_tbe_dict())
             self.delete_run(new_run)
 
     @pytest.mark.filterwarnings(
@@ -1441,7 +1604,7 @@ class TestValidation(TestCase):
         Generate a test with ISMN as non-reference dataset and the provided dataset, version, variable as reference.
         Test that the results and the output file with the function `check_results`
         """
-        run = self.ismn_upscaling_validation_runs['bulk_ismn_upscaling_validation'][0]()
+        run = self.get_test_validation_run('ismn_upscaling')[TestValidationRunType.BULK_ISMN_UPSCALING].generate_val()
         run.user = self.testuser
 
         # NOTE: ISMN non-reference points need to use one of the upscaling methods
@@ -1505,7 +1668,8 @@ class TestValidation(TestCase):
         non-reference dataset, the collected points change; in this case, with filters "COSMOS" and depth 0.0-0.1,
         no station in the ISMN is found
         """
-        run = self.ismn_upscaling_validation_runs['bulk_ismn_upscaling_validation'][0]()
+        run = self.get_test_validation_run(
+            'ismn_upscaling')[TestValidationRunType.BULK_ISMN_UPSCALING].generate_val()
         dataset = Dataset.objects.get(short_name='C3S_combined')
         version = DatasetVersion.objects.get(short_name="C3S_V202012")
         c3s_reader = val.create_reader(dataset, version)
@@ -1564,41 +1728,51 @@ class TestValidation(TestCase):
         "ignore: Too few points are available to generate:UserWarning")
     @pytest.mark.long_running
     def test_validation_spatial_subsetting(self):
-        run = generate_default_seasonal_validation()
-        run.plots_save_metadata = 'always'
-        run.user = self.testuser
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
 
-        # hawaii bounding box
-        run.min_lat = 18.625  # ll
-        run.min_lon = -156.375  # ll
-        run.max_lat = 20.375  # ur
-        run.max_lon = -154.625  # ur
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        run.save()
+            run = testvalrun_data.generate_val()
+            run.plots_save_metadata = 'always'
+            run.user = self.testuser
 
-        run.spatial_reference_configuration.filters.add(
-            DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-        run.spatial_reference_configuration.save()
-        for config in run.dataset_configurations.all():
-            if config != run.spatial_reference_configuration:
-                config.filters.add(
-                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
-            config.save()
+            # hawaii bounding box
+            run.min_lat = 18.625  # ll
+            run.min_lon = -156.375  # ll
+            run.max_lat = 20.375  # ur
+            run.max_lon = -154.625  # ur
 
-        run_id = run.id
+            run.save()
 
-        ## run the validation
-        val.run_validation(run_id)
+            run.spatial_reference_configuration.filters.add(
+                DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+            run.spatial_reference_configuration.save()
+            for config in run.dataset_configurations.all():
+                if config != run.spatial_reference_configuration:
+                    config.filters.add(
+                        DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+                config.save()
 
-        new_run = ValidationRun.objects.get(pk=run_id)
+            run_id = run.id
 
-        assert new_run
-        assert new_run.total_points == 9
-        assert new_run.error_points == 0
-        assert new_run.ok_points == 9
+            ## run the validation
+            val.run_validation(run_id)
 
-        self.check_results(new_run, is_tcol_run=False, meta_plots=True)
-        self.delete_run(new_run)
+            new_run = ValidationRun.objects.get(pk=run_id)
+
+            assert new_run
+            assert new_run.total_points == 9
+            assert new_run.error_points == 0
+            assert new_run.ok_points == 9
+
+            self.check_results(
+                new_run,
+                is_tcol_run=False,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
+            self.delete_run(new_run)
 
     def test_errors(self):
         dataset = Dataset()
@@ -2026,16 +2200,18 @@ class TestValidation(TestCase):
     @pytest.mark.graphs
     def test_generate_graphs_ismn_no_meta(self):
         # Note: parameterized tests don't really work in this case
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}' for {val_run}")
+        infile, short_name = ('testdata/output_data/c3s_ismn.nc', 'ISMN')
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test file does not contain intra-annual data
+                continue
 
-            _run, val_params_tbe_dict = val_run_params
-
-            infile, short_name = ('testdata/output_data/c3s_ismn.nc', 'ISMN')
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
             # create validation object and data folder for it
-            # v = generate_default_seasonal_validation()
-            v = _run()
+            v = testvalrun_data.generate_val()
+
             # scatterplot
             v.spatial_reference_configuration.dataset = Dataset.objects.get(
                 short_name=short_name)
@@ -2048,9 +2224,16 @@ class TestValidation(TestCase):
             shutil.copy(infile, path.join(run_dir, 'results.nc'))
             val.set_outfile(v, run_dir)
             v.save()
-            val.generate_all_graphs(validation_run=v, temporal_sub_windows=val_params_tbe_dict['temporal_sub_wndws'], outfolder=run_dir, save_metadata='never')
+            val.generate_all_graphs(
+                validation_run=v,
+                temporal_sub_windows=testvalrun_data.
+                results_tbe_dict()['temporal_sub_windows'],
+                outfolder=run_dir,
+                save_metadata='never',
+            )
 
-            for tsw in val_params_tbe_dict['temporal_sub_wndws']:
+            for tsw in testvalrun_data.results_tbe_dict()[
+                    'temporal_sub_windows']:
                 boxplot_pngs = [
                     x for x in os.listdir(os.path.join(run_dir, tsw))
                     if fnmatch.fnmatch(x, f'{tsw}_boxplot*.png')
@@ -2083,53 +2266,66 @@ class TestValidation(TestCase):
         # Note: parameterized tests don't really work in this case
         infile, short_name = ('testdata/output_data/c3s_ismn_metadata.nc',
                               'ISMN')
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test file does not contain intra-annual data
+                continue
 
-        # List of metadata classes for which box plots are created.
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        # create validation object and data folder for it
-        v = generate_default_seasonal_validation()
-        # scatterplot
-        v.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=short_name)
-        v.spatial_reference_configuration.save()
-        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
-        val.mkdir_if_not_exists(run_dir)
+            # create validation object and data folder for it
+            v = testvalrun_data.generate_val()
 
-        # copy our netcdf data file there and link it in the validation object
-        # then generate the graphs
-        shutil.copy(infile, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        v.save()
-        val.generate_all_graphs(v, run_dir, save_metadata='always')
+            # scatterplot
+            v.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=short_name)
+            v.spatial_reference_configuration.save()
+            run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+            val.mkdir_if_not_exists(run_dir)
 
-        n_metrics = len(globals.METRICS.keys())
-        n_metas = len(globals.METADATA_PLOT_NAMES.keys())
+            # copy our netcdf data file there and link it in the validation object
+            # then generate the graphs
+            shutil.copy(infile, path.join(run_dir, 'results.nc'))
+            val.set_outfile(v, run_dir)
+            v.save()
+            val.generate_all_graphs(
+                validation_run=v,
+                temporal_sub_windows=testvalrun_data.
+                results_tbe_dict()['temporal_sub_windows'],
+                outfolder=run_dir,
+                save_metadata='always',
+            )
 
-        meta_boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')
-        ]
-        self.__logger.debug(meta_boxplot_pngs)
-        # no meta box plots for r_p & rho_p
-        assert len(meta_boxplot_pngs) == (n_metrics - 3) * n_metas
+            n_metrics = len(globals.METRICS.keys())
+            n_metas = len(globals.METADATA_PLOT_NAMES.keys())
 
-        boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*.png')
-        ]
-        self.__logger.debug(boxplot_pngs)
-        # no boxplot for status
-        assert len(boxplot_pngs) == n_metrics - 1 + (n_metas * (n_metrics - 3))
+            meta_boxplot_pngs = [
+                x for x in os.listdir(run_dir)
+                if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')
+            ]
+            self.__logger.debug(meta_boxplot_pngs)
+            # no meta box plots for r_p & rho_p
+            assert len(meta_boxplot_pngs) == (n_metrics - 3) * n_metas
 
-        overview_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'overview*.png')
-        ]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metrics * (
-            v.dataset_configurations.count() - 1)
+            boxplot_pngs = [
+                x for x in os.listdir(run_dir)
+                if fnmatch.fnmatch(x, 'boxplot*.png')
+            ]
+            self.__logger.debug(boxplot_pngs)
+            # no boxplot for status
+            assert len(boxplot_pngs) == n_metrics - 1 + (n_metas *
+                                                         (n_metrics - 3))
 
-        self.delete_run(v)
+            overview_pngs = [
+                x for x in os.listdir(run_dir)
+                if fnmatch.fnmatch(x, 'overview*.png')
+            ]
+            self.__logger.debug(overview_pngs)
+            assert len(overview_pngs) == n_metrics * (
+                v.dataset_configurations.count() - 1)
+
+            self.delete_run(v)
 
     @pytest.mark.filterwarnings(
         "ignore: Too few points are available to generate:UserWarning")
@@ -2137,36 +2333,51 @@ class TestValidation(TestCase):
     @pytest.mark.graphs
     def test_generate_graphs_gldas(self):
         infile, short_name = ('testdata/output_data/c3s_gldas.nc', 'GLDAS')
-        v = generate_default_seasonal_validation()
-        v.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=short_name)
-        v.spatial_reference_configuration.save()
-        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
-        val.mkdir_if_not_exists(run_dir)
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test file does not contain intra-annual data
+                continue
 
-        shutil.copy(infile, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        v.save()
-        val.generate_all_graphs(v, run_dir, save_metadata='never')
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*.png')
-        ]
-        self.__logger.debug(boxplot_pngs)
-        # no boxplot for status
-        n_metrics = len(globals.METRICS.keys()) - 1
-        assert len(boxplot_pngs) == n_metrics
+            # create validation object and data folder for it
+            v = testvalrun_data.generate_val()
+            v.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=short_name)
+            v.spatial_reference_configuration.save()
+            run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+            val.mkdir_if_not_exists(run_dir)
 
-        overview_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'overview*.png')
-        ]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metrics * (
-            v.dataset_configurations.count() - 1)
+            shutil.copy(infile, path.join(run_dir, 'results.nc'))
+            val.set_outfile(v, run_dir)
+            v.save()
+            val.generate_all_graphs(
+                validation_run=v,
+                temporal_sub_windows=testvalrun_data.
+                results_tbe_dict()['temporal_sub_windows'],
+                outfolder=run_dir,
+                save_metadata='never',
+            )
 
-        self.delete_run(v)
+            boxplot_pngs = [
+                x for x in os.listdir(run_dir)
+                if fnmatch.fnmatch(x, 'boxplot*.png')
+            ]
+            self.__logger.debug(boxplot_pngs)
+            # no boxplot for status
+            n_metrics = len(globals.METRICS.keys()) - 1
+            assert len(boxplot_pngs) == n_metrics
+
+            overview_pngs = [
+                x for x in os.listdir(run_dir)
+                if fnmatch.fnmatch(x, 'overview*.png')
+            ]
+            self.__logger.debug(overview_pngs)
+            assert len(overview_pngs) == n_metrics * (
+                v.dataset_configurations.count() - 1)
+
+            self.delete_run(v)
 
     @pytest.mark.filterwarnings(
         "ignore: Too few points are available to generate:UserWarning")
@@ -2175,35 +2386,51 @@ class TestValidation(TestCase):
     def test_generate_graphs_era5land(self):
         infile, short_name = ('testdata/output_data/c3s_era5land.nc',
                               'ERA5_LAND')
-        v = generate_default_seasonal_validation()
-        v.spatial_reference_configuration.dataset = Dataset.objects.get(
-            short_name=short_name)
-        v.spatial_reference_configuration.save()
-        run_dir = path.join(OUTPUT_FOLDER, str(v.id))
-        val.mkdir_if_not_exists(run_dir)
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test file does not contain intra-annual data
+                continue
 
-        shutil.copy(infile, path.join(run_dir, 'results.nc'))
-        val.set_outfile(v, run_dir)
-        v.save()
-        val.generate_all_graphs(v, run_dir, save_metadata='never')
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-        boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*.png')
-        ]
-        self.__logger.debug(boxplot_pngs)
-        n_metrics = len(globals.METRICS.keys()) - 1  # no boxplot for status
-        assert len(boxplot_pngs) == n_metrics
+            # create validation object and data folder for it
+            v = testvalrun_data.generate_val()
+            v.spatial_reference_configuration.dataset = Dataset.objects.get(
+                short_name=short_name)
+            v.spatial_reference_configuration.save()
+            run_dir = path.join(OUTPUT_FOLDER, str(v.id))
+            val.mkdir_if_not_exists(run_dir)
 
-        overview_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'overview*.png')
-        ]
-        self.__logger.debug(overview_pngs)
-        assert len(overview_pngs) == n_metrics * (
-            v.dataset_configurations.count() - 1)
+            shutil.copy(infile, path.join(run_dir, 'results.nc'))
+            val.set_outfile(v, run_dir)
+            v.save()
+            val.generate_all_graphs(
+                validation_run=v,
+                temporal_sub_windows=testvalrun_data.
+                results_tbe_dict()['temporal_sub_windows'],
+                outfolder=run_dir,
+                save_metadata='never',
+            )
 
-        self.delete_run(v)
+            boxplot_pngs = [
+                x for x in os.listdir(run_dir)
+                if fnmatch.fnmatch(x, 'boxplot*.png')
+            ]
+            self.__logger.debug(boxplot_pngs)
+            n_metrics = len(
+                globals.METRICS.keys()) - 1  # no boxplot for status
+            assert len(boxplot_pngs) == n_metrics
+
+            overview_pngs = [
+                x for x in os.listdir(run_dir)
+                if fnmatch.fnmatch(x, 'overview*.png')
+            ]
+            self.__logger.debug(overview_pngs)
+            assert len(overview_pngs) == n_metrics * (
+                v.dataset_configurations.count() - 1)
+
+            self.delete_run(v)
 
     # @pytest.mark.long_running
     def test_existing_validations(self):
@@ -2219,7 +2446,9 @@ class TestValidation(TestCase):
         run_ids = []
         # preparing a few validations, so that there is a base to be searched
         for i in range(3):
-            run = self.validation_runs['default_bulk'][0]()
+            self.__logger.info(f"{self.get_test_validation_run('default')=}")
+            run = self.get_test_validation_run(
+                'default')[TestValidationRunType.DEFAULT_BULK].generate_val()
             run.plots_save_metadata = 'always'
             run.user = self.testuser
             run.interval_from = time_intervals_from
@@ -2243,7 +2472,8 @@ class TestValidation(TestCase):
             run_ids.append(run.id)
 
         # ================== tcols ====================================
-        run_tcol = self.tcol_validation_runs['default_tcol_bulk'][0]()
+        run_tcol = self.get_test_validation_run(
+            'tcol')[TestValidationRunType.DEFAULT_TCOL_BULK].generate_val()
         run_tcol.user = self.testuser
         run_tcol.interval_from = time_intervals_from
         run_tcol.interval_to = time_intervals_to
@@ -2264,7 +2494,8 @@ class TestValidation(TestCase):
 
         # ========= validations with filters
 
-        run_filt = self.validation_runs['default_bulk'][0]()
+        run_filt = self.get_test_validation_run(
+            'default')[TestValidationRunType.DEFAULT_BULK].generate_val()
         run_filt.user = self.testuser
         run_filt.interval_from = time_intervals_from
         run_filt.interval_to = time_intervals_to
@@ -2302,7 +2533,8 @@ class TestValidation(TestCase):
 
         # here will be validations for asserting, I start with exactly the same validations and check if it finds them:
         for i in range(3):
-            run = self.validation_runs['default_bulk'][0]()
+            run = self.get_test_validation_run(
+                'default')[TestValidationRunType.DEFAULT_BULK].generate_val()
             run.plots_save_metadata = 'always'
             run.user = self.testuser
             run.interval_from = time_intervals_from
@@ -2329,7 +2561,8 @@ class TestValidation(TestCase):
             run.delete()
 
         # runs to fail:
-        run = self.validation_runs['default_bulk'][0]()
+        run = self.get_test_validation_run(
+            'default')[TestValidationRunType.DEFAULT_BULK].generate_val()
         run.plots_save_metadata = 'always'
         run.user = self.testuser
         run.interval_from = time_intervals_from
@@ -2579,7 +2812,8 @@ class TestValidation(TestCase):
         assert not is_there_one['is_there_validation']
 
         # ================== tcols ====================================
-        run_tcol = self.tcol_validation_runs['default_tcol_bulk'][0]()
+        run_tcol = self.get_test_validation_run(
+            'tcol')[TestValidationRunType.DEFAULT_TCOL_BULK].generate_val()
         run_tcol.user = self.testuser
         run_tcol.interval_from = time_intervals_from
         run_tcol.interval_to = time_intervals_to
@@ -2611,15 +2845,18 @@ class TestValidation(TestCase):
         DatasetConfiguration.objects.all().delete()
         ParametrisedFilter.objects.all().delete()
 
-    #NOTE: does not run with temporal subwindows
+    #TODO: does not run with temporal subwindows
     def test_copy_validation(self):
-        for val_run, val_run_params in self.validation_runs.items():
-            self.__logger.debug(f"Running test '{get_function_name()}'  for {val_run}")
+        for testvalrun_type, testvalrun_data in self.get_test_validation_run(
+                'default').items():
+            if testvalrun_type != 'default_bulk':  # test file does not contain intra-annual data
+                continue
 
-            _run, val_params_tbe_dict = val_run_params
+            self.__logger.debug(
+                f"Running test '{get_function_name()}' for {testvalrun_type}")
 
-            # create a validation to copy:
-            run = _run()
+            # create validation object and data folder for it
+            run = testvalrun_data.generate_val()
 
             run.plots_save_metadata = 'always'
             run.user = self.testuser
@@ -2656,9 +2893,10 @@ class TestValidation(TestCase):
 
             validations = ValidationRun.objects.exclude(
                 pk=copied_run_info['run_id'])
-            copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
+            copied_run = ValidationRun.objects.get(
+                pk=copied_run_info['run_id'])
             comparison = compare_validation_runs(copied_run, validations,
-                                                copied_run.user)
+                                                 copied_run.user)
 
             # the query validations will be empty so 'is_there_validation' == False, 'val_id' == None, '
             # 'belongs_to_user'==False, 'is_published' == False
@@ -2672,10 +2910,11 @@ class TestValidation(TestCase):
 
             validations = ValidationRun.objects.exclude(
                 pk=copied_run_info['run_id'])
-            copied_run = ValidationRun.objects.get(pk=copied_run_info['run_id'])
+            copied_run = ValidationRun.objects.get(
+                pk=copied_run_info['run_id'])
 
             comparison = compare_validation_runs(copied_run, validations,
-                                                copied_run.user)
+                                                 copied_run.user)
 
             # print(f'\n\t{comparison}\n')
             assert comparison['is_there_validation']
@@ -2687,7 +2926,11 @@ class TestValidation(TestCase):
             assert copied_run.error_points == 0
             assert copied_run.ok_points == 9
 
-            self.check_results(copied_run, is_tcol_run=False, meta_plots=True, val_params_tbe=val_params_tbe_dict)
+            self.check_results(
+                copied_run,
+                is_tcol_run=False,
+                meta_plots=True,
+                expected_results=testvalrun_data.results_tbe_dict())
 
             # copying again, so to check CopiedValidations model
             new_run = get_object_or_404(ValidationRun, pk=run_id)
