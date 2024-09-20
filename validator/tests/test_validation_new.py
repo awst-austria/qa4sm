@@ -25,8 +25,8 @@ from api.tests import test_validation_config_view
 
 from api.views import auxiliary_functions
 from validator.validation.validation import compare_validation_runs, copy_validationrun
-# from validator.tests.auxiliary_functions import generate_ismn_upscaling_validation
-from validator.tests.auxiliary_functions_new import generate_ismn_upscaling_validation
+from validator.tests.auxiliary_functions import generate_ismn_upscaling_validation
+# from validator.tests.auxiliary_functions_new import generate_ismn_upscaling_validation
 import validator.tests.auxiliary_functions_new as aux
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -2849,8 +2849,8 @@ class TestValidation(TestCase):
     def test_copy_validation(self):
         for testvalrun_type, testvalrun_data in self.get_test_validation_run(
                 'default').items():
-            if testvalrun_type != 'default_bulk':  # test file does not contain intra-annual data
-                continue
+            # if testvalrun_type != 'default_bulk':  # test file does not contain intra-annual data
+            #     continue
 
             self.__logger.debug(
                 f"Running test '{get_function_name()}' for {testvalrun_type}")
