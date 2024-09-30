@@ -180,6 +180,9 @@ ALLOWED_COMPRESSION_LEVELS = qr_globals.ALLOWED_COMPRESSION_LEVELS
 DEFAULT_TSW = qr_globals.DEFAULT_TSW
 TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
 
+# inter-annual metrics related
+add_annual_subwindows = qr_globals.add_annual_subwindows
+
 
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
