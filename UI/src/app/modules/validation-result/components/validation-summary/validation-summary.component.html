@@ -164,6 +164,11 @@
           <span *ngIf="!validationRun.bootstrap_tcol_cis">deactivated. </span>
         </li>
 
+        <li>Stability metrics were
+          <span *ngIf="validationRun.stability_metrics">activated. </span>
+          <span *ngIf="!validationRun.stability_metrics">deactivated. </span>
+        </li>
+
         <li> Intra annual metrics were
           <span *ngIf="validationRun.intra_annual_metrics">activated. Selected type: {{validationRun.intra_annual_type}}. Selected overlap {{validationRun.intra_annual_overlap}}
             {{validationRun.intra_annual_overlap === 1 ? 'day' : 'days'}}.</span>

@@ -111,6 +111,12 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     """
 
     run_dir = path.join(OUTPUT_FOLDER, str(validation_run.id))
+    metric_template = METRIC_TEMPLATE[0]
+
+    if "bulk" in os.listdir(run_dir):
+        run_dir += '/bulk'
+        metric_template = 'bulk_' + metric_template
+
     pairs, triples = {}, {}
     ref0_config = None
 
@@ -118,7 +124,6 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
 
     for root, dirs, files in os.walk(run_dir):
         for f in files:
-
             if not f.endswith('.png'): continue
 
             for pair_metric in METRICS.keys():
@@ -131,7 +136,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                     metrics['status'] = METRICS['status']
                     continue
 
-                template = ''.join([METRIC_TEMPLATE[0],
+                template = ''.join([metric_template,
                                     METRIC_TEMPLATE[1].format(metric=pair_metric)]) + '.png'
                 parsed = parse(template, f)
 

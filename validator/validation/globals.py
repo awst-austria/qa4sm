@@ -180,12 +180,19 @@ ALLOWED_COMPRESSION_LEVELS = qr_globals.ALLOWED_COMPRESSION_LEVELS
 DEFAULT_TSW = qr_globals.DEFAULT_TSW
 TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
 
-# inter-annual metrics related
-add_annual_subwindows = qr_globals.add_annual_subwindows
-
 
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
+
+# inter-annual metrics related
+add_annual_subwindows = qr_globals.add_annual_subwindows
+
+# overlap parameter interval definiton
+OVERLAP_MIN = 0
+OVERLAP_MAX = 185
+
+# max amount of datasets that can be compared in one validation run
+MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
 GEOJSON_FILE_NAME = 'ismn_sensors.json'

@@ -131,8 +131,10 @@ class ValidationRun(models.Model):
         default='threshold'
     )
     intra_annual_metrics = models.BooleanField(default=False)
-    intra_annual_type = models.CharField(max_length=100, blank=True)
+    intra_annual_type = models.CharField(max_length=100, blank=True, null=True)
     intra_annual_overlap = models.IntegerField(blank=True, null=True)
+
+    stability_metrics = models.BooleanField(default=False)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration

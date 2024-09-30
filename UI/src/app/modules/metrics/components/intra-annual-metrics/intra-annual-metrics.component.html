@@ -2,13 +2,14 @@
   <div class="w-auto flex flex-row justify-content-center">
     <p-checkbox id="intraAnnualMetricsSelector"
                 [ngModel]="selectedMetric().intra_annual_metrics"
-                (ngModelChange)="updateSelectedMetric($event, 'intra_annual_metrics')"
+                (ngModelChange)="toggleMetricSelection($event)"
+                [disabled]="disabled()"
                 binary="true"/>
     <label class="pl-2" for="intraAnnualMetricsSelector">Include Intra-Annual metrics</label>
   </div>
   <div class="w-1">
     <label class="p-panel-header-icon"
-           pTooltip="Here goes some explanation of what this metric is about :)"
+           pTooltip="To assess the intra-annual variation in product performance (e.g., summer versus winter), metrics are calculated separately for each month or season (including data from the respective month/season of all years) instead of for the entire time series (bulk case)"
            tooltipPosition="bottom">
       <span class="pi pi-question-circle ml-2"></span>
     </label>
@@ -28,13 +29,13 @@
         <p-dropdown id="intraAnnualMetricTypeSelector"
                     [options]="intraAnnualMetricTypes"
                     [ngModel]="selectedMetric().intra_annual_type"
-                    (ngModelChange)="updateSelectedMetric($event, 'intra_annual_type')">
+                    (ngModelChange)="updateType($event)">
         </p-dropdown>
         <label for="intraAnnualMetricTypeSelector">Select</label>
       </div>
       <div class="w-1 flex lg:justify-content-center justify-content-start">
         <label class="p-panel-header-icon"
-               pTooltip="Here goes some explanation of what this type means"
+               pTooltip="The set of temporal sub-windows over which all metrics are calculated:&#10;&#10;&#8226; 'Seasonal': the four meteorological seasons.&#10;&#10;&#8226; 'Monthly': the twelve months.&#10;&#10;Note: Per default, the bulk case (metrics calculated over the entire time series) is always included.&#10;Refer to the manual for the exact definitions."
                tooltipPosition="bottom">
           <span class="pi pi-question-circle ml-2"></span>
         </label>
@@ -53,16 +54,16 @@
           [maxFractionDigits]="0"
           [suffix]="selectedMetric().intra_annual_overlap === 1 ? ' day' : ' days'"
           [ngModel]="selectedMetric().intra_annual_overlap"
-          (ngModelChange)="updateSelectedMetric($event, 'intra_annual_overlap')"
+          (ngModelChange)="setOverlap($event)"
           [step]="1"
           [min]="0"
-          [max]="185">
+          [max]="maxIntraAnnualOverlap()">
         </p-inputNumber>
         <label for="overlapSelector">Select overlap</label>
       </div>
       <div class="w-1 flex lg:justify-content-center justify-content-start">
         <label class="p-panel-header-icon"
-               pTooltip="Here goes some explanation of what the overlap means"
+               pTooltip="Extends each temporal sub-window on either side by the specified number of days, i.e. the overlap is symmetric. May be used to increase the sample size, but may introduce correlations between adjacent windows as they will overlap."
                tooltipPosition="bottom">
           <span class="pi pi-question-circle ml-2"></span>
         </label>
