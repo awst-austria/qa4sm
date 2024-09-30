@@ -11,6 +11,62 @@
          class="flex flex-column align-content-center justify-content-center">
       <div *ngIf="selectedMetric() && selectedMetric().boxplotFiles|async as boxplots"
            class="flex flex-column w-12 flex-wrap gap-2">
+        <div
+          class="flex flex-row w-12 align-content-center justify-content-center my-2 py-3 lg:flex-nowrap flex-wrap gap-2">
+          <div class="flex flex-column lg:w-6 w-10  flex-wrap justify-content-center align-content-center gap-4">
+            <div class="flex flex-column w-10"
+                 *ngIf="boxplots.length > 1">
+                          <span class="p-float-label">
+                              <p-dropdown id="boxplotSelector"
+                                          (onChange)="onBoxPlotChange($event)"
+                                          [options]="selectedMetric().boxplot_dicts"
+                                          [ngModel]="selectedMetric().boxplot_dicts[boxplotIndx]"
+                                          optionLabel="name"
+                                          [style]="{'width': '100%'}">
+                              </p-dropdown>
+                              <label for="boxplotSelector">Select boxplot classification</label>
+                            </span>
+            </div>
+            <div class="flex flex-column w-10">
+                      <span class="p-float-label">
+                        <p-dropdown id="metricSelector"
+                                    (onChange)="onMetricChange($event)"
+                                    [options]="metrics"
+                                    [ngModel]="selectedMetric()"
+                                    optionLabel="metric_pretty_name"
+                                    [style]="{'width': '100%'}">
+                        </p-dropdown>
+                        <label for="metricSelector">Select boxplot/map metric</label>
+                      </span>
+            </div>
+          </div>
+          <div
+            class="flex flex-row lg:w-6 w-10 lg:flex-nowrap flex-wrap justify-content-center align-content-center gap-2">
+            <div class="flex flex-column lg:w-5 w-10 justify-content-center">
+              <button pButton
+                      type="button"
+                      icon="pi pi-download"
+                      class="btn-action-large download-results"
+                      label="Download graphs"
+                      pTooltip="Download graphs .zip"
+                      [life]="globals.tooltipLifetime"
+                      (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
+              </button>
+            </div>
+
+            <div class="flex flex-column lg:w-5 w-10 justify-content-center">
+              <button pButton
+                      type="button"
+                      label="Download NetCDF"
+                      pTooltip="Download all results in NetCDF format"
+                      [life]="globals.tooltipLifetime"
+                      (click)="downloadResultFile(validation.id, 'netCDF', validation.output_file_name)">
+                <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <hr class="flex w-11 pt-0 mt-0 featurette-divider">
         <div *ngIf="selectedMetric().overviewFiles|async as overviewPlots"
              class="flex flex-row lg:flex-nowrap flex-wrap w-12 align-content-center justify-content-center py-3">
           <div *ngIf="boxplots.length > 0"
@@ -69,65 +125,12 @@
             </div>
           </div>
         </div>
-        <div
-          class="flex flex-row w-12 align-content-center justify-content-center my-2 py-3 lg:flex-nowrap flex-wrap gap-2">
-          <div class="flex flex-column lg:w-6 w-10  flex-wrap justify-content-center align-content-center gap-4">
-            <div class="flex flex-column w-10"
-                 *ngIf="boxplots.length > 1">
-                          <span class="p-float-label">
-                              <p-dropdown id="boxplotSelector"
-                                          (onChange)="onBoxPlotChange($event)"
-                                          [options]="selectedMetric().boxplot_dicts"
-                                          [ngModel]="selectedMetric().boxplot_dicts[boxplotIndx]"
-                                          optionLabel="name"
-                                          [style]="{'width': '100%'}">
-                              </p-dropdown>
-                              <label for="boxplotSelector">Select boxplot classification</label>
-                            </span>
-            </div>
-            <div class="flex flex-column w-10">
-                      <span class="p-float-label">
-                        <p-dropdown id="metricSelector"
-                                    (onChange)="onMetricChange($event)"
-                                    [options]="metrics"
-                                    [ngModel]="selectedMetric()"
-                                    optionLabel="metric_pretty_name"
-                                    [style]="{'width': '100%'}">
-                        </p-dropdown>
-                        <label for="metricSelector">Select boxplot/map metric</label>
-                      </span>
-            </div>
-          </div>
-          <div
-            class="flex flex-row lg:w-6 w-10 lg:flex-nowrap flex-wrap justify-content-center align-content-center gap-2">
-            <div class="flex flex-column lg:w-5 w-10 justify-content-center">
-              <button pButton
-                      type="button"
-                      icon="pi pi-download"
-                      class="btn-action-large download-results"
-                      label="Download graphs"
-                      pTooltip="Download graphs .zip"
-                      [life]="globals.tooltipLifetime"
-                      (click)="downloadResultFile(validation.id, 'graphics',validation.id + '_graphs.zip')">
-              </button>
-            </div>
-
-            <div class="flex flex-column lg:w-5 w-10 justify-content-center">
-              <button pButton
-                      type="button"
-                      class="btn-action-large download-results"
-                      icon="faIcons.faFileDownload"
-                      label="Download NetCDF"
-                      pTooltip="Download all results in NetCDF format"
-                      [life]="globals.tooltipLifetime"
-                      (click)="downloadResultFile(validation.id, 'netCDF', validation.output_file_name)">
-                <span><fa-icon [icon]="faIcons.faFileDownload"></fa-icon></span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
+
+
+
+<!--    leave it as it is-->
     <div *ngIf="dataFetchError() || fileError()">
       <p class="lead text-muted">
         Result plots are temporarily unavailable.
