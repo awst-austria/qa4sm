@@ -67,10 +67,17 @@
           </div>
         </div>
         <hr class="flex w-11 pt-0 mt-0 featurette-divider">
+        <div class="flex flex-row w-12 justify-content-center align-content-center text-4xl text-muted">
+          Bulk Plots
+          <span class="pi pi-question-circle mx-2 text-2xl"
+                pTooltip="Plots based on results from the entire selected timespan."
+                tooltipPosition="bottom">
+          </span>
+        </div>
         <div *ngIf="selectedMetric().overviewFiles|async as overviewPlots"
              class="flex flex-row lg:flex-nowrap flex-wrap w-12 align-content-center justify-content-center py-3">
           <div *ngIf="boxplots.length > 0"
-               class="flex flex-column lg:w-6 w-10 align-items-center justify-content-center">
+               class="flex flex-column lg:w-5 w-10 align-items-center justify-content-center plot-spot">
             <p-galleria [value]="boxplots"
                         [(visible)]="displayBoxplotGallery"
                         [(activeIndex)]="activeBoxplotIndex"
@@ -88,16 +95,17 @@
             </p-galleria>
             <img width="85%"
                  height="95%"
+                 style="object-fit: contain;"
                  [src]="sanitizePlotUrl(boxplots[boxplotIndx].plot)"
                  (click)="showGallery(boxplotIndx, 'boxplot')"
                  [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
                  alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
           </div>
-          <div class="flex flex-row flex-wrap lg:w-6 w-10 align-content-center justify-content-center gap-3">
+          <div class="flex flex-row flex-wrap lg:w-7 w-10 align-content-center justify-content-center gap-2 column-gap-0 plot-spot">
             <div *ngFor="let plot of overviewPlots; let ind = index"
                  [ngClass]="{'image-container': true,
                              'w-12': overviewPlots.length === 1,
-                             'w-9': overviewPlots.length === 2,
+                             'w-10': overviewPlots.length === 2,
                              'w-5': overviewPlots.length > 2}">
                     <span class="image-label">
                       {{ selectedMetric().datasets[ind] }}
@@ -117,7 +125,8 @@
                              display: block;"/>
                 </ng-template>
               </p-galleria>
-              <img width="95%" height="95%"
+              <img width="95%" height="85%"
+                   style="object-fit: contain;"
                    [src]="sanitizePlotUrl(plot.plot)"
                    (click)="showGallery(ind, 'overview')"
                    [ngClass]="{'result-plot':true, 'pcol': true}"
@@ -125,12 +134,54 @@
             </div>
           </div>
         </div>
+
+
+        <div *ngIf="validation.intra_annual_metrics" class="flex flex-column w-12 align-items-center">
+          <hr class="flex w-11 pt-0 mt-0 featurette-divider">
+          <div class="flex flex-row w-12 justify-content-center align-content-center text-4xl text-muted">
+            Seasonal Metrics Plots
+            <span class="pi pi-question-circle mx-2 text-2xl"
+                  pTooltip="Plots based on results from selected seasonal metrics. Please note, that these are only basic overview plots. All the generated plots can be found in the zip file."
+                  tooltipPosition="bottom">
+          </span>
+          </div>
+          <div *ngIf="(selectedMetric().comparisonFile|async) as comparisonFile; else noSeasonalPlots"
+               class="flex flex-row lg:flex-nowrap flex-wrap w-12 align-content-center justify-content-center mx-2 my-3 plot-spot">
+            <p-galleria [value]="comparisonFile"
+                        [(visible)]="displayAdditionalPlotGallery"
+                        [(activeIndex)]="activeAdditionalPlotIndex"
+                        [circular]="true"
+                        [fullScreen]="true"
+                        [showThumbnails]="false"
+                        [baseZIndex]="100000">
+              <ng-template pTemplate="item" let-item>
+                <img [src]="sanitizePlotUrl(item.plot)"
+                     alt="Boxplot for {{selectedMetric().metric_pretty_name}}"
+                     style="width: 70%;
+                             display: block;"/>
+              </ng-template>
+            </p-galleria>
+            <img width="55%"
+                 height="55%"
+                 style="object-fit: contain;"
+                 [src]="sanitizePlotUrl(comparisonFile[activeAdditionalPlotIndex].plot)"
+                 (click)="showGallery(0, 'seasonal')"
+                 [ngClass]="{'result-plot':true}"
+                 alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
+          </div>
+          <ng-template #noSeasonalPlots>
+            <div class="flex flex-row w-12 justify-content-center align-content-center text-muted py-4 text-xl">
+              <em> There are no plots for the selected metric </em>
+            </div>
+          </ng-template>
+        </div>
+
+
       </div>
     </div>
 
 
-
-<!--    leave it as it is-->
+    <!--    leave it as it is-->
     <div *ngIf="dataFetchError() || fileError()">
       <p class="lead text-muted">
         Result plots are temporarily unavailable.
