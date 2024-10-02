@@ -16,4 +16,9 @@ class Migration(migrations.Migration):
             name='potential_maintenance',
             field=models.BooleanField(default=False),
         ),
+        migrations.AddField(
+            model_name='settings',
+            name='potential_maintenance_description',
+            field=models.TextField(blank=True),
+        ),
     ]
