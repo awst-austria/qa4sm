@@ -654,7 +654,7 @@ def run_validation(validation_id):
                 pytesmo_results=os.path.join(OUTPUT_FOLDER,
                                           validation_run.output_file.name),
                 intra_annual_slices=temp_sub_wdw_instance,
-                keep_pytesmo_ncfile=False)
+                keep_pytesmo_ncfile=True)
             if transcriber.exists:
                 restructured_results = transcriber.get_transcribed_dataset()
                 transcriber.output_file_name = transcriber.build_outname(
