@@ -96,7 +96,6 @@ def get_metric_names_and_associated_files(request):
         if f'{seasonal_prefix}s' in path_content:
             seasonal_files_path = file_path + f'{seasonal_prefix}s/'
 
-
         if "bulk" in path_content:
             file_path += 'bulk/'
             bulk_prefix = 'bulk_'
@@ -122,24 +121,25 @@ def get_metric_names_and_associated_files(request):
     metrics = OrderedDict(sorted([(v, k) for k, v in metrics.items()]))
     response = []
 
+    # 'n_obs' doesn't refer to datasets, so I create a list with independent metrics, if there are other similar
+    # metrics it's just enough to add them here:
+    independent_metrics = ['n_obs', 'status']
+    barplot_metric = ['status']
 
     for metric_ind, key in enumerate(metrics):
-        # 'n_obs' doesn't refer to datasets, so I create a list with independent metrics, if there are other similar
-        # metrics it's just enough to add them here:
-
-        independent_metrics = ['n_obs', 'status']
-        barplot_metric = ['status']
-
         boxplot_file = ''
         seasonal_metric_file = ''
-        boxplot_file_name = bulk_prefix + 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric else 'barplot_' + \
-                                                                                                          metrics[
-                                                                                                              key] + '.png'
+        boxplot_file_name = bulk_prefix + 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric \
+            else 'barplot_' + metrics[key] + '.png'
         seasonal_file_name = seasonal_prefix + '_' + metrics[key] + '.png'
 
         if metrics[key] not in independent_metrics:
+            print('metric', metrics[key])
+
             overview_plots = [{'file_name': bulk_prefix + 'overview_' + name_key + '_' + metrics[key] + '.png',
                                'datasets': name_key} for name_key in combis]
+            print('number of overview plots', len(overview_plots))
+            print(overview_plots)
         else:
             overview_plots = [{'file_name': bulk_prefix + 'overview_' + metrics[key] + '.png', 'datasets': ''}]
 
@@ -147,10 +147,12 @@ def get_metric_names_and_associated_files(request):
             boxplot_file = file_path + boxplot_file_name
 
         if len(seasonal_files) and seasonal_file_name in seasonal_files:
-            seasonal_metric_file = [seasonal_files_path + seasonal_file_name] # for now there is only one file for intra-annual metrics;
+            seasonal_metric_file = [
+                seasonal_files_path + seasonal_file_name]  # for now there is only one file for intra-annual metrics;
 
         overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if
                           file_dict['file_name'] in files]
+        print('number of overview files', len(overview_files))
         datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if
                     file_dict['file_name'] in files]
 
