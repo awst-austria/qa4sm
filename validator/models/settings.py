@@ -6,6 +6,7 @@ class Settings(models.Model):
 
     id = models.AutoField(primary_key=True)
     maintenance_mode = models.BooleanField(default=True)
+    potential_maintenance = models.BooleanField(default=False)
     news = models.TextField(blank=True)
     sum_link = models.CharField(max_length=250, blank=True, verbose_name='User Manual Link')
     feed_link = models.CharField(max_length=250, blank=True, verbose_name='Feedback Link')
