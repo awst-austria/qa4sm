@@ -67,7 +67,7 @@
           </div>
         </div>
         <hr class="flex w-11 pt-0 mt-0 featurette-divider">
-        <div class="flex flex-row w-12 justify-content-center align-content-center text-4xl text-muted">
+        <div class="flex flex-row w-12 justify-content-center align-content-center md:text-4xl text-2xl text-muted">
           Bulk Plots
           <span class="pi pi-question-circle mx-2 text-2xl"
                 pTooltip="Plots based on results from the entire selected timespan."
@@ -138,7 +138,7 @@
 
         <div *ngIf="validation.intra_annual_metrics" class="flex flex-column w-12 align-items-center">
           <hr class="flex w-11 pt-0 mt-0 featurette-divider">
-          <div class="flex flex-row w-12 justify-content-center align-content-center text-4xl text-muted">
+          <div class="flex flex-row w-12 flex-wrap justify-content-center align-content-center md:text-4xl text-2xl text-muted">
             Seasonal Metrics Plots
             <span class="pi pi-question-circle mx-2 text-2xl"
                   pTooltip="Plots based on results from selected seasonal metrics. Please note, that these are only basic overview plots. All the generated plots can be found in the zip file."
@@ -177,13 +177,11 @@
             </div>
           </div>
           <ng-template #noSeasonalPlots>
-            <div class="flex flex-row w-12 justify-content-center align-content-center text-muted py-4 text-xl">
-              <em> There are no plots for the selected metric </em>
+            <div class="flex flex-row w-12 justify-content-center align-content-center text-muted py-4 md:text-xl">
+              <em style="color: darkgrey"> There are no plots for the selected metric </em>
             </div>
           </ng-template>
         </div>
-
-
       </div>
     </div>
 
