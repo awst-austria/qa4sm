@@ -18,7 +18,9 @@ export class SettingsService {
   fixedSettings = [{
     id: 0,
     maintenance_mode: true,
+    potential_maintenance: false,
     news: 'Sorry, something went wrong and we could not fetch news.',
+    potential_maintenance_description: '',
     sum_link: 'https://qa4sm.eu/api/user-manual',
     feed_link: 'https://qa4sm.eu/ui/**'
   }]
