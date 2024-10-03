@@ -27,7 +27,7 @@ from api.views import auxiliary_functions
 from validator.validation.validation import compare_validation_runs, copy_validationrun
 from validator.tests.auxiliary_functions import generate_ismn_upscaling_validation
 # from validator.tests.auxiliary_functions_new import generate_ismn_upscaling_validation
-import validator.tests.auxiliary_functions_new as aux
+# import validator.tests.auxiliary_functions_new as aux
 from django.test import TestCase
 from django.test.utils import override_settings
 from pytz import UTC
