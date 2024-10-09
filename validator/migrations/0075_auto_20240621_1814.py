@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('validator', '0074_alter_userdatasetfile_file'),
+        ('validator', '0074_auto_20241002_0834'),
     ]
 
     operations = [

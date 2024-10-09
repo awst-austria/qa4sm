@@ -43,6 +43,9 @@ def generate_default_validation_hires():        # defined, but never used
 
 
 def generate_default_validation():
+    '''
+    Generate a default validation run, as it was always used for tests
+    '''
     run = ValidationRun()
     run.start_time = datetime.now(tzlocal())
     run.save()
@@ -223,7 +226,8 @@ def generate_ismn_upscaling_validation():
 
     return run
 
-#----------------------------------vals for the intra-annual metrics-------------------------------
+
+# #----------------------------------vals for the intra-annual metrics-------------------------------
 
 def generate_default_seasonal_validation():
     run = generate_default_validation()
