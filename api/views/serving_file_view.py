@@ -85,6 +85,10 @@ def get_metric_names_and_associated_files(request):
 
     try:
         file_path = validation.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
+    except AttributeError:
+        return JsonResponse({'message': 'Given validation has no output directory assigned'}, status=404)
+
+    try:
         path_content = os.listdir(file_path)
 
         # for now we assume that there can be either intra-annual metrics or stability metrics, so the seasonal prefix
@@ -99,8 +103,9 @@ def get_metric_names_and_associated_files(request):
         if "bulk" in path_content:
             file_path += 'bulk/'
             bulk_prefix = 'bulk_'
-    except AttributeError:
-        return JsonResponse({'message': 'Given validation has no output directory assigned'}, status=404)
+    except FileNotFoundError:
+        return JsonResponse({'message': 'Output directory does not contain any files.'}, status=404)
+
 
     seasonal_files = []
     if seasonal_files_path:
@@ -111,7 +116,7 @@ def get_metric_names_and_associated_files(request):
     try:
         files = os.listdir(file_path)
         if len(files) == 0:
-            return JsonResponse({'message': 'There are no files in the given directory'}, status=404)
+            return JsonResponse({'message': 'There are no result files in the given directory'}, status=404)
 
     except FileNotFoundError as e:
         return JsonResponse({'message': str(e)}, status=404)

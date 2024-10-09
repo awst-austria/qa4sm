@@ -269,7 +269,8 @@ dependencies:
     - pytest-django==4.5.2
     - pytest-mpl==0.16.1
     - qa4sm-preprocessing==0.2
-    - qa4sm-reader==0.9.1
+    # - qa4sm-reader==0.9.1
+    - git+https://github.com/nfb2021/qa4sm-reader.git@comparison_plots_for_temp_sub_wins_for_744#egg=qa4sm-reader
     - redis==4.5.5
     - repurpose==0.9
     - ruamel-yaml==0.17.26
