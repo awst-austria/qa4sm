@@ -83,7 +83,12 @@ class TestValidationConfigView(TransactionTestCase):
                           'anomalies_to': None,
                           'scaling_method': ValidationRun.NO_SCALING,
                           'name_tag': 'test_validation',
-                          'temporal_matching': globals.TEMP_MATCH_WINDOW}
+                          'temporal_matching': globals.TEMP_MATCH_WINDOW,
+                          'intra_annual_metrics': {
+                              'intra_annual_metrics': False,
+                              'intra_annual_type': '',
+                              'intra_annual_overlap': None
+                          }}
 
     def test_start_validation(self):
         start_validation_url = reverse('Run new validation')
