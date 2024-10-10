@@ -53,7 +53,11 @@ def get_csv_with_statistics(request):
     """Download .csv of the statistics"""
     validation_id = request.query_params.get('validationId', None)
     validation = get_object_or_404(ValidationRun, id=validation_id)
-    inspection_table = get_inspection_table(validation)
+
+    try:
+        inspection_table = get_inspection_table(validation)
+    except FileNotFoundError as e:
+        return HttpResponse('File not found', 404)
 
     if isinstance(inspection_table, str):
         return HttpResponse('error file size', 404)
@@ -115,7 +119,8 @@ def get_metric_names_and_associated_files(request):
 
     try:
         files = os.listdir(file_path)
-        if len(files) == 0:
+
+        if len(files) == 0 or not any(file.endswith('.png') for file in files):
             return JsonResponse({'message': 'There are no result files in the given directory'}, status=404)
 
     except FileNotFoundError as e:
@@ -139,12 +144,8 @@ def get_metric_names_and_associated_files(request):
         seasonal_file_name = seasonal_prefix + '_' + metrics[key] + '.png'
 
         if metrics[key] not in independent_metrics:
-            print('metric', metrics[key])
-
             overview_plots = [{'file_name': bulk_prefix + 'overview_' + name_key + '_' + metrics[key] + '.png',
                                'datasets': name_key} for name_key in combis]
-            print('number of overview plots', len(overview_plots))
-            print(overview_plots)
         else:
             overview_plots = [{'file_name': bulk_prefix + 'overview_' + metrics[key] + '.png', 'datasets': ''}]
 
@@ -157,7 +158,6 @@ def get_metric_names_and_associated_files(request):
 
         overview_files = [file_path + file_dict['file_name'] for file_dict in overview_plots if
                           file_dict['file_name'] in files]
-        print('number of overview files', len(overview_files))
         datasets = [' '.join(file_dict['datasets'].split('_')) for file_dict in overview_plots if
                     file_dict['file_name'] in files]
 
@@ -233,7 +233,11 @@ def get_summary_statistics(request):
     validation = get_object_or_404(ValidationRun, id=validation_id)
     # resetting index added, otherwise there would be a row shift between the index column header and the header of the
     # rest of the columns when df rendered as html
-    inspection_table = get_inspection_table(validation)
+
+    try:
+        inspection_table = get_inspection_table(validation)
+    except FileNotFoundError as e:
+        return HttpResponse('File not found', 404)
 
     if isinstance(inspection_table, str):
         return HttpResponse('error file size')

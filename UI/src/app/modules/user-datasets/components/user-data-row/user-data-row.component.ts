@@ -235,7 +235,6 @@ export class UserDataRowComponent implements OnInit, OnDestroy {
   }
 
   fetchMetadataError(source: string): Observable<never> {
-    console.log(this.variable.prettyName(), this.datasetName(), this.versionName())
     this.toastService.showErrorWithHeader('Error fetching metadata',
       `${source} metadata could not be fetched, there might be information on your dataset missing. ` +
       'If the error persists, contact our support team.')
