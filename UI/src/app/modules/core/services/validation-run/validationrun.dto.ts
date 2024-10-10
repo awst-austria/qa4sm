@@ -1,4 +1,4 @@
-export class ValidationrunDto{
+export class ValidationrunDto {
   constructor(public id: any,
               public name_tag: string,
               public user: number,
@@ -39,6 +39,9 @@ export class ValidationrunDto{
               public is_a_copy: boolean,
               public bootstrap_tcol_cis: boolean,
               public temporal_matching: number,
+              public intra_annual_metrics: boolean,
+              public intra_annual_overlap: number | null,
+              public intra_annual_type: string | null,
               public comparison_label?: string,
               public contains_user_data?: boolean,
               public all_files_exist?: boolean) {

@@ -22,7 +22,7 @@ from rest_framework.authtoken.models import Token
 from validator.models import Dataset
 from validator.models import ValidationRun
 from validator.tests.testutils import set_dataset_paths
-from validator.validation import ISMN_LIST_FILE_NAME
+from validator.validation.globals import ISMN_LIST_FILE_NAME
 
 from django.contrib.auth import get_user_model
 

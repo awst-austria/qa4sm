@@ -101,7 +101,6 @@ export class HttpErrorService {
       ? "Possibly the link has been already used. Please request a new password reset." :
       'Setting new password is currently not possible. Please try again later or contact our support team.';
     const header: string = error.detail ? 'Invalid password reset link' : this.somethingWentWrongPhrase;
-    console.log(message, header)
     return {message: message, header: header};
   }
 

@@ -11,6 +11,7 @@ import {
   TemporalMatchingModel
 } from '../../modules/temporal-matching/components/temporal-matching/temporal-matching-model';
 import {ReferenceModel} from '../../modules/validation-reference/components/validation-reference/reference-model';
+import {IntraAnnualMetricsDto} from "./service/validation-run-config-dto";
 
 export class ValidationModel {
   // The reference configuration array should contain exactly one item.
@@ -19,6 +20,7 @@ export class ValidationModel {
               public spatialSubsetModel: SpatialSubsetModel,
               public validationPeriodModel: ValidationPeriodModel,
               public metrics: MetricModel[],
+              public intraAnnualMetrics: IntraAnnualMetricsDto,
               public anomalies: AnomaliesModel,
               public temporalMatchingModel: TemporalMatchingModel,
               public scalingMethod: ScalingModel,
