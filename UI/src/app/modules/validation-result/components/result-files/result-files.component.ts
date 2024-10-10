@@ -46,7 +46,6 @@ export class ResultFilesComponent implements OnInit {
 
   ngOnInit(): void {
     this.updateMetricsWithPlots();
-    console.log(this.validation)
   }
 
   private updateMetricsWithPlots(): void {
@@ -54,9 +53,6 @@ export class ResultFilesComponent implements OnInit {
 
     this.updatedMetrics$ = this.validationService.getMetricsAndPlotsNames(params)
       .pipe(
-        tap((metric) => {
-          console.log(metric)
-        }),
         map((metrics) =>
           metrics.map(
             metric =>
