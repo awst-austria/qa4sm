@@ -139,9 +139,10 @@
         <div *ngIf="validation.intra_annual_metrics" class="flex flex-column w-12 align-items-center">
           <hr class="flex w-11 pt-0 mt-0 featurette-divider">
           <div class="flex flex-row w-12 flex-wrap justify-content-center align-content-center md:text-4xl text-2xl text-muted">
-            Seasonal Metrics Plots
+            Additional Plots
             <span class="pi pi-question-circle mx-2 text-2xl"
-                  pTooltip="Plots based on results from selected seasonal metrics. Please note, that these are only basic overview plots. All the generated plots can be found in the zip file."
+                  pTooltip="Additional results based on the assessment of either intra-annual or inter-annual product performance.
+                            Note: Only graphs highlighting the key findings are shown here. Further results are available for download below"
                   tooltipPosition="bottom">
           </span>
           </div>
@@ -170,8 +171,8 @@
                  alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
             <div class="flex flex-column text-xl px-2 text-muted justify-content-center">
               <em>
-                Intra Annual Metrics <br>
-                Type: {{validation.intra_annual_type}} <br>
+                Intra-Annual Metrics <br>
+                Frequency: {{validation.intra_annual_type}} <br>
                 Overlap: {{validation.intra_annual_overlap}} day(s)
               </em>
             </div>

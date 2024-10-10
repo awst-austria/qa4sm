@@ -25,11 +25,11 @@ export class IntraAnnualMetricsComponent {
 
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
 
-  defaultOverlaps: number[] = [30, 1];
-  maxOverlaps: number[] = [185, 15];
+  defaultOverlaps: number[] = [0, 0];
+  maxOverlaps: number[] = [45, 15];
 
 
-  defaultIntraAnnualOverlap = signal(30);
+  defaultIntraAnnualOverlap = signal(0);
   maxIntraAnnualOverlap = signal(185);
   selectedMetric = model<IntraAnnualMetricsDto | null>(null)
 
