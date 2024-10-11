@@ -124,12 +124,13 @@ class StabilityMetricsAdapter(SubsetsMetricsAdapter):
 
             try:
                 slope, _, _, _ = theilslopes(valid_values, valid_years)
+                slope_per_decade = slope * 10
 
                 # Store the slope results for this metric type
-                stability_results[f'bulk|ts_slope_{metric_name}'] = np.array([slope])
-                #stability_results[f'theil_sen_{metric_name}_lower'] = np.array([lower_slope])
-                #stability_results[f'theil_sen_{metric_name}_upper'] = np.array([upper_slope])
+                stability_results[f'bulk|ts_slope_{metric_name}'] = np.array([slope_per_decade])
+
             except Exception as e:
+                stability_results[f'bulk|ts_slope_{metric_name}'] = np.array([np.nan])
                 warnings.warn(f"Failed to calculate Theil-Sen slope for {metric_name}: {e}")
 
         return stability_results
