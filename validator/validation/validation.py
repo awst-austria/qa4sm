@@ -557,7 +557,7 @@ def untrack_celery_task(task_id):
         __logger.debug('Task {} already deleted from db.'.format(task_id))
 
 
-def run_validation(validation_id):  #$$
+def run_validation(validation_id):
     __logger.info("Starting validation: {}".format(validation_id))
     validation_run = ValidationRun.objects.get(pk=validation_id)
     validation_aborted = False
