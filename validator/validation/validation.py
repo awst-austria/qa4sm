@@ -1143,11 +1143,11 @@ def define_tsw_metrics(val_run: ValidationRun, period: List) -> Dict[str, Union[
     '''
     
     temp_sub_wdw_instance = None
-    intra_annual_metric_lut = {'Seasonal': 'seasons',
--                                'Monthly': 'months'}
 
     # Handle intra-annual metrics
     if val_run.intra_annual_metrics:
+        intra_annual_metric_lut = {'Seasonal': 'seasons',
+                                'Monthly': 'months'} #TODO implement properly in qa4sm_reader.globals
         temp_sub_wdw_instance = TemporalSubWindowsFactory.create(
             temporal_sub_window_type=intra_annual_metric_lut[val_run.intra_annual_type],
             overlap=int(val_run.intra_annual_overlap),
