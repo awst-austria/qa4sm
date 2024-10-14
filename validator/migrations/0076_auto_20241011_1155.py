@@ -16,9 +16,4 @@ class Migration(migrations.Migration):
             name='stability_metrics',
             field=models.BooleanField(default=False),
         ),
-        migrations.AlterField(
-            model_name='usermanual',
-            name='file',
-            field=models.FileField(blank=True, null=True, storage=django.core.files.storage.FileSystemStorage(location='DOCS_DIR'), upload_to='./user_manual'),
-        ),
     ]
