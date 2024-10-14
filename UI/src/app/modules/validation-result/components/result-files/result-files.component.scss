@@ -2,9 +2,10 @@
   transform: scale(1.1);
 }
 .result-plot{
-  border-color: #dddddd;
+  border-color: rgba(0, 0, 0, 0.1);
   border-style: solid;
   border-width: thin;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 .result-plot:hover{
   box-shadow: 0 0 2em gray;
@@ -25,5 +26,10 @@
   font-size: 1.7rem;
   color: dimgray;
   padding-bottom: 1rem;
+}
+.plot-spot{
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1), 0 6px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 20px; /* Optional: Space inside the div */
 }
 

@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models.signals import post_delete, pre_delete
+from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.utils import timezone
 
@@ -66,6 +66,9 @@ class ValidationRun(models.Model):
 
     # temporal matching window size:
     TEMP_MATCH_WINDOW = 12
+
+    # intra-annual metrics
+
 
     # fields
 
@@ -127,6 +130,9 @@ class ValidationRun(models.Model):
         ),
         default='threshold'
     )
+    intra_annual_metrics = models.BooleanField(default=False)
+    intra_annual_type = models.CharField(max_length=100, blank=True, null=True)
+    intra_annual_overlap = models.IntegerField(blank=True, null=True)
 
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration

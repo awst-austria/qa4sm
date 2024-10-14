@@ -147,6 +147,10 @@ def get_validation_configuration(request, **kwargs):
                    {'id': 'bootstrap_tcol_cis', 'value': val_run.bootstrap_tcol_cis}]
         val_run_dict['metrics'] = metrics
 
+        val_run_dict['intra_annual_metrics'] = \
+            {'intra_annual_metrics': val_run.intra_annual_metrics, 'intra_annual_type': val_run.intra_annual_type,
+             'intra_annual_overlap': val_run.intra_annual_overlap}
+
         # dataset configs and filters
         datasets = []
         val_run_dict['dataset_configs'] = datasets
@@ -182,7 +186,8 @@ def get_validation_configuration(request, **kwargs):
             ds_dict['parametrised_filters'] = parametrised_filters
             for param_filter in ParametrisedFilter.objects.filter(dataset_config=ds):
                 # check if the reloaded filter still belongs to the dataset
-                datasetversion_filter_ids = DatasetVersion.objects.get(id=ds.version_id).filters.all().values_list('id', flat=True)
+                datasetversion_filter_ids = DatasetVersion.objects.get(id=ds.version_id).filters.all().values_list('id',
+                                                                                                                   flat=True)
                 if param_filter.filter_id in datasetversion_filter_ids:
                     parametrised_filters.append({'id': param_filter.filter.id, 'parameters': param_filter.parameters})
                 else:
@@ -246,6 +251,18 @@ class MetricsSerializer(serializers.Serializer):
     value = serializers.BooleanField(required=True)
 
 
+class IntraAnnualMetricsSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    intra_annual_metrics = serializers.BooleanField(default=False)
+    intra_annual_type = serializers.CharField(max_length=100, allow_null=True, allow_blank=True)
+    intra_annual_overlap = serializers.IntegerField(allow_null=True)
+
+
 class ValidationConfigurationSerializer(serializers.Serializer):
     requires_context = True
 
@@ -293,6 +310,10 @@ class ValidationConfigurationSerializer(serializers.Serializer):
             new_val_run.scaling_method = validated_data.get('scaling_method', None)
             new_val_run.name_tag = validated_data.get('name_tag', None)
             new_val_run.temporal_matching = validated_data.get('temporal_matching', None)
+            new_val_run.intra_annual_metrics = validated_data.get('intra_annual_metrics', None)
+
+            for key, value in validated_data.get('intra_annual_metrics', None).items():
+                setattr(new_val_run, key, value)
 
             for metric in validated_data.get('metrics'):
                 if metric.get('id') == 'tcol':
@@ -367,6 +388,7 @@ class ValidationConfigurationSerializer(serializers.Serializer):
     max_lon = serializers.FloatField(required=False, allow_null=True, default=180)
     name_tag = serializers.CharField(required=False, allow_null=True, max_length=80, allow_blank=True)
     temporal_matching = serializers.IntegerField(allow_null=False, default=globals.TEMP_MATCH_WINDOW)
+    intra_annual_metrics = IntraAnnualMetricsSerializer(many=False, required=False)
 
 
 class ValidationConfigurationModelSerializer(ModelSerializer):
