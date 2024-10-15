@@ -23,7 +23,7 @@ from pathlib import PosixPath
 
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW
+from validator.validation.globals import OUTPUT_FOLDER, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS, METRICS as READER_METRICS
 import os
 from io import BytesIO
 import base64
@@ -122,6 +122,12 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
 
     metrics = {}
 
+    if validation_run.stability_metrics:
+        METRICS = {**READER_METRICS, **STABILITY_METRICS}
+    else:
+        METRICS = READER_METRICS
+
+    # if validation_run
     for root, dirs, files in os.walk(run_dir):
         for f in files:
             if not f.endswith('.png'): continue
