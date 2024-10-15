@@ -136,7 +136,7 @@
         </div>
 
 
-        <div *ngIf="validation.intra_annual_metrics" class="flex flex-column w-12 align-items-center">
+        <div *ngIf="validation.intra_annual_metrics || validation.stability_metrics" class="flex flex-column w-12 align-items-center">
           <hr class="flex w-11 pt-0 mt-0 featurette-divider">
           <div class="flex flex-row w-12 flex-wrap justify-content-center align-content-center md:text-4xl text-2xl text-muted">
             Additional Plots
@@ -170,10 +170,13 @@
                  [ngClass]="{'result-plot':true}"
                  alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
             <div class="flex flex-column text-xl px-2 text-muted justify-content-center">
-              <em>
+              <em *ngIf="validation.intra_annual_metrics">
                 Intra-Annual Metrics <br>
                 Frequency: {{validation.intra_annual_type}} <br>
                 Overlap: {{validation.intra_annual_overlap}} day(s)
+              </em>
+              <em *ngIf="validation.stability_metrics">
+                Stability Metrics <br>
               </em>
             </div>
           </div>
