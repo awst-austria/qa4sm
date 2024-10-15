@@ -31,6 +31,7 @@ TC_METRIC_TEMPLATE = [
     "_{metric}", "_for_{id_met}-{ds_met}"
 ]
 
+STABILITY_METRICS = qr_globals.STABILITY_METRICS
 #-----------------------------------------------------------------------------------------------------------------------
 #TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
 #-----------------------------------------------------------------------------------------------------------------------
