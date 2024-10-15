@@ -444,14 +444,14 @@ class TestValidation(TestCase):
             else:
                 n_metadata_plots = len(out_metadata_plots)
 
-            patterns = [f"{globals.DEFAULT_TSW}_boxplot_{metric}_metadata_{'_and_'.join(meta_var)}.png"
+            patterns = [f"{DEFAULT_TSW}_boxplot_{metric}_metadata_{'_and_'.join(meta_var)}.png"
                         for meta_var in out_metadata_plots.values()] + \
-                       [f'{globals.DEFAULT_TSW}_boxplot_{metric}.png', f'{globals.DEFAULT_TSW}_boxplot_{metric}_for_*.png']
+                       [f'{DEFAULT_TSW}_boxplot_{metric}.png', f'{DEFAULT_TSW}_boxplot_{metric}_for_*.png']
 
             self.__logger.debug(f"{patterns=}")
 
             boxplot_pngs = [
-                x for x in os.listdir(os.path.join(outdir, globals.DEFAULT_TSW))
+                x for x in os.listdir(os.path.join(outdir, DEFAULT_TSW))
                 if any([fnmatch.fnmatch(x, p) for p in patterns])
             ]   #$$ testing the bulk case
 
@@ -462,8 +462,8 @@ class TestValidation(TestCase):
             assert len(boxplot_pngs) == n_metadata_plots + n_metric_plots
 
             overview_pngs = [
-                x for x in os.listdir(os.path.join(outdir, globals.DEFAULT_TSW))
-                if fnmatch.fnmatch(x, f'{globals.DEFAULT_TSW}_overview*_{metric}.png')
+                x for x in os.listdir(os.path.join(outdir, DEFAULT_TSW))
+                if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_overview*_{metric}.png')
             ]
 
             self.__logger.debug(f"{overview_pngs=}")
@@ -471,8 +471,8 @@ class TestValidation(TestCase):
                                 f"should: {(n_datasets - 1)}")
 
         assert os.path.isfile(os.path.join(outdir,
-                                           globals.DEFAULT_TSW,
-                                           f'{globals.DEFAULT_TSW}_overview_status.png')
+                                           DEFAULT_TSW,
+                                           f'{DEFAULT_TSW}_overview_status.png')
                               )
 
     # delete output of test validations, clean up after ourselves
@@ -976,7 +976,6 @@ class TestValidation(TestCase):
         assert new_run.ok_points == 19, "OK points are off"
 
         self.check_results(new_run,
-                           transcriber,
                            is_tcol_run=False,
                            meta_plots=False)
         self.delete_run(new_run)
@@ -1884,11 +1883,14 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir, save_metadata='never')
+        val.generate_all_graphs(validation_run=v,
+                                temporal_sub_windows=[DEFAULT_TSW],
+                                outfolder=run_dir,
+                                save_metadata='never')
 
         boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_boxplot*.png')
         ]
         self.__logger.debug(boxplot_pngs)
         # no boxplot for status
@@ -1896,8 +1898,8 @@ class TestValidation(TestCase):
         assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'overview*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_overview*.png')
         ]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (
@@ -1935,30 +1937,33 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir, save_metadata='always')
+        val.generate_all_graphs(validation_run=v,
+                                temporal_sub_windows=[DEFAULT_TSW],
+                                outfolder=run_dir,
+                                save_metadata='always')
 
         n_metrics = len(globals.METRICS.keys())
         n_metas = len(globals.METADATA_PLOT_NAMES.keys())
 
         meta_boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*_metadata_*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_boxplot*_metadata_*.png')
         ]
         self.__logger.debug(meta_boxplot_pngs)
         # no meta box plots for r_p & rho_p
         assert len(meta_boxplot_pngs) == (n_metrics - 3) * n_metas
 
         boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_boxplot*.png')
         ]
         self.__logger.debug(boxplot_pngs)
         # no boxplot for status
         assert len(boxplot_pngs) == n_metrics - 1 + (n_metas * (n_metrics - 3))
 
         overview_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'overview*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_overview*.png')
         ]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (
@@ -1982,11 +1987,14 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir, save_metadata='never')
+        val.generate_all_graphs(validation_run=v,
+                                temporal_sub_windows=[DEFAULT_TSW],
+                                outfolder=run_dir,
+                                save_metadata='never')
 
         boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_boxplot*.png')
         ]
         self.__logger.debug(boxplot_pngs)
         # no boxplot for status
@@ -1994,8 +2002,8 @@ class TestValidation(TestCase):
         assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'overview*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_overview*.png')
         ]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (
@@ -2020,19 +2028,22 @@ class TestValidation(TestCase):
         shutil.copy(infile, path.join(run_dir, 'results.nc'))
         val.set_outfile(v, run_dir)
         v.save()
-        val.generate_all_graphs(v, run_dir, save_metadata='never')
+        val.generate_all_graphs(validation_run=v,
+                                temporal_sub_windows=[DEFAULT_TSW],
+                                outfolder=run_dir,
+                                save_metadata='never')
 
         boxplot_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'boxplot*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_boxplot*.png')
         ]
         self.__logger.debug(boxplot_pngs)
         n_metrics = len(globals.METRICS.keys()) - 1  # no boxplot for status
         assert len(boxplot_pngs) == n_metrics
 
         overview_pngs = [
-            x for x in os.listdir(run_dir)
-            if fnmatch.fnmatch(x, 'overview*.png')
+            x for x in os.listdir(os.path.join(run_dir, DEFAULT_TSW))
+            if fnmatch.fnmatch(x, f'{DEFAULT_TSW}_overview*.png')
         ]
         self.__logger.debug(overview_pngs)
         assert len(overview_pngs) == n_metrics * (

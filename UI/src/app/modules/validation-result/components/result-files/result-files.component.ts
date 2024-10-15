@@ -27,9 +27,11 @@ export class ResultFilesComponent implements OnInit {
   boxplotIndx = 0;
   displayOverviewGallery: boolean;
   displayBoxplotGallery: boolean;
+  displayAdditionalPlotGallery: boolean;
 
   activeOverviewIndex = 0;
   activeBoxplotIndex = 0;
+  activeAdditionalPlotIndex = 0;
 
   selectedMetric: WritableSignal<MetricsPlotsDto> = signal({} as MetricsPlotsDto);
 
@@ -58,6 +60,7 @@ export class ResultFilesComponent implements OnInit {
                 ...metric,
                 boxplotFiles: this.getPlots(metric.boxplot_dicts.map(boxplotFile => boxplotFile.file)),
                 overviewFiles: this.getPlots(metric.overview_files),
+                comparisonFile: metric.comparison_boxplot.length !== 0 ?  this.getPlots(metric.comparison_boxplot) : of(null)
               })
           )
         ),
@@ -86,9 +89,12 @@ export class ResultFilesComponent implements OnInit {
     if (plotType === 'overview') {
       this.activeOverviewIndex = index;
       this.displayOverviewGallery = true;
-    } else {
+    } else if (plotType === 'boxplot') {
       this.activeBoxplotIndex = index;
       this.displayBoxplotGallery = true;
+    } else {
+      this.displayAdditionalPlotGallery = true;
+      this.activeAdditionalPlotIndex = index;
     }
   }
 

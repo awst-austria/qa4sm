@@ -1,4 +1,4 @@
-import {Component, input, model, signal} from '@angular/core';
+import {Component, Input, model, signal} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import {InputNumberModule} from "primeng/inputnumber";
 import {NgIf} from "@angular/common";
@@ -22,15 +22,19 @@ import {CheckboxModule} from "primeng/checkbox";
   styleUrl: './intra-annual-metrics.component.scss'
 })
 export class IntraAnnualMetricsComponent {
+  @Input() disabled: boolean = false;
 
   intraAnnualMetricTypes: string[] = ['Seasonal', 'Monthly'];
-  defaultOverlaps: number[] = [30, 1];
-  maxOverlaps: number[] = [185, 15];
 
-  defaultIntraAnnualOverlap = signal(30);
+  defaultOverlaps: number[] = [0, 0];
+  maxOverlaps: number[] = [45, 15];
+
+
+  defaultIntraAnnualOverlap = signal(0);
   maxIntraAnnualOverlap = signal(185);
-  disabled = input<boolean>();
   selectedMetric = model<IntraAnnualMetricsDto | null>(null)
+
+
 
 
   updateType(value: string) {

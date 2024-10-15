@@ -31,6 +31,7 @@ TC_METRIC_TEMPLATE = [
     "_{metric}", "_for_{id_met}-{ds_met}"
 ]
 
+STABILITY_METRICS = qr_globals.STABILITY_METRICS
 #-----------------------------------------------------------------------------------------------------------------------
 #TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
 #-----------------------------------------------------------------------------------------------------------------------
@@ -183,6 +184,9 @@ TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
 
 # default temporal sub windows
 TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
+
+# inter-annual metrics related
+add_annual_subwindows = qr_globals.add_annual_subwindows
 
 # overlap parameter interval definiton
 OVERLAP_MIN = 0

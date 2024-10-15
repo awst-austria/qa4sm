@@ -23,6 +23,11 @@ a {
   border-bottom: none;
 }
 
+.alert{
+  background-color: darkgoldenrod;
+  color: white;
+}
+
 @media screen and (max-width: 960px) {
   .logo-container {
     position: fixed;

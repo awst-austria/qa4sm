@@ -187,7 +187,7 @@ class TestCommands(TestCase):
 
         with open(full_script_path, 'r') as f:
             content = f.read()
-        expected_content = f"""#!/bin/bash
+        expected_content = f"""#!/bin/bash 
         curl -X POST {cleanup_api_url} -H "Authorization: Token {tkn.key}"
         """
         self.assertEqual(content, expected_content)
@@ -206,7 +206,7 @@ class TestCommands(TestCase):
 
         with open(full_script_path, 'r') as f:
             content = f.read()
-        expected_content = f"""#!/bin/bash
+        expected_content = f"""#!/bin/bash 
         curl -X POST {cleanup_api_url} -H "Authorization: Token {new_tkn.key}"
         """
 

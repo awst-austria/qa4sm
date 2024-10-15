@@ -144,7 +144,7 @@ class TestServingFileView(TestCase):
         # checking what happens if there is an output file but no directory
         response = self.client.get(get_metric_url+f'?validationId={self.run_id}')
         assert response.status_code == 404
-        assert 'No such file or directory' in response.json()['message']
+        assert 'Output directory does not contain any files.' in response.json()['message']
 
         # create this root and leave it empty
         file_path = self.run.output_dir_url.replace(settings.MEDIA_URL, settings.MEDIA_ROOT)
@@ -154,7 +154,7 @@ class TestServingFileView(TestCase):
         response = self.client.get(get_metric_url+f'?validationId={self.run_id}')
         print(response.json())
         assert response.status_code == 404
-        assert response.json()['message'] == 'There are no files in the given directory'
+        assert response.json()['message'] == 'There are no result files in the given directory'
 
         # removing the path
         if os.path.isdir(file_path):
