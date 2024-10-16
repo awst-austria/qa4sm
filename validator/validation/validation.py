@@ -39,7 +39,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, add_annual_subwindows
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, TEMPORAL_SUB_WINDOWS, add_annual_subwindows
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -376,6 +376,7 @@ def create_pytesmo_validation(validation_run):
     #     calc_kendall=_calc_kendall,
     # )
 
+    #TODO: this should be move to the api view
     if validation_run.intra_annual_metrics and validation_run.stability_metrics:
         raise ValueError("Both intra_annual_metrics and stability_metrics cannot be True at the same time.")
 
