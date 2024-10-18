@@ -4,14 +4,14 @@ import numpy as np
 
 
 from ascat.read_native.cdr import AscatGriddedNcTs
-from c3s_sm.interface import C3STs as c3s_read
+from c3s_sm.interface import C3STs
 from ecmwf_models.interface import ERATs
 from esa_cci_sm.interface import CCITs
 from gldas.interface import GLDASTs
 from ismn.interface import ISMN_Interface
 from ismn.custom import CustomSensorMetadataCsv
 from smap_io.interface import SMAPTs
-from smos.smos_ic.interface import SMOSTs
+from smos.interface import SMOSTs
 from pynetcf.time_series import GriddedNcTs, GriddedNcIndexedRaggedTs
 from pygeogrids.netcdf import load_grid
 
@@ -64,6 +64,31 @@ class SMOSL2Reader(GriddedNcIndexedRaggedTs):
                 ts = ts.dropna(subset='acquisition_time')
         return ts
 
+class ReaderWithTsExtension:
+    """
+    Concatenate 2 time series upon reading
+    """
+    def __init__(self, cls, path, path_ext, *args, **kwargs):
+        self.base_reader = cls(path, *args, **kwargs)
+        try:
+            self.ext_reader = cls(path_ext, *args, **kwargs)
+        except Exception:
+            self.ext_reader = None
+
+    def read(self, *args, **kwargs) -> pd.DataFrame:
+        ts = self.base_reader.read(*args, **kwargs)
+        try:
+            if self.ext_reader is not None:
+                ext = self.ext_reader.read(*args, **kwargs)
+                ts = pd.concat([ts, ext], axis=0)
+                ts = ts[~ts.index.duplicated(keep='last')]  # prefer ext. data
+        except Exception as e:
+            ext = None
+
+        return ts
+
+
+
 
 def create_reader(dataset, version) -> GriddedNcTs:
     """
@@ -73,6 +98,7 @@ def create_reader(dataset, version) -> GriddedNcTs:
     reader = None  # reader class, inherits pynetcf time series module
 
     folder_name = path.join(dataset.storage_path, version.short_name)
+    ext_folder_name = path.join(dataset.storage_path, version.short_name + '-ext', 'timeseries')
 
     if dataset.short_name == globals.ISMN:
         if path.isfile(path.join(folder_name, 'frm_classification.csv')):
@@ -89,7 +115,8 @@ def create_reader(dataset, version) -> GriddedNcTs:
 
     if dataset.short_name == globals.C3SC:
         c3s_data_folder = path.join(folder_name, 'TCDR/063_images_to_ts/combined-daily')
-        reader = c3s_read(c3s_data_folder, ioclass_kws={'read_bulk': True})
+        reader = ReaderWithTsExtension(C3STs, c3s_data_folder, ext_folder_name,
+                                       ioclass_kws={'read_bulk': True})
 
     if (dataset.short_name == globals.CCIC or
             dataset.short_name == globals.CCIA or
@@ -131,8 +158,11 @@ def create_reader(dataset, version) -> GriddedNcTs:
         reader = SMOSTs(folder_name, ioclass_kws={'read_bulk': True})
 
     if dataset.short_name == globals.SMOS_L2:
-        reader = SMOSL2Reader(folder_name, ioclass_kws={'read_bulk': True},
-                                grid=load_grid(path.join(folder_name, "grid.nc")))
+        reader = ReaderWithTsExtension(
+            SMOSL2Reader, folder_name, ext_folder_name,
+            ioclass_kws={'read_bulk': True},
+            grid=load_grid(path.join(folder_name, "grid.nc"))
+        )
 
     if dataset.short_name == globals.SMAP_L2:
         reader = GriddedNcOrthoMultiTs(folder_name, ioclass_kws={'read_bulk': True})
