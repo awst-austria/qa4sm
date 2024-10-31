@@ -51,7 +51,7 @@ class StabilityMetricsAdapter(SubsetsMetricsAdapter):
         # First, calculate and store base metrics for each subset
         for setname, distr in self.subsets.items():
             if len(data.index) == 0:
-                df = pd.DataFrame()  # Empty DataFrame for the subset
+                df = data
             else:
                 df = distr.select(data)  # Filter data by the current subset
 
