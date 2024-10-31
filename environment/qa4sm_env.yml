@@ -209,7 +209,7 @@ dependencies:
   - zipp=3.15.0
   - zlib=1.2.13
   - zstd=1.5.2
-	- libxcrypt
+  - libxcrypt
   - pip:
     - amqp==5.1.1
     - ascat==2.1.0
@@ -266,7 +266,7 @@ dependencies:
     - pynetcf==0.5.0
     - pyresample==1.26.1
     # - pytesmo==0.16.0
-		- git+https://github.com/TUW-GEO/pytesmo.git@master
+    - git+https://github.com/TUW-GEO/pytesmo.git@master
     - pytest-cov==4.0.0
     - pytest-django==4.5.2
     - pytest-mpl==0.16.1
