@@ -54,7 +54,7 @@ class ReaderWithTsExtension:
     @property
     def grid(self):
         return self.base_reader.grid
-    
+
     def read(self, *args, **kwargs) -> pd.DataFrame:
         """
         Read time series at location for both the base dataset and the

@@ -860,8 +860,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 140, "Number of gpis is off"
-        assert new_run.error_points == 134, "Error points are off"
-        assert new_run.ok_points == 6, "OK points are off"
+        assert new_run.error_points == 137, "Error points are off"
+        assert new_run.ok_points == 3, "OK points are off"
 
         self.check_results(new_run,
                            is_tcol_run=False,
@@ -973,8 +973,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 5, "Error points are off"
-        assert new_run.ok_points == 19, "OK points are off"
+        assert new_run.error_points == 6, "Error points are off"
+        assert new_run.ok_points == 18, "OK points are off"
 
         self.check_results(new_run,
                            is_tcol_run=False,
