@@ -136,6 +136,47 @@
         </div>
 
 
+        <div *ngIf="validation.intra_annual_metrics" class="flex flex-column w-12 align-items-center">
+          <hr class="flex w-11 pt-0 mt-0 featurette-divider">
+          <div class="flex flex-row w-12 flex-wrap justify-content-center align-content-center md:text-4xl text-2xl text-muted">
+            Additional Plots
+            <span class="pi pi-question-circle mx-2 text-2xl"
+                  pTooltip="Additional results based on the assessment of either intra-annual or inter-annual product performance.
+                            Note: Only graphs highlighting the key findings are shown here. Further results are available for download below"
+                  tooltipPosition="bottom">
+          </span>
+          </div>
+          <div *ngIf="(selectedMetric().comparisonFile|async) as comparisonFile; else noSeasonalPlots"
+               class="flex flex-row lg:flex-nowrap flex-wrap w-12 align-content-center justify-content-center mx-2 my-3 plot-spot column-gap-3 gap-3">
+            <p-galleria [value]="comparisonFile"
+                        [(visible)]="displayAdditionalPlotGallery"
+                        [(activeIndex)]="activeAdditionalPlotIndex"
+                        [circular]="true"
+                        [fullScreen]="true"
+                        [showThumbnails]="false"
+                        [baseZIndex]="100000">
+              <ng-template pTemplate="item" let-item>
+                <img [src]="sanitizePlotUrl(item.plot)"
+                     alt="Boxplot for {{selectedMetric().metric_pretty_name}}"
+                     style="width: 70%;
+                             display: block;"/>
+              </ng-template>
+            </p-galleria>
+            <img width="55%"
+                 height="55%"
+                 style="object-fit: contain;"
+                 [src]="sanitizePlotUrl(comparisonFile[activeAdditionalPlotIndex].plot)"
+                 (click)="showGallery(0, 'seasonal')"
+                 [ngClass]="{'result-plot':true}"
+                 alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
+            <div class="flex flex-column text-xl px-2 text-muted justify-content-center">
+              <em>
+                Intra-Annual Metrics <br>
+                Frequency: {{validation.intra_annual_type}} <br>
+                Overlap: {{validation.intra_annual_overlap}} day(s)
+              </em>
+
+
         <div *ngIf="validation.intra_annual_metrics || validation.stability_metrics" class="flex flex-column w-12 align-items-center">
           <hr class="flex w-11 pt-0 mt-0 featurette-divider">
           <div class="flex flex-row w-12 flex-wrap justify-content-center align-content-center md:text-4xl text-2xl text-muted">

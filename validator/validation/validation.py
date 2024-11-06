@@ -39,7 +39,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, TEMPORAL_SUB_WINDOWS, add_annual_subwindows
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, add_annual_subwindows
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -380,7 +380,7 @@ def create_pytesmo_validation(validation_run):
     if validation_run.intra_annual_metrics and validation_run.stability_metrics:
         raise ValueError("Both intra_annual_metrics and stability_metrics cannot be True at the same time.")
 
-    
+
     tsw_metrics = None
     temp_sub_wdws = None
 
@@ -403,7 +403,7 @@ def create_pytesmo_validation(validation_run):
                     subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
                     group_results="join",
                 )
-            
+
             elif tsw_metrics == "stability":
                 # Remove existing sub-windows and prepare stability sub-windows
                 temp_sub_wdw_instance.remove_temp_sub_wndws()
@@ -1126,6 +1126,49 @@ def get_period(val_run: ValidationRun) -> Union[None, List[str]]:
         return [startdate, enddate]
     return None
 
+def define_intra_annual_metrics(val_run: ValidationRun) -> Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]:
+    '''
+    Extract the intra-annual metrics settings from the validation run and instantiate the corresponding objects.
+
+    Parameters
+    ----------
+    val_run : ValidationRun
+        The validation run object
+
+    Returns
+    -------
+    Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]
+        A dictionary containing the temporal sub-window instance and the custom temporal sub-windows, if applicable. Otherwise, filled with None.
+    '''
+    # per default, assume bulk case
+    temp_sub_wdw_instance = None
+    temp_sub_wdws = None
+
+    # in case intra-annual metrics are desired, instantiate corresponding object
+    if val_run.intra_annual_metrics:
+        intra_annual_metric_lut = {'Seasonal': 'seasons',
+                                'Monthly': 'months'}     #TODO implement properly in qa4sm_reader.globals
+
+        temp_sub_wdw_instance = TemporalSubWindowsCreator(
+            temporal_sub_window_type=intra_annual_metric_lut[val_run.intra_annual_type],
+            overlap=int(val_run.intra_annual_overlap),
+            custom_file=None)  # loading default temporal sub-windows from globals file
+
+        period = get_period(val_run)
+        if not period:
+            period = [datetime(year=1978, month=1, day=1), datetime.now()]    #NOTE bit of a hack, but we need a period for the default case
+
+        default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
+        temp_sub_wdw_instance.add_temp_sub_wndw(
+            new_temp_sub_wndw=default_temp_sub_wndw,
+            insert_as_first_wndw=True)  # always add the default case and make it as the first one (wrong order will throw errors later on)
+        temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
+
+    __logger.debug(f"{temp_sub_wdw_instance=}")
+    __logger.debug(f"{temp_sub_wdws=}")
+    return {'temp_sub_wdw_instance': temp_sub_wdw_instance, 'temp_sub_wdws': temp_sub_wdws}
+
+
 def define_tsw_metrics(val_run: ValidationRun, period: List) -> Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]:
     '''
     Extract the temporal sub-window metrics settings from the validation run and instantiate the corresponding objects.
@@ -1142,7 +1185,7 @@ def define_tsw_metrics(val_run: ValidationRun, period: List) -> Dict[str, Union[
     Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]
         A dictionary containing the temporal sub-window instance and the custom temporal sub-windows, if applicable. Otherwise, filled with None.
     '''
-    
+
     temp_sub_wdw_instance = None
 
     # Handle intra-annual metrics

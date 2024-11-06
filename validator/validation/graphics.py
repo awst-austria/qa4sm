@@ -23,7 +23,7 @@ from pathlib import PosixPath
 
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-from validator.validation.globals import OUTPUT_FOLDER, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS, METRICS as READER_METRICS
+from validator.validation.globals import OUTPUT_FOLDER, METRICS as READER_METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW
 import os
 from io import BytesIO
 import base64
@@ -121,6 +121,9 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     ref0_config = None
 
     metrics = {}
+    bulk_prefix = ''
+    if "bulk" in run_dir:
+        bulk_prefix += 'bulk_'
 
     if validation_run.stability_metrics:
         METRICS = {**READER_METRICS, **STABILITY_METRICS}
@@ -164,8 +167,7 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
                         pairs[pair] = pretty_pair  # pretty name
 
             for tcol_metric in TC_METRICS.keys():
-
-                template = ''.join([TC_METRIC_TEMPLATE[0],
+                template = bulk_prefix + ''.join([TC_METRIC_TEMPLATE[0],
                                     TC_METRIC_TEMPLATE[1].format(metric=tcol_metric),
                                     TC_METRIC_TEMPLATE[2]]) + '.png'
 
@@ -185,7 +187,6 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
 
                     triple = '{}_and_{}_and_{}'.format(ref, ds, ds2)
                     pretty_triple = '{} and {} and {}'.format(ref, ds, ds2)
-
                     if triple not in triples.keys():
                         triples[triple] = pretty_triple
 
