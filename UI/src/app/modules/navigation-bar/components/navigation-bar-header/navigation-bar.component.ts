@@ -11,6 +11,8 @@ import {SettingsService} from '../../../core/services/global/settings.service';
   styleUrls: ['./navigation-bar.component.scss']
 })
 export class NavigationBarComponent implements OnInit {
+  isMaintenancePossible = false;
+  potentialMaintenanceDescription = '';
 
   items: MenuItem[];
   homeMenuItem: MenuItem = {
@@ -132,7 +134,7 @@ export class NavigationBarComponent implements OnInit {
 
   ngOnInit(): void {
     this.authService.authenticated.subscribe(authenticated => this.authStatusChanged(authenticated));
-    this.setSumLink();
+    this.setSettingsValues();
   }
 
   @HostListener('window:resize', ['$event'])
@@ -196,11 +198,13 @@ export class NavigationBarComponent implements OnInit {
     this.authService.setPreviousUrl(prevUrl);
   }
 
-  setSumLink(): void {
+  setSettingsValues(): void {
     const userManualItem = this.items.find(item => item.label === 'Info')
       .items.find(item => item.label === 'User Manual');
     this.settingsService.getAllSettings().subscribe(data => {
       userManualItem.url = data[0].sum_link;
+      this.isMaintenancePossible = data[0].potential_maintenance;
+      this.potentialMaintenanceDescription = data[0].potential_maintenance_description;
     });
   }
 

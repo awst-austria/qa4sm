@@ -39,14 +39,14 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, add_annual_subwindows
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-
+from validator.validation.adapters import StabilityMetricsAdapter
 import qa4sm_reader
-from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow
+from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 
 __logger = logging.getLogger(__name__)
@@ -376,31 +376,72 @@ def create_pytesmo_validation(validation_run):
     #     calc_kendall=_calc_kendall,
     # )
 
+    if validation_run.intra_annual_metrics and validation_run.stability_metrics:
+        raise ValueError("Both intra_annual_metrics and stability_metrics cannot be True at the same time.")
 
+    
+    tsw_metrics = None
+    temp_sub_wdws = None
 
-    # intra-annual metrics
-    iam_dict = define_intra_annual_metrics(validation_run)
-    temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
-    temp_sub_wdws = iam_dict['temp_sub_wdws']
+    if validation_run.intra_annual_metrics:
+        tsw_metrics = "intra_annual"
+    elif validation_run.stability_metrics:
+        tsw_metrics = "stability"
 
-    if isinstance(
-            temp_sub_wdws, dict
-    ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
-        pairwise_metrics = SubsetsMetricsAdapter(
-            calculator=_pairwise_metrics,
-            subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
-            group_results="join",
-        )
+    if tsw_metrics:
+        tsw_dict = define_tsw_metrics(validation_run, period)
+        temp_sub_wdw_instance = tsw_dict['temp_sub_wdw_instance']
+        temp_sub_wdws = tsw_dict['temp_sub_wdws']
 
-    elif temp_sub_wdws is None: # the default case
-        pairwise_metrics = _pairwise_metrics
+        # Proceed only if temp_sub_wdws is a dictionary
+        if isinstance(temp_sub_wdws, dict):
+            if tsw_metrics == "intra_annual":
+                # Set up Intra-annual metrics
+                pairwise_metrics = SubsetsMetricsAdapter(
+                    calculator=_pairwise_metrics,
+                    subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
+                    group_results="join",
+                )
+            
+            elif tsw_metrics == "stability":
+                # Remove existing sub-windows and prepare stability sub-windows
+                temp_sub_wdw_instance.remove_temp_sub_wndws()
+
+                # Add default and annual sub-windows
+                default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
+                temp_sub_wdw_instance.add_temp_sub_wndw(default_temp_sub_wndw)
+                add_annual_subwindows(list(range(period[0].year, period[1].year + 1)))
+
+                # Add custom sub-windows
+                for key, value in TEMPORAL_SUB_WINDOWS['custom'].items():
+                    new_subwindow = NewSubWindow(
+                        name=key,
+                        begin_date=datetime(value[0][0], value[0][1], value[0][2]),
+                        end_date=datetime(value[1][0], value[1][1], value[1][2]),
+                    )
+                    temp_sub_wdw_instance.add_temp_sub_wndw(new_subwindow)
+
+                # Set up Stability metrics
+                pairwise_metrics = StabilityMetricsAdapter(
+                    calculator=_pairwise_metrics,
+                    subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
+                    group_results="join",
+                )
 
     else:
-        raise ValueError(
-            f"Invalid value for temp_sub_wdws: {temp_sub_wdws}. Please specify either None or a custom temporal sub windowing function."
-        )
+        # Default case when tsw_metrics is None
+        if temp_sub_wdws is None:
+            pairwise_metrics = _pairwise_metrics
+        else:
+            raise ValueError(
+                f"Invalid value for temp_sub_wdws: {temp_sub_wdws}. "
+                "Please specify either None or a custom temporal sub windowing function."
+            )
 
-    metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
+    try:
+        metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
+    except Exception as e:
+        print(e)
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         _tcol_metrics = TripleCollocationMetrics(
@@ -646,7 +687,7 @@ def run_validation(validation_id):
         if (not validation_aborted):
             set_outfile(validation_run, run_dir)
 
-            iam_dict = define_intra_annual_metrics(validation_run)
+            iam_dict = define_tsw_metrics(validation_run, get_period(validation_run))
             temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
             temp_sub_wdws = iam_dict['temp_sub_wdws']
 
@@ -1084,43 +1125,45 @@ def get_period(val_run: ValidationRun) -> Union[None, List[str]]:
         return [startdate, enddate]
     return None
 
-def define_intra_annual_metrics(val_run: ValidationRun) -> Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]:
+def define_tsw_metrics(val_run: ValidationRun, period: List) -> Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]:
     '''
-    Extract the intra-annual metrics settings from the validation run and instantiate the corresponding objects.
+    Extract the temporal sub-window metrics settings from the validation run and instantiate the corresponding objects.
 
     Parameters
     ----------
     val_run : ValidationRun
         The validation run object
+    period : List
+        The period of a validation run
 
     Returns
     -------
     Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]
         A dictionary containing the temporal sub-window instance and the custom temporal sub-windows, if applicable. Otherwise, filled with None.
     '''
-    # per default, assume bulk case
+    
     temp_sub_wdw_instance = None
-    temp_sub_wdws = None
 
-    # in case intra-annual metrics are desired, instantiate corresponding object
+    # Handle intra-annual metrics
     if val_run.intra_annual_metrics:
         intra_annual_metric_lut = {'Seasonal': 'seasons',
-                                'Monthly': 'months'}     #TODO implement properly in qa4sm_reader.globals
-
-        temp_sub_wdw_instance = TemporalSubWindowsCreator(
+                                'Monthly': 'months'} #TODO implement properly in qa4sm_reader.globals
+        temp_sub_wdw_instance = TemporalSubWindowsFactory.create(
             temporal_sub_window_type=intra_annual_metric_lut[val_run.intra_annual_type],
             overlap=int(val_run.intra_annual_overlap),
-            custom_file=None)  # loading default temporal sub-windows from globals file
+            period=period
+        )
 
-        period = get_period(val_run)
-        if not period:
-            period = [datetime(year=1978, month=1, day=1), datetime.now()]    #NOTE bit of a hack, but we need a period for the default case
+    # Handle stability metrics
+    elif val_run.stability_metrics:
+        temp_sub_wdw_instance = TemporalSubWindowsFactory.create(
+            temporal_sub_window_type="stability",
+            overlap=0,  # Adjust overlap for stability metrics
+            period=period,
+            custom_subwindows=TEMPORAL_SUB_WINDOWS.get('custom', None)
+        )
 
-        default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
-        temp_sub_wdw_instance.add_temp_sub_wndw(
-            new_temp_sub_wndw=default_temp_sub_wndw,
-            insert_as_first_wndw=True)  # always add the default case and make it as the first one (wrong order will throw errors later on)
-        temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
+    temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows if temp_sub_wdw_instance else None
 
     __logger.debug(f"{temp_sub_wdw_instance=}")
     __logger.debug(f"{temp_sub_wdws=}")
