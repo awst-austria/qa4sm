@@ -51,7 +51,7 @@ class StabilityMetricsAdapter(SubsetsMetricsAdapter):
         # First, calculate and store base metrics for each subset
         for setname, distr in self.subsets.items():
             if len(data.index) == 0:
-                df = pd.DataFrame()  # Empty DataFrame for the subset
+                df = data
             else:
                 df = distr.select(data)  # Filter data by the current subset
 
@@ -121,16 +121,19 @@ class StabilityMetricsAdapter(SubsetsMetricsAdapter):
             valid_mask = ~np.isnan(flattened_values)
             valid_years = years[valid_mask]
             valid_values = flattened_values[valid_mask] 
-
+            
+            #slopeurmsd is not as easy to read as slopeURMSD
+            if metric_name == 'urmsd':
+                metric_name = metric_name.upper()
             try:
                 slope, _, _, _ = theilslopes(valid_values, valid_years)
                 slope_per_decade = slope * 10
 
                 # Store the slope results for this metric type
-                stability_results[f'bulk|ts_slope_{metric_name}'] = np.array([slope_per_decade])
+                stability_results[f'bulk|slope{metric_name}'] = np.array([slope_per_decade])
 
             except Exception as e:
-                stability_results[f'bulk|ts_slope_{metric_name}'] = np.array([np.nan])
+                stability_results[f'bulk|slope{metric_name}'] = np.array([np.nan])
                 warnings.warn(f"Failed to calculate Theil-Sen slope for {metric_name}: {e}")
 
         return stability_results
