@@ -45,6 +45,7 @@ import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
 from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
+from validator.validation.readers import ReaderWithTsExtension
 from django.shortcuts import get_object_or_404
 from math import comb
 
@@ -859,8 +860,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 140, "Number of gpis is off"
-        assert new_run.error_points == 134, "Error points are off"
-        assert new_run.ok_points == 6, "OK points are off"
+        assert new_run.error_points == 137, "Error points are off"
+        assert new_run.ok_points == 3, "OK points are off"
 
         self.check_results(new_run,
                            is_tcol_run=False,
@@ -972,8 +973,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 5, "Error points are off"
-        assert new_run.ok_points == 19, "OK points are off"
+        assert new_run.error_points == 6, "Error points are off"
+        assert new_run.ok_points == 18, "OK points are off"
 
         self.check_results(new_run,
                            is_tcol_run=False,
@@ -1454,6 +1455,31 @@ class TestValidation(TestCase):
         ## save config
         validation_run = ValidationRun()
         val.save_validation_config(validation_run)
+
+    def test_reader_with_extension(self):
+
+        # Extension test data is only available for one dataset
+        reader = val.create_reader(
+            Dataset.objects.get(short_name="C3S_combined"),
+            DatasetVersion.objects.get(short_name="C3S_V202212")
+        )
+        assert isinstance(reader, ReaderWithTsExtension)
+        assert reader.ext_reader is not None
+
+        assert reader.grid == reader.base_reader.grid
+        assert reader.ext_reader.grid == reader.grid
+
+        loc = -155.42, 19.78
+        ts1 = reader.base_reader.read(*loc)
+        ts2 = reader.ext_reader.read(*loc)
+        ts3 = reader.read(*loc)
+
+        # verify that the individual readers get the same data
+        assert np.all(ts1.loc['2022-06-30'] == ts3.loc['2022-06-30'])
+        assert np.all(ts2.loc['2022-06-30'] == ts3.loc['2022-06-30'])
+
+        # verify that the reader handles overlaps correctly
+        assert ts3.index.size == ts3.index.drop_duplicates().size
 
     def test_readers(self):
         start_time = time.time()
