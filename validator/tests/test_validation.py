@@ -43,8 +43,9 @@ from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
-from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS
+from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, STABILITY_METRICS, METADATA_PLOT_NAMES, NON_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
+from validator.validation.readers import ReaderWithTsExtension
 from django.shortcuts import get_object_or_404
 from math import comb
 
@@ -65,6 +66,7 @@ class TestValidation(TestCase):
     def setUp(self):
         self.metrics = ['gpi', 'lon', 'lat'] + list(METRICS.keys())
         self.tcol_metrics = list(TC_METRICS.keys())
+        self.stability_metrics = list(STABILITY_METRICS.keys())
 
         self.user_data = {
             'username': 'testuser',
@@ -205,7 +207,8 @@ class TestValidation(TestCase):
     def check_results(self,
                       run,
                       is_tcol_run=False,
-                      meta_plots=True):
+                      meta_plots=True,
+                      stability_metrics_run=False):
 
         try:
             self._check_validation_configuration_consistency(run)
@@ -231,6 +234,7 @@ class TestValidation(TestCase):
         pair_metrics = [
             m for m in list(METRICS.keys()) if m.lower() not in comm_metrics
         ]
+        stability_metrics = self.stability_metrics if stability_metrics_run else []
 
         # check netcdf output
         length = -1
@@ -244,7 +248,7 @@ class TestValidation(TestCase):
             assert settings.SITE_URL in ds.url
 
             # check the metrics contained in the file
-            for metric in self.metrics + tcol_metrics:  # we dont test lon, lat, time etc.
+            for metric in self.metrics + tcol_metrics + stability_metrics:  # we dont test lon, lat, time etc.
                 ## This gets all variables in the netcdf file that start with the name of the current metric
                 if metric in tcol_metrics:
                     metric_vars = ds.get_variables_by_attributes(
@@ -269,6 +273,7 @@ class TestValidation(TestCase):
                 self.__logger.debug(
                     f'Metric variables for metric {metric} are {[m.name for m in metric_vars]}'
                 )
+
 
                 # check that all metrics have the same number of variables (depends on number of input datasets)
                 if metric == 'status':
@@ -539,6 +544,66 @@ class TestValidation(TestCase):
         self.check_results(new_run,
                            is_tcol_run=False,
                            meta_plots=True)
+        self.delete_run(new_run)
+
+    # TODO: fails, if validation contains temporal sub-windows
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
+    def test_validation_stability_metrics(self):
+        run = generate_default_validation()
+        run.plots_save_metadata = 'always'
+        run.user = self.testuser
+
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.stability_metrics = True
+        run.scaling_ref.save()
+
+        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+
+
+        run.save()
+
+        self.__logger.debug(
+            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}")
+
+        for i, config in enumerate(run.dataset_configurations.all()):
+            if config == run.spatial_reference_configuration:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+            config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 9
+
+        self.check_results(new_run,
+                           is_tcol_run=False,
+                           meta_plots=True,
+                           stability_metrics=True)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
@@ -859,8 +924,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 140, "Number of gpis is off"
-        assert new_run.error_points == 134, "Error points are off"
-        assert new_run.ok_points == 6, "OK points are off"
+        assert new_run.error_points == 137, "Error points are off"
+        assert new_run.ok_points == 3, "OK points are off"
 
         self.check_results(new_run,
                            is_tcol_run=False,
@@ -972,8 +1037,8 @@ class TestValidation(TestCase):
         assert new_run
 
         assert new_run.total_points == 24, "Number of gpis is off"
-        assert new_run.error_points == 5, "Error points are off"
-        assert new_run.ok_points == 19, "OK points are off"
+        assert new_run.error_points == 6, "Error points are off"
+        assert new_run.ok_points == 18, "OK points are off"
 
         self.check_results(new_run,
                            is_tcol_run=False,
@@ -1454,6 +1519,31 @@ class TestValidation(TestCase):
         ## save config
         validation_run = ValidationRun()
         val.save_validation_config(validation_run)
+
+    def test_reader_with_extension(self):
+
+        # Extension test data is only available for one dataset
+        reader = val.create_reader(
+            Dataset.objects.get(short_name="C3S_combined"),
+            DatasetVersion.objects.get(short_name="C3S_V202212")
+        )
+        assert isinstance(reader, ReaderWithTsExtension)
+        assert reader.ext_reader is not None
+
+        assert reader.grid == reader.base_reader.grid
+        assert reader.ext_reader.grid == reader.grid
+
+        loc = -155.42, 19.78
+        ts1 = reader.base_reader.read(*loc)
+        ts2 = reader.ext_reader.read(*loc)
+        ts3 = reader.read(*loc)
+
+        # verify that the individual readers get the same data
+        assert np.all(ts1.loc['2022-06-30'] == ts3.loc['2022-06-30'])
+        assert np.all(ts2.loc['2022-06-30'] == ts3.loc['2022-06-30'])
+
+        # verify that the reader handles overlaps correctly
+        assert ts3.index.size == ts3.index.drop_duplicates().size
 
     def test_readers(self):
         start_time = time.time()

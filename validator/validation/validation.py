@@ -376,6 +376,7 @@ def create_pytesmo_validation(validation_run):
     #     calc_kendall=_calc_kendall,
     # )
 
+    #TODO: this should be move to the api view
     if validation_run.intra_annual_metrics and validation_run.stability_metrics:
         raise ValueError("Both intra_annual_metrics and stability_metrics cannot be True at the same time.")
 
@@ -402,7 +403,6 @@ def create_pytesmo_validation(validation_run):
                     subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
                     group_results="join",
                 )
-            
             elif tsw_metrics == "stability":
                 # Remove existing sub-windows and prepare stability sub-windows
                 temp_sub_wdw_instance.remove_temp_sub_wndws()
@@ -1141,7 +1141,6 @@ def define_tsw_metrics(val_run: ValidationRun, period: List) -> Dict[str, Union[
     Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]
         A dictionary containing the temporal sub-window instance and the custom temporal sub-windows, if applicable. Otherwise, filled with None.
     '''
-    
     temp_sub_wdw_instance = None
 
     # Handle intra-annual metrics
