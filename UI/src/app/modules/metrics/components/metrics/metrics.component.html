@@ -13,11 +13,8 @@
     </div>
 
     <div class="col-12">
-      <qa-metric [metricModel]="bootstrapTripleCollocationMetrics"
-                 [disabled]="checkIfDisabled('btcol')"/>
-    </div>
-    <div class="col-12">
-      <qa-intra-annual-metrics [(selectedMetric)]="validationModel.intraAnnualMetrics"/>
+      <qa-intra-annual-metrics [(selectedMetric)]="validationModel().intraAnnualMetrics"
+                               [disabled]="intraAnnulMetricDisabled()"/>
     </div>
   </div>
 
