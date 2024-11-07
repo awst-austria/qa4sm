@@ -121,7 +121,7 @@ class StabilityMetricsAdapter(SubsetsMetricsAdapter):
             valid_mask = ~np.isnan(flattened_values)
             valid_years = years[valid_mask]
             valid_values = flattened_values[valid_mask] 
-    
+
             #slopeurmsd is not as easy to read as slopeURMSD
             if metric_name == 'urmsd':
                 metric_name = metric_name.upper()

@@ -31,7 +31,7 @@ export class IntraAnnualMetricsComponent {
 
 
   defaultIntraAnnualOverlap = signal(0);
-  maxIntraAnnualOverlap = signal(185);
+  maxIntraAnnualOverlap = signal(45);
   selectedMetric = model<IntraAnnualMetricsDto | null>(null)
 
 

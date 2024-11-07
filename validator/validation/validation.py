@@ -403,6 +403,7 @@ def create_pytesmo_validation(validation_run):
                     subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
                     group_results="join",
                 )
+
             elif tsw_metrics == "stability":
                 # Remove existing sub-windows and prepare stability sub-windows
                 temp_sub_wdw_instance.remove_temp_sub_wndws()
