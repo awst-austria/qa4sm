@@ -39,7 +39,7 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS, add_annual_subwindows
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
@@ -405,23 +405,6 @@ def create_pytesmo_validation(validation_run):
                 )
 
             elif tsw_metrics == "stability":
-                # Remove existing sub-windows and prepare stability sub-windows
-                temp_sub_wdw_instance.remove_temp_sub_wndws()
-
-                # Add default and annual sub-windows
-                default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
-                temp_sub_wdw_instance.add_temp_sub_wndw(default_temp_sub_wndw)
-                add_annual_subwindows(list(range(period[0].year, period[1].year + 1)))
-
-                # Add custom sub-windows
-                for key, value in TEMPORAL_SUB_WINDOWS['custom'].items():
-                    new_subwindow = NewSubWindow(
-                        name=key,
-                        begin_date=datetime(value[0][0], value[0][1], value[0][2]),
-                        end_date=datetime(value[1][0], value[1][1], value[1][2]),
-                    )
-                    temp_sub_wdw_instance.add_temp_sub_wndw(new_subwindow)
-
                 # Set up Stability metrics
                 pairwise_metrics = StabilityMetricsAdapter(
                     calculator=_pairwise_metrics,
