@@ -10,8 +10,7 @@
           [useGrouping]="false"
           [showButtons]="true"
           [maxFractionDigits]="0"
-          [ngModel]="getYearFrom()"
-          (ngModelChange)="anomaliesModel.anomaliesFrom$.next(setDate($event))"
+          [(ngModel)]="anomaliesModel().anomaliesTo"
           [step]="1"
           [min]="minYear"
           [max]="maxYear">
@@ -32,8 +31,7 @@
           [useGrouping]="false"
           [showButtons]="true"
           [maxFractionDigits]="0"
-          [ngModel]="getYearTo()"
-          (ngModelChange)="anomaliesModel.anomaliesTo$.next(setDate($event))"
+          [(ngModel)]="anomaliesModel().anomaliesFrom"
           [step]="1"
           [min]="minYear"
           [max]="maxYear">
