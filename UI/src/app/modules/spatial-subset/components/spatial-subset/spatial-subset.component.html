@@ -20,7 +20,7 @@
             <div class="p-float-label">
               <p-inputNumber inputId="minLatInputId" id="minLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLat$|async"
-                             [min]="checkValIfLimited(subsetModel.minLat$|async)"
+                             [min]="(subsetModel.minLatLimit$|async) ? (subsetModel.minLatLimit$|async) : -90"
                              [max] ="checkValIfLimited(subsetModel.maxLat$|async, true)"
                              (ngModelChange)="subsetModel.minLat$.next($event)"></p-inputNumber>
 
@@ -34,7 +34,7 @@
             <div class="p-float-label">
               <p-inputNumber id="minLonInput" inputId="minLonInputId" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.minLon$|async"
-                             [min]="checkValIfLimited(subsetModel.minLon$|async)"
+                             [min]="(subsetModel.minLonLimit$|async) ? (subsetModel.minLonLimit$|async) : -180"
                              [max]="checkValIfLimited(subsetModel.maxLon$|async, true)"
                              (ngModelChange)="subsetModel.minLon$.next($event)"></p-inputNumber>
 
@@ -72,7 +72,7 @@
               <p-inputNumber inputId="maxLatInputId" id="maxLatInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="(subsetModel.maxLat$|async)"
                              [min]="checkValIfLimited(subsetModel.minLat$|async, true)"
-                             [max]="checkValIfLimited(subsetModel.maxLat$|async)"
+                             [max]="(subsetModel.maxLatLimit$|async) ? (subsetModel.maxLatLimit$|async) : 90"
                              (ngModelChange)="subsetModel.maxLat$.next($event)"></p-inputNumber>
 
               <label for="maxLatInputId">Max. Latitude</label>
@@ -85,7 +85,7 @@
               <p-inputNumber inputId="maxLonInputId" id="maxLonInput" [minFractionDigits]="1" [maxFractionDigits]="3"
                              [ngModel]="subsetModel.maxLon$|async"
                              [min]="checkValIfLimited(subsetModel.minLon$|async, true)"
-                             [max]="checkValIfLimited(subsetModel.maxLon$|async)"
+                             [max]="(subsetModel.maxLonLimit$|async) ? (subsetModel.maxLonLimit$|async) : 180"
                              (ngModelChange)="subsetModel.maxLon$.next($event)"></p-inputNumber>
 
               <label for="maxLonInputId">Max. Longitude</label>
