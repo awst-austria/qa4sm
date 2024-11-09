@@ -162,8 +162,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       new AnomaliesModel(
         new BehaviorSubject<string>(ANOMALIES_NONE),
         ANOMALIES_NONE_DESC,
-        new BehaviorSubject<Date>(null),
-        new BehaviorSubject<Date>(null)),
+        signal<number>(null),
+        signal<number>(null)),
       new TemporalMatchingModel(
         new BehaviorSubject<number>(null),
         'hours',
@@ -327,10 +327,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (validationRunConfig.anomalies_method != null) {
       this.anomaliesChild.setSelection(validationRunConfig.anomalies_method);
       if (validationRunConfig.anomalies_from != null) {
-        this.validationModel.anomalies.anomaliesFrom$.next(new Date(validationRunConfig.anomalies_from));
+        this.validationModel.anomalies.anomaliesFrom.set((new Date(validationRunConfig.anomalies_from)).getFullYear());
       }
       if (validationRunConfig.anomalies_to != null) {
-        this.validationModel.anomalies.anomaliesTo$.next(new Date(validationRunConfig.anomalies_to));
+        this.validationModel.anomalies.anomaliesTo.set((new Date(validationRunConfig.anomalies_to)).getFullYear());
       }
     }
 
@@ -759,8 +759,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       metrics: metricDtos,
       intra_annual_metrics: this.validationModel.intraAnnualMetrics,
       anomalies_method: this.validationModel.anomalies.method$.getValue(),
-      anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
-      anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
+      anomalies_from: new Date(this.validationModel.anomalies.anomaliesFrom(), 0, 1),
+      anomalies_to: new Date(this.validationModel.anomalies.anomaliesTo(), 11, 31),
       scaling_method: this.validationModel.scalingMethod.methodName,
       scale_to: '0',
       name_tag: this.validationModel.nameTag$.getValue(),
