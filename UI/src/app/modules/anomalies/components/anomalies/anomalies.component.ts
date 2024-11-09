@@ -53,20 +53,20 @@ export class AnomaliesComponent implements OnInit {
       new AnomaliesModel(
         new BehaviorSubject<string>(ANOMALIES_NONE),
         ANOMALIES_NONE_DESC,
-        signal<Date>(null),
-        signal<Date>(null)));
+        signal<number>(null),
+        signal<number>(null)));
     this.availableAnomalyMethodModels.push(
       new AnomaliesModel(
         new BehaviorSubject<string>(ANOMALIES_35D_MA),
         ANOMALIES_35D_MA_DESC,
-        signal<Date>(null),
-        signal<Date>(null)));
+        signal<number>(null),
+        signal<number>(null)));
 
     let climatology = new AnomaliesModel(
       new BehaviorSubject<string>(ANOMALIES_CLIMATOLOGY),
       ANOMALIES_CLIMATOLOGY_DESC,
-      signal<Date>(null),
-      signal<Date>(null));
+        signal<number>(1978),
+        signal<number>((new Date()).getFullYear()));
 
     // climatology.anomaliesTo$.subscribe(newToDate => {
     //   this.anomaliesModel.anomaliesTo$.next(newToDate);

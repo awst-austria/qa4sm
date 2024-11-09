@@ -14,12 +14,19 @@ export class AnomClimatologyComponent  {
   anomaliesModel = model({} as AnomaliesModel);
 
   constructor() {
+    // this.anomaliesModel.update(
+    //   model => {
+    //     model.anomaliesFrom.set(1978);
+    //     model.anomaliesTo.set((new Date()).getFullYear());
+    //     return model;
+    //   }
+    // )
   }
 
-  setDate(year: number): Date {
-    console.log(year);
-    return new Date(`${year}-01-01`);
- }
+ //  setDate(year: number): Date {
+ //    console.log(year);
+ //    return new Date(`${year}-01-01`);
+ // }
 
  //  getYearFrom(): number {
  //    let year: number;
