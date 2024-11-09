@@ -142,8 +142,8 @@
         <li *ngIf="validationRun.anomalies !== 'none'; else elseAnomalies">
           Validation metrics calculated from anomalies
           <span *ngIf="validationRun.anomalies === 'climatology'">
-                against climatology computed on years {{ validationRun.anomalies_from|date:"Y" }}
-            through {{ validationRun.anomalies_to|date:"Y" }}.
+                against climatology computed on years {{ validationRun.anomalies_from|date:"yyyy" }}
+            through {{ validationRun.anomalies_to|date:"yyyy" }}.
               </span>
           <span *ngIf="validationRun.anomalies === 'moving_avg_35_d'">
               against 35 day moving average.
