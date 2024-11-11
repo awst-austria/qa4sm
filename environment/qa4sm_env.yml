@@ -270,7 +270,7 @@ dependencies:
     - pytest-cov==4.0.0
     - pytest-django==4.5.2
     - pytest-mpl==0.16.1
-    - git+https://github.com/awst-austria/qa4sm-preprocessing@904ef6883511f411ae4a4cbf6a8139f28cf9217f
+    - qa4sm-preprocessing==0.3
     - git+https://github.com/daberer/qa4sm-reader.git@master
 #    - git+https://github.com/awst-austria/qa4sm-reader.git@master
     - redis==4.5.5
