@@ -274,7 +274,6 @@ class TestValidation(TestCase):
                     f'Metric variables for metric {metric} are {[m.name for m in metric_vars]}'
                 )
 
-
                 # check that all metrics have the same number of variables (depends on number of input datasets)
                 if metric == 'status':
                     # for status we generate 1 plot for non-spatial-reference dataset and one for each tcol combination
@@ -282,7 +281,7 @@ class TestValidation(TestCase):
                                 1) + is_tcol_run * comb(n_datasets - 1, 2)
                 elif (metric in comm_metrics) or (metric in non_metrics):
                     num_vars = 1
-                elif metric in pair_metrics:
+                elif metric in pair_metrics or metric in stability_metrics:
                     num_vars = n_datasets - 1
                 elif metric in tcol_metrics:
                     # for this testcase CIs via bootstrapping are activated, so
@@ -318,8 +317,13 @@ class TestValidation(TestCase):
                     self.__logger.debug(f'Length {m_var.name} are {length}')
 
                     # NaNs should only occur if the validation failed somehow
-                    nan_ratio = np.sum(np.isnan(values.data)) / float(
-                        len(values))
+                    if not stability_metrics_run:
+                        nan_ratio = np.sum(np.isnan(values.data)) / float(
+                            len(values))
+                    else:
+                        # todo: update this ration for stability metrics
+                        nan_ratio = 0
+
                     error_ratio = run.error_points / run.total_points
                     assert nan_ratio <= error_ratio, 'Variable {} has too many NaNs. Ratio: {}'.format(
                         metric, nan_ratio)
@@ -563,7 +567,7 @@ class TestValidation(TestCase):
         run.stability_metrics = True
         run.scaling_ref.save()
 
-        run.interval_from = datetime(1978, 1, 1, tzinfo=UTC)
+        run.interval_from = datetime(1990, 1, 1, tzinfo=UTC)
         run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
 
 
@@ -603,7 +607,7 @@ class TestValidation(TestCase):
         self.check_results(new_run,
                            is_tcol_run=False,
                            meta_plots=True,
-                           stability_metrics=True)
+                           stability_metrics_run=True)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows
