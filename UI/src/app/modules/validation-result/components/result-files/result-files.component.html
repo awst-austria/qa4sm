@@ -101,7 +101,7 @@
                  [ngClass]="{'result-plot':true, 'pcol': overviewPlots.length > 4}"
                  alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
           </div>
-          <div class="flex flex-row flex-wrap lg:w-7 w-10 align-content-center justify-content-center gap-2 column-gap-0 plot-spot">
+          <div class="flex flex-row flex-wrap lg:w-6 w-10 align-content-center justify-content-center gap-3">
             <div *ngFor="let plot of overviewPlots; let ind = index"
                  [ngClass]="{'image-container': true,
                              'w-12': overviewPlots.length === 1,
@@ -135,10 +135,11 @@
           </div>
         </div>
 
-
-        <div *ngIf="validation.intra_annual_metrics" class="flex flex-column w-12 align-items-center">
+        <div *ngIf="validation.intra_annual_metrics || validation.stability_metrics"
+             class="flex flex-column w-12 align-items-center">
           <hr class="flex w-11 pt-0 mt-0 featurette-divider">
-          <div class="flex flex-row w-12 flex-wrap justify-content-center align-content-center md:text-4xl text-2xl text-muted">
+          <div
+            class="flex flex-row w-12 flex-wrap justify-content-center align-content-center md:text-4xl text-2xl text-muted">
             Additional Plots
             <span class="pi pi-question-circle mx-2 text-2xl"
                   pTooltip="Additional results based on the assessment of either intra-annual or inter-annual product performance.
@@ -172,26 +173,27 @@
             <div class="flex flex-column text-xl px-2 text-muted justify-content-center">
               <em>
                 Intra-Annual Metrics <br>
-                Frequency: {{validation.intra_annual_type}} <br>
-                Overlap: {{validation.intra_annual_overlap}} day(s)
+                Frequency: {{ validation.intra_annual_type }} <br>
+                Overlap: {{ validation.intra_annual_overlap }} day(s)
               </em>
             </div>
           </div>
           <ng-template #noSeasonalPlots>
-            <div class="flex flex-row w-12 justify-content-center align-content-center text-muted py-4 md:text-xl">
+            <div
+              class="flex flex-row w-12 justify-content-center align-content-center text-muted py-4 md:text-xl">
               <em style="color: darkgrey"> There are no plots for the selected metric </em>
             </div>
           </ng-template>
+
+
+          <!--    leave it as it is-->
+          <div *ngIf="dataFetchError() || fileError()">
+            <p class="lead text-muted">
+              Result plots are temporarily unavailable.
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-
-
-    <!--    leave it as it is-->
-    <div *ngIf="dataFetchError() || fileError()">
-      <p class="lead text-muted">
-        Result plots are temporarily unavailable.
-      </p>
     </div>
   </p-panel>
 

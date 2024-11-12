@@ -142,8 +142,8 @@
         <li *ngIf="validationRun.anomalies !== 'none'; else elseAnomalies">
           Validation metrics calculated from anomalies
           <span *ngIf="validationRun.anomalies === 'climatology'">
-                against climatology computed on years {{ validationRun.anomalies_from|date:"Y" }}
-            through {{ validationRun.anomalies_to|date:"Y" }}.
+                against climatology computed on years {{ validationRun.anomalies_from|date:"yyyy" }}
+            through {{ validationRun.anomalies_to|date:"yyyy" }}.
               </span>
           <span *ngIf="validationRun.anomalies === 'moving_avg_35_d'">
               against 35 day moving average.
@@ -162,6 +162,11 @@
         <li>Bootstrapping of confidence intervals for Triple Collocation Analysis was
           <span *ngIf="validationRun.bootstrap_tcol_cis">activated. </span>
           <span *ngIf="!validationRun.bootstrap_tcol_cis">deactivated. </span>
+        </li>
+
+        <li>Stability metrics were
+          <span *ngIf="validationRun.stability_metrics">activated. </span>
+          <span *ngIf="!validationRun.stability_metrics">deactivated. </span>
         </li>
 
         <li> Intra annual metrics were

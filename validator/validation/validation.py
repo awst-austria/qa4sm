@@ -39,14 +39,15 @@ from validator.models import CeleryTask, DatasetConfiguration, CopiedValidations
 from validator.models import ValidationRun, DatasetVersion
 from validator.validation.batches import create_jobs, create_upscaling_lut
 from validator.validation.filters import setup_filtering
-from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS
+from validator.validation.globals import OUTPUT_FOLDER, IRREGULAR_GRIDS, VR_FIELDS, DS_FIELDS, ISMN, DEFAULT_TSW, \
+    TEMPORAL_SUB_WINDOW_SEPARATOR, METRICS, TEMPORAL_SUB_WINDOWS
 from validator.validation.graphics import generate_all_graphs
 from validator.validation.readers import create_reader, adapt_timestamp
 from validator.validation.util import mkdir_if_not_exists, first_file_in
 from validator.validation.globals import START_TIME, END_TIME, METADATA_TEMPLATE
-
+from validator.validation.adapters import StabilityMetricsAdapter
 import qa4sm_reader
-from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow
+from qa4sm_reader.intra_annual_temp_windows import TemporalSubWindowsCreator, NewSubWindow, TemporalSubWindowsFactory
 from qa4sm_reader.netcdf_transcription import Pytesmo2Qa4smResultsTranscriber
 
 __logger = logging.getLogger(__name__)
@@ -110,8 +111,8 @@ def set_outfile(validation_run, run_dir):
 def save_validation_config(validation_run):
     try:
         with netCDF4.Dataset(os.path.join(OUTPUT_FOLDER, validation_run.output_file.name),
-                     "a",
-                     format="NETCDF4") as ds:
+                             "a",
+                             format="NETCDF4") as ds:
 
             ds.qa4sm_version = settings.APP_VERSION
             ds.qa4sm_reader_version = qa4sm_reader.__version__
@@ -143,7 +144,7 @@ def save_validation_config(validation_run):
                     _list_comp = [
                         pf.filter.description + " " + pf.parameters
                         for pf in dataset_config.parametrisedfilter_set.all()
-                        ]
+                    ]
                     try:
                         filters += '; '.join(_list_comp)
                     except TypeError as e:
@@ -154,8 +155,8 @@ def save_validation_config(validation_run):
                     filters = 'N/A'
 
                 if (validation_run.spatial_reference_configuration and
-                    (dataset_config.id
-                     == validation_run.spatial_reference_configuration.id)):
+                        (dataset_config.id
+                         == validation_run.spatial_reference_configuration.id)):
                     i = 0  # reference is always 0
                 else:
                     i = j
@@ -209,7 +210,7 @@ def save_validation_config(validation_run):
                         pass
 
                 if ((validation_run.scaling_ref is not None) and
-                    (dataset_config.id == validation_run.scaling_ref.id)):
+                        (dataset_config.id == validation_run.scaling_ref.id)):
                     ds.val_scaling_ref = 'val_dc_dataset' + str(i)
 
                 if dataset_config.dataset.short_name in IRREGULAR_GRIDS.keys():
@@ -230,8 +231,8 @@ def save_validation_config(validation_run):
                     '%Y-%m-%d %H:%M')
 
             if all(x is not None for x in [
-                    validation_run.min_lat, validation_run.min_lon,
-                    validation_run.max_lat, validation_run.max_lon
+                validation_run.min_lat, validation_run.min_lon,
+                validation_run.max_lat, validation_run.max_lon
             ]):
                 ds.val_spatial_subset = "[{}, {}, {}, {}]".format(
                     validation_run.min_lat, validation_run.min_lon,
@@ -376,31 +377,55 @@ def create_pytesmo_validation(validation_run):
     #     calc_kendall=_calc_kendall,
     # )
 
+    # TODO: this should be move to the api view
+    if validation_run.intra_annual_metrics and validation_run.stability_metrics:
+        raise ValueError("Both intra_annual_metrics and stability_metrics cannot be True at the same time.")
 
+    tsw_metrics = None
+    temp_sub_wdws = None
 
-    # intra-annual metrics
-    iam_dict = define_intra_annual_metrics(validation_run)
-    temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
-    temp_sub_wdws = iam_dict['temp_sub_wdws']
+    if validation_run.intra_annual_metrics:
+        tsw_metrics = "intra_annual"
+    elif validation_run.stability_metrics:
+        tsw_metrics = "stability"
 
-    if isinstance(
-            temp_sub_wdws, dict
-    ):  # for more info, doc at see https://pytesmo.readthedocs.io/en/latest/examples/validation_framework.html#Metric-Calculator-Adapters
-        pairwise_metrics = SubsetsMetricsAdapter(
-            calculator=_pairwise_metrics,
-            subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
-            group_results="join",
-        )
+    if tsw_metrics:
+        tsw_dict = define_tsw_metrics(validation_run, period)
+        temp_sub_wdw_instance = tsw_dict['temp_sub_wdw_instance']
+        temp_sub_wdws = tsw_dict['temp_sub_wdws']
 
-    elif temp_sub_wdws is None: # the default case
-        pairwise_metrics = _pairwise_metrics
+        # Proceed only if temp_sub_wdws is a dictionary
+        if isinstance(temp_sub_wdws, dict):
+            if tsw_metrics == "intra_annual":
+                # Set up Intra-annual metrics
+                pairwise_metrics = SubsetsMetricsAdapter(
+                    calculator=_pairwise_metrics,
+                    subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
+                    group_results="join",
+                )
+
+            elif tsw_metrics == "stability":
+                # Set up Stability metrics
+                pairwise_metrics = StabilityMetricsAdapter(
+                    calculator=_pairwise_metrics,
+                    subsets=temp_sub_wdw_instance.custom_temporal_sub_windows,
+                    group_results="join",
+                )
 
     else:
-        raise ValueError(
-            f"Invalid value for temp_sub_wdws: {temp_sub_wdws}. Please specify either None or a custom temporal sub windowing function."
-        )
+        # Default case when tsw_metrics is None
+        if temp_sub_wdws is None:
+            pairwise_metrics = _pairwise_metrics
+        else:
+            raise ValueError(
+                f"Invalid value for temp_sub_wdws: {temp_sub_wdws}. "
+                "Please specify either None or a custom temporal sub windowing function."
+            )
 
-    metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
+    try:
+        metric_calculators = {(ds_num, 2): pairwise_metrics.calc_metrics}
+    except Exception as e:
+        print(e)
 
     if (len(ds_names) >= 3) and (validation_run.tcol is True):
         _tcol_metrics = TripleCollocationMetrics(
@@ -601,13 +626,17 @@ def run_validation(validation_id):
                     result_key = list(results.keys())[0]  # there is only 1 key
                     res = results[result_key]
                     status_result_keys = list(
-                        filter(lambda s: "status" in s, res.keys()))
+                        filter(
+                            lambda s: "status" in s and not s.split("|")[0].isdigit(),
+                            res.keys()
+                        )
+                    )
                     ok = res[status_result_keys[0]] == 0
                     for statkey in status_result_keys[1:]:
                         ok = ok & (res[statkey] == 0)
                     ngpis = num_gpis_from_job(
                         job_table[async_result.id]
-                    )  #? so we need a new criterion to determine, if the job was ok or not? like ngpis * len(time slices)
+                    )  # ? so we need a new criterion to determine, if the job was ok or not? like ngpis * len(time slices)
                     nok = sum(ok)
                     validation_run.ok_points += nok
                     validation_run.error_points += ngpis - nok
@@ -646,13 +675,13 @@ def run_validation(validation_id):
         if (not validation_aborted):
             set_outfile(validation_run, run_dir)
 
-            iam_dict = define_intra_annual_metrics(validation_run)
+            iam_dict = define_tsw_metrics(validation_run, get_period(validation_run))
             temp_sub_wdw_instance = iam_dict['temp_sub_wdw_instance']
             temp_sub_wdws = iam_dict['temp_sub_wdws']
 
             transcriber = Pytesmo2Qa4smResultsTranscriber(
                 pytesmo_results=os.path.join(OUTPUT_FOLDER,
-                                          validation_run.output_file.name),
+                                             validation_run.output_file.name),
                 intra_annual_slices=temp_sub_wdw_instance,
                 keep_pytesmo_ncfile=False)
             if transcriber.exists:
@@ -720,6 +749,7 @@ def stop_running_validation(validation_id):
                 file_path = os.path.join(run_dir, file_name)
                 os.remove(file_path)
 
+
 def _pytesmo_to_qa4sm_results(results: dict) -> dict:
     """
     Converts the new pytesmo results dictionary format to the old format that
@@ -761,7 +791,7 @@ def _pytesmo_to_qa4sm_results(results: dict) -> dict:
             else:
                 datasets = list(map(lambda t: t[0], key))
                 if metric[0] == '(' and metric[-1] == ')':
-                    metric = ast.literal_eval(metric)   # casts the string representing a tuple to a real tuple
+                    metric = ast.literal_eval(metric)  # casts the string representing a tuple to a real tuple
                 if isinstance(metric, tuple):
                     # happens only for triple collocation metrics, where the
                     # metric key is a tuple of (metric, dataset)
@@ -795,7 +825,7 @@ def _compare_param_filters(new_param_filters, old_param_filters):
         max_ind = len(new_param_filters)
         is_the_same = True
         while ind < max_ind and new_param_filters[
-                ind].parameters == old_param_filters[ind].parameters:
+            ind].parameters == old_param_filters[ind].parameters:
             ind += 1
         if ind != len(new_param_filters):
             is_the_same = False
@@ -833,7 +863,7 @@ def _compare_filters(new_dataset, old_dataset):
         max_filt_ind = new_filts_len
 
         while filt_ind < max_filt_ind and new_run_filters[
-                filt_ind] == old_run_filters[filt_ind]:
+            filt_ind] == old_run_filters[filt_ind]:
             filt_ind += 1
 
         if filt_ind == max_filt_ind:
@@ -874,7 +904,7 @@ def _compare_datasets(new_run_config, old_run_config):
             old_dataset = old_run_config[conf_ind]
             while ds_ind < max_ds_ind and getattr(
                     new_dataset, ds_fields[ds_ind]) == getattr(
-                        old_dataset, ds_fields[ds_ind]):
+                old_dataset, ds_fields[ds_ind]):
                 ds_ind += 1
             if ds_ind == max_ds_ind:
                 the_same = _compare_filters(new_dataset, old_dataset)
@@ -1084,43 +1114,46 @@ def get_period(val_run: ValidationRun) -> Union[None, List[str]]:
         return [startdate, enddate]
     return None
 
-def define_intra_annual_metrics(val_run: ValidationRun) -> Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]:
+
+def define_tsw_metrics(val_run: ValidationRun, period: List) -> Dict[
+    str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]:
     '''
-    Extract the intra-annual metrics settings from the validation run and instantiate the corresponding objects.
+    Extract the temporal sub-window metrics settings from the validation run and instantiate the corresponding objects.
 
     Parameters
     ----------
     val_run : ValidationRun
         The validation run object
+    period : List
+        The period of a validation run
 
     Returns
     -------
     Dict[str, Union[TemporalSubWindowsCreator, Dict[str, TsDistributor], None]]
         A dictionary containing the temporal sub-window instance and the custom temporal sub-windows, if applicable. Otherwise, filled with None.
     '''
-    # per default, assume bulk case
     temp_sub_wdw_instance = None
-    temp_sub_wdws = None
 
-    # in case intra-annual metrics are desired, instantiate corresponding object
+    # Handle intra-annual metrics
     if val_run.intra_annual_metrics:
         intra_annual_metric_lut = {'Seasonal': 'seasons',
-                                'Monthly': 'months'}     #TODO implement properly in qa4sm_reader.globals
-
-        temp_sub_wdw_instance = TemporalSubWindowsCreator(
+                                   'Monthly': 'months'}  # TODO implement properly in qa4sm_reader.globals
+        temp_sub_wdw_instance = TemporalSubWindowsFactory.create(
             temporal_sub_window_type=intra_annual_metric_lut[val_run.intra_annual_type],
             overlap=int(val_run.intra_annual_overlap),
-            custom_file=None)  # loading default temporal sub-windows from globals file
+            period=period
+        )
 
-        period = get_period(val_run)
-        if not period:
-            period = [datetime(year=1978, month=1, day=1), datetime.now()]    #NOTE bit of a hack, but we need a period for the default case
+    # Handle stability metrics
+    elif val_run.stability_metrics:
+        temp_sub_wdw_instance = TemporalSubWindowsFactory.create(
+            temporal_sub_window_type="stability",
+            overlap=0,  # Adjust overlap for stability metrics
+            period=period,
+            custom_subwindows=TEMPORAL_SUB_WINDOWS.get('custom', None)
+        )
 
-        default_temp_sub_wndw = NewSubWindow(DEFAULT_TSW, *period)
-        temp_sub_wdw_instance.add_temp_sub_wndw(
-            new_temp_sub_wndw=default_temp_sub_wndw,
-            insert_as_first_wndw=True)  # always add the default case and make it as the first one (wrong order will throw errors later on)
-        temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows
+    temp_sub_wdws = temp_sub_wdw_instance.custom_temporal_sub_windows if temp_sub_wdw_instance else None
 
     __logger.debug(f"{temp_sub_wdw_instance=}")
     __logger.debug(f"{temp_sub_wdws=}")

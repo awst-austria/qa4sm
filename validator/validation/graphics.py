@@ -19,11 +19,10 @@ from cartopy import config as cconfig
 from typing import List, Tuple, Dict, Set
 from pathlib import PosixPath
 
-
-
 cconfig['data_dir'] = path.join(settings.BASE_DIR, 'cartopy')
 
-from validator.validation.globals import OUTPUT_FOLDER, METRICS, METRIC_TEMPLATE, TC_METRICS, TC_METRIC_TEMPLATE, DEFAULT_TSW
+from validator.validation.globals import OUTPUT_FOLDER, METRICS as READER_METRICS, METRIC_TEMPLATE, TC_METRICS, \
+    TC_METRIC_TEMPLATE, DEFAULT_TSW, STABILITY_METRICS
 import os
 from io import BytesIO
 import base64
@@ -55,7 +54,6 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
     zipfilename = path.join(outfolder, 'graphs.zip')
     __logger.debug('Trying to create zipfile {}'.format(zipfilename))
 
-
     fnb, fnm, fcsv, fncb = plot_all(
         validation_run.output_file.path,
         temporal_sub_windows=temporal_sub_windows,
@@ -81,9 +79,9 @@ def generate_all_graphs(validation_run, temporal_sub_windows: List[str], outfold
             myzip.write(svgfile, arcname=arcname)
             remove(svgfile)
 
-    collect_statitics_files(dir = outfolder)
+    collect_statitics_files(dir=outfolder)
 
-    clean_output_folder(dir = outfolder,
+    clean_output_folder(dir=outfolder,
                         to_be_deleted=[x for x in temporal_sub_windows if x != DEFAULT_TSW])
 
 
@@ -124,6 +122,13 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
     bulk_prefix = ''
     if "bulk" in run_dir:
         bulk_prefix += 'bulk_'
+
+    if validation_run.stability_metrics:
+        METRICS = {**READER_METRICS, **STABILITY_METRICS}
+    else:
+        METRICS = READER_METRICS
+
+    # if validation_run
     for root, dirs, files in os.walk(run_dir):
         for f in files:
             if not f.endswith('.png'): continue
@@ -161,8 +166,8 @@ def get_dataset_combis_and_metrics_from_files(validation_run):
 
             for tcol_metric in TC_METRICS.keys():
                 template = bulk_prefix + ''.join([TC_METRIC_TEMPLATE[0],
-                                    TC_METRIC_TEMPLATE[1].format(metric=tcol_metric),
-                                    TC_METRIC_TEMPLATE[2]]) + '.png'
+                                                  TC_METRIC_TEMPLATE[1].format(metric=tcol_metric),
+                                                  TC_METRIC_TEMPLATE[2]]) + '.png'
 
                 parsed = parse(template, f)
                 if parsed is None:
@@ -430,6 +435,7 @@ def collect_statitics_files(dir: str) -> None:
                     arcname = os.path.relpath(path.join(root, f), dir)
                     myzip.write(path.join(root, f), arcname=arcname)
 
+
 def clean_output_folder(dir: str, to_be_deleted: List[str]) -> None:
     """
     Clean a specified directory of given elements.
@@ -449,10 +455,13 @@ def clean_output_folder(dir: str, to_be_deleted: List[str]) -> None:
         for element in to_be_deleted:
             element_path = os.path.join(dir, element)
             if os.path.exists(element_path):
-                if os.path.isfile(element_path):    remove(element_path)
-                elif os.path.isdir(element_path):   rmtree(element_path)
+                if os.path.isfile(element_path):
+                    remove(element_path)
+                elif os.path.isdir(element_path):
+                    rmtree(element_path)
     else:
         warnings.warn(f"Directory {dir} does not exist")
+
 
 def sort_filenames_to_filetypes(plot_output: Tuple[List[PosixPath]]) -> Dict[str, Dict[str, List[PosixPath]]]:
     """
@@ -474,20 +483,20 @@ def sort_filenames_to_filetypes(plot_output: Tuple[List[PosixPath]]) -> Dict[str
     """
 
     _out_dict = {'fnb': {},
-                    'fnm': {},
-                    'fcsv': {},
-                    'fncb': {},
-    }
+                 'fnm': {},
+                 'fcsv': {},
+                 'fncb': {},
+                 }
 
     _out_dict_lut = {0: 'fnb', 1: 'fnm', 2: 'fcsv', 3: 'fncb'}
 
     for l, lst in enumerate(plot_output):
         lst_suffixes = list(set([el.suffix for el in lst]))
         _out_dict[_out_dict_lut[l]] = {suffix.lstrip('.'): [ffile for ffile in lst if ffile.suffix == suffix]
-                                        for suffix in lst_suffixes}
-
+                                       for suffix in lst_suffixes}
 
     return _out_dict
+
 
 def files_to_zip(plot_dict: Dict[str, Dict[str, List[PosixPath]]], filetype: str) -> Set[PosixPath]:
     """
@@ -510,7 +519,7 @@ def files_to_zip(plot_dict: Dict[str, Dict[str, List[PosixPath]]], filetype: str
 
     try:
         _files += plot_dict['fncb'][filetype]
-    except KeyError as e:   # if there are no comparison boxplots the 'fncb' key will not be present
+    except KeyError as e:  # if there are no comparison boxplots the 'fncb' key will not be present
         warnings.warn(f"KeyError: {e}. No comparison boxplots found. Skipping...")
     finally:
         _files = set(_files)

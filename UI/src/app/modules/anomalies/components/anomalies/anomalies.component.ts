@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {AnomaliesModel} from './anomalies-model';
 import {BehaviorSubject} from 'rxjs';
 
@@ -42,8 +42,8 @@ export class AnomaliesComponent implements OnInit {
     this.prepareAnomaliesMethodModels();
     this.selectedMethod$.subscribe(value => {
       this.anomaliesModel.method$.next(value.method$.getValue());
-      this.anomaliesModel.anomaliesFrom$.next(value.anomaliesFrom$.getValue());
-      this.anomaliesModel.anomaliesTo$.next(value.anomaliesTo$.getValue());
+      this.anomaliesModel.anomaliesFrom.set(value.anomaliesFrom());
+      this.anomaliesModel.anomaliesTo.set(value.anomaliesTo());
     });
   }
 
@@ -53,27 +53,30 @@ export class AnomaliesComponent implements OnInit {
       new AnomaliesModel(
         new BehaviorSubject<string>(ANOMALIES_NONE),
         ANOMALIES_NONE_DESC,
-        new BehaviorSubject<Date>(null),
-        new BehaviorSubject<Date>(null)));
+        signal<number>(null),
+        signal<number>(null)));
     this.availableAnomalyMethodModels.push(
       new AnomaliesModel(
         new BehaviorSubject<string>(ANOMALIES_35D_MA),
         ANOMALIES_35D_MA_DESC,
-        new BehaviorSubject<Date>(null),
-        new BehaviorSubject<Date>(null)));
+        signal<number>(null),
+        signal<number>(null)));
 
     let climatology = new AnomaliesModel(
       new BehaviorSubject<string>(ANOMALIES_CLIMATOLOGY),
       ANOMALIES_CLIMATOLOGY_DESC,
-      new BehaviorSubject<Date>(null),
-      new BehaviorSubject<Date>(null));
+        signal<number>(1978),
+        signal<number>((new Date()).getFullYear()));
 
-    climatology.anomaliesTo$.subscribe(newToDate => {
-      this.anomaliesModel.anomaliesTo$.next(newToDate);
-    });
-    climatology.anomaliesFrom$.subscribe(newFromDate => {
-      this.anomaliesModel.anomaliesFrom$.next(newFromDate);
-    });
+    // climatology.anomaliesTo$.subscribe(newToDate => {
+    //   this.anomaliesModel.anomaliesTo$.next(newToDate);
+    // });
+
+    // climatology.anomaliesTo.
+
+    // climatology.anomaliesFrom$.subscribe(newFromDate => {
+    //   this.anomaliesModel.anomaliesFrom$.next(newFromDate);
+    // });
 
     this.availableAnomalyMethodModels.push(climatology);
 

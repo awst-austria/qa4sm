@@ -134,6 +134,8 @@ class ValidationRun(models.Model):
     intra_annual_type = models.CharField(max_length=100, blank=True, null=True)
     intra_annual_overlap = models.IntegerField(blank=True, null=True)
 
+    stability_metrics = models.BooleanField(default=False)
+
     # many-to-one relationships coming from other models:
     # dataset_configurations from DatasetConfiguration
     # celery_tasks from CeleryTask
