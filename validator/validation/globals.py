@@ -31,6 +31,7 @@ TC_METRIC_TEMPLATE = [
     "_{metric}", "_for_{id_met}-{ds_met}"
 ]
 
+STABILITY_METRICS = qr_globals.STABILITY_METRICS
 #-----------------------------------------------------------------------------------------------------------------------
 #TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
 #-----------------------------------------------------------------------------------------------------------------------
@@ -193,3 +194,5 @@ MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
 GEOJSON_FILE_NAME = 'ismn_sensors.json'
+
+

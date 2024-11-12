@@ -43,7 +43,7 @@ from validator.tests.testutils import set_dataset_paths
 from validator.validation import globals, adapt_timestamp
 import validator.validation as val
 from validator.validation.batches import _geographic_subsetting, create_upscaling_lut
-from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, METADATA_PLOT_NAMES, NON_METRICS
+from validator.validation.globals import DEFAULT_TSW, METRICS, TC_METRICS, STABILITY_METRICS, METADATA_PLOT_NAMES, NON_METRICS
 from validator.validation.globals import OUTPUT_FOLDER
 from validator.validation.readers import ReaderWithTsExtension
 from django.shortcuts import get_object_or_404
@@ -66,6 +66,7 @@ class TestValidation(TestCase):
     def setUp(self):
         self.metrics = ['gpi', 'lon', 'lat'] + list(METRICS.keys())
         self.tcol_metrics = list(TC_METRICS.keys())
+        self.stability_metrics = list(STABILITY_METRICS.keys())
 
         self.user_data = {
             'username': 'testuser',
@@ -206,7 +207,8 @@ class TestValidation(TestCase):
     def check_results(self,
                       run,
                       is_tcol_run=False,
-                      meta_plots=True):
+                      meta_plots=True,
+                      stability_metrics_run=False):
 
         try:
             self._check_validation_configuration_consistency(run)
@@ -232,6 +234,7 @@ class TestValidation(TestCase):
         pair_metrics = [
             m for m in list(METRICS.keys()) if m.lower() not in comm_metrics
         ]
+        stability_metrics = self.stability_metrics if stability_metrics_run else []
 
         # check netcdf output
         length = -1
@@ -245,7 +248,7 @@ class TestValidation(TestCase):
             assert settings.SITE_URL in ds.url
 
             # check the metrics contained in the file
-            for metric in self.metrics + tcol_metrics:  # we dont test lon, lat, time etc.
+            for metric in self.metrics + tcol_metrics + stability_metrics:  # we dont test lon, lat, time etc.
                 ## This gets all variables in the netcdf file that start with the name of the current metric
                 if metric in tcol_metrics:
                     metric_vars = ds.get_variables_by_attributes(
@@ -278,7 +281,7 @@ class TestValidation(TestCase):
                                 1) + is_tcol_run * comb(n_datasets - 1, 2)
                 elif (metric in comm_metrics) or (metric in non_metrics):
                     num_vars = 1
-                elif metric in pair_metrics:
+                elif metric in pair_metrics or metric in stability_metrics:
                     num_vars = n_datasets - 1
                 elif metric in tcol_metrics:
                     # for this testcase CIs via bootstrapping are activated, so
@@ -314,6 +317,13 @@ class TestValidation(TestCase):
                     self.__logger.debug(f'Length {m_var.name} are {length}')
 
                     # NaNs should only occur if the validation failed somehow
+                    if not stability_metrics_run:
+                        nan_ratio = np.sum(np.isnan(values.data)) / float(
+                            len(values))
+                    else:
+                        # todo: update this ration for stability metrics
+                        nan_ratio = 0
+
                     nan_ratio = np.sum(np.isnan(values.data)) / float(
                         len(values))
                     error_ratio = run.error_points / run.total_points
@@ -540,6 +550,68 @@ class TestValidation(TestCase):
         self.check_results(new_run,
                            is_tcol_run=False,
                            meta_plots=True)
+        self.delete_run(new_run)
+
+    # TODO: fails, if validation contains temporal sub-windows
+    @pytest.mark.filterwarnings(
+        "ignore:No results for gpi:UserWarning",
+        "ignore:read_ts is deprecated, please use read instead:DeprecationWarning",
+        "ignore: Too few points are available to generate:UserWarning")
+    def test_validation_stability_metrics(self):
+        run = generate_default_validation()
+        run.plots_save_metadata = 'always'
+        run.user = self.testuser
+
+        # run.scaling_ref = ValidationRun.SCALE_REF
+        run.scaling_method = ValidationRun.BETA_SCALING  # cdf matching
+        run.scaling_ref = run.spatial_reference_configuration
+        run.scaling_ref.is_scaling_reference = True
+        run.stability_metrics = True
+        run.scaling_ref.save()
+
+        run.interval_from = datetime(1990, 1, 1, tzinfo=UTC)
+        run.interval_to = datetime(2018, 12, 31, tzinfo=UTC)
+
+
+        run.save()
+
+        self.__logger.debug(f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}")
+
+        self.__logger.debug(
+            f"Intra-Annual params: {run.intra_annual_type=}, {run.intra_annual_metrics=}, {run.intra_annual_overlap=}")
+
+        for i, config in enumerate(run.dataset_configurations.all()):
+            if config == run.spatial_reference_configuration:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ISMN_GOOD'))
+            else:
+                config.filters.add(
+                    DataFilter.objects.get(name='FIL_ALL_VALID_RANGE'))
+
+            config.save()
+
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name='FIL_ISMN_NETWORKS'), parameters='SCAN', \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+        # add filterring according to depth_range with the default values:
+        pfilter = ParametrisedFilter(filter=DataFilter.objects.get(name="FIL_ISMN_DEPTH"), parameters="0.0,0.1", \
+                                     dataset_config=run.spatial_reference_configuration)
+        pfilter.save()
+
+        run_id = run.id
+
+        ## run the validation
+        val.run_validation(run_id)
+        new_run = ValidationRun.objects.get(pk=run_id)
+
+        assert new_run.total_points == 9  # 9 ismn stations in hawaii testdata
+        assert new_run.error_points == 0
+        assert new_run.ok_points == 9
+
+        self.check_results(new_run,
+                           is_tcol_run=False,
+                           meta_plots=True,
+                           stability_metrics_run=True)
         self.delete_run(new_run)
 
     # TODO: fails, if validation contains temporal sub-windows

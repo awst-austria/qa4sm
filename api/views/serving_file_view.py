@@ -98,7 +98,8 @@ def get_metric_names_and_associated_files(request):
         # for now we assume that there can be either intra-annual metrics or stability metrics, so the seasonal prefix
         # should be simply set accordingly
         # todo: update this part for stability metrics
-        if validation.intra_annual_metrics:
+
+        if validation.intra_annual_metrics or validation.stability_metrics:
             seasonal_prefix = 'comparison_boxplot'
 
         if f'{seasonal_prefix}s' in path_content:

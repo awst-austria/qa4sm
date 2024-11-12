@@ -38,6 +38,7 @@ export class ValidationrunDto {
               public copied_run: number[],
               public is_a_copy: boolean,
               public bootstrap_tcol_cis: boolean,
+              public stability_metrics: boolean,
               public temporal_matching: number,
               public intra_annual_metrics: boolean,
               public intra_annual_overlap: number | null,
