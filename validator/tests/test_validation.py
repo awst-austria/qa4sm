@@ -324,8 +324,6 @@ class TestValidation(TestCase):
                         # todo: update this ration for stability metrics
                         nan_ratio = 0
 
-                    nan_ratio = np.sum(np.isnan(values.data)) / float(
-                        len(values))
                     error_ratio = run.error_points / run.total_points
                     assert nan_ratio <= error_ratio, 'Variable {} has too many NaNs. Ratio: {}'.format(
                         metric, nan_ratio)
