@@ -108,6 +108,10 @@ def get_metric_names_and_associated_files(request):
         if "bulk" in path_content:
             file_path += 'bulk/'
             bulk_prefix = 'bulk_'
+
+        boxplot_prefix = bulk_prefix + 'boxplot_'
+        barplot_prefix = bulk_prefix + 'barplot_'
+        overview_prefix = bulk_prefix + 'overview_'
     except FileNotFoundError:
         return JsonResponse({'message': 'Output directory does not contain any files.'}, status=404)
 
@@ -140,15 +144,15 @@ def get_metric_names_and_associated_files(request):
     for metric_ind, key in enumerate(metrics):
         boxplot_file = ''
         seasonal_metric_file = ''
-        boxplot_file_name = bulk_prefix + 'boxplot_' + metrics[key] + '.png' if metrics[key] not in barplot_metric \
+        boxplot_file_name = boxplot_prefix + metrics[key] + '.png' if metrics[key] not in barplot_metric \
             else 'barplot_' + metrics[key] + '.png'
         seasonal_file_name = seasonal_prefix + '_' + metrics[key] + '.png'
 
         if metrics[key] not in independent_metrics:
-            overview_plots = [{'file_name': bulk_prefix + 'overview_' + name_key + '_' + metrics[key] + '.png',
+            overview_plots = [{'file_name': overview_prefix + name_key + '_' + metrics[key] + '.png',
                                'datasets': name_key} for name_key in combis]
         else:
-            overview_plots = [{'file_name': bulk_prefix + 'overview_' + metrics[key] + '.png', 'datasets': ''}]
+            overview_plots = [{'file_name': overview_prefix + metrics[key] + '.png', 'datasets': ''}]
 
         if boxplot_file_name in files:
             boxplot_file = file_path + boxplot_file_name
@@ -166,7 +170,7 @@ def get_metric_names_and_associated_files(request):
         boxplot_dicts = [{'ind': 0, 'name': 'Unclassified', 'file': boxplot_file}]
 
         if ref_dataset_name == ISMN:
-            metadata_plots = [{'file_name': f'{"boxplot_" if metrics[key] not in barplot_metric else "barplot_"}' +
+            metadata_plots = [{'file_name': f'{boxplot_prefix if metrics[key] not in barplot_metric else barplot_prefix}' +
                                             metrics[key] + '_' + metadata_name + '.png'}
                               for metadata_name in METADATA_PLOT_NAMES.values()]
             plot_ind = 1
