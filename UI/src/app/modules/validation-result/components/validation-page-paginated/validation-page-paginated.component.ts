@@ -28,6 +28,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
+  filterVar: string = '';
+
   dataFetchError = signal(false);
 
   constructor(private validationrunService: ValidationrunService) {
@@ -59,8 +61,13 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   getValidationsAndItsNumber(published: boolean): void {
     this.isLoading = true;
+
+    this.filterVar = 'Blue'
+
     const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
-      .set('order', String(this.order));
+      .set('order', String(this.order)).set('filterVar', String(this.filterVar));
+
+
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
         .pipe(
