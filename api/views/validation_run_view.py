@@ -79,7 +79,7 @@ def my_results(request):
 
     # Apply the filterVar if provided and not empty
     if filterVar:
-        val_runs = val_runs.filter(name_tag__icontains='Blue')
+        val_runs = val_runs.filter(name_tag__icontains=filterVar)
 
 
     if limit and offset:

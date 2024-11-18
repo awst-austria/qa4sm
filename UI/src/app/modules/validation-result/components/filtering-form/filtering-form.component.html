@@ -1,1 +1,73 @@
-<p>filtering-form works!</p>
+
+<div class="flex flex-row lg:flex-nowrap flex-wrap pt-2" id="filteringForm">
+    <div class="small-label lg:w-2 w-12">
+      <div class="p-fluid">
+        <span> Filter By:</span>
+      </div>
+    </div>
+    <div class="lg:w-5 w-12 px-0 mx-0">
+      <p-dropdown
+        [options]="dropdownFilters"
+        [(ngModel)]="selectedFilter"
+        placeholder="Select a filter">
+      </p-dropdown>
+    </div>  
+  <div *ngIf="selectedFilter === 'status'" class="lg:w-5 w-12 px-0 mx-0">
+        <p-multiSelect 
+        [options]="statuses" 
+        [(ngModel)]="selectedStatuses"  
+        placeholder="Select statuses"
+        display="chip"
+        [filter]="false"
+        showHeader="false"
+        [style]="{'width': '100%'}"></p-multiSelect>
+  </div>
+  <div *ngIf="selectedFilter === 'name'" class="lg:w-5 w-12 px-0 mx-0">
+    <input pInputText 
+    [(ngModel)]="selectedNames" 
+    placeholder="Enter name"
+    [style]="{'width': '100%'}" />
+  </div>
+
+<!--
+  <div *ngIf="selectedFilter === 'date'" class="lg:w-5 w-12 px-0 mx-0">
+    <p-multiSelect 
+      [options]="dates" 
+      [(ngModel)]="selectedDates" 
+      placeholder="Select dates"
+      display="chip"
+      [filter]="false"
+      showHeader="false"
+      [style]="{'width': '100%'}">
+    </p-multiSelect>
+  </div>
+-->
+
+  <div  *ngIf="selectedFilter" class="lg:w-5 w-12 px-0 mx-0">
+    <p-button 
+      label="Add Filter" 
+      icon="pi pi-filter" 
+      class="p-button-success p-button-rounded"
+      (click)="selectFilter()">
+    </p-button>
+  </div>
+</div>
+
+<div *ngIf="activeFilters.length > 0" class="active-filters mt-3">
+  <h4>Active Filters:</h4>
+  <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2">
+    <div class="filter-item">
+      <div class="filter-name">{{ filter.filter | titlecase }}:</div>
+      <div class="filter-values">
+        <span *ngFor="let value of filter.values; let j = index">
+          <span class="p-pill p-pill-info">{{ value }}</span>
+          <span *ngIf="j < filter.values.length - 1">, </span>
+        </span>
+      </div>
+      <div class="button-group flex gap-2">
+        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info" (click)="editFilter(i)"></button>
+        <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="removeFilter(i)"></button>
+    </div>
+    </div>
+  </div>
+</div>

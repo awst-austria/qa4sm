@@ -10,6 +10,7 @@ import {
 import {RouterModule} from '@angular/router';
 import {SortingFormComponent} from './components/sorting-form/sorting-form.component';
 import {DropdownModule} from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ValidationSummaryComponent} from './components/validation-summary/validation-summary.component';
 import {ButtonsComponent} from './components/buttons/buttons.component';
@@ -33,11 +34,13 @@ import {SelectButtonModule} from 'primeng/selectbutton';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {MenuModule} from 'primeng/menu';
 import {CoreModule} from '../core/core.module';
+import { FilteringFormComponent } from './components/filtering-form/filtering-form.component';
 
 @NgModule({
   declarations: [ValidationrunRowComponent,
     ValidationPagePaginatedComponent,
     SortingFormComponent,
+    FilteringFormComponent,
     ValidationSummaryComponent,
     ButtonsComponent,
     TrackedValidationsComponent,

@@ -23,13 +23,12 @@ export class ValidationPagePaginatedComponent implements OnInit {
   action$ = new BehaviorSubject(null);
   selectedValidations$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
-
   isLoading: boolean = false;
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
   filterVar: string = '';
-
+  filterChange: boolean = false;
   dataFetchError = signal(false);
 
   constructor(private validationrunService: ValidationrunService) {
@@ -52,7 +51,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const docHeight = document.documentElement.scrollHeight;
     const windowBottom = windowHeight + window.scrollY;
 
-    if (windowBottom >= docHeight - 1 && !this.isLoading && !this.endOfPage) {
+    const scrollThreshold = 0.95; //Load further results at 95% scroll - more robust
+    if ((windowBottom / docHeight) >= scrollThreshold && !this.isLoading && !this.endOfPage) {
       this.currentPage++;
       this.offset = (this.currentPage - 1) * this.limit;
       this.getValidationsAndItsNumber(this.published);
@@ -62,10 +62,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
   getValidationsAndItsNumber(published: boolean): void {
     this.isLoading = true;
 
-    this.filterVar = 'Blue'
-
-    const parameters = new HttpParams().set('offset', String(this.offset)).set('limit', String(this.limit))
-      .set('order', String(this.order)).set('filterVar', String(this.filterVar));
+    const parameters = new HttpParams()
+      .set('offset', String(this.offset))
+      .set('limit', String(this.limit))
+      .set('order', String(this.order))
+      .set('filterVar', String(this.filterVar));
 
 
     if (!published) {
@@ -89,9 +90,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
     }
   }
 
+
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
     const {validations, length} = serverResponse;
-    if (!this.maxNumberOfPages) {
+    if (!this.maxNumberOfPages || this.orderChange) {
       this.maxNumberOfPages = Math.ceil(length / this.limit);
     }
 
@@ -129,6 +131,19 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.getValidationsAndItsNumber(this.published);
   }
 
+  getFilter(filter): void {
+    this.filterVar = filter;
+    this.orderChange =true;
+
+    // Reset page
+    this.currentPage = 1;
+    this.offset = 0;
+    this.endOfPage = false;
+    //this.validations = [];
+
+    this.getValidationsAndItsNumber(this.published);
+  }
+
   setEndOfPage() {
     this.endOfPage = true;
     this.limit = this.validations.length;
@@ -152,7 +167,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const parameters = new HttpParams()
       .set('offset', String(this.offset))
       .set('limit', String(this.limit))
-      .set('order', String(this.order));
+      .set('order', String(this.order))
+      .set('filterVar', String(this.filterVar));
     this.validationrunService.getMyValidationruns(parameters)
       .pipe(
         catchError(() => this.onDataFetchError())

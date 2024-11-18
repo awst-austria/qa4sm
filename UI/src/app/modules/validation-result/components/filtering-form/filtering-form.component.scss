@@ -1,0 +1,57 @@
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    margin: 5px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    font-size: 14px;
+  }
+  
+  .filter-chip .filter-label {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  
+  .filter-chip .filter-values {
+    color: #333;
+  }
+  
+  .filter-chip button {
+    margin-left: 5px;
+  }
+  
+  .active-filters {
+      margin-top: 20px;
+    }
+    
+    .filter-item {
+      display: flex;
+      align-items: center;
+      background-color: #f1f1f1; 
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    
+    .filter-name {
+      background-color: #c8e6c9; 
+      color: #388e3c; 
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    
+    .filter-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    
+  
+    
+    button.p-button-rounded {
+      margin-left: 10px;
+  
+    }
