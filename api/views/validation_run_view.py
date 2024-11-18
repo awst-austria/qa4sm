@@ -57,6 +57,9 @@ def my_results(request):
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
     order = request.query_params.get('order', None)
+
+    filterVar = request.query_params.get('filterVar', None)
+
     order_list = ['name_tag',
                   '-name_tag',
                   'start_time',
@@ -73,6 +76,11 @@ def my_results(request):
         val_runs = ValidationRun.objects.filter(user=current_user)
     else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+    # Apply the filterVar if provided and not empty
+    if filterVar:
+        val_runs = val_runs.filter(name_tag__icontains='Blue')
+
 
     if limit and offset:
         limit = int(limit)
