@@ -38,7 +38,7 @@
     </div>
 
     <div *ngIf="validations.length && !dataFetchError()" class="w-12 my-2">
-      <qa-filtering-form (filterVar)="getFilter($event)"/>
+      <qa-filtering-form (filterPayload)="getFilter($event)"/>
     </div>
 
     <!-- Rows -->

@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 
 from django.http import JsonResponse
@@ -57,9 +58,6 @@ def my_results(request):
     limit = request.query_params.get('limit', None)
     offset = request.query_params.get('offset', None)
     order = request.query_params.get('order', None)
-
-    filterVar = request.query_params.get('filterVar', None)
-
     order_list = ['name_tag',
                   '-name_tag',
                   'start_time',
@@ -77,10 +75,25 @@ def my_results(request):
     else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
-    # Apply the filterVar if provided and not empty
-    if filterVar:
-        val_runs = val_runs.filter(name_tag__icontains=filterVar)
+    filter_name = request.query_params.get('name', None)
+    filter_statuses = request.query_params.getlist('statuses', None)
+    start_date_str = request.GET.get('startDate', None)
+    end_date_str = request.GET.get('endDate', None)
+    
+    #only run filter queries if they are provided 
+    if filter_name:
+        val_runs = val_runs.filter(name_tag__icontains=filter_name)
+    if filter_statuses:
+        status_filters = filter_by_job_statuses(filter_statuses)
+        val_runs = val_runs.filter(status_filters)
 
+
+    if start_date_str and end_date_str:
+        start_date = datetime.fromisoformat(start_date_str.rstrip('Z'))  
+        end_date = datetime.fromisoformat(end_date_str.rstrip('Z'))  
+        val_runs = val_runs.filter(
+            start_time__gte=start_date,  # Assuming 'date' is the field in your model
+            start_time__lte=end_date)
 
     if limit and offset:
         limit = int(limit)
@@ -162,6 +175,25 @@ def get_copied_validations(request, **kwargs):
     serializer = CopiedValidationRunSerializer(copied_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
+
+def filter_by_job_statuses(job_statuses):
+    #Horrible code to apply set of job status filters.
+    status_filters = Q()
+    for status in job_statuses:
+        if status == 'Scheduled':
+            status_filters |= Q(progress=0, end_time__isnull=True)
+        elif status == 'Done':
+            status_filters |= Q(progress=100, end_time__isnull=False)
+        elif status == 'Cancelled':
+            status_filters |= Q(progress__lt=0)
+        elif status == 'ERROR':
+            status_filters |= Q(end_time__isnull=False, total_points=0)
+            #status_filters |= Q(total_points=0)
+        elif status == 'Running':
+            status_filters |= Q(progress__gte=0, progress__lt=100, end_time__isnull=True, total_points__gt=0)
+        else:
+            print('Status didnt match')
+    return (status_filters)
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:

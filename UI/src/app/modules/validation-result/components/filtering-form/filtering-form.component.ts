@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+
+export interface FilterPayload {
+  statuses: string[];
+  name: string;
+  selectedDates: [Date, Date];
+}
+
 
 @Component({
   selector: 'qa-filtering-form',
@@ -8,32 +15,38 @@ import { Component, EventEmitter, Output } from '@angular/core';
   styleUrl: './filtering-form.component.scss'
 })
 export class FilteringFormComponent {
-  @Output() filterVar =  new EventEmitter<string>();
 
-  filterSelection = [
-    { label: 'Name', value: 'name' },
-    { label: 'Status', value: 'status' }
-  ];
+  @Output() filterPayload =  new EventEmitter<FilterPayload>();
 
+
+  availableStatuses = ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled']
   selectedFilter: string = '';
   activeFilters: { filter: string, values: string[] }[] = [];
-  availableFilters = ['name'];
+  availableFilters = ['name', 'Status', 'Date'];
   dropdownFilters: { label: string, value: string }[] = []; // filters still available after applied ones are removed from list
 
   selectedStatuses: string[] = []; 
   selectedNames: string = ''; 
+  selectedDateRange: [Date | null, Date | null];
 
   constructor() {
     this.updateDropdownFilters();
   }
+
 
   selectFilter() {
     let filterValues = [];
 
     //
     switch (this.selectedFilter) {
+      case 'Status':
+        filterValues = this.selectedStatuses;
+        break;
       case 'name':
         filterValues = [this.selectedNames];
+        break;
+      case 'Date':
+        filterValues = this.selectedDateRange
         break;
     }
     
@@ -55,6 +68,7 @@ export class FilteringFormComponent {
       this.selectedFilter = '';
       this.selectedStatuses = [];
       this.selectedNames = '';
+      //this.selectedDateRange = [, ];
     }
   }
 
@@ -81,15 +95,14 @@ export class FilteringFormComponent {
   }
 
   onFilteringChange(): void{
-    const filterVar = this.selectedNames;
-    //const filterVar = this.selectedNames.length > 0 ? this.selectedNames : null;
-    //console.log(this.selectedNames)
-    this.filterVar.emit(filterVar);
 
+
+    const filterPayload : FilterPayload = {statuses: this.selectedStatuses, name: this.selectedNames, selectedDates:this.selectedDateRange}
+    this.filterPayload.emit(filterPayload);
   }  
 
   updateDropdownFilters() {
     this.dropdownFilters = this.availableFilters.map(f => ({ label: f, value: f }));
   }
-  
+
 }

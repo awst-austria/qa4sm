@@ -133,6 +133,18 @@ class ValidationRun(models.Model):
     # celery_tasks from CeleryTask
 
     @property
+    def job_status(self):
+        if (self.progress == 0) and (not self.end_time):
+            return('Scheduled')
+        elif (self.progress == 100) and (self.end_time):
+            return('Done')
+        elif (self.progress < 0):
+            return('Cancelled')
+        elif (self.end_time) or (self.total_points == 0):
+            return('ERROR')
+        return('Running')
+
+    @property
     def expiry_date(self):
         if (self.is_archived or (self.end_time is None)) and (self.progress != -1):
             return None

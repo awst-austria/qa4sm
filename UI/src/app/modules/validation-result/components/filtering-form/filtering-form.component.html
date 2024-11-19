@@ -12,9 +12,9 @@
         placeholder="Select a filter">
       </p-dropdown>
     </div>  
-  <div *ngIf="selectedFilter === 'status'" class="lg:w-5 w-12 px-0 mx-0">
+  <div *ngIf="selectedFilter === 'Status'" class="lg:w-5 w-12 px-0 mx-0">
         <p-multiSelect 
-        [options]="statuses" 
+        [options]="availableStatuses" 
         [(ngModel)]="selectedStatuses"  
         placeholder="Select statuses"
         display="chip"
@@ -29,19 +29,15 @@
     [style]="{'width': '100%'}" />
   </div>
 
-<!--
-  <div *ngIf="selectedFilter === 'date'" class="lg:w-5 w-12 px-0 mx-0">
-    <p-multiSelect 
-      [options]="dates" 
-      [(ngModel)]="selectedDates" 
-      placeholder="Select dates"
-      display="chip"
-      [filter]="false"
-      showHeader="false"
-      [style]="{'width': '100%'}">
-    </p-multiSelect>
+  <div *ngIf="selectedFilter === 'Date'" class="lg:w-5 w-12 px-0 mx-0">
+    <p-calendar 
+          [options]="dates" 
+        [(ngModel)]="selectedDateRange" 
+        selectionMode="range" 
+        [readonlyInput]="true" 
+        [style]="{'width': '100%'}">
+    </p-calendar>
   </div>
--->
 
   <div  *ngIf="selectedFilter" class="lg:w-5 w-12 px-0 mx-0">
     <p-button 

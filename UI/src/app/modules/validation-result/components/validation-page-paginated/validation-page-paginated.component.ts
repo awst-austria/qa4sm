@@ -5,6 +5,11 @@ import {HttpParams} from '@angular/common/http';
 import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 
+export interface FilterPayload {
+  statuses: string[];
+  name: string;
+  selectedDates: [Date, Date];
+}
 @Component({
   selector: 'qa-validation-page-paginated',
   templateUrl: './validation-page-paginated.component.html',
@@ -27,8 +32,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
-  filterVar: string = '';
-  filterChange: boolean = false;
+  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate()};
+
   dataFetchError = signal(false);
 
   constructor(private validationrunService: ValidationrunService) {
@@ -62,12 +67,24 @@ export class ValidationPagePaginatedComponent implements OnInit {
   getValidationsAndItsNumber(published: boolean): void {
     this.isLoading = true;
 
-    const parameters = new HttpParams()
+    let parameters = new HttpParams()
       .set('offset', String(this.offset))
       .set('limit', String(this.limit))
-      .set('order', String(this.order))
-      .set('filterVar', String(this.filterVar));
+      .set('order', String(this.order));
 
+    //Various filters added when specified 
+    if (this.filterPayload.name) {
+      parameters = parameters.set('name', this.filterPayload.name);
+    }
+    if (this.filterPayload.statuses.length > 0) {
+      this.filterPayload.statuses.forEach(status => {
+        parameters = parameters.append('statuses', status);
+      });
+    }
+    if (this.filterPayload.selectedDates) {
+      parameters = parameters.append('startDate', this.filterPayload.selectedDates[0].toISOString());
+      parameters = parameters.append('endDate', this.filterPayload.selectedDates[1].toISOString());
+    }
 
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
@@ -131,15 +148,14 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.getValidationsAndItsNumber(this.published);
   }
 
-  getFilter(filter): void {
-    this.filterVar = filter;
+  getFilter(filter: FilterPayload): void {
+    this.filterPayload = filter;
     this.orderChange =true;
 
     // Reset page
     this.currentPage = 1;
     this.offset = 0;
     this.endOfPage = false;
-    //this.validations = [];
 
     this.getValidationsAndItsNumber(this.published);
   }
@@ -167,9 +183,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const parameters = new HttpParams()
       .set('offset', String(this.offset))
       .set('limit', String(this.limit))
-      .set('order', String(this.order))
-      .set('filterVar', String(this.filterVar));
-    this.validationrunService.getMyValidationruns(parameters)
+      .set('order', String(this.order));
+
+      this.validationrunService.getMyValidationruns(parameters)
       .pipe(
         catchError(() => this.onDataFetchError())
       )
@@ -212,6 +228,13 @@ export class ValidationPagePaginatedComponent implements OnInit {
   onDataFetchError(): Observable<never> {
     this.dataFetchError.set(true);
     return EMPTY;
+  }
+
+  getInitDate(): [Date, Date] {
+    const today = new Date();
+    const pastDate = new Date(today);
+    pastDate.setFullYear(today.getFullYear() - 5);  // Subtract 5 years from the current date
+    return [pastDate, today];
   }
 
 }
