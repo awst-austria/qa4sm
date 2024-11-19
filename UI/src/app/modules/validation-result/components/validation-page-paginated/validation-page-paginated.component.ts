@@ -9,7 +9,9 @@ export interface FilterPayload {
   statuses: string[];
   name: string;
   selectedDates: [Date, Date];
+  prettyName: string;
 }
+
 @Component({
   selector: 'qa-validation-page-paginated',
   templateUrl: './validation-page-paginated.component.html',
@@ -32,7 +34,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
-  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate()};
+  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate(), prettyName: null};
+  rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row
 
   dataFetchError = signal(false);
 
@@ -47,6 +50,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
       } else if (value && value === 'page') {
         this.refreshPage();
       }
+    });
+    this.validations.forEach(validation => {
+      this.rowVisibility.set(validation.id, true); // Visible by default
     });
   }
 
@@ -146,6 +152,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.order = order;
     this.orderChange = true;
     this.getValidationsAndItsNumber(this.published);
+  }
+
+  handleRowFilter(id: string, matches: boolean): void {
+    this.rowVisibility.set(id, matches);  // Update visibility based on filter result
   }
 
   getFilter(filter: FilterPayload): void {

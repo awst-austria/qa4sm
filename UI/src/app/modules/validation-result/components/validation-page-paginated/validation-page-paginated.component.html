@@ -56,7 +56,12 @@
             [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
             inputId="{{valrun.id}}}">
           </p-checkbox>
-          <qa-validationrun-row [published]=published [validationRun]="valrun" (emitError)="dataFetchError.set($event)"/>
+          <qa-validationrun-row [published]=published 
+                                [validationRun]="valrun" 
+                                [filterPayload]="filterPayload" 
+                                (matchesFilter)="handleRowFilter(valrun.id, $event)" 
+                                [isVisible]="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" 
+                                (emitError)="dataFetchError.set($event)"/>
           <br/>
         </div>
       </div>

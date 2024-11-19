@@ -22,10 +22,18 @@
         showHeader="false"
         [style]="{'width': '100%'}"></p-multiSelect>
   </div>
+
   <div *ngIf="selectedFilter === 'name'" class="lg:w-5 w-12 px-0 mx-0">
     <input pInputText 
     [(ngModel)]="selectedNames" 
     placeholder="Enter name"
+    [style]="{'width': '100%'}" />
+  </div>
+
+  <div *ngIf="selectedFilter === 'Dataset'" class="lg:w-5 w-12 px-0 mx-0">
+    <input pInputText 
+    [(ngModel)]="prettyName" 
+    placeholder="Enter dataset"
     [style]="{'width': '100%'}" />
   </div>
 

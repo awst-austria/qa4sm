@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, signal, SimpleChanges} from '@angular/core';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 import {GlobalParamsService} from '../../../core/services/global/global-params.service';
@@ -13,6 +13,12 @@ import {ValidationRunConfigService} from '../../../../pages/validate/service/val
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
 
+export interface FilterPayload {
+  statuses: string[];
+  name: string;
+  selectedDates: [Date, Date];
+  prettyName: string;
+}
 
 @Component({
   selector: 'qa-validationrun-row',
@@ -23,7 +29,14 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   @Input() published = false;
   @Input() validationRun: ValidationrunDto;
+  @Input() isVisible: boolean = true;  // Default visibility is true (visible)
+  @Input() filterPayload: FilterPayload | null = null;
+  @Output() matchesFilter = new EventEmitter<boolean>();
+
   @Output() emitError = new EventEmitter();
+
+  rowVisibility: Map<string, boolean> = new Map();
+
   configurations$: Observable<any>;
   validationStatusInterval: any;
   validationStatus = signal<string | undefined>(undefined);
@@ -53,6 +66,12 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     this.valName.set(this.validationRun.name_tag);
     this.validationStatus.set(this.getStatusFromProgress(this.validationRun));
     this.refreshStatus();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.filterPayload && this.filterPayload) {
+      this.updateConfig();
+    }
   }
 
   private updateConfig(): void {
@@ -90,6 +109,16 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
           }
         )
       ),
+      map(configurations => {
+        // Emit whether any configuration matches the dataset filter passed
+        const matches = configurations.some(config =>
+          this.filterPayload?.prettyName
+            ? config.dataset?.includes(this.filterPayload.prettyName)
+            : true
+        );
+        this.matchesFilter.emit(matches);
+        return configurations;
+      }),
       catchError(() => {
         this.emitError.emit(true);
         return EMPTY
@@ -99,6 +128,10 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   getDoiPrefix(): string {
     return this.globalParamsService.globalContext.doi_prefix;
+  }
+
+  handleRowFilter(id: string, matches: boolean): void {
+    this.rowVisibility.set(id, matches);
   }
 
   getStatusFromProgress(valrun): string {

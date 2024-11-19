@@ -4,13 +4,12 @@ export interface FilterPayload {
   statuses: string[];
   name: string;
   selectedDates: [Date, Date];
+  prettyName: string;
 }
 
 
 @Component({
   selector: 'qa-filtering-form',
-  //standalone: false,
-  //imports: [],
   templateUrl: './filtering-form.component.html',
   styleUrl: './filtering-form.component.scss'
 })
@@ -18,15 +17,15 @@ export class FilteringFormComponent {
 
   @Output() filterPayload =  new EventEmitter<FilterPayload>();
 
-
   availableStatuses = ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled']
   selectedFilter: string = '';
   activeFilters: { filter: string, values: string[] }[] = [];
-  availableFilters = ['name', 'Status', 'Date'];
+  availableFilters = ['name', 'Status', 'Date', 'Dataset'];
   dropdownFilters: { label: string, value: string }[] = []; // filters still available after applied ones are removed from list
 
   selectedStatuses: string[] = []; 
   selectedNames: string = ''; 
+  prettyName: string = ''; 
   selectedDateRange: [Date | null, Date | null];
 
   constructor() {
@@ -48,6 +47,9 @@ export class FilteringFormComponent {
       case 'Date':
         filterValues = this.selectedDateRange
         break;
+      case 'Dataset':
+        filterValues = [this.prettyName];
+        break;
     }
     
     // Only actually filter if given values 
@@ -68,7 +70,7 @@ export class FilteringFormComponent {
       this.selectedFilter = '';
       this.selectedStatuses = [];
       this.selectedNames = '';
-      //this.selectedDateRange = [, ];
+      this.prettyName = '';
     }
   }
 
@@ -95,9 +97,7 @@ export class FilteringFormComponent {
   }
 
   onFilteringChange(): void{
-
-
-    const filterPayload : FilterPayload = {statuses: this.selectedStatuses, name: this.selectedNames, selectedDates:this.selectedDateRange}
+    const filterPayload : FilterPayload = {statuses: this.selectedStatuses, name: this.selectedNames, selectedDates:this.selectedDateRange, prettyName: this.prettyName}
     this.filterPayload.emit(filterPayload);
   }  
 
