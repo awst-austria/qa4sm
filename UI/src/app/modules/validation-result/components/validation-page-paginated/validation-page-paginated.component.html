@@ -12,7 +12,7 @@
     <!-- custom -->
     <div *ngIf="!published && !dataFetchError()" class="text-center w-12">
       <h1>My validations</h1>
-      <p *ngIf="!validations.length" class="lead text-muted">
+      <p *ngIf="!validations.length && !areFiltersApplied()" class="lead text-muted">
         You have not started any validations yet. Visit the <a routerLink="/validate">validation page</a>
         to start your own validation run.
       </p>
@@ -33,11 +33,11 @@
       <qa-error></qa-error>
     </div>
 
-    <div *ngIf="validations.length && !dataFetchError()" class="w-12 my-2">
+    <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12 my-2">
       <qa-sorting-form (orderQueryName)="getOrder($event)"/>
     </div>
 
-    <div *ngIf="validations.length && !dataFetchError()" class="w-12 my-2">
+    <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12 my-2">
       <qa-filtering-form (filterPayload)="getFilter($event)"/>
     </div>
 
@@ -58,7 +58,6 @@
             [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
             inputId="{{valrun.id}}}">
           </p-checkbox>
-          <!--{{rowVisibility.get(valrun.id)}} -->
           <qa-validationrun-row [published]=published 
                                 [validationRun]="valrun" 
                                 [filterPayload]="filterPayload" 
@@ -79,6 +78,12 @@
       <div *ngIf="endOfPage && !published" class="val-number-information">
         <em> You have run {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}.</em>
       </div>
+    </div>
+
+    <div *ngIf="(!validations.length || !areAnyRowsVisible()) && areFiltersApplied()" class="text-center w-12 my-2">
+      <p class="lead text-muted">
+        No validation results meeting the filter criteria.
+      </p>
     </div>
 
   </div>

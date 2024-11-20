@@ -35,11 +35,24 @@
     [(ngModel)]="prettyName" 
     placeholder="Enter dataset"
     [style]="{'width': '100%'}" />
+    <div class="checkbox-group lg:w-5 w-12 px-0 mx-0">
+      Reference: 
+      <p-checkbox 
+        [(ngModel)]="spatial" 
+        binary="true" 
+        label="Spatial">
+      </p-checkbox>
+      <p-checkbox 
+        [(ngModel)]="temporal" 
+        binary="true" 
+        label="Temporal">
+      </p-checkbox>
+    </div>
   </div>
 
   <div *ngIf="selectedFilter === 'Submission Date'" class="lg:w-5 w-12 px-0 mx-0">
     <p-calendar 
-          [options]="dates" 
+        [options]="dates" 
         [(ngModel)]="selectedDateRange" 
         selectionMode="range" 
         [readonlyInput]="true" 
@@ -52,7 +65,10 @@
       label="Add Filter" 
       icon="pi pi-filter" 
       class="p-button-success p-button-rounded"
-      (click)="selectFilter()">
+      (click)="selectFilter()"
+      [disabled]="(selectedFilter === 'Dataset' && (!spatial || !temporal) && (!prettyName)) || (selectedFilter === 'Status' && selectedStatuses.length === 0) || (selectedFilter === 'Validation Name' && selectedNames === '') || (selectedFilter === 'Submission Date' && selectedDateRange === null)"
+      [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of Spatial or Temporal.' : null"
+      tooltipPosition="right">
     </p-button>
   </div>
 </div>

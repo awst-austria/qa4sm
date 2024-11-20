@@ -12,12 +12,15 @@ import {catchError, map} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
+import Filter from 'ol/format/filter/Filter';
 
 export interface FilterPayload {
   statuses: string[];
   name: string;
   selectedDates: [Date, Date];
   prettyName: string;
+  spatialReference: boolean;
+  temporalReference: boolean;
 }
 
 @Component({
@@ -111,12 +114,17 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
         )
       ),
       // also add map operator to check if the dataset pretty name matches the filter payload dataset - used to set visibility of row 
+      // expanded to also include spatial and/or temporal reference selection
       map(configurations => {
-        const matches = configurations.some(config =>
-          this.filterPayload?.prettyName
-            ? config.dataset?.includes(this.filterPayload.prettyName)
-            : true
-        );
+        const matches = configurations.some(config => {
+          const matchesPrettyName = this.filterPayload?.prettyName? config.dataset?.includes(this.filterPayload.prettyName) : true;
+          const matchesSpatial = this.filterPayload?.spatialReference ? config.is_spatial_reference : true;
+          const matchesTemporal = this.filterPayload?.temporalReference ? config.is_temporal_reference : true;
+          const matchesSpatialOrTemporal = this.filterPayload?.spatialReference && this.filterPayload?.temporalReference
+          ? config.is_spatial_reference || config.is_temporal_reference
+          : matchesSpatial && matchesTemporal;
+          return matchesPrettyName && matchesSpatialOrTemporal;
+      });
         this.matchesFilter.emit(matches); // emit boolean filter matches to parent component
         return configurations;
       }),

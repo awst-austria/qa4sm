@@ -10,6 +10,8 @@ export interface FilterPayload {
   name: string;
   selectedDates: [Date, Date];
   prettyName: string;
+  spatialReference: boolean;
+  temporalReference: boolean;
 }
 
 @Component({
@@ -35,7 +37,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   endOfPage: boolean = false;
 
 
-  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate(), prettyName: null};
+  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false};
   rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row - this is used for filtering results on dataset 
 
   dataFetchError = signal(false);
@@ -254,6 +256,16 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const pastDate = new Date(today);
     pastDate.setFullYear(today.getFullYear() - 5);  // Subtract 5 years from the current date
     return [pastDate, today];
+  }
+
+  areFiltersApplied(): boolean {
+    // check if any filters have been applied, used to define message in case of no validation results found)
+    return this.filterPayload.statuses.length > 0 || this.filterPayload.name !== '' || this.filterPayload.prettyName !== null || this.filterPayload.spatialReference || this.filterPayload.temporalReference;
+  }
+
+  areAnyRowsVisible(): boolean {
+    // check if no rows are visible because of dataset filtering
+    return Array.from(this.rowVisibility.values()).some(visible => visible);
   }
 
 }

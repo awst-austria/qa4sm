@@ -5,6 +5,8 @@ export interface FilterPayload {
   name: string;
   selectedDates: [Date, Date];
   prettyName: string;
+  spatialReference: boolean;
+  temporalReference: boolean;
 }
 
 
@@ -27,6 +29,8 @@ export class FilteringFormComponent {
   selectedNames: string = ''; 
   prettyName: string = ''; 
   selectedDateRange: [Date | null, Date | null];
+  spatial: boolean = false;
+  temporal: boolean = false;
 
   constructor() {
     this.updateDropdownFilters();
@@ -34,6 +38,15 @@ export class FilteringFormComponent {
 
 
   selectFilter() {
+
+    if (this.selectedFilter === 'Validation Name' && !this.selectedNames) {
+      return;
+    }
+
+    // Ensure at least one of the checkboxes is selected
+    if (this.selectedFilter === 'Dataset' && (!this.spatial || !this.temporal) && !this.prettyName) {
+      return;
+    }
 
     let filterValues = [];
     //switch case for chosen filtering variable
@@ -48,10 +61,12 @@ export class FilteringFormComponent {
         filterValues = this.selectedDateRange
         break;
       case 'Dataset':
-        filterValues = [this.prettyName];
+        filterValues = [this.prettyName, this.spatial, this.temporal];
         break;
     }
     
+
+
     // Only actually filter if given values 
     if (filterValues.length > 0) {
 
@@ -74,6 +89,8 @@ export class FilteringFormComponent {
       this.selectedNames = '';
       this.selectedDateRange = this.getInitDate();
       this.prettyName = '';
+      this.spatial = false;
+      this.temporal = false;
     }
   }
 
@@ -94,6 +111,8 @@ export class FilteringFormComponent {
         break;
       case 'Dataset':
         this.prettyName = filterToEdit.values[0];
+        this.spatial = filterToEdit.values[1] as unknown as boolean; // this casting to unknown is definitely a bad idea...
+        this.temporal = filterToEdit.values[2] as unknown  as boolean;
         break;
     }
   }
@@ -111,7 +130,9 @@ export class FilteringFormComponent {
       statuses: this.activeFilters.find(f => f.filter === 'Status')?.values || [],
       name: this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] || '',
       selectedDates: this.activeFilters.find(f => f.filter === 'Submission Date')?.values as unknown as [Date, Date] || this.getInitDate(),
-      prettyName: this.activeFilters.find(f => f.filter === 'Dataset')?.values[0] || ''
+      prettyName: this.activeFilters.find(f => f.filter === 'Dataset')?.values[0] || '',
+      spatialReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values[1] as unknown as boolean || false,
+      temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values[2] as unknown as boolean || false
     };
     this.filterPayload.emit(filterPayload);
   }
