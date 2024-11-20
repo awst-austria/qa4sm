@@ -23,7 +23,7 @@
         [style]="{'width': '100%'}"></p-multiSelect>
   </div>
 
-  <div *ngIf="selectedFilter === 'name'" class="lg:w-5 w-12 px-0 mx-0">
+  <div *ngIf="selectedFilter === 'Validation Name'" class="lg:w-5 w-12 px-0 mx-0">
     <input pInputText 
     [(ngModel)]="selectedNames" 
     placeholder="Enter name"
@@ -37,7 +37,7 @@
     [style]="{'width': '100%'}" />
   </div>
 
-  <div *ngIf="selectedFilter === 'Date'" class="lg:w-5 w-12 px-0 mx-0">
+  <div *ngIf="selectedFilter === 'Submission Date'" class="lg:w-5 w-12 px-0 mx-0">
     <p-calendar 
           [options]="dates" 
         [(ngModel)]="selectedDateRange" 
@@ -59,19 +59,21 @@
 
 <div *ngIf="activeFilters.length > 0" class="active-filters mt-3">
   <h4>Active Filters:</h4>
-  <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2">
+  <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">
     <div class="filter-item">
-      <div class="filter-name">{{ filter.filter | titlecase }}:</div>
-      <div class="filter-values">
-        <span *ngFor="let value of filter.values; let j = index">
-          <span class="p-pill p-pill-info">{{ value }}</span>
-          <span *ngIf="j < filter.values.length - 1">, </span>
-        </span>
+        <div class="filter-text">
+          <div class="filter-name">{{ filter.filter | titlecase }}:</div>
+          <div class="filter-values">
+            <span *ngFor="let value of filter.values; let j = index">
+              <span class="p-pill p-pill-info">{{ value }}</span>
+              <span *ngIf="j < filter.values.length - 1">, </span>
+            </span>
+          </div>
+        </div>
+        <div class="button-group">
+          <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info" (click)="editFilter(i)"></button>
+          <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="removeFilter(i)"></button>
+        </div>
       </div>
-      <div class="button-group flex gap-2">
-        <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info" (click)="editFilter(i)"></button>
-        <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="removeFilter(i)"></button>
-    </div>
     </div>
   </div>
-</div>

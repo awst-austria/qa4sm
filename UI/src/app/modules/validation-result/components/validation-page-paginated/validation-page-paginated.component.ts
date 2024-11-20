@@ -34,8 +34,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
+
   filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate(), prettyName: null};
-  rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row
+  rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row - this is used for filtering results on dataset 
 
   dataFetchError = signal(false);
 
@@ -52,7 +53,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       }
     });
     this.validations.forEach(validation => {
-      this.rowVisibility.set(validation.id, true); // Visible by default
+      this.rowVisibility.set(validation.id, true); // Validation results visible by default
     });
   }
 
@@ -78,7 +79,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order));
 
-    //Various filters added when specified 
+    //Various filters on validation run model added when specified 
     if (this.filterPayload.name) {
       parameters = parameters.set('name', this.filterPayload.name);
     }
@@ -155,10 +156,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   handleRowFilter(id: string, matches: boolean): void {
-    this.rowVisibility.set(id, matches);  // Update visibility based on filter result
+    this.rowVisibility.set(id, matches);  // Update row visibility based on filterMatches in dataset 
   }
 
   getFilter(filter: FilterPayload): void {
+    
     this.filterPayload = filter;
     this.orderChange =true;
 
@@ -166,6 +168,12 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.currentPage = 1;
     this.offset = 0;
     this.endOfPage = false;
+
+    // Reset row visibility 
+    this.rowVisibility.clear();
+    this.validations.forEach(validation => {
+      this.rowVisibility.set(validation.id, true); // Visible by default
+    });
 
     this.getValidationsAndItsNumber(this.published);
   }
@@ -241,6 +249,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   getInitDate(): [Date, Date] {
+    // get initial date range to cover past 5 years, repeated in child...
     const today = new Date();
     const pastDate = new Date(today);
     pastDate.setFullYear(today.getFullYear() - 5);  // Subtract 5 years from the current date

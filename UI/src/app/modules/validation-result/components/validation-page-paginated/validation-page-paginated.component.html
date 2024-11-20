@@ -44,8 +44,10 @@
     <!-- Rows -->
     <div *ngIf="validations.length" class="w-12 py-2">
       <div *ngIf="!(isLoading && orderChange)">
-        <div *ngFor="let valrun of validations"
+        <div *ngFor="let valrun of validations" 
              class="validation-row-area">
+        <div *ngIf="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" class="validation-row-area">
+
           <p-checkbox
             class="modify-checkbox"
             *ngIf="(selectionActive$|async)"
@@ -56,6 +58,7 @@
             [pTooltip]="!checkIfEnabled(valrun) ? 'This validation cannot be selected for current action' : null"
             inputId="{{valrun.id}}}">
           </p-checkbox>
+          <!--{{rowVisibility.get(valrun.id)}} -->
           <qa-validationrun-row [published]=published 
                                 [validationRun]="valrun" 
                                 [filterPayload]="filterPayload" 
@@ -63,6 +66,7 @@
                                 [isVisible]="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" 
                                 (emitError)="dataFetchError.set($event)"/>
           <br/>
+        </div>
         </div>
       </div>
 

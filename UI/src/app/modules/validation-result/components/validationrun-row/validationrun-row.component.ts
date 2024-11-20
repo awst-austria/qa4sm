@@ -29,7 +29,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   @Input() published = false;
   @Input() validationRun: ValidationrunDto;
-  @Input() isVisible: boolean = true;  // Default visibility is true (visible)
+  //@Input() isVisible: boolean = true;  // Default visibility is true (visible)
   @Input() filterPayload: FilterPayload | null = null;
   @Output() matchesFilter = new EventEmitter<boolean>();
 
@@ -68,6 +68,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     this.refreshStatus();
   }
 
+  // on changes in the filter payload, update the configurations map to reflect the dataset new filter
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.filterPayload && this.filterPayload) {
       this.updateConfig();
@@ -109,14 +110,14 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
           }
         )
       ),
+      // also add map operator to check if the dataset pretty name matches the filter payload dataset - used to set visibility of row 
       map(configurations => {
-        // Emit whether any configuration matches the dataset filter passed
         const matches = configurations.some(config =>
           this.filterPayload?.prettyName
             ? config.dataset?.includes(this.filterPayload.prettyName)
             : true
         );
-        this.matchesFilter.emit(matches);
+        this.matchesFilter.emit(matches); // emit boolean filter matches to parent component
         return configurations;
       }),
       catchError(() => {
@@ -130,6 +131,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     return this.globalParamsService.globalContext.doi_prefix;
   }
 
+  // set the visibility of the row based on the filter payload
   handleRowFilter(id: string, matches: boolean): void {
     this.rowVisibility.set(id, matches);
   }
