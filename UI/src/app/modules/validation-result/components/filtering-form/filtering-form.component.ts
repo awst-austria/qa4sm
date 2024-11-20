@@ -61,7 +61,14 @@ export class FilteringFormComponent {
         filterValues = this.selectedDateRange
         break;
       case 'Dataset':
-        filterValues = [this.prettyName, this.spatial, this.temporal];
+        filterValues.push(this.prettyName);
+        if (this.spatial && this.temporal) {
+          filterValues.push('Spatial or Temporal Reference');
+        } else if (this.spatial) {
+          filterValues.push('Spatial Reference');
+        } else if (this.temporal) {
+          filterValues.push('Temporal Reference');
+        }
         break;
     }
     
@@ -111,8 +118,8 @@ export class FilteringFormComponent {
         break;
       case 'Dataset':
         this.prettyName = filterToEdit.values[0];
-        this.spatial = filterToEdit.values[1] as unknown as boolean; // this casting to unknown is definitely a bad idea...
-        this.temporal = filterToEdit.values[2] as unknown  as boolean;
+        this.spatial = filterToEdit.values.includes('Spatial Reference') || filterToEdit.values.includes('Spatial or Temporal Reference');
+        this.temporal = filterToEdit.values.includes('Temporal Reference') || filterToEdit.values.includes('Spatial or Temporal Reference');
         break;
     }
   }
@@ -131,8 +138,8 @@ export class FilteringFormComponent {
       name: this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] || '',
       selectedDates: this.activeFilters.find(f => f.filter === 'Submission Date')?.values as unknown as [Date, Date] || this.getInitDate(),
       prettyName: this.activeFilters.find(f => f.filter === 'Dataset')?.values[0] || '',
-      spatialReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values[1] as unknown as boolean || false,
-      temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values[2] as unknown as boolean || false
+      spatialReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || false,
+      temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || false
     };
     this.filterPayload.emit(filterPayload);
   }
