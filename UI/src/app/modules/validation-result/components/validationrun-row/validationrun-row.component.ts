@@ -21,6 +21,7 @@ export interface FilterPayload {
   prettyName: string;
   spatialReference: boolean;
   temporalReference: boolean;
+  scalingReference: boolean;
 }
 
 @Component({
@@ -118,13 +119,34 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
       map(configurations => {
         const matches = configurations.some(config => {
           const matchesPrettyName = this.filterPayload?.prettyName? config.dataset?.includes(this.filterPayload.prettyName) : true;
+          
           const matchesSpatial = this.filterPayload?.spatialReference ? config.is_spatial_reference : true;
           const matchesTemporal = this.filterPayload?.temporalReference ? config.is_temporal_reference : true;
-          const matchesSpatialOrTemporal = this.filterPayload?.spatialReference && this.filterPayload?.temporalReference
-          ? config.is_spatial_reference || config.is_temporal_reference
-          : matchesSpatial && matchesTemporal;
-          return matchesPrettyName && matchesSpatialOrTemporal;
-      });
+          const matchesScaling = this.filterPayload?.scalingReference ? config.is_scaling_reference : true;
+
+          // This really cannot be the most efficient way to do this...
+          const matchesAnyReference = (() => {
+            if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
+              return config.is_spatial_reference || config.is_temporal_reference || config.is_scaling_reference;
+            } else if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference) {
+              return config.is_spatial_reference || config.is_temporal_reference;
+            } else if (this.filterPayload?.spatialReference && this.filterPayload?.scalingReference) {
+              return config.is_spatial_reference || config.is_scaling_reference;
+            } else if (this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
+              return config.is_temporal_reference || config.is_scaling_reference;
+            } else if (this.filterPayload?.spatialReference) {
+              return config.is_spatial_reference;
+            } else if (this.filterPayload?.temporalReference) {
+              return config.is_temporal_reference;
+            } else if (this.filterPayload?.scalingReference) {
+              return config.is_scaling_reference;
+            } else {
+              return true;
+            }
+          })();
+  
+          return matchesPrettyName && matchesAnyReference;
+        });
         this.matchesFilter.emit(matches); // emit boolean filter matches to parent component
         return configurations;
       }),

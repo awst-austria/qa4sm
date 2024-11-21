@@ -12,7 +12,9 @@ export interface FilterPayload {
   prettyName: string;
   spatialReference: boolean;
   temporalReference: boolean;
+  scalingReference: boolean;
 }
+
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -37,7 +39,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   endOfPage: boolean = false;
 
 
-  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false};
+  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false, scalingReference: false };
   rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row - this is used for filtering results on dataset 
 
   dataFetchError = signal(false);
@@ -260,7 +262,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   areFiltersApplied(): boolean {
     // check if any filters have been applied, used to define message in case of no validation results found)
-    return this.filterPayload.statuses.length > 0 || this.filterPayload.name !== '' || this.filterPayload.prettyName !== null || this.filterPayload.spatialReference || this.filterPayload.temporalReference;
+    return this.filterPayload.statuses.length > 0 || this.filterPayload.name !== '' || this.filterPayload.prettyName !== null || this.filterPayload.spatialReference || this.filterPayload.temporalReference || this.filterPayload.scalingReference;
   }
 
   areAnyRowsVisible(): boolean {

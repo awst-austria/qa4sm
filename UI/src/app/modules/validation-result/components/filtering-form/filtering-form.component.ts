@@ -7,6 +7,7 @@ export interface FilterPayload {
   prettyName: string;
   spatialReference: boolean;
   temporalReference: boolean;
+  scalingReference: boolean;
 }
 
 
@@ -31,6 +32,7 @@ export class FilteringFormComponent {
   selectedDateRange: [Date | null, Date | null];
   spatial: boolean = false;
   temporal: boolean = false;
+  scaling: boolean = false;
 
   constructor() {
     this.updateDropdownFilters();
@@ -62,12 +64,20 @@ export class FilteringFormComponent {
         break;
       case 'Dataset':
         filterValues.push(this.prettyName);
-        if (this.spatial && this.temporal) {
+        if (this.spatial && this.temporal && this.scaling) {
+          filterValues.push('Spatial, Temporal, or Scaling Reference');
+        } else if (this.spatial && this.temporal) {
           filterValues.push('Spatial or Temporal Reference');
+        } else if (this.spatial && this.scaling) {
+          filterValues.push('Spatial or Scaling Reference');
+        } else if (this.temporal && this.scaling) {
+          filterValues.push('Temporal or Scaling Reference');
         } else if (this.spatial) {
           filterValues.push('Spatial Reference');
         } else if (this.temporal) {
           filterValues.push('Temporal Reference');
+        } else if (this.scaling) {
+          filterValues.push('Scaling Reference');
         }
         break;
     }
@@ -98,6 +108,7 @@ export class FilteringFormComponent {
       this.prettyName = '';
       this.spatial = false;
       this.temporal = false;
+      this.scaling = false;
     }
   }
 
@@ -118,8 +129,9 @@ export class FilteringFormComponent {
         break;
       case 'Dataset':
         this.prettyName = filterToEdit.values[0];
-        this.spatial = filterToEdit.values.includes('Spatial Reference') || filterToEdit.values.includes('Spatial or Temporal Reference');
-        this.temporal = filterToEdit.values.includes('Temporal Reference') || filterToEdit.values.includes('Spatial or Temporal Reference');
+        this.spatial = filterToEdit.values.includes('Spatial Reference') || filterToEdit.values.includes('Spatial or Temporal Reference') || filterToEdit.values.includes('Spatial, Temporal, or Scaling Reference');
+        this.temporal = filterToEdit.values.includes('Temporal Reference') || filterToEdit.values.includes('Spatial or Temporal Reference') || filterToEdit.values.includes('Spatial, Temporal, or Scaling Reference');
+        this.scaling = filterToEdit.values.includes('Scaling Reference') || filterToEdit.values.includes('Spatial or Scaling Reference') || filterToEdit.values.includes('Temporal or Scaling Reference') || filterToEdit.values.includes('Spatial, Temporal, or Scaling Reference');
         break;
     }
   }
@@ -138,8 +150,9 @@ export class FilteringFormComponent {
       name: this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] || '',
       selectedDates: this.activeFilters.find(f => f.filter === 'Submission Date')?.values as unknown as [Date, Date] || this.getInitDate(),
       prettyName: this.activeFilters.find(f => f.filter === 'Dataset')?.values[0] || '',
-      spatialReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || false,
-      temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || false
+      spatialReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false,
+      temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false,
+      scalingReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false
     };
     this.filterPayload.emit(filterPayload);
   }
