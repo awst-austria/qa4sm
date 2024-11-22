@@ -19,13 +19,14 @@ class TestLoginView(TestCase):
     def setUp(self):
         self.auth_data = {
             'username': 'chuck_norris',
-            'password': 'roundhousekick'
+            'password': 'roundhousekick',
+            'email': 'norris@awst.at'
         }
 
         self.user_data = {
             'username': self.auth_data['username'],
             'password': self.auth_data['password'],
-            'email': 'norris@awst.at',
+            'email': self.auth_data['email'],
             'first_name': 'Chuck',
             'last_name': 'Norris',
             'organisation': 'Texas Rangers',
@@ -41,13 +42,20 @@ class TestLoginView(TestCase):
         login_url = reverse('api-login')
         # Try to login with wrong password
         response = self.client.post(login_url,
-                                    {'username': self.auth_data['username'], 'password': 'wrong password'},
+                                    {'identifier': self.auth_data['username'], 'password': 'wrong password'},
                                     format='json')
         assert response.status_code == 401
 
-        # Try to login with correct password
+        # Try to login with username and correct password
         response = self.client.post(login_url,
-                                    {'username': self.auth_data['username'], 'password': self.auth_data['password']},
+                                    {'identifier': self.auth_data['username'], 'password': self.auth_data['password']},
+                                    format='json')
+        # Http response status should be OK(200)
+        assert response.status_code == 200
+
+        # Try to login with email and correct password
+        response = self.client.post(login_url,
+                                    {'identifier': self.auth_data['email'], 'password': self.auth_data['password']},
                                     format='json')
         # Http response status should be OK(200)
         assert response.status_code == 200
