@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
   prevUrl = '';
 
   loginForm = new FormGroup<LoginForm>({
-    username: new FormControl<string>(this.loginDto.username, Validators.required),
+    identifier: new FormControl<string>(this.loginDto.identifier, Validators.required),
     password: new FormControl<string>(this.loginDto.password, Validators.required),
   });
 
@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
   onSubmit() {
 
     this.submitted = true;
-    this.loginDto.username = this.loginForm.value.username;
+    this.loginDto.identifier = this.loginForm.value.identifier;
     this.loginDto.password = this.loginForm.value.password;
 
 
@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
     this.loginService.login(this.loginDto).subscribe(authenticated => {
       if (authenticated && this.navigateAfter) {
         this.router.navigate([this.prevUrl]).then(
-          value => this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.loginService.currentUser.username));
+          value => this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + (this.loginService.currentUser.first_name ? this.loginService.currentUser.first_name : this.loginService.currentUser.username)));
       } else if (authenticated && !this.navigateAfter) {
         this.loggedIn.emit(authenticated);
         this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.loginService.currentUser.username);

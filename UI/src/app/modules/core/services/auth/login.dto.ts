@@ -1,6 +1,6 @@
 export class LoginDto {
 
-  constructor(public username: string, public password: string) {
+  constructor(public identifier: string, public password: string) {
   }
 
 }

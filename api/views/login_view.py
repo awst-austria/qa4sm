@@ -1,5 +1,5 @@
 from django.contrib import auth
-from django.contrib.auth import login
+from django.contrib.auth import login, get_user_model
 from django.http import JsonResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import status, serializers
@@ -37,7 +37,15 @@ def api_login(request):
 
         login_data = login_serializer.create()
 
-        user = auth.authenticate(username=login_data.username, password=login_data.password)
+        #########THIS ONLY WORKS IF AN EMAIL ADDRESS CAN ONLY BE ASSOSCIAED WITH ONE ACCOUNT#########
+        if '@' in login_data.identifier:
+            try:
+                username = get_user_model().objects.get(email=login_data.identifier).username
+                user = auth.authenticate(username=username, password=login_data.password)
+            except get_user_model().DoesNotExist:
+                return resp_invalid_credentials
+        else: 
+            user = auth.authenticate(username=login_data.identifier, password=login_data.password)
 
         if user:
             if user is not None:
@@ -62,19 +70,19 @@ class LoginDto(object):
     DTO for login requests
     """
 
-    def __init__(self, username='', password=''):
-        self.username = username
+    def __init__(self, identifier='', password=''):
+        self.identifier = identifier
         self.password = password
 
 
 class LoginDtoSerializer(serializers.Serializer):
     def create(self):
-        return LoginDto(username=self.validated_data['username'], password=self.validated_data['password'])
+        return LoginDto(identifier=self.validated_data['identifier'], password=self.validated_data['password'])
 
     def update(self, instance):
         pass
 
-    username = serializers.CharField(min_length=1)
+    identifier = serializers.CharField(min_length=1)
     password = serializers.CharField(min_length=1, write_only=True)
 
     class Meta:
