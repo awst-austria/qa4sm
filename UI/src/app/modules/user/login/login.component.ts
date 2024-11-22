@@ -42,18 +42,25 @@ export class LoginComponent implements OnInit {
     this.loginDto.password = this.loginForm.value.password;
 
 
-    // todo: this one should be rewritten the way, that it handles login entirely and sets the current user,
-    // also the message should be updated; it's not only wrong credentials that may fail
-    this.loginService.login(this.loginDto).subscribe(authenticated => {
-      if (authenticated && this.navigateAfter) {
-        this.router.navigate([this.prevUrl]).then(
-          value => this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + (this.loginService.currentUser.first_name ? this.loginService.currentUser.first_name : this.loginService.currentUser.username)));
-      } else if (authenticated && !this.navigateAfter) {
-        this.loggedIn.emit(authenticated);
-        this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + this.loginService.currentUser.username);
-      } else {
-        this.toastService.showErrorWithHeader('Login failed', 'Wrong username or password');
+    this.loginService.login(this.loginDto).subscribe({
+      next: data => {
+        if (this.navigateAfter) {
+          this.router.navigate([this.prevUrl]).then(() => {
+            this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + (this.loginService.currentUser.first_name ? this.loginService.currentUser.first_name : this.loginService.currentUser.username));
+          });
+        } else {
+          this.loggedIn.emit(true);
+          this.toastService.showSuccessWithHeader('Successful login', 'Welcome ' + (this.loginService.currentUser.first_name ? this.loginService.currentUser.first_name : this.loginService.currentUser.username));
+        }
+      },
+      error: (error) => {
+        if (error.status === 401) {
+          this.toastService.showErrorWithHeader('Login failed', 'Wrong username/email or password');
+        } else {
+          this.toastService.showErrorWithHeader('Login failed', 'An error occurred during login, please try again later');
+        }
       }
     });
+
   }
 }

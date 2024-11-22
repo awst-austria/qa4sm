@@ -172,26 +172,26 @@ export class NavigationBarComponent implements OnInit {
     ];
   }
 
-  logoutObserver = {
-    next: (result) => this.onLogoutNext(result),
-    error: () => this.toastService.showErrorWithHeader('Something went wrong.',
-      'We could not log you out. Please try again or contact our support team.')
-  }
+  //logoutObserver = {
+  //  next: (result) => this.onLogoutNext(result),
+  //  error: () => this.toastService.showErrorWithHeader('Something went wrong.',
+  //    'We could not log you out. Please try again or contact our support team.')
+  //}
 
-  onLogoutNext(result: any): void{
-    this.setPreviousUrl('');
-    if (result) {// Successful logout
-    this.router.navigate(['home'])
-      .then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
-  } else {
-      // this part should be removed when the logout subscription is removed from the service
-      this.toastService.showErrorWithHeader('Something went wrong.',
-        'We could not log you out. Please try again or contact our support team.')
+
+  private onLogoutNext(): void {
+    this.authService.setPreviousUrl('');
+    this.router.navigate(['home']).then(() =>{
+      this.toastService.showSuccessWithHeader('Logout', 'Succcessful logout');
     }
+    )
   }
 
   logout(): void {
-    this.authService.logout().subscribe(this.logoutObserver);
+    this.authService.logout().subscribe({
+      next: () => this.onLogoutNext(),
+      error: () => this.toastService.showErrorWithHeader('Something went wrong.', 'We could not log you out. Please try again or contact our support team.')
+    });
   }
 
   setPreviousUrl(prevUrl: string): void {
