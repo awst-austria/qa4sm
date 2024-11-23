@@ -87,9 +87,6 @@ def update_fixture_entry(version):
         if entry["model"] == "validator.datasetversion" and entry["pk"] == version.pk:
             # Update fields with the current DB data
             entry_fields =entry["fields"]
-            # for key in entry_fields.keys():
-            #     print(entry_fields[key], key)
-            #     print(getattr(version, key), type(getattr(version, key)))
             for key in entry_fields.keys():
                 try:
                     # Handle many-to-many relationships
