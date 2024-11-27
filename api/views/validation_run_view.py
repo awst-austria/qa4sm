@@ -155,6 +155,17 @@ def get_copied_validations(request, **kwargs):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_validation_status(request, **kwargs):
+
+    val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
+    if not val_run:
+        return JsonResponse(status=status.HTTP_404_NOT_FOUND)
+
+    ifFinished = (val_run.progress == 100 and val_run.end_time is not None)
+    return JsonResponse({'validation_complete': ifFinished}, status=status.HTTP_200_OK)
+
 class ValidationRunSerializer(ModelSerializer):
     class Meta:
         model = ValidationRun
