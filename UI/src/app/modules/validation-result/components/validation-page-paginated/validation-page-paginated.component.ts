@@ -7,7 +7,7 @@ import {catchError} from 'rxjs/operators';
 
 export interface FilterPayload {
   statuses: string[];
-  name: string;
+  name: string | null;
   selectedDates: [Date, Date];
   prettyName: string;
   spatialReference: boolean;
@@ -39,7 +39,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   endOfPage: boolean = false;
 
 
-  filterPayload: FilterPayload = {  statuses: [], name: '', selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false, scalingReference: false };
+  filterPayload: FilterPayload = {  statuses: [], name: null, selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false, scalingReference: false };
   rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row - this is used for filtering results on dataset 
 
   dataFetchError = signal(false);
@@ -84,7 +84,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('order', String(this.order));
 
     //Various filters on validation run model added when specified 
-    if (this.filterPayload.name) {
+    if ((this.filterPayload.name) || (this.filterPayload.name ===''))  {
       parameters = parameters.set('name', this.filterPayload.name);
     }
     if (this.filterPayload.statuses.length > 0) {

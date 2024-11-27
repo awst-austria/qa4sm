@@ -16,7 +16,7 @@ import Filter from 'ol/format/filter/Filter';
 
 export interface FilterPayload {
   statuses: string[];
-  name: string;
+  name: string | null;
   selectedDates: [Date, Date];
   prettyName: string;
   spatialReference: boolean;
@@ -119,10 +119,6 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
       map(configurations => {
         const matches = configurations.some(config => {
           const matchesPrettyName = this.filterPayload?.prettyName? config.dataset?.includes(this.filterPayload.prettyName) : true;
-          
-          const matchesSpatial = this.filterPayload?.spatialReference ? config.is_spatial_reference : true;
-          const matchesTemporal = this.filterPayload?.temporalReference ? config.is_temporal_reference : true;
-          const matchesScaling = this.filterPayload?.scalingReference ? config.is_scaling_reference : true;
 
           // This really cannot be the most efficient way to do this...
           const matchesAnyReference = (() => {

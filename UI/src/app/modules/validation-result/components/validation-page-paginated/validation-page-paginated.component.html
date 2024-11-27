@@ -62,7 +62,6 @@
                                 [validationRun]="valrun" 
                                 [filterPayload]="filterPayload" 
                                 (matchesFilter)="handleRowFilter(valrun.id, $event)" 
-                                [isVisible]="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" 
                                 (emitError)="dataFetchError.set($event)"/>
           <br/>
         </div>

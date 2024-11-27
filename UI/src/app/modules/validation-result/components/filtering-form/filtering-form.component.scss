@@ -1,5 +1,25 @@
 @import "../../../../../styles";  
 
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.side-menu-header {
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.side-menu-header .pi {
+  margin-left: 0.5rem;
+}
+
 .filter-chip {
   display: flex;
   align-items: center;
@@ -34,7 +54,8 @@
 }
 
 .active-filters {
-  margin-top: 20px;
+  margin-top: 14px;
+  font-size: 12px;
 }
 
 .filter-item {
@@ -72,4 +93,52 @@
 
 button.p-button-rounded {
   margin-left: 5px;
+}
+
+.active-filters-title {
+  font-size: 16px; // Adjust the size as needed
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.fixed-width-container {
+  width: 100%; 
+  min-width: 400px;
+}
+
+.filter-wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  
+  .small-label {
+    min-width: 240px;
+    padding-right: 1rem;
+  }
+  
+  .dropdown-container {
+    flex: 1;
+  }
+}
+
+.input-container {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.button-container {
+  width: 100%;
+  
+  ::ng-deep .p-button {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    border-radius: 0;
+
+    &:first-child {
+      border-radius: 4px 0 0 4px;
+    }
+  }
 }

@@ -1,96 +1,130 @@
 
 <div class="flex flex-row lg:flex-nowrap flex-wrap pt-2" id="filteringForm">
-    <div class="small-label lg:w-2 w-12">
+  <div class="fixed-width-container">
+  <div class="filter-wrapper">
+
+    <div class="small-label">
       <div class="p-fluid">
         <span> Filter By:</span>
       </div>
     </div>
-    <div class="lg:w-5 w-12 px-0 mx-0">
+    <div class="dropdown-container">
       <p-dropdown
         [options]="dropdownFilters"
         [(ngModel)]="selectedFilter"
-        placeholder="Select a filter">
+        placeholder="Select a filter"
+        [style]="{'width': '100%', 'height': '40px', 'border-radius': '0 0 0 0'}">
       </p-dropdown>
-    </div>  
-  <div *ngIf="selectedFilter === 'Status'" class="lg:w-5 w-12 px-0 mx-0">
-        <p-multiSelect 
-        [options]="availableStatuses" 
-        [(ngModel)]="selectedStatuses"  
-        placeholder="Select statuses"
-        display="chip"
-        [filter]="false"
-        showHeader="false"
-        [style]="{'width': '100%'}"></p-multiSelect>
-  </div>
-
-  <div *ngIf="selectedFilter === 'Validation Name'" class="lg:w-5 w-12 px-0 mx-0">
-    <input pInputText 
-    [(ngModel)]="selectedNames" 
-    placeholder="Enter name"
-    [style]="{'width': '100%'}" />
-  </div>
-
-  <div *ngIf="selectedFilter === 'Dataset'" class="lg:w-5 w-12 px-0 mx-0">
-    <input pInputText 
-    [(ngModel)]="prettyName" 
-    placeholder="Enter dataset"
-    [style]="{'width': '100%'}" />
-    <div class="checkbox-group lg:w-5 w-12 px-0 mx-0">
-      Reference: 
-      <p-checkbox 
-        [(ngModel)]="spatial" 
-        binary="true" 
-        label="Spatial">
-      </p-checkbox>
-      <p-checkbox 
-        [(ngModel)]="temporal" 
-        binary="true" 
-        label="Temporal">
-      </p-checkbox>
-      <p-checkbox 
-        [(ngModel)]="scaling" 
-        binary="true" 
-        label="Scaling">
-      </p-checkbox>
     </div>
   </div>
+  <ng-container *ngIf="selectedFilter === 'Status'">
+    <div class="input-container">
+      <p-multiSelect 
+          [options]="availableStatuses" 
+          [(ngModel)]="selectedStatuses"  
+          placeholder="Select statuses"
+          display="chip"
+          [filter]="false"
+          showHeader="false"
+          [style]="{'width': '100%', 'height': '40px', 'border-radius': '0 0 0 0'}"></p-multiSelect>
+    </div>
+  </ng-container>
 
-  <div *ngIf="selectedFilter === 'Submission Date'" class="lg:w-5 w-12 px-0 mx-0">
-    <p-calendar 
-        [options]="dates" 
-        [(ngModel)]="selectedDateRange" 
-        selectionMode="range" 
-        [readonlyInput]="true" 
-        [style]="{'width': '100%'}">
-    </p-calendar>
-  </div>
+  <ng-container *ngIf="selectedFilter === 'Validation Name'">
+    <div class="input-container">
+      <input pInputText 
+      [(ngModel)]="selectedNames" 
+      placeholder="Enter name"
+      [style]="{'width': '100%', 'height': '40px', 'border-radius': '0 0 0 0'}" />
+    </div>
+  </ng-container>
 
-  <div  *ngIf="selectedFilter" class="lg:w-5 w-12 px-0 mx-0">
-    <p-button 
-      label="Add Filter" 
-      icon="pi pi-filter" 
-      class="p-button-success p-button-rounded"
-      (click)="selectFilter()"
-      [disabled]="(selectedFilter === 'Dataset' && (!spatial || !temporal) && (!prettyName)) || (selectedFilter === 'Status' && selectedStatuses.length === 0) || (selectedFilter === 'Validation Name' && selectedNames === '') || (selectedFilter === 'Submission Date' && selectedDateRange === null)"
-      [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of Spatial or Temporal.' : null"
-      tooltipPosition="right">
-    </p-button>
+  <ng-container *ngIf="selectedFilter === 'Dataset'">
+    <div class="input-container">
+      <input pInputText 
+      [(ngModel)]="prettyName" 
+      placeholder="Enter dataset"
+      [style]="{'width': '100%', 'height': '40px', 'border-radius': '0 0 0 0'}" />
+      <div class="checkbox-group lg:w-5 w-12">
+        Reference: 
+        <p-checkbox 
+          [(ngModel)]="spatial" 
+          binary="true" 
+          label="Spatial">
+        </p-checkbox>
+        <p-checkbox 
+          [(ngModel)]="temporal" 
+          binary="true" 
+          label="Temporal">
+        </p-checkbox>
+        <p-checkbox 
+          [(ngModel)]="scaling" 
+          binary="true" 
+          label="Scaling">
+        </p-checkbox>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="selectedFilter === 'Submission Date'">
+    <div class="input-container">
+      <p-calendar 
+          [options]="dates" 
+          [(ngModel)]="selectedDateRange" 
+          selectionMode="range" 
+          [readonlyInput]="true" 
+          [style]="{'width': '100%', 'height': '40px', 'border-radius': '0 0 0 0'}">
+      </p-calendar>
+    </div>
+  </ng-container>
+
+  <div *ngIf="selectedFilter" class="lg:w-5 w-12 px-0 mx-0">
+    <div class="button-container flex flex-row">
+      <p-button 
+        label="Add" 
+        icon="pi pi-filter" 
+        class="p-button-success p-button-rounded"
+        (click)="selectFilter()"
+        [disabled]="(selectedFilter === 'Dataset' && (!spatial || !temporal) && (!prettyName)) || (selectedFilter === 'Status' && selectedStatuses.length === 0) || (selectedFilter === 'Submission Date' && selectedDateRange === null)"
+        [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of Spatial or Temporal.' : null"
+        tooltipPosition="right"
+        [style]="{'width': '100%', 'height': '40px', 'border-radius': '0 0 0 0'}">
+      </p-button>
+      <p-button
+        label="Cancel"
+        icon="pi pi-ban"
+        pTooltip="Cancel filter selection"
+        (onClick)="cancelFilter()"
+        [style]="{'width': '100%', 'height': '40px', 'border-radius': '0 4px 4px 0'}">
+      </p-button>
+    </div>
   </div>
+</div>
 </div>
 
 <div *ngIf="activeFilters.length > 0" class="active-filters mt-3">
-  <h4>Active Filters:</h4>
+  <h6 class="active-filters-title">Active Filters:</h6>
   <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">
     <div class="filter-item">
-        <div class="filter-text">
-          <div class="filter-name">{{ filter.filter | titlecase }}:</div>
-          <div class="filter-values">
-            <span *ngFor="let value of filter.values; let j = index">
-              <span class="p-pill p-pill-info">{{ value }}</span>
-              <span *ngIf="j < filter.values.length - 1">, </span>
+      <div class="filter-text">
+        <div class="filter-name">{{ filter.filter | titlecase }}:</div>
+        <div class="filter-values">
+          <span *ngFor="let value of filter.values; let j = index">
+            <span class="p-pill p-pill-info">
+              <ng-container *ngIf="filter.filter === 'Submission Date'; else regularValue">
+                {{ value | date:'dd/MM/yyyy' }}
+              </ng-container>
+              <ng-template #regularValue>
+                {{ value }}
+              </ng-template>
             </span>
-          </div>
+            <span *ngIf="j < filter.values.length - 1">
+              <ng-container *ngIf="filter.filter === 'Submission Date'"> - </ng-container>
+              <ng-container *ngIf="filter.filter !== 'Submission Date'">, </ng-container>
+            </span>
+          </span>
         </div>
+      </div>
         <div class="button-group">
           <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info" (click)="editFilter(i)"></button>
           <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="removeFilter(i)"></button>

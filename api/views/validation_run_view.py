@@ -79,10 +79,14 @@ def my_results(request):
     filter_statuses = request.query_params.getlist('statuses', None)
     start_date_str = request.GET.get('startDate', None)
     end_date_str = request.GET.get('endDate', None)
-    
-    #only run filter queries if they are provided 
-    if filter_name:
+
+    if filter_name in (None, "null"):
+        val_runs = val_runs.all() # when no filter is applied
+    elif filter_name.strip() == "":
+        val_runs = val_runs.filter(name_tag="") # when filter is for non-named runs
+    else:
         val_runs = val_runs.filter(name_tag__icontains=filter_name)
+
     if filter_statuses:
         status_filters = filter_by_job_statuses(filter_statuses)
         val_runs = val_runs.filter(status_filters)
@@ -92,7 +96,7 @@ def my_results(request):
         start_date = datetime.fromisoformat(start_date_str.rstrip('Z'))  
         end_date = datetime.fromisoformat(end_date_str.rstrip('Z'))  
         val_runs = val_runs.filter(
-            start_time__gte=start_date,  # Assuming 'date' is the field in your model
+            start_time__gte=start_date,  
             start_time__lte=end_date)
 
     if limit and offset:

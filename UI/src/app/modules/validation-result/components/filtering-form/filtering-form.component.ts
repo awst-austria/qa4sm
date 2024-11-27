@@ -1,8 +1,9 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { filter } from 'jszip';
 
 export interface FilterPayload {
   statuses: string[];
-  name: string;
+  name: string | null;
   selectedDates: [Date, Date];
   prettyName: string;
   spatialReference: boolean;
@@ -27,23 +28,19 @@ export class FilteringFormComponent {
   dropdownFilters: { label: string, value: string }[] = []; // filters still available after applied ones are removed from list
 
   selectedStatuses: string[] = []; 
-  selectedNames: string = ''; 
+  selectedNames: string | null = ''; 
   prettyName: string = ''; 
   selectedDateRange: [Date | null, Date | null];
   spatial: boolean = false;
   temporal: boolean = false;
   scaling: boolean = false;
 
-  constructor() {
+  constructor(private cdr: ChangeDetectorRef) {
     this.updateDropdownFilters();
   }
 
 
   selectFilter() {
-
-    if (this.selectedFilter === 'Validation Name' && !this.selectedNames) {
-      return;
-    }
 
     // Ensure at least one of the checkboxes is selected
     if (this.selectedFilter === 'Dataset' && (!this.spatial || !this.temporal) && !this.prettyName) {
@@ -81,14 +78,11 @@ export class FilteringFormComponent {
         }
         break;
     }
-    
-
 
     // Only actually filter if given values 
     if (filterValues.length > 0) {
 
       const existingFilterIndex = this.activeFilters.findIndex(f => f.filter === this.selectedFilter); //check if existing filter 
-      //const newFilter = { filter: this.selectedFilter, values: filterValues };
 
       if (existingFilterIndex !== -1) {
         this.activeFilters[existingFilterIndex].values = filterValues; // update if existing filter
@@ -115,7 +109,9 @@ export class FilteringFormComponent {
   editFilter(index: number) {
 
     const filterToEdit = this.activeFilters[index]; // get filter to edit
-    this.selectedFilter = filterToEdit.filter; // set selected filter name
+
+    this.selectedFilter = filterToEdit.filter;
+    this.cdr.detectChanges(); // should update drop-down to show filter being edited - doesn't seem to...
 
     switch (filterToEdit.filter) {
       case 'status':
@@ -137,23 +133,43 @@ export class FilteringFormComponent {
   }
 
   removeFilter(index: number) {
+
+    const removedFilter = this.activeFilters[index]; 
+
+    // If 'Validation Name' filter, reset to empty string to allow for filter on no name to still work
+    if (removedFilter.filter === 'Validation Name') {
+      this.selectedNames = '';
+    }
+
     this.availableFilters.push(this.activeFilters[index].filter); // Add deleted filter back to available filters
     this.activeFilters.splice(index, 1); // Remove filter from active filters
     this.updateDropdownFilters(); // Update list of dropdown filters
     this.onFilteringChange()
   }
 
-  onFilteringChange(): void {
+  cancelFilter() {
+    this.selectedFilter = '';
+    this.selectedStatuses = [];
+    this.selectedNames = '';
+    this.selectedDateRange = this.getInitDate();
+    this.prettyName = '';
+    this.spatial = false;
+    this.temporal = false;
+    this.scaling = false;
+  }
+
+  onFilteringChange(): void { 
     // build filter payload and emit to validation page component
     const filterPayload: FilterPayload = {
       statuses: this.activeFilters.find(f => f.filter === 'Status')?.values || [],
-      name: this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] || '',
+      name: this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] !== undefined ? this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] : null, // need to separate null (no filter) from empty string (filter on unnamed)
       selectedDates: this.activeFilters.find(f => f.filter === 'Submission Date')?.values as unknown as [Date, Date] || this.getInitDate(),
       prettyName: this.activeFilters.find(f => f.filter === 'Dataset')?.values[0] || '',
       spatialReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false,
       temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false,
       scalingReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false
     };
+    console.log(this.selectedNames)
     this.filterPayload.emit(filterPayload);
   }
 
@@ -168,5 +184,4 @@ export class FilteringFormComponent {
     pastDate.setFullYear(today.getFullYear() - 5);  
     return [pastDate, today];
   }
-
 }
