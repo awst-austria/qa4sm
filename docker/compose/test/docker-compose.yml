@@ -55,6 +55,9 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/cronjob-scripts"
         target: /var/lib/qa4sm-web-val/valentina/cronjob-scripts
+      - type: bind
+        source: "${QA4SM_DATA_FOLDER}/fixtures"
+        target: "/var/lib/qa4sm-web-val/valentina/validator/fixtures"
   proxy:
     image: "awst/qa4sm-proxy:latest"
     restart: always
@@ -83,6 +86,9 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/user_data"
         target: /var/lib/qa4sm-web-val/valentina/data/user_data
+      - type: bind
+        source: "${QA4SM_DATA_FOLDER}/fixtures"
+        target: "/var/lib/qa4sm-web-val/valentina/validator/fixtures"
     deploy:
       resources:
         limits:
