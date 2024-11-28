@@ -18,7 +18,7 @@ from api.views.comparison_view import get_comparison_table, get_comparison_plots
     download_comparison_table, get_comparison_metrics, get_spatial_extent
 from api.views.user_view import signup_post, user_update, user_delete
 from api.views.validation_run_view import published_results, my_results, validation_run_by_id, \
-    custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations
+    custom_tracked_validation_runs, get_validations_for_comparison, get_copied_validations, is_validation_finished
 from api.views.dataset_configuration_view import dataset_configuration, dataset_configuration_by_validation
 from api.views.global_params_view import global_params
 from api.views.modify_validation_view import *
@@ -70,6 +70,7 @@ urlpatterns = [
             name='Dataset_variable_by_dataset'),
     path('published-results', published_results, name='Published results'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
+    re_path(r'^validation-runs/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation,
             name='Configuration'),
