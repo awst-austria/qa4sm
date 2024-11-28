@@ -1,16 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { filter } from 'jszip';
-
-export interface FilterPayload {
-  statuses: string[];
-  name: string | null;
-  selectedDates: [Date, Date];
-  prettyName: string;
-  spatialReference: boolean;
-  temporalReference: boolean;
-  scalingReference: boolean;
-}
-
+import { FilterPayload } from './filterPayload.interface';
 
 @Component({
   selector: 'qa-filtering-form',

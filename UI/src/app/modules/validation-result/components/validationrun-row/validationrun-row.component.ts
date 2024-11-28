@@ -12,17 +12,8 @@ import {catchError, map} from 'rxjs/operators';
 import {ValidationRunConfigService} from '../../../../pages/validate/service/validation-run-config.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
-import Filter from 'ol/format/filter/Filter';
 
-export interface FilterPayload {
-  statuses: string[];
-  name: string | null;
-  selectedDates: [Date, Date];
-  prettyName: string;
-  spatialReference: boolean;
-  temporalReference: boolean;
-  scalingReference: boolean;
-}
+import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
 
 @Component({
   selector: 'qa-validationrun-row',
@@ -33,7 +24,6 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   @Input() published = false;
   @Input() validationRun: ValidationrunDto;
-  //@Input() isVisible: boolean = true;  // Default visibility is true (visible)
   @Input() filterPayload: FilterPayload | null = null;
   @Output() matchesFilter = new EventEmitter<boolean>();
 

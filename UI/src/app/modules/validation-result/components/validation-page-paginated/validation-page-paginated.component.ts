@@ -4,16 +4,7 @@ import {ValidationrunDto} from '../../../core/services/validation-run/validation
 import {HttpParams} from '@angular/common/http';
 import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
 import {catchError} from 'rxjs/operators';
-
-export interface FilterPayload {
-  statuses: string[];
-  name: string | null;
-  selectedDates: [Date, Date];
-  prettyName: string;
-  spatialReference: boolean;
-  temporalReference: boolean;
-  scalingReference: boolean;
-}
+import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
 
 
 @Component({
