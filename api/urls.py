@@ -70,7 +70,7 @@ urlpatterns = [
             name='Dataset_variable_by_dataset'),
     path('published-results', published_results, name='Published results'),
     re_path(r'^validation-runs/(?P<id>.+)$', validation_run_by_id, name='Validation run by id'),
-    re_path(r'^validation-runs/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
+    re_path(r'^is-validation-finished/(?P<id>.+)$', is_validation_finished, name='Is validation finished'),
     path('dataset-configuration', dataset_configuration, name='Configuration'),
     re_path(r'^dataset-configuration/(?P<validation_id>.+)$', dataset_configuration_by_validation,
             name='Configuration'),
