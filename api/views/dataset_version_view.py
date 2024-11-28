@@ -75,7 +75,6 @@ def field_validator(data, model_serializer):
 def update_fixture_entry(version):
     # Path to the fixture
     fixture_path = os.path.join(settings.BASE_DIR, 'validator', 'fixtures', 'versions.json')
-    print('fixture path', fixture_path)
 
     # Read the existing fixture file
     with open(fixture_path, 'r', encoding='utf-8') as f:
