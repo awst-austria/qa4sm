@@ -15,6 +15,9 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 
 import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
 
+
+import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
+
 @Component({
   selector: 'qa-validationrun-row',
   templateUrl: './validationrun-row.component.html',
@@ -26,6 +29,8 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
   @Input() validationRun: ValidationrunDto;
   @Input() filterPayload: FilterPayload | null = null;
   @Output() matchesFilter = new EventEmitter<boolean>();
+
+  @Output() datasetsLoaded = new EventEmitter<{ id: string; datasets: DatasetDto[] }>();
 
   @Output() emitError = new EventEmitter();
 
@@ -56,6 +61,11 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     if (this.validationRun.is_a_copy) {
       this.getOriginalDate(this.validationRun);
     }
+
+    //this.datasetService.getAllDatasets().subscribe(datasets => {
+    //  this.datasetsLoaded.emit({ id: this.validationRun.id, datasets });
+    //});
+    
     this.updateConfig();
     this.valName.set(this.validationRun.name_tag);
     this.validationStatus.set(this.getStatusFromProgress(this.validationRun));

@@ -1,16 +1,23 @@
 import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FilterPayload } from './filterPayload.interface';
 
+import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
+import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
+
+
 @Component({
   selector: 'qa-filtering-form',
   templateUrl: './filtering-form.component.html',
   styleUrl: './filtering-form.component.scss'
 })
-export class FilteringFormComponent {
+export class FilteringFormComponent implements OnInit {
 
   @Output() filterPayload =  new EventEmitter<FilterPayload>();
 
-  availableStatuses = ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled']
+  availableStatuses = ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'];
+  availableDatasets: string[];
+
+
   selectedFilter: string = '';
   activeFilters: { filter: string, values: string[] }[] = [];
   availableFilters = ['Validation Name', 'Status', 'Submission Date', 'Dataset'];
@@ -24,17 +31,55 @@ export class FilteringFormComponent {
   temporal: boolean = false;
   scaling: boolean = false;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  prettyNames: string;
+
+
+  constructor(private cdr: ChangeDetectorRef,
+              private datasetService: DatasetService) {
     this.updateDropdownFilters();
   }
+  
+  ngOnInit(): void {
+    this.fetchAndLogPrettyNames();
+  }
 
+  // get all dataset names to provide list for filter choice
+  private fetchAndLogPrettyNames(): void {
+    this.datasetService.getAllDatasets().subscribe({
+      next: (datasets: DatasetDto[]) => {
+        this.availableDatasets = datasets
+          .map(dataset => dataset.pretty_name)
+          .filter((name, index, self) => name && self.indexOf(name) === index); 
+        console.log('Dataset Pretty Names:', this.availableDatasets);
+      },
+      error: (error) => {
+        console.error('Error fetching datasets:', error);
+      }
+    });
+  }
+
+  isFilterValid(): boolean {
+    if (this.selectedFilter === 'Dataset') {
+      return !!(this.prettyName && (this.spatial || this.temporal || this.scaling));
+    }
+    if (this.selectedFilter === 'Status') {
+      return this.selectedStatuses.length > 0;
+    }
+    if (this.selectedFilter === 'Submission Date') {
+      return !!this.selectedDateRange;
+    }
+    return true;
+  }
 
   selectFilter() {
 
     // Ensure at least one of the checkboxes is selected
-    if (this.selectedFilter === 'Dataset' && (!this.spatial || !this.temporal) && !this.prettyName) {
-      return;
-    }
+    //if (this.selectedFilter === 'Dataset' && !(this.spatial || this.temporal || this.scaling) && !this.prettyName) {
+    //  return;
+    //}
+    //if (!this.isFilterValid()) {
+    //  return;
+    //}
 
     let filterValues = [];
     //switch case for chosen filtering variable
@@ -172,5 +217,10 @@ export class FilteringFormComponent {
     const pastDate = new Date(today);
     pastDate.setFullYear(today.getFullYear() - 5);  
     return [pastDate, today];
+  }
+
+  getDataSets(): void {
+    // Fetch datasets to populate dropdown
+
   }
 }
