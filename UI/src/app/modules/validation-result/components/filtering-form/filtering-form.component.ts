@@ -73,6 +73,10 @@ export class FilteringFormComponent implements OnInit {
 
   selectFilter() {
 
+    if (!this.isFilterValid()) {
+      return;
+    }
+
     let filterValues = [];
     //switch case for chosen filtering variable
     switch (this.selectedFilter) {
