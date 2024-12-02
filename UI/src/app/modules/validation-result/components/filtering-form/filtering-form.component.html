@@ -1,99 +1,120 @@
 
-<div class="full flex flex-row lg:flex-nowrap flex-wrap pt-2" id="filteringForm">
-  <div class="small-label lg:w-2 w-12">
-    <div class="p-fluid" style="display: flex; align-items: center;">
-      <span> Filter By:</span>
-    </div>
-  </div>
-  <div class="lg:w-4 w-12">
-    <p-dropdown
-      [options]="dropdownFilters"
-      [(ngModel)]="selectedFilter"
-      placeholder="Select a filter"
-      [style]="{'width': '100%', 'border-radius': '0 0 0 0'}" >
-    </p-dropdown>
-  </div>  
+<div class="w-12">
 
-<div *ngIf="selectedFilter === 'Status'" class="lg:w-4 w-12">
+  <div *ngIf="!showFilterForm" class="flex justify-content-start">
+    <p-button 
+      label="+ Add Filter"
+      (click)="showFilterForm = true"
+      [style]="{'height': '40px'}">
+    </p-button>
+  </div>
+
+  <div *ngIf="showFilterForm" class="full w-12 flex flex-row lg:flex-nowrap flex-wrap" id="filteringForm">
+    <div class="small-label lg:w-2 w-12">
+      <div class="p-fluid" style="display: flex; align-items: center;">
+        <span> Filter By:</span>
+      </div>
+    </div>
+    <div class="lg:w-4 w-12">
+      <p-dropdown
+        [options]="dropdownFilters"
+        [(ngModel)]="selectedFilter"
+        placeholder="Select a filter"
+        [style]="{'width': '100%', 'border-radius': '0 0 0 0'}" >
+      </p-dropdown>
+    </div>  
+
+  <div *ngIf="!selectedFilter" class="lg:w-4 w-12">
       <p-multiSelect 
-      [options]="availableStatuses" 
-      [(ngModel)]="selectedStatuses"  
-      placeholder="Select statuses"
+      placeholder="Filter parameters"
       display="chip"
+      [disabled]="true"
       [filter]="false"
       showHeader="false"
       [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"></p-multiSelect>
-</div>
+  </div>
 
-<div *ngIf="selectedFilter === 'Validation Name'" class="lg:w-4 w-12">
-  <input pInputText 
-  [(ngModel)]="selectedNames" 
-  placeholder="Enter name"
-  [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
-</div>
+  <div *ngIf="selectedFilter === 'Status'" class="lg:w-4 w-12">
+        <p-multiSelect 
+        [options]="availableStatuses" 
+        [(ngModel)]="selectedStatuses"  
+        placeholder="Select statuses"
+        display="chip"
+        [filter]="false"
+        showHeader="false"
+        [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"></p-multiSelect>
+  </div>
 
-<div *ngIf="selectedFilter === 'Dataset'" class="lg:w-4 w-12">
-  <p-dropdown
-    [(ngModel)]="prettyName" 
-    [options]="availableDatasets"
-    placeholder="Enter dataset"
+  <div *ngIf="selectedFilter === 'Validation Name'" class="lg:w-4 w-12">
+    <input pInputText 
+    [(ngModel)]="selectedNames" 
+    placeholder="Enter name"
     [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
-  <div class="checkbox-container">
-  <div *ngIf="prettyName" class="checkbox-group lg:w-4 w-12" style="display: flex; align-items: center; gap: 1rem;">
-    Reference: 
-    <p-checkbox 
-      [(ngModel)]="spatial" 
-      binary="true" 
-      label="Spatial">
-    </p-checkbox>
-    <p-checkbox 
-      [(ngModel)]="temporal" 
-      binary="true" 
-      label="Temporal">
-    </p-checkbox>
-    <p-checkbox 
-      [(ngModel)]="scaling" 
-      binary="true" 
-      label="Scaling">
-    </p-checkbox>
+  </div>
+
+  <div *ngIf="selectedFilter === 'Dataset'" class="lg:w-4 w-12">
+    <p-dropdown
+      [(ngModel)]="prettyName" 
+      [options]="availableDatasets"
+      placeholder="Enter dataset"
+      [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
+    <div class="checkbox-container">
+    <div *ngIf="prettyName" class="checkbox-group lg:w-4 w-12" style="display: flex; align-items: center; gap: 1rem;">
+      Reference: 
+      <p-checkbox 
+        [(ngModel)]="spatial" 
+        binary="true" 
+        label="Spatial">
+      </p-checkbox>
+      <p-checkbox 
+        [(ngModel)]="temporal" 
+        binary="true" 
+        label="Temporal">
+      </p-checkbox>
+      <p-checkbox 
+        [(ngModel)]="scaling" 
+        binary="true" 
+        label="Scaling">
+      </p-checkbox>
+    </div>
+    </div>
+  </div>
+
+  <div *ngIf="selectedFilter === 'Submission Date'" class="lg:w-4 w-12">
+    <p-calendar 
+        [options]="dates" 
+        [(ngModel)]="selectedDateRange" 
+        selectionMode="range" 
+        [readonlyInput]="true" 
+        [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}"
+        inputStyleClass="border-noround">
+    </p-calendar>
+  </div>
+
+  <div class="lg:w-2 w-12">
+    <div class="button-group flex flex-row">
+      <p-button
+        label="Add"
+        icon="pi pi-filter"
+        class="p-button-success p-button-rounded"
+        (click)="selectFilter()"
+        [disabled]="!isFilterValid()"
+        [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null"
+        tooltipPosition="right"
+        [style]="{'border-radius': '0 0 0 0', 'height': '42px'}">
+      </p-button>
+      <p-button
+        label="Cancel"
+        icon="pi pi-ban"
+        class="p-button-danger p-button-rounded"
+        (click)="cancelFilter()"
+        [style]="{'border-radius': '0 4px 4px 0', 'height': '42px'}">
+      </p-button>
+    </div>
   </div>
   </div>
 </div>
 
-<div *ngIf="selectedFilter === 'Submission Date'" class="lg:w-4 w-12">
-  <p-calendar 
-      [options]="dates" 
-      [(ngModel)]="selectedDateRange" 
-      selectionMode="range" 
-      [readonlyInput]="true" 
-      [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}"
-      inputStyleClass="border-noround">
-  </p-calendar>
-</div>
-
-<div  *ngIf="selectedFilter" class="lg:w-2 w-12">
-  <div class="button-group flex flex-row">
-    <p-button
-      label="Add"
-      icon="pi pi-filter"
-      class="p-button-success p-button-rounded"
-      (click)="selectFilter()"
-      [disabled]="!isFilterValid()"
-      [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null"
-      tooltipPosition="right"
-      [style]="{'border-radius': '0 0 0 0', 'height': '42px'}">
-    </p-button>
-    <p-button
-      label="Cancel"
-      icon="pi pi-ban"
-      class="p-button-danger p-button-rounded"
-      (click)="cancelFilter()"
-      [style]="{'border-radius': '0 4px 4px 0', 'height': '42px'}">
-    </p-button>
-  </div>
-</div>
-
-</div>
 <div *ngIf="activeFilters.length > 0" class="active-filters mt-3">
 <div class="filter-heading">Active Filters:</div>
 <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">

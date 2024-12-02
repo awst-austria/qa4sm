@@ -20,7 +20,10 @@ export class FilteringFormComponent implements OnInit {
 
   selectedFilter: string = '';
   activeFilters: { filter: string, values: string[] }[] = [];
-  availableFilters = ['Validation Name', 'Status', 'Submission Date', 'Dataset'];
+
+  allFilters = ['Validation Name', 'Status', 'Submission Date', 'Dataset'];
+  availableFilters = [...this.allFilters];
+
   dropdownFilters: { label: string, value: string }[] = []; // filters still available after applied ones are removed from list
 
   selectedStatuses: string[] = []; 
@@ -30,6 +33,11 @@ export class FilteringFormComponent implements OnInit {
   spatial: boolean = false;
   temporal: boolean = false;
   scaling: boolean = false;
+
+  showFilterForm: boolean = false;
+
+  isEditing: boolean = false; //to define if editing filter, required to properly show filter in dropdown when editing active filter 
+
 
   prettyNames: string;
 
@@ -76,6 +84,7 @@ export class FilteringFormComponent implements OnInit {
     if (!this.isFilterValid()) {
       return;
     }
+    this.isEditing = false;
 
     let filterValues = [];
     //switch case for chosen filtering variable
@@ -134,15 +143,19 @@ export class FilteringFormComponent implements OnInit {
       this.temporal = false;
       this.scaling = false;
     }
+    this.showFilterForm = false;
   }
 
   editFilter(index: number) {
 
+    this.isEditing = true;
+    this.showFilterForm = true;
     const filterToEdit = this.activeFilters[index]; // get filter to edit
 
     this.selectedFilter = filterToEdit.filter;
+    this.updateDropdownFilters(); 
     this.cdr.detectChanges(); // should update drop-down to show filter being edited - doesn't seem to...
-
+    console.log(this.availableFilters);
     switch (filterToEdit.filter) {
       case 'status':
         this.selectedStatuses = filterToEdit.values;
@@ -160,6 +173,7 @@ export class FilteringFormComponent implements OnInit {
         this.scaling = filterToEdit.values.includes('Scaling Reference') || filterToEdit.values.includes('Spatial or Scaling Reference') || filterToEdit.values.includes('Temporal or Scaling Reference') || filterToEdit.values.includes('Spatial, Temporal, or Scaling Reference');
         break;
     }
+
   }
 
   removeFilter(index: number) {
@@ -178,6 +192,8 @@ export class FilteringFormComponent implements OnInit {
   }
 
   cancelFilter() {
+    this.isEditing = false;
+
     this.selectedFilter = '';
     this.selectedStatuses = [];
     this.selectedNames = '';
@@ -186,6 +202,8 @@ export class FilteringFormComponent implements OnInit {
     this.spatial = false;
     this.temporal = false;
     this.scaling = false;
+
+    this.showFilterForm = false;
   }
 
   onFilteringChange(): void { 
@@ -199,12 +217,23 @@ export class FilteringFormComponent implements OnInit {
       temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false,
       scalingReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false
     };
-    console.log(this.selectedNames)
     this.filterPayload.emit(filterPayload);
   }
 
+
   updateDropdownFilters() {
-    this.dropdownFilters = this.availableFilters.map(f => ({ label: f, value: f }));
+    this.dropdownFilters = this.allFilters
+      .filter(filter => {
+        console.log(this.isEditing, filter, this.selectedFilter);
+        if (this.isEditing && filter === this.selectedFilter) {
+          return true;
+        }
+        return !this.activeFilters.some(af => af.filter === filter);
+      })
+      .map(filter => ({
+        label: filter,
+        value: filter
+      }));
   }
 
   getInitDate(): [Date, Date] {
@@ -215,8 +244,4 @@ export class FilteringFormComponent implements OnInit {
     return [pastDate, today];
   }
 
-  getDataSets(): void {
-    // Fetch datasets to populate dropdown
-
-  }
 }
