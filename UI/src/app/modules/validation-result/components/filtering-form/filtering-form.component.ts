@@ -73,14 +73,6 @@ export class FilteringFormComponent implements OnInit {
 
   selectFilter() {
 
-    // Ensure at least one of the checkboxes is selected
-    //if (this.selectedFilter === 'Dataset' && !(this.spatial || this.temporal || this.scaling) && !this.prettyName) {
-    //  return;
-    //}
-    //if (!this.isFilterValid()) {
-    //  return;
-    //}
-
     let filterValues = [];
     //switch case for chosen filtering variable
     switch (this.selectedFilter) {

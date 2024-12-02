@@ -1,5 +1,5 @@
 
-<div class="flex flex-row lg:flex-nowrap flex-wrap pt-2" id="filteringForm">
+<div class="full flex flex-row lg:flex-nowrap flex-wrap pt-2" id="filteringForm">
   <div class="small-label lg:w-2 w-12">
     <div class="p-fluid" style="display: flex; align-items: center;">
       <span> Filter By:</span>
@@ -95,7 +95,7 @@
 
 </div>
 <div *ngIf="activeFilters.length > 0" class="active-filters mt-3">
-<h4>Active Filters:</h4>
+<div class="filter-heading">Active Filters:</div>
 <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">
   <div class="filter-item">
     <div class="filter-text">

@@ -61,10 +61,6 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     if (this.validationRun.is_a_copy) {
       this.getOriginalDate(this.validationRun);
     }
-
-    //this.datasetService.getAllDatasets().subscribe(datasets => {
-    //  this.datasetsLoaded.emit({ id: this.validationRun.id, datasets });
-    //});
     
     this.updateConfig();
     this.valName.set(this.validationRun.name_tag);

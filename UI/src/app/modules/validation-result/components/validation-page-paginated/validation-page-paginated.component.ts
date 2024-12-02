@@ -253,7 +253,15 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   areFiltersApplied(): boolean {
     // check if any filters have been applied, used to define message in case of no validation results found)
-    return this.filterPayload.statuses.length > 0 || this.filterPayload.name !== '' || this.filterPayload.prettyName !== null || this.filterPayload.spatialReference || this.filterPayload.temporalReference || this.filterPayload.scalingReference;
+    if (!this.filterPayload) {
+      return false;
+    }
+    
+    return (
+      this.filterPayload.statuses.length > 0 || 
+      this.filterPayload.name !== null || 
+      (this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
+    );
   }
 
   areAnyRowsVisible(): boolean {
@@ -261,4 +269,12 @@ export class ValidationPagePaginatedComponent implements OnInit {
     return Array.from(this.rowVisibility.values()).some(visible => visible);
   }
 
+
+  getVisibleValrunsCount(): number {
+    // number of visible rows when filtering by dataset to display at bottom of list
+    return this.validations.filter(valrun => 
+      this.rowVisibility.get(valrun.id) !== undefined ? 
+      this.rowVisibility.get(valrun.id) : true
+    ).length;
+  }
 }

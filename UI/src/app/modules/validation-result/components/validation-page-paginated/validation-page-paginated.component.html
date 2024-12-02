@@ -74,8 +74,11 @@
         Loading... </em>
       </div>
 
-      <div *ngIf="endOfPage && !published" class="val-number-information">
+      <div *ngIf="endOfPage && !published && !areFiltersApplied()" class="val-number-information">
         <em> You have run {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}.</em>
+      </div>
+      <div *ngIf="endOfPage && !published && areFiltersApplied()" class="val-number-information">
+        <em> Showing {{ getVisibleValrunsCount() }} {{ validations.length === 1 ? 'validation ' : 'validations' }} that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
       </div>
     </div>
 
