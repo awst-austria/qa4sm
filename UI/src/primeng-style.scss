@@ -1081,17 +1081,18 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-top-left-radius: 0;
 }
 
-#sortingChoiceSelector .p-dropdown {
+#sortingChoiceSelector .p-dropdown, #filterSelector .p-dropdown {
   border-radius: 0;
+  width: 100%
 }
 
-#sortingForm .small-label {
+#sortingForm .small-label, #filteringForm .small-label{
   max-width: 100%;
   padding: 1.3rem;
 }
 
 @media screen and (max-width: 991px) {
-  #sortingForm .small-label {
+  #sortingForm .small-label, , #filteringForm .small-label {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
   }
