@@ -157,7 +157,8 @@
                 27,
                 34,
                 48,
-                51
+                51,
+                61
             ],
             "variables": [
                 9
@@ -233,7 +234,8 @@
             "citation": "<a target=\"_blank\" href=\"https://confluence.ecmwf.int/display/CKB/ERA5-Land%3A+data+documentation\" rel=\"noreferrer\">Online documentation here</a>",
             "is_spatial_reference": false,
             "versions": [
-                16
+                16,
+                62
             ],
             "variables": [
                 12
@@ -262,7 +264,8 @@
                 26,
                 33,
                 47,
-                50
+                50,
+                60
             ],
             "variables": [
                 13
@@ -291,7 +294,8 @@
                 25,
                 32,
                 49,
-                46
+                46,
+                59
             ],
             "variables": [
                 14

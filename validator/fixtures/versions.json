@@ -874,5 +874,72 @@
                 7
             ]
         }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 59,
+        "fields": {
+            "short_name": "ESA_CCI_SM_P_V09_1",
+            "pretty_name": "v09.1",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2023-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                6,
+                7
+            ]
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 60,
+        "fields": {
+            "short_name": "ESA_CCI_SM_A_V09_1",
+            "pretty_name": "v09.1",
+            "help_text": "-",
+            "time_range_start": "1991-08-05",
+            "time_range_end": "2023-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                6,
+                7
+            ]
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 61,
+        "fields": {
+            "short_name": "ESA_CCI_SM_C_V09_1",
+            "pretty_name": "v09.1",
+            "help_text": "-",
+            "time_range_start": "1978-11-01",
+            "time_range_end": "2023-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                6,
+                7
+            ]
+        }
+    },
+    {
+        "model": "validator.datasetversion",
+        "pk": 62,
+        "fields": {
+            "short_name": "ERA5_LAND_latest",
+            "pretty_name": "latest",
+            "help_text": "updated snapshot of the reanalysis dataset",
+            "time_range_start": "1981-01-01",
+            "time_range_end": "2022-12-31",
+            "geographical_range": null,
+            "filters": [
+                1,
+                17
+            ]
+        }
     }
 ]
