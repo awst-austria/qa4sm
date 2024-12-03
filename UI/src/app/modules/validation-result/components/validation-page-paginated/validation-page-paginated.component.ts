@@ -58,7 +58,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const docHeight = document.documentElement.scrollHeight;
     const windowBottom = windowHeight + window.scrollY;
 
-    const scrollThreshold = 0.95; //Load further results at 95% scroll - more robust
+    const scrollThreshold = 0.9; //Load further results at 95% scroll - more robust
     if ((windowBottom / docHeight) >= scrollThreshold && !this.isLoading && !this.endOfPage) {
       this.currentPage++;
       this.offset = (this.currentPage - 1) * this.limit;
@@ -109,7 +109,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     }
   }
 
-  checkValidationDatasets(validationId: number, filterDataset: string): Observable<boolean> {
+  checkValidationDatasets(validationId: number, filterDataset: string, spatial: boolean, temporal: boolean, scaling: boolean): Observable<boolean> {
     // combine api calls for validation configuration and datasets to check if the dataset is used in the validation
     return combineLatest([
       this.datasetConfigService.getConfigByValidationrun(validationId.toString()),
@@ -117,7 +117,16 @@ export class ValidationPagePaginatedComponent implements OnInit {
     ]).pipe(
       map(([configurations, datasets]) => { 
         const validationDatasets = configurations
-          .map(config => datasets.find(ds => config.dataset === ds.id)?.pretty_name) // check if the dataset id is used in the validation, get pretty name 
+          .map(config => {
+            // Evaluate the reference types selected, returns OR if multiple selected types
+            // why does this not work...
+            const matchesSpatial = spatial ? config.is_spatial_reference : !config.is_spatial_reference;    
+            const matchesTemporal = temporal ? config.is_temporal_reference : !config.is_temporal_reference;
+            const matchesScaling = scaling ? config.is_scaling_reference : !config.is_scaling_reference;
+            const matchesConditions = matchesSpatial && matchesTemporal && matchesScaling;
+            
+            return datasets.find(ds => (config.dataset === ds.id && matchesConditions))?.pretty_name; // get the pretty name of the dataset matching the id and reference types
+          })
           .filter(name => name);
         return validationDatasets.includes(filterDataset); // return true if the dataset is used in the validation
       })
@@ -129,7 +138,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     // if dataset filter exists, check if the dataset is used in the validation 
     if (this.filterPayload?.prettyName) {
       const filterObservables = validations.map(val => 
-        this.checkValidationDatasets(val.id, this.filterPayload.prettyName) // run the check for each validation
+        this.checkValidationDatasets(val.id, this.filterPayload.prettyName, this.filterPayload.spatialReference, this.filterPayload.temporalReference, this.filterPayload.scalingReference) // run the check for each validation
           .pipe(
             map(matches => ({ validation: val, matches })) // array of observables with validation and filter match status
           )
@@ -138,7 +147,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
         const filteredValidations = results
           .filter(result => result.matches)
           .map(result => result.validation); // filter out validations that don't match
-        this.updateValidations(filteredValidations, length); // continue to showing the validations on page 
+
+        const filteredLength = Math.ceil((filteredValidations.length / validations.length) * length); // update length of validations to match the filtered list
+
+        this.updateValidations(filteredValidations, filteredLength); // continue to showing the validations on page 
       });
     } else {
       this.updateValidations(validations, length);
@@ -146,9 +158,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
   
   private updateValidations(validations: ValidationrunDto[], length: number): void {
-    if (!this.maxNumberOfPages || this.orderChange) {
-      this.maxNumberOfPages = Math.ceil(length / this.limit);
-    }
+    this.maxNumberOfPages = Math.ceil(length / this.limit);
   
     if (this.orderChange) {
       this.validations = validations;
@@ -165,6 +175,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
             }
           })
           this.selectedValidations$.next(selectedValidations);
+        }
+
+        if (this.validations.length < length) {
+          this.currentPage = Math.floor(this.validations.length / this.limit);
         }
 
         if (this.currentPage > this.maxNumberOfPages) {
