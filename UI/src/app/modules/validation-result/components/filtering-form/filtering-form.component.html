@@ -1,6 +1,6 @@
 
 <div class="w-12">
-
+  
   <div *ngIf="!showFilterForm" class="flex justify-content-start">
     <p-button 
       label="+ Add Filter"
@@ -98,7 +98,7 @@
         icon="pi pi-filter"
         class="p-button-success p-button-rounded"
         (click)="selectFilter()"
-        [disabled]="!isFilterValid()"
+        [disabled]="!isFilterValid() || !selectedFilter"
         [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null"
         tooltipPosition="right"
         [style]="{'border-radius': '0 0 0 0', 'height': '42px'}">
@@ -115,7 +115,7 @@
   </div>
 </div>
 
-<div *ngIf="activeFilters.length > 0" class="active-filters mt-3">
+<div *ngIf="activeFilters.length > 0" class="active-filters">
 <div class="filter-heading">Active Filters:</div>
 <div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">
   <div class="filter-item">

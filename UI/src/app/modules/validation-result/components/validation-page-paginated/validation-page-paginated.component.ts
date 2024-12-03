@@ -2,10 +2,12 @@ import {Component, HostListener, Input, OnInit, signal} from '@angular/core';
 import {ValidationrunService} from '../../../core/services/validation-run/validationrun.service';
 import {ValidationrunDto} from '../../../core/services/validation-run/validationrun.dto';
 import {HttpParams} from '@angular/common/http';
-import {BehaviorSubject, EMPTY, Observable} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable} from 'rxjs';
+import {catchError, map} from 'rxjs/operators';
 import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
 
+import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
+import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -15,6 +17,7 @@ import {FilterPayload} from 'src/app/modules/validation-result/components/filter
 export class ValidationPagePaginatedComponent implements OnInit {
   @Input() published: boolean;
   validations: ValidationrunDto[] = [];
+
   maxNumberOfPages: number;
   currentPage = 1;
   limit = 10;
@@ -31,11 +34,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
 
   filterPayload: FilterPayload = {  statuses: [], name: null, selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false, scalingReference: false };
-  rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row - this is used for filtering results on dataset 
 
   dataFetchError = signal(false);
 
-  constructor(private validationrunService: ValidationrunService) {
+
+  constructor(private validationrunService: ValidationrunService, private datasetConfigService: DatasetConfigurationService, private datasetService: DatasetService) {
   }
 
   ngOnInit(): void {
@@ -46,9 +49,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
       } else if (value && value === 'page') {
         this.refreshPage();
       }
-    });
-    this.validations.forEach(validation => {
-      this.rowVisibility.set(validation.id, true); // Validation results visible by default
     });
   }
 
@@ -109,13 +109,47 @@ export class ValidationPagePaginatedComponent implements OnInit {
     }
   }
 
-
+  checkValidationDatasets(validationId: number, filterDataset: string): Observable<boolean> {
+    // combine api calls for validation configuration and datasets to check if the dataset is used in the validation
+    return combineLatest([
+      this.datasetConfigService.getConfigByValidationrun(validationId.toString()),
+      this.datasetService.getAllDatasets(true, false) 
+    ]).pipe(
+      map(([configurations, datasets]) => { 
+        const validationDatasets = configurations
+          .map(config => datasets.find(ds => config.dataset === ds.id)?.pretty_name) // check if the dataset id is used in the validation, get pretty name 
+          .filter(name => name);
+        return validationDatasets.includes(filterDataset); // return true if the dataset is used in the validation
+      })
+    );
+  }
+  
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
     const {validations, length} = serverResponse;
+    // if dataset filter exists, check if the dataset is used in the validation 
+    if (this.filterPayload?.prettyName) {
+      const filterObservables = validations.map(val => 
+        this.checkValidationDatasets(val.id, this.filterPayload.prettyName) // run the check for each validation
+          .pipe(
+            map(matches => ({ validation: val, matches })) // array of observables with validation and filter match status
+          )
+      );
+      forkJoin(filterObservables).subscribe(results => { // forkJoin to wait for all validations to be checked
+        const filteredValidations = results
+          .filter(result => result.matches)
+          .map(result => result.validation); // filter out validations that don't match
+        this.updateValidations(filteredValidations, length); // continue to showing the validations on page 
+      });
+    } else {
+      this.updateValidations(validations, length);
+    }
+  }
+  
+  private updateValidations(validations: ValidationrunDto[], length: number): void {
     if (!this.maxNumberOfPages || this.orderChange) {
       this.maxNumberOfPages = Math.ceil(length / this.limit);
     }
-
+  
     if (this.orderChange) {
       this.validations = validations;
     } else {
@@ -150,12 +184,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.getValidationsAndItsNumber(this.published);
   }
 
-  handleRowFilter(id: string, matches: boolean): void {
-    this.rowVisibility.set(id, matches);  // Update row visibility based on filterMatches in dataset 
-  }
-
   getFilter(filter: FilterPayload): void {
-    
     this.filterPayload = filter;
     this.orderChange =true;
 
@@ -164,11 +193,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.offset = 0;
     this.endOfPage = false;
 
-    // Reset row visibility 
-    this.rowVisibility.clear();
-    this.validations.forEach(validation => {
-      this.rowVisibility.set(validation.id, true); // Visible by default
-    });
 
     this.getValidationsAndItsNumber(this.published);
   }
@@ -264,17 +288,4 @@ export class ValidationPagePaginatedComponent implements OnInit {
     );
   }
 
-  areAnyRowsVisible(): boolean {
-    // check if no rows are visible because of dataset filtering
-    return Array.from(this.rowVisibility.values()).some(visible => visible);
-  }
-
-
-  getVisibleValrunsCount(): number {
-    // number of visible rows when filtering by dataset to display at bottom of list
-    return this.validations.filter(valrun => 
-      this.rowVisibility.get(valrun.id) !== undefined ? 
-      this.rowVisibility.get(valrun.id) : true
-    ).length;
-  }
 }

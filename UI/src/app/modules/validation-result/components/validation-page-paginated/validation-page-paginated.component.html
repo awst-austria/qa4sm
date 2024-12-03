@@ -37,7 +37,7 @@
       <qa-sorting-form (orderQueryName)="getOrder($event)"/>
     </div>
 
-    <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12 my-2">
+    <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12">
       <qa-filtering-form (filterPayload)="getFilter($event)"/>
     </div>
 
@@ -46,7 +46,8 @@
       <div *ngIf="!(isLoading && orderChange)">
         <div *ngFor="let valrun of validations" 
              class="validation-row-area">
-        <div *ngIf="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" class="validation-row-area">
+        <!--- <div *ngIf="rowVisibility.get(valrun.id) !== undefined ? rowVisibility.get(valrun.id) : true" class="validation-row-area"> --->
+        <div class="validation-row-area">
 
           <p-checkbox
             class="modify-checkbox"
@@ -78,11 +79,11 @@
         <em> You have run {{ validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }}.</em>
       </div>
       <div *ngIf="endOfPage && !published && areFiltersApplied()" class="val-number-information">
-        <em> Showing {{ getVisibleValrunsCount() }} {{ validations.length === 1 ? 'validation ' : 'validations' }} that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
+        <em> Showing {{  validations.length }} {{ validations.length === 1 ? 'validation ' : 'validations' }} that {{ validations.length === 1 ? 'meets ' : 'meet' }} the filter criteria.</em>
       </div>
     </div>
 
-    <div *ngIf="(!validations.length || !areAnyRowsVisible()) && areFiltersApplied()" class="text-center w-12 my-2">
+    <div *ngIf="(!validations.length) && areFiltersApplied()" class="text-center w-12 my-2">
       <p class="lead text-muted">
         No validation results meeting the filter criteria.
       </p>

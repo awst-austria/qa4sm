@@ -58,7 +58,6 @@ export class FilteringFormComponent implements OnInit {
         this.availableDatasets = datasets
           .map(dataset => dataset.pretty_name)
           .filter((name, index, self) => name && self.indexOf(name) === index); 
-        console.log('Dataset Pretty Names:', this.availableDatasets);
       },
       error: (error) => {
         console.error('Error fetching datasets:', error);
@@ -81,9 +80,10 @@ export class FilteringFormComponent implements OnInit {
 
   selectFilter() {
 
-    if (!this.isFilterValid()) {
+    if (!this.isFilterValid() || !this.selectedFilter) {
       return;
     }
+
     this.isEditing = false;
 
     let filterValues = [];
@@ -155,7 +155,6 @@ export class FilteringFormComponent implements OnInit {
     this.selectedFilter = filterToEdit.filter;
     this.updateDropdownFilters(); 
     this.cdr.detectChanges(); // should update drop-down to show filter being edited - doesn't seem to...
-    console.log(this.availableFilters);
     switch (filterToEdit.filter) {
       case 'status':
         this.selectedStatuses = filterToEdit.values;
@@ -224,7 +223,6 @@ export class FilteringFormComponent implements OnInit {
   updateDropdownFilters() {
     this.dropdownFilters = this.allFilters
       .filter(filter => {
-        console.log(this.isEditing, filter, this.selectedFilter);
         if (this.isEditing && filter === this.selectedFilter) {
           return true;
         }

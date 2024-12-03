@@ -13,10 +13,6 @@ import {ValidationRunConfigService} from '../../../../pages/validate/service/val
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 import {ToastService} from '../../../core/services/toast/toast.service';
 
-import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
-
-
-import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
 
 @Component({
   selector: 'qa-validationrun-row',
@@ -27,14 +23,8 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   @Input() published = false;
   @Input() validationRun: ValidationrunDto;
-  @Input() filterPayload: FilterPayload | null = null;
-  @Output() matchesFilter = new EventEmitter<boolean>();
-
-  @Output() datasetsLoaded = new EventEmitter<{ id: string; datasets: DatasetDto[] }>();
-
   @Output() emitError = new EventEmitter();
 
-  rowVisibility: Map<string, boolean> = new Map();
 
   configurations$: Observable<any>;
   validationStatusInterval: any;
@@ -68,12 +58,6 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     this.refreshStatus();
   }
 
-  // on changes in the filter payload, update the configurations map to reflect the dataset new filter
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.filterPayload && this.filterPayload) {
-      this.updateConfig();
-    }
-  }
 
   private updateConfig(): void {
     this.configurations$ = combineLatest(
@@ -110,38 +94,6 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
           }
         )
       ),
-      // also add map operator to check if the dataset pretty name matches the filter payload dataset - used to set visibility of row 
-      // expanded to also include spatial and/or temporal reference selection
-      map(configurations => {
-        const matches = configurations.some(config => {
-          const matchesPrettyName = this.filterPayload?.prettyName? config.dataset?.includes(this.filterPayload.prettyName) : true;
-
-          // This really cannot be the most efficient way to do this...
-          const matchesAnyReference = (() => {
-            if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
-              return config.is_spatial_reference || config.is_temporal_reference || config.is_scaling_reference;
-            } else if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference) {
-              return config.is_spatial_reference || config.is_temporal_reference;
-            } else if (this.filterPayload?.spatialReference && this.filterPayload?.scalingReference) {
-              return config.is_spatial_reference || config.is_scaling_reference;
-            } else if (this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
-              return config.is_temporal_reference || config.is_scaling_reference;
-            } else if (this.filterPayload?.spatialReference) {
-              return config.is_spatial_reference;
-            } else if (this.filterPayload?.temporalReference) {
-              return config.is_temporal_reference;
-            } else if (this.filterPayload?.scalingReference) {
-              return config.is_scaling_reference;
-            } else {
-              return true;
-            }
-          })();
-  
-          return matchesPrettyName && matchesAnyReference;
-        });
-        this.matchesFilter.emit(matches); // emit boolean filter matches to parent component
-        return configurations;
-      }),
       catchError(() => {
         this.emitError.emit(true);
         return EMPTY
@@ -151,11 +103,6 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
 
   getDoiPrefix(): string {
     return this.globalParamsService.globalContext.doi_prefix;
-  }
-
-  // set the visibility of the row based on the filter payload
-  handleRowFilter(id: string, matches: boolean): void {
-    this.rowVisibility.set(id, matches);
   }
 
   getStatusFromProgress(valrun): string {
