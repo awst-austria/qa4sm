@@ -1079,7 +1079,27 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
+  width: 100%
 }
+
+.filterOptionsSelector, .filterOptionsSelector .p-dropdown, .filterOptionsSelector .p-calendar {
+  width: 100%;
+  border: 1px solid #ced4da;
+  border-left: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  height: 2.6125rem;
+}
+
+.filterOptionsSelector .p-calendar input{
+  border: none;
+}
+
+//input.filterOptionsSelector, .filterOptionsSelector .p-calendar {
+//  height: 2.625rem;
+//  /* Your styles here */
+//}
+
 
 #sortingChoiceSelector .p-dropdown, #filterSelector .p-dropdown {
   border-radius: 0;
@@ -1096,10 +1116,11 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
     border-bottom-left-radius: 0;
     border-top-left-radius: 0;
   }
-  #orderSelector .p-dropdown {
+  #orderSelector .p-dropdown, .filterOptionsSelector, .filterOptionsSelector .p-dropdown, .filterOptionsSelector .p-calendar{
     border-radius: 0;
     border: 1px solid #ced4da;
     border-top: none;
+    width: 100%;
   }
 }
 
@@ -6594,6 +6615,14 @@ a.btn-action.p-button:hover, a.btn-action-large.p-button:hover {
 .clearCoordinates.p-button-info .p-button-icon {
   font-size: 1.2rem;
 }
+
+#apply-filter-button .p-button{
+  width: 100%;
+  height: 2.6115rem;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 
 .ol-control button {
   display: block;

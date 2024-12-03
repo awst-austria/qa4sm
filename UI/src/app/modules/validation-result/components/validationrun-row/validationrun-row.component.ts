@@ -16,7 +16,7 @@ import {ToastService} from '../../../core/services/toast/toast.service';
 import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
 
 
-import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
+import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
 
 @Component({
   selector: 'qa-validationrun-row',
@@ -61,7 +61,7 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
     if (this.validationRun.is_a_copy) {
       this.getOriginalDate(this.validationRun);
     }
-    
+
     this.updateConfig();
     this.valName.set(this.validationRun.name_tag);
     this.validationStatus.set(this.getStatusFromProgress(this.validationRun));
@@ -110,38 +110,38 @@ export class ValidationrunRowComponent implements OnInit, OnDestroy {
           }
         )
       ),
-      // also add map operator to check if the dataset pretty name matches the filter payload dataset - used to set visibility of row 
+      // also add map operator to check if the dataset pretty name matches the filter payload dataset - used to set visibility of row
       // expanded to also include spatial and/or temporal reference selection
-      map(configurations => {
-        const matches = configurations.some(config => {
-          const matchesPrettyName = this.filterPayload?.prettyName? config.dataset?.includes(this.filterPayload.prettyName) : true;
-
-          // This really cannot be the most efficient way to do this...
-          const matchesAnyReference = (() => {
-            if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
-              return config.is_spatial_reference || config.is_temporal_reference || config.is_scaling_reference;
-            } else if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference) {
-              return config.is_spatial_reference || config.is_temporal_reference;
-            } else if (this.filterPayload?.spatialReference && this.filterPayload?.scalingReference) {
-              return config.is_spatial_reference || config.is_scaling_reference;
-            } else if (this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
-              return config.is_temporal_reference || config.is_scaling_reference;
-            } else if (this.filterPayload?.spatialReference) {
-              return config.is_spatial_reference;
-            } else if (this.filterPayload?.temporalReference) {
-              return config.is_temporal_reference;
-            } else if (this.filterPayload?.scalingReference) {
-              return config.is_scaling_reference;
-            } else {
-              return true;
-            }
-          })();
-  
-          return matchesPrettyName && matchesAnyReference;
-        });
-        this.matchesFilter.emit(matches); // emit boolean filter matches to parent component
-        return configurations;
-      }),
+      // map(configurations => {
+      //   const matches = configurations.some(config => {
+      //     const matchesPrettyName = this.filterPayload?.prettyName? config.dataset?.includes(this.filterPayload.prettyName) : true;
+      //
+      //     // This really cannot be the most efficient way to do this...
+      //     const matchesAnyReference = (() => {
+      //       if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
+      //         return config.is_spatial_reference || config.is_temporal_reference || config.is_scaling_reference;
+      //       } else if (this.filterPayload?.spatialReference && this.filterPayload?.temporalReference) {
+      //         return config.is_spatial_reference || config.is_temporal_reference;
+      //       } else if (this.filterPayload?.spatialReference && this.filterPayload?.scalingReference) {
+      //         return config.is_spatial_reference || config.is_scaling_reference;
+      //       } else if (this.filterPayload?.temporalReference && this.filterPayload?.scalingReference) {
+      //         return config.is_temporal_reference || config.is_scaling_reference;
+      //       } else if (this.filterPayload?.spatialReference) {
+      //         return config.is_spatial_reference;
+      //       } else if (this.filterPayload?.temporalReference) {
+      //         return config.is_temporal_reference;
+      //       } else if (this.filterPayload?.scalingReference) {
+      //         return config.is_scaling_reference;
+      //       } else {
+      //         return true;
+      //       }
+      //     })();
+      //
+      //     return matchesPrettyName && matchesAnyReference;
+      //   });
+      //   this.matchesFilter.emit(matches); // emit boolean filter matches to parent component
+      //   return configurations;
+      // }),
       catchError(() => {
         this.emitError.emit(true);
         return EMPTY

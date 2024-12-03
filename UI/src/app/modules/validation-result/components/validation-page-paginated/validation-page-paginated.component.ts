@@ -29,9 +29,11 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
+  appliedFilters: FilterPayload[] = [];
 
-  filterPayload: FilterPayload = {  statuses: [], name: null, selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false, scalingReference: false };
-  rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row - this is used for filtering results on dataset 
+
+  // filterPayload: FilterPayload = {  statuses: [], name: null, selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false, scalingReference: false };
+  rowVisibility: Map<string, boolean> = new Map(); // To store visibility for each row - this is used for filtering results on dataset
 
   dataFetchError = signal(false);
 
@@ -74,19 +76,19 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order));
 
-    //Various filters on validation run model added when specified 
-    if ((this.filterPayload.name) || (this.filterPayload.name ===''))  {
-      parameters = parameters.set('name', this.filterPayload.name);
-    }
-    if (this.filterPayload.statuses.length > 0) {
-      this.filterPayload.statuses.forEach(status => {
-        parameters = parameters.append('statuses', status);
-      });
-    }
-    if (this.filterPayload.selectedDates) {
-      parameters = parameters.append('startDate', this.filterPayload.selectedDates[0].toISOString());
-      parameters = parameters.append('endDate', this.filterPayload.selectedDates[1].toISOString());
-    }
+    //Various filters on validation run model added when specified
+    // if ((this.filterPayload.name) || (this.filterPayload.name ===''))  {
+    //   parameters = parameters.set('name', this.filterPayload.name);
+    // }
+    // if (this.filterPayload.statuses.length > 0) {
+    //   this.filterPayload.statuses.forEach(status => {
+    //     parameters = parameters.append('statuses', status);
+    //   });
+    // }
+    // if (this.filterPayload.selectedDates) {
+    //   parameters = parameters.append('startDate', this.filterPayload.selectedDates[0].toISOString());
+    //   parameters = parameters.append('endDate', this.filterPayload.selectedDates[1].toISOString());
+    // }
 
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
@@ -151,12 +153,12 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   handleRowFilter(id: string, matches: boolean): void {
-    this.rowVisibility.set(id, matches);  // Update row visibility based on filterMatches in dataset 
+    this.rowVisibility.set(id, matches);  // Update row visibility based on filterMatches in dataset
   }
 
   getFilter(filter: FilterPayload): void {
-    
-    this.filterPayload = filter;
+
+    // this.filterPayload = filter;
     this.orderChange =true;
 
     // Reset page
@@ -164,7 +166,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.offset = 0;
     this.endOfPage = false;
 
-    // Reset row visibility 
+    // Reset row visibility
     this.rowVisibility.clear();
     this.validations.forEach(validation => {
       this.rowVisibility.set(validation.id, true); // Visible by default
@@ -251,18 +253,18 @@ export class ValidationPagePaginatedComponent implements OnInit {
     return [pastDate, today];
   }
 
-  areFiltersApplied(): boolean {
-    // check if any filters have been applied, used to define message in case of no validation results found)
-    if (!this.filterPayload) {
-      return false;
-    }
-    
-    return (
-      this.filterPayload.statuses.length > 0 || 
-      this.filterPayload.name !== null || 
-      (this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
-    );
-  }
+  // areFiltersApplied(): boolean {
+  //   // check if any filters have been applied, used to define message in case of no validation results found)
+  //   if (!this.filterPayload) {
+  //     return false;
+  //   }
+  //
+  //   return (
+  //     this.filterPayload.statuses.length > 0 ||
+  //     this.filterPayload.name !== null ||
+  //     (this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
+  //   );
+  // }
 
   areAnyRowsVisible(): boolean {
     // check if no rows are visible because of dataset filtering
@@ -272,8 +274,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
 
   getVisibleValrunsCount(): number {
     // number of visible rows when filtering by dataset to display at bottom of list
-    return this.validations.filter(valrun => 
-      this.rowVisibility.get(valrun.id) !== undefined ? 
+    return this.validations.filter(valrun =>
+      this.rowVisibility.get(valrun.id) !== undefined ?
       this.rowVisibility.get(valrun.id) : true
     ).length;
   }

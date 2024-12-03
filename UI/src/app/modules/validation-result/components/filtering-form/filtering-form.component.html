@@ -1,144 +1,109 @@
+<!--  <div *ngIf="!showFilterForm" class="flex justify-content-start">-->
+<!--    <p-button-->
+<!--      label="+ Add Filter"-->
+<!--      (click)="showFilterForm = true"-->
+<!--      [style]="{'height': '40px'}">-->
+<!--    </p-button>-->
+<!--  </div>-->
 
-<div class="w-12">
+<div class="flex flex-row lg:flex-nowrap flex-wrap pt-2" id="filteringForm">
+  <div class="small-label lg:w-2 w-12">
+    <div class="p-fluid">
+      <span> Filter By:</span>
+    </div>
+  </div>
 
-  <div *ngIf="!showFilterForm" class="flex justify-content-start">
-    <p-button 
-      label="+ Add Filter"
-      (click)="showFilterForm = true"
-      [style]="{'height': '40px'}">
+  <div class="lg:w-5 w-12 px-0 mx-0 p-float-label" id="filterSelector">
+    <!--      <div class="box">-->
+    <p-dropdown [options]="filters"
+                [(ngModel)]="selectedFilter"
+                optionLabel="name">
+    </p-dropdown>
+  </div>
+
+  <div *ngIf="selectedFilter" class="lg:w-4 w-12 px-0 mx-0 p-float-label">
+    <ng-container [ngSwitch]="selectedFilter.type" class="">
+      <p-floatLabel>
+        <!-- Input -->
+        <input *ngSwitchCase="'input'"
+               class="filterOptionsSelector"
+               type="text"
+               [(ngModel)]="selectedFilter.value"/>
+
+        <!-- Dropdown -->
+        <p-dropdown *ngSwitchCase="'dropdown'"
+                    class="filterOptionsSelector"
+                    [options]="selectedFilter.options"
+                    [(ngModel)]="selectedFilter.value"
+                    optionLabel="label">
+        </p-dropdown>
+
+        <!-- Checkbox -->
+        <p-multiSelect *ngSwitchCase="'checkbox'"
+                       class="filterOptionsSelector"
+                       [options]="selectedFilter.options"
+                       [(ngModel)]="selectedFilter.value">
+        </p-multiSelect>
+        <!--      Calendar-->
+        <p-calendar *ngSwitchCase="'calendar'"
+                    class="filterOptionsSelector"
+                    [(ngModel)]="selectedFilter.value">
+        </p-calendar>
+        <label>{{ selectedFilter.label }}</label>
+      </p-floatLabel>
+    </ng-container>
+
+
+  </div>
+  <div class="lg:w-1 w-12 px-0 mx-0">
+    <p-button
+      id="apply-filter-button"
+      icon="pi pi-filter"
+      class="p-button-success p-button-rounded"
+      (click)="addFilter(selectedFilter)"
+      style="{max-width: 100%; height: 2.6125rem}">
     </p-button>
   </div>
 
-  <div *ngIf="showFilterForm" class="full w-12 flex flex-row lg:flex-nowrap flex-wrap" id="filteringForm">
-    <div class="small-label lg:w-2 w-12">
-      <div class="p-fluid" style="display: flex; align-items: center;">
-        <span> Filter By:</span>
-      </div>
-    </div>
-    <div class="lg:w-4 w-12">
-      <p-dropdown
-        [options]="dropdownFilters"
-        [(ngModel)]="selectedFilter"
-        placeholder="Select a filter"
-        [style]="{'width': '100%', 'border-radius': '0 0 0 0'}" >
-      </p-dropdown>
-    </div>  
-
-  <div *ngIf="!selectedFilter" class="lg:w-4 w-12">
-      <p-multiSelect 
-      placeholder="Filter parameters"
-      display="chip"
-      [disabled]="true"
-      [filter]="false"
-      showHeader="false"
-      [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"></p-multiSelect>
-  </div>
-
-  <div *ngIf="selectedFilter === 'Status'" class="lg:w-4 w-12">
-        <p-multiSelect 
-        [options]="availableStatuses" 
-        [(ngModel)]="selectedStatuses"  
-        placeholder="Select statuses"
-        display="chip"
-        [filter]="false"
-        showHeader="false"
-        [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"></p-multiSelect>
-  </div>
-
-  <div *ngIf="selectedFilter === 'Validation Name'" class="lg:w-4 w-12">
-    <input pInputText 
-    [(ngModel)]="selectedNames" 
-    placeholder="Enter name"
-    [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
-  </div>
-
-  <div *ngIf="selectedFilter === 'Dataset'" class="lg:w-4 w-12">
-    <p-dropdown
-      [(ngModel)]="prettyName" 
-      [options]="availableDatasets"
-      placeholder="Enter dataset"
-      [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
-    <div class="checkbox-container">
-    <div *ngIf="prettyName" class="checkbox-group lg:w-4 w-12" style="display: flex; align-items: center; gap: 1rem;">
-      Reference: 
-      <p-checkbox 
-        [(ngModel)]="spatial" 
-        binary="true" 
-        label="Spatial">
-      </p-checkbox>
-      <p-checkbox 
-        [(ngModel)]="temporal" 
-        binary="true" 
-        label="Temporal">
-      </p-checkbox>
-      <p-checkbox 
-        [(ngModel)]="scaling" 
-        binary="true" 
-        label="Scaling">
-      </p-checkbox>
-    </div>
-    </div>
-  </div>
-
-  <div *ngIf="selectedFilter === 'Submission Date'" class="lg:w-4 w-12">
-    <p-calendar 
-        [options]="dates" 
-        [(ngModel)]="selectedDateRange" 
-        selectionMode="range" 
-        [readonlyInput]="true" 
-        [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}"
-        inputStyleClass="border-noround">
-    </p-calendar>
-  </div>
-
-  <div class="lg:w-2 w-12">
-    <div class="button-group flex flex-row">
-      <p-button
-        label="Add"
-        icon="pi pi-filter"
-        class="p-button-success p-button-rounded"
-        (click)="selectFilter()"
-        [disabled]="!isFilterValid()"
-        [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null"
-        tooltipPosition="right"
-        [style]="{'border-radius': '0 0 0 0', 'height': '42px'}">
-      </p-button>
-      <p-button
-        label="Cancel"
-        icon="pi pi-ban"
-        class="p-button-danger p-button-rounded"
-        (click)="cancelFilter()"
-        [style]="{'border-radius': '0 4px 4px 0', 'height': '42px'}">
-      </p-button>
-    </div>
-  </div>
-  </div>
 </div>
+<!--<div *ngIf="appliedFilters().length" class="flex flex-column lg:flex-nowrap flex-wrap pt-2">-->
+<!--  Applied filters:-->
+<!--  <div *ngFor="let filter of appliedFilters()">-->
+<!--      {{filter.name}} {{filter.value}}-->
+<!--    <p-button-->
+<!--      icon="pi pi-times"-->
+<!--      class="p-button-success p-button-rounded"-->
+<!--      (click)="removeFilter(filter)"-->
+<!--      style="{max-width: 100%; height: 2.6125rem}">-->
+<!--    </p-button>-->
+<!--  </div>-->
+<!--</div>-->
 
-<div *ngIf="activeFilters.length > 0" class="active-filters mt-3">
-<div class="filter-heading">Active Filters:</div>
-<div *ngFor="let filter of activeFilters; let i = index" class="p-m-2 p-shadow-2 filter-chip">
-  <div class="filter-item">
-    <div class="filter-text">
-      <ng-container *ngIf="filter.filter === 'Submission Date'">
-        {{ filter.filter | titlecase }}:
-        <div class="filter-values">
-          <span *ngFor="let value of filter.values; let j = index">
-            <span class="p-pill p-pill-info">{{ value | date:'dd/MM/yyyy' }}</span>
-            <span *ngIf="j < filter.values.length - 1"> - </span>
-          </span>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="filter.filter !== 'Submission Date'">
-        {{ filter.filter | titlecase }}:
-        <div class="filter-values">
-          <span *ngFor="let value of filter.values; let j = index">
-            <span class="p-pill p-pill-info">{{ value }}</span>
-            <span *ngIf="j < filter.values.length - 1">, </span>
-          </span>
-        </div>
-      </ng-container>
-    </div>
+<!--------------------------------------------------------------------------------------------------------------------------->
+<div *ngIf="appliedFilters().length > 0" class="active-filters mt-3">
+  <div class="filter-heading">Active Filters:</div>
+  <div *ngFor="let filter of appliedFilters(); let i = index" class="p-m-2 p-shadow-2 filter-chip">
+    <div class="filter-item">
+<!--      <div class="filter-text">-->
+<!--        <ng-container *ngIf="filter.name === 'Submission Date'">-->
+<!--          {{ filter.filter | titlecase }}:-->
+<!--          <div class="filter-values">-->
+<!--          <span *ngFor="let value of filter.values; let j = index">-->
+<!--            <span class="p-pill p-pill-info">{{ value | date:'dd/MM/yyyy' }}</span>-->
+<!--            <span *ngIf="j < filter.values.length - 1"> - </span>-->
+<!--          </span>-->
+<!--          </div>-->
+<!--        </ng-container>-->
+<!--        <ng-container *ngIf="filter.filter !== 'Submission Date'">-->
+<!--          {{ filter.filter | titlecase }}:-->
+<!--          <div class="filter-values">-->
+<!--          <span *ngFor="let value of filter.values; let j = index">-->
+<!--            <span class="p-pill p-pill-info">{{ value }}</span>-->
+<!--            <span *ngIf="j < filter.values.length - 1">, </span>-->
+<!--          </span>-->
+<!--          </div>-->
+<!--        </ng-container>-->
+<!--      </div>-->
       <div class="button-group">
         <button pButton icon="pi pi-pencil" class="p-button-rounded p-button-info" (click)="editFilter(i)"></button>
         <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger" (click)="removeFilter(i)"></button>

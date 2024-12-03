@@ -1,9 +1,7 @@
 export interface FilterPayload {
-    statuses: string[];
-    name: string | null;
-    selectedDates: [Date, Date];
-    prettyName: string;
-    spatialReference: boolean;
-    temporalReference: boolean;
-    scalingReference: boolean;
-  }
+  name: string; // Filter name (e.g., 'Date', 'Name', 'Dataset')
+  type: 'checkbox' | 'dropdown' | 'input' | 'calendar'; // Filter input type
+  label: string;
+  options?: { label: string; value: any }[]; // Options for dropdown or checkboxes
+  value?: any; // Current value of the filter
+}
