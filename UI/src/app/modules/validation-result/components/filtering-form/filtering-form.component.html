@@ -1,15 +1,12 @@
-
-<div class="w-12">
-  
-  <div *ngIf="!showFilterForm" class="flex justify-content-start">
+<div *ngIf="!showFilterForm" class="flex justify-content-start">
     <p-button 
       label="+ Add Filter"
       (click)="showFilterForm = true"
       [style]="{'height': '40px'}">
     </p-button>
-  </div>
+</div>
 
-  <div *ngIf="showFilterForm" class="full w-12 flex flex-row lg:flex-nowrap flex-wrap" id="filteringForm">
+<div *ngIf="showFilterForm" class="full w-12 flex flex-row lg:flex-nowrap flex-wrap" id="filteringForm">
     <div class="small-label lg:w-2 w-12">
       <div class="p-fluid" style="display: flex; align-items: center;">
         <span> Filter By:</span>
@@ -18,13 +15,15 @@
     <div class="lg:w-4 w-12">
       <p-dropdown
         [options]="dropdownFilters"
-        [(ngModel)]="selectedFilter"
+        [(ngModel)]="selectedFilterKey"
         placeholder="Select a filter"
+        optionLabel="label"
+        optionValue="value"
         [style]="{'width': '100%', 'border-radius': '0 0 0 0'}" >
       </p-dropdown>
     </div>  
 
-  <div *ngIf="!selectedFilter" class="lg:w-4 w-12">
+  <div *ngIf="!selectedFilterKey" class="lg:w-4 w-12">
       <p-multiSelect 
       placeholder="Filter parameters"
       display="chip"
@@ -34,62 +33,26 @@
       [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"></p-multiSelect>
   </div>
 
-  <div *ngIf="selectedFilter === 'Status'" class="lg:w-4 w-12">
-        <p-multiSelect 
-        [options]="availableStatuses" 
-        [(ngModel)]="selectedStatuses"  
-        placeholder="Select statuses"
-        display="chip"
-        [filter]="false"
-        showHeader="false"
-        [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"></p-multiSelect>
-  </div>
+  <ng-container [ngSwitch]="filterConfigs[selectedFilterKey]?.type" class="lg:w-4 w-12">
+    
+    <p-multiSelect *ngSwitchCase="'multi-select'"
+      [options]="filterConfigs[selectedFilterKey].options"
+      [(ngModel)]="filterStates[selectedFilterKey].value"
+      display="chip"
+      [filter]="false"
+      showHeader="false"
+      [style]="{'width': '100%', 'border-radius': '0 0 0 0'}"/>
 
-  <div *ngIf="selectedFilter === 'Validation Name'" class="lg:w-4 w-12">
-    <input pInputText 
-    [(ngModel)]="selectedNames" 
-    placeholder="Enter name"
-    [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
-  </div>
-
-  <div *ngIf="selectedFilter === 'Dataset'" class="lg:w-4 w-12">
-    <p-dropdown
-      [(ngModel)]="prettyName" 
-      [options]="availableDatasets"
-      placeholder="Enter dataset"
+    <input pInputText *ngSwitchCase="'string-input'"
+      [(ngModel)]="filterStates[selectedFilterKey].value"
+      placeholder="Enter name"
       [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}" />
-    <div class="checkbox-container">
-    <div *ngIf="prettyName" class="checkbox-group lg:w-4 w-12" style="display: flex; align-items: center; gap: 1rem;">
-      Reference: 
-      <p-checkbox 
-        [(ngModel)]="spatial" 
-        binary="true" 
-        label="Spatial">
-      </p-checkbox>
-      <p-checkbox 
-        [(ngModel)]="temporal" 
-        binary="true" 
-        label="Temporal">
-      </p-checkbox>
-      <p-checkbox 
-        [(ngModel)]="scaling" 
-        binary="true" 
-        label="Scaling">
-      </p-checkbox>
-    </div>
-    </div>
-  </div>
+    
+    <p-dropdown *ngSwitchCase="'dropdown'"
+      [options]="filterConfigs[selectedFilterKey].options"
+      [(ngModel)]="filterStates[selectedFilterKey].value"/>
 
-  <div *ngIf="selectedFilter === 'Submission Date'" class="lg:w-4 w-12">
-    <p-calendar 
-        [options]="dates" 
-        [(ngModel)]="selectedDateRange" 
-        selectionMode="range" 
-        [readonlyInput]="true" 
-        [style]="{'width': '100%', 'border-radius': '0 0 0 0', 'height': '42px'}"
-        inputStyleClass="border-noround">
-    </p-calendar>
-  </div>
+  </ng-container>
 
   <div class="lg:w-2 w-12">
     <div class="button-group flex flex-row">
@@ -98,7 +61,7 @@
         icon="pi pi-filter"
         class="p-button-success p-button-rounded"
         (click)="selectFilter()"
-        [disabled]="!isFilterValid() || !selectedFilter"
+        [disabled]="!isFilterValid() || !selectedFilterKey"
         [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null"
         tooltipPosition="right"
         [style]="{'border-radius': '0 0 0 0', 'height': '42px'}">
@@ -111,7 +74,6 @@
         [style]="{'border-radius': '0 4px 4px 0', 'height': '42px'}">
       </p-button>
     </div>
-  </div>
   </div>
 </div>
 

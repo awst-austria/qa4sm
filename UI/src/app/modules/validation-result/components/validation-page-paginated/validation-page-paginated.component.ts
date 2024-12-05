@@ -33,7 +33,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
   endOfPage: boolean = false;
 
 
-  filterPayload: FilterPayload = {  statuses: [], name: null, selectedDates: this.getInitDate(), prettyName: null, spatialReference: false, temporalReference: false, scalingReference: false };
+  filterPayload: FilterPayload = {  statuses: [], name: null, spatialRef: [], temporalRef: [], scalingRef: [] };
 
   dataFetchError = signal(false);
 
@@ -83,10 +83,26 @@ export class ValidationPagePaginatedComponent implements OnInit {
         parameters = parameters.append('statuses', status);
       });
     }
-    if (this.filterPayload.selectedDates) {
-      parameters = parameters.append('startDate', this.filterPayload.selectedDates[0].toISOString());
-      parameters = parameters.append('endDate', this.filterPayload.selectedDates[1].toISOString());
+    
+    if (this.filterPayload.spatialRef.length > 0) {
+      this.filterPayload.spatialRef.forEach(dataset => {
+        parameters = parameters.append('spatialRef', dataset);
+      });
     }
+    if (this.filterPayload.temporalRef.length > 0) {
+      this.filterPayload.temporalRef.forEach(dataset => {
+        parameters = parameters.append('temporalRef', dataset);
+      });
+    }
+    if (this.filterPayload.scalingRef.length > 0) {
+      this.filterPayload.scalingRef.forEach(dataset => {
+        parameters = parameters.append('scalingRef', dataset);
+      });
+    }
+    //if (this.filterPayload.selectedDates) {
+    //  parameters = parameters.append('startDate', this.filterPayload.selectedDates[0].toISOString());
+    //  parameters = parameters.append('endDate', this.filterPayload.selectedDates[1].toISOString());
+    //}
 
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
@@ -136,25 +152,25 @@ export class ValidationPagePaginatedComponent implements OnInit {
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
     const {validations, length} = serverResponse;
     // if dataset filter exists, check if the dataset is used in the validation 
-    if (this.filterPayload?.prettyName) {
-      const filterObservables = validations.map(val => 
-        this.checkValidationDatasets(val.id, this.filterPayload.prettyName, this.filterPayload.spatialReference, this.filterPayload.temporalReference, this.filterPayload.scalingReference) // run the check for each validation
-          .pipe(
-            map(matches => ({ validation: val, matches })) // array of observables with validation and filter match status
-          )
-      );
-      forkJoin(filterObservables).subscribe(results => { // forkJoin to wait for all validations to be checked
-        const filteredValidations = results
-          .filter(result => result.matches)
-          .map(result => result.validation); // filter out validations that don't match
+    //if (this.filterPayload?.prettyName) {
+    //  const filterObservables = validations.map(val => 
+    //    this.checkValidationDatasets(val.id, this.filterPayload.prettyName, this.filterPayload.spatialReference, this.filterPayload.temporalReference, this.filterPayload.scalingReference) // run the check for each validation
+    //      .pipe(
+    //        map(matches => ({ validation: val, matches })) // array of observables with validation and filter match status
+    //      )
+    //  );
+    //  forkJoin(filterObservables).subscribe(results => { // forkJoin to wait for all validations to be checked
+    //    const filteredValidations = results
+    //      .filter(result => result.matches)
+    //      .map(result => result.validation); // filter out validations that don't match
 
-        const filteredLength = Math.ceil((filteredValidations.length / validations.length) * length); // update length of validations to match the filtered list
+    //    const filteredLength = Math.ceil((filteredValidations.length / validations.length) * length); // update length of validations to match the filtered list
 
-        this.updateValidations(filteredValidations, filteredLength); // continue to showing the validations on page 
-      });
-    } else {
+    //    this.updateValidations(filteredValidations, filteredLength); // continue to showing the validations on page 
+    //  });
+    //} else {
       this.updateValidations(validations, length);
-    }
+    //}
   }
   
   private updateValidations(validations: ValidationrunDto[], length: number): void {
@@ -297,8 +313,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
     
     return (
       this.filterPayload.statuses.length > 0 || 
-      this.filterPayload.name !== null || 
-      (this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
+      this.filterPayload.name !== null //|| 
+      //(this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
     );
   }
 

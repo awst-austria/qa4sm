@@ -1,8 +1,30 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FilterPayload } from './filterPayload.interface';
 
 import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
+import { filter } from 'jszip';
+
+
+type FilterType = 'string-input' | 'dropdown' | 'multi-select' | 'single-select' | 'date-range' | 'dataset';
+
+interface FilterConfig {
+  name: string;
+  type: FilterType;
+  options?: string[];
+  validationFn: (value: any) => boolean;
+  formatValuesFn: (value: any) => string[];
+}
+
+interface FilterState {
+  // contains the runtime values of filters
+  value: any;
+  //references?: {
+  //  spatial: boolean;
+  //  temporal: boolean;
+  //  scaling: boolean;
+  //};
+}
 
 
 @Component({
@@ -12,41 +34,70 @@ import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.serv
 })
 export class FilteringFormComponent implements OnInit {
 
+  public static readonly FILTER_CONFIGS: { [key: string]: FilterConfig } = {
+    'Status': {
+      name: 'Status',
+      type: 'multi-select',
+      options: ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'],
+      validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
+      formatValuesFn: (state: FilterState) => state.value
+    },
+    'Validation Name': {
+      name: 'Validation Name', 
+      type: 'string-input',
+      validationFn: (state: FilterState) => true,
+      formatValuesFn: (state: FilterState) => [state.value]
+    },
+    'Spatial Reference Dataset': {
+      name: 'Spatial ref dataset', 
+      type: 'multi-select',
+      options: [],
+      validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
+      formatValuesFn: (state: FilterState) => state.value
+    },
+    'Temporal Reference Dataset': {
+      name: 'Temporal ref dataset', 
+      type: 'multi-select',
+      options: [],
+      validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
+      formatValuesFn: (state: FilterState) => state.value
+    },
+    'Scaling Reference Dataset': {
+      name: 'Scaling ref dataset', 
+      type: 'multi-select',
+      options: [],
+      validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
+      formatValuesFn: (state: FilterState) => state.value
+    }
+  };
+  
   @Output() filterPayload =  new EventEmitter<FilterPayload>();
 
-  availableStatuses = ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'];
-  availableDatasets: string[];
-
-
-  selectedFilter: string = '';
-  activeFilters: { filter: string, values: string[] }[] = [];
-
-  allFilters = ['Validation Name', 'Status', 'Submission Date', 'Dataset'];
+  availableDatasets: string[] = [];
+  allFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS);
   availableFilters = [...this.allFilters];
 
+  selectedFilterKey: string | null = null; // key of filter config
+  activeFilters: { filter: string, values: string[] }[] = []; // active filters and their values
+  filterStates: { [key: string]: FilterState } = {}; // current/runtime values of filters 
   dropdownFilters: { label: string, value: string }[] = []; // filters still available after applied ones are removed from list
 
-  selectedStatuses: string[] = []; 
-  selectedNames: string | null = ''; 
-  prettyName: string = ''; 
-  selectedDateRange: [Date | null, Date | null];
-  spatial: boolean = false;
-  temporal: boolean = false;
-  scaling: boolean = false;
-
   showFilterForm: boolean = false;
-
   isEditing: boolean = false; //to define if editing filter, required to properly show filter in dropdown when editing active filter 
 
 
-  prettyNames: string;
 
-
-  constructor(private cdr: ChangeDetectorRef,
-              private datasetService: DatasetService) {
+  constructor(private datasetService: DatasetService) {
+    Object.keys(FilteringFormComponent.FILTER_CONFIGS).forEach(key => {
+      this.filterStates[key] = {
+        value: null,
+        //references: { spatial: false, temporal: false, scaling: false }
+      };
+    });
     this.updateDropdownFilters();
   }
-  
+
+
   ngOnInit(): void {
     this.fetchAndLogPrettyNames();
   }
@@ -58,6 +109,10 @@ export class FilteringFormComponent implements OnInit {
         this.availableDatasets = datasets
           .map(dataset => dataset.pretty_name)
           .filter((name, index, self) => name && self.indexOf(name) === index); 
+
+        FilteringFormComponent.FILTER_CONFIGS['Spatial Reference Dataset'].options = this.availableDatasets;  // should change these so not hardcoded 
+        FilteringFormComponent.FILTER_CONFIGS['Temporal Reference Dataset'].options = this.availableDatasets;
+        FilteringFormComponent.FILTER_CONFIGS['Scaling Reference Dataset'].options = this.availableDatasets;
       },
       error: (error) => {
         console.error('Error fetching datasets:', error);
@@ -65,165 +120,99 @@ export class FilteringFormComponent implements OnInit {
     });
   }
 
+
+  // get the filters to use in template
+  get filterConfigs() {
+    return FilteringFormComponent.FILTER_CONFIGS;
+  }
+
+  // check the validity of the given filter input using its validation function
   isFilterValid(): boolean {
-    if (this.selectedFilter === 'Dataset') {
-      return !!(this.prettyName && (this.spatial || this.temporal || this.scaling));
-    }
-    if (this.selectedFilter === 'Status') {
-      return this.selectedStatuses.length > 0;
-    }
-    if (this.selectedFilter === 'Submission Date') {
-      return !!this.selectedDateRange;
-    }
-    return true;
+    if (!this.selectedFilterKey) return false;
+
+    return FilteringFormComponent.FILTER_CONFIGS[this.selectedFilterKey]
+      .validationFn(this.filterStates[this.selectedFilterKey]);
   }
 
   selectFilter() {
-
-    if (!this.isFilterValid() || !this.selectedFilter) {
-      return;
-    }
-
-    this.isEditing = false;
-
-    let filterValues = [];
-    //switch case for chosen filtering variable
-    switch (this.selectedFilter) {
-      case 'Status':
-        filterValues = this.selectedStatuses;
-        break;
-      case 'Validation Name':
-        filterValues = [this.selectedNames];
-        break;
-      case 'Submission Date':
-        filterValues = this.selectedDateRange
-        break;
-      case 'Dataset':
-        filterValues.push(this.prettyName);
-        if (this.spatial && this.temporal && this.scaling) {
-          filterValues.push('Spatial, Temporal, or Scaling Reference');
-        } else if (this.spatial && this.temporal) {
-          filterValues.push('Spatial or Temporal Reference');
-        } else if (this.spatial && this.scaling) {
-          filterValues.push('Spatial or Scaling Reference');
-        } else if (this.temporal && this.scaling) {
-          filterValues.push('Temporal or Scaling Reference');
-        } else if (this.spatial) {
-          filterValues.push('Spatial Reference');
-        } else if (this.temporal) {
-          filterValues.push('Temporal Reference');
-        } else if (this.scaling) {
-          filterValues.push('Scaling Reference');
-        }
-        break;
-    }
-
-    // Only actually filter if given values 
-    if (filterValues.length > 0) {
-
-      const existingFilterIndex = this.activeFilters.findIndex(f => f.filter === this.selectedFilter); //check if existing filter 
-
-      if (existingFilterIndex !== -1) {
-        this.activeFilters[existingFilterIndex].values = filterValues; // update if existing filter
-      } else {
-        this.activeFilters.push({ filter: this.selectedFilter, values: filterValues }); // create new if not existing
-      }
-
-      this.onFilteringChange()
-      this.availableFilters = this.availableFilters.filter(f => f !== this.selectedFilter);
-      this.updateDropdownFilters();
-
-      //Reset values once filter is added
-      this.selectedFilter = '';
-      this.selectedStatuses = [];
-      this.selectedNames = '';
-      this.selectedDateRange = this.getInitDate();
-      this.prettyName = '';
-      this.spatial = false;
-      this.temporal = false;
-      this.scaling = false;
-    }
+    if (!this.isFilterValid()) return;
+    
+    const config = FilteringFormComponent.FILTER_CONFIGS[this.selectedFilterKey];
+    const filterValues = config.formatValuesFn(this.filterStates[this.selectedFilterKey]);
+    
+    this.updateActiveFilters(filterValues);
+    this.onFilteringChange();
+    this.resetFilterState();
     this.showFilterForm = false;
   }
 
-  editFilter(index: number) {
+  private updateActiveFilters(filterValues: string[]) {
+    const existingIndex = this.activeFilters
+      .findIndex(f => f.filter === this.selectedFilterKey);
+    if (existingIndex !== -1) {
+      this.activeFilters[existingIndex].values = filterValues;
+    } else {
+      this.activeFilters.push({ 
+        filter: String(this.selectedFilterKey),
+        values: filterValues 
+      });
+    }
+  }
 
+  private resetFilterState() {
+    this.filterStates[this.selectedFilterKey] = { 
+      value: null, 
+    };
+    this.selectedFilterKey = null;
+    this.showFilterForm = false;
+  }
+
+  private getFilterValues(filterName: string): string[] {
+    const filter = this.activeFilters.find(f => f.filter === filterName);
+    return filter ? filter.values : [];
+  }
+
+  onFilteringChange(): void { 
+    // build filter payload and emit to validation page component
+
+    //////// NEEDS TO BE UPDATED ///////////
+    const filterPayload: FilterPayload = {
+      statuses: this.getFilterValues('Status'),
+      name: this.getFilterValues('Validation Name')[0] || null,
+      spatialRef: this.getFilterValues('Spatial Reference Dataset'),
+      temporalRef: this.getFilterValues('Temporal Reference Dataset'),
+      scalingRef: this.getFilterValues('Scaling Reference Dataset')
+    };
+    ///////////////////////////////////////
+    this.filterPayload.emit(filterPayload);
+  }
+
+  cancelFilter() {
+    this.isEditing = false;
+    this.showFilterForm = false;
+    this.resetFilterState()
+  }
+
+  editFilter(index: number) {
     this.isEditing = true;
     this.showFilterForm = true;
     const filterToEdit = this.activeFilters[index]; // get filter to edit
-
-    this.selectedFilter = filterToEdit.filter;
+    this.selectedFilterKey = filterToEdit.filter;
     this.updateDropdownFilters(); 
-    this.cdr.detectChanges(); // should update drop-down to show filter being edited - doesn't seem to...
-    switch (filterToEdit.filter) {
-      case 'status':
-        this.selectedStatuses = filterToEdit.values;
-        break;
-      case 'Validation Name':
-        this.selectedNames = filterToEdit.values[0];
-        break;
-      case 'Submission Date':
-        this.selectedDateRange = filterToEdit.values as unknown as [Date, Date]; //Not sure why this has to be converted to unkown
-        break;
-      case 'Dataset':
-        this.prettyName = filterToEdit.values[0];
-        this.spatial = filterToEdit.values.includes('Spatial Reference') || filterToEdit.values.includes('Spatial or Temporal Reference') || filterToEdit.values.includes('Spatial, Temporal, or Scaling Reference');
-        this.temporal = filterToEdit.values.includes('Temporal Reference') || filterToEdit.values.includes('Spatial or Temporal Reference') || filterToEdit.values.includes('Spatial, Temporal, or Scaling Reference');
-        this.scaling = filterToEdit.values.includes('Scaling Reference') || filterToEdit.values.includes('Spatial or Scaling Reference') || filterToEdit.values.includes('Temporal or Scaling Reference') || filterToEdit.values.includes('Spatial, Temporal, or Scaling Reference');
-        break;
-    }
-
   }
 
   removeFilter(index: number) {
-
     const removedFilter = this.activeFilters[index]; 
-
-    // If 'Validation Name' filter, reset to empty string to allow for filter on no name to still work
-    if (removedFilter.filter === 'Validation Name') {
-      this.selectedNames = '';
-    }
-
     this.availableFilters.push(this.activeFilters[index].filter); // Add deleted filter back to available filters
     this.activeFilters.splice(index, 1); // Remove filter from active filters
     this.updateDropdownFilters(); // Update list of dropdown filters
     this.onFilteringChange()
   }
 
-  cancelFilter() {
-    this.isEditing = false;
-
-    this.selectedFilter = '';
-    this.selectedStatuses = [];
-    this.selectedNames = '';
-    this.selectedDateRange = this.getInitDate();
-    this.prettyName = '';
-    this.spatial = false;
-    this.temporal = false;
-    this.scaling = false;
-
-    this.showFilterForm = false;
-  }
-
-  onFilteringChange(): void { 
-    // build filter payload and emit to validation page component
-    const filterPayload: FilterPayload = {
-      statuses: this.activeFilters.find(f => f.filter === 'Status')?.values || [],
-      name: this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] !== undefined ? this.activeFilters.find(f => f.filter === 'Validation Name')?.values[0] : null, // need to separate null (no filter) from empty string (filter on unnamed)
-      selectedDates: this.activeFilters.find(f => f.filter === 'Submission Date')?.values as unknown as [Date, Date] || this.getInitDate(),
-      prettyName: this.activeFilters.find(f => f.filter === 'Dataset')?.values[0] || '',
-      spatialReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false,
-      temporalReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Temporal Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false,
-      scalingReference: this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Temporal or Scaling Reference') || this.activeFilters.find(f => f.filter === 'Dataset')?.values.includes('Spatial, Temporal, or Scaling Reference') || false
-    };
-    this.filterPayload.emit(filterPayload);
-  }
-
-
   updateDropdownFilters() {
     this.dropdownFilters = this.allFilters
       .filter(filter => {
-        if (this.isEditing && filter === this.selectedFilter) {
+        if (this.isEditing && filter === this.selectedFilterKey) {
           return true;
         }
         return !this.activeFilters.some(af => af.filter === filter);
@@ -233,13 +222,4 @@ export class FilteringFormComponent implements OnInit {
         value: filter
       }));
   }
-
-  getInitDate(): [Date, Date] {
-    // Set an initial date range to cover past 5 years 
-    const today = new Date();
-    const pastDate = new Date(today);
-    pastDate.setFullYear(today.getFullYear() - 5);  
-    return [pastDate, today];
-  }
-
 }

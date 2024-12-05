@@ -80,6 +80,29 @@ def my_results(request):
     start_date_str = request.GET.get('startDate', None)
     end_date_str = request.GET.get('endDate', None)
 
+    filter_spatialRef = request.query_params.getlist('spatialRef', None)
+    filter_temporalRef = request.query_params.getlist('temporalRef', None)
+    filter_scalingRef = request.query_params.getlist('scalingRef', None)
+
+    if filter_spatialRef:
+        dataset_filters = Q()
+        for dataset in filter_spatialRef:
+            dataset_filters |= Q(spatial_reference_configuration_id__dataset__pretty_name__icontains=dataset)
+        val_runs = val_runs.filter(dataset_filters)
+
+    if filter_temporalRef:
+        dataset_filters = Q()
+        for dataset in filter_temporalRef:
+            dataset_filters |= Q(temporal_reference_configuration_id__dataset__pretty_name__icontains=dataset)
+        val_runs = val_runs.filter(dataset_filters)
+
+    if filter_scalingRef:
+        dataset_filters = Q()
+        for dataset in filter_scalingRef:
+            dataset_filters |= Q(scaling_ref_id__dataset__pretty_name__icontains=dataset)
+        val_runs = val_runs.filter(dataset_filters)
+
+
     if filter_name in (None, "null"):
         val_runs = val_runs.all() # when no filter is applied
     elif filter_name.strip() == "":
