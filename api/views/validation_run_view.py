@@ -87,19 +87,19 @@ def my_results(request):
     if filter_spatialRef:
         dataset_filters = Q()
         for dataset in filter_spatialRef:
-            dataset_filters |= Q(spatial_reference_configuration_id__dataset__pretty_name__icontains=dataset)
+            dataset_filters |= Q(spatial_reference_configuration_id__dataset__pretty_name=dataset)
         val_runs = val_runs.filter(dataset_filters)
 
     if filter_temporalRef:
         dataset_filters = Q()
         for dataset in filter_temporalRef:
-            dataset_filters |= Q(temporal_reference_configuration_id__dataset__pretty_name__icontains=dataset)
+            dataset_filters |= Q(temporal_reference_configuration_id__dataset__pretty_name=dataset)
         val_runs = val_runs.filter(dataset_filters)
 
     if filter_scalingRef:
         dataset_filters = Q()
         for dataset in filter_scalingRef:
-            dataset_filters |= Q(scaling_ref_id__dataset__pretty_name__icontains=dataset)
+            dataset_filters |= Q(scaling_ref_id__dataset__pretty_name=dataset)
         val_runs = val_runs.filter(dataset_filters)
 
 

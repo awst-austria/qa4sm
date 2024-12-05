@@ -4,10 +4,13 @@ import {ValidationrunDto} from '../../../core/services/validation-run/validation
 import {HttpParams} from '@angular/common/http';
 import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
-import {FilterPayload} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
+import {FilterPayload, FilterConfig} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
 
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
 import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
+
+///// MOVE THIS WHEN FINISHED TESTING ///////
+import { FilteringFormComponent } from 'src/app/modules/validation-result/components/filtering-form/filtering-form.component';
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -33,13 +36,19 @@ export class ValidationPagePaginatedComponent implements OnInit {
   endOfPage: boolean = false;
 
 
-  filterPayload: FilterPayload = {  statuses: [], name: null, spatialRef: [], temporalRef: [], scalingRef: [] };
+  filterPayload: FilterPayload; //= {  statuses: [], name: null, spatialRef: [], temporalRef: [], scalingRef: [] };
 
   dataFetchError = signal(false);
 
 
   constructor(private validationrunService: ValidationrunService, private datasetConfigService: DatasetConfigurationService, private datasetService: DatasetService) {
+    //initialise empty filterPayload with empty array or null for filters with/without isArray
+    this.filterPayload = Object.entries(FilteringFormComponent.FILTER_CONFIGS).reduce((acc, [_, config]) => {
+      acc[config.backendField] = config.isArray ? [] : null;
+      return acc;
+    }, {} as FilterPayload);
   }
+  
 
   ngOnInit(): void {
     this.getValidationsAndItsNumber(this.published);
@@ -74,35 +83,19 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order));
 
-    //Various filters on validation run model added when specified 
-    if ((this.filterPayload.name) || (this.filterPayload.name ===''))  {
-      parameters = parameters.set('name', this.filterPayload.name);
-    }
-    if (this.filterPayload.statuses.length > 0) {
-      this.filterPayload.statuses.forEach(status => {
-        parameters = parameters.append('statuses', status);
-      });
-    }
-    
-    if (this.filterPayload.spatialRef.length > 0) {
-      this.filterPayload.spatialRef.forEach(dataset => {
-        parameters = parameters.append('spatialRef', dataset);
-      });
-    }
-    if (this.filterPayload.temporalRef.length > 0) {
-      this.filterPayload.temporalRef.forEach(dataset => {
-        parameters = parameters.append('temporalRef', dataset);
-      });
-    }
-    if (this.filterPayload.scalingRef.length > 0) {
-      this.filterPayload.scalingRef.forEach(dataset => {
-        parameters = parameters.append('scalingRef', dataset);
-      });
-    }
-    //if (this.filterPayload.selectedDates) {
-    //  parameters = parameters.append('startDate', this.filterPayload.selectedDates[0].toISOString());
-    //  parameters = parameters.append('endDate', this.filterPayload.selectedDates[1].toISOString());
-    //}
+    Object.entries(FilteringFormComponent.FILTER_CONFIGS).forEach(([key, config]) => {
+      const values = this.filterPayload[config.backendField];
+      if (values) {
+        if (config.isArray && Array.isArray(values) && values.length > 0) {
+          values.forEach(value => {
+            parameters = parameters.append(config.backendField, value);
+          });
+        } else if (!config.isArray && values) {
+          const paramValue = Array.isArray(values) ? values[0] : values;
+          parameters = parameters.set(config.backendField, String(paramValue));
+        }
+      }
+    });
 
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
@@ -124,56 +117,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
           });
     }
   }
-
-  checkValidationDatasets(validationId: number, filterDataset: string, spatial: boolean, temporal: boolean, scaling: boolean): Observable<boolean> {
-    // combine api calls for validation configuration and datasets to check if the dataset is used in the validation
-    return combineLatest([
-      this.datasetConfigService.getConfigByValidationrun(validationId.toString()),
-      this.datasetService.getAllDatasets(true, false) 
-    ]).pipe(
-      map(([configurations, datasets]) => { 
-        const validationDatasets = configurations
-          .map(config => {
-            // Evaluate the reference types selected, returns OR if multiple selected types
-            // why does this not work...
-            const matchesSpatial = spatial ? config.is_spatial_reference : !config.is_spatial_reference;    
-            const matchesTemporal = temporal ? config.is_temporal_reference : !config.is_temporal_reference;
-            const matchesScaling = scaling ? config.is_scaling_reference : !config.is_scaling_reference;
-            const matchesConditions = matchesSpatial && matchesTemporal && matchesScaling;
-            
-            return datasets.find(ds => (config.dataset === ds.id && matchesConditions))?.pretty_name; // get the pretty name of the dataset matching the id and reference types
-          })
-          .filter(name => name);
-        return validationDatasets.includes(filterDataset); // return true if the dataset is used in the validation
-      })
-    );
-  }
   
   handleFetchedValidations(serverResponse: { validations: ValidationrunDto[]; length: number; }): void {
     const {validations, length} = serverResponse;
-    // if dataset filter exists, check if the dataset is used in the validation 
-    //if (this.filterPayload?.prettyName) {
-    //  const filterObservables = validations.map(val => 
-    //    this.checkValidationDatasets(val.id, this.filterPayload.prettyName, this.filterPayload.spatialReference, this.filterPayload.temporalReference, this.filterPayload.scalingReference) // run the check for each validation
-    //      .pipe(
-    //        map(matches => ({ validation: val, matches })) // array of observables with validation and filter match status
-    //      )
-    //  );
-    //  forkJoin(filterObservables).subscribe(results => { // forkJoin to wait for all validations to be checked
-    //    const filteredValidations = results
-    //      .filter(result => result.matches)
-    //      .map(result => result.validation); // filter out validations that don't match
-
-    //    const filteredLength = Math.ceil((filteredValidations.length / validations.length) * length); // update length of validations to match the filtered list
-
-    //    this.updateValidations(filteredValidations, filteredLength); // continue to showing the validations on page 
-    //  });
-    //} else {
-      this.updateValidations(validations, length);
-    //}
-  }
-  
-  private updateValidations(validations: ValidationrunDto[], length: number): void {
+    
     this.maxNumberOfPages = Math.ceil(length / this.limit);
   
     if (this.orderChange) {
@@ -206,6 +153,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
     }
     this.orderChange = false;
     this.isLoading = false;
+  }
+  
+  private updateValidations(validations: ValidationrunDto[], length: number): void {
+
   }
 
   getOrder(order): void {

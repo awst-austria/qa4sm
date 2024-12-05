@@ -1,20 +1,9 @@
 import {Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FilterPayload } from './filterPayload.interface';
+import { FilterPayload, FilterConfig } from './filterPayload.interface';
 
 import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
 import { filter } from 'jszip';
-
-
-type FilterType = 'string-input' | 'dropdown' | 'multi-select' | 'single-select' | 'date-range' | 'dataset';
-
-interface FilterConfig {
-  name: string;
-  type: FilterType;
-  options?: string[];
-  validationFn: (value: any) => boolean;
-  formatValuesFn: (value: any) => string[];
-}
 
 interface FilterState {
   // contains the runtime values of filters
@@ -40,34 +29,44 @@ export class FilteringFormComponent implements OnInit {
       type: 'multi-select',
       options: ['Done', 'ERROR', 'Cancelled', 'Running', 'Scheduled'],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
-      formatValuesFn: (state: FilterState) => state.value
+      formatValuesFn: (state: FilterState) => state.value,
+      backendField: 'statuses',
+      isArray: true
     },
     'Validation Name': {
       name: 'Validation Name', 
       type: 'string-input',
       validationFn: (state: FilterState) => true,
-      formatValuesFn: (state: FilterState) => [state.value]
+      formatValuesFn: (state: FilterState) => [state.value],
+      backendField: 'name',
+      isArray: false
     },
     'Spatial Reference Dataset': {
       name: 'Spatial ref dataset', 
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
-      formatValuesFn: (state: FilterState) => state.value
+      formatValuesFn: (state: FilterState) => state.value,
+      backendField: 'spatialRef',
+      isArray: true
     },
     'Temporal Reference Dataset': {
       name: 'Temporal ref dataset', 
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
-      formatValuesFn: (state: FilterState) => state.value
+      formatValuesFn: (state: FilterState) => state.value,
+      backendField: 'temporalRef',
+      isArray: true
     },
     'Scaling Reference Dataset': {
       name: 'Scaling ref dataset', 
       type: 'multi-select',
       options: [],
       validationFn: (state: FilterState) => {return Array.isArray(state?.value) && state.value.length > 0},
-      formatValuesFn: (state: FilterState) => state.value
+      formatValuesFn: (state: FilterState) => state.value,
+      backendField: 'scalingRef',
+      isArray: true
     }
   };
   
@@ -99,11 +98,11 @@ export class FilteringFormComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.fetchAndLogPrettyNames();
+    this.fetchPrettyNames();
   }
 
   // get all dataset names to provide list for filter choice
-  private fetchAndLogPrettyNames(): void {
+  private fetchPrettyNames(): void {
     this.datasetService.getAllDatasets().subscribe({
       next: (datasets: DatasetDto[]) => {
         this.availableDatasets = datasets
