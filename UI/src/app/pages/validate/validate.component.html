@@ -149,9 +149,11 @@
                   [validationModel]="validationModel"
                   [referenceType]="'temporalReference$'"
                   (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
+
+                <!--      Temporal matching-->
+                  <qa-temporal-matching
+                    [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
               </div>
-
-
             </p-panel>
 
 
@@ -201,11 +203,7 @@
             <qa-validation-period
               [validationPeriodModel]="validationModel.validationPeriodModel"/>
           </div>
-          <!--      Temporal matching-->
-          <div>
-            <qa-temporal-matching
-              [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
-          </div>
+
 
         </p-panel>
 
