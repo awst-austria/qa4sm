@@ -43,6 +43,8 @@ export class AuthService {
   public currentUser: UserDto = this.emptyUser;
 
 
+  private showLoginModalSubject = new BehaviorSubject<boolean>(false);
+  showLoginModal$ = this.showLoginModalSubject.asObservable();
 
   private passwordResetTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
   passwordResetToken$: Observable<string> = this.passwordResetTokenSubject.asObservable();
@@ -72,6 +74,15 @@ export class AuthService {
       .pipe(
         map(user =>  user != null),
         catchError(error => of(false)));
+  }
+
+
+  showLoginModal() {
+    this.showLoginModalSubject.next(true);
+  }
+
+  hideLoginModal() {
+    this.showLoginModalSubject.next(false);
   }
 
   // todo: remove subscription from the service

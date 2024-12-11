@@ -6,6 +6,19 @@
   <router-outlet></router-outlet>
 </div>
 
+<p-dialog header="Please sign in" 
+         [(visible)]="showLoginModal" 
+         [modal]="true"
+         [draggable]="false"
+         [resizable]="false"
+         [closeOnEscape]="true">
+    <div>
+      <qa-login (loggedIn)="onLoginSuccess()"></qa-login>
+    </div>
+</p-dialog>
+
+
+
 
 <qa-navigation-footer></qa-navigation-footer>
 

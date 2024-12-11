@@ -88,9 +88,7 @@ export class NavigationBarComponent implements OnInit {
   loginMenuItem: MenuItem = {
     label: 'Log in',
     icon: 'pi pi-fw pi-sign-in',
-    routerLink: ['login'],
-    command: () => this.setPreviousUrl('user-profile'),
-    visible: !this.authService.authenticated.value
+    command: () => this.authService.showLoginModal()
   };
 
   logoutMenuItem: MenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout()};
