@@ -29,16 +29,14 @@ def api_login(request):
     """
     if request.method == 'POST':
 
-        # serializer.data #to object
-
         login_serializer = LoginDtoSerializer(data=request.data)
         if not login_serializer.is_valid():
             return resp_invalid_credentials
 
         login_data = login_serializer.create()
 
-        #########THIS ONLY WORKS IF AN EMAIL ADDRESS CAN ONLY BE ASSOSCIAED WITH ONE ACCOUNT#########
         if '@' in login_data.identifier:
+            # django authenticate method can only take username, not email
             try:
                 username = get_user_model().objects.get(email=login_data.identifier).username
                 user = auth.authenticate(username=username, password=login_data.password)
