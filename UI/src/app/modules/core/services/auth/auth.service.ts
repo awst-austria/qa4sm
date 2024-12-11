@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../../environments/environment';
-import {BehaviorSubject, EMPTY, Observable, of, Subject} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, of, Subject, throwError} from 'rxjs';
 import {LoginDto} from './login.dto';
 import {UserDto} from './user.dto';
-import {catchError, map} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 import {HttpErrorService} from '../global/http-error.service';
 
 @Injectable({
@@ -85,51 +85,34 @@ export class AuthService {
     this.showLoginModalSubject.next(false);
   }
 
-  // todo: remove subscription from the service
-  login(credentials: LoginDto): Subject<boolean> {
-    let authResult = new Subject<boolean>();
-    this.httpClient
+  login(credentials: LoginDto): Observable<UserDto> {
+    return this.httpClient
       .post<UserDto>(this.loginUrl, credentials)
       .pipe(
-        catchError(error => this.onLoginError(error, authResult) )
+        tap(user => {
+          this.currentUser = user;
+          this.authenticated.next(true);
+        }),
+        catchError(error=> {
+          this.authenticated.next(false);
+          return throwError(() => error);
+        })
       )
-      .subscribe(data => this.onLoginNext(data, authResult));
-    return authResult;
   }
 
-  private onLoginNext(data, authResult): void {
-    this.currentUser = data;
-    this.authenticated.next(true);
-    authResult.next(true);
-  }
-
-  private onLoginError(error, authResult): Observable<never> {
-    this.authenticated.next(false);
-    authResult.next(false);
-    return EMPTY
-  }
- // todo: remove subscription from the service
-  logout(): Subject<boolean> {
-    let logoutResult = new Subject<boolean>();
-    this.httpClient
+  logout(): Observable<boolean> {
+    return this.httpClient
       .post(this.logoutUrl, null)
       .pipe(
-        catchError(() => this.onLogoutError(logoutResult))
-      )
-      .subscribe(data => this.onLogoutNext(data, logoutResult));
-
-    return logoutResult;
-  }
-
-  private onLogoutNext(data, logoutResult): void {
-    this.currentUser = this.emptyUser;
-    this.authenticated.next(false);
-    logoutResult.next(true);
-  }
-
-  private onLogoutError(logoutResult): Observable<never> {
-    logoutResult.next(false);
-    return EMPTY
+        map(() => {
+          this.currentUser = this.emptyUser; 
+          this.authenticated.next(false);
+          return true;
+        }),
+        catchError(() => {
+          return of(false)
+        })
+      );
   }
 
   signUp(userForm: any): Observable<any> {

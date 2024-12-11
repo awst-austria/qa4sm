@@ -4,6 +4,7 @@ import {AuthService} from '../../../core/services/auth/auth.service';
 import {Event, NavigationEnd, Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
+import { error } from 'console';
 
 @Component({
   selector: 'qa-navigation-bar-header',
@@ -170,27 +171,23 @@ export class NavigationBarComponent implements OnInit {
     ];
   }
 
-  logoutObserver = {
-    next: (result) => this.onLogoutNext(result),
-    error: () => this.toastService.showErrorWithHeader('Something went wrong.',
-      'We could not log you out. Please try again or contact our support team.')
-  }
-
-  onLogoutNext(result: any): void{
-    this.setPreviousUrl('');
-    if (result) {// Successful logout
-    this.router.navigate(['home'])
-      .then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
-  } else {
-      // this part should be removed when the logout subscription is removed from the service
-      this.toastService.showErrorWithHeader('Something went wrong.',
-        'We could not log you out. Please try again or contact our support team.')
-    }
-  }
 
   logout(): void {
-    this.authService.logout().subscribe(this.logoutObserver);
+    this.authService.logout().subscribe({       
+      next: () => {
+        this.setPreviousUrl('');
+        this.router.navigate(['home'])
+          .then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
+      },
+      error: () => {
+        this.toastService.showErrorWithHeader(
+          'Something went wrong.',
+          'We could not log you out. Please try again or contact our support team.'
+        );
+      }
+    });
   }
+
 
   setPreviousUrl(prevUrl: string): void {
     this.authService.setPreviousUrl(prevUrl);
