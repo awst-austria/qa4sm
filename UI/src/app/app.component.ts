@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
 import { AuthService } from './modules/core/services/auth/auth.service';
+import { LoginComponent } from './modules/user/login/login.component';
 
 
 
@@ -12,6 +13,7 @@ import { AuthService } from './modules/core/services/auth/auth.service';
 export class AppComponent implements OnInit {
   title = 'qa4sm-ui';
   showLoginModal = false;
+  @ViewChild(LoginComponent) loginComponent: LoginComponent;
 
 
   constructor(private logger: NGXLogger, private authService: AuthService) {
@@ -26,5 +28,11 @@ export class AppComponent implements OnInit {
 
   onLoginSuccess() {
     this.authService.hideLoginModal();
+  }
+
+  onLoginModalClose() {
+    if (this.loginComponent) {
+      this.loginComponent.loginForm.reset();
+    }
   }
 }

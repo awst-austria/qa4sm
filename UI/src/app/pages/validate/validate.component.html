@@ -6,7 +6,7 @@
       <h5 class="pt-2">
         You are not logged in.
         You can check validation options, but cannot start a validation.
-        <a [routerLink]="'/login'" class="mt-5">Click here</a> or on the Validate button
+        <a (click)="authService.showLoginModal()" class="mt-5">Click here</a> or on the Validate button
         to log in or use
         <a [routerLink]="'/signup'" class="mt-5">this form</a>
         to register.
@@ -270,13 +270,7 @@
     <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
                             [isThereValidation]="isThereValidation"
                             (startValidation)="startValidation(false)"/>
-    <p-dialog header="You need to be logged in to start a validation" id="log-in" [modal]="true"
-              [(visible)]="logInToValidate">
-      <div>
-        <qa-login (loggedIn)="setLoggedIn()"></qa-login>
-      </div>
-
-    </p-dialog>
+                          
   </div>
 
 </main>

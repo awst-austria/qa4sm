@@ -731,6 +731,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   }
 
   public startValidation(checkForExistingValidation: boolean): void {
+    
+    if (!this.authService.authenticated.value) {
+      this.authService.showLoginModal();
+      return;
+    }
+
     // prepare the dataset dtos (dataset, version, variable and filter settings)
     const datasets: ValidationRunDatasetConfigDto[] = [];
     this.validationModel.datasetConfigurations.forEach(datasetConfig => {
