@@ -70,8 +70,6 @@ def field_validator(data, model_serializer):
         raise KeyError('Submitted data contains a wrong key.')
     return data
 
-
-
 class DatasetVersionSerializer(ModelSerializer):
     class Meta:
         model = DatasetVersion
