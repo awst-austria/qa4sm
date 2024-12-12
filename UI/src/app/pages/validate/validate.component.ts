@@ -110,7 +110,6 @@ export class ValidateComponent implements OnInit, AfterViewInit {
               private modalWindowService: ModalWindowService,
               private settingsService: SettingsService,
               public authService: AuthService) {
-    console.log('constructor')
   }
 
   ngAfterViewInit(): void {
@@ -126,15 +125,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.modalWindowService.watch().subscribe(state => {
       this.isExistingValidationWindowOpen = state === 'open';
     });
-    console.log('on init')
     this.route.queryParams.subscribe(params => {
       if (params.validation_id) {
-        console.log('there are params')
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
           this.getValidationConfigObserver
         );
       } else {
-        console.log('there are no params')
         this.setDefaultDatasetSettings();
       }
     });
