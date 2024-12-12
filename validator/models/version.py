@@ -22,17 +22,17 @@ class DatasetVersion(models.Model):
     def __str__(self):
         return self.short_name
 
-    def save(self, *args, **kwargs):
-        try:
-            # save first
-            super(DatasetVersion, self).save(*args, **kwargs)
-
-            # Trigger the fixture update function after saving the object
-            update_fixture_entry(self)
-
-        except Exception as e:
-            logger.error(f"Error while saving DatasetVersion {self.pk}: {e}")
-            raise
+    # def save(self, *args, **kwargs):
+    #     try:
+    #         # save first
+    #         super(DatasetVersion, self).save(*args, **kwargs)
+    #
+    #         # Trigger the fixture update function after saving the object
+    #         update_fixture_entry(self)
+    #
+    #     except Exception as e:
+    #         logger.error(f"Error while saving DatasetVersion {self.pk}: {e}")
+    #         raise
 
 
 def update_fixture_entry(version):
