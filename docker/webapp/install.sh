@@ -11,7 +11,7 @@ touch $LOG_FILE
 chown root:www-data -R $LOG_DIR
 chmod ug+rwx -R $LOG_DIR
 
-rsync -r "$WEB_VAL_GIT_DIR/" "$APP_DIR/" --exclude="tests" --exclude="db.sqlite3" --exclude="fixtures"
+rsync -r "$WEB_VAL_GIT_DIR/" "$APP_DIR/" --exclude="tests" --exclude="db.sqlite3"
 ls "$WEB_VAL_GIT_DIR/docker/"
 ls "$WEB_VAL_GIT_DIR/docker/webapp"
 cp "$WEB_VAL_GIT_DIR/docker/webapp/apache.conf" /etc/apache2/sites-available/qa4sm-app.conf
