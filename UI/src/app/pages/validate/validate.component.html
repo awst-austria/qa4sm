@@ -116,7 +116,7 @@
               </ng-template>
 
               <!--             spatial reference-->
-              <div class="pt-2">
+              <div class="pt-2 pb-0">
                 <label for="spatial-reference"
                        class="mb-4"
                        pTooltip="Choose the spatial reference dataset. If the ISMN dataset belongs to the dataset pool,
@@ -134,8 +134,9 @@
                   (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
               </div>
 
+              <hr class="w-11 mt-2" style="opacity: 1.;">
+
               <!--             temporal reference-->
-              <div>
                 <label for="temporal-reference"
                        class="mb-4"
                        pTooltip="Choose the temporal reference dataset. Please note, that we do not recommend selecting ISMN."
@@ -149,9 +150,19 @@
                   [validationModel]="validationModel"
                   [referenceType]="'temporalReference$'"
                   (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
-              </div>
+      
 
-
+                <!--      Temporal matching-->
+                <label  for="temporal-matching"
+                        pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
+                                  The specified temporal window is centered on the reference measurements (i.e., with edges at +- half size distance from each considered measurement point).
+                                  NOTE: the size of the window influences the number of observations used in the validation and could lead to no results in case no matches are found."
+                        tooltipPosition="bottom">
+                <span class="pi pi-question-circle"></span>
+                Temporal matching window
+                </label>
+                <qa-temporal-matching id="temporal-matching"
+                [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
             </p-panel>
 
 
@@ -202,11 +213,6 @@
               [validationPeriodModel]="validationModel.validationPeriodModel"/>
           </div>
           <!--      Temporal matching-->
-          <div>
-            <qa-temporal-matching
-              [temporalMatchingModel]="validationModel.temporalMatchingModel"/>
-          </div>
-
         </p-panel>
 
 
