@@ -1075,6 +1075,13 @@ p-inputswitch.ng-dirty.ng-invalid > .p-inputswitch {
   width: 90%;
 }
 
+#windowSizeSelector {
+  .p-inputtext {
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+  }
+}
+
 #overlapSelector .p-inputtext{
   width: 80%;
 }
