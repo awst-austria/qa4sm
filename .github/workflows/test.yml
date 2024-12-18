@@ -24,7 +24,7 @@ jobs:
         shell: bash -l {0}
     strategy:
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.10', '3.11', '3.12']
         os: ["ubuntu-latest"]
     steps:
       - uses: actions/checkout@v2
@@ -42,6 +42,7 @@ jobs:
           activate-environment: qa4sm # todo: must match with name in environment.yml
       - name: Print environment infos
         run: |
+          pip install --no-deps smos==0.3.1
           conda info -a
           conda list
           pip list
