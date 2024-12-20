@@ -57,4 +57,8 @@ export class LoginComponent {
       this.toastService.showErrorWithHeader('Login failed', 'An error occurred while trying to log in, please try again later.');
     }
   }
+
+  onForgotOrSignUpClick(){
+    this.loginService.showLoginModalSubject.next(false);
+  }
 }

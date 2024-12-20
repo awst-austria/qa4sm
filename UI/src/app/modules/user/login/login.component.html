@@ -21,11 +21,21 @@
 
         <button pButton
                 type="submit"
-                label="Sign in">
+                label="Log in">
         </button>
 
-        <div class="mt-3"><a [routerLink]="'/password-reset'" class="mt-5">Forgot your password?</a></div>
-        <div class="mt-3"><a [routerLink]="'/signup'" class="mt-5">No account?</a></div>
+        <div class="mt-3">
+          <a [routerLink]="'/password-reset'" 
+            (click)="onForgotOrSignUpClick()"
+            class="mt-5">Forgot your password?
+          </a>
+        </div>
+        <div class="mt-3">
+          <a [routerLink]="'/signup'" 
+            (click)="onForgotOrSignUpClick()"
+            class="mt-5">No account?
+          </a>
+      </div>
       </form>
     </div>
   </div>

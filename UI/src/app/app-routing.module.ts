@@ -31,7 +31,6 @@ import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
-  {path: 'login', component: LoginPageComponent},
   {path: 'validate', component: ValidateComponent, resolve: {datasets: DatasetResolver}},
   {path: 'validation-result/:validationId', component: ValidationResultComponent},
   {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},

@@ -43,7 +43,7 @@ export class AuthService {
   public currentUser: UserDto = this.emptyUser;
 
 
-  private showLoginModalSubject = new BehaviorSubject<boolean>(false);
+  showLoginModalSubject = new BehaviorSubject<boolean>(false);
   showLoginModal$ = this.showLoginModalSubject.asObservable();
 
   private passwordResetTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
