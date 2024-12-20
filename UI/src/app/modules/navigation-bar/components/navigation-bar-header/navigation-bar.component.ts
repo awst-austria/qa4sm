@@ -1,10 +1,11 @@
-import {Component, HostListener, OnInit, signal} from '@angular/core';
+import {Component, HostListener, OnInit, signal, ViewChild} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {Event, NavigationEnd, Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
 import { error } from 'console';
+import { LoginComponent } from 'src/app/modules/user/login/login.component';
 
 @Component({
   selector: 'qa-navigation-bar-header',
@@ -116,6 +117,10 @@ export class NavigationBarComponent implements OnInit {
   maxWindowWidthForSquareLogo = 960;
   noLogoWindowWidth = 660;
 
+  showLoginModal = false;
+  @ViewChild(LoginComponent) loginComponent: LoginComponent;
+
+
   constructor(private authService: AuthService,
               private router: Router,
               private toastService: ToastService,
@@ -127,6 +132,9 @@ export class NavigationBarComponent implements OnInit {
       }
     });
 
+    this.authService.showLoginModal$.subscribe(
+      show => this.showLoginModal = show
+    );
     this.updateLogo(window.innerWidth);
   }
 
@@ -139,6 +147,17 @@ export class NavigationBarComponent implements OnInit {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.updateLogo(event.target.innerWidth)
+  }
+
+
+  onLoginSuccess() {
+    this.authService.hideLoginModal();
+  }
+
+  onLoginModalClose() {
+    if (this.loginComponent) {
+      this.loginComponent.loginForm.reset();
+    }
   }
 
   private updateLogo(windowWidth: number): void {

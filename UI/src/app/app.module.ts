@@ -14,7 +14,6 @@ import {ErrorPageComponent} from './pages/error/error-page.component';
 
 import {ValidationsComponent} from './pages/validations/validations.component';
 import {ValidationResultComponent} from './pages/validation-result/validation-result.component';
-import {LoginComponent} from './modules/user/login/login.component';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {HttpTokenInterceptor} from './modules/core/interceptors/http-token.interceptor';
 import {LoggerModule, NgxLoggerLevel} from 'ngx-logger';
@@ -69,7 +68,7 @@ import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
 import {ValidationReferenceModule} from './modules/validation-reference/validation-reference.module';
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 import {DialogModule} from 'primeng/dialog';
-import {LoginPageComponent} from './pages/login-page/login-page.component';
+//import {LoginPageComponent} from './pages/login-page/login-page.component';
 import {ProgressBarModule} from 'primeng/progressbar';
 import {ImageModule} from 'primeng/image';
 import {ScrollTopModule} from 'primeng/scrolltop';
@@ -84,7 +83,6 @@ import {SelectButtonModule} from 'primeng/selectbutton';
         ErrorPageComponent,
         ValidationsComponent,
         ValidationResultComponent,
-        LoginComponent,
         UserProfileComponent,
         PublishedValidationsComponent,
         TermsComponent,
@@ -101,7 +99,7 @@ import {SelectButtonModule} from 'primeng/selectbutton';
         TemporalMatchingComponent,
         MyDatasetsComponent,
         UserDataGuidelinesComponent,
-        LoginPageComponent,
+        //LoginPageComponent,
         ContactUsComponent,
     ],
     bootstrap: [AppComponent], imports: [LoggerModule.forRoot({ level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR }),

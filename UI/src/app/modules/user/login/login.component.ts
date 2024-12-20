@@ -5,6 +5,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ToastService} from '../../core/services/toast/toast.service';
 import {LoginForm} from '../../core/services/form-interfaces/login-form';
 import {HttpErrorResponse} from '@angular/common/http';
+import {Subject, takeUntil} from 'rxjs';
 
 
 @Component({
@@ -13,9 +14,13 @@ import {HttpErrorResponse} from '@angular/common/http';
   styleUrls: ['./login.component.scss'], 
   providers: []
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   @Input() navigateAfter: boolean;
   @Output() loggedIn = new EventEmitter();
+
+  showModal = false;
+  isLoading = false;
+  private destroy$ = new Subject<void>();
 
   loginDto = new LoginDto('', '');
 
@@ -26,6 +31,22 @@ export class LoginComponent {
 
   constructor(private loginService: AuthService,
               private toastService: ToastService) {
+  }
+
+  ngOnInit() {
+    this.loginService.showLoginModal$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(show => {
+        this.showModal = show;
+        if (!show) {
+          this.resetForm();
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   onSubmit() {
@@ -48,6 +69,15 @@ export class LoginComponent {
       }
     });
     }
+  }
+
+  private resetForm() {
+    this.loginForm.reset();
+    this.isLoading = false;
+  }
+
+  onWindowHide() {
+    this.loginService.hideLoginModal();
   }
 
   private handleLoginError(error: HttpErrorResponse) {
