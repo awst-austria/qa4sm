@@ -68,7 +68,6 @@ import {UserDatasetsModule} from './modules/user-datasets/user-datasets.module';
 import {ValidationReferenceModule} from './modules/validation-reference/validation-reference.module';
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
 import {DialogModule} from 'primeng/dialog';
-//import {LoginPageComponent} from './pages/login-page/login-page.component';
 import {ProgressBarModule} from 'primeng/progressbar';
 import {ImageModule} from 'primeng/image';
 import {ScrollTopModule} from 'primeng/scrolltop';
@@ -99,7 +98,6 @@ import {SelectButtonModule} from 'primeng/selectbutton';
         TemporalMatchingComponent,
         MyDatasetsComponent,
         UserDataGuidelinesComponent,
-        //LoginPageComponent,
         ContactUsComponent,
     ],
     bootstrap: [AppComponent], imports: [LoggerModule.forRoot({ level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR }),

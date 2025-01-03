@@ -24,7 +24,6 @@ import {
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
-import {LoginPageComponent} from './pages/login-page/login-page.component';
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 
 

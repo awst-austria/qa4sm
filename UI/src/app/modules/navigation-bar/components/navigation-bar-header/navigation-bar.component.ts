@@ -4,8 +4,8 @@ import {AuthService} from '../../../core/services/auth/auth.service';
 import {Event, NavigationEnd, Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
-import { error } from 'console';
-import { LoginComponent } from 'src/app/modules/user/login/login.component';
+import {LoginComponent} from 'src/app/modules/user/login/login.component';
+import {AuthGuard} from 'src/app/auth.guard';
 
 @Component({
   selector: 'qa-navigation-bar-header',
@@ -151,7 +151,7 @@ export class NavigationBarComponent implements OnInit {
 
 
   onLoginSuccess() {
-    this.authService.hideLoginModal();
+    this.authService.hideLoginModal();   // Hide the login modal window on successful login
   }
 
   onLoginModalClose() {
@@ -191,12 +191,22 @@ export class NavigationBarComponent implements OnInit {
   }
 
 
+  private isProtectedRoute(): boolean {
+    const currentUrl = this.router.url;
+    console.log(currentUrl);
+    return false;
+  }
+
   logout(): void {
     this.authService.logout().subscribe({       
       next: () => {
         this.setPreviousUrl('');
-        this.router.navigate(['home'])
-          .then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
+        if (this.isProtectedRoute()) {
+          this.router.navigate(['home'])
+            .then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
+        } else {
+          this.toastService.showSuccessWithHeader('Logout', 'Successful logout');
+        }
       },
       error: () => {
         this.toastService.showErrorWithHeader(

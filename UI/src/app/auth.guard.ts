@@ -18,7 +18,7 @@ export class AuthGuard  {
     return this.authService.isAuthenticated()
       .pipe(map(auth => {
         if (!auth) {
-          this.authService.showLoginModal(); 
+          this.authService.showLoginModal();  // show login modal if not logged in and try to access a protected route
           return false;
         }
         return true;

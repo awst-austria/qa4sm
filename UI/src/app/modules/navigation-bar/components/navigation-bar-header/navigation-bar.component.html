@@ -10,20 +10,9 @@
   </p-menubar>
 </div>
 
-<p-dialog 
-  header="Please log in" 
-  [(visible)]="showLoginModal" 
-  [modal]="true"
-  [draggable]="false"
-  [resizable]="false"
-  [closeOnEscape]="true"
-  [dismissableMask]="true"
-  styleClass="login-dialog"
-  (onHide)="onLoginModalClose()">
-  <div>
-    <qa-login (loggedIn)="onLoginSuccess()"></qa-login>
-  </div>
-</p-dialog>
+<div>
+  <qa-login (loggedIn)="onLoginSuccess()"></qa-login>
+</div>
 
 <div *ngIf="isMaintenancePossible"
      class="flex flex-column w-12 alert py-2 text-center align-content-center justify-content-center">
