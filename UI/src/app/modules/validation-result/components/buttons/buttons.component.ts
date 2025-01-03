@@ -10,6 +10,7 @@ import {GlobalParamsService} from '../../../core/services/global/global-params.s
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {CustomHttpError} from '../../../core/services/global/http-error.service';
 
+import {ValidationRunConfigService} from 'src/app/pages/validate/service/validation-run-config.service'
 
 @Component({
   selector: 'qa-buttons',
@@ -41,12 +42,12 @@ export class ButtonsComponent implements OnInit {
   publishingInProgress$: Observable<boolean>;
   isArchived = signal(undefined)
 
-
   constructor(private router: Router,
               private validationService: ValidationrunService,
               public authService: AuthService,
               public globals: GlobalParamsService,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              private validationRunConfigService: ValidationRunConfigService) {
   }
 
   ngOnInit(): void {
@@ -160,6 +161,26 @@ export class ButtonsComponent implements OnInit {
 
   downloadResultFile(validationId: string, fileType: string, fileName: string): void {
     this.validationService.downloadResultFile(validationId, fileType, fileName);
+  }
+
+  downloadValidationConfiguration(validationId: string): void {
+    this.validationRunConfigService.getValidationConfig(validationId).subscribe((data) => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+
+      // Create a URL for the Blob
+      const url = URL.createObjectURL(blob);
+      console.log(blob)
+      // Create an anchor element and trigger a download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `validation-config-${validationId}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // Clean up the URL object
+      URL.revokeObjectURL(url);
+    });
   }
 
   addValidation(validationId: string): void {

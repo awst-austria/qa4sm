@@ -1,0 +1,100 @@
+@import "../../../../../styles";  
+
+
+.small-label {
+  height: 42px;
+  line-height: 40px;
+}
+
+.filter-chip {
+  display: flex;
+  align-items: center;
+  margin: 5px;
+  padding: 1px;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  font-size: 18px;
+  border: 1px solid $button-base-color;  
+}
+
+.filter-chip .filter-name {
+  background-color: $dropdown-buttons-background; 
+  color: $button-base-color;  
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.filter-chip .filter-values {
+  color: #333;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.filter-chip .button-group {
+  margin-left: auto;
+  display: flex;
+  gap: 5px;
+}
+
+.active-filters {
+  margin-top: 20px;
+}
+
+.filter-heading {
+  font-size: 1rem; 
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;  
+  background-color: #f1f1f1;
+  padding: 5px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.filter-text {
+  display: flex;
+  flex-direction: row;  
+}
+
+.filter-name {
+  background-color: $dropdown-buttons-background;  
+  color: $button-base-color; 
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.filter-values {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2px 5px;
+  border-radius: 4px;
+  gap: 2px;
+}
+
+button.p-button-rounded {
+  margin-left: 5px;
+}
+
+.checkbox-group ::ng-deep .p-checkbox {
+  margin-right: 0.5rem;
+}
+
+::ng-deep .square-calendar .p-calendar {
+  .p-inputtext {
+    border-radius: 0;
+  }
+  .p-datepicker-trigger {
+    border-radius: 0;
+  }
+}
