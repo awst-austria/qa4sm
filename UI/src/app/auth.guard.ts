@@ -17,11 +17,11 @@ export class AuthGuard  {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     return this.authService.isAuthenticated()
       .pipe(map(auth => {
-      if (auth == true) {
+        if (!auth) {
+          this.authService.showLoginModal();  // show login modal if not logged in and try to access a protected route
+          return false;
+        }
         return true;
-      }
-      this.router.navigate(['login']);
-      return false;
     }));
   }
 }

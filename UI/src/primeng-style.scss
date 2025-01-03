@@ -4254,6 +4254,31 @@ div.carousel-caption {
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+.p-dialog.login-dialog {
+  .p-dialog-content {
+      min-width: 450px;
+      min-height: 350px;
+      padding: 2rem;
+  }
+  
+  .p-dialog-header {
+      padding: 1.5rem;
+  }
+
+  form {
+      width: 100%;
+      
+      .p-float-label {
+          margin-bottom: 1.5rem;
+      }
+
+      .p-button {
+          width: 100%;
+          margin-top: 1rem;
+      }
+  }
+}
+
 #ismn-depth-selector .p-dialog {
   width: 550px;
 }

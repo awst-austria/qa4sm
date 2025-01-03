@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
-import {faCoffee} from '@fortawesome/free-solid-svg-icons/faCoffee';
+import { AuthService } from './modules/core/services/auth/auth.service';
 
 
 
@@ -12,11 +12,11 @@ import {faCoffee} from '@fortawesome/free-solid-svg-icons/faCoffee';
 export class AppComponent implements OnInit {
   title = 'qa4sm-ui';
 
-
-  constructor(private logger: NGXLogger) {
+  constructor(private logger: NGXLogger, private authService: AuthService) {
   }
 
   ngOnInit(): void {
     this.logger.debug('Main app component init');
   }
+
 }
