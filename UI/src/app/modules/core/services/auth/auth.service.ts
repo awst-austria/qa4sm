@@ -94,8 +94,8 @@ export class AuthService {
   }
 
   private isProtectedRoute(route: string): boolean {
-    // Check if the provided route is in the list of unprotected routes - if not, it is assumed to be a protected route (safer approach that assuming all routes are protected unless specified)
-    return !this.unprotectedRoutes.some(unprotectedRoute => (route.substring(1).startsWith(unprotectedRoute) && (unprotectedRoute.length > 0)));
+    // Actually check if the provided route is in the list of unprotected routes - if not, it is assumed to be a protected route (safer approach that assuming all routes are protected unless specified)
+    return !this.unprotectedRoutes.some(unprotectedRoute => (route.startsWith(unprotectedRoute, 1) && (unprotectedRoute.length > 0)));
   }
 
   public isAuthenticated(): Observable<boolean> {
@@ -116,12 +116,17 @@ export class AuthService {
   }
 
   login(credentials: LoginDto): Observable<UserDto> {
+    const currentRoute = this.router.url;
+
     return this.httpClient
       .post<UserDto>(this.loginUrl, credentials)
       .pipe(
         tap(user => {
           this.currentUser = user;
           this.authenticated.next(true);
+          if ((currentRoute.startsWith('signup', 1)) || (currentRoute.startsWith('password-reset', 1))) {
+            this.router.navigate(['/home']); // redirect to home if on signup or password-reset page and successfully log in 
+          }
         }),
         catchError(error=> {
           this.authenticated.next(false);
