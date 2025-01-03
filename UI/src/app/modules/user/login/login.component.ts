@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
   showModal = false;
   isLoading = false;
   private destroy$ = new Subject<void>();
+  headerMessage = 'Please log in';
 
   loginDto = new LoginDto('', '');
 
@@ -36,9 +37,14 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
     this.loginService.showLoginModal$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(show => {
-        this.showModal = show;
-        if (!show) {
+      .subscribe(state => {
+        this.showModal = state.show;
+        if (state.message) {
+          this.headerMessage = state.message;
+        } else {
+          this.headerMessage = 'Please log in';
+        }
+        if (!state.show) {
           this.resetForm();
         }
       });
@@ -89,6 +95,6 @@ export class LoginComponent implements OnInit {
   }
 
   onForgotOrSignUpClick(){
-    this.loginService.showLoginModalSubject.next(false);
+    this.loginService.hideLoginModal();
   }
 }

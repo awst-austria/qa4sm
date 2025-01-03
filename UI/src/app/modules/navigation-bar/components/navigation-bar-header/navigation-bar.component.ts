@@ -133,7 +133,7 @@ export class NavigationBarComponent implements OnInit {
     });
 
     this.authService.showLoginModal$.subscribe(
-      show => this.showLoginModal = show
+      (state: {show: boolean, message?: string}) => this.showLoginModal = state.show
     );
     this.updateLogo(window.innerWidth);
   }

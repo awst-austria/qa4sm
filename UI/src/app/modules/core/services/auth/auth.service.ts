@@ -46,7 +46,7 @@ export class AuthService {
 
   private unprotectedRoutes: string[] = [];
 
-  showLoginModalSubject = new BehaviorSubject<boolean>(false);
+  private showLoginModalSubject = new BehaviorSubject<{show: boolean, message?: string}>({show: false});
   showLoginModal$ = this.showLoginModalSubject.asObservable();
 
   private passwordResetTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -107,12 +107,12 @@ export class AuthService {
   }
 
 
-  showLoginModal() {
-    this.showLoginModalSubject.next(true);
+  showLoginModal(message?: string) {
+    this.showLoginModalSubject.next({show: true, message});
   }
 
   hideLoginModal() {
-    this.showLoginModalSubject.next(false);
+    this.showLoginModalSubject.next({show: false});
   }
 
   login(credentials: LoginDto): Observable<UserDto> {

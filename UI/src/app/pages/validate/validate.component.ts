@@ -730,7 +730,8 @@ export class ValidateComponent implements OnInit, AfterViewInit {
   public startValidation(checkForExistingValidation: boolean): void {
     
     if (!this.authService.authenticated.value) {
-      this.authService.showLoginModal();
+      this.toastService.showErrorWithHeader('Cannot start validation', 'You must be logged in to start a validation.');
+      this.authService.showLoginModal('Please log in to start validation');
       return;
     }
 
