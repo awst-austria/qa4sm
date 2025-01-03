@@ -190,13 +190,11 @@ export class NavigationBarComponent implements OnInit {
     ];
   }
 
-
   logout(): void {
     this.authService.logout().subscribe({       
       next: () => {
         this.setPreviousUrl('');
-        this.router.navigate(['home'])
-          .then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
+        this.toastService.showSuccessWithHeader('Logout', 'Successful logout');
       },
       error: () => {
         this.toastService.showErrorWithHeader(

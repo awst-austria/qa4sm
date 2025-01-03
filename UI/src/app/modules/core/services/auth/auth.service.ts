@@ -6,6 +6,8 @@ import {LoginDto} from './login.dto';
 import {UserDto} from './user.dto';
 import {catchError, map, tap} from 'rxjs/operators';
 import {HttpErrorService} from '../global/http-error.service';
+import {AppRoutingModule} from 'src/app/app-routing.module';
+import {Router, Routes} from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +44,7 @@ export class AuthService {
   public authenticated: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public currentUser: UserDto = this.emptyUser;
 
+  private unprotectedRoutes: string[] = [];
 
   showLoginModalSubject = new BehaviorSubject<boolean>(false);
   showLoginModal$ = this.showLoginModalSubject.asObservable();
@@ -53,8 +56,12 @@ export class AuthService {
   previousUrl$: Observable<string> = this.previousUrlSubject.asObservable();
 
   constructor(private httpClient: HttpClient,
-              private httpError: HttpErrorService) {
+              private httpError: HttpErrorService,
+              private router: Router, 
+              private appRoutingModule: AppRoutingModule) {
     this.init();
+    this.initializeUnprotectedRoutes();
+
   }
 
   // todo: check if this method is actually needed
@@ -66,6 +73,29 @@ export class AuthService {
           this.authenticated.next(true);
         }
       );
+  }
+
+  private initializeUnprotectedRoutes() {
+    //Initialise the list of the unprotected routes from the router
+    const routes: Routes = this.router.config;
+    this.unprotectedRoutes = this.getUnprotectedRoutes(routes);
+  }
+
+  private getUnprotectedRoutes(routes: Routes): string[] {
+    //Get unprotected routes from the router 
+    const unprotectedRoutes = [];
+
+    for (const route of routes){
+      if ((!route.canActivate) && (route.path.length > 0)) {
+        unprotectedRoutes.push(route.path);
+      }    
+    }
+    return unprotectedRoutes;
+  }
+
+  private isProtectedRoute(route: string): boolean {
+    // Check if the provided route is in the list of unprotected routes - if not, it is assumed to be a protected route (safer approach that assuming all routes are protected unless specified)
+    return !this.unprotectedRoutes.some(unprotectedRoute => (route.substring(1).startsWith(unprotectedRoute) && (unprotectedRoute.length > 0)));
   }
 
   public isAuthenticated(): Observable<boolean> {
@@ -101,12 +131,17 @@ export class AuthService {
   }
 
   logout(): Observable<boolean> {
+    const currentRoute = this.router.url;
+
     return this.httpClient
       .post(this.logoutUrl, null)
       .pipe(
         map(() => {
           this.currentUser = this.emptyUser; 
           this.authenticated.next(false);
+          if (this.isProtectedRoute(currentRoute)) {
+            this.router.navigate(['/home']); // Redirect to home if on a protected route
+          }
           return true;
         }),
         catchError(() => {

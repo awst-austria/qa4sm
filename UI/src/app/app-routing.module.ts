@@ -27,7 +27,7 @@ import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-dat
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 
 
-const routes: Routes = [
+export const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
   {path: 'validate', component: ValidateComponent, resolve: {datasets: DatasetResolver}},
