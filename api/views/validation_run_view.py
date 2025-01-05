@@ -76,6 +76,8 @@ def my_results(request):
     else:
         return JsonResponse({'message': 'Not appropriate order given'}, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
+    print(request.query_params)
+
     filter_name = request.query_params.get('name', None)
     filter_statuses = request.query_params.getlist('statuses', None)
     start_date_str = request.GET.get('startDate', None)
@@ -102,7 +104,6 @@ def my_results(request):
         for dataset in filter_scalingRef:
             dataset_filters |= Q(scaling_ref_id__dataset__pretty_name=dataset)
         val_runs = val_runs.filter(dataset_filters)
-
 
     if filter_name in (None, "null"):
         val_runs = val_runs.all() # when no filter is applied
@@ -204,7 +205,6 @@ def get_copied_validations(request, **kwargs):
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
 
-<<<<<<< HEAD
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])
 def is_validation_finished(request, **kwargs):
@@ -215,7 +215,7 @@ def is_validation_finished(request, **kwargs):
 
     ifFinished = (val_run.progress == 100 and val_run.end_time is not None)
     return JsonResponse({'validation_complete': ifFinished}, status=status.HTTP_200_OK)
-=======
+
 def filter_by_job_statuses(job_statuses):
     #Horrible code to apply set of job status filters.
     status_filters = Q()
@@ -234,7 +234,6 @@ def filter_by_job_statuses(job_statuses):
         else:
             print('Status didnt match')
     return (status_filters)
->>>>>>> filtering-refactor
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:

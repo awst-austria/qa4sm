@@ -3,16 +3,10 @@ import { FilterPayload, FilterConfig } from './filterPayload.interface';
 
 import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
-import { filter } from 'jszip';
 
 interface FilterState {
   // contains the runtime values of filters
   value: any;
-  //references?: {
-  //  spatial: boolean;
-  //  temporal: boolean;
-  //  scaling: boolean;
-  //};
 }
 
 
@@ -39,6 +33,14 @@ export class FilteringFormComponent implements OnInit {
       validationFn: (state: FilterState) => true,
       formatValuesFn: (state: FilterState) => [state.value],
       backendField: 'name',
+      isArray: false
+    },
+    'Submission Date': {
+      name: 'Submission Date', 
+      type: 'date-input',
+      validationFn: (state: FilterState) => true,
+      formatValuesFn: (state: FilterState) => [state.value],
+      backendField: 'start_time',
       isArray: false
     },
     'Spatial Reference Dataset': {
@@ -90,7 +92,6 @@ export class FilteringFormComponent implements OnInit {
     Object.keys(FilteringFormComponent.FILTER_CONFIGS).forEach(key => {
       this.filterStates[key] = {
         value: null,
-        //references: { spatial: false, temporal: false, scaling: false }
       };
     });
     this.updateDropdownFilters();
@@ -101,8 +102,8 @@ export class FilteringFormComponent implements OnInit {
     this.fetchPrettyNames();
   }
 
-  // get all dataset names to provide list for filter choice
   private fetchPrettyNames(): void {
+    // get all dataset names to provide list for filter choice
     this.datasetService.getAllDatasets().subscribe({
       next: (datasets: DatasetDto[]) => {
         this.availableDatasets = datasets
@@ -120,22 +121,21 @@ export class FilteringFormComponent implements OnInit {
   }
 
 
-  // get the filters to use in template
   get filterConfigs() {
+    // get the filters to use in template
     return FilteringFormComponent.FILTER_CONFIGS;
   }
 
-  // check the validity of the given filter input using its validation function
   isFilterValid(): boolean {
+    // check the validity of the given filter input using its validation function
     if (!this.selectedFilterKey) return false;
-
     return FilteringFormComponent.FILTER_CONFIGS[this.selectedFilterKey]
       .validationFn(this.filterStates[this.selectedFilterKey]);
   }
 
-  selectFilter() {
+  addFilter() {
+    // Check if filter is valid and add it to active filters
     if (!this.isFilterValid()) return;
-    
     const config = FilteringFormComponent.FILTER_CONFIGS[this.selectedFilterKey];
     const filterValues = config.formatValuesFn(this.filterStates[this.selectedFilterKey]);
     
@@ -143,13 +143,15 @@ export class FilteringFormComponent implements OnInit {
     this.onFilteringChange();
     this.resetFilterState();
     this.showFilterForm = false;
+    console.log(this.filterPayload);
   }
 
   private updateActiveFilters(filterValues: string[]) {
+    // update active filters with new filter values, either adding new filter or updating existing one
     const existingIndex = this.activeFilters
       .findIndex(f => f.filter === this.selectedFilterKey);
     if (existingIndex !== -1) {
-      this.activeFilters[existingIndex].values = filterValues;
+      this.activeFilters[existingIndex].values = filterValues; 
     } else {
       this.activeFilters.push({ 
         filter: String(this.selectedFilterKey),
@@ -159,6 +161,7 @@ export class FilteringFormComponent implements OnInit {
   }
 
   private resetFilterState() {
+    // reset filter state after successfully adding filter
     this.filterStates[this.selectedFilterKey] = { 
       value: null, 
     };
@@ -174,41 +177,44 @@ export class FilteringFormComponent implements OnInit {
   onFilteringChange(): void { 
     // build filter payload and emit to validation page component
 
-    //////// NEEDS TO BE UPDATED ///////////
+    //////// neeeds to be made more generic ///////////
     const filterPayload: FilterPayload = {
       statuses: this.getFilterValues('Status'),
-      name: this.getFilterValues('Validation Name')[0] || null,
+      name: this.getFilterValues('Validation Name')[0],// || null,
       spatialRef: this.getFilterValues('Spatial Reference Dataset'),
       temporalRef: this.getFilterValues('Temporal Reference Dataset'),
       scalingRef: this.getFilterValues('Scaling Reference Dataset')
     };
-    ///////////////////////////////////////
     this.filterPayload.emit(filterPayload);
   }
 
   cancelFilter() {
+    // cancel filter input form and reset state
     this.isEditing = false;
     this.showFilterForm = false;
     this.resetFilterState()
   }
 
   editFilter(index: number) {
+    // edit filter by setting filter form to show and setting selected filter key to filter being edited
     this.isEditing = true;
     this.showFilterForm = true;
-    const filterToEdit = this.activeFilters[index]; // get filter to edit
+    const filterToEdit = this.activeFilters[index];
     this.selectedFilterKey = filterToEdit.filter;
     this.updateDropdownFilters(); 
   }
 
   removeFilter(index: number) {
+    // remove filter from active filters and add it back to available filters to update dropdown list
     const removedFilter = this.activeFilters[index]; 
-    this.availableFilters.push(this.activeFilters[index].filter); // Add deleted filter back to available filters
-    this.activeFilters.splice(index, 1); // Remove filter from active filters
-    this.updateDropdownFilters(); // Update list of dropdown filters
+    this.availableFilters.push(this.activeFilters[index].filter); 
+    this.activeFilters.splice(index, 1); 
+    this.updateDropdownFilters(); 
     this.onFilteringChange()
   }
 
   updateDropdownFilters() {
+    // update dropdown filter list to show filters that are not active
     this.dropdownFilters = this.allFilters
       .filter(filter => {
         if (this.isEditing && filter === this.selectedFilterKey) {

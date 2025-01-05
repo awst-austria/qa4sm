@@ -34,8 +34,9 @@ import {SelectButtonModule} from 'primeng/selectbutton';
 import {ToggleButtonModule} from 'primeng/togglebutton';
 import {MenuModule} from 'primeng/menu';
 import {CoreModule} from '../core/core.module';
-import { FilteringFormComponent } from './components/filtering-form/filtering-form.component';
-import { CalendarModule } from 'primeng/calendar';
+import {FilteringFormComponent} from './components/filtering-form/filtering-form.component';
+import {CalendarModule} from 'primeng/calendar';
+
 @NgModule({
   declarations: [ValidationrunRowComponent,
     ValidationPagePaginatedComponent,

@@ -1,5 +1,5 @@
 
-type FilterType = 'string-input' | 'dropdown' | 'multi-select' | 'single-select' | 'date-range' | 'dataset';
+type FilterType = 'string-input' | 'dropdown' | 'multi-select' | 'single-select' | 'date-input' | 'date-range' | 'dataset';
 
 export interface FilterPayload {
   [key: string]: string[] | string | null;

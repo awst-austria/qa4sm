@@ -67,7 +67,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
     const docHeight = document.documentElement.scrollHeight;
     const windowBottom = windowHeight + window.scrollY;
 
-    const scrollThreshold = 0.9; //Load further results at 95% scroll - more robust
+    const scrollThreshold = 0.9; //Load further results at 90% scroll - more robust
     if ((windowBottom / docHeight) >= scrollThreshold && !this.isLoading && !this.endOfPage) {
       this.currentPage++;
       this.offset = (this.currentPage - 1) * this.limit;
@@ -83,6 +83,7 @@ export class ValidationPagePaginatedComponent implements OnInit {
       .set('limit', String(this.limit))
       .set('order', String(this.order));
 
+    // Add filters from payload to query parameters
     Object.entries(FilteringFormComponent.FILTER_CONFIGS).forEach(([key, config]) => {
       const values = this.filterPayload[config.backendField];
       if (values) {
@@ -154,10 +155,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.orderChange = false;
     this.isLoading = false;
   }
-  
-  private updateValidations(validations: ValidationrunDto[], length: number): void {
-
-  }
 
   getOrder(order): void {
     this.order = order;
@@ -173,8 +170,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.currentPage = 1;
     this.offset = 0;
     this.endOfPage = false;
-
-
     this.getValidationsAndItsNumber(this.published);
   }
 

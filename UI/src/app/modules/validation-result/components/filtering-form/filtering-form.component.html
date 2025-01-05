@@ -6,7 +6,7 @@
     </p-button>
 </div>
 
-<div *ngIf="showFilterForm" class="full w-12 flex flex-row lg:flex-nowrap flex-wrap" id="filteringForm">
+<div *ngIf="showFilterForm" class="flex flex-row lg:flex-nowrap flex-wrap" id="filteringForm">
     <div class="small-label lg:w-2 w-12">
       <div class="p-fluid" style="display: flex; align-items: center;">
         <span> Filter By:</span>
@@ -60,7 +60,7 @@
         label="Add"
         icon="pi pi-filter"
         class="p-button-success p-button-rounded"
-        (click)="selectFilter()"
+        (click)="addFilter()"
         [disabled]="!isFilterValid() || !selectedFilterKey"
         [pTooltip]="selectedFilter === 'Dataset' && !spatial && !temporal ? 'Please select at least one of referencing methods.' : null"
         tooltipPosition="right"
