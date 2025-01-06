@@ -39,7 +39,10 @@ export class FilteringFormComponent implements OnInit {
       name: 'Submission Date', 
       type: 'date-input',
       validationFn: (state: FilterState) => true,
-      formatValuesFn: (state: FilterState) => [state.value],
+      formatValuesFn: (state: FilterState) => {
+        const date = state.value as Date;
+        return [date.toLocaleDateString()];
+      },
       backendField: 'start_time',
       isArray: false
     },
@@ -143,7 +146,6 @@ export class FilteringFormComponent implements OnInit {
     this.onFilteringChange();
     this.resetFilterState();
     this.showFilterForm = false;
-    console.log(this.filterPayload);
   }
 
   private updateActiveFilters(filterValues: string[]) {
@@ -181,6 +183,7 @@ export class FilteringFormComponent implements OnInit {
     const filterPayload: FilterPayload = {
       statuses: this.getFilterValues('Status'),
       name: this.getFilterValues('Validation Name')[0],// || null,
+      start_time: this.getFilterValues('Submission Date')[0],// || null,
       spatialRef: this.getFilterValues('Spatial Reference Dataset'),
       temporalRef: this.getFilterValues('Temporal Reference Dataset'),
       scalingRef: this.getFilterValues('Scaling Reference Dataset')
@@ -227,4 +230,5 @@ export class FilteringFormComponent implements OnInit {
         value: filter
       }));
   }
+
 }

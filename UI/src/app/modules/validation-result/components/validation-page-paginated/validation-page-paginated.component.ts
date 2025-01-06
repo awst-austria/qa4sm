@@ -97,7 +97,6 @@ export class ValidationPagePaginatedComponent implements OnInit {
         }
       }
     });
-
     if (!published) {
       this.validationrunService.getMyValidationruns(parameters)
         .pipe(

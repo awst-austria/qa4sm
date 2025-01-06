@@ -1,7 +1,9 @@
+from dateutil import parser
 from datetime import datetime
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
@@ -11,8 +13,6 @@ from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
-
-
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -80,7 +80,7 @@ def my_results(request):
 
     filter_name = request.query_params.get('name', None)
     filter_statuses = request.query_params.getlist('statuses', None)
-    start_date_str = request.GET.get('startDate', None)
+    start_date_str = request.GET.get('start_time', None)
     end_date_str = request.GET.get('endDate', None)
 
     filter_spatialRef = request.query_params.getlist('spatialRef', None)
@@ -117,12 +117,9 @@ def my_results(request):
         val_runs = val_runs.filter(status_filters)
 
 
-    if start_date_str and end_date_str:
-        start_date = datetime.fromisoformat(start_date_str.rstrip('Z'))  
-        end_date = datetime.fromisoformat(end_date_str.rstrip('Z'))  
-        val_runs = val_runs.filter(
-            start_time__gte=start_date,  
-            start_time__lte=end_date)
+    if start_date_str:
+        start_date = parser.parse(start_date_str).date()
+        val_runs = val_runs.filter(start_time__date=start_date)
 
     if limit and offset:
         limit = int(limit)

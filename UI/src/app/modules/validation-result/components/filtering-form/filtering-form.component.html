@@ -52,6 +52,13 @@
       [options]="filterConfigs[selectedFilterKey].options"
       [(ngModel)]="filterStates[selectedFilterKey].value"/>
 
+    <p-calendar *ngSwitchCase="'date-input'"
+      [(ngModel)]="filterStates[selectedFilterKey].value"
+      dateFormat="dd/mm/yy"
+      [inputStyle]="{'width': '100%', 'height': '42px',  'border-radius': '0 0 0 0'}"
+      placeholder="Select Date">
+  </p-calendar>
+
   </ng-container>
 
   <div class="lg:w-2 w-12">
