@@ -125,7 +125,7 @@ export class FilteringFormComponent implements OnInit {
 
 
   get filterConfigs() {
-    // get the filters to use in template
+    // get the filters
     return FilteringFormComponent.FILTER_CONFIGS;
   }
 
@@ -146,6 +146,7 @@ export class FilteringFormComponent implements OnInit {
     this.onFilteringChange();
     this.resetFilterState();
     this.showFilterForm = false;
+    this.updateDropdownFilters()
   }
 
   private updateActiveFilters(filterValues: string[]) {
@@ -169,6 +170,7 @@ export class FilteringFormComponent implements OnInit {
     };
     this.selectedFilterKey = null;
     this.showFilterForm = false;
+    this.updateDropdownFilters();
   }
 
   private getFilterValues(filterName: string): string[] {
@@ -182,8 +184,8 @@ export class FilteringFormComponent implements OnInit {
     //////// neeeds to be made more generic ///////////
     const filterPayload: FilterPayload = {
       statuses: this.getFilterValues('Status'),
-      name: this.getFilterValues('Validation Name')[0],// || null,
-      start_time: this.getFilterValues('Submission Date')[0],// || null,
+      name: this.getFilterValues('Validation Name')[0],
+      start_time: this.getFilterValues('Submission Date')[0],
       spatialRef: this.getFilterValues('Spatial Reference Dataset'),
       temporalRef: this.getFilterValues('Temporal Reference Dataset'),
       scalingRef: this.getFilterValues('Scaling Reference Dataset')
@@ -218,17 +220,17 @@ export class FilteringFormComponent implements OnInit {
 
   updateDropdownFilters() {
     // update dropdown filter list to show filters that are not active
-    this.dropdownFilters = this.allFilters
-      .filter(filter => {
-        if (this.isEditing && filter === this.selectedFilterKey) {
-          return true;
-        }
-        return !this.activeFilters.some(af => af.filter === filter);
-      })
-      .map(filter => ({
-        label: filter,
-        value: filter
-      }));
-  }
+    console.log('Active filters:', this.activeFilters);
+    const availableFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS)
+    .filter(filter => {
+      return (this.isEditing && filter === this.selectedFilterKey) || 
+             !this.activeFilters.some(af => af.filter === filter);
+    });
 
+    this.dropdownFilters = availableFilters.map(filter => ({
+      label: filter,
+      value: filter
+    }));
+
+  }
 }

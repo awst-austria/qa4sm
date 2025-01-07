@@ -41,7 +41,9 @@ export class ValidationPagePaginatedComponent implements OnInit {
   dataFetchError = signal(false);
 
 
-  constructor(private validationrunService: ValidationrunService, private datasetConfigService: DatasetConfigurationService, private datasetService: DatasetService) {
+  constructor(private validationrunService: ValidationrunService, 
+              private datasetConfigService: DatasetConfigurationService, 
+              private datasetService: DatasetService) {
     //initialise empty filterPayload with empty array or null for filters with/without isArray
     this.filterPayload = Object.entries(FilteringFormComponent.FILTER_CONFIGS).reduce((acc, [_, config]) => {
       acc[config.backendField] = config.isArray ? [] : null;
