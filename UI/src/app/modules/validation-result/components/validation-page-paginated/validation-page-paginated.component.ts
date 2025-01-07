@@ -5,12 +5,9 @@ import {HttpParams} from '@angular/common/http';
 import {BehaviorSubject, combineLatest, EMPTY, forkJoin, Observable} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 import {FilterPayload, FilterConfig} from 'src/app/modules/validation-result/components/filtering-form/filterPayload.interface';
+import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
 
-import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
-import {DatasetConfigurationService} from '../../services/dataset-configuration.service';
-
-///// MOVE THIS WHEN FINISHED TESTING ///////
-import { FilteringFormComponent } from 'src/app/modules/validation-result/components/filtering-form/filtering-form.component';
+import {FilteringFormComponent} from 'src/app/modules/validation-result/components/filtering-form/filtering-form.component';
 
 @Component({
   selector: 'qa-validation-page-paginated',
@@ -35,20 +32,19 @@ export class ValidationPagePaginatedComponent implements OnInit {
   orderChange: boolean = false;
   endOfPage: boolean = false;
 
-
-  filterPayload: FilterPayload; //= {  statuses: [], name: null, spatialRef: [], temporalRef: [], scalingRef: [] };
+  filterPayload: FilterPayload; 
 
   dataFetchError = signal(false);
 
 
   constructor(private validationrunService: ValidationrunService, 
-              private datasetConfigService: DatasetConfigurationService, 
-              private datasetService: DatasetService) {
+              private filterService: FilterService) {
     //initialise empty filterPayload with empty array or null for filters with/without isArray
-    this.filterPayload = Object.entries(FilteringFormComponent.FILTER_CONFIGS).reduce((acc, [_, config]) => {
-      acc[config.backendField] = config.isArray ? [] : null;
-      return acc;
-    }, {} as FilterPayload);
+    this.filterService.filterState$.subscribe(filters => {
+      this.filterPayload = filters;
+      this.orderChange = true;
+      this.getValidationsAndItsNumber(this.published);
+    });
   }
   
 
@@ -163,11 +159,8 @@ export class ValidationPagePaginatedComponent implements OnInit {
     this.getValidationsAndItsNumber(this.published);
   }
 
-  getFilter(filter: FilterPayload): void {
-    this.filterPayload = filter;
+  getFilter(): void {
     this.orderChange =true;
-
-    // Reset page
     this.currentPage = 1;
     this.offset = 0;
     this.endOfPage = false;
@@ -244,23 +237,15 @@ export class ValidationPagePaginatedComponent implements OnInit {
     return EMPTY;
   }
 
-  getInitDate(): [Date, Date] {
-    // get initial date range to cover past 5 years, repeated in child...
-    const today = new Date();
-    const pastDate = new Date(today);
-    pastDate.setFullYear(today.getFullYear() - 5);  // Subtract 5 years from the current date
-    return [pastDate, today];
-  }
-
   areFiltersApplied(): boolean {
-    // check if any filters have been applied, used to define message in case of no validation results found)
+    // check if any filters have been applied, used to define message in case of no validation results found
     if (!this.filterPayload) {
       return false;
     }
     
     return (
       this.filterPayload.statuses.length > 0 || 
-      this.filterPayload.name !== null //|| 
+      this.filterPayload.name !== null 
       //(this.filterPayload.prettyName && this.filterPayload.prettyName.length > 0)
     );
   }

@@ -1,8 +1,9 @@
 import {Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FilterPayload, FilterConfig } from './filterPayload.interface';
 
-import { DatasetDto } from 'src/app/modules/core/services/dataset/dataset.dto';
+import {DatasetDto} from 'src/app/modules/core/services/dataset/dataset.dto';
 import {DatasetService} from 'src/app/modules/core/services/dataset/dataset.service';
+import {FilterService} from 'src/app/modules/validation-result/services/filter.service';
 
 interface FilterState {
   // contains the runtime values of filters
@@ -75,7 +76,7 @@ export class FilteringFormComponent implements OnInit {
     }
   };
   
-  @Output() filterPayload =  new EventEmitter<FilterPayload>();
+  //@Output() filterPayload =  new EventEmitter<FilterPayload>();
 
   availableDatasets: string[] = [];
   allFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS);
@@ -91,7 +92,7 @@ export class FilteringFormComponent implements OnInit {
 
 
 
-  constructor(private datasetService: DatasetService) {
+  constructor(private filterService: FilterService, private datasetService: DatasetService) {
     Object.keys(FilteringFormComponent.FILTER_CONFIGS).forEach(key => {
       this.filterStates[key] = {
         value: null,
@@ -190,7 +191,9 @@ export class FilteringFormComponent implements OnInit {
       temporalRef: this.getFilterValues('Temporal Reference Dataset'),
       scalingRef: this.getFilterValues('Scaling Reference Dataset')
     };
-    this.filterPayload.emit(filterPayload);
+    //this.filterPayload.emit(filterPayload);
+    this.filterService.updateFilters(filterPayload);
+
   }
 
   cancelFilter() {
@@ -220,7 +223,6 @@ export class FilteringFormComponent implements OnInit {
 
   updateDropdownFilters() {
     // update dropdown filter list to show filters that are not active
-    console.log('Active filters:', this.activeFilters);
     const availableFilters = Object.keys(FilteringFormComponent.FILTER_CONFIGS)
     .filter(filter => {
       return (this.isEditing && filter === this.selectedFilterKey) || 

@@ -38,8 +38,8 @@
     </div>
 
     <div *ngIf="(validations.length || areFiltersApplied()) && !dataFetchError()" class="w-12">
-      <qa-filtering-form (filterPayload)="getFilter($event)"/>
-      
+      <qa-filtering-form/> 
+
     </div>
 
     <!-- Rows -->
@@ -86,7 +86,7 @@
 
     <div *ngIf="(!validations.length) && areFiltersApplied()" class="text-center w-12 my-2">
       <p class="lead text-muted">
-        No validation results meeting the filter criteria.
+        No validation results found that meet the filter criteria.
       </p>
     </div>
 
