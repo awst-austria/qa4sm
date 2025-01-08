@@ -11,19 +11,9 @@ from django.contrib.auth import update_session_auth_hash
 
 
 def _get_querydict_from_user_data(request, userdata):
-    print(userdata)
     user_data_dict = QueryDict(mutable=True)
     user_data_dict.update({'csrfmiddlewaretoken': get_token(request)})
     user_data_dict.update(userdata)
-
-    if not userdata.get('password1') and not userdata.get('password2'):
-        # Optionally, you can skip the password fields entirely if they are not updated
-        user_data_dict = user_data_dict.copy()  # Make it mutable again if it's not
-        user_data_dict.pop('password1', None)
-        user_data_dict.pop('password2', None)
-
-
-    print(user_data_dict)
     return user_data_dict
 
 
@@ -57,10 +47,7 @@ def user_update(request):
     form = UserProfileForm(new_user_data, instance=request.user)
 
     if form.is_valid():
-        current_password_hash = request.user.password
         newuser = form.save(commit=False)
-        if form.cleaned_data['password1'] == current_password_hash:
-            newuser.password = current_password_hash
 
         newuser.save()
         update_session_auth_hash(request, newuser)

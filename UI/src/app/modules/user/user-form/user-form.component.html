@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <div class="py-3">
+      <div class="py-3" *ngIf="!userForm.controls['password1'].disabled">
         <span class="p-float-label">
           <input class="form-field" id="password" type="password" pInputText formControlName="password1" autocomplete="new-password">
           <label for="password">Password</label>
@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <div class="py-3">
+      <div class="py-3" *ngIf="!userForm.controls['password2'].disabled">
         <span class="p-float-label">
           <input class="form-field" id="password-confirm" type="password" pInputText formControlName="password2">
           <label for="password-confirm">Password confirmation</label>
