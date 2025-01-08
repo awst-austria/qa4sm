@@ -142,7 +142,7 @@ export class AuthService {
       );
   }
 
-  resetPassword(resetPasswordForm: any): Observable<any> {
+  resetPasswordRequest(resetPasswordForm: any): Observable<any> {
     return this.httpClient.post(this.passwordResetUrl, resetPasswordForm)
       .pipe(
         catchError(err =>
