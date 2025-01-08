@@ -52,40 +52,36 @@ export class SetPasswordComponent implements OnInit {
   }
 
   onSubmit(): void {
-    // let submit: Observable<any>;
+    let passUpdate: Observable<any>;
     if (this.userAuthenticated) {
-     this.updatePassword();
-    } else{
-      this.resetPassword();
+      passUpdate = this.updatePassword();
+    } else {
+      passUpdate = this.resetPassword();
     }
+    passUpdate
+      .pipe(
+        catchError(error => this.onSetPasswordError(error))
+      )
+      .subscribe(
+        () => this.onSetPasswordNext()
+      );
   }
 
-  private resetPassword(){
+  private resetPassword() {
     const setPasswordFormToSubmit = {
       token: this.token,
       password: this.setPasswordForm.controls.password1.value
     };
-    this.authService.resetPassword(setPasswordFormToSubmit, this.token).pipe(
-     catchError(error => this.onSetPasswordError(error))
-   )
-     .subscribe(
-       () => this.onSetPasswordNext()
-     );
+    return this.authService.resetPassword(setPasswordFormToSubmit, this.token);
   }
 
-  private updatePassword(){
+  private updatePassword() {
     const updatePasswordForm = {
       old_password: this.setPasswordForm.controls.oldPassword.value,
       new_password: this.setPasswordForm.controls.password1.value,
       confirm_password: this.setPasswordForm.controls.password2.value,
     }
-     this.authService.updatePassword(updatePasswordForm)
-       .pipe(
-       catchError(error => this.onSetPasswordError(error))
-     )
-       .subscribe(
-         () => this.onPasswordUpdate()
-       );
+    return this.authService.updatePassword(updatePasswordForm);
   }
 
   private onSetPasswordNext(): void {
@@ -93,10 +89,6 @@ export class SetPasswordComponent implements OnInit {
       this.toastService.showSuccessWithHeader('Password changed', 'You can log in using the new password'));
   }
 
-  private onPasswordUpdate(): void {
-    this.router.navigate(['/user-profile']).then(() =>
-      this.toastService.showSuccessWithHeader('Password updated', 'Your password has been updated.'));
-  }
 
   private onSetPasswordError(error: CustomHttpError): Observable<never> {
     this.formErrors = error.errorMessage.message;
