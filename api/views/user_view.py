@@ -1,23 +1,29 @@
 from django.contrib.auth import logout
 from django.http import HttpResponse, QueryDict, JsonResponse
 from django.middleware.csrf import get_token
-from django_countries.serializer_fields import CountryField
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.serializers import ModelSerializer
 from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
-from validator.models import User
 from django.contrib.auth import update_session_auth_hash
-from rest_framework.authtoken.models import Token
+
 
 
 def _get_querydict_from_user_data(request, userdata):
+    print(userdata)
     user_data_dict = QueryDict(mutable=True)
     user_data_dict.update({'csrfmiddlewaretoken': get_token(request)})
     user_data_dict.update(userdata)
+
+    if not userdata.get('password1') and not userdata.get('password2'):
+        # Optionally, you can skip the password fields entirely if they are not updated
+        user_data_dict = user_data_dict.copy()  # Make it mutable again if it's not
+        user_data_dict.pop('password1', None)
+        user_data_dict.pop('password2', None)
+
+
+    print(user_data_dict)
     return user_data_dict
 
 
@@ -51,15 +57,14 @@ def user_update(request):
     form = UserProfileForm(new_user_data, instance=request.user)
 
     if form.is_valid():
-
         current_password_hash = request.user.password
         newuser = form.save(commit=False)
-        if form.cleaned_data['password1'] == '':
+        if form.cleaned_data['password1'] == current_password_hash:
             newuser.password = current_password_hash
 
         newuser.save()
         update_session_auth_hash(request, newuser)
-        keys_to_remove = ['password1', 'password2', 'csrfmiddlewaretoken', 'terms_consent']
+        keys_to_remove = ['csrfmiddlewaretoken', 'terms_consent']
         for key in keys_to_remove:
             del form.data[key]
         response = JsonResponse(form.data, status=200)
@@ -79,30 +84,3 @@ def user_delete(request):
     logout(request)
     return HttpResponse(status=200)
 
-
-class UserSerializer(ModelSerializer):
-    last_login = DateTimeField(read_only=True)
-    date_joined = DateTimeField(read_only=True)
-    password = CharField(write_only=True)
-    country = CountryField()
-
-    class Meta:
-        model = User
-        fields = ['username',
-                  'password',
-                  'email',
-                  'first_name',
-                  'last_name',
-                  'organisation',
-                  'last_login',
-                  'date_joined',
-                  'country',
-                  'orcid',
-                  'id',
-                  'copied_runs',
-                  'space_limit',
-                  'space_limit_value',
-                  'space_left',
-                  'is_staff',
-                  'is_superuser',
-                  'auth_token']
