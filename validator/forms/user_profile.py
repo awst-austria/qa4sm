@@ -14,3 +14,7 @@ class UserProfileForm(forms.ModelForm):
                   'country',
                   'orcid',
                   ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].required = True
