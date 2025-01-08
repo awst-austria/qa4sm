@@ -163,10 +163,9 @@ export class AuthService {
   updatePassword(setPasswordForm: any): Observable<any> {
     return this.httpClient.post(this.passwordUpdateUrl, setPasswordForm)
       .pipe(
-        catchError(err => this.httpError.handleResetPasswordError(err, 'settingPassword'))
+        catchError(err => this.httpError.handleError(err, err.error.error))
       );
   }
-
 
 
   validateResetPasswordToken(tkn: string): Observable<any> {
