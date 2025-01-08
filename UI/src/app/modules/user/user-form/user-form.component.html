@@ -162,6 +162,15 @@
       <button *ngIf="userData"
               pButton
               type="button"
+              label="Update password"
+              (click)="redirectToSetPassword()"
+              class="p-button-secondary">
+      </button>
+    </p>
+    <p>
+      <button *ngIf="userData"
+              pButton
+              type="button"
               label="Deactivate my account"
               (click)="deactivateAccount()"
               class="p-button-danger">

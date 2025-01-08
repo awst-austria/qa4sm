@@ -133,5 +133,8 @@ export class UserFormComponent implements OnInit {
     this.sliderValues.push(value)
   }
 
+  redirectToSetPassword(){
+    this.router.navigate(['/set-password'])
+  }
 
 }
