@@ -1,4 +1,5 @@
 <p-dialog 
+  #dialog
   [header]="headerMessage"
   [(visible)]="showModal"
   [modal]="true"
@@ -7,8 +8,8 @@
   [closeOnEscape]="true"
   [dismissableMask]="true"
   (onHide)="onWindowHide()"
-  styleClass="login-dialog">
- 
+  [styleClass]="dialogClasses">
+
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="p-fluid">
       <span class="p-float-label mb-4">

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, signal, ViewChild} from '@angular/core';
 import {AuthService} from '../../core/services/auth/auth.service';
 import {LoginDto} from '../../core/services/auth/login.dto';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
@@ -6,6 +6,7 @@ import {ToastService} from '../../core/services/toast/toast.service';
 import {LoginForm} from '../../core/services/form-interfaces/login-form';
 import {HttpErrorResponse} from '@angular/common/http';
 import {Subject, takeUntil} from 'rxjs';
+import {Router, NavigationEnd} from '@angular/router';
 
 
 @Component({
@@ -15,8 +16,9 @@ import {Subject, takeUntil} from 'rxjs';
   providers: []
 })
 export class LoginComponent implements OnInit {
-  @Input() navigateAfter: boolean;
+
   @Output() loggedIn = new EventEmitter();
+  isHomePage = signal<boolean | undefined>(undefined)
 
   showModal = false;
   isLoading = false;
@@ -31,10 +33,16 @@ export class LoginComponent implements OnInit {
   });
 
   constructor(private loginService: AuthService,
-              private toastService: ToastService) {
-  }
+              private toastService: ToastService,
+              private router: Router) {}
 
   ngOnInit() {
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.isHomePage.set(event.url.includes('/home'))
+      }
+    });
+
     this.loginService.showLoginModal$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
@@ -48,6 +56,16 @@ export class LoginComponent implements OnInit {
           this.resetForm();
         }
       });
+  }
+
+
+  get isHomePageValue(): boolean {
+    return this.isHomePage();
+  }
+
+  get dialogClasses(): string {
+    const baseClass = 'login-dialog';
+    return this.isHomePageValue ? `${baseClass} home-page-modal` : baseClass;
   }
 
   ngOnDestroy() {
