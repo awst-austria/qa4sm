@@ -25,8 +25,6 @@ export class SetPasswordComponent implements OnInit {
   formErrors: any;
   userAuthenticated: boolean;
 
-  // sub = new Subscription;
-
   constructor(private authService: AuthService,
               private router: Router,
               private toastService: ToastService) {
@@ -42,6 +40,12 @@ export class SetPasswordComponent implements OnInit {
         )
       }
     })
+
+    this.setPasswordForm.valueChanges.subscribe(() => {
+      this.formErrors = null; // Clear form-level errors
+    });
+
+
     this.authService.passwordResetToken$.subscribe(tkn => {
       this.token = tkn;
     });
