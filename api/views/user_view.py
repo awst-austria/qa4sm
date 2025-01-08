@@ -1,4 +1,4 @@
-from django.contrib.auth import logout
+from django.contrib.auth import logout, password_validation
 from django.http import HttpResponse, QueryDict, JsonResponse
 from django.middleware.csrf import get_token
 from rest_framework import status, serializers
