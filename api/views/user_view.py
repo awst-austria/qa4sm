@@ -1,13 +1,12 @@
 from django.contrib.auth import logout
 from django.http import HttpResponse, QueryDict, JsonResponse
 from django.middleware.csrf import get_token
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
 from django.contrib.auth import update_session_auth_hash
-
 
 
 def _get_querydict_from_user_data(request, userdata):
@@ -61,6 +60,32 @@ def user_update(request):
     return response
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def password_update(request):
+    serializer = PasswordUpdateSerializer(data=request.data)
+    if serializer.is_valid():
+        user = request.user
+        # Verify the old password
+        if not user.check_password(serializer.validated_data['old_password']):
+            return JsonResponse(
+                {
+                    'error': "The old password is incorrect."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update the password
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+
+        return JsonResponse({"detail": "Password updated successfully."}, status=status.HTTP_200_OK)
+    else:
+        full_error = ''
+        for error in serializer.errors['non_field_errors']:
+            full_error += f'{error}\n\n'
+        return JsonResponse({'error': full_error}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def user_delete(request):
@@ -71,3 +96,18 @@ def user_delete(request):
     logout(request)
     return HttpResponse(status=200)
 
+
+class PasswordUpdateSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True)
+    confirm_password = serializers.CharField(write_only=True, required=True)
+
+    def validate(self, attrs):
+        # Ensure new_password matches confirm_password
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
+        # Validate the new password using Django's password validators
+        password_validation.validate_password(attrs['new_password'])
+
+        return attrs
