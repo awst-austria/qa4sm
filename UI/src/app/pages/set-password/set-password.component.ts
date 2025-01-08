@@ -96,4 +96,8 @@ export class SetPasswordComponent implements OnInit {
     return EMPTY
   }
 
+  goBackToProfile(){
+    this.router.navigate(['/user-profile']);
+  }
+
 }
