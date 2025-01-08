@@ -151,7 +151,7 @@ export class AuthService {
       );
   }
 
-  setPassword(setPasswordForm: any, token: string): Observable<any> {
+  resetPassword(setPasswordForm: any, token: string): Observable<any> {
     const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
     return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm)
       .pipe(

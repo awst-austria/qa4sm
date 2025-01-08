@@ -23,6 +23,7 @@ export class SetPasswordComponent implements OnInit {
     return PasswordValidator.validPasswordConfirmation(formGroup);
   });
   formErrors: any;
+  userAuthenticated: boolean;
 
   sub = new Subscription;
 
@@ -32,6 +33,9 @@ export class SetPasswordComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.authService.isAuthenticated().subscribe(isAuthenticated => {
+      this.userAuthenticated = isAuthenticated;
+    })
     this.authService.passwordResetToken$.subscribe(tkn => {
       this.token = tkn;
     });
@@ -42,7 +46,7 @@ export class SetPasswordComponent implements OnInit {
       token: this.token,
       password: this.setPasswordForm.controls.password1.value
     };
-    this.sub = this.authService.setPassword(setPasswordFormToSubmit, this.token)
+    this.sub = this.authService.resetPassword(setPasswordFormToSubmit, this.token)
       .pipe(
         catchError(error => this.onSetPasswordError(error))
       )
