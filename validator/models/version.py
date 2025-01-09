@@ -1,11 +1,6 @@
 import logging
 from django.db import models
 from validator.models.filter import DataFilter
-from django.core.exceptions import ObjectDoesNotExist
-import os
-import json
-from django.conf import settings
-from django.core.serializers.json import DjangoJSONEncoder
 
 logger = logging.getLogger(__name__)
 
