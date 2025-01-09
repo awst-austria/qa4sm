@@ -1,9 +1,5 @@
-import logging
 from django.db import models
 from validator.models.filter import DataFilter
-
-logger = logging.getLogger(__name__)
-
 
 class DatasetVersion(models.Model):
     id = models.AutoField(primary_key=True)
