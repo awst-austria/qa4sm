@@ -1,3 +1,8 @@
+import json
+import os
+
+from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -46,6 +51,7 @@ def update_dataset_version(request):
             version_serializer = DatasetVersionSerializer(version, data=validated_data, partial=True)
             if version_serializer.is_valid():
                 version_serializer.save()
+                update_fixture_entry(version)
             else:
                 return JsonResponse(
                     {'message': 'Version could not be updated. Please check the data you are trying to pass.'},
@@ -64,6 +70,43 @@ def field_validator(data, model_serializer):
     if not data_keys.issubset(model_fields):
         raise KeyError('Submitted data contains a wrong key.')
     return data
+
+
+def update_fixture_entry(version):
+    # Path to the fixture
+    fixture_path = os.path.join(settings.BASE_DIR, 'validator', 'fixtures', 'versions.json')
+
+    # Read the existing fixture file
+    with open(fixture_path, 'r', encoding='utf-8') as f:
+        fixture_data = json.load(f)
+
+    # Find the entry matching the updated version
+    for entry in fixture_data:
+        print(entry)
+        if entry["model"] == "validator.datasetversion" and entry["pk"] == version.pk:
+            # Update fields with the current DB data
+            entry_fields =entry["fields"]
+            for key in entry_fields.keys():
+                try:
+                    # Handle many-to-many relationships
+                    if hasattr(version, key) and isinstance(getattr(version, key), (list, set, tuple)):
+                        entry_fields[key] = list(getattr(version, key).values_list('id', flat=True))
+                    elif hasattr(version, key) and hasattr(getattr(version, key), 'all'):  # For ManyRelatedManager
+                        entry_fields[key] = list(getattr(version, key).all().values_list('id', flat=True))
+                    # Handle foreign key relationships
+                    elif hasattr(version, key) and hasattr(getattr(version, key), 'pk'):
+                        entry_fields[key] = getattr(version, key).pk
+                    else:
+                        # Default: Use the attribute directly
+                        entry_fields[key] = getattr(version, key)
+                except AttributeError:
+                    # Skip keys that don't map directly to the version object
+                    pass
+            break  # Exit the loop once the relevant entry is updated
+
+    # Write the updated data back to the fixture file
+    with open(fixture_path, 'w', encoding='utf-8') as f:
+        json.dump(fixture_data, f, cls=DjangoJSONEncoder, indent=4)
 
 
 class DatasetVersionSerializer(ModelSerializer):
