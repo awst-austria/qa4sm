@@ -55,7 +55,7 @@ export class MetricsComponent implements OnInit {
     this.stabilityMetrics = new MetricModel(
       'stability_metrics',
       'Include Stability Metrics',
-      'Here we will explain what stability metrics are',
+      'Slopes are derived from annual R, uRMSD, and BIAS values to capture performance trends over time. Additionally, all metrics are calculated separately for each year in the validation period.',
       false,
       true,
       this.stabilityMetricsDisabled.bind(this),

@@ -171,10 +171,13 @@
                  [ngClass]="{'result-plot':true}"
                  alt="Boxplot for {{selectedMetric().metric_pretty_name}}">
             <div class="flex flex-column text-xl px-2 text-muted justify-content-center">
-              <em>
+              <em *ngIf="validation.intra_annual_metrics">
                 Intra-Annual Metrics <br>
                 Frequency: {{ validation.intra_annual_type }} <br>
                 Overlap: {{ validation.intra_annual_overlap }} day(s)
+              </em>
+              <em *ngIf="validation.stability_metrics">
+                Stability Metrics
               </em>
             </div>
           </div>
