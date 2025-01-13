@@ -8,10 +8,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from rest_framework.response import Response
 from rest_framework.serializers import ModelSerializer
 from rest_framework.authentication import TokenAuthentication
 
 from validator.models import DatasetVersion, Dataset
+from api.views.auxiliary_functions import push_changes_to_github
 
 
 @api_view(['GET'])
@@ -64,6 +66,31 @@ def update_dataset_version(request):
     return JsonResponse({'message': 'Updated'}, status=status.HTTP_200_OK, safe=False)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+@authentication_classes([TokenAuthentication])
+def update_fixture_in_github(request):
+    """
+    Updates the version fixture on GitHub by committing the changes to the repository.
+    The fixture is located at 'validator/fixtures/versions.json' and the changes are
+    pushed to the 'master' branch.
+
+    :param request: The HTTP request object.
+    :return: A JSON response indicating success or failure.
+    """
+
+    branch_name = 'master'
+    file_name = os.path.join('validator', 'fixtures', 'versions.json')
+    commit_message = 'Version fixture updated'
+
+    try:
+        push_changes_to_github(file_name, commit_message, branch_name)
+        return Response({'message': 'All good'}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 def field_validator(data, model_serializer):
     model_fields = set(model_serializer().fields)
     data_keys = set(data.keys())
@@ -85,7 +112,7 @@ def update_fixture_entry(version):
         print(entry)
         if entry["model"] == "validator.datasetversion" and entry["pk"] == version.pk:
             # Update fields with the current DB data
-            entry_fields =entry["fields"]
+            entry_fields = entry["fields"]
             for key in entry_fields.keys():
                 try:
                     # Handle many-to-many relationships
