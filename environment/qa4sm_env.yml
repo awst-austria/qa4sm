@@ -1,4 +1,4 @@
-name: /var/lib/qa4sm-conda
+name: qa4sm
 channels:
   - conda-forge
   - defaults
