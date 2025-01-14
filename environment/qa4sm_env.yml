@@ -270,7 +270,7 @@ dependencies:
     - pytest-django==4.5.2
     - pytest-mpl==0.16.1
     - qa4sm-preprocessing==0.3
-    - qa4sm-reader==0.10
+    - git+https://github.com/awst-austria/qa4sm-reader.git@check-master
     - redis==4.5.5
     - repurpose==0.13.1
     - ruamel-yaml==0.17.26
