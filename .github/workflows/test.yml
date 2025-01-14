@@ -42,14 +42,15 @@ jobs:
           activate-environment: qa4sm # todo: must match with name in environment.yml
       - name: Print environment infos
         run: |
-          pip install --no-deps smos==0.3.1
           conda info -a
           conda list
           pip list
           which pip
           which python
       - name: Activate Environment
-        run: conda activate qa4sm
+        run: |
+          conda activate qa4sm
+          pip install --no-deps smos==0.3.1
       - name: Apply needed settings
         run: |
           bash ./init_config.sh test
