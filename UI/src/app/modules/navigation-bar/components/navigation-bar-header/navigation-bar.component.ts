@@ -151,10 +151,12 @@ export class NavigationBarComponent implements OnInit {
 
 
   onLoginSuccess() {
-    this.authService.hideLoginModal();   // Hide the login modal window on successful login
+    // Hide the login modal window on successful login
+    this.authService.hideLoginModal();   
   }
 
   onLoginModalClose() {
+    // Hide/reset the login modal window on close
     if (this.loginComponent) {
       this.loginComponent.loginForm.reset();
     }

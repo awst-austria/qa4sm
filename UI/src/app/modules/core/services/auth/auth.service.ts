@@ -6,7 +6,6 @@ import {LoginDto} from './login.dto';
 import {UserDto} from './user.dto';
 import {catchError, map, tap} from 'rxjs/operators';
 import {HttpErrorService} from '../global/http-error.service';
-import {AppRoutingModule} from 'src/app/app-routing.module';
 import {Router, Routes} from '@angular/router';
 
 @Injectable({
@@ -57,8 +56,7 @@ export class AuthService {
 
   constructor(private httpClient: HttpClient,
               private httpError: HttpErrorService,
-              private router: Router, 
-              private appRoutingModule: AppRoutingModule) {
+              private router: Router) {
     this.init();
     this.initializeUnprotectedRoutes();
 
@@ -108,6 +106,7 @@ export class AuthService {
 
 
   showLoginModal(message?: string) {
+    // Show the login modal window with an optional header message
     this.showLoginModalSubject.next({show: true, message});
   }
 
@@ -116,8 +115,8 @@ export class AuthService {
   }
 
   login(credentials: LoginDto): Observable<UserDto> {
+    // Log user in and redirect to home if on signup or password-reset page
     const currentRoute = this.router.url;
-
     return this.httpClient
       .post<UserDto>(this.loginUrl, credentials)
       .pipe(
@@ -125,7 +124,7 @@ export class AuthService {
           this.currentUser = user;
           this.authenticated.next(true);
           if ((currentRoute.startsWith('signup', 1)) || (currentRoute.startsWith('password-reset', 1))) {
-            this.router.navigate(['/home']); // redirect to home if on signup or password-reset page and successfully log in 
+            this.router.navigate(['/home']); 
           }
         }),
         catchError(error=> {
@@ -136,8 +135,8 @@ export class AuthService {
   }
 
   logout(): Observable<boolean> {
+    // Log user out and redirect to home page if currently on a protected route
     const currentRoute = this.router.url;
-
     return this.httpClient
       .post(this.logoutUrl, null)
       .pipe(
@@ -145,7 +144,7 @@ export class AuthService {
           this.currentUser = this.emptyUser; 
           this.authenticated.next(false);
           if (this.isProtectedRoute(currentRoute)) {
-            this.router.navigate(['/home']); // Redirect to home if on a protected route
+            this.router.navigate(['/home']); 
           }
           return true;
         }),

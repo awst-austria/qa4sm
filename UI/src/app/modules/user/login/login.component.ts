@@ -37,12 +37,15 @@ export class LoginComponent implements OnInit {
               private router: Router) {}
 
   ngOnInit() {
+    
+    //set isHomePage boolean value based on the current route
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this.isHomePage.set(event.url.includes('/home'))
       }
     });
 
+    // open login modal on showLoginModal$ observable
     this.loginService.showLoginModal$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
@@ -60,15 +63,18 @@ export class LoginComponent implements OnInit {
 
 
   get isHomePageValue(): boolean {
+    // is homepage boolean getter 
     return this.isHomePage();
   }
 
   get dialogClasses(): string {
+    // get p dialog classes for login modal colour scheme 
     const baseClass = 'login-dialog';
     return this.isHomePageValue ? `${baseClass} home-page-modal` : baseClass;
   }
 
   ngOnDestroy() {
+    // unsubscribe from the destroy$ subject
     this.destroy$.next();
     this.destroy$.complete();
   }
