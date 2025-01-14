@@ -147,7 +147,7 @@ dependencies:
   - pthread-stubs=0.4
   - pyarrow-core=18.1.0
   - pyside6=6.8.1
-  - python=3.12.8
+  - python>=3.12
   - python-tzdata=2024.2
   - python_abi=3.12
   - qhull=2020.2
