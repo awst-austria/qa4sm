@@ -87,7 +87,7 @@ export class FilteringFormComponent implements OnInit {
   filterStates: { [key: string]: FilterState } = {}; // current/runtime values of filters 
   dropdownFilters: { label: string, value: string }[] = []; // filters still available after applied ones are removed from list
 
-  showFilterForm: boolean = true;
+  showFilterForm: boolean = false;
   isEditing: boolean = false; //to define if editing filter, required to properly show filter in dropdown when editing active filter 
 
 
