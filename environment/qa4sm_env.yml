@@ -284,6 +284,7 @@ dependencies:
     - urllib3==2.2.3
     - xarray==2024.3.0
     - xyzservices==2024.9.0
+    - zarr==2.18.3
     - zict==3.0.0
     - zipp==3.21.0
     - zstandard==0.23.0
