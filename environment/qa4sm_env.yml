@@ -222,6 +222,7 @@ dependencies:
     - fsspec==2024.10.0
     - gldas==0.7.0
     - h2==4.1.0
+    - h5netcdf==1.4.1
     - h5py==3.12.1
     - hpack==4.0.0
     - hyperframe==6.0.1
