@@ -259,6 +259,7 @@ dependencies:
     - pysocks==1.7.1
     - pytesmo==0.17.0
     - pytest==8.3.4
+    - pytest-cov==6.0.0
     - pytest-django==4.9.0
     - python-dateutil==2.9.0.post0
     - pytz==2024.1
