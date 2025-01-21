@@ -6,6 +6,8 @@ export C_FORCE_ROOT="true"
 
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
+pip install --no-deps smos==0.3.1
+pip install --no-deps qa4sm-preprocessing==0.3
 if [ ! -d "run_celery" ]; then
   mkdir run_celery
   touch run_celery/celery.state.dat
