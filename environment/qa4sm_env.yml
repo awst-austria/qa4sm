@@ -249,6 +249,7 @@ dependencies:
     - platformdirs==4.3.6
     - pluggy==1.5.0
     - psutil==6.1.0
+    - psycopg2-binary==2.9.10
     - pyarrow==18.1.0
     - pycparser==2.22
     - pygrib==2.1.6
