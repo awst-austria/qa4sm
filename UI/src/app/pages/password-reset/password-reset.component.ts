@@ -31,7 +31,7 @@ export class PasswordResetComponent {
   }
 
   onSubmit(): void {
-    this.authService.resetPassword(this.resetPasswordForm.value)
+    this.authService.resetPasswordRequest(this.resetPasswordForm.value)
       .pipe(
         catchError(err => this.onResetPasswordError(err))
       )

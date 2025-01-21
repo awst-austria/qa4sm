@@ -7,6 +7,8 @@ ADMIN_PASS="12admin34"
 
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
+pip install --no-deps smos==0.3.1
+pip install --no-deps qa4sm-preprocessing==0.3
 export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
