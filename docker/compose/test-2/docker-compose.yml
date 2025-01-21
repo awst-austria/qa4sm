@@ -1,18 +1,5 @@
 version: "3.9"
-services:      
-#  qa4sm-db:
-#    image: "postgres:10"
-#    restart: always
-#    environment:
-#      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-#    volumes:
-#      - type: bind
-#        source: "${QA4SM_WORKSPACE}db/log"
-#        target: /var/log
-#      - type: bind
-#        source: "${QA4SM_WORKSPACE}db/data"
-#        target: /var/lib/postgresql/data
-
+services:
   qa4sm-db:
     image: "postgres:16"
     restart: always
