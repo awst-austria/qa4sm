@@ -83,16 +83,18 @@ export class AuthService {
     //Get unprotected routes from the router 
     const unprotectedRoutes = [];
 
-    for (const route of routes){
+    routes.forEach(route => {
       if ((!route.canActivate) && (route.path.length > 0)) {
         unprotectedRoutes.push(route.path);
-      }    
-    }
+      }
+    })
+
     return unprotectedRoutes;
   }
 
   private isProtectedRoute(route: string): boolean {
-    // Actually check if the provided route is in the list of unprotected routes - if not, it is assumed to be a protected route (safer approach that assuming all routes are protected unless specified)
+    // Actually check if the provided route is in the list of unprotected routes - if not, it is assumed to be a protected route 
+    // (safer approach that assumes all routes are protected unless specified)
     return !this.unprotectedRoutes.some(unprotectedRoute => (route.startsWith(unprotectedRoute, 1) && (unprotectedRoute.length > 0)));
   }
 
@@ -104,14 +106,9 @@ export class AuthService {
         catchError(error => of(false)));
   }
 
-
-  showLoginModal(message?: string) {
-    // Show the login modal window with an optional header message
-    this.showLoginModalSubject.next({show: true, message});
-  }
-
-  hideLoginModal() {
-    this.showLoginModalSubject.next({show: false});
+  switchLoginModal(switchOn: boolean, message: string | null = null) {
+    // Toggle the login modal window with an optional header message
+    this.showLoginModalSubject.next({show: switchOn, message});
   }
 
   login(credentials: LoginDto): Observable<UserDto> {

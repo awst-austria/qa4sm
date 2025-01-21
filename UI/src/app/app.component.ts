@@ -1,7 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {NGXLogger} from 'ngx-logger';
-import { AuthService } from './modules/core/services/auth/auth.service';
-
 
 
 @Component({
@@ -12,7 +10,7 @@ import { AuthService } from './modules/core/services/auth/auth.service';
 export class AppComponent implements OnInit {
   title = 'qa4sm-ui';
 
-  constructor(private logger: NGXLogger, private authService: AuthService) {
+  constructor(private logger: NGXLogger) {
   }
 
   ngOnInit(): void {

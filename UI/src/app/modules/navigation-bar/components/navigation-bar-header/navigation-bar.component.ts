@@ -90,7 +90,7 @@ export class NavigationBarComponent implements OnInit {
   loginMenuItem: MenuItem = {
     label: 'Log in',
     icon: 'pi pi-fw pi-sign-in',
-    command: () => this.authService.showLoginModal()
+    command: () => this.authService.switchLoginModal(true)
   };
 
   logoutMenuItem: MenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout()};
@@ -152,14 +152,7 @@ export class NavigationBarComponent implements OnInit {
 
   onLoginSuccess() {
     // Hide the login modal window on successful login
-    this.authService.hideLoginModal();   
-  }
-
-  onLoginModalClose() {
-    // Hide/reset the login modal window on close
-    if (this.loginComponent) {
-      this.loginComponent.loginForm.reset();
-    }
+    this.authService.switchLoginModal(false);   
   }
 
   private updateLogo(windowWidth: number): void {

@@ -22,7 +22,6 @@ export class LoginComponent implements OnInit {
 
   showModal = false;
   isLoading = false;
-  private destroy$ = new Subject<void>();
   headerMessage = 'Please log in';
 
   loginDto = new LoginDto('', '');
@@ -47,7 +46,6 @@ export class LoginComponent implements OnInit {
 
     // open login modal on showLoginModal$ observable
     this.loginService.showLoginModal$
-      .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.showModal = state.show;
         if (state.message) {
@@ -71,12 +69,6 @@ export class LoginComponent implements OnInit {
     // get p dialog classes for login modal colour scheme 
     const baseClass = 'login-dialog';
     return this.isHomePageValue ? `${baseClass} home-page-modal` : baseClass;
-  }
-
-  ngOnDestroy() {
-    // unsubscribe from the destroy$ subject
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   onSubmit() {
@@ -107,7 +99,7 @@ export class LoginComponent implements OnInit {
   }
 
   onWindowHide() {
-    this.loginService.hideLoginModal();
+    this.loginService.switchLoginModal(false);
   }
 
   private handleLoginError(error: HttpErrorResponse) {
@@ -119,6 +111,6 @@ export class LoginComponent implements OnInit {
   }
 
   onForgotOrSignUpClick(){
-    this.loginService.hideLoginModal();
+    this.loginService.switchLoginModal(false);
   }
 }
