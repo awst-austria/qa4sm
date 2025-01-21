@@ -12,6 +12,19 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}db/data"
         target: /var/lib/postgresql/data
+
+  qa4sm-db-new:
+    image: "postgres:16"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - type: bind
+        source: "${QA4SM_WORKSPACE}new_db/log"
+        target: /var/log
+      - type: bind
+        source: "${QA4SM_WORKSPACE}new_db/data"
+        target: /var/lib/postgresql/data
         
   qa4sm-redis:
     image: "redis:alpine"
