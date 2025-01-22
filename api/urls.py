@@ -134,5 +134,6 @@ urlpatterns = [
     path('archive-multiple-validations', archive_multiple_results, name='Archive Multiple Results'),
     path('api-obtain-token/', views.obtain_auth_token, name='Obtain token'),
     path('update-dataset-version', update_dataset_version, name='Update Dataset Version'),
-    path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup')
+    path('run-auto-cleanup', run_auto_cleanup_script, name='Run Auto Cleanup'),
+    path('update-fixture-in-git', update_fixture_in_github, name='Update-Fixture')
 ]
