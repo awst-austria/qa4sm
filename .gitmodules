@@ -2,6 +2,3 @@
 	path = testdata
 	url = https://github.com/awst-austria/qa4sm-testdata.git
 	branch = master
-[submodule "validator/fixtures"]
-	path = validator/fixtures
-	url = git@github.com:awst-austria/qa4sm-fixtures.git
