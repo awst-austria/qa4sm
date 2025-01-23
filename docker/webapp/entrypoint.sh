@@ -12,7 +12,7 @@ python $APP_DIR/manage.py collectstatic --noinput
 
 cd $APP_DIR
 git config --global --add safe.directory $APP_DIR
-git submodule update --init --recursive
+git submodule update --init validator/fixtures
 
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"

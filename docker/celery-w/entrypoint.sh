@@ -13,7 +13,7 @@ fi
 
 cd $APP_DIR
 
-git submodule update --init --recursive
+git submodule update --init validator/fixtures
 
 if [ ! -d "/var/log/valentina" ]; then
   mkdir /var/log/valentina
