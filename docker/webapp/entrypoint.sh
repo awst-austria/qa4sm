@@ -11,7 +11,7 @@ export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
 cd $APP_DIR
-
+git config --global --add safe.directory $APP_DIR
 git submodule update --init --recursive
 
 # generate ISMN geojson files if they don't exist
