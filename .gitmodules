@@ -4,4 +4,4 @@
 	branch = master
 [submodule "validator/fixtures"]
 	path = validator/fixtures
-	url = git@github.com:awst-austria/qa4sm-fixtures.git
+	url = https://github.com/awst-austria/qa4sm-fixtures.git
