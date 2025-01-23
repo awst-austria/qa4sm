@@ -10,8 +10,6 @@ conda activate /var/lib/qa4sm-web-val/virtenv
 export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
-git submodule add git@github.com:awst-austria/qa4sm-fixtures.git $APP_DIR/validator/fixtures
-
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
 ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
