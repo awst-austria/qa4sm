@@ -13,6 +13,8 @@ fi
 
 cd $APP_DIR
 
+git submodule add git@github.com:awst-austria/qa4sm-fixtures.git validator/fixtures
+
 if [ ! -d "/var/log/valentina" ]; then
   mkdir /var/log/valentina
 fi
