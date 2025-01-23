@@ -79,7 +79,7 @@ def update_fixture_in_github(request):
     :return: A JSON response indicating success or failure.
     """
 
-    branch_name = 'master'
+    branch_name = 'main'
     file_name = os.path.join('validator', 'fixtures', 'versions.json')
     commit_message = 'Version fixture updated'
 
