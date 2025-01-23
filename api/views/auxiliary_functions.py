@@ -1,3 +1,4 @@
+import os
 from django.db.models.fields.related import ManyToManyRel, OneToOneField
 from django.conf import settings
 from git import Repo, GitCommandError
@@ -43,7 +44,8 @@ def push_changes_to_github(file_path, commit_message, branch_name='master'):
     branch_name
     """
     # our repository is initialized here
-    repo = Repo(settings.BASE_DIR)
+    repo_dir = os.path.join(settings.BASE_DIR, 'validator', 'fixtures')
+    repo = Repo(repo_dir)
     origin = repo.remote('origin')
 
     # check for changes
