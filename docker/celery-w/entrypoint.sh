@@ -18,6 +18,7 @@ git checkout main
 
 cd $APP_DIR
 
+
 if [ ! -d "/var/log/valentina" ]; then
   mkdir /var/log/valentina
 fi

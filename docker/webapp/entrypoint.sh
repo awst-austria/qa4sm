@@ -20,6 +20,7 @@ git checkout main
 
 cd $APP_DIR
 
+
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
 ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
