@@ -5,3 +5,4 @@
 [submodule "validator/fixtures"]
 	path = validator/fixtures
 	url = https://github.com/awst-austria/qa4sm-fixtures.git
+	branch = main
