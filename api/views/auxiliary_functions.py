@@ -1,10 +1,8 @@
 import os
-import logging
 from django.db.models.fields.related import ManyToManyRel, OneToOneField
 from django.conf import settings
 from git import Repo, GitCommandError
 
-__logger = logging.getLogger(__name__)
 
 def get_fields_as_list(model):
     fields = []
@@ -47,13 +45,8 @@ def push_changes_to_github(file_path, commit_message, branch_name='master'):
     """
     # our repository is initialized here
     repo_dir = os.path.join(settings.BASE_DIR, 'validator', 'fixtures')
-    __logger.debug(f"{repo_dir}")
     repo = Repo(repo_dir)
-    __logger.debug(f"{repo}")
-    __logger.debug(f"{repo.active_branch.repo.remotes[0].url}")
     origin = repo.remote('origin')
-
-    __logger.debug(f"{repo.index.diff(None)}")
 
     # check for changes
     diffs = [item.a_path for item in repo.index.diff(None)]
@@ -66,14 +59,14 @@ def push_changes_to_github(file_path, commit_message, branch_name='master'):
 
         else:
             # No changes in the specified file, nothing to push
-            __logger.debug(f"No changes detected in {file_path}.")
+            print(f"No changes detected in {file_path}.")
             return False
 
     except GitCommandError as e:
         # Handle Git-related errors (e.g., remote repository issues)
-        __logger.error(f"Git command error: {e}")
+        print(f"Git command error: {e}")
         return False
     except Exception as e:
         # Handle any other unexpected errors
-        __logger.error(f"An error occurred: {e}")
+        print(f"An error occurred: {e}")
         return False
