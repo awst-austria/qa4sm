@@ -13,7 +13,8 @@ fi
 
 cd $APP_DIR
 
-git submodule update --init validator/fixtures
+git submodule sync validator/fixtures
+git submodule update --init --remote validator/fixtures
 
 if [ ! -d "/var/log/valentina" ]; then
   mkdir /var/log/valentina
