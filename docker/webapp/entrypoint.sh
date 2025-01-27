@@ -15,6 +15,11 @@ git config --global --add safe.directory $APP_DIR
 git config --global --add safe.directory "$APP_DIR/validator/fixtures"
 
 git submodule update --init --recursive  validator/fixtures
+cd "validator/fixtures"
+git checkout main
+
+cd $APP_DIR
+
 
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
