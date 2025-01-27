@@ -50,11 +50,11 @@ def push_changes_to_github(file_path, commit_message, branch_name='master'):
     repo = Repo(repo_dir)
     origin = repo.remote('origin')
 
+    __logger.debug(f"{repo.active_branch.repo.remotes[0].url}")
+    __logger.debug(f"{repo.index.diff(None)}")
+
     # check for changes
     diffs = [item.a_path for item in repo.index.diff(None)]
-
-    print(repo_dir)
-    print(repo.active_branch.repo.remotes[0].url)
 
     try:
         if file_path in diffs:
