@@ -12,9 +12,7 @@ if [ ! -d "run_celery" ]; then
 fi
 
 cd $APP_DIR
-
-git submodule sync validator/fixtures
-git submodule update --init --remote validator/fixtures
+git submodule update --init --recursive  validator/fixtures
 
 if [ ! -d "/var/log/valentina" ]; then
   mkdir /var/log/valentina
