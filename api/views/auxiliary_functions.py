@@ -47,10 +47,12 @@ def push_changes_to_github(file_path, commit_message, branch_name='master'):
     """
     # our repository is initialized here
     repo_dir = os.path.join(settings.BASE_DIR, 'validator', 'fixtures')
+    __logger.debug(f"{repo_dir}")
     repo = Repo(repo_dir)
+    __logger.debug(f"{repo}")
+    __logger.debug(f"{repo.active_branch.repo.remotes[0].url}")
     origin = repo.remote('origin')
 
-    __logger.debug(f"{repo.active_branch.repo.remotes[0].url}")
     __logger.debug(f"{repo.index.diff(None)}")
 
     # check for changes
