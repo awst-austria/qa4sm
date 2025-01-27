@@ -1,5 +1,6 @@
 import json
 import os
+import logging
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -14,6 +15,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from validator.models import DatasetVersion, Dataset
 from api.views.auxiliary_functions import push_changes_to_github
+__logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])
@@ -78,7 +80,7 @@ def update_fixture_in_github(request):
     :param request: The HTTP request object.
     :return: A JSON response indicating success or failure.
     """
-
+    __logger.debug(f'I triggered the api call')
     branch_name = 'main' #'main' - nominally will be main, let's test it for now
     file_name = os.path.join('validator', 'fixtures', 'versions.json')
     commit_message = 'Version fixture updated'
