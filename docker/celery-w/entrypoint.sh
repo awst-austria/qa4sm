@@ -17,6 +17,7 @@ cd "validator/fixtures"
 git checkout main
 
 cd $APP_DIR
+chown www-data:www-data -R "$APP_DIR/validator/fixtures"
 
 
 if [ ! -d "/var/log/valentina" ]; then

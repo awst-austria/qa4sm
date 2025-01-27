@@ -19,7 +19,7 @@ cd "validator/fixtures"
 git checkout main
 
 cd $APP_DIR
-
+chown www-data:www-data -R "$APP_DIR/validator/fixtures"
 
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
