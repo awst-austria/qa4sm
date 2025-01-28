@@ -1,5 +1,7 @@
 import os
 import logging
+from urllib.parse import urlparse, urlunparse
+
 from django.db.models.fields.related import ManyToManyRel, OneToOneField
 from django.conf import settings
 from git import Repo, GitCommandError
@@ -50,6 +52,10 @@ def push_changes_to_github(file_path, commit_message, branch_name='master'):
     repo_dir = os.path.join(settings.BASE_DIR, 'validator', 'fixtures')
     repo = Repo(repo_dir)
     origin = repo.remote('origin')
+
+    parsed_url = urlparse(origin.url)
+    updated_url = urlunparse(parsed_url._replace(netloc=f'{settings.GITHUB_USERNAME}:{settings.GITHUB_TOKEN}@{parsed_url.hostname}'))
+    repo.git.config('remote.origin.url', updated_url)  # Update the remote URL with credentials
 
     # check for changes
     diffs = [item.a_path for item in repo.index.diff(None)]
