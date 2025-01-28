@@ -10,6 +10,22 @@ conda activate /var/lib/qa4sm-web-val/virtenv
 export LD_LIBRARY_PATH=/var/lib/qa4sm-web-val/virtenv/lib
 python $APP_DIR/manage.py collectstatic --noinput
 
+
+# this part is needed, so we are able to run commits on our fixtures ---
+cd $APP_DIR
+git config --global --add safe.directory $APP_DIR
+git config --global --add safe.directory "$APP_DIR/validator/fixtures"
+
+git submodule update --init --recursive  validator/fixtures
+cd "validator/fixtures"
+git checkout main
+
+cd $APP_DIR
+chown www-data:www-data -R "$APP_DIR/validator/fixtures"
+chown www-data:www-data -R "$APP_DIR/.git/modules"
+# -----------------------------------------------------------------------
+
+
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
 ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
