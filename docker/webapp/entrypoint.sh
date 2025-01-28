@@ -25,6 +25,7 @@ chown www-data:www-data -R "$APP_DIR/validator/fixtures"
 chown www-data:www-data -R "$APP_DIR/.git/modules
 # -----------------------------------------------------------------------
 
+
 # generate ISMN geojson files if they don't exist
 DATA_FOLDER="/var/lib/qa4sm-web-val/valentina/data/ISMN"
 ls -d "$DATA_FOLDER"/*/ | grep -v '2018' | while IFS= read -r dir; do
