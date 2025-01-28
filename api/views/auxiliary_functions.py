@@ -56,10 +56,9 @@ def push_changes_to_github(file_path, commit_message, branch_name='master'):
 
     try:
         if file_path in diffs:
-            __logger.debug(f'{file_path} is in diff')
-            # repo.index.add([file_path])
-            # repo.index.commit(commit_message)
-            # origin.push(refspec=f'{branch_name}:{branch_name}')
+            repo.index.add([file_path])
+            repo.index.commit(commit_message)
+            origin.push(refspec=f'{branch_name}:{branch_name}')
 
         else:
             # No changes in the specified file, nothing to push
