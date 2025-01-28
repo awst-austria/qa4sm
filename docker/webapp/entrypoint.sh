@@ -22,7 +22,7 @@ git checkout main
 
 cd $APP_DIR
 chown www-data:www-data -R "$APP_DIR/validator/fixtures"
-chown www-data:www-data -R "$APP_DIR/.git/modules
+chown www-data:www-data -R "$APP_DIR/.git/modules"
 # -----------------------------------------------------------------------
 
 # generate ISMN geojson files if they don't exist
