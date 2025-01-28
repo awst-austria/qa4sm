@@ -79,7 +79,7 @@ def update_fixture_in_github(request):
     :return: A JSON response indicating success or failure.
     """
     branch_name = 'main' #'main' - nominally will be main, let's test it for now
-    file_name = os.path.join('validator', 'fixtures', 'versions.json')
+    file_name = 'versions.json' # it will be run in the submodule directly, so the file name is enough
     commit_message = 'Version fixture updated'
 
     try:
