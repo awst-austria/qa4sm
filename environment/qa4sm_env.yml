@@ -220,6 +220,7 @@ dependencies:
     - esa_cci_sm==0.5.0
     - fonttools==4.55.3
     - fsspec==2024.10.0
+    - GitPython==3.1.44
     - gldas==0.7.0
     - h2==4.1.0
     - h5netcdf==1.4.1
