@@ -21,6 +21,8 @@ a2ensite qa4sm-app
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
 pip install mod_wsgi
+pip install --no-deps smos==0.3.1
+pip install --no-deps qa4sm-preprocessing==0.3
 mod_wsgi-express module-config
 # a2dismod wsgi
 # rm /usr/lib/apache2/modules/mod_wsgi.so

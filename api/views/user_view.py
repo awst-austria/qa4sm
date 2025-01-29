@@ -1,17 +1,12 @@
-from django.contrib.auth import logout
+from django.contrib.auth import logout, password_validation
 from django.http import HttpResponse, QueryDict, JsonResponse
 from django.middleware.csrf import get_token
-from django_countries.serializer_fields import CountryField
-from rest_framework import status
+from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.fields import DateTimeField, CharField
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.serializers import ModelSerializer
 from validator.forms import SignUpForm, UserProfileForm
 from validator.mailer import send_new_user_signed_up, send_user_account_removal_request, send_user_status_changed
-from validator.models import User
 from django.contrib.auth import update_session_auth_hash
-from rest_framework.authtoken.models import Token
 
 
 def _get_querydict_from_user_data(request, userdata):
@@ -51,15 +46,11 @@ def user_update(request):
     form = UserProfileForm(new_user_data, instance=request.user)
 
     if form.is_valid():
-
-        current_password_hash = request.user.password
         newuser = form.save(commit=False)
-        if form.cleaned_data['password1'] == '':
-            newuser.password = current_password_hash
 
         newuser.save()
         update_session_auth_hash(request, newuser)
-        keys_to_remove = ['password1', 'password2', 'csrfmiddlewaretoken', 'terms_consent']
+        keys_to_remove = ['csrfmiddlewaretoken', 'terms_consent']
         for key in keys_to_remove:
             del form.data[key]
         response = JsonResponse(form.data, status=200)
@@ -67,6 +58,32 @@ def user_update(request):
         errors = form.errors.get_json_data()
         response = JsonResponse(errors, status=400, safe=False)
     return response
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def password_update(request):
+    serializer = PasswordUpdateSerializer(data=request.data)
+    if serializer.is_valid():
+        user = request.user
+        # Verify the old password
+        if not user.check_password(serializer.validated_data['old_password']):
+            return JsonResponse(
+                {
+                    'error': "The old password is incorrect."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Update the password
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+
+        return JsonResponse({"detail": "Password updated successfully."}, status=status.HTTP_200_OK)
+    else:
+        full_error = ''
+        for error in serializer.errors['non_field_errors']:
+            full_error += f'{error}\n\n'
+        return JsonResponse({'error': full_error}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['DELETE'])
@@ -80,29 +97,17 @@ def user_delete(request):
     return HttpResponse(status=200)
 
 
-class UserSerializer(ModelSerializer):
-    last_login = DateTimeField(read_only=True)
-    date_joined = DateTimeField(read_only=True)
-    password = CharField(write_only=True)
-    country = CountryField()
+class PasswordUpdateSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True)
+    confirm_password = serializers.CharField(write_only=True, required=True)
 
-    class Meta:
-        model = User
-        fields = ['username',
-                  'password',
-                  'email',
-                  'first_name',
-                  'last_name',
-                  'organisation',
-                  'last_login',
-                  'date_joined',
-                  'country',
-                  'orcid',
-                  'id',
-                  'copied_runs',
-                  'space_limit',
-                  'space_limit_value',
-                  'space_left',
-                  'is_staff',
-                  'is_superuser',
-                  'auth_token']
+    def validate(self, attrs):
+        # Ensure new_password matches confirm_password
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
+        # Validate the new password using Django's password validators
+        password_validation.validate_password(attrs['new_password'])
+
+        return attrs

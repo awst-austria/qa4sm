@@ -105,6 +105,8 @@ export class UserFormComponent implements OnInit {
   setDefaultValues(): void {
     this.userForm.patchValue(this.userData)
     this.userForm.controls.username.disable();
+    this.userForm.controls.password1.disable();
+    this.userForm.controls.password2.disable();
     this.userForm.controls.terms_consent.setValue(true);
   }
 
@@ -131,5 +133,8 @@ export class UserFormComponent implements OnInit {
     this.sliderValues.push(value)
   }
 
+  redirectToSetPassword(){
+    this.router.navigate(['/set-password'])
+  }
 
 }

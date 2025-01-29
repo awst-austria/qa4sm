@@ -19,6 +19,7 @@ export class AuthService {
   private userUpdateUrl = this.API_URL + 'api/user-update';
   private userDeleteUrl = this.API_URL + 'api/user-delete';
   private passwordResetUrl = this.API_URL + 'api/password-reset/';
+  private passwordUpdateUrl = this.API_URL + 'api/password-update';
   private setPasswordUrl = this.API_URL + 'api/password-reset/confirm';
   private validateTokenUrl = this.API_URL + 'api/password-reset/validate_token/';
   private contactUrl = this.API_URL + 'api/support-request';
@@ -142,7 +143,7 @@ export class AuthService {
       );
   }
 
-  resetPassword(resetPasswordForm: any): Observable<any> {
+  resetPasswordRequest(resetPasswordForm: any): Observable<any> {
     return this.httpClient.post(this.passwordResetUrl, resetPasswordForm)
       .pipe(
         catchError(err =>
@@ -151,13 +152,21 @@ export class AuthService {
       );
   }
 
-  setPassword(setPasswordForm: any, token: string): Observable<any> {
+  resetPassword(setPasswordForm: any, token: string): Observable<any> {
     const setPasswordUrlWithToken = this.setPasswordUrl + '/?token=' + token;
     return this.httpClient.post(setPasswordUrlWithToken, setPasswordForm)
       .pipe(
         catchError(err => this.httpError.handleResetPasswordError(err, 'settingPassword'))
       );
   }
+
+  updatePassword(setPasswordForm: any): Observable<any> {
+    return this.httpClient.post(this.passwordUpdateUrl, setPasswordForm)
+      .pipe(
+        catchError(err => this.httpError.handleError(err, err.error.error))
+      );
+  }
+
 
   validateResetPasswordToken(tkn: string): Observable<any> {
     return this.httpClient.post(this.validateTokenUrl, {token: tkn})
