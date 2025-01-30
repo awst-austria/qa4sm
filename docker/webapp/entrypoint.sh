@@ -66,11 +66,11 @@ fi
 # Check if DB_UPDATE is true and upload the dump if necessary
 if [ "$DB_UPDATE" = "TRUE" ]; then
     echo "Updating DB from dump..."
-    if [ -f "/var/lib/postgresql/data/$DB_DUMP_NAME" ]; then
-        psql -h qa4sm-db -p 5432 -U postgres -d $QA4SM_DB_NAME -q -f "/var/lib/postgresql/data/$DB_DUMP_NAME"
+    if [ -f "/var/lib/postgresql/$DB_DUMP_NAME" ]; then
+        psql -h qa4sm-db -p 5432 -U postgres -d $QA4SM_DB_NAME -q -f "/var/lib/postgresql/$DB_DUMP_NAME"
         echo "DB dump uploaded successfully."
     else
-        echo "DB dump file not found: /var/lib/postgresql/data/$DB_DUMP_NAME"
+        echo "DB dump file not found: /var/lib/postgresql/$DB_DUMP_NAME"
         exit 1
     fi
 fi
