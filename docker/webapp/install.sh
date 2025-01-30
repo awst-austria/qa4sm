@@ -6,6 +6,7 @@ APP_DIR="/var/lib/qa4sm-web-val/valentina"
 LOG_DIR="/var/log/valentina"
 LOG_FILE="$LOG_DIR/valentina.log"
 mkdir -p "$APP_DIR"
+mkdir "$APP_DIR/db_dump"
 mkdir $LOG_DIR
 touch $LOG_FILE
 chown root:www-data -R $LOG_DIR
