@@ -7,10 +7,10 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
     volumes:
       - type: bind
-        source: "${QA4SM_WORKSPACE}new_db/log"
+        source: "${QA4SM_WORKSPACE}db/log"
         target: /var/log
       - type: bind
-        source: "${QA4SM_WORKSPACE}new_db/data"
+        source: "${QA4SM_WORKSPACE}db/data"
         target: /var/lib/postgresql/data
         
   qa4sm-redis:
@@ -52,9 +52,6 @@ services:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/cronjob-scripts"
         target: /var/lib/qa4sm-web-val/valentina/cronjob-scripts
-      - type: bind
-        source: "${QA4SM_WORKSPACE}new_db/dump"
-        target: /var/lib/qa4sm-web-val/valentina/db_dump
   proxy:
     image: "awst/qa4sm-proxy:latest-2"
     restart: always
