@@ -63,6 +63,20 @@ else
   NEW_DB="TRUE"
 fi
 
+# Check if DB_UPDATE is true and upload the dump if necessary
+if [ "$DB_UPDATE" = "TRUE" ]; then
+    echo "Updating DB from dump..."
+    if [ -f "/var/lib/postgresql/data/$DB_DUMP_NAME" ]; then
+        psql -h qa4sm-db -p 5432 -U postgres -d $QA4SM_DB_NAME -q -f "/var/lib/postgresql/data/$DB_DUMP_NAME"
+        echo "DB dump uploaded successfully."
+    else
+        echo "DB dump file not found: /var/lib/postgresql/data/$DB_DUMP_NAME"
+        exit 1
+    fi
+fi
+
+
+
 if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
 		echo "Running migrations"
 		python $APP_DIR/manage.py migrate
