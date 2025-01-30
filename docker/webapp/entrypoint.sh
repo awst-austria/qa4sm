@@ -58,7 +58,7 @@ else
     -c "GRANT ALL PRIVILEGES ON DATABASE $QA4SM_DB_NAME TO $QA4SM_DB_USER;"
 
   psql -h qa4sm-db -p 5432 -U postgres -q -d $QA4SM_DB_NAME -c '\set ON_ERROR_STOP on' \
-    -c "GRANT ALL ON SCHEMA public TO $QA4SM_DB_USER;"
+    -c "GRANT USAGE, CREATE ON SCHEMA public TO $QA4SM_DB_USER;"
 	echo "DB has been created."
   NEW_DB="TRUE"
 fi
