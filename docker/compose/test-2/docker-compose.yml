@@ -54,7 +54,7 @@ services:
         target: /var/lib/qa4sm-web-val/valentina/cronjob-scripts
       - type: bind
         source: "${QA4SM_WORKSPACE}new_db/dump"
-        target: /var/lib/qa4sm-web-val/valentina/
+        target: /var/lib/qa4sm-web-val/valentina/db_dump
   proxy:
     image: "awst/qa4sm-proxy:latest-2"
     restart: always
