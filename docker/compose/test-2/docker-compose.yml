@@ -31,8 +31,6 @@ services:
       QA4SM_DB_USER: "${QA4SM_DB_USER}"
       QA4SM_DB_PASSWORD: "${QA4SM_DB_PASSWORD}"
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
-      DB_UPDATE: "${DB_UPDATE}"
-      DB_DUMP_NAME: "${DB_DUMP_NAME}"
     volumes:
       - type: bind
         source: "${QA4SM_WORKSPACE}webapp/log"
