@@ -78,7 +78,7 @@ fi
 
 
 
-if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
+if psql -h qa4sm-db -p 5432 -U postgres -tAc "SELECT datname FROM pg_database" | grep -qw "$QA4SM_DB_NAME"; then
 		echo "Running migrations"
 		python $APP_DIR/manage.py migrate
     echo "Loading fixtures"
