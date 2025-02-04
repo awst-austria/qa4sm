@@ -48,7 +48,7 @@ done
 # wait for the db to initialize
 sleep 10s
 NEW_DB="FALSE"
-if psql -h qa4sm-db -p 5432 -U postgres -lqt | cut -d \| -f 1 | grep -qw $QA4SM_DB_NAME; then
+if psql -h qa4sm-db -p 5432 -U postgres -tAc "SELECT datname FROM pg_database" | grep -qw "$QA4SM_DB_NAME"; then
     echo "DB exists"
 else
 	echo "DB does not exist, let's create it..."
