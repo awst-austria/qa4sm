@@ -1,4 +1,5 @@
 <main>
-  <qa-user-form/>
+  <qa-user-form *ngIf="!maintenanceMode"/>
+  <qa-maintenance-mode *ngIf="maintenanceMode" [action]="'sign up'"/>
 </main>
 
