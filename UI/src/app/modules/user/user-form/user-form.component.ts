@@ -9,6 +9,7 @@ import {Router} from '@angular/router';
 import {ToastService} from '../../core/services/toast/toast.service';
 import {UserData} from '../../core/services/form-interfaces/UserDataForm';
 import {CustomHttpError} from '../../core/services/global/http-error.service';
+import {SettingsService} from "../../core/services/global/settings.service";
 
 @Component({
   selector: 'qa-user-form',
@@ -35,6 +36,7 @@ export class UserFormComponent implements OnInit {
   selectedCountry: CountryDto;
   formErrors: any;
   sliderValues = [];
+  maintenanceMode = false;
 
   signUpObserver = {
     next: () => this.onSignUpNext(),
@@ -59,7 +61,8 @@ export class UserFormComponent implements OnInit {
               private formBuilder: FormBuilder,
               private userService: AuthService,
               private router: Router,
-              private toastService: ToastService) {
+              private toastService: ToastService,
+              private settingsService: SettingsService) {
   }
 
   ngOnInit(): void {
@@ -69,6 +72,9 @@ export class UserFormComponent implements OnInit {
     }
     this.userForm.get('honeypot').valueChanges.subscribe(value => {
       this.handleSliderChange(value);
+    });
+    this.settingsService.getAllSettings().subscribe(setting => {
+      this.maintenanceMode = setting[0].maintenance_mode;
     });
   }
 
