@@ -76,6 +76,7 @@ import {ScrollTopModule} from 'primeng/scrolltop';
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 import {ContactModule} from './modules/contact/contact.module';
 import {SelectButtonModule} from 'primeng/selectbutton';
+import {MaintenanceModeComponent} from "./modules/core/maintenance-mode/maintenance-mode.component";
 
 @NgModule({ declarations: [
         AppComponent,
@@ -104,7 +105,8 @@ import {SelectButtonModule} from 'primeng/selectbutton';
         LoginPageComponent,
         ContactUsComponent,
     ],
-    bootstrap: [AppComponent], imports: [LoggerModule.forRoot({ level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR }),
+    bootstrap: [AppComponent],
+    imports: [LoggerModule.forRoot({level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR}),
         NavigationBarModule,
         FormsModule,
         ReactiveFormsModule,
@@ -144,7 +146,7 @@ import {SelectButtonModule} from 'primeng/selectbutton';
         ImageModule,
         ScrollTopModule,
         ContactModule,
-        SelectButtonModule], providers: [
+        SelectButtonModule, MaintenanceModeComponent], providers: [
         {
             provide: HTTP_INTERCEPTORS,
             useClass: HttpTokenInterceptor,

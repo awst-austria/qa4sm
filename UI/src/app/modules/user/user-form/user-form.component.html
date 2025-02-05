@@ -1,10 +1,11 @@
 <div class="center">
-  <div>
+  <qa-maintenance-mode *ngIf="maintenanceMode" [action]="userData ? 'update your data' : 'sign up'"/>
+  <div *ngIf="!maintenanceMode">
     <div class="center">
-    <h1 *ngIf="!userData" class="h3 mb-3 font-weight-normal"> Sign up </h1>
-    <h1 *ngIf="userData" class="h3 mb-3 font-weight-normal">User profile</h1>
+      <h1 *ngIf="!userData" class="h3 mb-3 font-weight-normal"> Sign up </h1>
+      <h1 *ngIf="userData" class="h3 mb-3 font-weight-normal">User profile</h1>
     </div>
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!maintenanceMode">
       <div class="py-3">
         <span class="p-float-label">
           <input class="form-field" id="username" type="text" pInputText formControlName="username">
@@ -15,21 +16,23 @@
         </span>
         <div *ngIf="formErrors && formErrors.username"
              class="alert">
-          <span *ngFor="let error of formErrors.username">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.username">{{ error.message }}<br></span>
         </div>
       </div>
 
       <div class="py-3" *ngIf="!userForm.controls['password1'].disabled">
         <span class="p-float-label">
-          <input class="form-field" id="password" type="password" pInputText formControlName="password1" autocomplete="new-password">
+          <input class="form-field" id="password" type="password" pInputText formControlName="password1"
+                 autocomplete="new-password">
           <label for="password">Password</label>
-          <span pTooltip="Your password can't be too similar to your other personal information.Your password must contain at least 8 characters. Your password can't be a commonly used password. Your password can't be entirely numeric."
-                class="pi pi-question-circle">
+          <span
+            pTooltip="Your password can't be too similar to your other personal information.Your password must contain at least 8 characters. Your password can't be a commonly used password. Your password can't be entirely numeric."
+            class="pi pi-question-circle">
           </span>
         </span>
         <div *ngIf="formErrors && formErrors.password1"
              class="alert">
-          <span *ngFor="let error of formErrors.password1">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.password1">{{ error.message }}<br></span>
         </div>
       </div>
 
@@ -43,7 +46,7 @@
         </span>
         <div *ngIf="formErrors && formErrors.password2"
              class="alert">
-          <span *ngFor="let error of formErrors.password2">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.password2">{{ error.message }}<br></span>
         </div>
       </div>
 
@@ -57,7 +60,7 @@
         </span>
         <div *ngIf="formErrors && formErrors.email"
              class="alert">
-          <span *ngFor="let error of formErrors.email">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.email">{{ error.message }}<br></span>
         </div>
       </div>
 
@@ -115,26 +118,29 @@
         <span class="p-float-label">
           <input class="form-field" id="orcid" type="text" pInputText formControlName="orcid">
           <label for="orcid">ORCID (optional)</label>
-          <span pTooltip="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM."
-                class="pi pi-question-circle">
+          <span
+            pTooltip="Optional. Your ORCID identifier from https://orcid.org/, e.g. 0000-0002-1825-0097. Will be used to identify you as the author if you publish results to zenodo through QA4SM."
+            class="pi pi-question-circle">
           </span>
         </span>
         <div *ngIf="formErrors && formErrors.orcid"
              class="alert">
-          <span *ngFor="let error of formErrors.orcid">{{error.message}}<br></span>
+          <span *ngFor="let error of formErrors.orcid">{{ error.message }}<br></span>
         </div>
       </div>
 
       <div *ngIf="!userData" class="py-3" style="max-width: 15rem; line-height: 1.2rem">
         <p-checkbox id="terms" formControlName="terms_consent" binary="true"></p-checkbox>
-        <label for="terms"> I accept the <a [routerLink]="['/terms']" target="_blank">terms, conditions and privacy policy</a>.</label>
+        <label for="terms"> I accept the <a [routerLink]="['/terms']" target="_blank">terms, conditions and privacy
+          policy</a>.</label>
       </div>
 
 
       <div *ngIf="!userData" class="py-3" style="line-height: 1.2rem">
         <span class="p-float-label">
-          <p-slider id="honeypot-user" formControlName="honeypot" ></p-slider>
-          <label for="honeypot-user" style="margin-top: -1rem"> Are you a real person? Slide the handle all the way to the right <span class="pi pi-angle-double-right"></span></label>
+          <p-slider id="honeypot-user" formControlName="honeypot"></p-slider>
+          <label for="honeypot-user" style="margin-top: -1rem"> Are you a real person? Slide the handle all the way to the right <span
+            class="pi pi-angle-double-right"></span></label>
         </span>
       </div>
 
@@ -153,10 +159,8 @@
               pButton
               type="submit"
               label="Save"
-              [disabled]="!userForm.valid && sliderValues.length > 5">
+      >
       </button>
-
-
     </form>
     <p>
       <button *ngIf="userData"
