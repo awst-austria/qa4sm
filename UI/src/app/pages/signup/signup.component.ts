@@ -1,4 +1,5 @@
 import {Component} from '@angular/core';
+import {SettingsService} from "../../modules/core/services/global/settings.service";
 
 @Component({
   selector: 'qa-signup',
@@ -7,5 +8,5 @@ import {Component} from '@angular/core';
 })
 export class SignupComponent{
 
-  constructor() { }
+  constructor(private settingsService: SettingsService) { }
 }

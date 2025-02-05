@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, input} from '@angular/core';
 
 @Component({
   selector: 'qa-maintenance-mode',
@@ -8,5 +8,5 @@ import {Component} from '@angular/core';
   styleUrl: './maintenance-mode.component.scss'
 })
 export class MaintenanceModeComponent {
-
+  action = input('');
 }
