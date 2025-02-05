@@ -134,7 +134,7 @@
                   (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
               </div>
 
-              <hr class="w-11 mt-2" style="opacity: 1.;">
+              <hr class="w-11 mt-2" style="opacity: 1.0;">
 
               <!--             temporal reference-->
                 <label for="temporal-reference"
@@ -150,7 +150,7 @@
                   [validationModel]="validationModel"
                   [referenceType]="'temporalReference$'"
                   (hoverOverDataset)="onHoverOverReferenceDataset($event)"/>
-      
+
 
                 <!--      Temporal matching-->
                 <label  for="temporal-matching"
@@ -266,11 +266,8 @@
 
       </div>
 
-      <div *ngIf="maintenanceMode" class="container text-center mb-5 mt-4" style="max-width: 40rem;">
-        <h1 class="jumbotron-heading">Maintenance...</h1>
-        <p class="lead text-muted">Sorry! Currently, you can't start new validations because we're doing maintenance on
-          the service. Please come back later.</p>
-      </div>
+
+      <qa-maintenance-mode *ngIf="maintenanceMode"></qa-maintenance-mode>
 
     </div>
     <qa-existing-validation *ngIf="isExistingValidationWindowOpen"
