@@ -1,11 +1,12 @@
 from django.db.models import Q, ExpressionWrapper, F, BooleanField
-
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import ModelSerializer
+from rest_framework.authentication import TokenAuthentication
 
 from api.views.auxiliary_functions import get_fields_as_list
 from validator.models import ValidationRun, CopiedValidations
@@ -154,6 +155,17 @@ def get_copied_validations(request, **kwargs):
     serializer = CopiedValidationRunSerializer(copied_run)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+def is_validation_finished(request, **kwargs):
+
+    val_run = get_object_or_404(ValidationRun, pk=kwargs['id'])
+    if not val_run:
+        return JsonResponse(status=status.HTTP_404_NOT_FOUND)
+
+    ifFinished = (val_run.progress == 100 and val_run.end_time is not None)
+    return JsonResponse({'validation_complete': ifFinished}, status=status.HTTP_200_OK)
 
 class ValidationRunSerializer(ModelSerializer):
     class Meta:

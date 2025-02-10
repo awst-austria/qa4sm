@@ -12,6 +12,14 @@ if [ ! -d "run_celery" ]; then
 fi
 
 cd $APP_DIR
+git submodule update --init --recursive  validator/fixtures
+git config --global --add safe.directory "$APP_DIR/validator/fixtures"
+cd "validator/fixtures"
+git checkout main
+
+cd $APP_DIR
+chown www-data:www-data -R "$APP_DIR/validator/fixtures"
+
 
 if [ ! -d "/var/log/valentina" ]; then
   mkdir /var/log/valentina

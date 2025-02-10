@@ -209,6 +209,7 @@ dependencies:
   - zipp=3.15.0
   - zlib=1.2.13
   - zstd=1.5.2
+  - libxcrypt
   - pip:
     - amqp==5.1.1
     - ascat==2.1.0
@@ -216,11 +217,11 @@ dependencies:
     - async-timeout==4.0.2
     - backports-zoneinfo==0.2.1
     - billiard==3.6.4.0
-    - c3s-sm==0.1.2
+    - c3s-sm==0.3
     - cadati==0.0.4
-    - cdsapi==0.6.1
+    - cdsapi==0.7.3
     - celery==5.2.7
-    - cf-xarray==0.8.1
+    - cf-xarray==0.8.4
     - cftime==1.6.2
     - click-didyoumean==0.3.0
     - click-plugins==1.1.1
@@ -242,11 +243,12 @@ dependencies:
     - entrypoints==0.4
     - esa_cci_sm==0.4.0
     - fasteners==0.18
+    - GitPython==3.1.44
     - gldas==0.7.0
     - h5netcdf==1.1.0
     - h5py==3.8.0
     - ismn==1.4.0
-    - joblib==1.2.0
+    - joblib==1.4.2
     - kombu==5.2.4
     - llvmlite==0.40.0
     - lxml==4.9.2
@@ -262,23 +264,23 @@ dependencies:
     - pygeobase==0.6.2
     - pygeogrids==0.4.2
     - pykdtree==1.3.7.post0
-    - pynetcf==0.5.0
+    - pynetcf==0.5.1
     - pyresample==1.26.1
-    - pytesmo==0.16.0
+    - pytesmo==0.16.1
     - pytest-cov==4.0.0
     - pytest-django==4.5.2
     - pytest-mpl==0.16.1
-    - qa4sm-preprocessing==0.2
-    - qa4sm-reader==0.9
+    - qa4sm-preprocessing==0.3
+    - qa4sm-reader==0.10
     - redis==4.5.5
-    - repurpose==0.9
+    - repurpose==0.13.1
     - ruamel-yaml==0.17.26
     - ruamel-yaml-clib==0.2.7
     - scikit-learn==1.2.2
     - seaborn==0.12.2
     - smap-io==0.5
     - smecv-grid==0.3
-    - smos==0.2
+    - smos==0.3
     - threadpoolctl==3.1.0
     - tqdm==4.65.0
     - trollsift==0.2.1

@@ -1,37 +1,19 @@
-<div class="flex flex-column pt-4">
-  <div class="w-12 text-center py-0 my-0">
-    <div class="text-2xl py-0 my-0 text-muted">
-      Temporal matching
-      <span class="pi pi-question-circle mb-1"
-            pTooltip="Select the size of the temporal matching window used to collocate the 'reference' and 'data' measurements in time.
-            The specified temporal window is centered on the reference measurements (i.e., with edges at +- half size distance from each considered measurement point).
-            NOTE: the size of the window influences the number of observations used in the validation and could lead to no results in case no matches are found."
-            tooltipPosition="bottom">
-      </span>
-    </div>
-  </div>
-  <hr class="w-11 pt-0 mt-0 featurette-divider">
-  <div class="flex flex-row w-12 py-5 align-content-center justify-content-start pl-4">
-      <div class="small-label w-4" style="max-width: 8rem">
-        <div class="p-fluid">
-          <div>Window size</div>
-        </div>
-      </div>
-      <div class="flex w-8 px-0 p-float-label align-content-center justify-content-start">
-          <p-inputNumber
-            id="windowSizeSelector"
-            inputId="windowSizeSelectorInput"
-            [showButtons]="true"
-            [maxFractionDigits]="0"
-            [suffix]="(temporalMatchingModel.size$|async) === 1 ? ' hour' : ' hours'"
-            [ngModel]="(temporalMatchingModel.size$|async) ? (temporalMatchingModel.size$|async) : getDefaultSize() "
-            (ngModelChange)="temporalMatchingModel.size$.next($event)"
-            [step]="1"
-            [min]="1"
-            [max]="24">
-          </p-inputNumber>
-          <label for="windowSizeSelectorInput">Select a size</label>
-      </div>
+<div class="grid align-content-center pt-2">
+  <div class="col" style="max-width: 100%">
+    <span class="p-float-label  mb-3 mt-3">
+      <p-inputNumber
+        id="temporalWindowSizeSelector"
+        inputId="windowSizeSelectorInput"
+        [showButtons]="true"
+        [maxFractionDigits]="0"
+        [suffix]="(temporalMatchingModel.size$|async) === 1 ? ' hour' : ' hours'"
+        [ngModel]="(temporalMatchingModel.size$|async) ? (temporalMatchingModel.size$|async) : getDefaultSize()"
+        (ngModelChange)="temporalMatchingModel.size$.next($event)"
+        [step]="1"
+        [min]="1"
+        [max]="24">
+      </p-inputNumber>
+      <label for="windowSizeSelectorInput">Select temporal window size</label>
+    </span>
   </div>
 </div>
-

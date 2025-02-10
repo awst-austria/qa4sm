@@ -22,7 +22,7 @@ def custom_exception_handler(exc, context):
     __logger = logging.getLogger(__name__)
     response = exception_handler(exc, context)
     if response is None:
-        __logger.error('Unhandled exception: ', exc)
+        __logger.error('Unhandled exception: %s', exc)
         return JsonResponse({'message': 'Unexpected error'}, status=500)
 
     return response

@@ -8,6 +8,7 @@ from pygeobase.io_base import GriddedBase
 
 from validator.models import DataFilter
 from validator.validation import globals
+from validator.validation.readers import ReaderWithTsExtension
 
 __logger = logging.getLogger(__name__)
 
@@ -127,7 +128,7 @@ def create_jobs(
     total_points = 0
 
     # if we've got data on a grid, process one cell at a time
-    if isinstance(reader, GriddedBase):
+    if isinstance(reader, GriddedBase) or isinstance(reader, ReaderWithTsExtension):
         cells = reader.grid.get_cells()
 
         jobs = []

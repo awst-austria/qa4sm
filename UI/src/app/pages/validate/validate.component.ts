@@ -56,6 +56,10 @@ import {CustomHttpError} from '../../modules/core/services/global/http-error.ser
 
 const MAX_DATASETS_FOR_VALIDATION = 6;  // TODO: this should come from either config file or the database
 
+//NOTE the maximum number of datasets is already defined in the backend, maybe it could be used here?
+// from validator.validation.globals import MAX_NUM_DS_PER_VAL_RUN;
+// const MAX_DATASETS_FOR_VALIDATION = MAX_NUM_DS_PER_VAL_RUN;
+
 @Component({
   selector: 'qa-validate',
   templateUrl: './validate.component.html',
@@ -125,6 +129,7 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     this.modalWindowService.watch().subscribe(state => {
       this.isExistingValidationWindowOpen = state === 'open';
     });
+
     this.route.queryParams.subscribe(params => {
       if (params.validation_id) {
         this.validationConfigService.getValidationConfig(params.validation_id).subscribe(
@@ -153,11 +158,12 @@ export class ValidateComponent implements OnInit, AfterViewInit {
         new BehaviorSubject<number>(null)),
       new ValidationPeriodModel(new BehaviorSubject<Date>(null), new BehaviorSubject<Date>(null)),
       [],
+      {intra_annual_metrics: false, intra_annual_type: "", intra_annual_overlap: null},
       new AnomaliesModel(
         new BehaviorSubject<string>(ANOMALIES_NONE),
         ANOMALIES_NONE_DESC,
-        new BehaviorSubject<Date>(null),
-        new BehaviorSubject<Date>(null)),
+        signal<number>(null),
+        signal<number>(null)),
       new TemporalMatchingModel(
         new BehaviorSubject<number>(null),
         'hours',
@@ -307,22 +313,24 @@ export class ValidateComponent implements OnInit, AfterViewInit {
     if (validationRunConfig.metrics) {
       validationRunConfig.metrics.forEach(metricDto => {
         this.validationModel.metrics.forEach(metricModel => {
-          if (metricModel.id === metricDto.id) {
-            metricModel.value$.next(metricDto.value);
+          if (metricModel.name === metricDto.id) {
+            metricModel.value = metricDto.value;
           }
         });
       });
     }
 
+    // Intra-Annual Metrics
+    this.validationModel.intraAnnualMetrics = validationRunConfig.intra_annual_metrics;
 
     // Anomalies
     if (validationRunConfig.anomalies_method != null) {
       this.anomaliesChild.setSelection(validationRunConfig.anomalies_method);
       if (validationRunConfig.anomalies_from != null) {
-        this.validationModel.anomalies.anomaliesFrom$.next(new Date(validationRunConfig.anomalies_from));
+        this.validationModel.anomalies.anomaliesFrom.set((new Date(validationRunConfig.anomalies_from)).getFullYear());
       }
       if (validationRunConfig.anomalies_to != null) {
-        this.validationModel.anomalies.anomaliesTo$.next(new Date(validationRunConfig.anomalies_to));
+        this.validationModel.anomalies.anomaliesTo.set((new Date(validationRunConfig.anomalies_to)).getFullYear());
       }
     }
 
@@ -749,9 +757,10 @@ export class ValidateComponent implements OnInit, AfterViewInit {
       max_lat: this.validationModel.spatialSubsetModel.maxLat$.getValue(),
       max_lon: this.validationModel.spatialSubsetModel.maxLon$.getValue(),
       metrics: metricDtos,
+      intra_annual_metrics: this.validationModel.intraAnnualMetrics,
       anomalies_method: this.validationModel.anomalies.method$.getValue(),
-      anomalies_from: this.validationModel.anomalies.anomaliesFrom$.getValue(),
-      anomalies_to: this.validationModel.anomalies.anomaliesTo$.getValue(),
+      anomalies_from: new Date(this.validationModel.anomalies.anomaliesFrom(), 0, 1),
+      anomalies_to: new Date(this.validationModel.anomalies.anomaliesTo(), 11, 31),
       scaling_method: this.validationModel.scalingMethod.methodName,
       scale_to: '0',
       name_tag: this.validationModel.nameTag$.getValue(),

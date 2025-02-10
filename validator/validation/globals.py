@@ -3,35 +3,38 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from validator.models import ValidationRun
+import qa4sm_reader.globals as qr_globals
 
 OUTPUT_FOLDER = settings.MEDIA_ROOT
 
-METRICS = {'R': 'Pearson\'s r',
-           'p_R': 'Pearson\'s r p-value',
-           'rho': 'Spearman\'s rho',
-           'p_rho': 'Spearman\'s rho p-value',
-           'RMSD': 'Root-mean-square deviation',
-           'BIAS': 'Bias (difference of means)',
-           'n_obs': '# observations',
-           'status': '# status',
-           'urmsd': 'Unbiased root-mean-square deviation',
-           'RSS': 'Residual sum of squares',
-           'mse': 'Mean square error',
-           'mse_corr': 'Mean square error correlation',
-           'mse_bias': 'Mean square error bias',
-           'mse_var': 'Mean square error variance', }
 
-METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_",
-                   "{metric}"]
+METRICS = qr_globals.METRICS
 
-TC_METRICS = {'snr': 'TC: Signal-to-noise ratio',
-              'err_std': 'TC: Error standard deviation',
-              'beta': 'TC: Scaling coefficient', }
+NON_METRICS = qr_globals.NON_METRICS
 
-TC_METRIC_TEMPLATE = ["overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
-                      "_{metric}",
-                      "_for_{id_met}-{ds_met}"]
+BAD_METRICS = qr_globals.BAD_METRICS
 
+METRIC_TEMPLATE = [
+    "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_", "{metric}"
+]
+
+TEMPORAL_SUB_WINDOW_SEPARATOR = qr_globals.TEMPORAL_SUB_WINDOW_SEPARATOR
+
+INTRA_ANNUAL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_METRIC_TEMPLATE
+
+INTRA_ANNUAL_TCOL_METRIC_TEMPLATE = qr_globals.INTRA_ANNUAL_TCOL_METRIC_TEMPLATE
+
+TC_METRICS = qr_globals.TC_METRICS
+
+TC_METRIC_TEMPLATE = [
+    "overview_{id_ref}-{ds_ref}_and_{id_sat}-{ds_sat}_and_{id_sat2}-{ds_sat2}",
+    "_{metric}", "_for_{id_met}-{ds_met}"
+]
+
+STABILITY_METRICS = qr_globals.STABILITY_METRICS
+#-----------------------------------------------------------------------------------------------------------------------
+#TODO: If a new dataset is added here, make sure to add it to `qa4sm_reader.globals.DATASETS` as well
+#-----------------------------------------------------------------------------------------------------------------------
 C3SC = 'C3S_combined'
 ISMN = 'ISMN'
 GLDAS = 'GLDAS'
@@ -49,6 +52,11 @@ SMOS_L3 = 'SMOS_L3'
 SMOS_L2 = 'SMOS_L2'
 SMAP_L2 = 'SMAP_L2'
 SMOS_SBPCA = 'SMOS_SBPCA'
+#-----------------------------------------------------------------------------------------------------------------------
+
+DATASETS = qr_globals.DATASETS
+
+MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 # dataset versions
 C3S_V201706 = 'C3S_V201706'
@@ -122,57 +130,39 @@ SMOS_SBPCA_sm = 'SMOS_SBPCA_sm'
 NOT_AS_REFERENCE = []
 
 # ValidationRun and Datasets fields for comparison when looking for a validation with the same settings
-VR_FIELDS = ['interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon', 'tcol',
-             'bootstrap_tcol_cis', 'anomalies', 'anomalies_from', 'anomalies_to', 'temporal_matching']
-DS_FIELDS = ['dataset', 'version', 'is_spatial_reference', 'is_temporal_reference']
+VR_FIELDS = [
+    'interval_from', 'interval_to', 'max_lat', 'min_lat', 'max_lon', 'min_lon',
+    'tcol', 'bootstrap_tcol_cis', 'anomalies', 'anomalies_from',
+    'anomalies_to', 'temporal_matching'
+]
+DS_FIELDS = [
+    'dataset', 'version', 'is_spatial_reference', 'is_temporal_reference'
+]
 
-IRREGULAR_GRIDS = {'SMAP_L3': 0.35,
-                   'SMOS_L3': 0.25,
-                   'SMOS_IC': 0.25,
-                   'ASCAT': 0.1,
-                   'SMOS_L2': 0.135,  # 15km
-                   'SMOS_SBPCA': 0.135,  # 15km
-                   'SMAP_L2': 0.35, }  # 35km
+IRREGULAR_GRIDS = {
+    'SMAP_L3': 0.35,
+    'SMOS_L3': 0.25,
+    'SMOS_IC': 0.25,
+    'ASCAT': 0.1,
+    'SMOS_L2': 0.135,  # 15km
+    'SMOS_SBPCA': 0.135,  # 15km
+    'SMAP_L2': 0.35,
+}  # 35km
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')
 
-METADATA_TEMPLATE = {'other_ref': None,
-                     'ismn_ref': {'clay_fraction': np.float32([np.nan]),
-                                  'climate_KG': np.array([' ' * 256]),
-                                  'climate_insitu': np.array([' ' * 256]),
-                                  'elevation': np.float32([np.nan]),
-                                  'instrument': np.array([' ' * 256]),
-                                  'latitude': np.float32([np.nan]),
-                                  'lc_2000': np.float32([np.nan]),
-                                  'lc_2005': np.float32([np.nan]),
-                                  'lc_2010': np.float32([np.nan]),
-                                  'lc_insitu': np.array([' ' * 256]),
-                                  'longitude': np.float32([np.nan]),
-                                  'network': np.array([' ' * 256]),
-                                  'organic_carbon': np.float32([np.nan]),
-                                  'sand_fraction': np.float32([np.nan]),
-                                  'saturation': np.float32([np.nan]),
-                                  'silt_fraction': np.float32([np.nan]),
-                                  'station': np.array([' ' * 256]),
-                                  'timerange_from': np.array([' ' * 256]),
-                                  'timerange_to': np.array([' ' * 256]),
-                                  'variable': np.array([' ' * 256]),
-                                  'instrument_depthfrom': np.float32([np.nan]),
-                                  'instrument_depthto': np.float32([np.nan]),
-                                  # only available for FRM4SM ISMN version(s)
-                                  'frm_class': np.array([' ' * 256]),
-                                  }
-                     }
+METADATA_TEMPLATE = qr_globals.METADATA_TEMPLATE
 
 INSTRUMENT_META = "instrument"
 MEASURE_DEPTH_FROM = "instrument_depthfrom"
 MEASURE_DEPTH_TO = "instrument_depthto"
-METADATA_PLOT_NAMES = {"Land cover classification": "metadata_lc_2010",
-                       "Climate classification": "metadata_climate_KG",
-                       "Soil type classification": "metadata_instrument_depth_and_soil_type",
-                       "FRM classification": "metadata_frm_class",
-                       }
+METADATA_PLOT_NAMES = {
+    "Land cover classification": "metadata_lc_2010",
+    "Climate classification": "metadata_climate_KG",
+    "Soil type classification": "metadata_instrument_depth_and_soil_type",
+    "FRM classification": "metadata_frm_class",
+}
 
 TEMP_MATCH_WINDOW = ValidationRun.TEMP_MATCH_WINDOW
 
@@ -182,6 +172,25 @@ SCALING_METHODS = ValidationRun.SCALING_METHODS
 USER_DATASET_MIN_ID = 200
 USER_DATASET_VERSION_MIN_ID = 500
 USER_DATASET_VARIABLE_MIN_ID = 500
+
+# netcdf compression means
+IMPLEMENTED_COMPRESSIONS = qr_globals.IMPLEMENTED_COMPRESSIONS
+ALLOWED_COMPRESSION_LEVELS = qr_globals.ALLOWED_COMPRESSION_LEVELS
+
+# intra-annual metrics related
+DEFAULT_TSW = qr_globals.DEFAULT_TSW
+TEMPORAL_SUB_WINDOW_NC_COORD_NAME = qr_globals.TEMPORAL_SUB_WINDOW_NC_COORD_NAME
+
+
+# default temporal sub windows
+TEMPORAL_SUB_WINDOWS = qr_globals.TEMPORAL_SUB_WINDOWS
+
+# overlap parameter interval definiton
+OVERLAP_MIN = 0
+OVERLAP_MAX = 185
+
+# max amount of datasets that can be compared in one validation run
+MAX_NUM_DS_PER_VAL_RUN = qr_globals.MAX_NUM_DS_PER_VAL_RUN
 
 ISMN_LIST_FILE_NAME = 'ismn_station_list.csv'
 GEOJSON_FILE_NAME = 'ismn_sensors.json'
