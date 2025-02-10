@@ -1,32 +1,40 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {UserFormComponent} from './user-form/user-form.component';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {InputTextModule} from 'primeng/inputtext';
-import {DropdownModule} from 'primeng/dropdown';
-import {TooltipModule} from 'primeng/tooltip';
-import {ButtonModule} from 'primeng/button';
-import {CheckboxModule} from 'primeng/checkbox';
-import {RouterModule} from '@angular/router';
-import {SliderModule} from 'primeng/slider';
-
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { SliderModule } from 'primeng/slider';
+import { TooltipModule } from 'primeng/tooltip';
+import { LoginComponent } from './login/login.component';
+import { UserFormComponent } from './user-form/user-form.component';
 
 @NgModule({
-  declarations: [UserFormComponent],
-  exports: [
+  declarations: [
+    LoginComponent,
     UserFormComponent
   ],
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        InputTextModule,
-        DropdownModule,
-        FormsModule,
-        TooltipModule,
-        ButtonModule,
-        CheckboxModule,
-        RouterModule,
-        SliderModule,
-    ]
+  exports: [
+    LoginComponent,
+    UserFormComponent
+  ],
+  imports: [
+    ButtonModule,
+    CheckboxModule,
+    CommonModule,
+    DialogModule,
+    DropdownModule,
+    FormsModule,
+    InputTextModule,
+    PasswordModule,
+    ReactiveFormsModule,
+    RouterModule,
+    SliderModule,
+    TooltipModule
+  ]
 })
 export class UserModule { }

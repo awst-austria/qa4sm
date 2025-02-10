@@ -24,31 +24,29 @@ import {
 } from './pages/password-reset-validate-token/password-reset-validate-token.component';
 import {MyDatasetsComponent} from './pages/my-datasets/my-datasets.component';
 import {UserDataGuidelinesComponent} from './pages/user-data-guidelines/user-data-guidelines.component';
-import {LoginPageComponent} from './pages/login-page/login-page.component';
 import {ContactUsComponent} from './pages/contact-us/contact-us.component';
 
 
-const routes: Routes = [
+export const routes: Routes = [
   {path: '', redirectTo: '/home', pathMatch: 'full'},
   {path: 'home', component: HomeComponent},
-  {path: 'login', component: LoginPageComponent},
   {path: 'validate', component: ValidateComponent, resolve: {datasets: DatasetResolver}},
   {path: 'validation-result/:validationId', component: ValidationResultComponent},
-  {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard]},
-  {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard]},
+  {path: 'my-validations', component: ValidationsComponent, canActivate: [AuthGuard], data: {requiresAuth: true}},
+  {path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard], data: {requiresAuth: true}},
   {path: 'published-validations', component: PublishedValidationsComponent},
   {path: 'help', component: HelpComponent},
   {path: 'terms', component: TermsComponent},
   {path: 'datasets', component: DatasetInfoComponent},
-  {path: 'comparison', component: ComparisonComponent, canActivate: [AuthGuard]},
-  {path: 'signup', component: SignupComponent},
-  {path: 'signup-complete', component: SignupCompleteComponent},
+  {path: 'comparison', component: ComparisonComponent, canActivate: [AuthGuard], data: {requiresAuth: true}},
+  {path: 'signup', component: SignupComponent, canActivate: [AuthGuard], data: {requiresAuth: false}},
+  {path: 'signup-complete', component: SignupCompleteComponent, canActivate: [AuthGuard], data: {requiresAuth: false}},
   {path: 'deactivate-user-complete', component: DeactivateUserCompleteComponent},
   {path: 'password-reset', component: PasswordResetComponent},
   {path: 'password-reset-done', component: PasswordResetDoneComponent},
   {path: 'password-reset/:token', component: PasswordResetValidateTokenComponent},
   {path: 'set-password', component: SetPasswordComponent},
-  {path: 'my-datasets', component: MyDatasetsComponent, canActivate: [AuthGuard]},
+  {path: 'my-datasets', component: MyDatasetsComponent, canActivate: [AuthGuard], data: {requiresAuth: true}},
   {path: 'user-data-guidelines', component: UserDataGuidelinesComponent},
   {path: 'contact-us', component: ContactUsComponent},
   {path: '**', component: ErrorPageComponent}

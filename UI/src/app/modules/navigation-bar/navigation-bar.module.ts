@@ -5,7 +5,8 @@ import {RouterModule} from '@angular/router';
 import {MenubarModule} from 'primeng/menubar';
 import {NavigationFooterComponent} from './components/navigation-footer/navigation-footer.component';
 import {ImageModule} from 'primeng/image';
-
+import {DialogModule} from 'primeng/dialog';
+import { UserModule } from '../user/user.module';
 
 @NgModule({
   declarations: [NavigationBarComponent, NavigationFooterComponent],
@@ -17,7 +18,9 @@ import {ImageModule} from 'primeng/image';
         CommonModule,
         RouterModule,
         MenubarModule,
-        ImageModule
+        ImageModule,
+        DialogModule,
+        UserModule
     ]
 })
 export class NavigationBarModule {

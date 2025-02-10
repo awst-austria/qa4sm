@@ -1,9 +1,11 @@
-import {Component, HostListener, OnInit, signal} from '@angular/core';
+import {Component, HostListener, OnInit, signal, ViewChild} from '@angular/core';
 import {MenuItem} from 'primeng/api';
 import {AuthService} from '../../../core/services/auth/auth.service';
 import {Event, NavigationEnd, Router} from '@angular/router';
 import {ToastService} from '../../../core/services/toast/toast.service';
 import {SettingsService} from '../../../core/services/global/settings.service';
+import {LoginComponent} from 'src/app/modules/user/login/login.component';
+import {AuthGuard} from 'src/app/auth.guard';
 
 @Component({
   selector: 'qa-navigation-bar-header',
@@ -88,9 +90,7 @@ export class NavigationBarComponent implements OnInit {
   loginMenuItem: MenuItem = {
     label: 'Log in',
     icon: 'pi pi-fw pi-sign-in',
-    routerLink: ['login'],
-    command: () => this.setPreviousUrl('user-profile'),
-    visible: !this.authService.authenticated.value
+    command: () => this.authService.switchLoginModal(true)
   };
 
   logoutMenuItem: MenuItem = {label: 'Log out', icon: 'pi pi-fw pi-sign-out', command: () => this.logout()};
@@ -117,6 +117,10 @@ export class NavigationBarComponent implements OnInit {
   maxWindowWidthForSquareLogo = 960;
   noLogoWindowWidth = 660;
 
+  showLoginModal = false;
+  @ViewChild(LoginComponent) loginComponent: LoginComponent;
+
+
   constructor(private authService: AuthService,
               private router: Router,
               private toastService: ToastService,
@@ -128,6 +132,9 @@ export class NavigationBarComponent implements OnInit {
       }
     });
 
+    this.authService.showLoginModal$.subscribe(
+      (state: {show: boolean, message?: string}) => this.showLoginModal = state.show
+    );
     this.updateLogo(window.innerWidth);
   }
 
@@ -140,6 +147,12 @@ export class NavigationBarComponent implements OnInit {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.updateLogo(event.target.innerWidth)
+  }
+
+
+  onLoginSuccess() {
+    // Hide the login modal window on successful login
+    this.authService.switchLoginModal(false);   
   }
 
   private updateLogo(windowWidth: number): void {
@@ -172,27 +185,21 @@ export class NavigationBarComponent implements OnInit {
     ];
   }
 
-  logoutObserver = {
-    next: (result) => this.onLogoutNext(result),
-    error: () => this.toastService.showErrorWithHeader('Something went wrong.',
-      'We could not log you out. Please try again or contact our support team.')
-  }
-
-  onLogoutNext(result: any): void{
-    this.setPreviousUrl('');
-    if (result) {// Successful logout
-    this.router.navigate(['home'])
-      .then(() => this.toastService.showSuccessWithHeader('Logout', 'Successful logout'));
-  } else {
-      // this part should be removed when the logout subscription is removed from the service
-      this.toastService.showErrorWithHeader('Something went wrong.',
-        'We could not log you out. Please try again or contact our support team.')
-    }
-  }
-
   logout(): void {
-    this.authService.logout().subscribe(this.logoutObserver);
+    this.authService.logout().subscribe({       
+      next: () => {
+        this.setPreviousUrl('');
+        this.toastService.showSuccessWithHeader('Logout', 'Successful logout');
+      },
+      error: () => {
+        this.toastService.showErrorWithHeader(
+          'Something went wrong.',
+          'We could not log you out. Please try again or contact our support team.'
+        );
+      }
+    });
   }
+
 
   setPreviousUrl(prevUrl: string): void {
     this.authService.setPreviousUrl(prevUrl);
