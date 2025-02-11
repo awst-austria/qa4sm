@@ -267,7 +267,8 @@ dependencies:
     - python-dateutil==2.9.0.post0
     - pytz==2024.1
     - pyyaml==6.0.2
-    - git+https://github.com/awst-austria/qa4sm-reader.git@check-master
+    - qa4sm-reader==0.11
+    - git+https://github.com/awst-austria/qa4sm-preprocessing.git@update-env
     - redis==5.2.0
     - requests==2.32.3
     - scipy==1.14.1

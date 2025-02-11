@@ -44,7 +44,6 @@ jobs:
         run: |
           conda activate qa4sm
           pip install --no-deps smos==0.3.1
-          pip install --no-deps qa4sm-preprocessing==0.3
       - name: Print environment infos
         run: |
           conda info -a
