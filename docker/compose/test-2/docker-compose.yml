@@ -31,6 +31,7 @@ services:
       QA4SM_DB_USER: "${QA4SM_DB_USER}"
       QA4SM_DB_PASSWORD: "${QA4SM_DB_PASSWORD}"
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
+      QA4SM_INSTANCE: "${QA4SM_INSTANCE}"
 
     volumes:
       - type: bind
@@ -66,6 +67,7 @@ services:
     environment:
       QA4SM_DB_HOST: "${QA4SM_DB_HOST}"
       QA4SM_CELERY_WORKERS: "${QA4SM_WORKER_THREAD_PER_NODE}"
+      QA4SM_INSTANCE: "${QA4SM_INSTANCE}"
     volumes:
       - type: bind
         source: "${QA4SM_WORKSPACE}celery-w1/log"
