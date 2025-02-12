@@ -19,7 +19,7 @@ git config --global --add safe.directory "$APP_DIR/validator/fixtures"
 
 git submodule update --init --remote  validator/fixtures
 
-
+cd "validator/fixtures"
 if [[ "$QA4SM_INSTANCE" == "TEST" ]]; then
     git fetch origin
     git switch test-branch || git checkout -b test-branch origin/test-branch
