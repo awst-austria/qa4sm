@@ -16,9 +16,7 @@ cd $APP_DIR
 git config --global --add safe.directory $APP_DIR
 git config --global --add safe.directory "$APP_DIR/validator/fixtures"
 
-git submodule update --init --recursive  validator/fixtures
-cd "validator/fixtures"
-git checkout main
+git submodule update --init --remote  validator/fixtures
 
 cd $APP_DIR
 chown www-data:www-data -R "$APP_DIR/validator/fixtures"
