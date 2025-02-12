@@ -78,7 +78,8 @@ def update_fixture_in_github(request):
     :param request: The HTTP request object.
     :return: A JSON response indicating success or failure.
     """
-    branch_name = 'main' #'main' - nominally will be main, let's test it for now
+    is_production = (sub not in settings.SITE_URL for sub in ['test', 'localhost'])
+    branch_name = 'main' if is_production else 'test-branch'
     file_name = 'versions.json' # it will be run in the submodule directly, so the file name is enough
     commit_message = 'Version fixture updated'
 
