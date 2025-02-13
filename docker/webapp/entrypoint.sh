@@ -4,6 +4,7 @@ set -x
 APP_DIR="/var/lib/qa4sm-web-val/valentina"
 PGPASSWORD="$POSTGRES_PASSWORD"
 ADMIN_PASS="12admin34"
+QA4SM_INSTANCE="$QA4SM_INSTANCE"
 
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
@@ -17,9 +18,13 @@ cd $APP_DIR
 git config --global --add safe.directory $APP_DIR
 git config --global --add safe.directory "$APP_DIR/validator/fixtures"
 
-git submodule update --init --recursive  validator/fixtures
+git submodule update --init --remote  validator/fixtures
+
 cd "validator/fixtures"
-git checkout main
+if [[ "$QA4SM_INSTANCE" == "TEST" ]]; then
+    git fetch origin
+    git switch test-branch || git checkout -b test-branch origin/test-branch
+fi
 
 cd $APP_DIR
 chown www-data:www-data -R "$APP_DIR/validator/fixtures"
