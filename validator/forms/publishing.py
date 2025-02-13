@@ -83,7 +83,7 @@ class PublishingForm(forms.Form):
         if not self.is_valid():
             raise Exception("Invalid form content, unable to render metadata")
 
-        keyword_delimiter = reg_compile("[\s]*,[\s]*")
+        keyword_delimiter = reg_compile(r"[\s]*,[\s]*")
         keywords = []
 
         if self.cleaned_data['keywords']:

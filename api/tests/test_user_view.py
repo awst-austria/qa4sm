@@ -197,15 +197,57 @@ class TestUserView(TestCase):
         assert new_user
         assert not new_user.is_active # the account has been created but not activated
 
+    def test_update_password(self):
+        # change your password
+        password_update_url = reverse('Password Update')
+        self.client.login(**self.auth_data)
+
+        old_password = User.objects.get(username=self.auth_data['username']).password
+        user_data = {
+            'old_password': self.auth_data['password'],
+            'new_password': 'myNewWordPass',
+            'confirm_password': 'myNewWordPass',
+        }
+
+        response = self.client.post(password_update_url, user_data, format='json')
+        assert response.status_code == 200
+        assert User.objects.get(username=self.auth_data['username']).password != old_password
+
+        user_data_wrong_password = {
+            'old_password': 'notTheProperPassword',
+            'new_password': 'myNewWordPass',
+            'confirm_password': 'myNewWordPass',
+        }
+
+        response = self.client.post(user_data_wrong_password, user_data, format='json')
+        assert response.status_code == 404
+
+
+        user_data_non_matching_passwords = {
+            'old_password': 'myNewWordPass',
+            'new_password': 'brandNewPassword1209',
+            'confirm_password': 'almostTheSame',
+        }
+
+        response = self.client.post(user_data_non_matching_passwords, user_data, format='json')
+        assert response.status_code == 404
+
+        user_data_not_appropriate_password= {
+            'old_password': 'myNewWordPass',
+            'new_password': '12345',
+            'confirm_password': '12345',
+        }
+
+        response = self.client.post(user_data_not_appropriate_password, user_data, format='json')
+        assert response.status_code == 404
+
+
     def test_user_update(self):
         user_update_url = reverse('User update')
         self.client.login(**self.auth_data)
 
         # correct data - no password change
         user_data = {
-            'username': self.auth_data['username'],
-            'password1': '',
-            'password2': '',
             'email': 'geralt@awst.at',
             'first_name': 'Geralt',
             'last_name': 'TheWitcher',
@@ -221,9 +263,6 @@ class TestUserView(TestCase):
 
         # remove all non required data
         user_data = {
-            'username': self.auth_data['username'],
-            'password1': '',
-            'password2': '',
             'email': 'geralt@awst.at',
             'first_name': '',
             'last_name': '',
@@ -237,30 +276,8 @@ class TestUserView(TestCase):
         assert response.status_code == 200
         assert User.objects.get(username=self.auth_data['username']).first_name == ''
 
-        # change your password
-        old_password = User.objects.get(username=self.auth_data['username']).password
-        user_data = {
-            'username': self.auth_data['username'],
-            'password1': 'myNewWordPass',
-            'password2': 'myNewWordPass',
-            'email': 'geralt@awst.at',
-            'first_name': '',
-            'last_name': '',
-            'organisation': '',
-            'country': '',
-            'orcid': '',
-            'terms_consent': True
-        }
-
-        response = self.client.patch(user_update_url, user_data, format='json')
-        assert response.status_code == 200
-        assert User.objects.get(username=self.auth_data['username']).password != old_password
-
         # try to remove email
         user_data = {
-            'username': self.auth_data['username'],
-            'password1': '',
-            'password2': '',
             'email': '',
             'first_name': '',
             'last_name': '',
@@ -276,9 +293,6 @@ class TestUserView(TestCase):
 
         # try to introduce wrong orcid
         user_data = {
-            'username': self.auth_data['username'],
-            'password1': '',
-            'password2': '',
             'email': 'geralt@awst.at',
             'first_name': '',
             'last_name': '',

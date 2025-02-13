@@ -5,8 +5,10 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import status, serializers
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
-
-from api.views.user_view import UserSerializer
+from rest_framework.serializers import ModelSerializer
+from rest_framework.fields import DateTimeField, CharField
+from django_countries.serializer_fields import CountryField
+from validator.models import User
 
 # Predefined response bodies
 resp_invalid_credentials = JsonResponse({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -79,3 +81,32 @@ class LoginDtoSerializer(serializers.Serializer):
 
     class Meta:
         model = LoginDto
+
+
+
+class UserSerializer(ModelSerializer):
+    last_login = DateTimeField(read_only=True)
+    date_joined = DateTimeField(read_only=True)
+    password = CharField(write_only=True)
+    country = CountryField()
+
+    class Meta:
+        model = User
+        fields = ['username',
+                  'password',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'organisation',
+                  'last_login',
+                  'date_joined',
+                  'country',
+                  'orcid',
+                  'id',
+                  'copied_runs',
+                  'space_limit',
+                  'space_limit_value',
+                  'space_left',
+                  'is_staff',
+                  'is_superuser',
+                  'auth_token']

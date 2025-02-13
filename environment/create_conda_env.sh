@@ -71,13 +71,13 @@ fi
 export PATH="$MINICONDA_PATH/bin:$PATH"
 
 # echo "Creating python virtual environment in $PYTHON_ENV_DIR"
-conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.8 numpy scipy pandas cython pytest pip matplotlib pyproj django=3.2 pyresample pygrib shapely cartopy xarray dask
+conda create --yes --prefix $PYTHON_ENV_DIR -c conda-forge python=3.12 numpy>=2.0.0 scipy pandas>=2 cython pytest pip matplotlib pyproj django pyresample pygrib shapely cartopy xarray>=2025.01.2 dask
 source activate $PYTHON_ENV_DIR
 
 # pip uninstall --yes shapely
 # pip install --no-binary :all: shapely
 pip install sqlparse
-pip install pynetcf
+pip install sqlparse
 pip install ascat
 pip install c3s_sm
 pip install esa_cci_sm
@@ -100,10 +100,13 @@ pip install --upgrade --force-reinstall netcdf4
 pip install "pytesmo>=0.16.0"
 pip install "ismn>=1.3.2"
 pip install requests
-pip install "qa4sm-reader>=0.9.0"
+pip install git+https://github.com/awst-austria/qa4sm-reader.git@check-master
 pip install "qa4sm-preprocessing>=0.2.0"
 pip install djangorestframework
 pip install django_rest_passwordreset
+pip install "numpy>=2.0.0"
+pip install "pandas>=2"
+pip install GitPython
 
 cd $TEMP_DIR
 

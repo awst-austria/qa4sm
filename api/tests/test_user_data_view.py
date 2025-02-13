@@ -236,7 +236,7 @@ class TestUploadUserDataView(TransactionTestCase):
             reverse(self.get_user_file_by_id_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
 
         assert response.status_code == 404
-        assert response.json().get('detail') == 'Not found.'
+        assert response.json().get('detail') == 'No UserDatasetFile matches the given query.'
 
         self.client.logout()
         self.client.login(**self.auth_data)
@@ -281,7 +281,7 @@ class TestUploadUserDataView(TransactionTestCase):
             reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
 
         assert response.status_code == 404
-        assert response.json().get('detail') == 'Not found.'
+        assert response.json().get('detail') == 'No UserDatasetFile matches the given query.'
 
         delete_response = self.client.delete(
             reverse(self.delete_data_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
@@ -331,7 +331,7 @@ class TestUploadUserDataView(TransactionTestCase):
             reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: '00000000-6c36-0000-0000-599e9a3840ca'}))
 
         assert delete_response.status_code == 404
-        assert delete_response.json().get('detail') == 'Not found.'
+        assert delete_response.json().get('detail') == 'No UserDatasetFile matches the given query.'
 
         delete_response = self.client.delete(
             reverse(self.delete_file_only_url_name, kwargs={URL_FILE_UUID: file_entry_id}))
