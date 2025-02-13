@@ -71,7 +71,7 @@ fi
 if [ "$DB_UPDATE" = "TRUE" ]; then
     echo "Updating DB from dump..."
     if [ -f "/var/lib/qa4sm-web-val/valentina/db_dump/$DB_DUMP_NAME" ]; then
-        psql -h qa4sm-db -p 5432 -U postgres -d $QA4SM_DB_NAME -q -f "/var/lib/qa4sm-web-val/valentina/db_dump/$DB_DUMP_NAME"
+        psql -h qa4sm-db -p 5432 -U $QA4SM_DB_USER -d $QA4SM_DB_NAME -q -f "/var/lib/qa4sm-web-val/valentina/db_dump/$DB_DUMP_NAME"
         NEW_DB="FALSE"
         echo "DB dump uploaded successfully."
     else
