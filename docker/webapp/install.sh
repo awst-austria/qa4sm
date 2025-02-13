@@ -6,6 +6,7 @@ APP_DIR="/var/lib/qa4sm-web-val/valentina"
 LOG_DIR="/var/log/valentina"
 LOG_FILE="$LOG_DIR/valentina.log"
 mkdir -p "$APP_DIR"
+mkdir "$APP_DIR/db_dump"
 mkdir $LOG_DIR
 touch $LOG_FILE
 chown root:www-data -R $LOG_DIR
@@ -21,6 +22,7 @@ a2ensite qa4sm-app
 . /opt/miniconda/etc/profile.d/conda.sh
 conda activate /var/lib/qa4sm-web-val/virtenv
 pip install mod_wsgi
+pip install --no-deps smos==0.3.1
 mod_wsgi-express module-config
 # a2dismod wsgi
 # rm /usr/lib/apache2/modules/mod_wsgi.so

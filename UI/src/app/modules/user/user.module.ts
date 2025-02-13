@@ -9,6 +9,7 @@ import {ButtonModule} from 'primeng/button';
 import {CheckboxModule} from 'primeng/checkbox';
 import {RouterModule} from '@angular/router';
 import {SliderModule} from 'primeng/slider';
+import {MaintenanceModeComponent} from "../core/maintenance-mode/maintenance-mode.component";
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import {SliderModule} from 'primeng/slider';
         CheckboxModule,
         RouterModule,
         SliderModule,
+        MaintenanceModeComponent,
     ]
 })
 export class UserModule { }
