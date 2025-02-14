@@ -478,6 +478,7 @@ class TestModifyValidationView(TestCase):
         assert response.status_code == 200
         assert len(self.test_user.copied_runs.all()) == 0
 
+
     def test_delete_result(self):
         delete_validation_url = reverse('Delete validation', kwargs={'result_uuid': self.run_id})
 
@@ -485,20 +486,24 @@ class TestModifyValidationView(TestCase):
         self.run.doi = '19282843'
         self.run.save()
 
-        response = self.client.delete(delete_validation_url)
+        response = self.client.patch(delete_validation_url)
 
         assert response.status_code == 405
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         self.run.doi = ''
         self.run.save()
 
         # someone else's validation
         self.client.login(**self.alt_data)
-        response = self.client.delete(delete_validation_url)
+        response = self.client.patch(delete_validation_url)
 
         assert response.status_code == 403
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         # non-existing validation
         self.client.login(**self.auth_data)  # getting back to the right user
@@ -506,18 +511,24 @@ class TestModifyValidationView(TestCase):
 
         assert response.status_code == 404
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         # wrong method
         response = self.client.post(delete_validation_url)
 
         assert response.status_code == 405
         assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation still there
+        assert not ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag false  
+        assert os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files still there 
 
         # finally should work
-        response = self.client.delete(delete_validation_url)
+        response = self.client.patch(delete_validation_url)
 
         assert response.status_code == 200
-        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 0  # not there anymore
+        assert len(ValidationRun.objects.filter(pk=self.run_id)) == 1  # validation config info still there 
+        assert ValidationRun.objects.filter(pk=self.run_id).isRemoved()  # validation isRemoved flag true  
+        assert not os.path.exists(os.path.dirname(ValidationRun.objects.filter(pk=self.run_id).output_file.path))  # output files deleted properly
 
     def test_delete_multiple_results(self):
         create_default_validation_without_running(self.test_user)
@@ -535,10 +546,13 @@ class TestModifyValidationView(TestCase):
             delete_validation_url += f'id={id}&'
         delete_validation_url = delete_validation_url.rstrip('&')
 
-        response = self.client.delete(delete_validation_url)
+        response = self.client.post(delete_validation_url)
 
         assert response.status_code == 200
-        assert len(ValidationRun.objects.all()) == 2  # 2 left, one belonging to othe user, second one published.
+        assert len(ValidationRun.objects.all()) == 4  # assert all 4 still exist
+        assert sum(run.isRemoved() for run in ValidationRun.objects.all()) == 2  # assert 2 have been removed 
+        assert sum(os.path.exists(os.path.dirname(run.output_file.path)) for run in ValidationRun.objects.all()) == 2 # assert 2 output files have been deleted 
+
 
     def test_get_publishing_form(self):
         get_publishing_form_url = reverse('Get publishing form')
