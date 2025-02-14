@@ -1552,6 +1552,7 @@ class TestValidation(TestCase):
         assert ts3.index.size == ts3.index.drop_duplicates().size
 
     def test_readers(self):
+
         start_time = time.time()
 
         datasets = Dataset.objects.all()
