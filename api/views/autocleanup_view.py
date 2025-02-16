@@ -91,7 +91,7 @@ def auto_cleanup():
 @permission_classes([IsAuthenticated, IsAdminUser])
 @authentication_classes([TokenAuthentication])
 def run_auto_cleanup_script(request): 
-    if str(request.user.auth_token):# == settings.ADMIN_ACCESS_TOKEN:
+    if str(request.user.auth_token) == settings.ADMIN_ACCESS_TOKEN:
         try:
             auto_cleanup()
         except Exception as e:
