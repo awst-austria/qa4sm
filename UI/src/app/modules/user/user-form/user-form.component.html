@@ -55,6 +55,9 @@
                 class="pi pi-question-circle">
           </span>
         </span>
+        <div *ngIf="userForm.get('email').errors?.emailTaken" class="alert">
+          This email address is already in use
+        </div>
         <div *ngIf="formErrors && formErrors.email"
              class="alert">
           <span *ngFor="let error of formErrors.email">{{error.message}}<br></span>

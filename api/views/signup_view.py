@@ -1,11 +1,19 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 
 from api.dto import Dto
 
 User = get_user_model()
 
+@api_view(['GET'])
+@permission_classes([AllowAny])  
+def check_email(request, email):
+    exists = User.objects.filter(email=email).exists()
+    available = not exists
+    return Response(available)
 
 class UserDto(Dto):
     """
@@ -44,13 +52,13 @@ class UserSignupSerializer(serializers.Serializer):
     UserModelSerializer cannot be used for signup.
     """
     password = serializers.CharField(write_only=True, required=True)
-    username = serializers.CharField(required=True, unique=True, validators=[UniqueValidator(queryset=User.objects.all(), message="This username is already in use.")])
-    email = serializers.EmailField(required=True, unique=True, validators=[UniqueValidator(queryset=User.objects.all(), message="This email is already in use, if you require help please contact the adminisators.")])
+    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
     first_name = serializers.CharField()
     last_name = serializers.CharField()
     organisation = serializers.CharField()
     country = serializers.CharField()
-    orcid = serializers.CharField(unique=True, validators=[UniqueValidator(queryset=User.objects.all(), message="This ORCID is already in use, if you require help please contact the adminisators.")])
+    orcid = serializers.CharField()
     terms_consent = serializers.BooleanField(required=True)
     date_joined = serializers.DateField(read_only=True)
     last_login = serializers.DateTimeField(read_only=True)

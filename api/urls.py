@@ -30,6 +30,7 @@ from api.views.support_request_view import *
 from api.views.custom_dataset_view import *
 from rest_framework.authtoken import views
 from api.views.autocleanup_view import run_auto_cleanup_script
+from api.views.signup_view import check_email
 
 # schema_view = get_schema_view(
 #     openapi.Info(
@@ -106,6 +107,7 @@ urlpatterns = [
     path('validation-runs-for-comparison', get_validations_for_comparison, name='Get validations for comparison'),
     path('country-list', get_list_of_countries, name='List of countries'),
     path('sign-up', signup_post, name='Sign up'),
+    re_path(r'^auth/check-email/(?P<email>[\w.@+-]+)$', check_email, name='check-email'),
     path('user-update', user_update, name='User update'),
     path('user-delete', user_delete, name='User delete'),
     path('settings', backend_settings, name="Settings"),
