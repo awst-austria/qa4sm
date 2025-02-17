@@ -1,4 +1,4 @@
-from django.conf.urls import re_path
+from django.urls import re_path
 from django.urls import path, include
 
 from api.views.data_filter_view import data_filter, data_parameterised_filter, data_filter_by_datasetversion
