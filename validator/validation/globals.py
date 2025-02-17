@@ -104,6 +104,7 @@ SMOSL3_Level3_ASC = 'SMOSL3_v339_ASC'
 SMOSL2_700 = 'SMOSL2_v700'
 SMAPL2_V8 = 'SMAPL2_V8'
 SMOS_SBPCA_v724 = 'SMOS_SBPCA_v724'
+V781_FinalMetrics = 'V781_FinalMetrics'
 
 # dataset data variables PRETTY NAMES
 C3S_sm = 'C3S_sm'
@@ -146,8 +147,8 @@ IRREGULAR_GRIDS = {
     'ASCAT': 0.1,
     'SMOS_L2': 0.135,  # 15km
     'SMOS_SBPCA': 0.135,  # 15km
-    'SMAP_L2': 0.35,
-}  # 35km
+    'SMAP_L2': 0.35,  # 35km
+}
 
 START_TIME = datetime(1978, 1, 1).strftime('%Y-%m-%d')
 END_TIME = datetime.now().strftime('%Y-%m-%d')

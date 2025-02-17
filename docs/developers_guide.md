@@ -225,7 +225,7 @@ Start a celery worker with the shell script:
 
 Run the following:
 
-    python manage.py runserver
+    python manage.py runserver 0.0.0.0:8000
 
 Check the output of this command for the URL to point your browser to - e.g. <http://127.0.0.1:8000/>.
 
