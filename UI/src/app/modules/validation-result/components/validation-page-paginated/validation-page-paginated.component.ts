@@ -175,12 +175,10 @@ export class ValidationPagePaginatedComponent implements OnInit {
   }
 
   checkIfEnabled(valrun: ValidationrunDto): boolean {
-    let condition = valrun.is_unpublished;
+    let condition = valrun.is_unpublished && !valrun.is_archived;
 
     if (this.action$.value === 'unarchive') {
-      condition = condition && valrun.is_archived;
-    } else if (this.action$.value === 'archive') {
-      condition = condition && !valrun.is_archived;
+      condition = valrun.is_unpublished  && valrun.is_archived;
     }
 
     return condition;

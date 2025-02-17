@@ -24,22 +24,26 @@ jobs:
         shell: bash -l {0}
     strategy:
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.12']
         os: ["ubuntu-latest"]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: conda-incubator/setup-miniconda@v2
+      - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-update-conda: true
           python-version: ${{ matrix.python-version }}
           environment-file: environment/qa4sm_env.yml
           activate-environment: qa4sm # todo: must match with name in environment.yml
+      - name: Activate Environment
+        run: |
+          conda activate qa4sm
+          pip install --no-deps smos==0.3.1
       - name: Print environment infos
         run: |
           conda info -a
@@ -47,8 +51,6 @@ jobs:
           pip list
           which pip
           which python
-      - name: Activate Environment
-        run: conda activate qa4sm
       - name: Apply needed settings
         run: |
           bash ./init_config.sh test
