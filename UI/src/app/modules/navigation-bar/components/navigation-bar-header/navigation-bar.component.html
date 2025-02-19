@@ -9,6 +9,11 @@
   <p-menubar [model]="items" [ngClass]="{'lg:w-10': !isHomePage()}" autoDisplay="false">
   </p-menubar>
 </div>
+
+<div>
+  <qa-login (loggedIn)="onLoginSuccess()"></qa-login>
+</div>
+
 <div *ngIf="isMaintenancePossible"
      class="flex flex-column w-12 alert py-2 text-center align-content-center justify-content-center">
   <h5 class="pt-2">
